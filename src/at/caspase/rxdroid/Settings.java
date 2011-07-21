@@ -17,7 +17,7 @@ public enum Settings
 	{
 		// TODO
 		if(doseTime == Drug.TIME_EVENING)
-			return 20 * 3600 * 1000 + 15 * 60 * 1000;
+			return 21 * 3600 * 1000 + 45 * 60 * 1000;
 		
 		return beginHours[doseTime] * 3600 * 1000;		
 	}
@@ -37,7 +37,10 @@ public enum Settings
 		for(int doseTime : doseTimes)
 		{		
 			if(offset >= getDoseTimeBeginOffset(doseTime) && offset < getDoseTimeEndOffset(doseTime))
-				return doseTime;	
+			{
+				Log.d(TAG, "getDoseTime: active=" + doseTime);
+				return doseTime;
+			}
 		}
 		
 		Log.d(TAG, "getActiveDoseTime: none active");
@@ -78,6 +81,6 @@ public enum Settings
 	
 	public long getSnoozeTime()
 	{
-		return 1 * 60 * 1000;
+		return 10 * 1000;
 	}	
 }

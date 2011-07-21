@@ -34,11 +34,12 @@ public class Util {
     	}
     	
     	static long nowOffsetFromMidnight() {
-    		Time now = now();
-    		Date today = today();
-    		    		
-    		Log.d(TAG, "nowOffsetFromMidnight: now=" + now + "(" + now.getTime() +"), today=" + today + "(" + today.getTime() + ")");    		
+    		final Time now = now();
+    		final Date today = today();    		    		
+    			
     		long ret = now.getTime() - today.getTime();
+    		
+    		Log.d(TAG, "nowOffsetFromMidnight: now=" + now + "(" + now.getTime() +"), today=" + today + "(" + today.getTime() + ")");
     		Log.d(TAG, "nowOffsetFromMidnight: ret=" + ret);
     		return ret;
     	}

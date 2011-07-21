@@ -144,9 +144,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     			return true;
     		}
     		case MENU_DELETE:
-    			
-    			//mDbHelper.clearTable();
-    			//refresh();
+    			getHelper().dropTables();
     			return true;
     			
     		case MENU_DEBUG_FILL:
@@ -390,7 +388,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	if(shiftBy == 0)
     	{
     		if(newDate == null)
-    			mDate = new Date(System.currentTimeMillis());
+    			mDate = Util.DateTime.today();
     		else
     			mDate = newDate;    		
     		

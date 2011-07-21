@@ -17,6 +17,12 @@ import at.caspase.rxdroid.Database.Intake;
 import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 import com.j256.ormlite.dao.Dao;
 
+/**
+ * Primary notification service for handling 
+ * 
+ * @author caspase
+ *
+ */
 public class DrugNotificationService extends OrmLiteBaseService<Database.Helper> implements DatabaseWatcher
 {
 	private static final String TAG = DrugNotificationService.class.getName();
@@ -47,9 +53,10 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	@Override
 	public void onDestroy() 
 	{
+		super.onDestroy();
+		Log.d(TAG, "onDestroy");
 		// FIXME
-		mThread.interrupt();
-		
+		mThread.interrupt();		
 		Database.removeWatcher(this);
 	}
 
@@ -63,6 +70,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	@Override
 	public void onDrugCreate(Drug drug)
 	{
+		Log.d(TAG, "onDrugCreate");
 		restartThread();		
 	}
 
@@ -122,6 +130,9 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			@Override
 			public void run()
 			{
+				NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+				notificationManager.cancel(R.id.notification_intake);
+				
 				/* TODO
 				 * 
 				 * 1. query settings to determine begin of the next doseTime period & sleep 
@@ -137,11 +148,12 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				 * also install a BroadcastReceiver to monitor changes to the system time
 				 */
 				
-				int count = 0;
-				
+				int doseTime = -1;
+								
 				while(true)
 				{
-					final int doseTime = Settings.INSTANCE.getNextDoseTime();
+					if(doseTime == -1)
+						doseTime = Settings.INSTANCE.getActiveOrNextDoseTime();
 					
 					// TODO check supply levels
 					final Date today = Util.DateTime.today();
@@ -157,49 +169,58 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					
 					try
 					{
-						Log.d(TAG, "Will sleep " + millisUntilNextDoseTime + "ms");
-						Thread.sleep(millisUntilNextDoseTime);
-																		
-						while(Settings.INSTANCE.getActiveDoseTime() == doseTime)
+						if(millisUntilNextDoseTime > 0)
 						{
-							count = 0;
-							// FIXME this does not need to be determined every time							
-							for(Drug drug : drugs)
+							Log.d(TAG, "Will sleep " + millisUntilNextDoseTime + "ms");
+							Thread.sleep(millisUntilNextDoseTime);
+						}
+						else
+						{
+							// if the user marks a drug as taken, this thread will be restarted. in order to prevent a new
+							// notification from flashing up instantly, we'll snooze a little
+							Log.d(TAG, "Will snooze");
+							Thread.sleep(mSnoozeTime);
+						}
+						
+						int count = 0;
+						// FIXME this does not need to be determined every time							
+						for(Drug drug : drugs)
+						{
+							if(!drug.getDose(doseTime).equals(0))
 							{
-								if(drug.isActive() && !drug.getDose(doseTime).equals(0))
-								{
-									final List<Intake> intakes = Database.getIntakes(intakeDao, drug, today, doseTime);
-									if(intakes.isEmpty())
-										++count;
-								}
+								final List<Intake> intakes = Database.getIntakes(intakeDao, drug, today, doseTime);
+								if(intakes.isEmpty())
+									++count;
+								else
+									Log.d(TAG, "Not counting " + drug + ": " + intakes.size() + " intakes");
 							}
+						}
+						
+						if(count != 0)
+						{										
+							PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 							
-							if(count != 0)
-							{													
-								NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);					
-								PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-								
-								final CharSequence contentTitle = "RxDroid: Reminder";
-								final CharSequence contentText = "You have " + count + " prescriptions to take";
-								
-								Notification notification = new Notification(R.drawable.med_pill, "RxDroid", System.currentTimeMillis());
-								notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
-								notification.defaults |= Notification.DEFAULT_ALL;
-								
-								manager.cancel(R.id.notification_intake);
-								manager.notify(R.id.notification_intake, notification);
-								
-								if(Settings.INSTANCE.getDoseTimeBeginOffset(doseTime) - offset > mSnoozeTime)
-									Thread.sleep(mSnoozeTime);
-							}
-							else
-								break;
-						}						
+							final CharSequence contentTitle = "RxDroid: Reminder";
+							final CharSequence contentText = "You have " + count + " prescriptions to take";
+							
+							Notification notification = new Notification(R.drawable.med_pill, "RxDroid", System.currentTimeMillis());
+							notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
+							notification.defaults |= Notification.DEFAULT_ALL;
+							
+							Log.d(TAG, "Posting notification");
+							notificationManager.notify(R.id.notification_intake, notification);							
+							
+							Thread.sleep(mSnoozeTime);
+						}
+						else
+						{
+							Log.d(TAG, "No intakes remaining.");
+							doseTime = Settings.INSTANCE.getNextDoseTime();			
+						}
+							
 					}
 					catch (InterruptedException e)
 					{
-						Log.d(TAG, "Interrupted. Exiting.");
-						stopSelf();
 						break;
 					}
 				}

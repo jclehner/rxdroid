@@ -152,6 +152,14 @@ public class Database
 		}
 	}
 	
+	public static void dropDatabase(Helper helper)
+	{
+		helper.dropTables();
+		
+		for(DatabaseWatcher watcher : sWatchers)
+			watcher.onDatabaseDropped();
+	}
+	
 	public static List<Intake> getIntakes(Dao<Intake, Integer> dao, Drug drug, Date date, int doseTime)
 	{		
 		try
@@ -246,7 +254,7 @@ public class Database
 	    private int form;
 	    
 	    @DatabaseField(defaultValue = "true")
-	    private boolean active;
+	    private boolean active = true;
 	    
 	    // if mRefillSize == 0, mCurrentSupply should be ignored
 	    @DatabaseField(useGetSet = true)
@@ -459,7 +467,7 @@ public class Database
 		}
 
 		public Timestamp getTimestamp() {
-			return new Timestamp(date.getTime());
+			return new Timestamp(timestamp.getTime());
 		}
 
 		public int getDoseTime() {
@@ -499,12 +507,10 @@ public class Database
 		@Override
 		public void onCreate(SQLiteDatabase db, ConnectionSource cs) 
 		{
-		    Log.d("DatabaseHelper", "onCreate()");
-			try
+		    try
 			{
 				TableUtils.createTable(cs, Database.Drug.class);
-				TableUtils.createTable(cs, Database.Intake.class);
-				
+				TableUtils.createTable(cs, Database.Intake.class);				
 			}
 			catch(SQLException e)
 			{
@@ -515,13 +521,18 @@ public class Database
 		@Override
 		public void onUpgrade(SQLiteDatabase db, ConnectionSource cs, int oldVersion, int newVersion) 
 		{
-			try 
+			dropTables();
+			onCreate(db, cs);
+		}
+		
+		public void dropTables()
+		{			
+			try
 			{
-				TableUtils.dropTable(cs, Database.Drug.class, true);
-				TableUtils.dropTable(cs, Database.Intake.class, true);
-				onCreate(db, cs);
+				TableUtils.dropTable(getConnectionSource(), Database.Drug.class, true);
+				TableUtils.dropTable(getConnectionSource(), Database.Intake.class, true);
 			}
-			catch (SQLException e) 
+			catch (SQLException e)
 			{
 				throw new RuntimeException("Error while deleting tables", e);
 			}
