@@ -18,7 +18,7 @@ import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 import com.j256.ormlite.dao.Dao;
 
 /**
- * Primary notification service for handling 
+ * Primary notification service.
  * 
  * @author caspase
  *
@@ -28,18 +28,13 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	private static final String TAG = DrugNotificationService.class.getName();
 	
 	Thread mThread;
-	long mSnoozeTime;
+	// FIXME
+	final long mSnoozeTime = Settings.INSTANCE.getSnoozeTime();
 	
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
-		
-		Log.d(TAG, "onCreate");
-		restartThread();
-		
-		mSnoozeTime = Settings.INSTANCE.getSnoozeTime();
-		
 		Database.addWatcher(this);
 	}
 	
@@ -47,6 +42,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
 		super.onStartCommand(intent, flags, startId);
+		restartThread();
 		return START_STICKY;
 	}
 	
@@ -104,6 +100,14 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		restartThread();
 	}
 	
+	/**
+	 * (Re)starts the worker thread.
+	 * 
+	 * Calling this function will cause the service to consult the DB in order to 
+	 * determine when the next notification should be posted. Currently, the 
+	 * worker thread is restarted when <em>any</em> database changes occur (see
+	 * DatabaseWatcher) or when the user opens the app. 
+	 */	
 	private void restartThread()
 	{
 		final Dao<Drug, Integer> drugDao = getHelper().getDrugDao();
@@ -235,6 +239,4 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		Log.d(TAG, "Starting thread");
 		mThread.start();
 	}
-
-
 }

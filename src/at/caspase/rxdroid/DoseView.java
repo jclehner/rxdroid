@@ -1,7 +1,6 @@
 package at.caspase.rxdroid;
 
 import java.sql.Date;
-import java.sql.Time;
 import java.util.List;
 
 import android.content.Context;

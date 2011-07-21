@@ -10,7 +10,6 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.BaseDaoImpl;
@@ -61,6 +60,18 @@ public class Database
 		sWatchers.remove(watcher);
 	}
 	
+	
+	/**
+	 * Creates a new database entry.
+	 * 
+	 * Using this function will ensure that all DatabaseWatcher objects registered
+	 * via addWatcher are notified of the change.
+	 * 
+	 * @param <T>
+	 * @param <ID>
+	 * @param dao
+	 * @param t
+	 */
 	public static <T, ID> void create(final Dao<T, ID> dao, final T t)
 	{
 		Thread th = new Thread(new Runnable() {
@@ -390,6 +401,7 @@ public class Database
 	    	final Object[] thisMembers = {
 	    		this.name,
 	    		this.form,
+	    		this.active,
 	    		this.doseMorning,
 	    		this.doseNoon,
 	    		this.doseEvening,
@@ -402,6 +414,7 @@ public class Database
 	    	final Object[] otherMembers = {
 		    	other.name,
 		    	other.form,
+		    	other.active,
 		    	other.doseMorning,
 		    	other.doseNoon,
 		    	other.doseEvening,
