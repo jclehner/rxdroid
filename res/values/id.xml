@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<item type="id" name="tag_drug_id"/>
+	<item type="id" name="tag_time"/>
+	<item type="id" name="tag_adapter_index"/>
+	<item type="id" name="intake_notification"/>
+</resources>

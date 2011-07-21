@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+>
+	<!-- first line: icon + name -->
+	
+	<ImageView android:id="@+id/drug_icon"
+		android:layout_width="30dp"
+		android:layout_height="30dp"
+		
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentTop="true"
+							
+		android:scaleType="fitCenter"
+		android:src="@drawable/med_pill"
+	/>
+  
+  	<TextView android:id="@+id/drug_name"
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content"
+  		  		
+  		android:layout_toRightOf="@id/drug_icon"
+  		android:layout_alignTop="@id/drug_icon"
+  		android:layout_alignBottom="@id/drug_icon"
+  		android:layout_marginLeft="5dp"
+  		  		  		  		
+  		android:gravity="center_vertical"
+  		android:text="Cocaine 100mg"
+  		
+  		android:clickable="true"
+  		android:onClick="onDrugNameClick"
+  		
+  		style="@style/android:TextAppearance.Large"  	
+	/>
+	
+	<!-- second line: dose views -->
+  	
+  	<at.caspase.rxdroid.DoseView android:id="@+id/morning"
+  		android:layout_height="wrap_content"
+  		android:layout_width="wrap_content"
+  		
+  		android:layout_toRightOf="@id/drug_icon"
+  		android:layout_below="@id/drug_icon"
+  		
+  		android:onClick="onDoseClick"
+  	/>
+  	
+  	<at.caspase.rxdroid.DoseView android:id="@+id/noon"
+  		android:layout_height="wrap_content"
+  		android:layout_width="wrap_content"
+  		
+  		android:layout_toRightOf="@id/morning"
+  		android:layout_alignBottom="@id/morning"
+  		
+  		android:onClick="onDoseClick"
+  	/>
+  	
+  	<at.caspase.rxdroid.DoseView android:id="@+id/evening"
+  		android:layout_height="wrap_content"
+  		android:layout_width="wrap_content"
+  	
+  		android:layout_toRightOf="@id/noon"
+  		android:layout_alignBottom="@id/noon"
+  		
+  		android:onClick="onDoseClick"
+  	/>
+  	
+  	<at.caspase.rxdroid.DoseView android:id="@+id/night"
+  		android:layout_height="wrap_content"
+  		android:layout_width="wrap_content"
+  	
+  		android:layout_toRightOf="@id/evening"
+  		android:layout_alignBottom="@id/evening"
+  		
+  		android:onClick="onDoseClick"
+  	/>  
+    
+</RelativeLayout>

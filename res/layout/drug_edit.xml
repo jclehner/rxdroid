@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+ 	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" 
+	android:orientation="vertical"
+>
+	<ScrollView 
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:fillViewport="true"
+		
+	>
+	
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:orientation="vertical"
+			android:padding="5sp"
+		>
+
+			<EditText android:id="@+id/drug_name" 
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:hint="Drug name"
+				android:singleLine="true"
+			/>
+						
+			<LinearLayout
+				android:orientation="vertical"
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:padding="10sp"	
+			>
+				
+				<TextView 
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:text="Intake schedule"
+					style="@style/android:TextAppearance.Small"
+				/>				
+				
+				<TableLayout
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+				>
+					<TableRow>
+						<TextView 
+							android:layout_width="fill_parent"
+							android:layout_height="fill_parent"
+							android:layout_weight="1"
+							android:gravity="center|left"
+							android:text="Morning"
+							style="@style/android:TextAppearance.Medium"
+						/>
+						
+						<at.caspase.rxdroid.DoseView android:id="@+id/morning" />
+						
+					</TableRow>
+					<TableRow>
+						<TextView 
+							android:layout_width="fill_parent"
+							android:layout_height="fill_parent"
+							android:layout_weight="1"
+							android:gravity="center|left"
+							android:text="Noon"
+							style="@style/android:TextAppearance.Medium"
+						/>
+						
+						<at.caspase.rxdroid.DoseView android:id="@+id/noon" />
+							
+					</TableRow>
+					<TableRow>
+						<TextView 
+							android:layout_width="fill_parent"
+							android:layout_height="fill_parent"
+							android:layout_weight="1"
+							android:gravity="center|left"
+							android:text="Evening"
+							style="@style/android:TextAppearance.Medium"
+						/>
+						
+						<at.caspase.rxdroid.DoseView android:id="@+id/evening" />
+								
+					</TableRow>
+					<TableRow>
+						<TextView 
+							android:layout_width="fill_parent"
+							android:layout_height="fill_parent"
+							android:layout_weight="1"
+							android:gravity="center|left"
+							android:text="Night"
+							style="@style/android:TextAppearance.Medium"
+						/>
+						
+						<at.caspase.rxdroid.DoseView android:id="@+id/night" />	
+							
+					</TableRow>			
+				</TableLayout>
+				
+				<TextView 
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:text="Miscellaneous"
+					style="@style/android:TextAppearance.Small"
+				/>
+				
+				<TableLayout
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+				>
+					<TableRow>
+						<TextView 
+							android:layout_width="fill_parent"
+							android:layout_height="60sp"
+							android:layout_weight="1"
+							android:gravity="center|left"
+							android:text="Drug form"
+							
+							style="@style/android:TextAppearance.Medium"
+						/>
+						
+						<Spinner android:id="@+id/drug_form_chooser" 
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center"
+						/>						
+					</TableRow>
+					 
+					<TableRow android:baselineAligned="false">
+						<TextView 
+							android:layout_width="fill_parent"
+							android:layout_height="60sp"
+							android:layout_weight="1"
+							android:gravity="center|left"
+							android:text="Current supply"
+							
+							style="@style/android:TextAppearance.Medium"
+						/>
+						
+						<at.caspase.rxdroid.EditFraction android:id="@+id/current_supply"
+							android:layout_width="60sp"
+							android:layout_height="wrap_content"
+							android:text="0"
+							android:singleLine="true"
+							android:hint="Current supply"
+						/>						
+					</TableRow>
+					
+					<TableRow>
+						<TextView 
+							android:layout_width="fill_parent"
+							android:layout_height="60sp"
+							android:layout_weight="1"
+							android:gravity="center|left"
+							android:text="Doses per package"
+							
+							style="@style/android:TextAppearance.Medium"
+						/>
+						
+						<EditText android:id="@+id/refill_size"
+							android:layout_width="60sp"
+							android:layout_height="wrap_content"
+							android:text="0"
+							android:singleLine="true"
+						/>						
+					</TableRow>
+										 
+				</TableLayout>	
+		    </LinearLayout>
+	    </LinearLayout>
+    </ScrollView>
+</LinearLayout>

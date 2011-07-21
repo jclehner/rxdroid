@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Open MedMind</string>
+   
+    <string name="open_helper_classname">at.caspase.rxdroid.Database$Helper</string>
+    
+</resources>

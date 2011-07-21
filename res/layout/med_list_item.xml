@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:padding="1sp"
+	android:paddingRight="10sp"
+	style="@style/list_item" android:orientation="vertical">
+	
+	<TableLayout
+		android:orientation="horizontal"
+		android:layout_height="30sp"
+		android:layout_width="fill_parent"
+		android:stretchColumns="1"
+	>
+			<TableRow>
+				
+				<ImageView android:id="@+id/med_icon" 
+					style="@style/med_icon"
+					android:src="@drawable/med_pill"
+				/>
+			
+				<TextView android:id="@+id/med_name"
+					android:text="Cocaine 100mg"
+					style="@style/med_name"
+					android:clickable="true"
+				/>
+			</TableRow>
+	</TableLayout>
+	
+	<view android:id="@+id/med_doseview_wrapper"
+		class="at.caspase.openmedmind.MedListActivity$DoseView"
+		android:layout_width="fill_parent"
+		android:layout_height="60sp"
+	/>
+	
+	
+</LinearLayout>

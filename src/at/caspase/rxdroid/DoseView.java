@@ -1,0 +1,298 @@
+package at.caspase.rxdroid;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.text.TextWatcher;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.Database.Intake;
+
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
+
+/**
+ * A class for viewing drug doses.
+ * 
+ * 
+ * 
+ * 
+ * @author caspase
+ *
+ */
+public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchListener
+{
+	private static final String TAG = DoseView.class.getName();
+	
+	private ImageView mIntakeStatus;
+	private TextView mDoseText;
+	private ImageView mDoseTimeIcon;
+		
+	private Drug mDrug;
+	private int mDoseTime = -1;
+	private long mDay = -1;
+	
+	private Dao<Database.Intake, Integer> mIntakeDao = null;
+	
+	public DoseView(Context context) {
+		this(context, null);
+	}
+
+	public DoseView(Context context, AttributeSet attrs) 
+	{
+		super(context, attrs);
+						
+		LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		li.inflate(R.layout.dose_view, this, true);
+				
+		mIntakeStatus = (ImageView) findViewById(R.id.icon_intake_status);
+		mDoseText = (TextView) findViewById(R.id.text_dose);
+		mDoseTimeIcon = (ImageView) findViewById(R.id.icon_dose_time);
+				
+		String hint = null;
+		
+		switch(getId())
+		{
+			case R.id.morning:
+				setDoseTime(Database.Drug.TIME_MORNING);
+				hint = "Morning";
+				break;
+				
+			case R.id.noon:
+				setDoseTime(Database.Drug.TIME_NOON);
+				hint = "Noon";
+				break;
+				
+			case R.id.evening:
+				setDoseTime(Database.Drug.TIME_EVENING);
+				hint = "Evening";
+				break;
+				
+			case R.id.night:
+				setDoseTime(Database.Drug.TIME_NIGHT);
+				hint = "Night";
+				break;
+				
+			default:
+				throw new RuntimeException("Invalid DoseView id");
+		}
+		
+		mIntakeStatus.setImageDrawable(null);
+		
+		mDoseText.setHint(hint);
+		mDoseText.setText("0");
+		
+		setClickable(true);
+		setFocusable(true);		
+		setOnTouchListener(this);
+		
+		updateIntakeStatusIcon(true);
+		
+		Database.addWatcher(this);
+	}
+	
+	public void setDoseTime(int doseTime)
+	{
+		if(doseTime > Database.Drug.TIME_NIGHT)
+			throw new IllegalArgumentException();
+		
+		final int drawableIds[] = { R.drawable.ic_morning, R.drawable.ic_noon, R.drawable.ic_evening, R.drawable.ic_night };
+				
+		mDoseTimeIcon.setImageResource(drawableIds[doseTime]);
+		mDoseTime = doseTime;		
+	}
+	
+	public int getDoseTime() {
+		return mDoseTime;
+	}
+	
+	public void setDrug(final Drug drug)
+	{
+		mDrug = drug;
+		updateView();
+	}
+	
+	public void setDay(long day) {
+		mDay = day;
+	}
+	
+	public long getDay() {
+		return mDay;
+	}
+	
+	public int getDrugId() 
+	{
+		assert mDrug != null;
+		return mDrug.getId();
+	}
+	
+	public Fraction getDose() {
+		return Fraction.decode(mDoseText.getText().toString());
+	}
+	
+	public TextView getTextView() {
+		return mDoseText;
+	}
+	
+	public void setDao(Dao<Intake, Integer> dao) 
+	{
+		mIntakeDao = dao;
+		updateIntakeStatusIcon(true);
+	}
+	
+	public void addTextChangedListener(TextWatcher watcher) {
+		mDoseText.addTextChangedListener(watcher);
+	}
+	
+	@Override
+	public boolean onTouch(View v, MotionEvent event)
+	{
+		// TODO i'm sure there's a better way to do this...
+		switch(event.getAction() & MotionEvent.ACTION_MASK)
+		{
+			case MotionEvent.ACTION_DOWN:
+				// TODO export!
+				v.setBackgroundColor(Color.rgb(0xff, 0x66, 0x00));
+				return true;
+				
+			case MotionEvent.ACTION_UP:
+				v.performClick();
+				// fall through
+				
+			case MotionEvent.ACTION_CANCEL:
+			case MotionEvent.ACTION_OUTSIDE:
+				v.setBackgroundDrawable(null);
+				return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void onDrugCreate(Drug drug) {}
+
+	@Override
+	public void onDrugDelete(Drug drug) {}
+
+	@Override
+	public void onDrugUpdate(Drug drug) 
+	{
+		if(mDrug == null || drug.getId() == mDrug.getId())
+			setDrug(drug);
+	}
+
+	@Override
+	public void onIntakeCreate(Intake intake)
+	{
+		if(mDay == -1)
+			return;
+				
+		if(isApplicableIntake(intake))
+			mIntakeStatus.setImageResource(R.drawable.bg_dose_taken);
+	}
+
+	@Override
+	public void onIntakeDelete(Intake intake)
+	{
+		if(mDay == -1)
+			return;
+		
+		if(isApplicableIntake(intake))
+			updateIntakeStatusIcon(true);
+	}
+
+	@Override
+	public void onDatabaseDropped() {}
+	
+	@Override
+	public void onWindowVisibilityChanged(int visibility)
+	{
+		if(visibility != VISIBLE)
+			Database.removeWatcher(this);
+		else
+		{
+			Database.addWatcher(this);
+			updateView();
+		}
+	}
+	
+	@Override
+	protected void finalize()
+	{
+		Log.d(TAG, "FINALIZE");
+	}	
+	
+	private boolean isApplicableIntake(Intake intake)
+	{
+		if(intake.getDrug().getId() != mDrug.getId())
+			return false;
+		else if(intake.getDay() != mDay)
+			return false;
+		else if(intake.getDoseTime() != mDoseTime)
+			return false;
+		return true;
+	}
+	
+	private void updateView()
+	{
+		if(mDrug == null)
+			return;
+		
+		mDoseText.setText(mDrug.getDose(mDoseTime).toString());
+		updateIntakeStatusIcon(true);		
+	}
+				
+	private void updateIntakeStatusIcon(boolean checkDbForIntake)
+	{
+		if(mDay == -1 || mIntakeDao == null)
+			return;		
+		
+		if(checkDbForIntake)
+		{
+			final int intakeCount = getIntakes().size();
+			if(intakeCount != 0)
+			{
+				mIntakeStatus.setImageResource(R.drawable.bg_dose_taken);
+				return;
+			}
+		}
+				
+		if(!mDoseText.getText().equals("0") && System.currentTimeMillis() > mDay + Settings.getDoseTimeOffsetInMillis(mDoseTime))
+			mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
+		else
+			mIntakeStatus.setImageDrawable(null);
+	}
+	
+	private List<Database.Intake> getIntakes()
+    {
+		if(mDay == -1 || mDrug == null)
+			throw new IllegalStateException("Cannot obtain intake data from DoseView with unset date and/or drug");
+		
+    	try
+    	{   		
+	    	QueryBuilder<Database.Intake, Integer> qb = mIntakeDao.queryBuilder();
+	    	Where<Database.Intake, Integer> where = qb.where();
+	    	where.eq(Database.Intake.COLUMN_DRUG_ID, mDrug.getId());
+	    	where.and();
+	    	where.eq(Database.Intake.COLUMN_DAY, mDay);
+	    	where.and();
+	    	where.eq(Database.Intake.COLUMN_DOSE_TIME, mDoseTime);
+    			        	
+	    	return mIntakeDao.query(qb.prepare());
+    	}
+    	catch(SQLException e)
+    	{
+    		throw new RuntimeException(e);
+    	}    	
+    }
+}

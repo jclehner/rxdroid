@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content">
+  
+  <ImageView android:id="@+id/icon_intake_status"
+  	android:layout_width="40dp"
+  	android:layout_height="40dp" 
+  	android:layout_gravity="center"
+  	android:scaleType="fitCenter"
+  />  
+  
+  <ImageView android:id="@+id/icon_dose_time"
+  	android:layout_width="30dp"
+  	android:layout_height="30dp"
+  	android:layout_gravity="left"
+  	android:scaleType="fitCenter"
+  	android:src="@drawable/ic_morning"
+  />  
+  
+  <TextView android:id="@+id/text_dose"
+  	android:layout_width="60dip"
+  	android:layout_height="60dip"
+  	android:gravity="center"
+  	android:text="X"
+  	
+  	style="@style/android:TextAppearance.Large"
+  />
+        
+</FrameLayout>

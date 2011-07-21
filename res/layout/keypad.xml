@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content">
+  
+  <TableRow>
+  	<Button android:id="@+id/keypad_btn_1"
+  		android:text="1"
+  		style="@style/keypad_digit"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_2"
+  		android:text="2"
+  		style="@style/keypad_digit"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_3"
+  		android:text="3"
+  		style="@style/keypad_digit"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_minus"
+  		android:text="-"
+  		style="@style/keypad_special"
+  	/>  
+  </TableRow>
+  
+  <TableRow>
+  	<Button android:id="@+id/keypad_btn_4"
+  		android:text="4"
+  		style="@style/keypad_digit"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_5"
+  		android:text="5"
+  		style="@style/keypad_digit"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_6"
+  		android:text="6"
+  		style="@style/keypad_digit"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_fraction"
+  		android:text="A b/c"
+  		style="@style/keypad_special"
+  	/>  
+  </TableRow>
+  
+  <TableRow>
+  	<Button android:id="@+id/keypad_btn_7"
+  		android:text="1"
+  		style="@style/keypad_digit"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_8"
+  		android:text="2"
+  		style="@style/keypad_digit"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_9"
+  		android:text="3"
+  		style="@style/keypad_digit"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_delete"
+  		android:text="&lt;x"
+  		style="@style/keypad_special"
+  	/>  
+  </TableRow>
+  
+  <TableRow>
+  	<Button android:id="@+id/keypad_btn_help"
+  		android:text="1"
+  		style="@style/keypad_special"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_0"
+  		android:text="0"
+  		style="@style/keypad_digit"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_space"
+  		android:text="____"
+  		style="@style/keypad_digit"
+  	/>
+  	
+  	<Button android:id="@+id/keypad_btn_enter"
+  		android:text="&lt;--'"
+  		style="@style/keypad_special"
+  	/>  
+  </TableRow>
+  
+  
+  
+    
+</TableLayout>
