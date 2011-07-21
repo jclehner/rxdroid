@@ -170,8 +170,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
 							notification.defaults |= Notification.DEFAULT_ALL;
 							
-							manager.cancel(R.id.intake_notification);
-							manager.notify(R.id.intake_notification, notification);
+							manager.cancel(R.id.notification_intake);
+							manager.notify(R.id.notification_intake, notification);
 						}
 	
 						// FIXME
