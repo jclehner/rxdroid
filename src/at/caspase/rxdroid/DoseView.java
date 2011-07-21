@@ -265,9 +265,9 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 			}
 		}
 		
-		final java.util.Date now = new Time(System.currentTimeMillis());
+		final Date end = new Date(mDate.getTime() + Settings.INSTANCE.getDoseTimeEndOffset(mDoseTime));
 		
-		if(!mDoseText.getText().equals("0") && now.compareTo(mDate) == -1)
+		if(!mDoseText.getText().equals("0") && Util.DateTime.now().compareTo(end) != -1)
 			mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
 		else
 			mIntakeStatus.setImageDrawable(null);
