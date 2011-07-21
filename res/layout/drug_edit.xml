@@ -165,6 +165,22 @@
 							android:singleLine="true"
 						/>						
 					</TableRow>
+					
+					<TableRow>
+						<TextView 
+							android:layout_width="fill_parent"
+							android:layout_height="60sp"
+							android:layout_weight="1"
+							android:gravity="center|left"
+							android:text="Active"
+							
+							style="@style/android:TextAppearance.Medium"
+						/>
+						
+						<CheckBox android:id="@+id/drug_active"
+							android:checked="true"				
+						/>					
+					</TableRow>
 										 
 				</TableLayout>	
 		    </LinearLayout>

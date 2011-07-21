@@ -10,6 +10,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 import at.caspase.rxdroid.Database.Drug;
@@ -39,6 +40,7 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		
 	private EditText mTextCurrentSupply;
 	private EditText mTextRefillSize;
+	private CheckBox mIsActive;
 		
 	// indicates whether a change was made to the drug we're editing
 	private boolean mChanged = false;
@@ -61,6 +63,7 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		mTextName = (EditText) findViewById(R.id.drug_name);
 		mTextCurrentSupply = (EditText) findViewById(R.id.current_supply);
 		mTextRefillSize = (EditText) findViewById(R.id.refill_size);
+		mIsActive = (CheckBox) findViewById(R.id.drug_active);
 		
 		mTextName.addTextChangedListener(this);
 		mTextCurrentSupply.addTextChangedListener(this);
@@ -99,6 +102,7 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			
 			mTextCurrentSupply.setText(mDrug.getCurrentSupply().toString());
 			mTextRefillSize.setText(Integer.toString(mDrug.getRefillSize()));
+			mIsActive.setChecked(mDrug.isActive());
 			
 			final boolean focusOnCurrentSupply = intent.getBooleanExtra(EXTRA_FOCUS_ON_CURRENT_SUPPLY, false);
 			if(focusOnCurrentSupply)
@@ -136,6 +140,7 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		mDrug.setForm(Database.Drug.FORM_TABLET);
 		mDrug.setCurrentSupply(Fraction.decode(mTextCurrentSupply.getText().toString()));
 		mDrug.setRefillSize(Integer.parseInt(mTextRefillSize.getText().toString(), 10));
+		mDrug.setActive(mIsActive.isChecked());
 		
 		for(DoseView v : mDoses)
 			mDrug.setDose(v.getDoseTime(), v.getDose());

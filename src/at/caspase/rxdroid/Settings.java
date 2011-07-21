@@ -2,6 +2,7 @@ package at.caspase.rxdroid;
 
 import android.util.Log;
 import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.Util.Constants;
 
 public enum Settings 
 {
@@ -48,12 +49,19 @@ public enum Settings
 		return -1;		
 	}
 	
-	public int getNextDoseTime()
+	public int getNextDoseTime() {
+		return getNextDoseTime(false);
+	}
+	
+	public int getNextDoseTime(boolean useNextDay)
 	{
-		final long offset = Util.DateTime.nowOffsetFromMidnight();
-		long smallestDiff = 0;
-		int retDoseTime = -1;
+		long offset = Util.DateTime.nowOffsetFromMidnight();
+		if(useNextDay)
+			offset -= Constants.MILLIS_PER_DAY;
 		
+		int retDoseTime = -1;
+		long smallestDiff = 0;
+			
 		for(int doseTime : doseTimes)
 		{
 			final long diff = getDoseTimeBeginOffset(doseTime) - offset;
@@ -67,6 +75,12 @@ public enum Settings
 			}			
 			Log.d(TAG, "getNextDoseTime: diff was " + diff + "ms for doseTime=" + doseTime);
 		}
+		
+		if(retDoseTime == -1 && !useNextDay)
+		{
+			Log.d(TAG, "getNextDoseTime: retrying with next day");
+			return getNextDoseTime(true);
+		}			
 		
 		return retDoseTime;		
 	}

@@ -149,18 +149,25 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				 */
 				
 				int doseTime = -1;
-								
+				boolean firstRun = true;
+				
 				while(true)
 				{
 					if(doseTime == -1)
 						doseTime = Settings.INSTANCE.getActiveOrNextDoseTime();
+					else
+						firstRun = false;
 					
 					// TODO check supply levels
 					final Date today = Util.DateTime.today();
 					final long offset = Util.DateTime.now().getTime() - today.getTime();				
-					final long millisUntilNextDoseTime = Settings.INSTANCE.getDoseTimeBeginOffset(doseTime) - offset;
 					
-					Log.d(TAG, "Next dose time (" + doseTime + ") in " + millisUntilNextDoseTime + "ms");
+					long millisUntilNextDoseTime = Settings.INSTANCE.getDoseTimeBeginOffset(doseTime) - offset;
+					if(!firstRun)
+					{
+						millisUntilNextDoseTime += Util.Constants.MILLIS_PER_DAY;
+						Log.d(TAG, "Adjusting sleep time to next day");
+					}
 					
 					Intent intent = new Intent(Intent.ACTION_VIEW);
 					intent.setClass(getApplicationContext(), DrugListActivity.class);
@@ -168,9 +175,9 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					
 					try
-					{
+					{						
 						if(millisUntilNextDoseTime > 0)
-						{
+						{					
 							Log.d(TAG, "Will sleep " + millisUntilNextDoseTime + "ms");
 							Thread.sleep(millisUntilNextDoseTime);
 						}
@@ -186,7 +193,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 						// FIXME this does not need to be determined every time							
 						for(Drug drug : drugs)
 						{
-							if(!drug.getDose(doseTime).equals(0))
+							if(drug.isActive() && !drug.getDose(doseTime).equals(0))
 							{
 								final List<Intake> intakes = Database.getIntakes(intakeDao, drug, today, doseTime);
 								if(intakes.isEmpty())
@@ -194,6 +201,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 								else
 									Log.d(TAG, "Not counting " + drug + ": " + intakes.size() + " intakes");
 							}
+							else
+								Log.d(TAG, "Not considering " + drug);
 						}
 						
 						if(count != 0)
@@ -212,12 +221,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							
 							Thread.sleep(mSnoozeTime);
 						}
-						else
-						{
-							Log.d(TAG, "No intakes remaining.");
-							doseTime = Settings.INSTANCE.getNextDoseTime();			
-						}
-							
+						
+						doseTime = Settings.INSTANCE.getNextDoseTime();							
 					}
 					catch (InterruptedException e)
 					{
