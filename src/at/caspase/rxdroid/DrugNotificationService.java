@@ -11,22 +11,86 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.Database.Intake;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.query.Not;
 
-public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
+public class DrugNotificationService extends OrmLiteBaseService<Database.Helper> implements DatabaseWatcher
 {
 	private static final String TAG = DrugNotificationService.class.getName();
 	
 	Thread mThread;
 	
 	@Override
+	public void onCreate()
+	{
+		super.onCreate();
+		
+		Log.d(TAG, "onCreate");
+		restartThread();
+	}
+	
+	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
 		super.onStartCommand(intent, flags, startId);
+		return START_STICKY;
+	}
+	
+	@Override
+	public void onDestroy() 
+	{
 		// FIXME
+		mThread.interrupt();
+	}
+
+	@Override
+	public IBinder onBind(Intent arg0)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void onDrugCreate(Drug drug)
+	{
+		restartThread();		
+	}
+
+	@Override
+	public void onDrugDelete(Drug drug)
+	{
+		restartThread();
+	}
+
+	@Override
+	public void onDrugUpdate(Drug drug)
+	{
+		restartThread();
+	}
+
+	@Override
+	public void onIntakeCreate(Intake intake)
+	{
+		restartThread();
+	}
+
+	@Override
+	public void onIntakeDelete(Intake intake)
+	{
+		restartThread();
+	}
+
+	@Override
+	public void onDatabaseDropped()
+	{
+		restartThread();
+	}
+	
+	private void restartThread()
+	{
 		final Dao<Drug, Integer> dao = getHelper().getDrugDao();
 		final List<Drug> drugs;
 		
@@ -37,7 +101,10 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		catch (SQLException e)
 		{
 			throw new RuntimeException(e);
-		}		
+		}
+		
+		if(mThread != null && mThread.isAlive())
+			mThread.interrupt();
 		
 		mThread = new Thread(new Runnable() {
 			
@@ -82,7 +149,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 						
 						Thread.sleep(10000);
 						
-						// FIXME this does not need to be determined everytime
+						// FIXME this does not need to be determined every time
 						int count = 0;
 						
 						for(Drug drug : drugs)
@@ -91,18 +158,21 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 								++count;
 						}
 						
-						NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);					
-						PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-						
-						final CharSequence contentTitle = "RxDroid: Reminder";
-						final CharSequence contentText = "You have " + count + " prescriptions to take";
-						
-						Notification notification = new Notification(R.drawable.med_pill, "RxDroid", System.currentTimeMillis());
-						notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
-						notification.defaults |= Notification.DEFAULT_ALL;
-						
-						manager.cancel(R.id.intake_notification);
-						manager.notify(R.id.intake_notification, notification);
+						if(/*count != 0*/ true)
+						{													
+							NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);					
+							PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+							
+							final CharSequence contentTitle = "RxDroid: Reminder";
+							final CharSequence contentText = "You have " + count + " prescriptions to take";
+							
+							Notification notification = new Notification(R.drawable.med_pill, "RxDroid", System.currentTimeMillis());
+							notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
+							notification.defaults |= Notification.DEFAULT_ALL;
+							
+							manager.cancel(R.id.intake_notification);
+							manager.notify(R.id.intake_notification, notification);
+						}
 	
 						// FIXME
 						break;
@@ -115,24 +185,10 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					}
 				}
 			}
-		});		
+		});
 		
 		mThread.start();
-		return START_STICKY;
-	}
-	
-	@Override
-	public void onDestroy() 
-	{
-		// FIXME
-		mThread.interrupt();
 	}
 
-	@Override
-	public IBinder onBind(Intent arg0)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }
