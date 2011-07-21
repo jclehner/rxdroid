@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import at.caspase.rxdroid.Database.Drug;
-import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.EditFraction.FractionPickerDialog;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;

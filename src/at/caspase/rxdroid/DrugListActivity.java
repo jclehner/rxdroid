@@ -305,7 +305,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	{
     		builder.setTitle(drug.getName() + ": " + drug.getDose(doseTime));
     		
-    		boolean hasIntake = getIntakes(drug, doseTime).size() != 0;
+    		boolean hasIntake = Database.getIntakes(mIntakeDao, drug, mDay, doseTime).size() != 0;
     		
         	if(!hasIntake)
         	{
@@ -469,26 +469,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	
     	Log.d(TAG, "updateListView: " + t);
     }
-    
-    private List<Database.Intake> getIntakes(Database.Drug drug, int doseTime)
-    {
-    	try
-    	{    		
-	    	QueryBuilder<Database.Intake, Integer> qb = mIntakeDao.queryBuilder();
-	    	Where<Database.Intake, Integer> where = qb.where();
-	    	where.eq(Database.Intake.COLUMN_DRUG_ID, drug.getId());
-	    	where.and();
-	    	where.eq(Database.Intake.COLUMN_DAY, mDay);
-	    	where.and();
-	    	where.eq(Database.Intake.COLUMN_DOSE_TIME, doseTime);
-    			        	
-	    	return mIntakeDao.query(qb.prepare());
-    	}
-    	catch(SQLException e)
-    	{
-    		throw new RuntimeException(e);
-    	}    	
-    }    
 	
 	private class DrugAdapter extends ArrayAdapter<Database.Drug>
 	{

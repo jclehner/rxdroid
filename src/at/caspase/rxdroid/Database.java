@@ -4,6 +4,7 @@ package at.caspase.rxdroid;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -14,6 +15,8 @@ import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.DatabaseTable;
 import com.j256.ormlite.table.TableUtils;
@@ -145,7 +148,28 @@ public class Database
 			for(DatabaseWatcher watcher : sWatchers)
 				watcher.onIntakeDelete((Intake) t);
 		}
-	}	
+	}
+	
+	public static List<Intake> getIntakes(Dao<Intake, Integer> dao, Drug drug, long day, int doseTime)
+	{		
+		try
+    	{    		
+	    	QueryBuilder<Database.Intake, Integer> qb = dao.queryBuilder();
+	    	Where<Database.Intake, Integer> where = qb.where();
+	    	where.eq(Database.Intake.COLUMN_DRUG_ID, drug.getId());
+	    	where.and();
+	    	where.eq(Database.Intake.COLUMN_DAY, day);
+	    	where.and();
+	    	where.eq(Database.Intake.COLUMN_DOSE_TIME, doseTime);
+    			        	
+	    	return dao.query(qb.prepare());
+    	}
+    	catch(SQLException e)
+    	{
+    		throw new RuntimeException(e);
+    	}    
+		
+	}
 	
 	private Database() {}
 	

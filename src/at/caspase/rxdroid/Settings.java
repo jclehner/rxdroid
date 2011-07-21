@@ -9,7 +9,7 @@ public enum Settings
 	
 	private static final String TAG = Settings.class.getName();
 	
-	private static final long[] beginHours = { 5, 14, 21, 23 };
+	private static final long[] beginHours = { 5, 14, 19, 23 };
 	private static final long[] endHours = { 11, 17, 23, 24 };
 	private static final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };		
 	
@@ -71,7 +71,13 @@ public enum Settings
 		return ret;
 	}
 	
-	public static long getDoseTimeOffsetInMillis(int doseType) {
+	public long getSnoozeTime()
+	{
+		return 1 * 60 * 1000;
+	}
+	
+	public static long getDoseTimeOffsetInMillis(int doseType) 
+	{
 		// TODO implement!
 		
 		long hours = 0;
@@ -94,5 +100,7 @@ public enum Settings
 		
 		return hours * 3600 * 1000;
 	}
+	
+	
 	
 }
