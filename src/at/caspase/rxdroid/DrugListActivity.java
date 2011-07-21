@@ -383,10 +383,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     // shift to previous (-1) or next(1) date. passing 0
     // will reset to specified date, or current date
     // if newDate is -1
-    private synchronized void setOrShiftDate(int shiftBy, long newDate)
+    private void setOrShiftDate(int shiftBy, long newDate)
     {
-    	final Timer t = new Timer();
-    	    	
     	if(mViewSwitcher.getChildCount() != 0)   	
     		mViewSwitcher.removeAllViews();
     	
