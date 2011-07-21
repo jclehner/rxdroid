@@ -23,8 +23,8 @@
   		android:layout_height="wrap_content"
   		  		
   		android:layout_toRightOf="@id/drug_icon"
-  		android:layout_alignTop="@id/drug_icon"
-  		android:layout_alignBottom="@id/drug_icon"
+  		android:layout_alignParentTop="true"
+  		
   		android:layout_marginLeft="5dp"
   		  		  		  		
   		android:gravity="center_vertical"
@@ -36,14 +36,14 @@
   		style="@style/android:TextAppearance.Large"  	
 	/>
 	
-	<!-- second line: dose views -->
+	<!-- second line: dose views android:layout_alignBottom="@id/drug_icon" -->
   	
   	<at.caspase.rxdroid.DoseView android:id="@+id/morning"
   		android:layout_height="wrap_content"
   		android:layout_width="wrap_content"
   		
   		android:layout_toRightOf="@id/drug_icon"
-  		android:layout_below="@id/drug_icon"
+  		android:layout_below="@id/drug_name"
   		
   		android:onClick="onDoseClick"
   	/>

@@ -43,6 +43,8 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 	private int mDoseTime = -1;
 	private long mDay = -1;
 	
+	private boolean mWasHidden = false;
+	
 	private Dao<Database.Intake, Integer> mIntakeDao = null;
 	
 	public DoseView(Context context) {
@@ -218,19 +220,17 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 	public void onWindowVisibilityChanged(int visibility)
 	{
 		if(visibility != VISIBLE)
+		{
 			Database.removeWatcher(this);
+			mWasHidden = true;
+		}
 		else
 		{
 			Database.addWatcher(this);
-			updateView();
+			if(mWasHidden)
+				updateView();
 		}
 	}
-	
-	@Override
-	protected void finalize()
-	{
-		Log.d(TAG, "FINALIZE");
-	}	
 	
 	private boolean isApplicableIntake(Intake intake)
 	{

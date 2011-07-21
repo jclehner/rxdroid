@@ -44,7 +44,6 @@ public class Database
 	 */
 	public static synchronized void addWatcher(DatabaseWatcher watcher) {
 		sWatchers.add(watcher);
-		Log.d(TAG, "addWatcher: watcher=" + watcher.toString());
 	}
 	
 	
@@ -55,7 +54,6 @@ public class Database
 	 */
 	public static synchronized void removeWatcher(DatabaseWatcher watcher) {
 		sWatchers.remove(watcher);
-		Log.d(TAG, "removeWatcher: watcher=" + watcher.toString());
 	}
 	
 	public static <T, ID> void create(final Dao<T, ID> dao, final T t)

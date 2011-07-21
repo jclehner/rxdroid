@@ -42,7 +42,7 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	private EditText mTextRefillSize;
 		
 	// indicates whether a change was made to the drug we're editing
-	private boolean mChanged;
+	private boolean mChanged = false;
 	
 	Dao<Database.Drug, Integer> mDao;
 	
@@ -86,9 +86,9 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	{
 		super.onResume();
 		
-		Intent intent = getIntent();
-		String action = intent.getAction();
-		
+		final Intent intent = getIntent();
+		final String action = intent.getAction();
+				
 		if(Intent.ACTION_EDIT.equals(action))
 		{
 			mDrug = (Database.Drug) intent.getSerializableExtra(EXTRA_DRUG);
@@ -119,6 +119,7 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		}
 		
 		mChanged = false;
+		Log.d(TAG, "onResume: setting mChanged to false");
 	}
 	
 	@Override
@@ -184,8 +185,10 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	}
 
 	@Override
-	public void afterTextChanged(Editable arg0) {
-		mChanged = true;		
+	public void afterTextChanged(Editable arg0) 
+	{
+		mChanged = true;
+		Log.d(TAG, "onTextChanged: arg0=" + arg0.toString());
 	}
 
 	@Override

@@ -89,26 +89,26 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     {
         super.onStart();
         
-        final Intent intent = getIntent();
-        final String action = (intent != null) ? intent.getAction() : null;
-                
-        if(intent == null || Intent.ACTION_MAIN.equals(action))
-        	shiftDate(0);
-        else
-        {
-            if(Intent.ACTION_VIEW.equals(action))
-            {
-            	long day = intent.getLongExtra(EXTRA_DAY, Util.getMidnightMillisFromNow());
-            	Log.d(TAG, "day=" + day);
-            	setDate(day);
-            }
-            else
-                throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());
-            
-        }
         
         // TODO currently, pressing the BACK key in DrugEditActivity will revert to 
         // DrugListActivity with the date set to today intstead of the last viewed date!
+    }
+    
+    @Override
+    protected void onResume()
+    {
+    	super.onResume();  	
+
+        final Intent intent = getIntent();
+        final String action = (intent != null) ? intent.getAction() : null;
+                
+        if(Intent.ACTION_VIEW.equals(action) || Intent.ACTION_MAIN.equals(action))
+        {
+            long day = intent.getLongExtra(EXTRA_DAY, Util.getMidnightMillisFromNow());
+            setDate(day);
+        }
+    	else
+    		throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());
     }
     
     @Override
@@ -151,7 +151,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     		case MENU_DEBUG_FILL:
     		{
     			final String[] names = { "Rivaroxaban", "Propranolol", "Thiamazole", 
-    					"2,3,7,8-Tetrachlor-4,6-Dimethyldibenzodioxine", "N-Acetyl-5-Methoxytryptamine" };
+    					"2-(3,4,5-trimethoxyphenyl)ethanamine", "N-Acetyl-5-Methoxytryptamine" };
     			
     			for(String name : names)
     			{
@@ -444,7 +444,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	
     	((TextView) findViewById(R.id.med_list_footer)).setText(Util.getDateString(mDay));
     	
-    	Log.d(TAG, "setOrShiftDate: " + t);
+    	// update the intent so our Activity is restarted with the last opened date
+    	setIntent(getIntent().putExtra(EXTRA_DAY, mDay));
     }
     
     private void updateDrugList()
