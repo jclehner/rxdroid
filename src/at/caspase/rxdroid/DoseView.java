@@ -1,13 +1,13 @@
 package at.caspase.rxdroid;
 
-import java.sql.SQLException;
+import java.sql.Date;
+import java.sql.Time;
 import java.util.List;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,8 +19,6 @@ import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
 
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
 
 /**
  * A class for viewing drug doses.
@@ -41,7 +39,7 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 		
 	private Drug mDrug;
 	private int mDoseTime = -1;
-	private long mDay = -1;
+	private Date mDate;
 	
 	private boolean mWasHidden = false;
 	
@@ -125,12 +123,12 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 		updateView();
 	}
 	
-	public void setDay(long day) {
-		mDay = day;
+	public void setDate(Date date) {
+		mDate = date;
 	}
 	
-	public long getDay() {
-		return mDay;
+	public Date getDate() {
+		return mDate;
 	}
 	
 	public int getDrugId() 
@@ -196,7 +194,7 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 	@Override
 	public void onIntakeCreate(Intake intake)
 	{
-		if(mDay == -1)
+		if(mDate == null)
 			return;
 				
 		if(isApplicableIntake(intake))
@@ -206,7 +204,7 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 	@Override
 	public void onIntakeDelete(Intake intake)
 	{
-		if(mDay == -1)
+		if(mDate == null)
 			return;
 		
 		if(isApplicableIntake(intake))
@@ -236,7 +234,7 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 	{
 		if(intake.getDrug().getId() != mDrug.getId())
 			return false;
-		else if(intake.getDay() != mDay)
+		else if(intake.getDate() != mDate)
 			return false;
 		else if(intake.getDoseTime() != mDoseTime)
 			return false;
@@ -254,7 +252,7 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 				
 	private void updateIntakeStatusIcon(boolean checkDbForIntake)
 	{
-		if(mDay == -1 || mIntakeDao == null)
+		if(mDate == null || mIntakeDao == null)
 			return;		
 		
 		if(checkDbForIntake)
@@ -266,8 +264,10 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 				return;
 			}
 		}
-				
-		if(!mDoseText.getText().equals("0") && System.currentTimeMillis() >= mDay + Settings.INSTANCE.getDoseTimeEndOffset(mDoseTime))
+		
+		final java.util.Date now = new Time(System.currentTimeMillis());
+		
+		if(!mDoseText.getText().equals("0") && now.compareTo(mDate) == -1)
 			mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
 		else
 			mIntakeStatus.setImageDrawable(null);
@@ -275,9 +275,9 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 	
 	private List<Database.Intake> getIntakes()
     {
-		if(mDay == -1 || mDrug == null)
+		if(mDate == null || mDrug == null)
 			throw new IllegalStateException("Cannot obtain intake data from DoseView with unset date and/or drug");
 		
-    	return Database.getIntakes(mIntakeDao, mDrug, mDay, mDoseTime);
+    	return Database.getIntakes(mIntakeDao, mDrug, mDate, mDoseTime);
     }
 }

@@ -1,7 +1,9 @@
 package at.caspase.rxdroid;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.NoSuchElementException;
 
 import android.util.Log;
@@ -13,10 +15,44 @@ public class Util {
 	
     private Util() {}
     
-    static public class Constants
+    static class Constants
     {
         static final int MILLIS_PER_DAY = 24 * 3600 * 1000;
     }
+    
+    static class DateTime
+    {
+    	static Date today() 
+    	{
+    		final Timestamp today = new Timestamp(currentTimeMillis());
+    		today.setHours(0);
+    		today.setMinutes(0);
+    		today.setSeconds(0);
+    		today.setNanos(0);
+    		
+    		return new Date(today.getTime());
+    	}
+    	
+    	static long nowOffsetFromMidnight() {
+    		Time now = now();
+    		Date today = today();
+    		    		
+    		Log.d(TAG, "nowOffsetFromMidnight: now=" + now + "(" + now.getTime() +"), today=" + today + "(" + today.getTime() + ")");    		
+    		long ret = now.getTime() - today.getTime();
+    		Log.d(TAG, "nowOffsetFromMidnight: ret=" + ret);
+    		return ret;
+    	}
+    	
+    	static Time now() {
+    		return new Time(currentTimeMillis());
+    	}
+    	
+    	static long currentTimeMillis()
+    	{
+    		Calendar now = Calendar.getInstance();
+    		return now.getTimeInMillis();
+    	}
+    }    
 	
 	/**
 	 * Checks whether number lies in range.
@@ -26,26 +62,7 @@ public class Util {
 	static boolean inRange(final long num, final long begin, final long end) {
 		return num >= begin && num < end;
 	}
-	
-	static long getMidnightMillisFromNow()
-	{
-		final Date date = new Date(System.currentTimeMillis());
-		return date.getTime();
-	}
-	
-	static long getDayOffsetInMillis()
-	{
-		long ret = System.currentTimeMillis() - getMidnightMillisFromNow();
-		Log.d(TAG, "ret=" + ret);
-		return ret;
-	}
-	
-	static String getDateString(final long time) 
-	{
-	    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	    return sdf.format(new Date(time));
-	}
-	
+		
 	static View findView(View parent, int id)
 	{		
 	    View ret = parent.findViewById(id);

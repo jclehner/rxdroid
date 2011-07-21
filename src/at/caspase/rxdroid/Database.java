@@ -2,7 +2,9 @@ package at.caspase.rxdroid;
 
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
 
@@ -150,7 +152,7 @@ public class Database
 		}
 	}
 	
-	public static List<Intake> getIntakes(Dao<Intake, Integer> dao, Drug drug, long day, int doseTime)
+	public static List<Intake> getIntakes(Dao<Intake, Integer> dao, Drug drug, Date date, int doseTime)
 	{		
 		try
     	{    		
@@ -158,7 +160,7 @@ public class Database
 	    	Where<Database.Intake, Integer> where = qb.where();
 	    	where.eq(Database.Intake.COLUMN_DRUG_ID, drug.getId());
 	    	where.and();
-	    	where.eq(Database.Intake.COLUMN_DAY, day);
+	    	where.eq(Database.Intake.COLUMN_DATE, (java.util.Date) date);
 	    	where.and();
 	    	where.eq(Database.Intake.COLUMN_DOSE_TIME, doseTime);
     			        	
@@ -422,42 +424,42 @@ public class Database
 	    private static final long serialVersionUID = -9158847314588407608L;
 		
 		public static final String COLUMN_DRUG_ID = "drug_id";
-		public static final String COLUMN_DAY = "day";
+		public static final String COLUMN_DATE = "date";
 		public static final String COLUMN_TIMESTAMP = "timestamp";
 		public static final String COLUMN_DOSE_TIME = "dose_time";
 	    
 		@DatabaseField(columnName = COLUMN_DRUG_ID, foreign = true)
 		private Drug drug;
 		
-		@DatabaseField(columnName = COLUMN_DAY)
-        private long day;
+		@DatabaseField(columnName = COLUMN_DATE)
+        private java.util.Date date;
 		
 		@DatabaseField(columnName = COLUMN_TIMESTAMP)
-        private long timestamp;
+        private java.util.Date timestamp;
 		
 		@DatabaseField(columnName = COLUMN_DOSE_TIME)
         private int doseTime;
 		
 		public Intake() {}
 		
-		public Intake(Drug drug, long day, int doseTime) 
+		public Intake(Drug drug, Date date, int doseTime) 
 		{
 			this.drug = drug;
-			this.day = day;
-			this.timestamp = System.currentTimeMillis();
-			this.doseTime = doseTime;		
+			setDate(date);
+			this.timestamp = new Timestamp(System.currentTimeMillis());
+			this.doseTime = doseTime;
 		}
 		
 		public Drug getDrug() {
 			return drug;
 		}
 
-		public long getDay() {
-			return day;
+		public Date getDate() {
+			return new Date(date.getTime());
 		}
 
-		public long getTimestamp() {
-			return timestamp;
+		public Timestamp getTimestamp() {
+			return new Timestamp(date.getTime());
 		}
 
 		public int getDoseTime() {
@@ -468,11 +470,11 @@ public class Database
 			this.drug = drug;
 		}
 
-		public void setDay(long day) {
-			this.day = day;
+		public void setDate(Date date) {
+			this.date = new java.util.Date(date.getTime());
 		}
 
-		public void setTimestamp(long timestamp) {
+		public void setTimestamp(Timestamp timestamp) {
 			this.timestamp = timestamp;
 		}
 
@@ -485,7 +487,7 @@ public class Database
 	public static class Helper extends OrmLiteSqliteOpenHelper
 	{
 		private static final String DB_NAME = "db.sqlite";
-		private static final int DB_VERSION = 36;
+		private static final int DB_VERSION = 39;
 		
 		private Dao<Database.Drug, Integer> mDrugDao = null;
 		private Dao<Database.Intake, Integer> mIntakeDao = null;

@@ -1,5 +1,6 @@
 package at.caspase.rxdroid;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -15,7 +16,6 @@ import at.caspase.rxdroid.Database.Intake;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.query.Not;
 
 public class DrugNotificationService extends OrmLiteBaseService<Database.Helper> implements DatabaseWatcher
 {
@@ -144,17 +144,15 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					final int doseTime = Settings.INSTANCE.getNextDoseTime();
 					
 					// TODO check supply levels
-					
-					final long day = Util.getMidnightMillisFromNow();
-					final long offset = Util.getDayOffsetInMillis();
-					
+					final Date today = Util.DateTime.today();
+					final long offset = Util.DateTime.now().getTime() - today.getTime();				
 					final long millisUntilNextDoseTime = Settings.INSTANCE.getDoseTimeBeginOffset(doseTime) - offset;
 					
 					Log.d(TAG, "Next dose time (" + doseTime + ") in " + millisUntilNextDoseTime + "ms");
 					
 					Intent intent = new Intent(Intent.ACTION_VIEW);
 					intent.setClass(getApplicationContext(), DrugListActivity.class);
-					intent.putExtra(DrugListActivity.EXTRA_DAY, Util.getMidnightMillisFromNow());
+					intent.putExtra(DrugListActivity.EXTRA_DAY, today);
 					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					
 					try
@@ -170,7 +168,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							{
 								if(drug.isActive() && !drug.getDose(doseTime).equals(0))
 								{
-									final List<Intake> intakes = Database.getIntakes(intakeDao, drug, day, doseTime);
+									final List<Intake> intakes = Database.getIntakes(intakeDao, drug, today, doseTime);
 									if(intakes.isEmpty())
 										++count;
 								}

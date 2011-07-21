@@ -33,7 +33,7 @@ public enum Settings
 		// TODO
 		assert beginHours.length == endHours.length;
 		
-		final long offset = System.currentTimeMillis() - Util.getMidnightMillisFromNow();		
+		final long offset = Util.DateTime.nowOffsetFromMidnight();
 		for(int doseTime : doseTimes)
 		{		
 			if(offset >= getDoseTimeBeginOffset(doseTime) && offset < getDoseTimeEndOffset(doseTime))
@@ -47,7 +47,7 @@ public enum Settings
 	
 	public int getNextDoseTime()
 	{
-		final long offset = System.currentTimeMillis() - Util.getMidnightMillisFromNow();
+		final long offset = Util.DateTime.nowOffsetFromMidnight();
 		long smallestDiff = 0;
 		int retDoseTime = -1;
 		

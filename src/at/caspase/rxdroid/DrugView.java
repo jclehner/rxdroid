@@ -1,5 +1,7 @@
 package at.caspase.rxdroid;
 
+import java.sql.Date;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -40,12 +42,12 @@ public class DrugView extends RelativeLayout implements DatabaseWatcher
 			mDoseViews[i] = (DoseView) findViewById(doseViewIds[i]);
 	}
 	
-	public void initialize(Drug drug, long day, Dao<Intake, Integer> dao)
+	public void initialize(Drug drug, Date date, Dao<Intake, Integer> dao)
 	{
 		for(DoseView doseView : mDoseViews)
 		{
 			doseView.setDrug(drug);
-			doseView.setDay(day);
+			doseView.setDate(date);
 			doseView.setDao(dao);
 		}
 		

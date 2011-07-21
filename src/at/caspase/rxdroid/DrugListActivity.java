@@ -1,6 +1,7 @@
 package at.caspase.rxdroid;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -31,8 +32,6 @@ import at.caspase.rxdroid.Database.Intake;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
 
 public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> implements DatabaseWatcher, OnLongClickListener
 {    
@@ -56,7 +55,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		
 	private ViewSwitcher mViewSwitcher;
 	private List<Database.Drug> mDrugs;
-	private long mDay;
+	private Date mDate;
 		
 	private Dao<Database.Drug, Integer> mDao;
 	private Dao<Database.Intake, Integer> mIntakeDao;
@@ -103,8 +102,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
                 
         if(Intent.ACTION_VIEW.equals(action) || Intent.ACTION_MAIN.equals(action))
         {
-            long day = intent.getLongExtra(EXTRA_DAY, Util.getMidnightMillisFromNow());
-            setDate(day);
+        	final Date date = (Date) intent.getSerializableExtra(EXTRA_DAY);
+            setDate(date);
         }
     	else
     		throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());
@@ -263,7 +262,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			{
 				if(which == AlertDialog.BUTTON_POSITIVE)
 				{
-					final Database.Intake intake = new Database.Intake(drug, mDay, doseTime);
+					final Database.Intake intake = new Database.Intake(drug, mDate, doseTime);
 					
 					if(newSupply.compareTo(0) != -1)
 						drug.setCurrentSupply(newSupply);
@@ -305,7 +304,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	{
     		builder.setTitle(drug.getName() + ": " + drug.getDose(doseTime));
     		
-    		boolean hasIntake = Database.getIntakes(mIntakeDao, drug, mDay, doseTime).size() != 0;
+    		boolean hasIntake = Database.getIntakes(mIntakeDao, drug, mDate, doseTime).size() != 0;
     		
         	if(!hasIntake)
         	{
@@ -372,34 +371,28 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	@Override
 	public void onDatabaseDropped() {}
 	        
-    private void setDate(long newDate) {
+    private void setDate(Date newDate) {
     	setOrShiftDate(0, newDate);
     }
     
     private void shiftDate(int shiftBy) {
-    	setOrShiftDate(shiftBy, -1);
+    	setOrShiftDate(shiftBy, null);
     }
     
     // shift to previous (-1) or next(1) date. passing 0
     // will reset to specified date, or current date
     // if newDate is -1
-    private void setOrShiftDate(int shiftBy, long newDate)
+    private void setOrShiftDate(int shiftBy, Date newDate)
     {
     	if(mViewSwitcher.getChildCount() != 0)   	
     		mViewSwitcher.removeAllViews();
     	
     	if(shiftBy == 0)
     	{
-    		if(newDate == -1)
-    			mDay = Util.getMidnightMillisFromNow();
-    		else if((newDate % Util.Constants.MILLIS_PER_DAY) != 0)
-    		{
-    			
-    		    throw new IllegalArgumentException("Time must be 00:00:00");
-    		}
+    		if(newDate == null)
+    			mDate = new Date(System.currentTimeMillis());
     		else
-    			mDay = newDate;
-    		
+    			mDate = newDate;    		
     		
     		mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
     		mViewSwitcher.setOutAnimation(null);
@@ -408,8 +401,9 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	{
     		final Animation inAnimation = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
     		final Animation outAnimation = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);    		
-    		
-    		mDay += shiftBy * Util.Constants.MILLIS_PER_DAY;
+    		    		
+    		final long shiftedTime = mDate.getTime() + shiftBy * Util.Constants.MILLIS_PER_DAY;
+    		mDate.setTime(shiftedTime);
     		
     		if(shiftBy == 1)
 	    	{
@@ -435,17 +429,17 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	}
     	
     	ListView newListView = new ListView(this);
-    	newListView.setAdapter(new DrugAdapter(this, R.layout.dose_view, mDrugs, mDay));
+    	newListView.setAdapter(new DrugAdapter(this, R.layout.dose_view, mDrugs, mDate));
     	
     	mViewSwitcher.addView(newListView);
     	mViewSwitcher.showNext();
     	
     	mListView = newListView;
     	
-    	((TextView) findViewById(R.id.med_list_footer)).setText(Util.getDateString(mDay));
+    	((TextView) findViewById(R.id.med_list_footer)).setText(mDate.toString());
     	
     	// update the intent so our Activity is restarted with the last opened date
-    	setIntent(getIntent().putExtra(EXTRA_DAY, mDay));
+    	setIntent(getIntent().putExtra(EXTRA_DAY, (Serializable) mDate));
     }
     
     private void updateDrugList()
@@ -472,12 +466,12 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	
 	private class DrugAdapter extends ArrayAdapter<Database.Drug>
 	{
-		private final long mDay;
+		private final Date mDate;
 		
-	    public DrugAdapter(Context context, int textViewResId, List<Database.Drug> items, long day) 
+	    public DrugAdapter(Context context, int textViewResId, List<Database.Drug> items, Date date) 
 	    {
 	        super(context, textViewResId, items);
-	        mDay = day;
+	        mDate = date;
 	    }
 	    
 	    @Override
@@ -501,7 +495,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	        for(int doseViewId : doseViewIds)
 	        {
 	        	DoseView doseView = (DoseView) v.findViewById(doseViewId);
-	        	doseView.setDay(mDay);
+	        	doseView.setDate(mDate);
 	        	doseView.setDrug(drug);
 	        	doseView.setDao(mIntakeDao);
 	        }
