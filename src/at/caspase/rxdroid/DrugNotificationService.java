@@ -112,7 +112,10 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		}
 		
 		if(mThread != null && mThread.isAlive())
+		{
 			mThread.interrupt();
+			Log.d(TAG, "Interrupting thread");
+		}
 		
 		mThread = new Thread(new Runnable() {
 			
@@ -145,7 +148,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					final long day = Util.getMidnightMillisFromNow();
 					final long offset = Util.getDayOffsetInMillis();
 					
-					final long millisUntilNextDoseTime = Settings.INSTANCE.getDoseTimeBegin(doseTime) - offset;
+					final long millisUntilNextDoseTime = Settings.INSTANCE.getDoseTimeBeginOffset(doseTime) - offset;
 					
 					Log.d(TAG, "Next dose time (" + doseTime + ") in " + millisUntilNextDoseTime + "ms");
 					
@@ -156,6 +159,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					
 					try
 					{
+						Log.d(TAG, "Will sleep " + millisUntilNextDoseTime + "ms");
 						Thread.sleep(millisUntilNextDoseTime);
 																		
 						while(Settings.INSTANCE.getActiveDoseTime() == doseTime)
@@ -187,7 +191,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 								manager.cancel(R.id.notification_intake);
 								manager.notify(R.id.notification_intake, notification);
 								
-								if(Settings.INSTANCE.getDoseTimeBegin(doseTime) - offset > mSnoozeTime)
+								if(Settings.INSTANCE.getDoseTimeBeginOffset(doseTime) - offset > mSnoozeTime)
 									Thread.sleep(mSnoozeTime);
 							}
 							else
@@ -204,6 +208,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			}
 		});
 		
+		Log.d(TAG, "Starting thread");
 		mThread.start();
 	}
 

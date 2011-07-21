@@ -267,7 +267,7 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 			}
 		}
 				
-		if(!mDoseText.getText().equals("0") && System.currentTimeMillis() > mDay + Settings.getDoseTimeOffsetInMillis(mDoseTime))
+		if(!mDoseText.getText().equals("0") && System.currentTimeMillis() >= mDay + Settings.INSTANCE.getDoseTimeEndOffset(mDoseTime))
 			mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
 		else
 			mIntakeStatus.setImageDrawable(null);
@@ -278,21 +278,6 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 		if(mDay == -1 || mDrug == null)
 			throw new IllegalStateException("Cannot obtain intake data from DoseView with unset date and/or drug");
 		
-    	try
-    	{   		
-	    	QueryBuilder<Database.Intake, Integer> qb = mIntakeDao.queryBuilder();
-	    	Where<Database.Intake, Integer> where = qb.where();
-	    	where.eq(Database.Intake.COLUMN_DRUG_ID, mDrug.getId());
-	    	where.and();
-	    	where.eq(Database.Intake.COLUMN_DAY, mDay);
-	    	where.and();
-	    	where.eq(Database.Intake.COLUMN_DOSE_TIME, mDoseTime);
-    			        	
-	    	return mIntakeDao.query(qb.prepare());
-    	}
-    	catch(SQLException e)
-    	{
-    		throw new RuntimeException(e);
-    	}    	
+    	return Database.getIntakes(mIntakeDao, mDrug, mDay, mDoseTime);
     }
 }

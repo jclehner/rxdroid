@@ -1,17 +1,16 @@
 package at.caspase.rxdroid;
 
+import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.NoSuchElementException;
-import java.util.TimeZone;
 
 import android.util.Log;
 import android.view.View;
 
 public class Util {
     
+	private static final String TAG = Util.class.getName();
+	
     private Util() {}
     
     static public class Constants
@@ -30,15 +29,15 @@ public class Util {
 	
 	static long getMidnightMillisFromNow()
 	{
-		final Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
-				
-		final long now = calendar.getTimeInMillis();
-		return now - (now % Constants.MILLIS_PER_DAY);
+		final Date date = new Date(System.currentTimeMillis());
+		return date.getTime();
 	}
 	
 	static long getDayOffsetInMillis()
 	{
-		return System.currentTimeMillis() - getMidnightMillisFromNow();
+		long ret = System.currentTimeMillis() - getMidnightMillisFromNow();
+		Log.d(TAG, "ret=" + ret);
+		return ret;
 	}
 	
 	static String getDateString(final long time) 
@@ -87,22 +86,5 @@ public class Util {
     	}
     	
     	throw new IllegalArgumentException();    	
-    }
-    
-    static String visibilityToString(int visibility)
-    {
-    	switch(visibility)
-    	{
-    		case View.VISIBLE:
-    			return "VISIBLE";
-    			
-    		case View.INVISIBLE:
-    			return "INVISIBLE";
-    			
-    		case View.GONE:
-    			return "GONE";
-    	}
-    	
-    	throw new IllegalArgumentException();
     }
 }
