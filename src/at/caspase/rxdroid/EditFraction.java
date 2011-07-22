@@ -109,18 +109,9 @@ public class EditFraction extends EditText implements OnTouchListener
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		Log.d(TAG, "onTouch: view=" + v.getClass().getSimpleName());
-		onFocusChanged(true, 0, null);
+		requestFocus();
+		mDialog.show();
 		return true;
-	}
-	
-	@Override
-	public synchronized void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect)
-	{
-		if(focused)
-			mDialog.show(); 
-		else
-			mDialog.dismiss();
 	}
 	
 	private void setup(Context context, AttributeSet attrs) 
@@ -216,8 +207,6 @@ public class EditFraction extends EditText implements OnTouchListener
 			mKeypad.setOnKeyboardActionListener(this);
 			
 			setIcon(android.R.drawable.ic_dialog_dialer);
-
-			this.setMessage("Hey, this is just a fuckin test");
 						
 			updateFractionInput();
 		}
