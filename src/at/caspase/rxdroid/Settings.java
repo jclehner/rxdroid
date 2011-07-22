@@ -45,7 +45,7 @@ public enum Settings
 	{
 		// TODO
 		if(doseTime == Drug.TIME_EVENING)
-			return 1000 * (18 * 3600 + 31 * 60);
+			return 1000 * (18 * 3600 + 45 * 60);
 			
 		return endHours[doseTime] * 3600 * 1000;
 	}

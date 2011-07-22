@@ -194,7 +194,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				Log.d(TAG, "Thread is up and running");
 								
 				final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mIntent, 0);
-				final Notification notification = new Notification(R.drawable.ic_stat_pill, "RxDroid", 0);
+				
 								
 				/* TODO
 				 * 
@@ -266,9 +266,10 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							final int count = pendingIntakes.size();							
 														
 							final CharSequence contentText = count + " doses pending";
+							
+							final Notification notification = new Notification(R.drawable.ic_stat_pill, "RxDroid", Util.DateTime.currentTimeMillis());
 							notification.setLatestEventInfo(getApplicationContext(), "Dose reminder", contentText, contentIntent);
 							notification.defaults |= Notification.DEFAULT_ALL;
-							notification.when = Util.DateTime.currentTimeMillis();
 							//notification.number = count;
 							
 							Log.d(TAG, "Posting notification");
