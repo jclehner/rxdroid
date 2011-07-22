@@ -186,7 +186,7 @@ public class Database
 	
 	public static void dropDatabase(Helper helper)
 	{
-		helper.dropTables();
+		helper.onUpgrade(helper.getWritableDatabase(), 0, Helper.DB_VERSION);
 		
 		for(DatabaseWatcher watcher : sWatchers)
 			watcher.onDatabaseDropped();
