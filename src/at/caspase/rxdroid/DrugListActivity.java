@@ -453,9 +453,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	mViewSwitcher.addView(newListView);
     	mViewSwitcher.showNext();
     	
-    	mListView = newListView;
-    	
-    	
+    	mListView = newListView;   	
     	
     	SpannableString dateString = new SpannableString(mDate.toString());
     	
