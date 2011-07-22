@@ -4,4 +4,6 @@
 	<item type="id" name="tag_time"/>
 	<item type="id" name="tag_adapter_index"/>
 	<item type="id" name="notification_intake"/>
+	<item type="id" name="notification_intake_forgotten"/>
+	<item type="id" name="notification_low_supplies"/>
 </resources>

@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
 
@@ -164,7 +165,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					
 					// TODO check supply levels
 					final Date today = Util.DateTime.today();
-					final long offset = Util.DateTime.now().getTime() - today.getTime();				
+					long offset = Util.DateTime.nowOffsetFromMidnight();		
 					
 					long millisUntilNextDoseTime = Settings.INSTANCE.getDoseTimeBeginOffset(doseTime) - offset;
 					if(!firstRun)
@@ -214,19 +215,36 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 							
 							final CharSequence contentTitle = "RxDroid: Reminder";
-							final CharSequence contentText = "You have " + count + " prescriptions to take";
+							CharSequence contentText = "You have " + count + " prescriptions to take";
 							
-							Notification notification = new Notification(R.drawable.med_pill, "RxDroid", System.currentTimeMillis());
+							Notification notification = new Notification(R.drawable.ic_stat_pill, "RxDroid", Util.DateTime.currentTimeMillis());
 							notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
 							notification.defaults |= Notification.DEFAULT_ALL;
+							notification.number = count;
 							
 							Log.d(TAG, "Posting notification");
 							notificationManager.notify(R.id.notification_intake, notification);							
 							
-							Thread.sleep(mSnoozeTime);
-						}
+							offset = Util.DateTime.nowOffsetFromMidnight();
+							final long millisUntilDoseTimeEnd = Settings.INSTANCE.getDoseTimeEndOffset(doseTime) - offset;
+							
+							if(millisUntilDoseTimeEnd > 0)
+							{
+								Log.d(TAG, "Time left until dose time end: " + millisUntilDoseTimeEnd + "ms");
+								Thread.sleep(millisUntilDoseTimeEnd);
+							}
+							
+							notificationManager.cancel(R.id.notification_intake);
+							
+							contentText = count + " prescriptions were not taken on time";
+							notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
+							
+							notificationManager.notify(R.id.notification_intake_forgotten, notification);
+						}						
 						
-						doseTime = Settings.INSTANCE.getNextDoseTime();							
+						// TODO cancel old notification, display "forgotten" notification
+						
+						doseTime = Settings.INSTANCE.getNextDoseTime();						
 					}
 					catch (InterruptedException e)
 					{

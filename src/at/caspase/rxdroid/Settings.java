@@ -12,20 +12,19 @@ public enum Settings
 	
 	private static final long[] beginHours = { 5, 14, 21, 23 };
 	private static final long[] endHours = { 11, 17, 23, 24 };
-	private static final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };		
+	private static final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 	
 	public long getDoseTimeBeginOffset(int doseTime)
 	{
 		// TODO
-		if(doseTime == Drug.TIME_EVENING)
-			return 21 * 3600 * 1000 + 45 * 60 * 1000;
-		
 		return beginHours[doseTime] * 3600 * 1000;		
 	}
 	
 	public long getDoseTimeEndOffset(int doseTime)
 	{
 		// TODO
+		if(doseTime == Drug.TIME_MORNING)
+			return 11 * 3600 * 1000 + 10 * 60 * 1000;
 		return endHours[doseTime] * 3600 * 1000;
 	}
 	
