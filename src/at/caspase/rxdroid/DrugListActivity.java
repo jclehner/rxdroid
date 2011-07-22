@@ -537,14 +537,4 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			return Math.abs(f - 1f);			
 		}		
 	}
-	
-	private enum DummyInterpolator implements Interpolator
-	{
-		INSTANCE;
-		
-		@Override
-		public float getInterpolation(float f) {
-			return f;
-		}
-	}	
 }
