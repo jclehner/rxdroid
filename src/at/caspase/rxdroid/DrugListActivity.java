@@ -24,9 +24,12 @@ package at.caspase.rxdroid;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -42,10 +45,10 @@ import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -57,7 +60,7 @@ import at.caspase.rxdroid.Database.Intake;
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import com.j256.ormlite.dao.Dao;
 
-public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> implements DatabaseWatcher, OnLongClickListener
+public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> implements DatabaseWatcher, OnLongClickListener, OnDateSetListener
 {    
     public static final String TAG = DrugListActivity.class.getName();
 		
@@ -77,8 +80,9 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	// 2 ... ListView for next day
 	
 	private ListView mListView;
-		
 	private ViewSwitcher mViewSwitcher;
+	private TextView mTextDate;
+	
 	private List<Database.Drug> mDrugs;
 	private Date mDate;
 		
@@ -96,15 +100,17 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         mDao = getHelper().getDrugDao();
         mIntakeDao = getHelper().getIntakeDao();
         mViewSwitcher = (ViewSwitcher) findViewById(R.id.drug_list_view_flipper);
-                
+        mTextDate = (TextView) findViewById(R.id.med_list_footer);
+        
         updateDrugList();
         
+        mTextDate.setOnLongClickListener(this);
         Database.addWatcher(this);
                 
         Intent serviceIntent = new Intent();
         serviceIntent.setClass(this, DrugNotificationService.class);
         
-        startService(serviceIntent);
+        //startService(serviceIntent);
     }
     
     @Override
@@ -258,12 +264,24 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     @Override
     public boolean onLongClick(View view)
     {
-    	if(view.getId() == R.id.drug_name)
+    	if(view.getId() == R.id.med_list_footer)
     	{
-    		Toast.makeText(this, "Long click registered", Toast.LENGTH_SHORT).show();
-    		return true;    	
+    		DatePickerDialog dialog = new DatePickerDialog(this, this, mDate.getYear() + 1900, mDate.getMonth(), mDate.getDate());
+    		dialog.show();
+    		return true;
     	}
     	return false;
+    }
+    
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int day)
+    {
+    	final Timestamp timestamp = new Timestamp(0);
+    	timestamp.setYear(year - 1900);
+    	timestamp.setMonth(month);
+    	timestamp.setDate(day);
+    	
+    	setDate(new Date(timestamp.getTime()));
     }
     
     public void onDoseClick(final View view)
@@ -461,7 +479,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	if(mDate.equals(Util.DateTime.today()))
     	   	dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
     	
-    	((TextView) findViewById(R.id.med_list_footer)).setText(dateString);
+    	mTextDate.setText(dateString);
     	
     	// update the intent so our Activity is restarted with the last opened date
     	setIntent(getIntent().putExtra(EXTRA_DAY, (Serializable) mDate));
