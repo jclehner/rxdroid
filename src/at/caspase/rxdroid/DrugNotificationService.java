@@ -59,10 +59,13 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	private static final String CONTENT_TITLE = "RxDroid: Notification";
 	
 	
+	private static int sLastForgottenNotificationDoseTime = -1;
+	
 	private Dao<Drug, Integer> mDrugDao;
 	private Dao<Intake, Integer> mIntakeDao;
 	private NotificationManager mNotificationManager;
 	private Date mDate;
+	private Intent mIntent;
 	
 	private Set<Intake> mForgottenIntakes = Collections.emptySet();
 	
@@ -77,6 +80,29 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		mDrugDao = getHelper().getDrugDao();
 		mIntakeDao = getHelper().getIntakeDao();
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		
+		mIntent = new Intent(Intent.ACTION_VIEW);
+		mIntent.setClass(getApplicationContext(), DrugListActivity.class);
+		mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		
+		mDate = Util.DateTime.today();
+		
+		final int activeDoseTime = Settings.INSTANCE.getActiveDoseTime();
+		final int nextDoseTime = Settings.INSTANCE.getNextDoseTime();
+				
+		int lastDoseTime;
+		
+		if(activeDoseTime == -1)
+			lastDoseTime = nextDoseTime - 1;
+		else
+			lastDoseTime = activeDoseTime - 1;
+				
+		synchronized(Locker.INSTANCE)
+		{
+			Log.d(TAG, "onCreate: Will post first 'forgotten' notification");
+			mForgottenIntakes = getAllForgottenIntakes(mDate);
+			maybeDisplayForgottenIntakesNotification(mIntent, lastDoseTime);			
+		}
 		
 		Database.addWatcher(this);
 	}
@@ -165,15 +191,11 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			@Override
 			public void run()
 			{
-				Log.d(TAG, "Started thread...");
-				
-				final Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setClass(getApplicationContext(), DrugListActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				
-				final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+				Log.d(TAG, "Thread is up and running");
+								
+				final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mIntent, 0);
 				final Notification notification = new Notification(R.drawable.ic_stat_pill, "RxDroid", 0);
-				
+								
 				/* TODO
 				 * 
 				 * 1. query settings to determine begin of the next doseTime period & sleep 
@@ -206,21 +228,21 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					{
 						mDate = today;
 						mForgottenIntakes = getAllForgottenIntakes(today);
-						intent.putExtra(DrugListActivity.EXTRA_DAY, today);
+						mIntent.putExtra(DrugListActivity.EXTRA_DAY, today);						
+						sLastForgottenNotificationDoseTime = -1;
 						
+						Log.d(TAG, "Date change noted");
 						// TODO check current supplies
-					}				
+					}					
 					
-					long offset = Util.DateTime.nowOffsetFromMidnight();		
+					long offset = Util.DateTime.nowOffsetFromMidnight();
 					
 					long millisUntilNextDoseTime = Settings.INSTANCE.getDoseTimeBeginOffset(doseTime) - offset;
 					if(!firstRun)
 					{
 						millisUntilNextDoseTime += Util.Constants.MILLIS_PER_DAY;
 						Log.d(TAG, "Adjusting sleep time to next day");
-					}
-															
-					maybeDisplayForgottenIntakesNotification(intent);
+					}				
 					
 					try
 					{						
@@ -262,7 +284,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							}
 							
 							mNotificationManager.cancel(R.id.notification_intake);
-							mForgottenIntakes.addAll(pendingIntakes);		
+							mForgottenIntakes.addAll(pendingIntakes);
+							maybeDisplayForgottenIntakesNotification(mIntent, doseTime);
 						}
 						
 						doseTime = Settings.INSTANCE.getNextDoseTime();						
@@ -276,8 +299,9 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			}
 		});
 		
-		Log.d(TAG, "Starting thread");
-		mThread.start();
+		synchronized(Locker.INSTANCE) {
+			mThread.start();
+		}
 	}
 		
 	private Set<Intake> getAllForgottenIntakes(Date date) {
@@ -323,8 +347,14 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				{					
 					if(!drug.getDose(doseTime).equals(0))
 					{
-						final Intake intake = new Intake(drug, mDate, doseTime);
-						intakes.add(intake);
+						final List<Intake> intakesInDb = Database.getIntakes(mIntakeDao, drug, date, doseTime);
+						if(intakesInDb.isEmpty())
+						{				
+							
+							final Intake intake = new Intake(drug, mDate, doseTime);
+							intakes.add(intake);
+							Log.d(TAG, "getAllForgottenOrPendingIntakes: adding " + intake);
+						}
 					}
 					
 					if(onlyPendingIntakes)
@@ -336,66 +366,31 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		return intakes;
 	}
 	
-	
-	private void checkForgottenIntakes(Drug drug, Intake intake, boolean wasRemoved)
-	{
-		assert drug == null ^ intake == null;
-		
-		synchronized(this)
-		{
-			for(Intake forgottenIntake : mForgottenIntakes)
-			{
-				if(drug != null)
-				{				
-					if(forgottenIntake.getDrug().getId() == drug.getId())
-					{
-						boolean removeIntake = wasRemoved;
-						
-						if(!removeIntake)
-						{
-							// check if the drug was updated in such a way that the
-							// forgotten intake is not applicable any more, due to the
-							// dose having been changed to zero						
-							final int doseTime = forgottenIntake.getDoseTime();
-							if(drug.getDose(doseTime).equals(0))
-								removeIntake = true;						
-						}
-						
-						if(removeIntake)
-						{
-							Log.d(TAG, "Removing intake: " + forgottenIntake);
-							mForgottenIntakes.remove(forgottenIntake);
-						}										
-					}
-				}
-				else if(intake != null)
-				{
-					if(forgottenIntake.getDrug().equals(intake.getDrug()))
-					{
-						// FIXME
-						assert !wasRemoved;
-						
-						// FIXME for now, assume that if an intake was added/updated, we can clear the forgotten intake
-						mForgottenIntakes.remove(intake);						
-					}					
-				}
-			}		
-		}
-	}
-	
-	private synchronized void maybeDisplayForgottenIntakesNotification(Intent intent)
+	private void maybeDisplayForgottenIntakesNotification(final Intent intent, int doseTime)
 	{
 		if(!mForgottenIntakes.isEmpty())
-		{	
-			final CharSequence contentText = mForgottenIntakes.size() + " prescriptions were not taken on time";
-			final Notification notification = new Notification(R.drawable.ic_stat_pill, TICKER_TEXT, Util.DateTime.currentTimeMillis());
-			final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-			
-			notification.setLatestEventInfo(getApplicationContext(), CONTENT_TITLE, contentText, contentIntent);						
-			notification.defaults |= Notification.DEFAULT_ALL;
-			mNotificationManager.notify(R.id.notification_intake_forgotten, notification);
+		{
+			if(doseTime == -1 || doseTime > sLastForgottenNotificationDoseTime)
+			{
+				sLastForgottenNotificationDoseTime = doseTime;
+				
+				intent.putExtra(DrugListActivity.EXTRA_CLEAR_FORGOTTEN_NOTIFICATION, true);
+				
+				final CharSequence contentText = mForgottenIntakes.size() + " prescriptions were not taken on time";
+				final Notification notification = new Notification(R.drawable.ic_stat_pill, TICKER_TEXT, Util.DateTime.currentTimeMillis());
+				final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+				
+				notification.setLatestEventInfo(getApplicationContext(), CONTENT_TITLE, contentText, contentIntent);						
+				notification.defaults |= Notification.DEFAULT_ALL;
+				mNotificationManager.notify(R.id.notification_intake_forgotten, notification);
+			}
+			else
+				Log.d(TAG, "maybeDisplayForgottenIntakesNotification: Notification was already displayed.");
 		}
 		else
 			mNotificationManager.cancel(R.id.notification_intake_forgotten);
 	}
+	
+
+	private enum Locker { INSTANCE; }
 }

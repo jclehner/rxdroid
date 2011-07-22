@@ -523,6 +523,11 @@ public class Database
 		public void setDoseTime(int doseTime) {
 			this.doseTime = doseTime;
 		}
+		
+		@Override
+		public String toString() {
+			return drug.getName() + ": date=" + date + ", doseTime=" + doseTime;		
+		}
 
     }
 	

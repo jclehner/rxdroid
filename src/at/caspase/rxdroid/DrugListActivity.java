@@ -63,6 +63,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	public static final int MENU_DEBUG_FILL = MENU_DELETE + 1;
 		
 	public static final String EXTRA_DAY = "day";
+	public static final String EXTRA_CLEAR_FORGOTTEN_NOTIFICATION = "clear_forgotten_notification";
 	
 	private static final int TAG_ID = R.id.tag_drug_id;
 
@@ -131,6 +132,9 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(R.id.notification_intake);
+        
+        if(intent.getBooleanExtra(EXTRA_CLEAR_FORGOTTEN_NOTIFICATION, false))
+        	manager.cancel(R.id.notification_intake_forgotten);
     }
     
     @Override
