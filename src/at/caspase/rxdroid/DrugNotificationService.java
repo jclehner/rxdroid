@@ -265,8 +265,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 						{
 							final int count = pendingIntakes.size();							
 														
-							final CharSequence contentText = "You have " + count + " prescriptions to take";
-							notification.setLatestEventInfo(getApplicationContext(), CONTENT_TITLE, contentText, contentIntent);
+							final CharSequence contentText = count + " doses pending";
+							notification.setLatestEventInfo(getApplicationContext(), "Dose reminder", contentText, contentIntent);
 							notification.defaults |= Notification.DEFAULT_ALL;
 							notification.when = Util.DateTime.currentTimeMillis();
 							//notification.number = count;
@@ -376,11 +376,12 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				
 				intent.putExtra(DrugListActivity.EXTRA_CLEAR_FORGOTTEN_NOTIFICATION, true);
 				
-				final CharSequence contentText = mForgottenIntakes.size() + " prescriptions were not taken on time";
+				final CharSequence contentText = mForgottenIntakes.size() + " forgotten doses";
+				
 				final Notification notification = new Notification(R.drawable.ic_stat_pill, TICKER_TEXT, Util.DateTime.currentTimeMillis());
 				final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 				
-				notification.setLatestEventInfo(getApplicationContext(), CONTENT_TITLE, contentText, contentIntent);						
+				notification.setLatestEventInfo(getApplicationContext(), "Forgotten doses", contentText, contentIntent);						
 				notification.defaults |= Notification.DEFAULT_ALL;
 				mNotificationManager.notify(R.id.notification_intake_forgotten, notification);
 			}
