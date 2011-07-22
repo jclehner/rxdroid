@@ -25,7 +25,9 @@ import java.sql.SQLException;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -156,11 +158,14 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			
 			setTitle("Edit " + mDrug.getName());		
 		}
-		else if(!Intent.ACTION_INSERT.equals(action))
-			throw new RuntimeException("Unexpected intent action: " + action);
-		else
+		else if(Intent.ACTION_INSERT.equals(action))
+		{
+			findViewById(R.id.delete_drug).setVisibility(View.GONE);
 			setTitle("Add new drug");
-		
+		}
+		else
+			throw new RuntimeException("Unexpected intent action: " + action);
+				
 		for(DoseView v : mDoses)
 		{
 			if(mDrug != null)
@@ -233,6 +238,31 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		}
 			
 		finish();
+	}
+	
+	public void onDeleteDrug(View view)
+	{
+		if(mDrug != null)
+		{
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setIcon(android.R.drawable.ic_dialog_info);
+			builder.setTitle("Delete drug?");
+			builder.setMessage("Are you sure that you want to delete " + mDrug.getName() + "?");
+			
+			builder.setPositiveButton("Yes", new OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					Database.delete(mDao, mDrug);
+					Toast.makeText(getApplicationContext(), "Deleted.", Toast.LENGTH_SHORT);
+					finish();			
+				}
+			});
+			
+			builder.setNegativeButton("No", null);
+			builder.show();			
+		}
 	}
 
 	@Override

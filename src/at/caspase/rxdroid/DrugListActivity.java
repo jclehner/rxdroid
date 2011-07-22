@@ -110,7 +110,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         Intent serviceIntent = new Intent();
         serviceIntent.setClass(this, DrugNotificationService.class);
         
-        //startService(serviceIntent);
+        startService(serviceIntent);
     }
     
     @Override
@@ -392,7 +392,12 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	@Override
 	public void onDrugDelete(Drug drug)
 	{
-		mDrugs.remove(drug);
+		for(Drug storedDrug : mDrugs)
+		{
+			if(storedDrug.getId() == drug.getId())
+				mDrugs.remove(storedDrug);
+		}
+		
 		((DrugAdapter) mListView.getAdapter()).notifyDataSetChanged();		
 	}
 
