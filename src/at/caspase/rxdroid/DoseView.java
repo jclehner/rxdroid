@@ -25,7 +25,7 @@ import com.j256.ormlite.dao.Dao;
  * 
  * 
  * 
- * @author caspase
+ * @author Joseph Lehner
  *
  */
 public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchListener

@@ -28,7 +28,7 @@ import com.j256.ormlite.table.TableUtils;
  * Note that all ORMLite related classes will have members prefixed without the
  * usual "m" (i.e. "comment" instead of "mComment").
  * 
- * @author caspase
+ * @author Joseph Lehner
  *
  */
 public class Database 
@@ -235,7 +235,7 @@ public class Database
 	 * </ul>
 	 *  
 	 * 
-	 * @author caspase
+	 * @author Joseph Lehner
 	 *
 	 */
 	@DatabaseTable(tableName = "drugs")

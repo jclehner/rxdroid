@@ -2,6 +2,7 @@ package at.caspase.rxdroid;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 
 import android.app.Notification;
@@ -21,12 +22,19 @@ import com.j256.ormlite.dao.Dao;
 /**
  * Primary notification service.
  * 
- * @author caspase
+ * @author Joseph Lehner
  *
  */
 public class DrugNotificationService extends OrmLiteBaseService<Database.Helper> implements DatabaseWatcher
 {
 	private static final String TAG = DrugNotificationService.class.getName();
+	
+	private static final String TICKER_TEXT = "RxDroid";
+	private static final String CONTENT_TITLE = "RxDroid: Notification";
+	
+	private NotificationManager mNotificationManager;
+	
+	private HashSet<Intake> mForgottenIntakes = new HashSet<Intake>();
 	
 	Thread mThread;
 	// FIXME
@@ -36,6 +44,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	public void onCreate()
 	{
 		super.onCreate();
+		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		Database.addWatcher(this);
 	}
 	
@@ -67,37 +76,44 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	@Override
 	public void onDrugCreate(Drug drug)
 	{
-		Log.d(TAG, "onDrugCreate");
+		checkForgottenIntakes(drug, null, false);
 		restartThread();		
 	}
 
 	@Override
 	public void onDrugDelete(Drug drug)
 	{
+		checkForgottenIntakes(drug, null, true);
 		restartThread();
 	}
 
 	@Override
 	public void onDrugUpdate(Drug drug)
 	{
+		checkForgottenIntakes(drug, null, false);
 		restartThread();
 	}
 
 	@Override
 	public void onIntakeCreate(Intake intake)
 	{
+		checkForgottenIntakes(null, intake, false);
 		restartThread();
 	}
 
 	@Override
 	public void onIntakeDelete(Intake intake)
 	{
+		checkForgottenIntakes(null, intake, true);
 		restartThread();
 	}
 
 	@Override
 	public void onDatabaseDropped()
 	{
+		synchronized(this) {
+			mForgottenIntakes.clear();
+		}
 		restartThread();
 	}
 	
@@ -135,9 +151,6 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			@Override
 			public void run()
 			{
-				NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-				notificationManager.cancel(R.id.notification_intake);
-				
 				/* TODO
 				 * 
 				 * 1. query settings to determine begin of the next doseTime period & sleep 
@@ -179,6 +192,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					intent.putExtra(DrugListActivity.EXTRA_DAY, today);
 					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					
+					maybeDisplayForgottenIntakesNotification(intent);
+					
 					try
 					{						
 						if(millisUntilNextDoseTime > 0)
@@ -194,15 +209,28 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							Thread.sleep(mSnoozeTime);
 						}
 						
-						int count = 0;
+						if(doseTime == Drug.TIME_MORNING)
+						{	
+							mNotificationManager.cancel(R.id.notification_intake_forgotten);
+							synchronized(this) {
+								mForgottenIntakes.clear();
+							}
+							// TODO check current supplies							
+						}
+						
+						final HashSet<Intake> forgottenIntakes = new HashSet<Intake>();
+						
 						// FIXME this does not need to be determined every time							
 						for(Drug drug : drugs)
 						{
 							if(drug.isActive() && !drug.getDose(doseTime).equals(0))
 							{
+								for(int )
+								
+								
 								final List<Intake> intakes = Database.getIntakes(intakeDao, drug, today, doseTime);
 								if(intakes.isEmpty())
-									++count;
+									forgottenIntakes.add(new Intake(drug, today, doseTime));
 								else
 									Log.d(TAG, "Not counting " + drug + ": " + intakes.size() + " intakes");
 							}
@@ -210,20 +238,20 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 								Log.d(TAG, "Not considering " + drug);
 						}
 						
-						if(count != 0)
-						{										
-							PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-							
-							final CharSequence contentTitle = "RxDroid: Reminder";
-							CharSequence contentText = "You have " + count + " prescriptions to take";
-							
-							Notification notification = new Notification(R.drawable.ic_stat_pill, "RxDroid", Util.DateTime.currentTimeMillis());
-							notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
+						final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+						final Notification notification = new Notification(R.drawable.ic_stat_pill, "RxDroid", Util.DateTime.currentTimeMillis());
+						
+						if(!forgottenIntakes.isEmpty())
+						{
+							final int count = forgottenIntakes.size();							
+														
+							final CharSequence contentText = "You have " + count + " prescriptions to take";
+							notification.setLatestEventInfo(getApplicationContext(), CONTENT_TITLE, contentText, contentIntent);
 							notification.defaults |= Notification.DEFAULT_ALL;
-							notification.number = count;
+							//notification.number = count;
 							
 							Log.d(TAG, "Posting notification");
-							notificationManager.notify(R.id.notification_intake, notification);							
+							mNotificationManager.notify(R.id.notification_intake, notification);							
 							
 							offset = Util.DateTime.nowOffsetFromMidnight();
 							final long millisUntilDoseTimeEnd = Settings.INSTANCE.getDoseTimeEndOffset(doseTime) - offset;
@@ -234,15 +262,14 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 								Thread.sleep(millisUntilDoseTimeEnd);
 							}
 							
-							notificationManager.cancel(R.id.notification_intake);
+							mNotificationManager.cancel(R.id.notification_intake);
 							
-							contentText = count + " prescriptions were not taken on time";
-							notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
-							
-							notificationManager.notify(R.id.notification_intake_forgotten, notification);
-						}						
+							synchronized(this) {
+								mForgottenIntakes.addAll(forgottenIntakes);
+							}						
+						}
 						
-						// TODO cancel old notification, display "forgotten" notification
+						maybeDisplayForgottenIntakesNotification(intent);
 						
 						doseTime = Settings.INSTANCE.getNextDoseTime();						
 					}
@@ -256,5 +283,66 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		
 		Log.d(TAG, "Starting thread");
 		mThread.start();
+	}
+	
+	private void checkForgottenIntakes(Drug drug, Intake intake, boolean wasRemoved)
+	{
+		assert drug == null ^ intake == null;
+		
+		synchronized(this)
+		{
+			for(Intake forgottenIntake : mForgottenIntakes)
+			{
+				if(drug != null)
+				{				
+					if(forgottenIntake.getDrug().getId() == drug.getId())
+					{
+						boolean removeIntake = wasRemoved;
+						
+						if(!removeIntake)
+						{
+							// check if the drug was updated in such a way that the
+							// forgotten intake is not applicable any more, due to the
+							// dose having been changed to zero						
+							final int doseTime = forgottenIntake.getDoseTime();
+							if(drug.getDose(doseTime).equals(0))
+								removeIntake = true;						
+						}
+						
+						if(removeIntake)
+						{
+							Log.d(TAG, "Removing intake: " + forgottenIntake);
+							mForgottenIntakes.remove(forgottenIntake);
+						}										
+					}
+				}
+				else if(intake != null)
+				{
+					if(forgottenIntake.getDrug().equals(intake.getDrug()))
+					{
+						// FIXME
+						assert !wasRemoved;
+						
+						// FIXME for now, assume that if an intake was added/updated, we can clear the forgotten intake
+						mForgottenIntakes.remove(intake);						
+					}					
+				}
+			}		
+		}
+	}
+	
+	private synchronized void maybeDisplayForgottenIntakesNotification(Intent intent)
+	{
+		if(!mForgottenIntakes.isEmpty())
+		{	
+			final CharSequence contentText = mForgottenIntakes.size() + " prescriptions were not taken on time";
+			final Notification notification = new Notification(R.drawable.ic_stat_pill, TICKER_TEXT, Util.DateTime.currentTimeMillis());
+			final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+			
+			notification.setLatestEventInfo(getApplicationContext(), CONTENT_TITLE, contentText, contentIntent);						
+			mNotificationManager.notify(R.id.notification_intake_forgotten, notification);
+		}
+		else
+			mNotificationManager.cancel(R.id.notification_intake_forgotten);
 	}
 }

@@ -16,7 +16,7 @@ import com.j256.ormlite.dao.Dao;
 /**
  * List item view for DrugListActivity.
  *  
- * @author caspase
+ * @author Joseph Lehner
  *
  */
 public class DrugView extends RelativeLayout implements DatabaseWatcher

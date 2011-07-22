@@ -23,7 +23,7 @@ import com.j256.ormlite.stmt.Where;
 
 /**
  * Edit a drug's database entry.
- * @author caspase
+ * @author Joseph Lehner
  *
  */
 

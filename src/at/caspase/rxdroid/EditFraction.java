@@ -25,7 +25,7 @@ import android.widget.TextView;
  * This class enables the user to input fractions. Once the EditText is focused/touched,
  * a Dialog will open, presenting the user with a method of typing fractions.
  * 
- * @author caspase
+ * @author Joseph Lehner
  *
  */
 

@@ -13,7 +13,7 @@ import at.caspase.rxdroid.Database.Intake;
  * @see Database#update
  * @see Database#delete
  * @see Database#dropDatabase
- * @author caspase
+ * @author Joseph Lehner
  *
  */
 public interface DatabaseWatcher
