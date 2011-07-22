@@ -32,6 +32,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -422,8 +424,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     			mDate = newDate;    		
     		
     		mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-    		mViewSwitcher.setOutAnimation(null);
-    		
+    		mViewSwitcher.setOutAnimation(null);    		
     	}
     	else
     	{    		    		
@@ -454,7 +455,14 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	
     	mListView = newListView;
     	
-    	((TextView) findViewById(R.id.med_list_footer)).setText(mDate.toString());
+    	
+    	
+    	SpannableString dateString = new SpannableString(mDate.toString());
+    	
+    	if(mDate.equals(Util.DateTime.today()))
+    	   	dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
+    	
+    	((TextView) findViewById(R.id.med_list_footer)).setText(dateString);
     	
     	// update the intent so our Activity is restarted with the last opened date
     	setIntent(getIntent().putExtra(EXTRA_DAY, (Serializable) mDate));
