@@ -202,10 +202,10 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					// TODO check supply levels
 					final Date today = Util.DateTime.today();
 					
-					if(!mDate.equals(today))
+					if(!today.equals(mDate))
 					{
-						mForgottenIntakes = getAllForgottenIntakes(mDate);
 						mDate = today;
+						mForgottenIntakes = getAllForgottenIntakes(today);
 						intent.putExtra(DrugListActivity.EXTRA_DAY, today);
 						
 						// TODO check current supplies
