@@ -528,7 +528,6 @@ public class Database
 		public String toString() {
 			return drug.getName() + ": date=" + date + ", doseTime=" + doseTime;		
 		}
-
     }
 	
 	public static class Helper extends OrmLiteSqliteOpenHelper

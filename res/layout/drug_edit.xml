@@ -24,6 +24,7 @@
 				android:layout_height="wrap_content"
 				android:hint="Drug name"
 				android:singleLine="true"
+				android:inputType="textCapWords"
 			/>
 						
 			<LinearLayout
@@ -163,6 +164,7 @@
 							android:layout_height="wrap_content"
 							android:text="0"
 							android:singleLine="true"
+							android:inputType="number"
 						/>						
 					</TableRow>
 					
