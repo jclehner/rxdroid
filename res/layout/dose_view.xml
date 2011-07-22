@@ -4,14 +4,13 @@
   android:orientation="vertical"
   android:layout_width="wrap_content"
   android:layout_height="wrap_content"
-  android:background="@drawable/doseview_background"
 >
   <ImageView android:id="@+id/icon_intake_status"
   	android:layout_width="40dp"
   	android:layout_height="40dp" 
   	android:layout_gravity="center"
   	android:scaleType="fitCenter"
-  />  
+  /> 
   
   <ImageView android:id="@+id/icon_dose_time"
   	android:layout_width="30dp"

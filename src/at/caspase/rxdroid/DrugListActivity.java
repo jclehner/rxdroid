@@ -46,6 +46,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -520,7 +521,10 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	        final TextView drugName = (TextView) v.findViewById(R.id.drug_name);
 	        drugName.setText(drug.getName());
 	        drugName.setTag(TAG_ID, drug.getId());
-	        	        	       	        
+	        
+	        final ImageView drugIcon = (ImageView) v.findViewById(R.id.drug_icon);
+	        drugIcon.setImageResource(drug.getFormResourceId());
+ 	        
 	        final int doseViewIds[] = { R.id.morning, R.id.noon, R.id.evening, R.id.night };
 	        for(int doseViewId : doseViewIds)
 	        {

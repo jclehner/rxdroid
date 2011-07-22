@@ -31,6 +31,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.BaseDaoImpl;
@@ -321,6 +322,23 @@ public class Database
 	    
 	    public int getForm() {
 	        return form;
+	    }
+	    
+	    public int getFormResourceId() 
+	    {
+	    	switch(form)
+	    	{
+	    		case FORM_TABLET:
+	    			return R.drawable.med_pill;
+	    			
+	    		case FORM_INJECTION:
+	    			return R.drawable.med_syringe;
+	    			
+	    		case FORM_DROP:
+	    			return R.drawable.med_drink;    			
+	    	}
+	    	
+	    	return R.drawable.med_pill;
 	    }
 	    
 	    public boolean isActive() {

@@ -109,7 +109,7 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 				throw new RuntimeException("Invalid DoseView id");
 		}
 		
-		mIntakeStatus.setImageDrawable(null);
+		setBackgroundResource(R.drawable.doseview_background);
 		
 		mDoseText.setHint(hint);
 		mDoseText.setText("0");

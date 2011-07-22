@@ -31,8 +31,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.EditFraction.FractionPickerDialog;
@@ -56,12 +60,13 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	private static final String TAG = DrugEditActivity.class.getName();
 		
 	private EditText mTextName;
-	
 	private DoseView[] mDoses;
-		
 	private EditText mTextCurrentSupply;
 	private EditText mTextRefillSize;
+	private Spinner mDrugFormChooser;
 	private CheckBox mIsActive;
+	
+	int mDrugForm;
 		
 	// indicates whether a change was made to the drug we're editing
 	private boolean mChanged = false;
@@ -84,11 +89,30 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		mTextName = (EditText) findViewById(R.id.drug_name);
 		mTextCurrentSupply = (EditText) findViewById(R.id.current_supply);
 		mTextRefillSize = (EditText) findViewById(R.id.refill_size);
+		mDrugFormChooser = (Spinner) findViewById(R.id.drug_form_chooser);
 		mIsActive = (CheckBox) findViewById(R.id.drug_active);
 		
 		mTextName.addTextChangedListener(this);
 		mTextCurrentSupply.addTextChangedListener(this);
 		mTextRefillSize.addTextChangedListener(this);
+		
+		final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+				this, R.array.drug_forms, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		
+		mDrugFormChooser.setAdapter(adapter);	
+		mDrugFormChooser.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				mDrugForm = position;				
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				mDrugForm = Drug.FORM_TABLET;				
+			}
+		});
 		
 		mDoses = new DoseView[4];
 				
@@ -124,6 +148,7 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			mTextCurrentSupply.setText(mDrug.getCurrentSupply().toString());
 			mTextRefillSize.setText(Integer.toString(mDrug.getRefillSize()));
 			mIsActive.setChecked(mDrug.isActive());
+			mDrugFormChooser.setSelection(mDrug.getForm());			
 			
 			final boolean focusOnCurrentSupply = intent.getBooleanExtra(EXTRA_FOCUS_ON_CURRENT_SUPPLY, false);
 			if(focusOnCurrentSupply)
@@ -161,6 +186,7 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		mDrug.setForm(Database.Drug.FORM_TABLET);
 		mDrug.setCurrentSupply(Fraction.decode(mTextCurrentSupply.getText().toString()));
 		mDrug.setRefillSize(Integer.parseInt(mTextRefillSize.getText().toString(), 10));
+		mDrug.setForm(mDrugForm);
 		mDrug.setActive(mIsActive.isChecked());
 		
 		for(DoseView v : mDoses)
