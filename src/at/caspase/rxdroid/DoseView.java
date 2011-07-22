@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewStub;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -56,7 +57,7 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 	private ImageView mIntakeStatus;
 	private TextView mDoseText;
 	private ImageView mDoseTimeIcon;
-		
+
 	private Drug mDrug;
 	private int mDoseTime = -1;
 	private Date mDate;
@@ -79,7 +80,7 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 		mIntakeStatus = (ImageView) findViewById(R.id.icon_intake_status);
 		mDoseText = (TextView) findViewById(R.id.text_dose);
 		mDoseTimeIcon = (ImageView) findViewById(R.id.icon_dose_time);
-				
+		
 		String hint = null;
 		
 		switch(getId())
@@ -183,7 +184,8 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 		{
 			case MotionEvent.ACTION_DOWN:
 				// TODO export!
-				v.setBackgroundColor(Color.rgb(0xff, 0x66, 0x00));
+				//v.setBackgroundColor(Color.rgb(0xff, 0x66, 0x00));
+				v.setBackgroundResource(R.drawable.doseview_background_focus);
 				return true;
 				
 			case MotionEvent.ACTION_UP:
@@ -192,7 +194,7 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 				
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_OUTSIDE:
-				v.setBackgroundDrawable(null);
+				v.setBackgroundResource(R.drawable.doseview_background);
 				return true;
 		}
 		return false;

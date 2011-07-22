@@ -97,7 +97,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         updateDrugList();
         
         Database.addWatcher(this);
-        
+                
         Intent serviceIntent = new Intent();
         serviceIntent.setClass(this, DrugNotificationService.class);
         
@@ -214,6 +214,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
        
     public void onDateChangeRequest(View view)
     {
+    	Timer t = new Timer();
+    	
     	switch(view.getId())
         {
             case R.id.med_list_footer:
@@ -228,6 +230,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
             default:
             	throw new IllegalArgumentException("Unhandled view " + view.getClass().getSimpleName() + ", id=" + view.getId());
         }
+    	
+    	Log.d(TAG, "onDateChangeRequest: " + t);
     }
     
     public void onDrugNameClick(View view)
@@ -419,41 +423,32 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     		
     		mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
     		mViewSwitcher.setOutAnimation(null);
+    		
     	}
     	else
-    	{
-    		final Animation inAnimation = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
-    		final Animation outAnimation = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);    		
-    		    		
+    	{    		    		
     		final long shiftedTime = mDate.getTime() + shiftBy * Util.Constants.MILLIS_PER_DAY;
     		mDate.setTime(shiftedTime);
     		
     		if(shiftBy == 1)
 	    	{
-	    		// reverses the animations
-	    		final Interpolator interpolator = new Interpolator() {
-					
-					@Override
-					public float getInterpolation(float f) {
-						return Math.abs(f - 1f);
-					}
-				};
-	    		
-	    		inAnimation.setInterpolator(interpolator);
-	    		outAnimation.setInterpolator(interpolator);
+	    		mViewSwitcher.getInAnimation().setInterpolator(ReverseInterpolator.INSTANCE);
+				mViewSwitcher.getOutAnimation().setInterpolator(ReverseInterpolator.INSTANCE);
 	    	}
-	    	else if(shiftBy != -1)
+	    	else if(shiftBy == -1)
+	    	{
+	    		mViewSwitcher.getInAnimation().setInterpolator(null);
+				mViewSwitcher.getOutAnimation().setInterpolator(null);
+	    	}
+	    	else
 	    		throw new IllegalArgumentException();
-    		    	    		    		    		    		
-    		mViewSwitcher.setInAnimation(inAnimation);
-    		mViewSwitcher.setOutAnimation(outAnimation);
-    		
-    		mViewSwitcher.addView(mListView);
+    		    		
+    		mViewSwitcher.addView(mListView);    		
     	}
-    	
+        	
     	ListView newListView = new ListView(this);
     	newListView.setAdapter(new DrugAdapter(this, R.layout.dose_view, mDrugs, mDate));
-    	
+    	    	
     	mViewSwitcher.addView(newListView);
     	mViewSwitcher.showNext();
     	
@@ -463,6 +458,12 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	
     	// update the intent so our Activity is restarted with the last opened date
     	setIntent(getIntent().putExtra(EXTRA_DAY, (Serializable) mDate));
+    	
+    	if(shiftBy == 0)
+    	{
+	    	mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left));
+			mViewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right));
+    	}
     }
     
     private void updateDrugList()
@@ -526,9 +527,24 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	        return v;
 	    }	   
 	}
-
 	
-
+	private enum ReverseInterpolator implements Interpolator
+	{	
+		INSTANCE;
+		
+		@Override
+		public float getInterpolation(float f) {
+			return Math.abs(f - 1f);			
+		}		
+	}
 	
-	
+	private enum DummyInterpolator implements Interpolator
+	{
+		INSTANCE;
+		
+		@Override
+		public float getInterpolation(float f) {
+			return f;
+		}
+	}	
 }
