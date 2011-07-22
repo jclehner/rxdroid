@@ -1,3 +1,24 @@
+/**
+ * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * 
+ * This file is part of RxDroid.
+ *
+ * RxDroid is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * RxDroid is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * 
+ */
+
 package at.caspase.rxdroid;
 
 import java.sql.Date;
@@ -32,6 +53,9 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	private static final String TICKER_TEXT = "RxDroid";
 	private static final String CONTENT_TITLE = "RxDroid: Notification";
 	
+	
+	private Dao<Drug, Integer> mDrugDao;
+	private Dao<Intake, Integer> mIntakeDao;
 	private NotificationManager mNotificationManager;
 	
 	private HashSet<Intake> mForgottenIntakes = new HashSet<Intake>();
@@ -44,6 +68,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	public void onCreate()
 	{
 		super.onCreate();
+		mDrugDao = getHelper().getDrugDao();
+		mIntakeDao = getHelper().getIntakeDao();
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		Database.addWatcher(this);
 	}
@@ -284,6 +310,35 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		Log.d(TAG, "Starting thread");
 		mThread.start();
 	}
+	
+	/**
+	 * 
+	 */
+	private void fillForgottenIntakes()
+	{
+		final List<Drug> drugs;
+		
+		try
+		{
+			drugs = mDrugDao.queryForAll();
+		}
+		catch (SQLException e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		for(Drug drug : drugs)
+		{
+			
+			
+			
+			
+		}
+		
+		
+		
+	}
+	
 	
 	private void checkForgottenIntakes(Drug drug, Intake intake, boolean wasRemoved)
 	{
