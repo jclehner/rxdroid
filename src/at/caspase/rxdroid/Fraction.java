@@ -39,7 +39,7 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		
 	private static boolean sDisplayMixedNumbers = true;
 		
-	private int mNominator = 0;
+	private int mNumerator = 0;
 	private int mDenominator = 1;
 	
 	/**
@@ -56,19 +56,19 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	 * Construct a fraction from a whole number.
 	 */
 	public Fraction(int wholeNum) {
-		mNominator = wholeNum;
+		mNumerator = wholeNum;
 	}
 		
 	/**
-	 * Construct a fraction from a nominator and denominator.
+	 * Construct a fraction from a numerator and denominator.
 	 * 
 	 * When initializing a negative fraction, always specify the
-	 * nominator negative.
+	 * numerator negative.
 	 * 
 	 * @throws IllegalArgumentException if {@code denominator <= 0}
 	 */
-	public Fraction(int nominator, int denominator) {
-		construct(0, nominator, denominator);
+	public Fraction(int numerator, int denominator) {
+		construct(0, numerator, denominator);
 	}
 
 	/**
@@ -77,10 +77,10 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	 * When initializing negative fractions, only specify the
 	 * wholeNum parameter as negative.
 	 * 
-	 * @throws IllegalArgumentException if {@code denominator <= 0} or {@code wholeNum != 0 && nominator < 0}
+	 * @throws IllegalArgumentException if {@code denominator <= 0} or {@code wholeNum != 0 && numerator < 0}
 	 */
-	public Fraction(int wholeNum, int nominator, int denominator) {
-		construct(wholeNum, nominator, denominator);
+	public Fraction(int wholeNum, int numerator, int denominator) {
+		construct(wholeNum, numerator, denominator);
 	}
 	
 	/**
@@ -88,7 +88,7 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	 */
 	public Fraction plus(final Fraction other)
 	{
-		int nominator, denominator;
+		int numerator, denominator;
 		
 		if(this.mDenominator != other.mDenominator)
 		{
@@ -98,15 +98,15 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 			int multOther = lcm / other.mDenominator;
 			
 			denominator = lcm;
-			nominator = (this.mNominator * multThis) + (other.mNominator * multOther);
+			numerator = (this.mNumerator * multThis) + (other.mNumerator * multOther);
 		}
 		else
 		{
-			nominator = this.mNominator + other.mNominator;
+			numerator = this.mNumerator + other.mNumerator;
 			denominator = this.mDenominator;
 		}
 					
-		return new Fraction(nominator, denominator);
+		return new Fraction(numerator, denominator);
 	}
 	
 	public Fraction plus(Integer integer) {
@@ -128,7 +128,7 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	 * Return the fraction's negative.
 	 */
 	public Fraction negate() {
-		return new Fraction(-mNominator, mDenominator);
+		return new Fraction(-mNumerator, mDenominator);
 	}
 	
 	public boolean equals(final Number other)
@@ -150,17 +150,17 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	public String toString()
 	{
 		if(mDenominator == 1)
-			return Integer.toString(mNominator);
+			return Integer.toString(mNumerator);
 		
-		int wholeNum = mNominator / mDenominator;
-		int nominator = mNominator % mDenominator;
+		int wholeNum = mNumerator / mDenominator;
+		int numerator = mNumerator % mDenominator;
 		
-		if(nominator != 0)
+		if(numerator != 0)
 		{
 			if(sDisplayMixedNumbers)
-				return (wholeNum == 0 ? "" : wholeNum + " ") + (wholeNum < 0 ? Math.abs(nominator) : nominator) + "/" + mDenominator;
+				return (wholeNum == 0 ? "" : wholeNum + " ") + (wholeNum < 0 ? Math.abs(numerator) : numerator) + "/" + mDenominator;
 			else
-				return mNominator + "/" + mDenominator;			
+				return mNumerator + "/" + mDenominator;			
 		}
 			
 		return Integer.toString(wholeNum);
@@ -168,7 +168,7 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	
 	@Override
 	public double doubleValue() {
-		return (double) mNominator / mDenominator;
+		return (double) mNumerator / mDenominator;
 	}
 
 	@Override
@@ -190,7 +190,7 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	{
 		Log.d(TAG, "decode: string=" + string);
 		
-		int wholeNum = 0, nominator = 0, denominator = 1;
+		int wholeNum = 0, numerator = 0, denominator = 1;
 		
 		// this matcher will always have a group count of three,
 		// but the subgroups that are specified as optional will
@@ -211,7 +211,7 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 			{
 				assert matcher.group(3) != null;
 				
-				nominator = Integer.parseInt(matcher.group(2), 10);
+				numerator = Integer.parseInt(matcher.group(2), 10);
 				denominator = Integer.parseInt(matcher.group(3), 10);
 				
 				if(denominator == 0)
@@ -231,11 +231,11 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 			wholeNum = Integer.parseInt(string, 10);
 		}
 		
-		Log.d(TAG, "  " + wholeNum + " " + nominator + "/" + denominator);
+		Log.d(TAG, "  " + wholeNum + " " + numerator + "/" + denominator);
 		Log.d(TAG, "-------------------------------------");
 		
 				
-		return new Fraction(wholeNum, nominator, denominator);
+		return new Fraction(wholeNum, numerator, denominator);
 	}
 	
 
@@ -243,28 +243,28 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		sDisplayMixedNumbers = displayMixedNumbers;
 	}
 	
-	private void construct(int wholeNum, int nominator, int denominator)
+	private void construct(int wholeNum, int numerator, int denominator)
 	{
 		if(denominator <= 0)
 			throw new IllegalArgumentException("Denominator must be greater than zero");
 		
-		if(wholeNum != 0 && nominator < 0)
+		if(wholeNum != 0 && numerator < 0)
 			throw new IllegalArgumentException("Nominator must not be negative if wholeNum is non-zero");
 				
-		// set mNominator, even though we divide it by the GCD later,
+		// set mNumerator, even though we divide it by the GCD later,
 		// so as to pass the original argument to this function to
 		// findGCD
 		if(wholeNum >= 0)
-			mNominator = wholeNum * denominator + nominator;
+			mNumerator = wholeNum * denominator + numerator;
 		else
-			mNominator = wholeNum * denominator - nominator;
+			mNumerator = wholeNum * denominator - numerator;
 		
-		// the sign, if present, has been moved to the nominator by now
+		// the sign, if present, has been moved to the numerator by now
 		denominator = Math.abs(denominator);
 		
-		final int divisor = findGCD(Math.abs(nominator), denominator);
+		final int divisor = findGCD(Math.abs(numerator), denominator);
 		
-		mNominator = mNominator / divisor;
+		mNumerator = mNumerator / divisor;
 		mDenominator = denominator / divisor;		
 	}
 					
