@@ -96,6 +96,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			lastDoseTime = nextDoseTime - 1;
 		else
 			lastDoseTime = activeDoseTime - 1;
+		
+		Log.d(TAG, "onCreate: lastDoseTime=" + lastDoseTime);
 				
 		synchronized(Locker.INSTANCE)
 		{
@@ -238,7 +240,9 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					long offset = Util.DateTime.nowOffsetFromMidnight();
 					
 					long millisUntilNextDoseTime = Settings.INSTANCE.getDoseTimeBeginOffset(doseTime) - offset;
-					if(!firstRun)
+					
+					// FIXME ?
+					if(!firstRun && millisUntilNextDoseTime < 0)
 					{
 						millisUntilNextDoseTime += Util.Constants.MILLIS_PER_DAY;
 						Log.d(TAG, "Adjusting sleep time to next day");
@@ -385,12 +389,10 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				notification.setLatestEventInfo(getApplicationContext(), "Forgotten doses", contentText, contentIntent);						
 				notification.defaults |= Notification.DEFAULT_ALL;
 				mNotificationManager.notify(R.id.notification_intake_forgotten, notification);
+				return;
 			}
-			else
-				Log.d(TAG, "maybeDisplayForgottenIntakesNotification: Notification was already displayed.");
 		}
-		else
-			mNotificationManager.cancel(R.id.notification_intake_forgotten);
+		mNotificationManager.cancel(R.id.notification_intake_forgotten);
 	}
 	
 

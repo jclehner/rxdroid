@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="drug_forms">
+    	<item>Tablet</item>
+    	<item>Injection</item>
+    	<item>Spray</item>
+    	<item>Drop</item>
+    	<item>Gel</item>
+    	<item>Other</item>
+    </string-array>    
+</resources>

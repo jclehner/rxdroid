@@ -395,7 +395,10 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		for(Drug storedDrug : mDrugs)
 		{
 			if(storedDrug.getId() == drug.getId())
+			{
 				mDrugs.remove(storedDrug);
+				break;
+			}
 		}
 		
 		((DrugAdapter) mListView.getAdapter()).notifyDataSetChanged();		
@@ -410,6 +413,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			{
 				mDrugs.remove(i);
 				mDrugs.add(i, drug);
+				break;
 			}
 		}
 		((DrugAdapter) mListView.getAdapter()).notifyDataSetChanged();
