@@ -54,10 +54,7 @@ import com.j256.ormlite.dao.Dao;
 public class DrugNotificationService extends OrmLiteBaseService<Database.Helper> implements DatabaseWatcher
 {
 	private static final String TAG = DrugNotificationService.class.getName();
-	
 	private static final String TICKER_TEXT = "RxDroid";
-	private static final String CONTENT_TITLE = "RxDroid: Notification";
-	
 	
 	private static int sLastForgottenNotificationDoseTime = -1;
 	
@@ -97,13 +94,12 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		else
 			lastDoseTime = activeDoseTime - 1;
 		
-		Log.d(TAG, "onCreate: lastDoseTime=" + lastDoseTime);
-				
-		synchronized(Locker.INSTANCE)
+		synchronized(Locker.INSTANCE) 
 		{
-			Log.d(TAG, "onCreate: Will post first 'forgotten' notification");
+			// display a 'forgotten doses' notification on startup for
+			// the last active doseTime
 			mForgottenIntakes = getAllForgottenIntakes(mDate);
-			maybeDisplayForgottenIntakesNotification(mIntent, lastDoseTime);			
+			maybeDisplayForgottenIntakesNotification(mIntent, lastDoseTime);
 		}
 		
 		Database.addWatcher(this);
@@ -121,8 +117,6 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	public void onDestroy() 
 	{
 		super.onDestroy();
-		Log.d(TAG, "onDestroy");
-		// FIXME
 		mThread.interrupt();		
 		Database.removeWatcher(this);
 	}
@@ -235,7 +229,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 						
 						Log.d(TAG, "Date change noted");
 						// TODO check current supplies
-					}					
+					}		
 					
 					long offset = Util.DateTime.nowOffsetFromMidnight();
 					
@@ -393,8 +387,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			}
 		}
 		mNotificationManager.cancel(R.id.notification_intake_forgotten);
-	}
-	
+	}	
 
 	private enum Locker { INSTANCE; }
 }

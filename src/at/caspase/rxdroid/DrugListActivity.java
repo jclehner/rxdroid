@@ -280,6 +280,10 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	timestamp.setYear(year - 1900);
     	timestamp.setMonth(month);
     	timestamp.setDate(day);
+    	timestamp.setHours(0);
+    	timestamp.setMinutes(0);
+    	timestamp.setSeconds(0);
+    	timestamp.setNanos(0);
     	
     	setDate(new Date(timestamp.getTime()));
     }
@@ -459,6 +463,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     		final long shiftedTime = mDate.getTime() + shiftBy * Util.Constants.MILLIS_PER_DAY;
     		mDate.setTime(shiftedTime);
     		
+    		Timer t = new Timer();
+    		
     		if(shiftBy == 1)
 	    	{
 	    		mViewSwitcher.getInAnimation().setInterpolator(ReverseInterpolator.INSTANCE);
@@ -471,8 +477,9 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	    	}
 	    	else
 	    		throw new IllegalArgumentException();
-    		    		
-    		mViewSwitcher.addView(mListView);    		
+    		
+    		Log.d(TAG, "Setting interpolators took " + t + " with shiftBy=" + shiftBy);
+    		mViewSwitcher.addView(mListView); 		
     	}
         	
     	ListView newListView = new ListView(this);
@@ -483,7 +490,12 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	
     	mListView = newListView;   	
     	
-    	SpannableString dateString = new SpannableString(mDate.toString());
+    	final SpannableString dateString = new SpannableString(mDate.toString());
+    	final Date today = Util.DateTime.today();
+    	
+    	Log.d(TAG, "Current date: " + mDate + " (" + mDate.getTime() + ")");
+    	Log.d(TAG, "Today: " + today + " (" + today.getTime() + ")");
+    	Log.d(TAG, "mDate == today: " + (mDate.equals(Util.DateTime.today())));
     	
     	if(mDate.equals(Util.DateTime.today()))
     	   	dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);

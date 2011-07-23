@@ -31,8 +31,8 @@ public enum Settings
 	
 	private static final String TAG = Settings.class.getName();
 	
-	private static final long[] beginHours = { 5, 14, 18, 23 };
-	private static final long[] endHours = { 11, 17, 23, 24 };
+	private static final long[] beginHours = { 5, 12, 18, 23 };
+	private static final long[] endHours = { 11, 16, 21, 24 };
 	private static final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 	
 	public long getDoseTimeBeginOffset(int doseTime)
