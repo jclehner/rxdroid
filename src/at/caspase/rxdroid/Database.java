@@ -28,6 +28,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -216,22 +217,36 @@ public class Database
 	
 	private Database() {}
 	
-    public static abstract class Entry implements Serializable
+	/**
+	 * Base class for all database entries.
+	 * 
+	 * The main purpose of this class is to provide alleviate child classes from
+	 * declaring an ID field and to provide an unimplemented equals() method.
+	 * 
+	 * @author Joseph Lehner
+	 *
+	 */
+	public static abstract class Entry implements Serializable
     {
-    	private static final long	serialVersionUID	= 8300191193261799857L;
+    	private static final long serialVersionUID = 8300191193261799857L;
 
 		public static final String COLUMN_ID = "id";
 		
+		@DatabaseField(columnName = COLUMN_ID, generatedId = true)
+    	protected int id;
+		
+		/**
+		 * This will always throw!
+		 * 
+		 * @throws RuntimeException
+		 */
 		public boolean equals(Entry other) {
 			throw new RuntimeException("Not implemented");
 		}
-    	
-    	@DatabaseField(columnName = COLUMN_ID, generatedId = true)
-    	protected int id;
-    	
-    	int getId() {
+		
+    	public int getId() {
     		return id;
-    	}
+    	}    	
     }
         
 	/**
@@ -241,8 +256,12 @@ public class Database
 	 * the smallest available dose of that drug without having to 
 	 * manually reduce its amount (i.e. no pill-splitting). For example,
 	 * a package of Aspirin containing 30 tablets contains 30 doses; of
-	 * course, the intake schedule may also contain fractions (see {@link Fraction}) 
-	 * of doses.
+	 * course, the intake schedule may also contain doses in fractions.
+	 * 
+	 * Another term you'll come across in the docs and the code is the
+	 * concept of a 'dose-time'. A dose-time is a user-definable subdivision
+	 * of the day, having one of the following predefined names: morning,
+	 * noon, evening, night.  
 	 * 
 	 * Any drug in the database will have the following attributes:
 	 * <ul>
@@ -254,8 +273,9 @@ public class Database
 	 *      the word "dose" mentioned above, this size must not be a fraction.</li>
 	 *  <li>The current supply. This contains the number of doses left for this particular drug.</li>
 	 *  <li>An optional comment for that drug (e.g. "Take with food").</li>
-	 * </ul>
-	 *  
+	 *  <li>A field indicating whether the drug should be considered active. A drug marked
+	 *      as inactive will be ignored by the DrugNotificationService.</li>
+	 * </ul>  
 	 * 
 	 * @author Joseph Lehner
 	 *
@@ -335,7 +355,9 @@ public class Database
 	    			return R.drawable.med_syringe;
 	    			
 	    		case FORM_DROP:
-	    			return R.drawable.med_drink;    			
+	    			return R.drawable.med_drink;
+	    			
+	    		// FIXME
 	    	}
 	    	
 	    	return R.drawable.med_pill;
@@ -478,6 +500,16 @@ public class Database
 	    }
 	}
 	
+	/**
+	 * Represents a dose intake by the user.
+	 * 
+	 * Each database entry will consist of an id of the drug that was taken, a timestamp 
+	 * representing the time the user marked the dose as 'taken' in the app, the dose-time, the <em>scheduled</em>
+	 * date (note that this may differ from the date represented by the timestamp. Assume for
+	 * example that the user takes a drug scheduled for the night at 1 minute past midnight.),
+	 * 
+	 * @author Joseph Lehner
+	 */
 	@DatabaseTable(tableName = "intake")
 	public static class Intake extends Entry
 	{
@@ -499,6 +531,8 @@ public class Database
 		
 		@DatabaseField(columnName = COLUMN_DOSE_TIME)
         private int doseTime;
+		
+		// FIXME add a field for the actual dose that was taken
 		
 		public Intake() {}
 		
@@ -548,6 +582,12 @@ public class Database
 		}
     }
 	
+	/**
+	 * Helper class for ORMLite related voodoo.
+	 * 
+	 * @author Joseph Lehner
+	 * 
+	 */	
 	public static class Helper extends OrmLiteSqliteOpenHelper
 	{
 		private static final String DB_NAME = "db.sqlite";
@@ -577,21 +617,20 @@ public class Database
 		@Override
 		public void onUpgrade(SQLiteDatabase db, ConnectionSource cs, int oldVersion, int newVersion) 
 		{
-			dropTables();
-			onCreate(db, cs);
-		}
-		
-		public void dropTables()
-		{			
 			try
 			{
 				TableUtils.dropTable(getConnectionSource(), Database.Drug.class, true);
 				TableUtils.dropTable(getConnectionSource(), Database.Intake.class, true);
+				onCreate(db, cs);
 			}
 			catch (SQLException e)
 			{
 				throw new RuntimeException("Error while deleting tables", e);
 			}
+		}
+		
+		public void dropTables() {			
+			onUpgrade(getWritableDatabase(), 0, DB_VERSION);
 		}
 			
 		public synchronized Dao<Database.Drug, Integer> getDrugDao()

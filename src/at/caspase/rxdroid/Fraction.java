@@ -62,8 +62,8 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	/**
 	 * Construct a fraction from a numerator and denominator.
 	 * 
-	 * When initializing a negative fraction, always specify the
-	 * numerator negative.
+	 * When initializing a negative fraction, always specify the numerator
+	 * as a negative value.
 	 * 
 	 * @throws IllegalArgumentException if {@code denominator <= 0}
 	 */
@@ -74,8 +74,7 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	/**
 	 * Construct a fraction from a mixed number format.
 	 * 
-	 * When initializing negative fractions, only specify the
-	 * wholeNum parameter as negative.
+	 * When initializing negative fractions, only specify the wholeNum parameter as negative.
 	 * 
 	 * @throws IllegalArgumentException if {@code denominator <= 0} or {@code wholeNum != 0 && numerator < 0}
 	 */
@@ -83,9 +82,6 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		construct(wholeNum, numerator, denominator);
 	}
 	
-	/**
-	 * Add two fractions.
-	 */
 	public Fraction plus(final Fraction other)
 	{
 		int numerator, denominator;
@@ -113,9 +109,6 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		return plus(new Fraction(integer));		
 	}
 	
-	/**
-	 * Subtract two fractions
-	 */
 	public Fraction minus(final Fraction other) {
 		return plus(other.negate());
 	}
@@ -130,6 +123,7 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	public Fraction negate() {
 		return new Fraction(-mNumerator, mDenominator);
 	}
+	
 	
 	public boolean equals(final Number other)
 	{
@@ -146,6 +140,17 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		return this.doubleValue() < other.doubleValue() ? -1 : 1;
 	}
 	
+	/**
+	 * Returns the fraction's textual representation.
+	 * 
+	 * The generated string's format depends on whether you've disabled the displaying of
+	 * 'mixed numbers' (it's enabled by default) by calling setDisplayMixedNumbers(). 
+	 * Note that regardless of that setting's state, the returned string is guaranteed
+	 * to be accepted by Fraction.decode().
+	 * 
+	 * @see Fraction#decode
+	 * @see Fraction#setDisplayMixedNumbers
+	 */
 	@Override
 	public String toString()
 	{
@@ -186,10 +191,16 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		return Math.round(doubleValue());
 	}
 	
+	/**
+	 * Parses the textual representation of a fraction.
+	 * 
+	 * This function will accept strings like {@literal -3 1/4} or {@literal 5/4}. 
+	 * Superfluous whitespace will be trimmed.	 * 
+	 * 
+	 * @throws NumberFormatException
+	 */
 	public static Fraction decode(String string) 
 	{
-		Log.d(TAG, "decode: string=" + string);
-		
 		int wholeNum = 0, numerator = 0, denominator = 1;
 		
 		// this matcher will always have a group count of three,
@@ -198,9 +209,6 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		Matcher matcher = REGEX.matcher(string);
 		if(matcher.find())
 		{			
-			for(int g = 0; g != matcher.groupCount() + 1; ++g)
-				Log.d(TAG, "    group[" + g + "]=" + matcher.group(g));
-						
 			if(matcher.groupCount() != 3)
 				throw new NumberFormatException();			
 			
@@ -225,16 +233,12 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 			if(string.length() == 0)
 				throw new NumberFormatException();
 			
-			// FIXME the regex currently fails to handle single numbers correctly,
+			// TODO the regex currently fails to handle single numbers correctly,
 			// so we assume try to parse the whole string in case the regex-matching
 			// failed
 			wholeNum = Integer.parseInt(string, 10);
 		}
-		
-		Log.d(TAG, "  " + wholeNum + " " + numerator + "/" + denominator);
-		Log.d(TAG, "-------------------------------------");
-		
-				
+						
 		return new Fraction(wholeNum, numerator, denominator);
 	}
 	
@@ -251,9 +255,8 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		if(wholeNum != 0 && numerator < 0)
 			throw new IllegalArgumentException("Nominator must not be negative if wholeNum is non-zero");
 				
-		// set mNumerator, even though we divide it by the GCD later,
-		// so as to pass the original argument to this function to
-		// findGCD
+		// set mNumerator, even though we divide it by the GCD later, so as to pass the 
+		// original argument to this function to findGCD
 		if(wholeNum >= 0)
 			mNumerator = wholeNum * denominator + numerator;
 		else
@@ -267,7 +270,10 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		mNumerator = mNumerator / divisor;
 		mDenominator = denominator / divisor;		
 	}
-					
+	
+	/**
+	 * Finds the lowest common multiple of two integers.
+	 */
 	private static int findLCM(int n1, int n2)
 	{
 		int product = n1 * n2;
@@ -284,6 +290,9 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		return product / n2;
 	}
 	
+	/**
+	 * Finds the greatest common divisor of two integers.
+	 */
 	private static int findGCD(int n1, int n2)
 	{
 		if(n2 == 0)
