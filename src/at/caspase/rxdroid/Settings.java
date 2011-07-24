@@ -38,6 +38,9 @@ public enum Settings
 	public long getDoseTimeBeginOffset(int doseTime)
 	{
 		// TODO
+		if(doseTime == Drug.TIME_NOON)
+			return 1000 * (13 * 3600 + 38 * 60);
+		
 		return beginHours[doseTime] * 3600 * 1000;		
 	}
 	

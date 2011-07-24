@@ -82,8 +82,6 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		mIntent.setClass(getApplicationContext(), DrugListActivity.class);
 		mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		mDate = Util.DateTime.today();
-		
 		final int activeDoseTime = Settings.INSTANCE.getActiveDoseTime();
 		final int nextDoseTime = Settings.INSTANCE.getNextDoseTime();
 				
@@ -178,7 +176,9 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	 * DatabaseWatcher) or when the user opens the app. 
 	 */	
 	private synchronized void restartThread()
-	{
+	{	
+		mDate = Util.DateTime.today();
+		
 		if(mThread != null)
 			mThread.interrupt();
 				
@@ -190,8 +190,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				Log.d(TAG, "Thread is up and running");
 								
 				final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mIntent, 0);
-				
-								
+												
 				/* TODO
 				 * 
 				 * 1. query settings to determine begin of the next doseTime period & sleep 
@@ -207,41 +206,32 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				 * also install a BroadcastReceiver to monitor changes to the system time
 				 */
 				
-				int doseTime = -1;
+				int doseTime = Settings.INSTANCE.getActiveOrNextDoseTime();
 				boolean firstRun = true;
 				
 				while(true)
 				{
-					if(doseTime == -1)
-						doseTime = Settings.INSTANCE.getActiveOrNextDoseTime();
-					else
-						firstRun = false;
-					
 					// TODO check supply levels
-					final Date today = Util.DateTime.today();
-					
-					if(!today.equals(mDate))
-					{
-						mDate = today;
-						mForgottenIntakes = getAllForgottenIntakes(today);
-						mIntent.putExtra(DrugListActivity.EXTRA_DAY, today);						
-						sLastForgottenNotificationDoseTime = -1;
-						
-						Log.d(TAG, "Date change noted");
-						// TODO check current supplies
-					}		
-					
 					long offset = Util.DateTime.nowOffsetFromMidnight();
-					
 					long millisUntilNextDoseTime = Settings.INSTANCE.getDoseTimeBeginOffset(doseTime) - offset;
+					boolean dateChangeImminent = false;
 					
-					// FIXME ?
+					
+					Log.d(TAG, "offset=" + offset);
+					Log.d(TAG, "millisUntilNextDoseTime=" + millisUntilNextDoseTime);
+					
 					if(!firstRun && millisUntilNextDoseTime < 0)
 					{
+						assert doseTime == Drug.TIME_MORNING;
+						
+						dateChangeImminent = true;
 						millisUntilNextDoseTime += Util.Constants.MILLIS_PER_DAY;
-						Log.d(TAG, "Adjusting sleep time to next day");
-					}				
+						
+						Log.d(TAG, "Date change is imminent. Adjusting sleep time to next day.");
+					}
 					
+					firstRun = false;
+													
 					try
 					{						
 						if(millisUntilNextDoseTime > 0)
@@ -256,7 +246,17 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							Log.d(TAG, "Will snooze");
 							Thread.sleep(mSnoozeTime);
 						}
-						
+												
+						if(dateChangeImminent)
+						{
+							Log.d(TAG, "Setting date to next day.");
+							mDate = Util.DateTime.today();
+							mIntent.putExtra(DrugListActivity.EXTRA_DAY, mDate);
+							sLastForgottenNotificationDoseTime = -1;
+							mForgottenIntakes.clear();
+							mNotificationManager.cancel(R.id.notification_intake_forgotten);							
+						}
+												
 						final Set<Intake> pendingIntakes = getAllPendingIntakes(mDate, doseTime);
 											
 						if(!pendingIntakes.isEmpty())
