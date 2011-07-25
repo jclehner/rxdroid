@@ -34,7 +34,10 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
@@ -66,8 +69,9 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		
 	public static final int MENU_ADD = Menu.FIRST;
 	public static final int MENU_DELETE = MENU_ADD + 1;
-	public static final int MENU_DEBUG_FILL = MENU_DELETE + 1;
-		
+	public static final int MENU_PREFERENCES = MENU_ADD + 2;
+	public static final int MENU_DEBUG_FILL = MENU_ADD + 3;
+			
 	public static final String EXTRA_DAY = "day";
 	public static final String EXTRA_CLEAR_FORGOTTEN_NOTIFICATION = "clear_forgotten_notification";
 	
@@ -111,16 +115,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         serviceIntent.setClass(this, DrugNotificationService.class);
         
         startService(serviceIntent);
-    }
-    
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
         
-        
-        // TODO currently, pressing the BACK key in DrugEditActivity will revert to 
-        // DrugListActivity with the date set to today intstead of the last viewed date!
+        Settings.INSTANCE.setSharedPreferences(PreferenceManager.getDefaultSharedPreferences(this));
     }
     
     @Override
@@ -159,8 +155,9 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	menu.add(0, MENU_ADD, 0, "Add").setIcon(android.R.drawable.ic_menu_add);
     	menu.add(0, MENU_DELETE, 0, "Delete").setIcon(android.R.drawable.ic_menu_delete);
     	menu.add(0, MENU_DEBUG_FILL, 0, "Fill DB").setIcon(android.R.drawable.ic_menu_agenda);
+    	menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(android.R.drawable.ic_menu_preferences);
     	
-    	return super.onCreateOptionsMenu(menu);  	
+    	return super.onCreateOptionsMenu(menu);
     }
     
     @Override
@@ -178,9 +175,11 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     			return true;
     		}
     		case MENU_DELETE:
-    			getHelper().dropTables();
+    		{
+    			//getHelper().dropTables();
+    			    			
     			return true;
-    			
+    		}	
     		case MENU_DEBUG_FILL:
     		{
     			final String[] names = { "Rivaroxaban", "Propranolol", "Thiamazole", 
@@ -208,7 +207,15 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     				{
     					// ignore
     				}
-    			}    			
+    			}
+    			
+    			return true;
+    		}
+    		case MENU_PREFERENCES:
+    		{
+    			Intent intent = new Intent();
+    			intent.setClass(getApplicationContext(), PreferenceTabActivity.class);
+    			startActivity(intent);
     		}
     	}
     	return super.onOptionsItemSelected(item);

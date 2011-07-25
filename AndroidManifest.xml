@@ -15,15 +15,21 @@
             </intent-filter>
         </activity>
         
-        <activity android:name="at.caspase.rxdroid.DrugEditActivity">
+        <activity android:name=".DrugEditActivity">
         	<intent-filter>
         		<action android:name="android.intent.action.VIEW" />
         		<category android:name="android.intent.category.DEFAULT" />
         		<action android:name="android.intent.action.EDIT" />
         		<category android:name="android.intent.category.DEFAULT" />
+        	</intent-filter>       
+        </activity>
+        
+        <activity android:name=".PreferenceTabActivity">
+        	<intent-filter>
+	        	<intent>
+	        		<action android:name="android.intent.action.MAIN" />
+	        	</intent>
         	</intent-filter>
-        
-        
         </activity>
         
         <uses-library android:name="android.test.runner" />

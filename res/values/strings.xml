@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Open MedMind</string>
-   
+    <string name="app_name">RxDroid</string>
     <string name="open_helper_classname">at.caspase.rxdroid.Database$Helper</string>
     
+    <!-- Begin of translatable strings -->
+    
+    <string name="_Morning">Morning</string>
+    <string name="_Noon">Noon</string>
+    <string name="_Evening">Evening</string>
+    <string name="_Night">Night</string>
+    <string name="_Begin">Begin</string>
+    <string name="_End">End</string>
+    <string name="_Error">Error</string>
 </resources>

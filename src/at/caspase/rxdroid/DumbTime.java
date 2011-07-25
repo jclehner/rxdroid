@@ -1,0 +1,151 @@
+package at.caspase.rxdroid;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
+/**
+ * A time class that is not aware of time zones.
+ * 
+ * The purpose of this class is to handle the time offsets frequently encountered
+ * in RxDroid without having to deal with unexpected timezone issues. Thus, in the
+ * context of this application, it could actually be considered smart.
+ * 
+ * @author Joseph Lehner
+ *
+ */
+public class DumbTime extends Date
+{
+	private static final long serialVersionUID = -8142558717636198167L;
+	
+	private static final String[] FORMATS = { "HH:mm:ss", "HH:mm" };
+	
+	private int mHours;
+	private int mMinutes;
+	private int mSeconds;
+	
+	public DumbTime(int hours, int minutes, int seconds) 
+	{
+		mHours = hours;
+		mMinutes = minutes;
+		mSeconds = seconds;
+	}
+	
+	public DumbTime(int hours, int minutes) {
+		this(hours, minutes, 0);
+	}	
+	
+	@Override
+	public int getHours() {
+		return mHours;
+	}
+	
+	@Override
+	public int getMinutes() {
+		return mMinutes;
+	}
+	
+	@Override
+	public int getSeconds() {
+		return mSeconds;
+	}
+		
+	@Override
+	public long getTime() {
+		return 1000 * (mHours * 3600 + mMinutes * 60 + mSeconds);
+	}
+	
+	@Override
+	public int getTimezoneOffset() {
+		return 0;
+	}
+	
+	public static DumbTime valueOf(String timeString)
+	{
+		if(timeString != null)
+		{
+			for(String format : FORMATS)
+			{
+				final SimpleDateFormat sdf = new SimpleDateFormat(format);
+				try
+				{
+					final Date date = sdf.parse(timeString);
+					return new DumbTime(date.getHours(), date.getMinutes(), date.getSeconds());				
+				}
+				catch(ParseException e)
+				{
+					// ignore
+				}
+			}
+		}
+		
+		throw new IllegalArgumentException("timeString=" + timeString);
+	}
+
+	@Override
+	public void setHours(int hours) 
+	{
+		if(hours < 0 || hours > 23)
+			throw new IllegalArgumentException();
+		
+		mHours = hours;
+	}
+	
+	@Override
+	public void setMinutes(int minutes) 
+	{
+		if(minutes < 0 || minutes > 59)
+			throw new IllegalArgumentException();
+		
+		mMinutes = minutes;
+	}
+	
+	@Override
+	public void setSeconds(int seconds) 
+	{
+		if(seconds < 0 || seconds > 59)
+			throw new IllegalArgumentException();
+		
+		mSeconds = seconds;
+	}
+	
+	@Override
+	public String toString() {
+		return toString(false);
+	}
+	
+	public String toString(boolean withSeconds)
+	{
+		final SimpleDateFormat sdf = new SimpleDateFormat(FORMATS[withSeconds ? 0 : 1]);
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return sdf.format(this);
+	}
+		
+	public boolean before(DumbTime time) {
+		return getTime() < time.getTime();
+	}
+	
+	public boolean after(DumbTime time) {
+		return getTime() > time.getTime();
+	}
+	
+	
+	/**
+	 * Creates an instance with an offset.
+	 * 
+	 * @param offset An offset from midnight, in milliseconds. The permissible range is thus [0, 86400000).
+	 */
+	protected DumbTime(long offset) 
+	{
+		offset /= 1000;
+		
+		mHours = (int) offset % 3600;
+		offset -= mHours * 3600;
+		
+		mMinutes = (int) offset % 60;
+		offset -= mMinutes * 60;
+		
+		mSeconds = (int) offset;
+	}
+}

@@ -21,6 +21,9 @@
 
 package at.caspase.rxdroid;
 
+import java.sql.Time;
+
+import android.content.SharedPreferences;
 import android.util.Log;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Util.Constants;
@@ -30,34 +33,35 @@ public enum Settings
 	INSTANCE;
 	
 	private static final String TAG = Settings.class.getName();
+	private static final long beginTimes[] = { 6, 12, 18, 22 };
+	private static final long endTimes[] = { 10, 15, 21, 23 };
 	
-	private static final long[] beginHours = { 5, 12, 18, 23 };
-	private static final long[] endHours = { 11, 16, 21, 24 };
+	private static final String prefKeyPrefixes[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 	private static final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 	
-	public long getDoseTimeBeginOffset(int doseTime)
+	private SharedPreferences mSharedPrefs = null;
+	
+	public void setSharedPreferences(SharedPreferences sharedPrefs) {
+		mSharedPrefs = sharedPrefs;
+	}
+	
+	public long getDoseTimeBeginOffset(int doseTime) 
 	{
-		// TODO
-		if(doseTime == Drug.TIME_NOON)
-			return 1000 * (13 * 3600 + 38 * 60);
-		
-		return beginHours[doseTime] * 3600 * 1000;		
+		return 3600 * 1000 * beginTimes[doseTime];
+		//return getTime(prefKeyPrefixes[doseTime] + "_begin").getTime();
 	}
 	
 	public long getDoseTimeEndOffset(int doseTime)
 	{
-		// TODO
-		return endHours[doseTime] * 3600 * 1000;
+		return 3600 * 1000 * endTimes[doseTime];
+		//return getTime(prefKeyPrefixes[doseTime] + "_end").getTime();
 	}
 	
 	public int getActiveDoseTime()
 	{
-		// TODO
-		assert beginHours.length == endHours.length;
-		
 		final long offset = Util.DateTime.nowOffsetFromMidnight();
 		for(int doseTime : doseTimes)
-		{		
+		{
 			if(offset >= getDoseTimeBeginOffset(doseTime) && offset < getDoseTimeEndOffset(doseTime))
 			{
 				Log.d(TAG, "getDoseTime: active=" + doseTime);
@@ -117,5 +121,13 @@ public enum Settings
 	public long getSnoozeTime()
 	{
 		return 10 * 1000;
-	}	
+	}
+	
+	public DumbTime getTime(String key)
+	{
+		if(key == null)
+			return null;
+		
+		return DumbTime.valueOf(mSharedPrefs.getString(key, null));
+	}
 }

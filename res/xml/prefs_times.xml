@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orderingFromXml="true"
+  android:title="Preferences: Times"
+>  
+	<PreferenceCategory android:key="cat_time_morning"
+		android:title="@string/_Morning"
+	>
+		<at.caspase.rxdroid.TimePreference android:key="time_morning_begin"
+			android:title="@string/_Begin"
+			android:defaultValue="06:00"
+			
+			isBefore="time_morning_end"
+		/>
+			
+		<at.caspase.rxdroid.TimePreference android:key="time_morning_end"
+			android:title="@string/_End"
+			android:defaultValue="10:00"
+			
+			isAfter="time_morning_begin"
+			isBefore="time_noon_begin"
+		/>
+		
+	</PreferenceCategory>
+	
+	<PreferenceCategory android:key="cat_time_noon"
+		android:title="@string/_Noon"
+	>
+		<at.caspase.rxdroid.TimePreference android:key="time_noon_begin"
+			android:title="@string/_Begin"
+			android:defaultValue="12:00"
+			
+			isAfter="time_morning_end"
+			isBefore="time_noon_end"
+		/>
+		
+		<at.caspase.rxdroid.TimePreference android:key="time_noon_end"
+			android:title="@string/_End"
+			android:defaultValue="15:00"
+			
+			isAfter="time_noon_begin"
+			isBefore="time_evening_begin"
+		/>
+			
+	</PreferenceCategory>
+	
+	<PreferenceCategory android:key="cat_time_evening"
+		android:title="@string/_Evening"
+	>
+		<at.caspase.rxdroid.TimePreference android:key="time_evening_begin"
+			android:title="@string/_Begin"
+			android:defaultValue="18:00"
+			
+			isAfter="time_noon_end"
+			isBefore="time_evening_end"
+		/>
+		
+		<at.caspase.rxdroid.TimePreference android:key="time_evening_end"
+			android:title="@string/_End"
+			android:defaultValue="20:00"
+			
+			isAfter="time_evening_begin"
+			isBefore="time_night_begin"
+		/>		
+			
+	</PreferenceCategory>
+	
+	<PreferenceCategory android:key="cat_time_night"
+		android:title="@string/_Night"
+	>
+		<at.caspase.rxdroid.TimePreference android:key="time_night_begin"
+			android:title="@string/_Begin"
+			android:defaultValue="22:00"
+			
+			isAfter="time_evening_end"
+		/>
+		
+		<at.caspase.rxdroid.TimePreference android:key="time_night_end"
+			android:title="@string/_End"
+			android:defaultValue="01:00"
+			
+			isAfter="time_night_begin"
+		/>	
+			
+	</PreferenceCategory>	
+</PreferenceScreen>
