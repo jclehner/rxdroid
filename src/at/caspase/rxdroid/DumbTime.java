@@ -48,9 +48,9 @@ public class DumbTime extends Date
 	
 	public DumbTime(int hours, int minutes, int seconds) 
 	{
-		mHours = hours;
-		mMinutes = minutes;
-		mSeconds = seconds;
+		setHours(hours);
+		setMinutes(minutes);
+		setSeconds(seconds);
 	}
 	
 	public DumbTime(int hours, int minutes) {

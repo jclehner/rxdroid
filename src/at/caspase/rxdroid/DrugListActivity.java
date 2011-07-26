@@ -35,6 +35,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
@@ -63,7 +64,8 @@ import at.caspase.rxdroid.Database.Intake;
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import com.j256.ormlite.dao.Dao;
 
-public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> implements DatabaseWatcher, OnLongClickListener, OnDateSetListener
+public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> implements 
+	DatabaseWatcher, OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener
 {    
     public static final String TAG = DrugListActivity.class.getName();
 		
@@ -93,6 +95,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	private Dao<Database.Drug, Integer> mDao;
 	private Dao<Database.Intake, Integer> mIntakeDao;
 	
+	private SharedPreferences mSharedPreferences;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
@@ -106,10 +110,12 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         mViewSwitcher = (ViewSwitcher) findViewById(R.id.drug_list_view_flipper);
         mTextDate = (TextView) findViewById(R.id.med_list_footer);
         
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        
         updateDrugList();
         
         mTextDate.setOnLongClickListener(this);
-        Database.addWatcher(this);
+       
                 
         Intent serviceIntent = new Intent();
         serviceIntent.setClass(this, DrugNotificationService.class);
@@ -117,6 +123,9 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         startService(serviceIntent);
                 
         Settings.INSTANCE.setApplicationContext(getApplicationContext());
+        
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        Database.addWatcher(this);
     }
     
     @Override
@@ -125,7 +134,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	super.onResume();  	
 
         final Intent intent = getIntent();
-        final String action = (intent != null) ? intent.getAction() : null;
+        final String action = intent.getAction();
                 
         if(Intent.ACTION_VIEW.equals(action) || Intent.ACTION_MAIN.equals(action))
         {
@@ -146,6 +155,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     public void onDestroy() 
     {
     	super.onDestroy();
+    	mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
     	Database.removeWatcher(this);
     }
     
@@ -216,6 +226,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     			Intent intent = new Intent();
     			intent.setClass(getApplicationContext(), PreferenceTabActivity.class);
     			startActivity(intent);
+    			return true;
     		}
     	}
     	return super.onOptionsItemSelected(item);
@@ -438,6 +449,12 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	
 	@Override
 	public void onDatabaseDropped() {}
+	
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences preferences, String key)
+	{
+		setDate(mDate);
+	}
 	        
     private void setDate(Date newDate) {
     	setOrShiftDate(0, newDate);
@@ -459,7 +476,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	{
     		if(newDate == null)
     			mDate = Util.DateTime.today();
-    		else
+    		else if(mDate != newDate)
     			mDate = newDate;    		
     		
     		mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));

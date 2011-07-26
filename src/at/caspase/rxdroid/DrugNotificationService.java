@@ -23,8 +23,6 @@ package at.caspase.rxdroid;
 
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -35,11 +33,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Path.FillType;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
 
@@ -52,7 +50,7 @@ import com.j256.ormlite.dao.Dao;
  * @author Joseph Lehner
  *
  */
-public class DrugNotificationService extends OrmLiteBaseService<Database.Helper> implements DatabaseWatcher
+public class DrugNotificationService extends OrmLiteBaseService<Database.Helper> implements DatabaseWatcher, OnSharedPreferenceChangeListener
 {
 	private static final String TAG = DrugNotificationService.class.getName();
 	private static final String TICKER_TEXT = "RxDroid";
@@ -67,6 +65,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	
 	private Set<Intake> mForgottenIntakes = Collections.emptySet();
 	
+	private SharedPreferences mSharedPreferences;
+	
 	Thread mThread;
 	// FIXME
 	final long mSnoozeTime = Settings.INSTANCE.getSnoozeTime();
@@ -77,7 +77,10 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		super.onCreate();
 		mDrugDao = getHelper().getDrugDao();
 		mIntakeDao = getHelper().getIntakeDao();
+		
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+				
+		mDate = Util.DateTime.today();
 		
 		mIntent = new Intent(Intent.ACTION_VIEW);
 		mIntent.setClass(getApplicationContext(), DrugListActivity.class);
@@ -103,6 +106,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			maybeDisplayForgottenIntakesNotification(mIntent, lastDoseTime);
 		}
 		
+		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		Database.addWatcher(this);
 	}
 	
@@ -118,7 +123,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	public void onDestroy() 
 	{
 		super.onDestroy();
-		mThread.interrupt();		
+		mThread.interrupt();
+		mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
 		Database.removeWatcher(this);
 	}
 
@@ -166,6 +172,12 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 
 	@Override
 	public void onDatabaseDropped()
+	{
+		restartThread();
+	}
+	
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
 	{
 		restartThread();
 	}
@@ -231,9 +243,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 						millisUntilNextDoseTime += Util.Constants.MILLIS_PER_DAY;
 						
 						Log.d(TAG, "Date change is imminent. Adjusting sleep time to next day.");
-					}
-					
-					firstRun = false;
+					}					
 													
 					try
 					{						
@@ -242,12 +252,13 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							Log.d(TAG, "Will sleep " + millisUntilNextDoseTime + "ms");
 							Thread.sleep(millisUntilNextDoseTime);
 						}
-						else
+						else if(firstRun)
 						{
 							// if the user marks a drug as taken, this thread will be restarted. in order to prevent a new
 							// notification from flashing up instantly, we'll snooze a little
 							Log.d(TAG, "Will snooze");
 							Thread.sleep(mSnoozeTime);
+							firstRun = false;
 						}
 												
 						if(dateChangeImminent)

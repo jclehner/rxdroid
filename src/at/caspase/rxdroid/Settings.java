@@ -143,9 +143,7 @@ public enum Settings
 					
 			value = mApplicationContext.getString(resId);
 		}
-		
-		Log.d(TAG, "getTime: key=" + key + ", value=" + value);
-		
+				
 		return DumbTime.valueOf(value);
 	}
 	
