@@ -115,8 +115,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         serviceIntent.setClass(this, DrugNotificationService.class);
         
         startService(serviceIntent);
-        
-        Settings.INSTANCE.setSharedPreferences(PreferenceManager.getDefaultSharedPreferences(this));
+                
+        Settings.INSTANCE.setApplicationContext(getApplicationContext());
     }
     
     @Override

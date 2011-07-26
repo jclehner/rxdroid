@@ -21,10 +21,7 @@
 
 package at.caspase.rxdroid;
 
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -32,7 +29,7 @@ import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.DialogPreference;
 import android.text.format.DateFormat;
@@ -67,10 +64,17 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 		for(int i = 0; i != attrs.getAttributeCount(); ++i)
 		{
 			final String name = attrs.getAttributeName(i);
-			final String value = attrs.getAttributeValue(i);
+			String value = attrs.getAttributeValue(i);
 				
 			if(name.equals("defaultValue"))
+			{
+				if(value.charAt(0) == '@')
+				{
+					final Resources res = context.getResources();										
+					value = res.getString(Integer.parseInt(value.substring(1), 10));
+				}			
 				mDefaultValue = value;
+			}
 			else if(name.equals("isAfter"))
 				mAfterTimeKey = value;
 			else if(name.equals("isBefore"))
@@ -132,9 +136,12 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 	protected void onAttachedToActivity()
 	{
 		super.onAttachedToActivity();
+		
 		// getPersistedString returns null in the constructor, so we have to set the summary here
-		setSummary(getPersistedString(mDefaultValue));
-		mTime = DumbTime.valueOf(getPersistedString(mDefaultValue));
+		final String persisted = getPersistedString(mDefaultValue);
+		
+		setSummary(persisted);
+		mTime = DumbTime.valueOf(persisted);
 		
 		setupTimePicker();
 	}

@@ -9,14 +9,14 @@
 	>
 		<at.caspase.rxdroid.TimePreference android:key="time_morning_begin"
 			android:title="@string/_Begin"
-			android:defaultValue="06:00"
+			android:defaultValue="@string/pref_default_time_morning_begin"
 			
 			isBefore="time_morning_end"
 		/>
 			
 		<at.caspase.rxdroid.TimePreference android:key="time_morning_end"
 			android:title="@string/_End"
-			android:defaultValue="10:00"
+			android:defaultValue="@string/pref_default_time_morning_end"
 			
 			isAfter="time_morning_begin"
 			isBefore="time_noon_begin"
@@ -29,7 +29,7 @@
 	>
 		<at.caspase.rxdroid.TimePreference android:key="time_noon_begin"
 			android:title="@string/_Begin"
-			android:defaultValue="12:00"
+			android:defaultValue="@string/pref_default_time_noon_begin"
 			
 			isAfter="time_morning_end"
 			isBefore="time_noon_end"
@@ -37,7 +37,7 @@
 		
 		<at.caspase.rxdroid.TimePreference android:key="time_noon_end"
 			android:title="@string/_End"
-			android:defaultValue="15:00"
+			android:defaultValue="@string/pref_default_time_noon_end"
 			
 			isAfter="time_noon_begin"
 			isBefore="time_evening_begin"
@@ -50,7 +50,7 @@
 	>
 		<at.caspase.rxdroid.TimePreference android:key="time_evening_begin"
 			android:title="@string/_Begin"
-			android:defaultValue="18:00"
+			android:defaultValue="@string/pref_default_time_evening_begin"
 			
 			isAfter="time_noon_end"
 			isBefore="time_evening_end"
@@ -58,7 +58,7 @@
 		
 		<at.caspase.rxdroid.TimePreference android:key="time_evening_end"
 			android:title="@string/_End"
-			android:defaultValue="20:00"
+			android:defaultValue="@string/pref_default_time_evening_end"
 			
 			isAfter="time_evening_begin"
 			isBefore="time_night_begin"
@@ -71,14 +71,14 @@
 	>
 		<at.caspase.rxdroid.TimePreference android:key="time_night_begin"
 			android:title="@string/_Begin"
-			android:defaultValue="22:00"
+			android:defaultValue="@string/pref_default_time_night_begin"
 			
 			isAfter="time_evening_end"
 		/>
 		
 		<at.caspase.rxdroid.TimePreference android:key="time_night_end"
 			android:title="@string/_End"
-			android:defaultValue="01:00"
+			android:defaultValue="@string/pref_default_time_night_end"
 			
 			isAfter="time_night_begin"
 		/>	

@@ -3,6 +3,15 @@
     <string name="app_name">RxDroid</string>
     <string name="open_helper_classname">at.caspase.rxdroid.Database$Helper</string>
     
+    <string name="pref_default_time_morning_begin">06:00</string>
+    <string name="pref_default_time_morning_end">10:00</string>
+    <string name="pref_default_time_noon_begin">12:00</string>
+    <string name="pref_default_time_noon_end">15:00</string>
+    <string name="pref_default_time_evening_begin">19:00</string>
+    <string name="pref_default_time_evening_end">21:00</string>
+    <string name="pref_default_time_night_begin">22:00</string>
+    <string name="pref_default_time_night_end">23:30</string>
+        
     <!-- Begin of translatable strings -->
     
     <string name="_Morning">Morning</string>

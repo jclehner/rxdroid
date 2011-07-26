@@ -37,6 +37,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Path.FillType;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import at.caspase.rxdroid.Database.Drug;
@@ -81,6 +82,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		mIntent = new Intent(Intent.ACTION_VIEW);
 		mIntent.setClass(getApplicationContext(), DrugListActivity.class);
 		mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		
+		Settings.INSTANCE.setApplicationContext(getApplicationContext());
 		
 		final int activeDoseTime = Settings.INSTANCE.getActiveDoseTime();
 		final int nextDoseTime = Settings.INSTANCE.getNextDoseTime();

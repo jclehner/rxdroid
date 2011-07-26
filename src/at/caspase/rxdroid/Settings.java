@@ -21,9 +21,10 @@
 
 package at.caspase.rxdroid;
 
-import java.sql.Time;
-
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Util.Constants;
@@ -39,22 +40,28 @@ public enum Settings
 	private static final String prefKeyPrefixes[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 	private static final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 	
+	private Context mApplicationContext = null;
 	private SharedPreferences mSharedPrefs = null;
-	
-	public void setSharedPreferences(SharedPreferences sharedPrefs) {
-		mSharedPrefs = sharedPrefs;
+		
+	public void setApplicationContext(Context context)
+	{
+		if(mApplicationContext == null)
+		{
+			mApplicationContext = context.getApplicationContext();
+			mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
+		}
 	}
 	
 	public long getDoseTimeBeginOffset(int doseTime) 
 	{
-		return 3600 * 1000 * beginTimes[doseTime];
-		//return getTime(prefKeyPrefixes[doseTime] + "_begin").getTime();
+		//return 3600 * 1000 * beginTimes[doseTime];
+		return getTime(prefKeyPrefixes[doseTime] + "_begin").getTime();
 	}
 	
 	public long getDoseTimeEndOffset(int doseTime)
 	{
-		return 3600 * 1000 * endTimes[doseTime];
-		//return getTime(prefKeyPrefixes[doseTime] + "_end").getTime();
+		//return 3600 * 1000 * endTimes[doseTime];
+		return getTime(prefKeyPrefixes[doseTime] + "_end").getTime();
 	}
 	
 	public int getActiveDoseTime()
@@ -128,6 +135,23 @@ public enum Settings
 		if(key == null)
 			return null;
 		
-		return DumbTime.valueOf(mSharedPrefs.getString(key, null));
+		String value = mSharedPrefs.getString(key, null);
+		if(value == null)
+		{
+			int resId = mApplicationContext.getResources().getIdentifier(
+					"at.caspase.rxdroid:string/pref_default_" + key, null, null);
+					
+			value = mApplicationContext.getString(resId);
+		}
+		
+		Log.d(TAG, "getTime: key=" + key + ", value=" + value);
+		
+		return DumbTime.valueOf(value);
+	}
+	
+	private Settings()
+	{
+		Log.d("Settings", "Settings()");
+		//mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(App.getContext());
 	}
 }
