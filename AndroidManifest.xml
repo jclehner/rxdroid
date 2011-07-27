@@ -4,8 +4,8 @@
       android:versionName="1.0" package="at.caspase.rxdroid">
     
     <uses-permission android:name="android.permission.VIBRATE" />
-    
-        
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+            
     <application android:icon="@drawable/ic_launcher" android:debuggable="true">
         <activity android:name=".DrugListActivity"
                   android:label="@string/app_name">
@@ -26,14 +26,21 @@
         
         <activity android:name=".PreferenceTabActivity">
         	<intent-filter>
-	        	<intent>
-	        		<action android:name="android.intent.action.MAIN" />
-	        	</intent>
-        	</intent-filter>
+	        	<action android:name="android.intent.action.MAIN" />
+	        </intent-filter>
         </activity>
         
         <uses-library android:name="android.test.runner" />
-        <service android:name=".DrugNotificationService"></service>
+        
+        <service android:name=".DrugNotificationService" />
+        
+        <receiver android:name=".MyBroadcastReceiver">
+        	<intent-filter>
+        		<action android:name="android.intent.action.BOOT_COMPLETED" />
+        		<category android:name="android.intent.category.LAUNCHER" />
+        	</intent-filter>
+        </receiver>
+     
      </application>
 	
 	<instrumentation android:name="android.test.InstrumentationTestRunner"

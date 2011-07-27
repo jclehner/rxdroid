@@ -60,12 +60,13 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
+import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import com.j256.ormlite.dao.Dao;
 
 public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> implements 
-	DatabaseWatcher, OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener
+	OnDatabaseChangedListener, OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener
 {    
     public static final String TAG = DrugListActivity.class.getName();
 		
@@ -404,7 +405,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     }
         
     @Override
-	public void onDrugCreate(Drug drug)
+	public void onCreateEntry(Drug drug)
 	{
 		mDrugs.add(drug);
 		((DrugAdapter) mListView.getAdapter()).notifyDataSetChanged();
@@ -412,7 +413,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	}
 
 	@Override
-	public void onDrugDelete(Drug drug)
+	public void onDeleteEntry(Drug drug)
 	{
 		for(Drug storedDrug : mDrugs)
 		{
@@ -427,7 +428,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	}
 
 	@Override
-	public void onDrugUpdate(Drug drug)
+	public void onUpdateEntry(Drug drug)
 	{
 		for(int i = 0; i != mDrugs.size(); ++i)
 		{
@@ -442,10 +443,10 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	}
 
 	@Override
-	public void onIntakeCreate(Intake intake) {}
+	public void onCreateEntry(Intake intake) {}
 	
 	@Override
-	public void onIntakeDelete(Intake intake) {}
+	public void onDeleteEntry(Intake intake) {}
 	
 	@Override
 	public void onDatabaseDropped() {}

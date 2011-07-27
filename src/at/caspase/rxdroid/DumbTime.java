@@ -151,10 +151,18 @@ public class DumbTime extends Date
 		return getTime() > time.getTime();
 	}
 	
-	public boolean equals(DumbTime time) {
-		return getTime() == time.getTime();
+	@Override
+	public boolean equals(Object other) 
+	{
+		if(other != null)
+		{
+			if(other instanceof Date)
+				return getTime() == ((Date) other).getTime();
+		}
+		
+		return false;
 	}
-	
+		
 	
 	/**
 	 * Creates an instance with an offset.

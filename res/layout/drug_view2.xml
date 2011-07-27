@@ -30,6 +30,7 @@
   		android:gravity="center_vertical"
   		android:text="Cocaine 100mg"
   		
+  		android:focusable="true"
   		android:clickable="true"
   		android:onClick="onDrugNameClick"
   		
@@ -45,6 +46,7 @@
   		android:layout_toRightOf="@id/drug_icon"
   		android:layout_below="@id/drug_name"
   		
+  		android:focusable="true"
   		android:onClick="onDoseClick"
   	/>
   	
@@ -55,6 +57,7 @@
   		android:layout_toRightOf="@id/morning"
   		android:layout_alignBottom="@id/morning"
   		
+  		android:focusable="true"
   		android:onClick="onDoseClick"
   	/>
   	
@@ -65,6 +68,7 @@
   		android:layout_toRightOf="@id/noon"
   		android:layout_alignBottom="@id/noon"
   		
+  		android:focusable="true"
   		android:onClick="onDoseClick"
   	/>
   	
@@ -75,6 +79,7 @@
   		android:layout_toRightOf="@id/evening"
   		android:layout_alignBottom="@id/evening"
   		
+  		android:focusable="true"
   		android:onClick="onDoseClick"
   	/>  
     

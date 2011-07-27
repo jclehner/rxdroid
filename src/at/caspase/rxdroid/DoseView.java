@@ -25,19 +25,18 @@ import java.sql.Date;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewStub;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
+import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 
 import com.j256.ormlite.dao.Dao;
 
@@ -50,7 +49,7 @@ import com.j256.ormlite.dao.Dao;
  * @author Joseph Lehner
  *
  */
-public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchListener
+public class DoseView extends FrameLayout implements OnDatabaseChangedListener, OnTouchListener
 {
 	private static final String TAG = DoseView.class.getName();
 	
@@ -201,20 +200,20 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 	}
 
 	@Override
-	public void onDrugCreate(Drug drug) {}
+	public void onCreateEntry(Drug drug) {}
 
 	@Override
-	public void onDrugDelete(Drug drug) {}
+	public void onDeleteEntry(Drug drug) {}
 
 	@Override
-	public void onDrugUpdate(Drug drug) 
+	public void onUpdateEntry(Drug drug) 
 	{
 		if(mDrug == null || drug.getId() == mDrug.getId())
 			setDrug(drug);
 	}
 
 	@Override
-	public void onIntakeCreate(Intake intake)
+	public void onCreateEntry(Intake intake)
 	{
 		if(mDate == null)
 			return;
@@ -224,7 +223,7 @@ public class DoseView extends FrameLayout implements DatabaseWatcher, OnTouchLis
 	}
 
 	@Override
-	public void onIntakeDelete(Intake intake)
+	public void onDeleteEntry(Intake intake)
 	{
 		if(mDate == null)
 			return;

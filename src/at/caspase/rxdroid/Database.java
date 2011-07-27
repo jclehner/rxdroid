@@ -28,11 +28,11 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.Drawable;
+import android.test.AssertionFailedError;
+import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.BaseDaoImpl;
@@ -58,7 +58,7 @@ public class Database
 {
 	private static final String TAG = Database.class.getName();
 	
-	private static HashSet<DatabaseWatcher> sWatchers = new HashSet<DatabaseWatcher>();
+	private static HashSet<OnDatabaseChangedListener> sWatchers = new HashSet<OnDatabaseChangedListener>();
 	
 	/**
 	 * Add an object to the DatabseWatcher registry.
@@ -69,8 +69,8 @@ public class Database
 	 * 
 	 * @param watcher
 	 */
-	public static synchronized void addWatcher(DatabaseWatcher watcher) {
-		sWatchers.add(watcher);
+	public static synchronized void addWatcher(OnDatabaseChangedListener watcher) {
+		sWatchers.add(watcher);		
 	}
 	
 	
@@ -79,7 +79,7 @@ public class Database
 	 * 
 	 * @param watcher
 	 */
-	public static synchronized void removeWatcher(DatabaseWatcher watcher) {
+	public static synchronized void removeWatcher(OnDatabaseChangedListener watcher) {
 		sWatchers.remove(watcher);
 	}
 	
@@ -95,7 +95,7 @@ public class Database
 	 * @param dao
 	 * @param t
 	 */
-	public static <T, ID> void create(final Dao<T, ID> dao, final T t)
+	public static <T extends Entry, ID> void create(final Dao<T, ID> dao, final T t)
 	{
 		Thread th = new Thread(new Runnable() {
 			
@@ -117,17 +117,17 @@ public class Database
 				
 		if(t instanceof Drug)
 		{
-			for(DatabaseWatcher watcher : sWatchers)
-				watcher.onDrugCreate((Drug) t);			
+			for(OnDatabaseChangedListener watcher : sWatchers)
+				watcher.onCreateEntry((Drug) t);			
 		}
 		else if(t instanceof Intake)
 		{
-			for(DatabaseWatcher watcher : sWatchers)
-				watcher.onIntakeCreate((Intake) t);
+			for(OnDatabaseChangedListener watcher : sWatchers)
+				watcher.onCreateEntry((Intake) t);
 		}
 	}
 	
-	public static <T, ID> void update(final Dao<T, ID> dao, final T t)
+	public static <T extends Entry, ID> void update(final Dao<T, ID> dao, final T t)
 	{
 		Thread th = new Thread(new Runnable() {
 			
@@ -149,12 +149,12 @@ public class Database
 				
 		if(t instanceof Drug)
 		{
-			for(DatabaseWatcher watcher : sWatchers)
-				watcher.onDrugUpdate((Drug) t);			
+			for(OnDatabaseChangedListener watcher : sWatchers)
+				watcher.onUpdateEntry((Drug) t);			
 		}
 	}	
 	
-	public static <T, ID> void delete(final Dao<T, ID> dao, final T t)
+	public static <T extends Entry, ID> void delete(final Dao<T, ID> dao, final T t)
 	{
 		Thread th = new Thread(new Runnable() {
 			
@@ -176,13 +176,13 @@ public class Database
 		
 		if(t instanceof Drug)
 		{
-			for(DatabaseWatcher watcher : sWatchers)
-				watcher.onDrugDelete((Drug) t);
+			for(OnDatabaseChangedListener watcher : sWatchers)
+				watcher.onDeleteEntry((Drug) t);
 		}
 		else if(t instanceof Intake)
 		{
-			for(DatabaseWatcher watcher : sWatchers)
-				watcher.onIntakeDelete((Intake) t);
+			for(OnDatabaseChangedListener watcher : sWatchers)
+				watcher.onDeleteEntry((Intake) t);
 		}
 	}
 	
@@ -190,7 +190,7 @@ public class Database
 	{
 		helper.onUpgrade(helper.getWritableDatabase(), 0, Helper.DB_VERSION);
 		
-		for(DatabaseWatcher watcher : sWatchers)
+		for(OnDatabaseChangedListener watcher : sWatchers)
 			watcher.onDatabaseDropped();
 	}
 	
@@ -240,7 +240,7 @@ public class Database
 		 * 
 		 * @throws RuntimeException
 		 */
-		public boolean equals(Entry other) {
+		public boolean equals(Object other) {
 			throw new RuntimeException("Not implemented");
 		}
 		
@@ -348,19 +348,20 @@ public class Database
 	    {
 	    	switch(form)
 	    	{
-	    		case FORM_TABLET:
-	    			return R.drawable.med_pill;
-	    			
 	    		case FORM_INJECTION:
 	    			return R.drawable.med_syringe;
 	    			
 	    		case FORM_DROP:
 	    			return R.drawable.med_drink;
+	    		
+	    		case FORM_TABLET:
+	    			// fall through
+	    			
+	    		default:
+	    			return R.drawable.med_pill;	
 	    			
 	    		// FIXME
 	    	}
-	    	
-	    	return R.drawable.med_pill;
 	    }
 	    
 	    public boolean isActive() {
@@ -456,6 +457,9 @@ public class Database
 	    
 	    public boolean equals(Drug other)
 	    {
+	    	if(other == null)
+	    		return false;
+	    	
 	    	if(other == this)
 	    		return true;
 	    	
@@ -568,7 +572,7 @@ public class Database
 			this.date = new java.util.Date(date.getTime());
 		}
 
-		public void setTimestamp(Timestamp timestamp) {
+		public void setTimestamp(final Timestamp timestamp) {
 			this.timestamp = timestamp;
 		}
 
@@ -668,6 +672,34 @@ public class Database
 			mDrugDao = null;
 			mIntakeDao = null;
 		}
+	}
+	
+	/**
+	 * Notifies objects of database changes.
+	 * 
+	 * Objects implementing this interface and registering themselves with
+	 * Database.addWatcher will be notified upon any changes to the database,
+	 * as long as they are handled by the functions in Database.
+	 * @see Database#create
+	 * @see Database#update
+	 * @see Database#delete
+	 * @see Database#dropDatabase
+	 * @author Joseph Lehner
+	 *
+	 */
+	public interface OnDatabaseChangedListener
+	{
+		public void onCreateEntry(Drug drug);
+		
+		public void onDeleteEntry(Drug drug);
+		
+		public void onUpdateEntry(Drug drug);
+		
+		public void onCreateEntry(Intake intake);
+		
+		public void onDeleteEntry(Intake intake);
+		
+		public void onDatabaseDropped();	
 	}
 }
 

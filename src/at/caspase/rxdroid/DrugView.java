@@ -31,6 +31,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
+import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 
 import com.j256.ormlite.dao.Dao;
 
@@ -40,7 +41,7 @@ import com.j256.ormlite.dao.Dao;
  * @author Joseph Lehner
  *
  */
-public class DrugView extends RelativeLayout implements DatabaseWatcher
+public class DrugView extends RelativeLayout implements OnDatabaseChangedListener
 {
 	private ImageView mDrugIcon;
 	private TextView mDrugName;
@@ -72,7 +73,7 @@ public class DrugView extends RelativeLayout implements DatabaseWatcher
 			doseView.setDao(dao);
 		}
 		
-		onDrugUpdate(drug);		
+		onUpdateEntry(drug);		
 	}
 	
 	@Override
@@ -85,23 +86,23 @@ public class DrugView extends RelativeLayout implements DatabaseWatcher
 	}
 		
 	@Override
-	public void onDrugUpdate(Drug drug) 
+	public void onUpdateEntry(Drug drug) 
 	{
 		mDrugName.setText(drug.getName());
 		// TODO set the correct icon
 	}
 
 	@Override
-	public void onDrugCreate(Drug drug) {}
+	public void onCreateEntry(Drug drug) {}
 	
 	@Override
-	public void onDrugDelete(Drug drug) {}
+	public void onDeleteEntry(Drug drug) {}
 	
 	@Override
-	public void onIntakeCreate(Intake intake) {}
+	public void onCreateEntry(Intake intake) {}
 	
 	@Override
-	public void onIntakeDelete(Intake intake) {}
+	public void onDeleteEntry(Intake intake) {}
 	
 	@Override
 	public void onDatabaseDropped() {}

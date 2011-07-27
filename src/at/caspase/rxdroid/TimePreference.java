@@ -118,6 +118,7 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 			persistString(timeString);
 			setSummary(timeString);
 			Log.d(TAG, "onTimeSet: persisting");
+			setupTimePicker();
 		}
 	}
 	
