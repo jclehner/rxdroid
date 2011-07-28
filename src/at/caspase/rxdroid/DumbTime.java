@@ -94,9 +94,6 @@ public class DumbTime extends Date
 				try
 				{
 					final Date date = sdf.parse(timeString);
-					
-					Log.d("DumbTime", "valueOf: " + timeString + " -> " + date.getHours() + ":" + date.getMinutes());
-					
 					return new DumbTime(date.getHours(), date.getMinutes(), date.getSeconds());				
 				}
 				catch(ParseException e)
