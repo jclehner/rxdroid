@@ -25,14 +25,13 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.util.Log;
-
 /**
  * Very simple class for handling fractions.
  * 
  * @author Joseph Lehner
  */
-public class Fraction extends Number implements Serializable, Comparable<Number> {
+public class Fraction extends Number implements Serializable, Comparable<Number> 
+{
 	private static final long serialVersionUID = 2050536341303052796L;
 	private static final String TAG = Fraction.class.getName();
 	private static final Pattern REGEX = Pattern.compile("^\\s*(?:(-?\\d+)\\s+)?\\s*(?:(-?\\d+)\\s*/\\s*(\\d+)\\s*)\\s*$");

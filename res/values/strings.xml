@@ -11,6 +11,7 @@
     <string name="pref_default_time_evening_end">21:00</string>
     <string name="pref_default_time_night_begin">22:00</string>
     <string name="pref_default_time_night_end">23:30</string>
+    <string name="pref_default_time_snooze">00:15</string>
         
     <!-- Begin of translatable strings -->
     
@@ -21,4 +22,5 @@
     <string name="_Begin">Begin</string>
     <string name="_End">End</string>
     <string name="_Error">Error</string>
+    <string name="_Snooze_time">Snooze time</string>
 </resources>

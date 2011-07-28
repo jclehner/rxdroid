@@ -21,9 +21,10 @@
 
 package at.caspase.rxdroid;
 
+import java.util.Date;
+
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.Database.Drug;
@@ -34,9 +35,7 @@ public enum Settings
 	INSTANCE;
 	
 	private static final String TAG = Settings.class.getName();
-	private static final long beginTimes[] = { 6, 12, 18, 22 };
-	private static final long endTimes[] = { 10, 15, 21, 23 };
-	
+		
 	private static final String prefKeyPrefixes[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 	private static final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 	
@@ -50,23 +49,56 @@ public enum Settings
 			mApplicationContext = context.getApplicationContext();
 			mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
 		}
+	}	
+	
+	public long getMillisFromNowUntilDoseTimeBegin(int doseTime) {
+		return getMillisFromNowUntilDoseTimeBeginOrEnd(doseTime, true);
 	}
 	
-	public long getDoseTimeBeginOffset(int doseTime) 
-	{
-		//return 3600 * 1000 * beginTimes[doseTime];
-		return getTime(prefKeyPrefixes[doseTime] + "_begin").getTime();
+	public long getMillisFromNowUntilDoseTimeEnd(int doseTime) {
+		return getMillisFromNowUntilDoseTimeBeginOrEnd(doseTime, false);
 	}
 	
-	public long getDoseTimeEndOffset(int doseTime)
+	public long getSnoozeTime() {
+		return getTimePreference("time_snooze").getTime();
+	}	
+
+	public long getDoseTimeBeginOffset(int doseTime) {
+		return getTimePreference(prefKeyPrefixes[doseTime] + "_begin").getTime();
+	}
+	
+	public long getDoseTimeEndOffset(int doseTime) {
+		return getTimePreference(prefKeyPrefixes[doseTime] + "_end").getTime();
+	}
+	
+	public DumbTime getTimePreference(String key)
 	{
-		//return 3600 * 1000 * endTimes[doseTime];
-		return getTime(prefKeyPrefixes[doseTime] + "_end").getTime();
+		if(key == null)
+			return null;
+		
+		String value = mSharedPrefs.getString(key, null);
+		if(value == null)
+		{
+			int resId = mApplicationContext.getResources().getIdentifier(
+					"at.caspase.rxdroid:string/pref_default_" + key, null, null);
+					
+			value = mApplicationContext.getString(resId);
+		}
+				
+		return DumbTime.valueOf(value);
+	}	
+	
+	public int getActiveOrNextDoseTime()
+	{
+		int ret = getActiveDoseTime();
+		if(ret == -1)
+			return getNextDoseTime();
+		return ret;
 	}
 	
 	public int getActiveDoseTime()
 	{
-		final long offset = Util.DateTime.nowOffsetFromMidnight();
+		final long offset = Util.DateTime.getOffsetFromMidnight(Util.DateTime.today());
 		for(int doseTime : doseTimes)
 		{
 			if(offset >= getDoseTimeBeginOffset(doseTime) && offset < getDoseTimeEndOffset(doseTime))
@@ -79,15 +111,15 @@ public enum Settings
 		Log.d(TAG, "getActiveDoseTime: none active");
 		
 		return -1;		
-	}
+	}	
 	
 	public int getNextDoseTime() {
 		return getNextDoseTime(false);
 	}
 	
-	public int getNextDoseTime(boolean useNextDay)
+	private int getNextDoseTime(boolean useNextDay)
 	{
-		long offset = Util.DateTime.nowOffsetFromMidnight();
+		long offset = Util.DateTime.getOffsetFromMidnight(Util.DateTime.today());
 		if(useNextDay)
 			offset -= Constants.MILLIS_PER_DAY;
 		
@@ -116,40 +148,27 @@ public enum Settings
 		
 		return retDoseTime;		
 	}
-	
-	public int getActiveOrNextDoseTime()
+
+	private long getMillisFromNowUntilDoseTimeBeginOrEnd(int doseTime, boolean getMillisUntilBegin)
 	{
-		int ret = getActiveDoseTime();
-		if(ret == -1)
-			return getNextDoseTime();
-		return ret;
-	}
-	
-	public long getSnoozeTime()
-	{
-		return 10 * 1000;
-	}
-	
-	public DumbTime getTime(String key)
-	{
-		if(key == null)
-			return null;
+		final long offset = getMillisUntilBegin ? getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
+		final Date today = Util.DateTime.today();
 		
-		String value = mSharedPrefs.getString(key, null);
-		if(value == null)
+		long beginTime = today.getTime() + offset;	
+		
+		if(beginTime < Util.DateTime.currentTimeMillis())
 		{
-			int resId = mApplicationContext.getResources().getIdentifier(
-					"at.caspase.rxdroid:string/pref_default_" + key, null, null);
-					
-			value = mApplicationContext.getString(resId);
+			final Date tomorrow = new Date(today.getTime() + Util.Constants.MILLIS_PER_DAY);
+			beginTime = tomorrow.getTime() + offset;
+			
+			Log.d(TAG, "Getting offset from tomorrow");
 		}
+		
+		final DumbTime ret = new DumbTime(beginTime - Util.DateTime.currentTimeMillis());
+		Log.d(TAG, "Time until " + (getMillisUntilBegin ? "begin" : "end") + " of doseTime " + doseTime + ": " + ret.toString(true));
 				
-		return DumbTime.valueOf(value);
-	}
+		return ret.getTime();		
+	}	
+
 	
-	private Settings()
-	{
-		Log.d("Settings", "Settings()");
-		//mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(App.getContext());
-	}
 }

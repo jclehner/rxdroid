@@ -30,7 +30,6 @@ import java.util.List;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,7 +37,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
@@ -76,8 +74,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	public static final int MENU_DEBUG_FILL = MENU_ADD + 3;
 			
 	public static final String EXTRA_DAY = "day";
-	public static final String EXTRA_CLEAR_FORGOTTEN_NOTIFICATION = "clear_forgotten_notification";
-	
+		
 	private static final int TAG_ID = R.id.tag_drug_id;
 
 	// stores the ListViews for the ViewFlipper.
@@ -116,8 +113,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         updateDrugList();
         
         mTextDate.setOnLongClickListener(this);
-       
-                
+                       
         Intent serviceIntent = new Intent();
         serviceIntent.setClass(this, DrugNotificationService.class);
         
@@ -126,7 +122,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         Settings.INSTANCE.setApplicationContext(getApplicationContext());
         
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        Database.addWatcher(this);
+        Database.registerOnChangedListener(this);
     }
     
     @Override
@@ -144,12 +140,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         }
     	else
     		throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());
-        
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.cancel(R.id.notification_intake);
-        
-        if(intent.getBooleanExtra(EXTRA_CLEAR_FORGOTTEN_NOTIFICATION, false))
-        	manager.cancel(R.id.notification_intake_forgotten);
     }
     
     @Override
@@ -157,7 +147,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     {
     	super.onDestroy();
     	mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-    	Database.removeWatcher(this);
+    	Database.unregisterOnChangedListener(this);
     }
     
     @Override

@@ -31,8 +31,6 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.test.AssertionFailedError;
-import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.BaseDaoImpl;
@@ -69,7 +67,7 @@ public class Database
 	 * 
 	 * @param watcher
 	 */
-	public static synchronized void addWatcher(OnDatabaseChangedListener watcher) {
+	public static synchronized void registerOnChangedListener(OnDatabaseChangedListener watcher) {
 		sWatchers.add(watcher);		
 	}
 	
@@ -79,7 +77,7 @@ public class Database
 	 * 
 	 * @param watcher
 	 */
-	public static synchronized void removeWatcher(OnDatabaseChangedListener watcher) {
+	public static synchronized void unregisterOnChangedListener(OnDatabaseChangedListener watcher) {
 		sWatchers.remove(watcher);
 	}
 	
@@ -240,7 +238,7 @@ public class Database
 		 * 
 		 * @throws RuntimeException
 		 */
-		public boolean equals(Object other) {
+		public boolean equals(Entry other) {
 			throw new RuntimeException("Not implemented");
 		}
 		
@@ -579,11 +577,13 @@ public class Database
 		public void setDoseTime(int doseTime) {
 			this.doseTime = doseTime;
 		}
-		
+				
 		@Override
 		public String toString() {
 			return drug.getName() + ": date=" + date + ", doseTime=" + doseTime;		
 		}
+		
+		
     }
 	
 	/**

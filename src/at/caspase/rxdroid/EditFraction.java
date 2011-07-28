@@ -24,7 +24,6 @@ package at.caspase.rxdroid;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;

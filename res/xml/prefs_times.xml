@@ -83,5 +83,15 @@
 			isAfter="time_night_begin"
 		/>	
 			
-	</PreferenceCategory>	
+	</PreferenceCategory>
+	
+	<PreferenceCategory android:key="cat_time_snooze"
+		android:title="@string/_Snooze_time"
+	>
+		<at.caspase.rxdroid.TimePreference android:key="time_snooze"
+			android:title="@string/_Snooze_time"
+			android:defaultValue="@string/pref_default_time_snooze"
+		/>
+		
+	</PreferenceCategory>
 </PreferenceScreen>

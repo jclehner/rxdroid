@@ -26,6 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import android.util.Log;
+
 /**
  * A time class that is not aware of time zones.
  * 
@@ -92,6 +94,9 @@ public class DumbTime extends Date
 				try
 				{
 					final Date date = sdf.parse(timeString);
+					
+					Log.d("DumbTime", "valueOf: " + timeString + " -> " + date.getHours() + ":" + date.getMinutes());
+					
 					return new DumbTime(date.getHours(), date.getMinutes(), date.getSeconds());				
 				}
 				catch(ParseException e)
@@ -169,8 +174,11 @@ public class DumbTime extends Date
 	 * 
 	 * @param offset An offset from midnight, in milliseconds. The permissible range is thus [0, 86400000).
 	 */
-	protected DumbTime(long offset) 
+	public DumbTime(long offset) 
 	{
+		if(offset >= 86400000)
+			throw new IllegalArgumentException(offset + " is out of range");
+		
 		offset /= 1000;
 		
 		mHours = (int) offset % 3600;

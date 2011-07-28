@@ -119,7 +119,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 		
 		updateIntakeStatusIcon(true);
 		
-		Database.addWatcher(this);
+		Database.registerOnChangedListener(this);
 	}
 	
 	public void setDoseTime(int doseTime)
@@ -182,8 +182,6 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 		switch(event.getAction() & MotionEvent.ACTION_MASK)
 		{
 			case MotionEvent.ACTION_DOWN:
-				// TODO export!
-				//v.setBackgroundColor(Color.rgb(0xff, 0x66, 0x00));
 				v.setBackgroundResource(R.drawable.doseview_background_focus);
 				return true;
 				
@@ -240,12 +238,12 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 	{
 		if(visibility != VISIBLE)
 		{
-			Database.removeWatcher(this);
+			Database.unregisterOnChangedListener(this);
 			mWasHidden = true;
 		}
 		else
 		{
-			Database.addWatcher(this);
+			Database.registerOnChangedListener(this);
 			if(mWasHidden)
 				updateView();
 		}

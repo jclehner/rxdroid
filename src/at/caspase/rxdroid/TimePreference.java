@@ -21,7 +21,6 @@
 
 package at.caspase.rxdroid;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -29,6 +28,8 @@ import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.DialogPreference;
@@ -37,7 +38,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TimePicker;
 
-public class TimePreference extends DialogPreference implements OnTimeSetListener, OnClickListener
+public class TimePreference extends DialogPreference implements OnTimeSetListener, OnClickListener, OnSharedPreferenceChangeListener
 {
 	private static final String TAG = TimePreference.class.getName();
 		
@@ -95,30 +96,24 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 	{		
 		final DumbTime time = new DumbTime(hourOfDay, minute, 0);
 		
-		Log.d(TAG, "onTimeSet: hourOfDay=" + hourOfDay + ", minute=" + minute);
-		
-		Log.d(TAG, "onTimeSet: mTime=" + mTime + "(" + mTime.getTime() + ")");
-		Log.d(TAG, "onTimeSet: time=" + time + "(" + time.getTime() + ")");
-		//Log.d(TAG, "UTC: " + Time.UTC(year, month, day, hour, minute, second))
-		
 		if((mAfter != null && time.compareTo(mAfter) == -1) || (mBefore != null && !time.before(mBefore)))
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setTitle(R.string._Error);		
-			builder.setMessage("Time is not within the required constraints.");
+			builder.setMessage("DumbTime is not within the required constraints.");
 			
 			builder.setNeutralButton(android.R.string.ok, this);
 			builder.show();
 		}
 		else
 		{
-			final String timeString = time.toString(false);
+			final String timeString = time.toString();
 			mTime = time;
 			persistString(timeString);
 			setSummary(timeString);
 			Log.d(TAG, "onTimeSet: persisting");
-			setupTimePicker();
+			updateTimePicker();
 		}
 	}
 	
@@ -134,17 +129,23 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 	}
 	
 	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
+	{
+		if(getKey().equals(key) || mAfterTimeKey.equals(key) || mBeforeTimeKey.equals(key))
+			updateTimePicker();
+	}
+	
+	@Override
 	protected void onAttachedToActivity()
 	{
 		super.onAttachedToActivity();
 		
 		// getPersistedString returns null in the constructor, so we have to set the summary here
 		final String persisted = getPersistedString(mDefaultValue);
-		
 		setSummary(persisted);
 		mTime = DumbTime.valueOf(persisted);
-		
-		setupTimePicker();
+				
+		updateTimePicker();
 	}
 	
 	@Override
@@ -153,15 +154,15 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 		getDialog().show();
 	}
 		
-	private void setupTimePicker()
+	private void updateTimePicker()
 	{
 		final boolean is24HourFormat = DateFormat.is24HourFormat(getContext());
 		mDialog = new TimePickerDialog(getContext(), this, mTime.getHours(), mTime.getMinutes(), is24HourFormat);
 		
 		String message = null;
 		
-		mAfter = Settings.INSTANCE.getTime(mAfterTimeKey);
-		mBefore = Settings.INSTANCE.getTime(mBeforeTimeKey);		
+		mAfter = Settings.INSTANCE.getTimePreference(mAfterTimeKey);
+		mBefore = Settings.INSTANCE.getTimePreference(mBeforeTimeKey);		
 				
 		if(mAfter != null && mBefore != null)
 		{
@@ -180,6 +181,6 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 			message = message.replace("%1", mBefore.toString());		
 		}
 				
-		mDialog.setMessage(message);		
+		mDialog.setMessage(message);
 	}		
 }

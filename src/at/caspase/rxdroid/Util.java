@@ -24,8 +24,10 @@ package at.caspase.rxdroid;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.NoSuchElementException;
+import java.util.TimeZone;
 
 import android.util.Log;
 import android.view.View;
@@ -54,10 +56,17 @@ public class Util {
     		return new Date(today.getTime());
     	}
     	
-    	static long nowOffsetFromMidnight() {
+    	static String toString(Time time)
+    	{
+    		final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+    		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+    		
+    		return sdf.format(time);	
+    	}
+    	    	
+    	static long getOffsetFromMidnight(Date today) {
     		final Time now = now();
-    		final Date today = today();    		    		
-    			
+    		    			
     		long ret = now.getTime() - today.getTime();
     		
     		Log.d(TAG, "nowOffsetFromMidnight: now=" + now + "(" + now.getTime() +"), today=" + today + "(" + today.getTime() + ")");
