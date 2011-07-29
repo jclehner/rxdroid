@@ -65,15 +65,13 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	private EditText mTextCurrentSupply;
 	private EditText mTextRefillSize;
 	private Spinner mDrugFormChooser;
+	private int mDrugForm;
 	private CheckBox mIsActive;
-	
-	int mDrugForm;
 		
 	// indicates whether a change was made to the drug we're editing
 	private boolean mChanged = false;
 	
-	Dao<Database.Drug, Integer> mDao;
-	
+	private Dao<Database.Drug, Integer> mDao;
 	private Database.Drug mDrug;
 		
 	@Override
@@ -106,7 +104,8 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				mDrugForm = position;				
+				mDrugForm = position;
+				mChanged = true;
 			}
 
 			@Override

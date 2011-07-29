@@ -66,9 +66,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	private SharedPreferences mSharedPreferences;
 	
 	Thread mThread;
-	// FIXME
-	final long mSnoozeTime = Settings.INSTANCE.getSnoozeTime();
-	
+		
 	@Override
 	public void onCreate()
 	{
@@ -201,7 +199,9 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				
 				int doseTime = Settings.INSTANCE.getActiveOrNextDoseTime();
 				boolean firstRun = true;			
-								
+				
+				final long snoozeTime = Settings.INSTANCE.getSnoozeTime();
+				
 				while(true)
 				{
 					Date today = Util.DateTime.today();
@@ -239,7 +239,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							// if the user marks a drug as taken, this thread will be restarted. in order to prevent a new
 							// notification from flashing up instantly, we'll snooze a little
 							Log.d(TAG, "Will snooze");
-							Thread.sleep(mSnoozeTime);
+							Thread.sleep(snoozeTime);
 						}
 						else
 							Log.d(TAG, "Not sleeping or snoozing");
@@ -266,12 +266,12 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 								Log.d(TAG, "millisUntilDoseTimeEnd=" + millisUntilDoseTimeEnd);
 								int counter = 0;
 								
-								while(millisUntilDoseTimeEnd >= mSnoozeTime)
+								while(millisUntilDoseTimeEnd >= snoozeTime)
 								{
 									notification.when = Util.DateTime.currentTimeMillis();
 									mNotificationManager.notify(R.id.notification_intake, notification);									
-									Thread.sleep(mSnoozeTime);
-									millisUntilDoseTimeEnd -= mSnoozeTime;
+									Thread.sleep(snoozeTime);
+									millisUntilDoseTimeEnd -= snoozeTime;
 									++counter;
 								}				
 								
