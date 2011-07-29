@@ -570,7 +570,7 @@ public class Database
 			this.date = new java.util.Date(date.getTime());
 		}
 
-		public void setTimestamp(final Timestamp timestamp) {
+		public void setTimestamp(Timestamp timestamp) {
 			this.timestamp = timestamp;
 		}
 

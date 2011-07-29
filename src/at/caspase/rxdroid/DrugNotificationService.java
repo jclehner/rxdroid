@@ -390,7 +390,5 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		}
 		else
 			mNotificationManager.cancel(R.id.notification_intake_forgotten);
-	}	
-
-	private enum Locker { INSTANCE; }
+	}
 }

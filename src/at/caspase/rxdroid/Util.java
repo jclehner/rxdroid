@@ -40,7 +40,7 @@ public class Util {
     
     static class Constants
     {
-        static final int MILLIS_PER_DAY = 24 * 3600 * 1000;
+        static final long MILLIS_PER_DAY = 24 * 3600 * 1000;
     }
     
     static class DateTime
