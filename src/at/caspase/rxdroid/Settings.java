@@ -60,7 +60,8 @@ public enum Settings
 	}
 	
 	public long getSnoozeTime() {
-		return getTimePreference("time_snooze").getTime();
+		//return getTimePreference("time_snooze").getTime();
+		return 10 * 1000;
 	}	
 
 	public long getDoseTimeBeginOffset(int doseTime) {

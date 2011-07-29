@@ -213,7 +213,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					
 					long millisUntilNextDoseTime;
 					
-					if(!hasActiveDoseTime)
+					if(!firstRun && !hasActiveDoseTime)
 						millisUntilNextDoseTime = Settings.INSTANCE.getMillisFromNowUntilDoseTimeBegin(doseTime);
 					else
 						millisUntilNextDoseTime = -1;
@@ -247,7 +247,9 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 						firstRun = false;
 								
 						final Set<Intake> pendingIntakes = getAllPendingIntakes(today, doseTime);
-											
+						
+						long millisUntilDoseTimeEnd = Settings.INSTANCE.getMillisFromNowUntilDoseTimeEnd(doseTime);
+						
 						if(!pendingIntakes.isEmpty())
 						{
 							final int count = pendingIntakes.size();							
@@ -259,8 +261,6 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							notification.defaults |= Notification.DEFAULT_ALL;
 							notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE | Notification.FLAG_AUTO_CANCEL;
 														
-							long millisUntilDoseTimeEnd = Settings.INSTANCE.getMillisFromNowUntilDoseTimeEnd(doseTime);
-							
 							if(millisUntilDoseTimeEnd > 0)
 							{
 								Log.d(TAG, "millisUntilDoseTimeEnd=" + millisUntilDoseTimeEnd);
@@ -283,8 +283,15 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 
 							displayOrClearForgottenIntakesNotification();
 						}
+						else
+						{
+							Log.d(TAG, "No pending intakes found. Sleeping.");
+							Thread.sleep(millisUntilDoseTimeEnd);
+						}
 												
-						doseTime = Settings.INSTANCE.getNextDoseTime();						
+						doseTime = Settings.INSTANCE.getNextDoseTime();
+						
+						Log.d(TAG, "Next doseTime=" + doseTime);
 					}
 					catch (InterruptedException e)
 					{
@@ -329,7 +336,9 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		else
 			lastDoseTime = activeDoseTime - 1;
 		
-		if((onlyPendingIntakes && activeDoseTime == -1) || lastDoseTime == -1)
+		Log.d(TAG, "lastDoseTime=" + lastDoseTime);
+		
+		if((onlyPendingIntakes && activeDoseTime == -1) || (!onlyPendingIntakes && lastDoseTime == -1))
 			return Collections.emptySet();
 		
 		final Set<Intake> intakes = new HashSet<Intake>();
