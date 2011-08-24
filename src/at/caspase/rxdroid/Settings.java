@@ -165,10 +165,12 @@ public enum Settings
 			Log.d(TAG, "Getting offset from tomorrow");
 		}
 		
-		final DumbTime ret = new DumbTime(beginTime - Util.DateTime.currentTimeMillis());
-		Log.d(TAG, "Time until " + (getMillisUntilBegin ? "begin" : "end") + " of doseTime " + doseTime + ": " + ret.toString(true));
+		long diff = beginTime - Util.DateTime.currentTimeMillis();
+		
+		//final DumbTime ret = new DumbTime(beginTime - Util.DateTime.currentTimeMillis());
+		//Log.d(TAG, "Time until " + (getMillisUntilBegin ? "begin" : "end") + " of doseTime " + doseTime + ": " + ret.toString(true));
 				
-		return ret.getTime();		
+		return diff;
 	}	
 
 	

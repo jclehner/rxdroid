@@ -96,7 +96,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	}
 	
 	@Override
-	public void onDestroy() 
+	public synchronized void onDestroy() 
 	{
 		super.onDestroy();
 		mThread.interrupt();
@@ -157,7 +157,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	{
 		restartThread();
 	}
-	
+
 	/**
 	 * (Re)starts the worker thread.
 	 * 
@@ -166,93 +166,89 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	 * worker thread is restarted when <em>any</em> database changes occur (see
 	 * DatabaseWatcher) or when the user opens the app. 
 	 */	
+	
 	private synchronized void restartThread()
-	{	
+	{
 		if(mThread != null)
 			mThread.interrupt();
-				
+		
 		mThread = new Thread(new Runnable() {
 			
 			@Override
 			public void run()
 			{
-				Log.d(TAG, "Thread is up and running");
-								
 				final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mIntent, 0);
-												
-				/* TODO
+				
+				/**
+				 * TODO:
 				 * 
-				 * 1. query settings to determine begin of the next doseTime period & sleep 
-				 * 2. determine drugs with a dose other than "0" for the current doseTime
-				 * 3. set Intent options for DrugListActivity: mDay=day of notification
-				 * 4. post notification
-				 * 5. if doseTime == TIME_MORNING, check if supply levels are low and
-				 *    post notification
-				 * 6. determine remaining time in the current doseTime period & sleep
-				 * 7. clear intake reminder notification & replace with "forgotten" notification
-				 * 8. goto 1
+				 * - on start, clear all notifications
 				 * 
-				 * also install a BroadcastReceiver to monitor changes to the system time
+				 * - collect forgotten intakes & display notifications if necessary
+				 * - if a dose time is active, collect pending intakes & display notifications if neccessary. do so every
+				 *   N minutes (as specified by the snooze time), until the next dose time becomes active
+				 *   
+				 *   - if the active dose time is TIME_MORNING, also check supply levels & display notifications, if applicable
+				 *   
+				 * - if no dose time is active, sleep until the start of the next dose time
+				 * 
+				 * 
+				 * 
+				 * 
+				 * 
+				 * 
+				 * 
+				 * 
 				 */
 				
-				boolean hasActiveDoseTime = Settings.INSTANCE.getActiveDoseTime() != -1;
+				mNotificationManager.cancel(R.id.notification_intake);
+				//mNotificationManager.cancel(R.id.notification_intake_forgotten);
+				mNotificationManager.cancel(R.id.notification_low_supplies);
 				
-				int doseTime = Settings.INSTANCE.getActiveOrNextDoseTime();
-				boolean firstRun = true;			
-				
-				final long snoozeTime = Settings.INSTANCE.getSnoozeTime();
-				
-				while(true)
+				try
 				{
-					Date today = Util.DateTime.today();
-					
-					mForgottenIntakes = getAllForgottenIntakes(today);
-					displayOrClearForgottenIntakesNotification();
-					
-					mIntent.putExtra(DrugListActivity.EXTRA_DAY, today);
-					
-					long millisUntilNextDoseTime;
-					
-					if(!firstRun && !hasActiveDoseTime)
-						millisUntilNextDoseTime = Settings.INSTANCE.getMillisFromNowUntilDoseTimeBegin(doseTime);
-					else
-						millisUntilNextDoseTime = -1;
+					boolean snoozeBeforeFirstNotification = true;
 										
-					Log.d(TAG, "millisUntilNextDoseTime=" + millisUntilNextDoseTime);
-					
-					try
-					{						
-						if(millisUntilNextDoseTime > 0)
-						{					
-							Log.d(TAG, "Will sleep " + millisUntilNextDoseTime + "ms");
-							Thread.sleep(millisUntilNextDoseTime);
-							
-							if(doseTime == Drug.TIME_MORNING)
-							{
-								mForgottenIntakes.clear();
-								displayOrClearForgottenIntakesNotification();
-							}
-							
-						}
-						else if(firstRun)
+					while(true)
+					{					
+						final Date date = Util.DateTime.today();
+						mIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
+						
+						final int activeDoseTime = Settings.INSTANCE.getActiveDoseTime();						
+						final int nextDoseTime = Settings.INSTANCE.getNextDoseTime();
+						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
+						
+						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
+						
+						if(lastDoseTime >= 0)
 						{
-							// if the user marks a drug as taken, this thread will be restarted. in order to prevent a new
-							// notification from flashing up instantly, we'll snooze a little
-							Log.d(TAG, "Will snooze");
-							Thread.sleep(snoozeTime);
+							mForgottenIntakes = getAllForgottenIntakes(date, lastDoseTime);
+							displayOrClearForgottenIntakesNotification();							
 						}
-						else
-							Log.d(TAG, "Not sleeping or snoozing");
 						
-						firstRun = false;
-								
-						final Set<Intake> pendingIntakes = getAllPendingIntakes(today, doseTime);
+						if(activeDoseTime == -1)
+						{
+							long sleepTime = Settings.INSTANCE.getMillisFromNowUntilDoseTimeBegin(nextDoseTime);
+							
+							Log.d(TAG, "Time until next dose time (" + nextDoseTime + "): " + sleepTime + "ms");
+							
+							Thread.sleep(sleepTime);
+							snoozeBeforeFirstNotification = false;
+							continue;							
+						}
+						else if(activeDoseTime == Drug.TIME_MORNING)
+						{
+							mForgottenIntakes.clear();
+							
+							mNotificationManager.cancel(R.id.notification_intake_forgotten);
+							//mNotificationManager.cancel(R.id.notification_low_supplies);							
+						}						
 						
-						long millisUntilDoseTimeEnd = Settings.INSTANCE.getMillisFromNowUntilDoseTimeEnd(doseTime);
-						
+						final Set<Intake> pendingIntakes = getAllOpenIntakes(date, activeDoseTime);
+																		
 						if(!pendingIntakes.isEmpty())
 						{
-							final int count = pendingIntakes.size();							
+							final int count = pendingIntakes.size();
 														
 							final CharSequence contentText = count + " doses pending. Click to snooze.";
 							
@@ -260,64 +256,47 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							notification.setLatestEventInfo(getApplicationContext(), "Dose reminder", contentText, contentIntent);
 							notification.defaults |= Notification.DEFAULT_ALL;
 							notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE | Notification.FLAG_AUTO_CANCEL;
+							
+							final long snoozeTime = Settings.INSTANCE.getSnoozeTime();
+							
+							if(snoozeBeforeFirstNotification)
+							{								
+								snoozeBeforeFirstNotification = false;
+								Log.d(TAG, "Sleeping before first notification");
+								Thread.sleep(snoozeTime);
+							}								
 														
-							if(millisUntilDoseTimeEnd > 0)
+							long millisUntilDoseTimeEnd = Settings.INSTANCE.getMillisFromNowUntilDoseTimeEnd(activeDoseTime);
+							Log.d(TAG, "Will post " + millisUntilDoseTimeEnd / snoozeTime + " notifications");
+														
+							while(millisUntilDoseTimeEnd > snoozeTime)
 							{
-								Log.d(TAG, "millisUntilDoseTimeEnd=" + millisUntilDoseTimeEnd);
-								int counter = 0;
-								
-								while(millisUntilDoseTimeEnd >= snoozeTime)
-								{
-									notification.when = Util.DateTime.currentTimeMillis();
-									mNotificationManager.notify(R.id.notification_intake, notification);									
-									Thread.sleep(snoozeTime);
-									millisUntilDoseTimeEnd -= snoozeTime;
-									++counter;
-								}				
-								
-								Log.d(TAG, "Posted " + counter + " notifications");
+								notification.when = Util.DateTime.currentTimeMillis();
+								mNotificationManager.notify(R.id.notification_intake, notification);									
+								Thread.sleep(snoozeTime);
+								millisUntilDoseTimeEnd -= snoozeTime;								
 							}
 							
-							mNotificationManager.cancel(R.id.notification_intake);
-							mForgottenIntakes.addAll(pendingIntakes);
-
-							displayOrClearForgottenIntakesNotification();
-						}
-						else
-						{
-							Log.d(TAG, "No pending intakes found. Sleeping.");
-							Thread.sleep(millisUntilDoseTimeEnd);
-						}
-												
-						doseTime = Settings.INSTANCE.getNextDoseTime();
-						
-						Log.d(TAG, "Next doseTime=" + doseTime);
+							if(millisUntilDoseTimeEnd > 0)
+								Thread.sleep(millisUntilDoseTimeEnd);
+						}						
 					}
-					catch (InterruptedException e)
-					{
-						Log.d(TAG, "Thread was interrupted. Exiting...");
-						break;
-					}
+				}
+				catch(InterruptedException e)
+				{
+					Log.d(TAG, "Thread interrupted, exiting...");					
 				}
 			}
 		});
 		
-		mThread.start();
-	}
-		
-	private Set<Intake> getAllForgottenIntakes(Date date) {
-		return getAllForgottenOrPendingIntakes(date, -1);
+		mThread.start();		
 	}
 	
-	private Set<Intake> getAllPendingIntakes(Date date, int activeDoseTime) {
-		return getAllForgottenOrPendingIntakes(date, activeDoseTime);
-	}
-	
-	private Set<Intake> getAllForgottenOrPendingIntakes(Date date, int activeDoseTime)
-	{
-		final boolean onlyPendingIntakes = activeDoseTime != -1;
-		
+	private Set<Intake> getAllOpenIntakes(Date date, int doseTime)
+	{		
+		final Set<Intake> openIntakes = new HashSet<Database.Intake>();
 		final List<Drug> drugs;
+		
 		try
 		{
 			drugs = mDrugDao.queryForAll();
@@ -327,51 +306,49 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			throw new RuntimeException(e);
 		}
 		
-		final int activeOrNextDoseTime = (activeDoseTime == -1) ? Settings.INSTANCE.getActiveOrNextDoseTime() : activeDoseTime;
-				
-		final int lastDoseTime;
-		
-		if(activeDoseTime == -1)
-			lastDoseTime = activeOrNextDoseTime - 1;
-		else
-			lastDoseTime = activeDoseTime - 1;
-		
-		Log.d(TAG, "lastDoseTime=" + lastDoseTime);
-		
-		if((onlyPendingIntakes && activeDoseTime == -1) || (!onlyPendingIntakes && lastDoseTime == -1))
-			return Collections.emptySet();
-		
-		final Set<Intake> intakes = new HashSet<Intake>();
-		
 		for(Drug drug : drugs)
 		{
-			if(!drug.isActive())
-				continue;
+			final List<Intake> intakes = Database.getIntakes(mIntakeDao, drug, date, doseTime);
 			
-			for(int doseTime = 0;; ++doseTime)
-			{
-				if(!onlyPendingIntakes || doseTime == activeDoseTime)
-				{					
-					if(!drug.getDose(doseTime).equals(0))
-					{
-						final List<Intake> intakesInDb = Database.getIntakes(mIntakeDao, drug, date, doseTime);
-						if(intakesInDb.isEmpty())
-						{							
-							final Intake intake = new Intake(drug, date, doseTime);
-							intakes.add(intake);
-							Log.d(TAG, "getAllForgottenOrPendingIntakes: adding " + intake);
-						}
-					}
-					
-					if(onlyPendingIntakes || doseTime == lastDoseTime)
-						break;
-				}			
-			}
+			if(!drug.getDose(doseTime).equals(0) && intakes.size() == 0)
+				openIntakes.add(new Intake(drug, date, doseTime));			
 		}
 		
-		return intakes;
+		return openIntakes;		
 	}
 	
+	private Set<Intake> getAllForgottenIntakes(Date date, int lastDoseTime)
+	{
+		final Date today = Util.DateTime.today();
+				
+		if(date.after(today))
+		{
+			Log.d(TAG, "date.after(today)");
+			return Collections.emptySet();
+		}
+		else if(date.before(today))
+		{
+			Log.d(TAG, "date.before(today)");
+			lastDoseTime = -1;
+		}
+		else
+		{
+			Log.d(TAG, "date.equals(today)");
+		}
+			
+		final Set<Intake> forgottenIntakes = new HashSet<Database.Intake>();
+		
+		for(int doseTime : Drug.TIMES)
+		{
+			forgottenIntakes.addAll(getAllOpenIntakes(date, doseTime));		
+			
+			if(doseTime == lastDoseTime)
+				break;
+		}
+		
+		return forgottenIntakes;		
+	}
+
 	private void displayOrClearForgottenIntakesNotification()
 	{
 		Log.d(TAG, mForgottenIntakes.size() + " forgotten intakes");

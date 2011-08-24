@@ -296,6 +296,8 @@ public class Database
 	    public static final int TIME_NIGHT = 3;
 	    public static final int TIME_WHOLE_DAY = 4;
 	    
+	    public static final int[] TIMES = { TIME_MORNING, TIME_NOON, TIME_EVENING, TIME_NIGHT }; 
+	    
 	    public static final String COLUMN_NAME = "name";
 	  	   	   
 	    @DatabaseField(unique = true)
