@@ -31,6 +31,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import at.caspase.rxdroid.Util.Hasher;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.BaseDaoImpl;
@@ -238,7 +239,13 @@ public class Database
 		 * 
 		 * @throws RuntimeException
 		 */
-		public boolean equals(Entry other) {
+		@Override
+		public boolean equals(Object other) {
+			throw new RuntimeException("Not implemented");
+		}
+		
+		@Override
+		public int hashCode() {
 			throw new RuntimeException("Not implemented");
 		}
 		
@@ -296,7 +303,7 @@ public class Database
 	    public static final int TIME_NIGHT = 3;
 	    public static final int TIME_WHOLE_DAY = 4;
 	    
-	    public static final int[] TIMES = { TIME_MORNING, TIME_NOON, TIME_EVENING, TIME_NIGHT }; 
+	    protected static final int[] TIMES = { TIME_MORNING, TIME_NOON, TIME_EVENING, TIME_NIGHT }; 
 	    
 	    public static final String COLUMN_NAME = "name";
 	  	   	   
@@ -455,15 +462,50 @@ public class Database
 	        this.comment = comment;
 	    }	
 	    
-	    public boolean equals(Drug other)
+	    @Override
+	    public boolean equals(Object o)
 	    {
-	    	if(other == null)
+	    	if(!(o instanceof Drug) || o == null)
 	    		return false;
 	    	
+	    	final Drug other = (Drug) o;
+	    	    	
 	    	if(other == this)
 	    		return true;
 	    	
-	    	final Object[] thisMembers = {
+	    	final Object[] thisMembers = this.getRelevantMembers();
+	    	final Object[] otherMembers = other.getRelevantMembers();
+	    		    	
+	    	for(int i = 0; i != thisMembers.length; ++i)
+	    	{
+	    		if(!thisMembers[i].equals(otherMembers[i]))
+	    			return false;
+	    	}
+	    	
+	    	return true;	    	
+	    }
+	    
+	    @Override
+	    public int hashCode()
+	    {
+	    	int result = Hasher.SEED;
+	    	
+	    	final Object[] thisMembers = this.getRelevantMembers();
+	    	
+	    	for(Object o : thisMembers)
+	    		result = Hasher.hash(result, o);
+	    	
+	    	return result;	    	
+	    }
+	    
+	    @Override
+	    public String toString() {
+	    	return name + "(" + id + ")={ " + doseMorning + " - " + doseNoon + " - " + doseEvening + " - " + doseNight + "}";
+	    }
+	    
+	    private Object[] getRelevantMembers()
+	    {
+	    	final Object[] members = {
 	    		this.name,
 	    		this.form,
 	    		this.active,
@@ -476,31 +518,7 @@ public class Database
 	    		this.comment	    		
 	    	};
 	    	
-	    	final Object[] otherMembers = {
-		    	other.name,
-		    	other.form,
-		    	other.active,
-		    	other.doseMorning,
-		    	other.doseNoon,
-		    	other.doseEvening,
-		    	other.doseNight,
-		    	other.currentSupply,
-		    	other.refillSize,
-		    	other.comment	    		
-		    };
-	    	
-	    	for(int i = 0; i != thisMembers.length; ++i)
-	    	{
-	    		if(!thisMembers[i].equals(otherMembers[i]))
-	    			return false;
-	    	}
-	    	
-	    	return true;	    	
-	    }
-	    
-	    @Override
-	    public String toString() {
-	    	return name + "(" + id + ")={ " + doseMorning + " - " + doseNoon + " - " + doseEvening + " - " + doseNight + "}";
+	    	return members;
 	    }
 	}
 	
@@ -578,6 +596,19 @@ public class Database
 
 		public void setDoseTime(int doseTime) {
 			this.doseTime = doseTime;
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			int result = Hasher.SEED;
+			
+			result = Hasher.hash(result, drug);
+			result = Hasher.hash(result, date);
+			result = Hasher.hash(result, timestamp);
+			result = Hasher.hash(result, doseTime);
+			
+			return result;			
 		}
 				
 		@Override
