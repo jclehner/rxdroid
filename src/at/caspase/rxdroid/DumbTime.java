@@ -47,12 +47,13 @@ public class DumbTime extends Date
 	private int mHours;
 	private int mMinutes;
 	private int mSeconds;
+	private int mMillis = 0;
 	
 	public DumbTime(int hours, int minutes, int seconds) 
 	{
 		setHours(hours);
 		setMinutes(minutes);
-		setSeconds(seconds);
+		setSeconds(seconds);		
 	}
 	
 	public DumbTime(int hours, int minutes) {
@@ -76,7 +77,7 @@ public class DumbTime extends Date
 		
 	@Override
 	public long getTime() {
-		return 1000 * (mHours * 3600 + mMinutes * 60 + mSeconds);
+		return mMillis + 1000 * (mHours * 3600 + mMinutes * 60 + mSeconds);
 	}
 	
 	@Override
@@ -171,19 +172,20 @@ public class DumbTime extends Date
 	 * 
 	 * @param offset An offset from midnight, in milliseconds. The permissible range is thus [0, 86400000).
 	 */
-	public DumbTime(long offset) 
+	private DumbTime(long offset) 
 	{
 		if(offset >= 86400000)
 			throw new IllegalArgumentException(offset + " is out of range");
+				
+		mHours = (int) offset % (3600 * 1000);
+		offset -= mHours * (3600 * 1000);
 		
-		offset /= 1000;
+		mMinutes = (int) offset % (60 * 1000);
+		offset -= mMinutes * (60 * 1000);
 		
-		mHours = (int) offset % 3600;
-		offset -= mHours * 3600;
+		mSeconds = (int) offset % 1000;
+		offset -= mSeconds * 1000;
 		
-		mMinutes = (int) offset % 60;
-		offset -= mMinutes * 60;
-		
-		mSeconds = (int) offset;
+		mMillis = (int) offset;
 	}
 }
