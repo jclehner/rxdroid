@@ -335,10 +335,11 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		{
 			Log.d(TAG, "date.equals(today)");
 		}
-			
+		
+		final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 		final Set<Intake> forgottenIntakes = new HashSet<Database.Intake>();
 		
-		for(int doseTime : Drug.TIMES)
+		for(int doseTime : doseTimes)
 		{
 			forgottenIntakes.addAll(getAllOpenIntakes(date, doseTime));		
 			

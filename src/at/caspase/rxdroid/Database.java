@@ -244,6 +244,11 @@ public class Database
 			throw new RuntimeException("Not implemented");
 		}
 		
+		/**
+		 * This will always throw!
+		 * 
+		 * @throws RuntimeException
+		 */
 		@Override
 		public int hashCode() {
 			throw new RuntimeException("Not implemented");
@@ -302,9 +307,7 @@ public class Database
 	    public static final int TIME_EVENING = 2;
 	    public static final int TIME_NIGHT = 3;
 	    public static final int TIME_WHOLE_DAY = 4;
-	    
-	    protected static final int[] TIMES = { TIME_MORNING, TIME_NOON, TIME_EVENING, TIME_NIGHT }; 
-	    
+	    	    
 	    public static final String COLUMN_NAME = "name";
 	  	   	   
 	    @DatabaseField(unique = true)
@@ -465,7 +468,7 @@ public class Database
 	    @Override
 	    public boolean equals(Object o)
 	    {
-	    	if(!(o instanceof Drug) || o == null)
+	    	if(!(o instanceof Drug))
 	    		return false;
 	    	
 	    	final Drug other = (Drug) o;
@@ -591,7 +594,7 @@ public class Database
 		}
 
 		public void setTimestamp(Timestamp timestamp) {
-			this.timestamp = timestamp;
+			this.timestamp = new Timestamp(timestamp.getTime());
 		}
 
 		public void setDoseTime(int doseTime) {
@@ -609,6 +612,29 @@ public class Database
 			result = Hasher.hash(result, doseTime);
 			
 			return result;			
+		}
+		
+		@Override
+		public boolean equals(Object o)
+		{
+			if(!(o instanceof Intake))
+				return false;
+			
+			final Intake other = (Intake) o;
+			
+			if(this.doseTime != other.doseTime)
+				return false;
+			
+			if(!this.timestamp.equals(other.timestamp))
+				return false;
+			
+			if(!this.date.equals(other.date))
+				return false;
+			
+			if(!this.drug.equals(other.drug))
+				return false;
+			
+			return true;			
 		}
 				
 		@Override

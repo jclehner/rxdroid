@@ -32,6 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.TimeZone;
 
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.View;
 
 public class Util {
@@ -140,7 +141,7 @@ public class Util {
     	    	
     	private static final int PRIME = 37;    	
     }
-	
+    
 	/**
 	 * Checks whether number lies in range.
 	 
