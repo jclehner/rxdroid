@@ -237,21 +237,21 @@ public class Database
 		/**
 		 * This will always throw!
 		 * 
-		 * @throws RuntimeException
+		 * @throws UnsupportedOperationException
 		 */
 		@Override
 		public boolean equals(Object other) {
-			throw new RuntimeException("Not implemented");
+			throw new UnsupportedOperationException();
 		}
 		
 		/**
 		 * This will always throw!
 		 * 
-		 * @throws RuntimeException
+		 * @throws UnsupportedOperationException
 		 */
 		@Override
 		public int hashCode() {
-			throw new RuntimeException("Not implemented");
+			throw new UnsupportedOperationException();
 		}
 		
     	public int getId() {

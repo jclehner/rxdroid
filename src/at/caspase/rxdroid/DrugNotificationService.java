@@ -207,7 +207,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				
 				try
 				{
-					boolean snoozeBeforeFirstNotification = true;
+					boolean sleepBeforeFirstNotification = true;
 										
 					while(true)
 					{					
@@ -233,7 +233,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							Log.d(TAG, "Time until next dose time (" + nextDoseTime + "): " + sleepTime + "ms");
 							
 							Thread.sleep(sleepTime);
-							snoozeBeforeFirstNotification = false;
+							sleepBeforeFirstNotification = false;
 							continue;							
 						}
 						else if(activeDoseTime == Drug.TIME_MORNING)
@@ -243,6 +243,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							mNotificationManager.cancel(R.id.notification_intake_forgotten);
 							//mNotificationManager.cancel(R.id.notification_low_supplies);							
 						}						
+						
+						long millisUntilDoseTimeEnd = Settings.INSTANCE.getMillisFromNowUntilDoseTimeEnd(activeDoseTime);
 						
 						final Set<Intake> pendingIntakes = getAllOpenIntakes(date, activeDoseTime);
 																		
@@ -259,14 +261,14 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							
 							final long snoozeTime = Settings.INSTANCE.getSnoozeTime();
 							
-							if(snoozeBeforeFirstNotification)
+							if(sleepBeforeFirstNotification)
 							{								
-								snoozeBeforeFirstNotification = false;
+								sleepBeforeFirstNotification = false;
 								Log.d(TAG, "Sleeping before first notification");
-								Thread.sleep(snoozeTime);
+								// FIXME export this
+								Thread.sleep(10000);
 							}								
 														
-							long millisUntilDoseTimeEnd = Settings.INSTANCE.getMillisFromNowUntilDoseTimeEnd(activeDoseTime);
 							Log.d(TAG, "Will post " + millisUntilDoseTimeEnd / snoozeTime + " notifications");
 														
 							while(millisUntilDoseTimeEnd > snoozeTime)
@@ -275,11 +277,16 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 								mNotificationManager.notify(R.id.notification_intake, notification);									
 								Thread.sleep(snoozeTime);
 								millisUntilDoseTimeEnd -= snoozeTime;								
-							}
-							
-							if(millisUntilDoseTimeEnd > 0)
-								Thread.sleep(millisUntilDoseTimeEnd);
-						}						
+							}							
+						}
+						
+						if(millisUntilDoseTimeEnd > 0)
+						{
+							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms until end of dose time " + activeDoseTime);
+							Thread.sleep(millisUntilDoseTimeEnd);
+						}							
+						
+						Log.d(TAG, "Finished iteration");
 					}
 				}
 				catch(InterruptedException e)
@@ -308,10 +315,16 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		
 		for(Drug drug : drugs)
 		{
-			final List<Intake> intakes = Database.getIntakes(mIntakeDao, drug, date, doseTime);
-			
-			if(!drug.getDose(doseTime).equals(0) && intakes.size() == 0)
-				openIntakes.add(new Intake(drug, date, doseTime));			
+			if(drug.isActive())
+			{			
+				final List<Intake> intakes = Database.getIntakes(mIntakeDao, drug, date, doseTime);
+								
+				if(drug.getDose(doseTime).compareTo(0) != 0 && intakes.size() == 0)
+				{
+					Log.d(TAG, "getAllOpenIntakes: adding " + drug);
+					openIntakes.add(new Intake(drug, date, doseTime));
+				}					
+			}			
 		}
 		
 		return openIntakes;		
@@ -322,20 +335,11 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		final Date today = Util.DateTime.today();
 				
 		if(date.after(today))
-		{
-			Log.d(TAG, "date.after(today)");
 			return Collections.emptySet();
-		}
-		else if(date.before(today))
-		{
-			Log.d(TAG, "date.before(today)");
-			lastDoseTime = -1;
-		}
-		else
-		{
-			Log.d(TAG, "date.equals(today)");
-		}
 		
+		if(date.before(today))
+			lastDoseTime = -1;
+				
 		final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 		final Set<Intake> forgottenIntakes = new HashSet<Database.Intake>();
 		

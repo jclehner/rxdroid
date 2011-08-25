@@ -25,6 +25,8 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import at.caspase.rxdroid.Util.Hasher;
+
 /**
  * Very simple class for handling fractions.
  * 
@@ -108,7 +110,7 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		return plus(new Fraction(integer));		
 	}
 	
-	public Fraction minus(final Fraction other) {
+	public Fraction minus(Fraction other) {
 		return plus(other.negate());
 	}
 	
@@ -123,19 +125,39 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 		return new Fraction(-mNumerator, mDenominator);
 	}
 	
-	
-	public boolean equals(final Number other)
+	@Override
+	public boolean equals(Object o)
 	{
-		// TODO ugly, change to equalizing to the same denominator and
-		// then comparing the nominators!
-		return this.doubleValue() == other.doubleValue();
+		if(!(o instanceof Fraction))
+			return false;
+		
+		Fraction other = (Fraction) o;
+		
+		if(other == this)
+			return true;
+		
+		return compareTo(other) == 0;
 	}
 	
 	@Override
+	public int hashCode()
+	{
+		int result = Hasher.SEED;
+		
+		result = Hasher.hash(result, mNumerator);
+		result = Hasher.hash(result, mDenominator);
+		
+		return result;
+	}
+		
+	@Override
 	public int compareTo(Number other)
 	{
-		if(this.equals(other))
+		// TODO ugly, change to equalizing to the same denominator and
+		// then comparing the nominators!
+		if(this.doubleValue() == other.doubleValue())
 			return 0;
+		
 		return this.doubleValue() < other.doubleValue() ? -1 : 1;
 	}
 	

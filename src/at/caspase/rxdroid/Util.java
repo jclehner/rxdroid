@@ -22,7 +22,6 @@
 package at.caspase.rxdroid;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -32,7 +31,6 @@ import java.util.NoSuchElementException;
 import java.util.TimeZone;
 
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.View;
 
 public class Util {
@@ -88,8 +86,40 @@ public class Util {
     	}
     }
     
+    
+    /**
+     * Helper class for writing hashCode methods.
+     * 
+     * The design is essentially copied from the Android SDK's javadoc, which in
+     * turn is based on <em>Effective Java</em> item 8.
+     * 
+     * Usage example:
+     * <pre>
+     * 
+     * // ...
+     * &#64;Override 	
+     * public int hashCode()
+     * {
+     * 	int result = Hasher.SEED;
+     * 	
+     * 	result = Hasher.hash(result, mMember1);
+     * 	result = Hasher.hash(result, mMember2);
+     * 	// ...
+     * 	result = Hasher.hash(result, mMemberX);
+     *  
+     * 	return result;
+     * }
+     * // ...
+     * </pre>
+     * 
+     * @author Joseph Lehner
+     *
+     */
     static class Hasher
     {
+    	/**
+    	 * Initial seed for the hash.
+    	 */
     	public static final int SEED = 23;
     	
     	public static int hash(int seed, boolean b) {

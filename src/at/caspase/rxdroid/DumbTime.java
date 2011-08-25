@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import android.util.Log;
+import at.caspase.rxdroid.Util.Hasher;
 
 /**
  * A time class that is not aware of time zones.
@@ -85,27 +85,6 @@ public class DumbTime extends Date
 		return 0;
 	}
 	
-	public static DumbTime valueOf(String timeString)
-	{
-		if(timeString != null)
-		{
-			for(String format : FORMATS)
-			{
-				final SimpleDateFormat sdf = new SimpleDateFormat(format);
-				try
-				{
-					final Date date = sdf.parse(timeString);
-					return new DumbTime(date.getHours(), date.getMinutes(), date.getSeconds());				
-				}
-				catch(ParseException e)
-				{
-					// ignore
-				}
-			}
-		}
-		
-		throw new IllegalArgumentException("timeString=" + timeString);
-	}
 
 	@Override
 	public void setHours(int hours) 
@@ -132,8 +111,54 @@ public class DumbTime extends Date
 			throw new IllegalArgumentException();
 		
 		mSeconds = seconds;
+	}	
+	
+	@Override
+	public boolean before(Date time) {
+		return getTime() < time.getTime();
 	}
 	
+	@Override
+	public boolean after(Date time) {
+		return getTime() > time.getTime();
+	}
+	
+	@Override
+	public int compareTo(Date other)
+	{
+		if(this.getTime() == other.getTime())
+			return 0;
+		
+		return this.before(other) ? -1 : 1;
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if(!(o instanceof DumbTime))
+			return false;
+		
+		DumbTime other = (DumbTime) o;
+		
+		if(other == this)
+			return true;
+		
+		return this.getTime() == other.getTime();		
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		int result = Hasher.SEED;
+		
+		result = Hasher.hash(result, mMillis);
+		result = Hasher.hash(result, mSeconds);
+		result = Hasher.hash(result, mMinutes);
+		result = Hasher.hash(result, mHours);
+		
+		return result;
+	}
+
 	@Override
 	public String toString() {
 		return toString(false);
@@ -145,14 +170,28 @@ public class DumbTime extends Date
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return sdf.format(this);
 	}
+
+	public static DumbTime valueOf(String timeString)
+	{
+		if(timeString != null)
+		{
+			for(String format : FORMATS)
+			{
+				final SimpleDateFormat sdf = new SimpleDateFormat(format);
+				try
+				{
+					final Date date = sdf.parse(timeString);
+					return new DumbTime(date.getHours(), date.getMinutes(), date.getSeconds());				
+				}
+				catch(ParseException e)
+				{
+					// ignore
+				}
+			}
+		}
 		
-	public boolean before(DumbTime time) {
-		return getTime() < time.getTime();
+		throw new IllegalArgumentException("timeString=" + timeString);
 	}
-	
-	public boolean after(DumbTime time) {
-		return getTime() > time.getTime();
-	}	
 		
 	/**
 	 * Creates an instance with an offset.
