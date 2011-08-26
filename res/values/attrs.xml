@@ -3,4 +3,14 @@
     <declare-styleable name="EditFraction">
     	<attr name="title" format="string" />
     </declare-styleable>
+    
+    <declare-styleable name="IconPreferenceScreen">
+    	<attr name="icon" format="reference" />
+    </declare-styleable>
+    
+    <declare-styleable name="TimePreference">
+    	<attr name="before" format="string" />
+    	<attr name="after" format="string" />
+    	<attr name="defaultValue" format="string|reference" />
+    </declare-styleable>    
 </resources>

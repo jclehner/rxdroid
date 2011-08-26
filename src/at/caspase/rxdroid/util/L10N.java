@@ -38,8 +38,8 @@ public class L10N
 	public static String getText(String format, Object... args)
 	{
 		for(int i = 0; i != args.length; ++i)
-			format.replaceAll("^[%](%\\{?" + i + "\\}?)", args[i].toString());
+			format = format.replaceAll("([^%])%\\{?" + (i + 1) + "(?:\\}|(\\D))", "$1" + args[i].toString() + "$2");
 		
-		return format;
+		return format.replaceAll("%%", "%");
 	}
 }

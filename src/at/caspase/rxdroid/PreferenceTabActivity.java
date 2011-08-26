@@ -43,7 +43,7 @@ public class PreferenceTabActivity extends PreferenceActivity implements OnPrefe
 		super.onCreate(savedInstanceState);
 		
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
-		addPreferencesFromResource(R.xml.prefs_times);		
+		addPreferencesFromResource(R.xml.preferences);		
 	}
 
 	@Override

@@ -54,8 +54,7 @@ import com.j256.ormlite.dao.Dao;
  * @author Joseph Lehner
  * 
  */
-public class DrugNotificationService extends
-		OrmLiteBaseService<Database.Helper> implements
+public class DrugNotificationService extends OrmLiteBaseService<Database.Helper> implements 
 		OnDatabaseChangedListener, OnSharedPreferenceChangeListener
 {
 	public static final String EXTRA_FORCE_RESTART = "force_restart";
@@ -226,9 +225,9 @@ public class DrugNotificationService extends
 				 * 
 				 */
 
-				mNotificationManager.cancel(R.id.notification_intake);
+				mNotificationManager.cancel(TAG, R.id.notification_intake);
 				// mNotificationManager.cancel(R.id.notification_intake_forgotten);
-				mNotificationManager.cancel(R.id.notification_low_supplies);
+				mNotificationManager.cancel(TAG, R.id.notification_low_supplies);
 
 				try
 				{
@@ -281,7 +280,7 @@ public class DrugNotificationService extends
 						{
 							mForgottenIntakes.clear();
 
-							mNotificationManager.cancel(R.id.notification_intake_forgotten);
+							mNotificationManager.cancel(TAG, R.id.notification_intake_forgotten);
 							checkSupplies();
 							// mNotificationManager.cancel(R.id.notification_low_supplies);
 						}
@@ -300,18 +299,12 @@ public class DrugNotificationService extends
 									+ " doses pending. Click to snooze.";
 							final CharSequence contentTitle = "Dose reminder";
 
-							final Notification notification = new Notification(
-									R.drawable.ic_stat_pill, contentTitle,
-									DateTime.currentTimeMillis());
-							notification.setLatestEventInfo(
-									getApplicationContext(), contentTitle,
-									contentText, contentIntent);
+							final Notification notification = new Notification(R.drawable.ic_stat_pill, contentTitle, DateTime.currentTimeMillis());
+							notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
 							notification.defaults |= Notification.DEFAULT_ALL;
-							notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE
-									| Notification.FLAG_AUTO_CANCEL;
+							notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE | Notification.FLAG_AUTO_CANCEL;
 
-							final long snoozeTime = Settings.INSTANCE
-									.getSnoozeTime();
+							final long snoozeTime = Settings.INSTANCE.getSnoozeTime();
 
 							if (delayFirstNotification)
 							{
@@ -326,10 +319,8 @@ public class DrugNotificationService extends
 
 							while (millisUntilDoseTimeEnd > snoozeTime)
 							{
-								notification.when = DateTime
-										.currentTimeMillis();
-								mNotificationManager.notify(
-										R.id.notification_intake, notification);
+								notification.when = DateTime.currentTimeMillis();
+								mNotificationManager.notify(TAG, R.id.notification_intake, notification);
 								Thread.sleep(snoozeTime);
 								millisUntilDoseTimeEnd -= snoozeTime;
 							}
@@ -337,9 +328,7 @@ public class DrugNotificationService extends
 
 						if (millisUntilDoseTimeEnd > 0)
 						{
-							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd
-									+ "ms until end of dose time "
-									+ activeDoseTime);
+							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms until end of dose time " + activeDoseTime);
 							Thread.sleep(millisUntilDoseTimeEnd);
 						}
 
@@ -374,11 +363,9 @@ public class DrugNotificationService extends
 		{
 			if (drug.isActive())
 			{
-				final List<Intake> intakes = Database.findIntakes(mIntakeDao,
-						drug, date, doseTime);
+				final List<Intake> intakes = Database.findIntakes(mIntakeDao, drug, date, doseTime);
 
-				if (drug.getDose(doseTime).compareTo(0) != 0
-						&& intakes.size() == 0)
+				if (drug.getDose(doseTime).compareTo(0) != 0 && intakes.size() == 0)
 				{
 					Log.d(TAG, "getAllOpenIntakes: adding " + drug);
 					openIntakes.add(new Intake(drug, date, doseTime));
@@ -399,8 +386,7 @@ public class DrugNotificationService extends
 		if (date.before(today))
 			lastDoseTime = -1;
 
-		final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON,
-				Drug.TIME_EVENING, Drug.TIME_NIGHT };
+		final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 		final Set<Intake> forgottenIntakes = new HashSet<Database.Intake>();
 
 		for (int doseTime : doseTimes)
@@ -420,26 +406,20 @@ public class DrugNotificationService extends
 
 		if (!mForgottenIntakes.isEmpty())
 		{
-			final CharSequence contentText = mForgottenIntakes.size()
-					+ " forgotten doses";
+			final CharSequence contentText = mForgottenIntakes.size() + " forgotten doses";
 			final CharSequence title = "Forgotten doses";
 
-			final Notification notification = new Notification(
-					R.drawable.ic_stat_pill, title,
-					DateTime.currentTimeMillis());
-			final PendingIntent contentIntent = PendingIntent.getActivity(
-					getApplicationContext(), 0, mIntent, 0);
+			final Notification notification = new Notification(R.drawable.ic_stat_pill, title, DateTime.currentTimeMillis());
+			final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mIntent, 0);
 
-			notification.setLatestEventInfo(getApplicationContext(), title,
-					contentText, contentIntent);
+			notification.setLatestEventInfo(getApplicationContext(), title, contentText, contentIntent);
 			notification.defaults |= Notification.DEFAULT_LIGHTS;
-			notification.flags |= Notification.FLAG_NO_CLEAR
-					| Notification.FLAG_ONLY_ALERT_ONCE;
+			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONLY_ALERT_ONCE;
 
-			mNotificationManager.notify(R.id.notification_intake_forgotten, notification);
+			mNotificationManager.notify(TAG, R.id.notification_intake_forgotten, notification);
 		}
 		else
-			mNotificationManager.cancel(R.id.notification_intake_forgotten);
+			mNotificationManager.cancel(TAG, R.id.notification_intake_forgotten);
 	}
 
 	private void checkSupplies()
@@ -454,7 +434,7 @@ public class DrugNotificationService extends
 			//final CharSequence contentText = mForgottenIntakes.size() + " forgotten doses";
 			final CharSequence title = "Low supplies";
 			
-			final Notification notification = new Notification(R.drawable.ic_stat_pill, title, DateTime.currentTimeMillis());
+			final Notification notification = new Notification(R.drawable.ic_stat_pill, title, 0);
 			final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mIntent, 0);
 						
 			final String firstDrugName = drugsWithLowSupply.get(0).getName();
@@ -467,12 +447,12 @@ public class DrugNotificationService extends
 			
 			notification.setLatestEventInfo(getApplicationContext(), title, contentText, contentIntent);
 			notification.defaults = Notification.DEFAULT_LIGHTS;
-			notification.flags |= Notification.FLAG_NO_CLEAR;
+			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONLY_ALERT_ONCE | Notification.FLAG_ONGOING_EVENT;
 			
-			mNotificationManager.notify(R.id.notification_low_supplies, notification);			
+			mNotificationManager.notify(TAG, R.id.notification_low_supplies, notification);			
 		}
 		else
-			mNotificationManager.cancel(R.id.notification_low_supplies);
+			mNotificationManager.cancel(TAG, R.id.notification_low_supplies);
 	}
 
 	private List<Drug> getAllDrugsWithLowSupply(int minDays)
@@ -509,8 +489,7 @@ public class DrugNotificationService extends
 
 			if (dailyDose != 0)
 			{
-				final double currentSupply = drug.getCurrentSupply()
-						.doubleValue();
+				final double currentSupply = drug.getCurrentSupply().doubleValue();
 
 				if (Double.compare(currentSupply / dailyDose, (double) minDays) == -1)
 					drugsWithLowSupply.add(drug);

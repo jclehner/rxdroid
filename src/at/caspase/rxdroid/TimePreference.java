@@ -22,7 +22,6 @@
 package at.caspase.rxdroid;
 
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
@@ -31,27 +30,30 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.preference.DialogPreference;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 public class TimePreference extends DialogPreference implements OnTimeSetListener, OnClickListener, OnSharedPreferenceChangeListener
 {
 	private static final String TAG = TimePreference.class.getName();
-		
-	private MyTimePickerDialog mDialog;
-			
-	private String mAfterTimeKey;
-	private String mBeforeTimeKey;
+	private static final String DEFAULT_TIME = "00:00";
 	
+	private static final int IDX_AFTER = 0;
+	private static final int IDX_BEFORE = 1;
+	
+	private MyTimePickerDialog mDialog;
+	
+	private DumbTime[] mConstraintTimes = new DumbTime[2];
+	private String[] mConstraintTimePrefKeys = new String[2];
+		
 	private DumbTime mTime;
 				
-	private String mDefaultValue = "00:00";
+	private String mDefaultValue;
 		
 	public TimePreference(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
@@ -59,10 +61,38 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 	
 	public TimePreference(Context context, AttributeSet attrs, int defStyle) 
 	{
-		super(context, attrs, defStyle);		
+		super(context, attrs, defStyle);
+		
+		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TimePreference, defStyle, 0);
+		
+		final int[] attrIds = { R.styleable.TimePreference_after, R.styleable.TimePreference_before };
+				
+		for(int i = 0; i != 2; ++i)
+		{
+			final String value = a.getString(attrIds[i]);
+						
+			if(value != null)
+			{				
+				try
+				{
+					mConstraintTimes[i] = DumbTime.valueOf(value);
+				}
+				catch(IllegalArgumentException e)
+				{
+					mConstraintTimePrefKeys[i] = value;
+				}
+			}
+		}
+		
+		mDefaultValue = a.getString(R.styleable.TimePreference_defaultValue);
+		if(mDefaultValue == null)
+			mDefaultValue = DEFAULT_TIME;
+		
+		
+		
 				
 		// FIXME
-		for(int i = 0; i != attrs.getAttributeCount(); ++i)
+		/*for(int i = 0; i != attrs.getAttributeCount(); ++i)
 		{
 			final String name = attrs.getAttributeName(i);
 			String value = attrs.getAttributeValue(i);
@@ -82,12 +112,13 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 				mBeforeTimeKey = value;			
 		}
 		
-		Log.d(TAG, "init: after=" + mAfterTimeKey + ", before=" + mBeforeTimeKey);
+		Log.d(TAG, "init: after=" + mAfterTimeKey + ", before=" + mBeforeTimeKey);*/
 	}
 	
 	@Override
 	public Dialog getDialog() 
 	{
+		updateTimePicker();
 		return mDialog;
 	}
 	
@@ -135,7 +166,7 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 	{
 		Log.d(TAG, "key=" + key);
 		
-		if(key.equals(getKey()) || key.equals(mAfterTimeKey) || key.equals(mBeforeTimeKey))
+		if(key.equals(getKey()) || key.equals(mConstraintTimePrefKeys[IDX_AFTER]) || key.equals(mConstraintTimePrefKeys[IDX_BEFORE]))
 			updateTimePicker();
 	}
 	
@@ -161,41 +192,42 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 	}
 	
 	@Override
-	protected void showDialog(Bundle state)
-	{
-		updateTimePicker();
+	protected void showDialog(Bundle state) {
+		
 		getDialog().show();
 	}
 		
 	private void updateTimePicker()
 	{
-		final boolean is24HourFormat = DateFormat.is24HourFormat(getContext());
-		mDialog = new MyTimePickerDialog(getContext(), this, mTime.getHours(), mTime.getMinutes(), is24HourFormat);
+		mDialog = new MyTimePickerDialog(getContext(), this, mTime.getHours(), mTime.getMinutes(), DateFormat.is24HourFormat(getContext()));
 		
-		mDialog.setConstraintAfter(Settings.INSTANCE.getTimePreference(mAfterTimeKey));
-		mDialog.setConstraintBefore(Settings.INSTANCE.getTimePreference(mBeforeTimeKey));		
+		for(int i = 0; i != 2; ++i)
+		{
+			final DumbTime time = mConstraintTimes[i];
+			
+			if(time == null)
+				mConstraintTimes[i] = Settings.INSTANCE.getTimePreference(mConstraintTimePrefKeys[i]);
+			
+			if(i == 0)
+				mDialog.setConstraintAfter(time);
+			else if(i == 1)
+				mDialog.setConstraintBefore(time);
+			else
+				throw new RuntimeException();		
+		}
 	}
 	
 	private static class MyTimePickerDialog extends TimePickerDialog
 	{
 		private DumbTime mAfter = null;
 		private DumbTime mBefore = null;
-		
-		private int mHourOfDay;
-		private int mMinute;
-		
-		public MyTimePickerDialog(Context context, int theme, OnTimeSetListener callBack, int hourOfDay, int minute, boolean is24HourView)
-		{
-			super(context, theme, callBack, hourOfDay, minute, is24HourView);			
-			mHourOfDay = hourOfDay;
-			mMinute = minute;
+				
+		public MyTimePickerDialog(Context context, int theme, OnTimeSetListener callBack, int hourOfDay, int minute, boolean is24HourView) {
+			super(context, theme, callBack, hourOfDay, minute, is24HourView);
 		}
 		
-		public MyTimePickerDialog(Context context, OnTimeSetListener callBack, int hourOfDay, int minute, boolean is24HourView) 
-		{
+		public MyTimePickerDialog(Context context, OnTimeSetListener callBack, int hourOfDay, int minute, boolean is24HourView) {
 			super(context, callBack, hourOfDay, minute, is24HourView);
-			mHourOfDay = hourOfDay;
-			mMinute = minute;
 		}		
 		
 		public void setConstraintAfter(DumbTime after)
