@@ -25,7 +25,8 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import at.caspase.rxdroid.Util.Hasher;
+import at.caspase.rxdroid.util.Hasher;
+
 
 /**
  * Very simple class for handling fractions.

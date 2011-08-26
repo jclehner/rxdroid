@@ -37,6 +37,7 @@ import android.widget.TextView;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.util.DateTime;
 
 import com.j256.ormlite.dao.Dao;
 
@@ -286,7 +287,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 		
 		final Date end = new Date(mDate.getTime() + Settings.INSTANCE.getDoseTimeEndOffset(mDoseTime));
 		
-		if(!mDoseText.getText().equals("0") && Util.DateTime.now().compareTo(end) != -1)
+		if(!mDoseText.getText().equals("0") && DateTime.now().compareTo(end) != -1)
 			mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
 		else
 			mIntakeStatus.setImageDrawable(null);
@@ -297,6 +298,6 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 		if(mDate == null || mDrug == null)
 			throw new IllegalStateException("Cannot obtain intake data from DoseView with unset date and/or drug");
 		
-    	return Database.getIntakes(mIntakeDao, mDrug, mDate, mDoseTime);
+    	return Database.findIntakes(mIntakeDao, mDrug, mDate, mDoseTime);
     }
 }

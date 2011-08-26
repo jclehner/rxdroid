@@ -21,6 +21,7 @@
     <string name="_Night">Night</string>
     <string name="_Begin">Begin</string>
     <string name="_End">End</string>
-    <string name="_Error">Error</string>
+    <string name="_title_error">Error</string>
+    <string name="_msg_timepreference_constraint_failed">Time is not within specified bounds.</string>
     <string name="_Snooze_time">Snooze time</string>
 </resources>

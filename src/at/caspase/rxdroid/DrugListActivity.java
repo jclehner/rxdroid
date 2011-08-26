@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Currency;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -59,6 +60,9 @@ import android.widget.ViewSwitcher;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.util.Constants;
+import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Util;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import com.j256.ormlite.dao.Dao;
@@ -348,7 +352,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		};    	
     	
     	
-    	if(newSupply.compareTo(0) == -1)
+    	if(newSupply.compareTo(0) == -1 && drug.getRefillSize() != 0)
     	{
     		builder.setIcon(android.R.drawable.ic_dialog_alert);
     		builder.setTitle(drug.getName());
@@ -365,7 +369,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	{
     		builder.setTitle(drug.getName() + ": " + drug.getDose(doseTime));
     		
-    		boolean hasIntake = Database.getIntakes(mIntakeDao, drug, mDate, doseTime).size() != 0;
+    		boolean hasIntake = Database.findIntakes(mIntakeDao, drug, mDate, doseTime).size() != 0;
     		
         	if(!hasIntake)
         	{
@@ -466,7 +470,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	if(shiftBy == 0)
     	{
     		if(newDate == null)
-    			mDate = Util.DateTime.today();
+    			mDate = DateTime.today();
     		else if(mDate != newDate)
     			mDate = newDate;    		
     		
@@ -475,7 +479,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	}
     	else
     	{    		    		
-    		final long shiftedTime = mDate.getTime() + shiftBy * Util.Constants.MILLIS_PER_DAY;
+    		final long shiftedTime = mDate.getTime() + shiftBy * Constants.MILLIS_PER_DAY;
     		mDate.setTime(shiftedTime);
     		
     		Timer t = new Timer();
@@ -506,13 +510,13 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     	mListView = newListView;   	
     	
     	final SpannableString dateString = new SpannableString(mDate.toString());
-    	final Date today = Util.DateTime.today();
+    	final Date today = DateTime.today();
     	
     	Log.d(TAG, "Current date: " + mDate + " (" + mDate.getTime() + ")");
     	Log.d(TAG, "Today: " + today + " (" + today.getTime() + ")");
-    	Log.d(TAG, "mDate == today: " + (mDate.equals(Util.DateTime.today())));
+    	Log.d(TAG, "mDate == today: " + (mDate.equals(DateTime.today())));
     	
-    	if(mDate.equals(Util.DateTime.today()))
+    	if(mDate.equals(DateTime.today()))
     	   	dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
     	
     	mTextDate.setText(dateString);

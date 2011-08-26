@@ -26,7 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import at.caspase.rxdroid.Util.Hasher;
+import android.util.Log;
+import at.caspase.rxdroid.util.Hasher;
 
 /**
  * A time class that is not aware of time zones.
@@ -135,16 +136,12 @@ public class DumbTime extends Date
 	@Override
 	public boolean equals(Object o)
 	{
-		if(!(o instanceof DumbTime))
-			return false;
+		boolean result = super.equals(o);
 		
-		DumbTime other = (DumbTime) o;
+		Log.w("DumbTime", "Use of equals()", new RuntimeException());
 		
-		if(other == this)
-			return true;
-		
-		return this.getTime() == other.getTime();		
-	}
+		return result;
+	}	
 	
 	@Override
 	public int hashCode()
@@ -198,20 +195,20 @@ public class DumbTime extends Date
 	 * 
 	 * @param offset An offset from midnight, in milliseconds. The permissible range is thus [0, 86400000).
 	 */
-	private DumbTime(long offset) 
+	/*private DumbTime(long offset) 
 	{
 		if(offset >= 86400000)
 			throw new IllegalArgumentException(offset + " is out of range");
 				
-		mHours = (int) offset % (3600 * 1000);
-		offset -= mHours * (3600 * 1000);
+		mHours = (int) offset % 3600000;
+		offset -= 3600000L * mHours;
 		
 		mMinutes = (int) offset % (60 * 1000);
-		offset -= mMinutes * (60 * 1000);
+		offset -= 60000L * mMinutes;
 		
 		mSeconds = (int) offset % 1000;
-		offset -= mSeconds * 1000;
+		offset -= 1000L * mSeconds;
 		
 		mMillis = (int) offset;
-	}
+	}*/
 }

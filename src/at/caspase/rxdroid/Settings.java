@@ -28,7 +28,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.Database.Drug;
-import at.caspase.rxdroid.Util.Constants;
+import at.caspase.rxdroid.util.Constants;
+import at.caspase.rxdroid.util.DateTime;
 
 public enum Settings 
 {
@@ -99,7 +100,7 @@ public enum Settings
 	
 	public int getActiveDoseTime()
 	{
-		final long offset = Util.DateTime.getOffsetFromMidnight(Util.DateTime.today());
+		final long offset = DateTime.getOffsetFromMidnight(DateTime.today());
 		for(int doseTime : doseTimes)
 		{
 			if(offset >= getDoseTimeBeginOffset(doseTime) && offset < getDoseTimeEndOffset(doseTime))
@@ -120,7 +121,7 @@ public enum Settings
 	
 	private int getNextDoseTime(boolean useNextDay)
 	{
-		long offset = Util.DateTime.getOffsetFromMidnight(Util.DateTime.today());
+		long offset = DateTime.getOffsetFromMidnight(DateTime.today());
 		if(useNextDay)
 			offset -= Constants.MILLIS_PER_DAY;
 		
@@ -153,19 +154,19 @@ public enum Settings
 	private long getMillisFromNowUntilDoseTimeBeginOrEnd(int doseTime, boolean getMillisUntilBegin)
 	{
 		final long offset = getMillisUntilBegin ? getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
-		final Date today = Util.DateTime.today();
+		final Date today = DateTime.today();
 		
 		long beginTime = today.getTime() + offset;	
 		
-		if(beginTime < Util.DateTime.currentTimeMillis())
+		if(beginTime < DateTime.currentTimeMillis())
 		{
-			final Date tomorrow = new Date(today.getTime() + Util.Constants.MILLIS_PER_DAY);
+			final Date tomorrow = new Date(today.getTime() + Constants.MILLIS_PER_DAY);
 			beginTime = tomorrow.getTime() + offset;
 			
 			Log.d(TAG, "Getting offset from tomorrow");
 		}
 		
-		long diff = beginTime - Util.DateTime.currentTimeMillis();
+		long diff = beginTime - DateTime.currentTimeMillis();
 		
 		//final DumbTime ret = new DumbTime(beginTime - Util.DateTime.currentTimeMillis());
 		//Log.d(TAG, "Time until " + (getMillisUntilBegin ? "begin" : "end") + " of doseTime " + doseTime + ": " + ret.toString(true));

@@ -22,6 +22,7 @@
 package at.caspase.rxdroid;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
@@ -37,20 +38,19 @@ import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 public class TimePreference extends DialogPreference implements OnTimeSetListener, OnClickListener, OnSharedPreferenceChangeListener
 {
 	private static final String TAG = TimePreference.class.getName();
 		
-	private TimePickerDialog mDialog;
+	private MyTimePickerDialog mDialog;
 			
 	private String mAfterTimeKey;
 	private String mBeforeTimeKey;
 	
 	private DumbTime mTime;
-	private DumbTime mAfter;
-	private DumbTime mBefore;
-			
+				
 	private String mDefaultValue = "00:00";
 		
 	public TimePreference(Context context, AttributeSet attrs) {
@@ -93,30 +93,32 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 	
 	@Override
 	public void onTimeSet(TimePicker view, int hourOfDay, int minute)
-	{		
-		final DumbTime time = new DumbTime(hourOfDay, minute, 0);
-		
-		if((mAfter != null && time.compareTo(mAfter) == -1) || (mBefore != null && !time.before(mBefore)))
+	{	
+		// FIXME
+		if(!mDialog.checkConstraints(hourOfDay, minute))
 		{
-			AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setTitle(R.string._Error);		
-			builder.setMessage("DumbTime is not within the required constraints.");
+			updateTimePicker();
 			
+			AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+			builder.setTitle(R.string._title_error);
+			builder.setIcon(android.R.drawable.ic_dialog_alert);
+			builder.setMessage(R.string._msg_timepreference_constraint_failed);
 			builder.setNeutralButton(android.R.string.ok, this);
 			builder.show();
 		}
 		else
-		{
+		{			
+			final DumbTime time = new DumbTime(hourOfDay, minute, 0);
+			
 			final String timeString = time.toString();
 			mTime = time;
 			persistString(timeString);
 			setSummary(timeString);
 			Log.d(TAG, "onTimeSet: persisting");
 			updateTimePicker();
-		}
+		}		
 	}
-	
+		
 	@Override
 	public void onClick(DialogInterface dialog, int which)
 	{
@@ -131,7 +133,9 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
 	{
-		if(getKey().equals(key) || mAfterTimeKey.equals(key) || mBeforeTimeKey.equals(key))
+		Log.d(TAG, "key=" + key);
+		
+		if(key.equals(getKey()) || key.equals(mAfterTimeKey) || key.equals(mBeforeTimeKey))
 			updateTimePicker();
 	}
 	
@@ -144,43 +148,134 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 		final String persisted = getPersistedString(mDefaultValue);
 		setSummary(persisted);
 		mTime = DumbTime.valueOf(persisted);
-				
+					
 		updateTimePicker();
+		
+		getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+	}
+	
+	@Override
+	protected void onPrepareForRemoval()
+	{
+		getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 	}
 	
 	@Override
 	protected void showDialog(Bundle state)
 	{
+		updateTimePicker();
 		getDialog().show();
 	}
 		
 	private void updateTimePicker()
 	{
 		final boolean is24HourFormat = DateFormat.is24HourFormat(getContext());
-		mDialog = new TimePickerDialog(getContext(), this, mTime.getHours(), mTime.getMinutes(), is24HourFormat);
+		mDialog = new MyTimePickerDialog(getContext(), this, mTime.getHours(), mTime.getMinutes(), is24HourFormat);
 		
-		String message = null;
+		mDialog.setConstraintAfter(Settings.INSTANCE.getTimePreference(mAfterTimeKey));
+		mDialog.setConstraintBefore(Settings.INSTANCE.getTimePreference(mBeforeTimeKey));		
+	}
+	
+	private static class MyTimePickerDialog extends TimePickerDialog
+	{
+		private DumbTime mAfter = null;
+		private DumbTime mBefore = null;
 		
-		mAfter = Settings.INSTANCE.getTimePreference(mAfterTimeKey);
-		mBefore = Settings.INSTANCE.getTimePreference(mBeforeTimeKey);		
+		private int mHourOfDay;
+		private int mMinute;
+		
+		public MyTimePickerDialog(Context context, int theme, OnTimeSetListener callBack, int hourOfDay, int minute, boolean is24HourView)
+		{
+			super(context, theme, callBack, hourOfDay, minute, is24HourView);			
+			mHourOfDay = hourOfDay;
+			mMinute = minute;
+		}
+		
+		public MyTimePickerDialog(Context context, OnTimeSetListener callBack, int hourOfDay, int minute, boolean is24HourView) 
+		{
+			super(context, callBack, hourOfDay, minute, is24HourView);
+			mHourOfDay = hourOfDay;
+			mMinute = minute;
+		}		
+		
+		public void setConstraintAfter(DumbTime after)
+		{
+			mAfter = after;
+			updateMessage();
+		}
+		
+		public void setConstraintBefore(DumbTime before)
+		{
+			mBefore = before;
+			updateMessage();
+		}
+		
+		@Override
+		public void dismiss()
+		{
+			Log.d(TAG, "dismiss");
+			super.dismiss();
+		}
+		
+		@Override
+		public void onTimeChanged(TimePicker view, int hourOfDay, int minute)
+		{
+			Log.d(TAG, "onTimeChanged");
+			
+			if(checkConstraints(hourOfDay, minute))
+				super.onTimeChanged(view, hourOfDay, minute);
+		}
+		
+		@Override
+		public void onClick(DialogInterface dialog, int which)
+		{
+			Log.d(TAG, "onClick");
+			super.onClick(dialog, which);
+		}
 				
-		if(mAfter != null && mBefore != null)
+		public boolean checkConstraints(int hourOfDay, int minute)
 		{
-			message = "Choose a time after %1 and before %2.";
-			message = message.replace("%1", mAfter.toString());
-			message = message.replace("%2", mBefore.toString());
+			final DumbTime time = new DumbTime(hourOfDay, minute);
+			
+			boolean isValid;
+			
+			if((mAfter != null && time.compareTo(mAfter) == -1) || (mBefore != null && !time.before(mBefore)))
+				isValid = false;
+			else
+				isValid = true;
+			
+			Log.d(TAG, "checkConstraints: time=" + time + ", enabled=" + isValid);
+			
+			getButton(BUTTON_POSITIVE).setEnabled(isValid);
+			
+			return isValid;
 		}
-		else if(mAfter != null)
+		
+		private void updateMessage()
 		{
-			message = "Choose a time after %1.";
-			message = message.replace("%1", mAfter.toString());			
+			String message = null;
+			
+			if(mAfter != null && mBefore != null)
+			{
+				message = "Choose a time after %1 and before %2.";
+				message = message.replace("%1", mAfter.toString());
+				message = message.replace("%2", mBefore.toString());
+			}
+			else if(mAfter != null)
+			{
+				message = "Choose a time after %1.";
+				message = message.replace("%1", mAfter.toString());			
+			}
+			else if(mBefore != null)
+			{
+				message = "Choose a time before %1.";
+				message = message.replace("%1", mBefore.toString());		
+			}
+			
+			setMessage(message);
 		}
-		else if(mBefore != null)
-		{
-			message = "Choose a time before %1.";
-			message = message.replace("%1", mBefore.toString());		
-		}
-				
-		mDialog.setMessage(message);
-	}		
+
+		
+	}
+	
 }

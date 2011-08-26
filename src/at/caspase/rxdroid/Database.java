@@ -31,7 +31,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import at.caspase.rxdroid.Util.Hasher;
+import at.caspase.rxdroid.util.Hasher;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.BaseDaoImpl;
@@ -193,7 +193,7 @@ public class Database
 			watcher.onDatabaseDropped();
 	}
 	
-	public static List<Intake> getIntakes(Dao<Intake, Integer> dao, Drug drug, Date date, int doseTime)
+	public static List<Intake> findIntakes(Dao<Intake, Integer> dao, Drug drug, Date date, int doseTime)
 	{		
 		try
     	{    		
@@ -476,8 +476,8 @@ public class Database
 	    	if(other == this)
 	    		return true;
 	    	
-	    	final Object[] thisMembers = this.getRelevantMembers();
-	    	final Object[] otherMembers = other.getRelevantMembers();
+	    	final Object[] thisMembers = this.getFieldValues();
+	    	final Object[] otherMembers = other.getFieldValues();
 	    		    	
 	    	for(int i = 0; i != thisMembers.length; ++i)
 	    	{
@@ -493,12 +493,12 @@ public class Database
 	    {
 	    	int result = Hasher.SEED;
 	    	
-	    	final Object[] thisMembers = this.getRelevantMembers();
+	    	final Object[] thisMembers = this.getFieldValues();
 	    	
 	    	for(Object o : thisMembers)
 	    		result = Hasher.hash(result, o);
-	    	
-	    	return result;	    	
+	    		    	
+	    	return result;    	
 	    }
 	    
 	    @Override
@@ -506,7 +506,15 @@ public class Database
 	    	return name + "(" + id + ")={ " + doseMorning + " - " + doseNoon + " - " + doseEvening + " - " + doseNight + "}";
 	    }
 	    
-	    private Object[] getRelevantMembers()
+	    /**
+	     * Get all relevant members for comparison/hashing.
+	     * 
+	     * When comparing for equality or hashing, we ignore a drug's unique ID, as it may be left
+	     * uninitialized and automatically determined by the SQLite logic.
+	     * 
+	     * @return An array containing all fields but the ID.
+	     */	    
+	    private Object[] getFieldValues()
 	    {
 	    	final Object[] members = {
 	    		this.name,
@@ -682,8 +690,8 @@ public class Database
 		{
 			try
 			{
-				TableUtils.dropTable(getConnectionSource(), Database.Drug.class, true);
-				TableUtils.dropTable(getConnectionSource(), Database.Intake.class, true);
+				TableUtils.dropTable(cs, Database.Drug.class, true);
+				TableUtils.dropTable(cs, Database.Intake.class, true);
 				onCreate(db, cs);
 			}
 			catch (SQLException e)
@@ -739,6 +747,7 @@ public class Database
 	 * Objects implementing this interface and registering themselves with
 	 * Database.addWatcher will be notified upon any changes to the database,
 	 * as long as they are handled by the functions in Database.
+	 * 
 	 * @see Database#create
 	 * @see Database#update
 	 * @see Database#delete
