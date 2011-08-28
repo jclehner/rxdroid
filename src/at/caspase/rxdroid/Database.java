@@ -498,7 +498,7 @@ public class Database
 	    	for(Object o : thisMembers)
 	    		result = Hasher.hash(result, o);
 	    		    	
-	    	return result;    	
+	    	return result;
 	    }
 	    
 	    @Override

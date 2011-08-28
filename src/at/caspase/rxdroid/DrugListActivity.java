@@ -446,8 +446,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	public void onDatabaseDropped() {}
 	
 	@Override
-	public void onSharedPreferenceChanged(SharedPreferences preferences, String key)
-	{
+	public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
 		setDate(mDate);
 	}
 	        

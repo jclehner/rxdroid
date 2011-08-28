@@ -23,6 +23,7 @@ package at.caspase.rxdroid;
 
 import java.util.Date;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -50,7 +51,24 @@ public enum Settings
 			mApplicationContext = context.getApplicationContext();
 			mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
 		}
-	}	
+	}
+	
+	public Notification blessNotification(Notification notification)
+	{
+		int flags = notification.flags;
+		
+		if(mSharedPrefs.getBoolean("use_led", true))
+			flags |= Notification.DEFAULT_LIGHTS;
+		
+		if(mSharedPrefs.getBoolean("use_sound", true))
+			flags |= Notification.DEFAULT_SOUND;
+		
+		if(mSharedPrefs.getBoolean("use_vibrator", true))
+			flags |= Notification.DEFAULT_VIBRATE;
+		
+		notification.flags = flags;
+		return notification;		
+	}
 	
 	public long getMillisFromNowUntilDoseTimeBegin(int doseTime) {
 		return getMillisFromNowUntilDoseTimeBeginOrEnd(doseTime, true);
@@ -172,7 +190,9 @@ public enum Settings
 		//Log.d(TAG, "Time until " + (getMillisUntilBegin ? "begin" : "end") + " of doseTime " + doseTime + ": " + ret.toString(true));
 				
 		return diff;
-	}	
+	}
+	
+	
 
 	
 }

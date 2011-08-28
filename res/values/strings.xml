@@ -23,12 +23,19 @@
     <string name="_End">End</string>
     
     <string name="_title_error">Error</string>
+    <string name="_title_preferences">Preferences</string>
     
     <string name="_title_prefscreen_times">Times</string>
     <string name="_summary_prefscreen_times">Definitions of morning, noon, etc.</string>
     
     <string name="_title_prefscreen_notifications">Notifications</string>
     <string name="_summary_prefscreen_notifications">Notification methods, snooze time, etc.</string>
+    
+    <string name="_title_pref_notification_methods">Notification methods</string>
+    
+    <string name="_title_pref_use_led">LED</string>
+    <string name="_title_pref_use_sound">Sound</string>
+    <string name="_title_pref_use_vibrator">Vibration</string>    
     
     <string name="_msg_timepreference_constraint_failed">Time is not within specified bounds.</string>
     <string name="_Snooze_time">Snooze time</string>

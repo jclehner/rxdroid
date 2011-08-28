@@ -60,14 +60,11 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	public static final String EXTRA_FORCE_RESTART = "force_restart";
 
 	private static final String TAG = DrugNotificationService.class.getName();
-	private static final String TICKER_TEXT = "RxDroid";
 
 	private Dao<Drug, Integer> mDrugDao;
 	private Dao<Intake, Integer> mIntakeDao;
 	private NotificationManager mNotificationManager;
 	private Intent mIntent;
-
-	private Set<Intake> mForgottenIntakes = Collections.emptySet();
 
 	private SharedPreferences mSharedPreferences;
 
@@ -98,7 +95,12 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
 		super.onStartCommand(intent, flags, startId);
-		restartThread(intent.getBooleanExtra(EXTRA_FORCE_RESTART, false));
+		
+		if(intent != null)
+			restartThread(intent.getBooleanExtra(EXTRA_FORCE_RESTART, false));
+		else
+			Log.w(TAG, "Intent was null");
+		
 		return START_STICKY;
 	}
 
@@ -161,10 +163,12 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	}
 
 	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPrefs,
-			String key)
+	public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
 	{
-		restartThread(true);
+		if(key.startsWith("time_"))
+			restartThread(true);
+		else
+			Log.d(TAG, "Ignoring preference change of " + key);
 	}
 
 	/**
@@ -180,9 +184,9 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	{
 		Log.d(TAG, "restartThread(" + forceRestart + ")");
 
-		if (mThread != null)
+		if(mThread != null)
 		{
-			if (!forceRestart)
+			if(!forceRestart)
 			{
 				Log.d(TAG, "Ignoring service restart request");
 				return;
@@ -196,8 +200,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			@Override
 			public void run()
 			{
-				final PendingIntent contentIntent = PendingIntent.getActivity(
-						getApplicationContext(), 0, mIntent, 0);
+				final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mIntent, 0);
 
 				/**
 				 * TODO:
@@ -235,68 +238,52 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 					
 					checkSupplies();
 					
-					while (true)
+					while(true)
 					{
 						final Date date = DateTime.today();
 						mIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
 
-						final int activeDoseTime = Settings.INSTANCE
-								.getActiveDoseTime();
-						final int nextDoseTime = Settings.INSTANCE
-								.getNextDoseTime();
-						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1)
-								: (activeDoseTime - 1);
+						final int activeDoseTime = Settings.INSTANCE.getActiveDoseTime();
+						final int nextDoseTime = Settings.INSTANCE.getNextDoseTime();
+						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
 
-						Log.d(TAG, "times: active=" + activeDoseTime
-								+ ", next=" + nextDoseTime + ", last="
-								+ lastDoseTime);
+						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
 
-						if (lastDoseTime >= 0)
+						if(lastDoseTime >= 0)
+							checkIntakes(date, lastDoseTime);
+
+						if(activeDoseTime == -1)
 						{
-							mForgottenIntakes = getAllForgottenIntakes(date,
-									lastDoseTime);
-							displayOrClearForgottenIntakesNotification();
-						}
+							long sleepTime = Settings.INSTANCE.getMillisFromNowUntilDoseTimeBegin(nextDoseTime);
 
-						if (activeDoseTime == -1)
-						{
-							long sleepTime = Settings.INSTANCE
-									.getMillisFromNowUntilDoseTimeBegin(nextDoseTime);
-
-							Log.d(TAG, "Time until next dose time ("
-									+ nextDoseTime + "): " + sleepTime + "ms");
+							Log.d(TAG, "Time until next dose time (" + nextDoseTime + "): " + sleepTime + "ms");
 
 							Thread.sleep(sleepTime);
 							delayFirstNotification = false;
 
-							if (Settings.INSTANCE.getActiveDoseTime() != nextDoseTime)
-								throw new RuntimeException(
-										"Unexpected dose time, expected "
-												+ nextDoseTime);
+							if(Settings.INSTANCE.getActiveDoseTime() != nextDoseTime)
+							{
+								Log.e(TAG, "Unexpected dose time, expected " + nextDoseTime);
+								//throw new RuntimeException("Unexpected dose time, expected " + nextDoseTime);
+							}
 
 							continue;
 						}
-						else if (activeDoseTime == Drug.TIME_MORNING)
+						else if(activeDoseTime == Drug.TIME_MORNING)
 						{
-							mForgottenIntakes.clear();
-
 							mNotificationManager.cancel(TAG, R.id.notification_intake_forgotten);
 							checkSupplies();
-							// mNotificationManager.cancel(R.id.notification_low_supplies);
 						}
 
-						long millisUntilDoseTimeEnd = Settings.INSTANCE
-								.getMillisFromNowUntilDoseTimeEnd(activeDoseTime);
+						long millisUntilDoseTimeEnd = Settings.INSTANCE.getMillisFromNowUntilDoseTimeEnd(activeDoseTime);
 
-						final Set<Intake> pendingIntakes = getAllOpenIntakes(
-								date, activeDoseTime);
+						final Set<Intake> pendingIntakes = getAllOpenIntakes(date, activeDoseTime);
 
-						if (!pendingIntakes.isEmpty())
+						if(!pendingIntakes.isEmpty())
 						{
 							final int count = pendingIntakes.size();
 
-							final CharSequence contentText = count
-									+ " doses pending. Click to snooze.";
+							final CharSequence contentText = count + " doses pending. Click to snooze.";
 							final CharSequence contentTitle = "Dose reminder";
 
 							final Notification notification = new Notification(R.drawable.ic_stat_pill, contentTitle, DateTime.currentTimeMillis());
@@ -306,7 +293,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 
 							final long snoozeTime = Settings.INSTANCE.getSnoozeTime();
 
-							if (delayFirstNotification)
+							if(delayFirstNotification)
 							{
 								delayFirstNotification = false;
 								Log.d(TAG, "Delaying first notification");
@@ -314,10 +301,9 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 								Thread.sleep(10000);
 							}
 
-							Log.d(TAG, "Will post " + millisUntilDoseTimeEnd
-									/ snoozeTime + " notifications");
+							Log.d(TAG, "Will post " + millisUntilDoseTimeEnd / snoozeTime + " notifications");
 
-							while (millisUntilDoseTimeEnd > snoozeTime)
+							while(millisUntilDoseTimeEnd > snoozeTime)
 							{
 								notification.when = DateTime.currentTimeMillis();
 								mNotificationManager.notify(TAG, R.id.notification_intake, notification);
@@ -326,7 +312,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							}
 						}
 
-						if (millisUntilDoseTimeEnd > 0)
+						if(millisUntilDoseTimeEnd > 0)
 						{
 							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms until end of dose time " + activeDoseTime);
 							Thread.sleep(millisUntilDoseTimeEnd);
@@ -335,7 +321,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 						Log.d(TAG, "Finished iteration");
 					}
 				}
-				catch (InterruptedException e)
+				catch(InterruptedException e)
 				{
 					Log.d(TAG, "Thread interrupted, exiting...");
 				}
@@ -354,18 +340,18 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		{
 			drugs = mDrugDao.queryForAll();
 		}
-		catch (SQLException e)
+		catch(SQLException e)
 		{
 			throw new RuntimeException(e);
 		}
 
-		for (Drug drug : drugs)
+		for(Drug drug : drugs)
 		{
-			if (drug.isActive())
+			if(drug.isActive())
 			{
 				final List<Intake> intakes = Database.findIntakes(mIntakeDao, drug, date, doseTime);
 
-				if (drug.getDose(doseTime).compareTo(0) != 0 && intakes.size() == 0)
+				if(drug.getDose(doseTime).compareTo(0) != 0 && intakes.size() == 0)
 				{
 					Log.d(TAG, "getAllOpenIntakes: adding " + drug);
 					openIntakes.add(new Intake(drug, date, doseTime));
@@ -380,33 +366,35 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	{
 		final Date today = DateTime.today();
 
-		if (date.after(today))
+		if(date.after(today))
 			return Collections.emptySet();
 
-		if (date.before(today))
+		if(date.before(today))
 			lastDoseTime = -1;
 
 		final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 		final Set<Intake> forgottenIntakes = new HashSet<Database.Intake>();
 
-		for (int doseTime : doseTimes)
+		for(int doseTime : doseTimes)
 		{
 			forgottenIntakes.addAll(getAllOpenIntakes(date, doseTime));
 
-			if (doseTime == lastDoseTime)
+			if(doseTime == lastDoseTime)
 				break;
 		}
 
 		return forgottenIntakes;
 	}
 
-	private void displayOrClearForgottenIntakesNotification()
+	private void checkIntakes(Date date, int lastDoseTime)
 	{
-		Log.d(TAG, mForgottenIntakes.size() + " forgotten intakes");
+		final Set<Intake> forgottenIntakes = getAllForgottenIntakes(date, lastDoseTime);
+		
+		Log.d(TAG, forgottenIntakes.size() + " forgotten intakes");
 
-		if (!mForgottenIntakes.isEmpty())
+		if(!forgottenIntakes.isEmpty())
 		{
-			final CharSequence contentText = mForgottenIntakes.size() + " forgotten doses";
+			final CharSequence contentText = forgottenIntakes.size() + " forgotten doses";
 			final CharSequence title = "Forgotten doses";
 
 			final Notification notification = new Notification(R.drawable.ic_stat_pill, title, DateTime.currentTimeMillis());
@@ -463,35 +451,35 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 		{
 			drugs = mDrugDao.queryForAll();
 		}
-		catch (SQLException e)
+		catch(SQLException e)
 		{
 			throw new RuntimeException(e);
 		}
 
 		ArrayList<Drug> drugsWithLowSupply = new ArrayList<Drug>();
 
-		for (Drug drug : drugs)
+		for(Drug drug : drugs)
 		{
 			// refill size of zero means ignore supply values
-			if (drug.getRefillSize() == 0)
+			if(drug.getRefillSize() == 0)
 				continue;
 
 			final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON,
 					Drug.TIME_EVENING, Drug.TIME_NIGHT };
 			double dailyDose = 0;
 
-			for (int doseTime : doseTimes)
+			for(int doseTime : doseTimes)
 			{
 				final Fraction dose = drug.getDose(doseTime);
-				if (dose.compareTo(0) != 0)
+				if(dose.compareTo(0) != 0)
 					dailyDose += dose.doubleValue();
 			}
 
-			if (dailyDose != 0)
+			if(dailyDose != 0)
 			{
 				final double currentSupply = drug.getCurrentSupply().doubleValue();
 
-				if (Double.compare(currentSupply / dailyDose, (double) minDays) == -1)
+				if(Double.compare(currentSupply / dailyDose, (double) minDays) == -1)
 					drugsWithLowSupply.add(drug);
 			}
 		}
