@@ -180,10 +180,10 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 	 * DatabaseWatcher) or when the user opens the app.
 	 */
 
-	private synchronized void restartThread(final boolean forceRestart)
+	private synchronized void restartThread(boolean forceRestart)
 	{
-		Log.d(TAG, "restartThread(" + forceRestart + ")");
-
+		final boolean wasRunning;
+		
 		if(mThread != null)
 		{
 			if(!forceRestart)
@@ -192,8 +192,13 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				return;
 			}
 
+			wasRunning = true;
 			mThread.interrupt();
 		}
+		else
+			wasRunning = false;
+		
+		Log.d(TAG, "restartThread(" + forceRestart + "): wasRunning=" + wasRunning);
 
 		mThread = new Thread(new Runnable() {
 
@@ -228,15 +233,15 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 				 * 
 				 */
 
-				mNotificationManager.cancel(TAG, R.id.notification_intake);
+				mNotificationManager.cancel(R.id.notification_intake);
 				// mNotificationManager.cancel(R.id.notification_intake_forgotten);
-				mNotificationManager.cancel(TAG, R.id.notification_low_supplies);
-
+				
 				try
 				{
 					boolean delayFirstNotification = true;
 					
-					checkSupplies();
+					if(!wasRunning)
+						checkSupplies();
 					
 					while(true)
 					{
@@ -256,7 +261,8 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 						{
 							long sleepTime = Settings.INSTANCE.getMillisFromNowUntilDoseTimeBegin(nextDoseTime);
 
-							Log.d(TAG, "Time until next dose time (" + nextDoseTime + "): " + sleepTime + "ms");
+							Log.d(TAG, "Time until next dose time (" + nextDoseTime + "): " + sleepTime + "ms (" + 
+									new DumbTime(sleepTime).toString(true) + ")");
 
 							Thread.sleep(sleepTime);
 							delayFirstNotification = false;
@@ -271,7 +277,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 						}
 						else if(activeDoseTime == Drug.TIME_MORNING)
 						{
-							mNotificationManager.cancel(TAG, R.id.notification_intake_forgotten);
+							mNotificationManager.cancel(R.id.notification_intake_forgotten);
 							checkSupplies();
 						}
 
@@ -293,7 +299,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 
 							final long snoozeTime = Settings.INSTANCE.getSnoozeTime();
 
-							if(delayFirstNotification)
+							if(delayFirstNotification && wasRunning)
 							{
 								delayFirstNotification = false;
 								Log.d(TAG, "Delaying first notification");
@@ -306,7 +312,7 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 							while(millisUntilDoseTimeEnd > snoozeTime)
 							{
 								notification.when = DateTime.currentTimeMillis();
-								mNotificationManager.notify(TAG, R.id.notification_intake, notification);
+								mNotificationManager.notify(R.id.notification_intake, notification);
 								Thread.sleep(snoozeTime);
 								millisUntilDoseTimeEnd -= snoozeTime;
 							}
@@ -314,9 +320,12 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 
 						if(millisUntilDoseTimeEnd > 0)
 						{
-							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms until end of dose time " + activeDoseTime);
+							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms (" + new DumbTime(millisUntilDoseTimeEnd).toString(true) + ") " +
+									"until end of dose time " + activeDoseTime);
 							Thread.sleep(millisUntilDoseTimeEnd);
 						}
+						
+						mNotificationManager.cancel(R.id.notification_intake);
 
 						Log.d(TAG, "Finished iteration");
 					}
@@ -404,10 +413,10 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			notification.defaults |= Notification.DEFAULT_LIGHTS;
 			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONLY_ALERT_ONCE;
 
-			mNotificationManager.notify(TAG, R.id.notification_intake_forgotten, notification);
+			mNotificationManager.notify(R.id.notification_intake_forgotten, notification);
 		}
 		else
-			mNotificationManager.cancel(TAG, R.id.notification_intake_forgotten);
+			mNotificationManager.cancel(R.id.notification_intake_forgotten);
 	}
 
 	private void checkSupplies()
@@ -437,10 +446,10 @@ public class DrugNotificationService extends OrmLiteBaseService<Database.Helper>
 			notification.defaults = Notification.DEFAULT_LIGHTS;
 			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONLY_ALERT_ONCE | Notification.FLAG_ONGOING_EVENT;
 			
-			mNotificationManager.notify(TAG, R.id.notification_low_supplies, notification);			
+			mNotificationManager.notify(R.id.notification_low_supplies, notification);			
 		}
 		else
-			mNotificationManager.cancel(TAG, R.id.notification_low_supplies);
+			mNotificationManager.cancel(R.id.notification_low_supplies);
 	}
 
 	private List<Drug> getAllDrugsWithLowSupply(int minDays)

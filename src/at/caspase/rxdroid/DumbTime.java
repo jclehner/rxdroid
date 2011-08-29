@@ -61,6 +61,28 @@ public class DumbTime extends Date
 		this(hours, minutes, 0);
 	}	
 	
+	/**
+	 * Creates an instance with an offset.
+	 * 
+	 * @param offset An offset from midnight, in milliseconds. The permissible range is thus [0, 86400000).
+	 */
+	public DumbTime(long offset) 
+	{
+		if(offset >= 86400000)
+			throw new IllegalArgumentException(offset + " is out of range");
+				
+		mHours = (int) offset % 3600000;
+		offset -= 3600000L * mHours;
+		
+		mMinutes = (int) offset % (60 * 1000);
+		offset -= 60000L * mMinutes;
+		
+		mSeconds = (int) offset % 1000;
+		offset -= 1000L * mSeconds;
+		
+		mMillis = (int) offset;
+	}
+	
 	@Override
 	public int getHours() {
 		return mHours;
@@ -84,6 +106,21 @@ public class DumbTime extends Date
 	@Override
 	public int getTimezoneOffset() {
 		return 0;
+	}
+	
+	@Override
+	public int getYear() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public int getMonth() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public int getDay() {
+		throw new UnsupportedOperationException();
 	}
 	
 
@@ -163,7 +200,7 @@ public class DumbTime extends Date
 	
 	public String toString(boolean withSeconds)
 	{
-		final SimpleDateFormat sdf = new SimpleDateFormat(FORMATS[withSeconds ? 0 : 1]);
+		final SimpleDateFormat sdf = new SimpleDateFormat(withSeconds ? FORMATS[0] + ".SSS" : FORMATS[1]);
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return sdf.format(this);
 	}
@@ -189,26 +226,5 @@ public class DumbTime extends Date
 		
 		throw new IllegalArgumentException("timeString=" + timeString);
 	}
-		
-	/**
-	 * Creates an instance with an offset.
-	 * 
-	 * @param offset An offset from midnight, in milliseconds. The permissible range is thus [0, 86400000).
-	 */
-	/*private DumbTime(long offset) 
-	{
-		if(offset >= 86400000)
-			throw new IllegalArgumentException(offset + " is out of range");
-				
-		mHours = (int) offset % 3600000;
-		offset -= 3600000L * mHours;
-		
-		mMinutes = (int) offset % (60 * 1000);
-		offset -= 60000L * mMinutes;
-		
-		mSeconds = (int) offset % 1000;
-		offset -= 1000L * mSeconds;
-		
-		mMillis = (int) offset;
-	}*/
 }
+	
