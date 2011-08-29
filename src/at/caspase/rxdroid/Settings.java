@@ -99,11 +99,11 @@ public enum Settings
 		String value = mSharedPrefs.getString(key, null);
 		if(value == null)
 		{
-			int resId = mApplicationContext.getResources().getIdentifier(
-					"at.caspase.rxdroid:string/pref_default_" + key, null, null);
-					
+			int resId = mApplicationContext.getResources().getIdentifier("at.caspase.rxdroid:string/pref_default_" + key, null, null);
 			value = mApplicationContext.getString(resId);
 		}
+		
+		Log.d(TAG, "getTimePreference(" + key + ") -> " + value);
 				
 		return DumbTime.valueOf(value);
 	}	

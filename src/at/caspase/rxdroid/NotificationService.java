@@ -212,8 +212,6 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			@Override
 			public void run()
 			{
-				final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mIntent, 0);
-
 				/**
 				 * TODO:
 				 * 
