@@ -54,12 +54,12 @@ import com.j256.ormlite.dao.Dao;
  * @author Joseph Lehner
  * 
  */
-public class DrugNotificationService extends OrmLiteBaseService<Database.Helper> implements 
+public class NotificationService extends OrmLiteBaseService<Database.Helper> implements 
 		OnDatabaseChangedListener, OnSharedPreferenceChangeListener
 {
 	public static final String EXTRA_FORCE_RESTART = "force_restart";
 
-	private static final String TAG = DrugNotificationService.class.getName();
+	private static final String TAG = NotificationService.class.getName();
 
 	private Dao<Drug, Integer> mDrugDao;
 	private Dao<Intake, Integer> mIntakeDao;

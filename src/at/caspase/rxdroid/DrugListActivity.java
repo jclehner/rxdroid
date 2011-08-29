@@ -119,7 +119,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
         mTextDate.setOnLongClickListener(this);
                        
         Intent serviceIntent = new Intent();
-        serviceIntent.setClass(this, DrugNotificationService.class);
+        serviceIntent.setClass(this, NotificationService.class);
         
         startService(serviceIntent);
                 

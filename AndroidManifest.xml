@@ -32,7 +32,7 @@
         
         <uses-library android:name="android.test.runner" />
         
-        <service android:name=".DrugNotificationService" />
+        <service android:name=".NotificationService" />
         
         <receiver android:name=".MyBroadcastReceiver">
         	<intent-filter>
@@ -50,6 +50,6 @@
      </application>
 	
 	<instrumentation android:name="android.test.InstrumentationTestRunner"
-		android:targetPackage="at.caspase.openmedmind" android:label="Open MedMind Tests" />
+		android:targetPackage="at.caspase.rxdroid" android:label="Open MedMind Tests" />
 	<uses-sdk android:minSdkVersion="7"></uses-sdk>
 </manifest> 
