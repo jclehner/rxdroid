@@ -230,9 +230,7 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 				isValid = false;
 			else
 				isValid = true;
-			
-			Log.d(TAG, "checkConstraints: time=" + time + ", enabled=" + isValid);
-			
+						
 			getButton(BUTTON_POSITIVE).setEnabled(isValid);
 			
 			return isValid;
@@ -240,29 +238,19 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 		
 		private void updateMessage()
 		{
-			String message = null;
+			int msgId = -1;
 			
 			if(mAfter != null && mBefore != null)
-			{
-				message = "Choose a time after %1 and before %2.";
-				message = message.replace("%1", mAfter.toString());
-				message = message.replace("%2", mBefore.toString());
-			}
+				msgId = R.string._msg_constraints_ab;
 			else if(mAfter != null)
-			{
-				message = "Choose a time after %1.";
-				message = message.replace("%1", mAfter.toString());			
-			}
+				msgId = R.string._msg_constraints_a;
 			else if(mBefore != null)
-			{
-				message = "Choose a time before %1.";
-				message = message.replace("%1", mBefore.toString());		
-			}
+				msgId = R.string._msg_constraints_b;
 			
-			setMessage(message);
-		}
-
-		
-	}
-	
+			if(msgId != -1)
+				setMessage(getContext().getString(msgId, mAfter, mBefore));
+			else
+				setMessage(null);
+		}		
+	}	
 }

@@ -29,7 +29,11 @@
     <string name="_msg_doses_p">Doses: %2$s pending.</string>
     <string name="_msg_low_supply_single">Low supplies for %1$s.</string>
     <string name="_msg_low_supply_multiple">Low supplies for %1$s and %2$d other(s).</string>
-       
+    
+	<string name="_msg_constraints_ab">Select a time after %1$s and before %2$s.</string>
+	<string name="_msg_constraints_a">Select a time after %1$s.</string>
+	<string name="_msg_constraints_b">Select a time before %2$s.</string>
+           
     <string name="_title_error">Error</string>
     <string name="_title_preferences">Preferences</string>
     
