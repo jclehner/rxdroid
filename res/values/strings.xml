@@ -45,6 +45,9 @@
     
     <string name="_title_pref_notification_methods">Notification methods</string>
     
+    <string name="_title_min_supply_days">Low supply threshold</string>
+    <string name="_summary_min_supply_days">Display a warning if a drug\'s supply lasts less than the number of specified days.</string>
+    
     <string name="_title_pref_use_led">LED</string>
     <string name="_title_pref_use_sound">Sound</string>
     <string name="_title_pref_use_vibrator">Vibration</string>    

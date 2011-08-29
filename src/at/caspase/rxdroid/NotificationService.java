@@ -213,8 +213,6 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			public void run()
 			{
 				/**
-				 * TODO:
-				 * 
 				 * - on start, clear all notifications
 				 * 
 				 * - collect forgotten intakes & display notifications if
@@ -229,16 +227,10 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 				 * - if no dose time is active, sleep until the start of the
 				 * next dose time
 				 * 
-				 * 
-				 * 
-				 * 
-				 * 
-				 * 
-				 * 
-				 * 
 				 */
 
 				cancelAllNotifications();
+				
 				if(!wasRunning || forceSupplyCheck)
 					checkSupplies();
 				
@@ -264,8 +256,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 						{
 							long sleepTime = Settings.INSTANCE.getMillisFromNowUntilDoseTimeBegin(nextDoseTime);
 
-							Log.d(TAG, "Time until next dose time (" + nextDoseTime + "): " + sleepTime + "ms (" + 
-									new DumbTime(sleepTime).toString(true) + ")");
+							Log.d(TAG, "Time until next dose time (" + nextDoseTime + "): " + sleepTime + "ms");
 
 							Thread.sleep(sleepTime);
 							delayFirstNotification = false;
@@ -313,14 +304,11 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 						if(millisUntilDoseTimeEnd > 0)
 						{
-							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms (" + new DumbTime(millisUntilDoseTimeEnd).toString(true) + ") " +
-									"until end of dose time " + activeDoseTime);
+							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms until end of dose time " + activeDoseTime);
 							Thread.sleep(millisUntilDoseTimeEnd);
 						}
 						
 						cancelNotification(R.id.notification_intake_pending);
-
-						Log.d(TAG, "Finished iteration");
 					}
 				}
 				catch(InterruptedException e)
@@ -408,10 +396,9 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 	private void checkSupplies()
 	{
-		// FIXME
-		final int MIN_DAYS = 7;
-		
-		final List<Drug> drugsWithLowSupply = getAllDrugsWithLowSupply(MIN_DAYS);
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		final int minDays = Integer.parseInt(prefs.getString("num_min_supply_days", "7"), 10);
+		final List<Drug> drugsWithLowSupply = getAllDrugsWithLowSupply(minDays);
 		
 		if(!drugsWithLowSupply.isEmpty())
 		{

@@ -92,6 +92,15 @@
 			android:defaultValue="@string/pref_default_time_snooze"
 		/>
 		
+		<EditTextPreference android:key="num_min_supply_days"
+			android:title="@string/_title_min_supply_days"
+			android:summary="@string/_summary_min_supply_days"
+			
+			android:defaultValue="7"
+			android:inputType="number"
+			android:selectAllOnFocus="true"
+		/>
+		
 		<PreferenceCategory 
 			android:title="@string/_title_pref_notification_methods">
 		

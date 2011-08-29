@@ -95,6 +95,7 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 			mDefaultValue = DEFAULT_TIME;
 		
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+		a.recycle();
 	}
 	
 	@Override
