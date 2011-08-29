@@ -43,7 +43,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TimePicker;
 
-public class TimePreference extends DialogPreference implements OnTimeSetListener, OnClickListener
+public class TimePreference extends DialogPreference implements OnTimeSetListener
 {
 	private static final String TAG = TimePreference.class.getName();
 	private static final String DEFAULT_TIME = "00:00";
@@ -112,7 +112,15 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 			builder.setTitle(R.string._title_error);
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setMessage(R.string._msg_timepreference_constraint_failed);
-			builder.setNeutralButton(android.R.string.ok, this);
+			builder.setNeutralButton(android.R.string.ok, new OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					if(which == Dialog.BUTTON_NEUTRAL)
+						showDialog(null);					
+				}
+			});
 			builder.show();
 		}
 		else
@@ -128,17 +136,6 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 			editor.putString(getKey(), timeString);
 			editor.commit();
 		}		
-	}
-	
-	@Override
-	public void onClick(DialogInterface dialog, int which)
-	{
-		if(which == Dialog.BUTTON_NEUTRAL)
-		{
-			// dialog is the AlertDialog created above. clicking OK should bring back
-			// the TimePickerDialog
-			mDialog.show();
-		}
 	}
 			
 	@Override
@@ -164,9 +161,9 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 			if(time == null)
 				time = Settings.INSTANCE.getTimePreference(mConstraintTimePrefKeys[i]);
 						
-			if(i == 0)
+			if(i == IDX_AFTER)
 				mDialog.setConstraintAfter(time);
-			else if(i == 1)
+			else if(i == IDX_BEFORE)
 				mDialog.setConstraintBefore(time);
 			else
 				throw new RuntimeException();		
