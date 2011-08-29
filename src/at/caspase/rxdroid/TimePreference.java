@@ -226,7 +226,7 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 			
 			boolean isValid;
 			
-			if((mAfter != null && time.compareTo(mAfter) == -1) || (mBefore != null && !time.before(mBefore)))
+			if((mAfter != null && !time.after(mAfter)) || (mBefore != null && !time.before(mBefore)))
 				isValid = false;
 			else
 				isValid = true;
