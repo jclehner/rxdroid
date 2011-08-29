@@ -219,7 +219,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
     		case MENU_PREFERENCES:
     		{
     			Intent intent = new Intent();
-    			intent.setClass(getApplicationContext(), PreferenceTabActivity.class);
+    			intent.setClass(getApplicationContext(), PreferencesActivity.class);
     			startActivity(intent);
     			return true;
     		}

@@ -31,9 +31,9 @@ import android.preference.PreferenceActivity;
 import android.util.Log;
 
 
-public class PreferenceTabActivity extends PreferenceActivity implements OnPreferenceChangeListener
+public class PreferencesActivity extends PreferenceActivity implements OnPreferenceChangeListener
 {
-	private static final String TAG = PreferenceTabActivity.class.getName();
+	private static final String TAG = PreferencesActivity.class.getName();
 	
 	SharedPreferences mSharedPreferences;
 	

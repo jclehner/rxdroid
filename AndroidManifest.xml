@@ -24,7 +24,7 @@
         	</intent-filter>       
         </activity>
         
-        <activity android:name=".PreferenceTabActivity">
+        <activity android:name=".PreferencesActivity">
         	<intent-filter>
 	        	<action android:name="android.intent.action.MAIN" />
 	        </intent-filter>
