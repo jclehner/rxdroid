@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:paddingLeft="5dp"
+  android:paddingRight="5dp"
+  android:paddingTop="3dp">
+  
+  <ImageView android:id="@+id/stat_icon"
+  	android:layout_width="25dp"
+  	android:layout_height="25dp"
+  	android:layout_alignParentLeft="true"
+  	android:layout_alignParentTop="true"
+  	android:layout_marginRight="4dp"
+  	  	
+  	android:scaleType="fitCenter"
+  	android:src="@drawable/ic_stat_pill"/>
+    
+  <TextView android:id="@+id/stat_title"
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:layout_toRightOf="@id/stat_icon"
+  	android:layout_alignTop="@id/stat_icon"
+  	  	  	
+  	android:gravity="center_vertical"
+  	android:singleLine="true"
+  	android:text="Title"
+  	  	
+  	style="@android:style/TextAppearance.StatusBar.EventContent.Title"/>
+  	
+  <TextView android:id="@+id/stat_time"
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:layout_alignParentRight="true"
+   	android:layout_alignTop="@id/stat_icon"
+  	android:layout_alignBottom="@id/stat_icon"
+  	 	
+  	android:gravity="right|center_vertical"
+  	android:text="20:15"
+  	
+  	style="@android:style/TextAppearance.StatusBar.EventContent"/>
+    
+  <TextView android:id="@+id/stat_text" 
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:layout_below="@id/stat_title"
+  	android:layout_toRightOf="@id/stat_icon"
+  	
+  	android:gravity="left|center_vertical"
+  	android:maxLines="2"
+  	android:ellipsize="marquee"
+  	android:text="Message"
+  	
+  	style="@android:style/TextAppearance.StatusBar.EventContent"/>  
+    
+</RelativeLayout>

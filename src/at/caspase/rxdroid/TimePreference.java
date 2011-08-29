@@ -166,8 +166,8 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 	{
 		Log.d(TAG, "key=" + key);
 		
-		if(key.equals(getKey()) || key.equals(mConstraintTimePrefKeys[IDX_AFTER]) || key.equals(mConstraintTimePrefKeys[IDX_BEFORE]))
-			updateTimePicker();
+		//if(key.equals(getKey()) || key.equals(mConstraintTimePrefKeys[IDX_AFTER]) || key.equals(mConstraintTimePrefKeys[IDX_BEFORE]))
+		updateTimePicker();
 	}
 	
 	@Override

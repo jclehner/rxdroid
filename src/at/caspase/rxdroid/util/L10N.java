@@ -29,6 +29,7 @@ import android.content.Context;
  * @author Joseph Lehner
  *
  */
+@Deprecated
 public class L10N
 {
 	public static String getText(Context context, int resId, Object... args) {
