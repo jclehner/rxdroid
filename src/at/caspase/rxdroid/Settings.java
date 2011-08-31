@@ -102,9 +102,7 @@ public enum Settings
 			int resId = mApplicationContext.getResources().getIdentifier("at.caspase.rxdroid:string/pref_default_" + key, null, null);
 			value = mApplicationContext.getString(resId);
 		}
-		
-		Log.d(TAG, "getTimePreference(" + key + ") -> " + value);
-				
+						
 		return DumbTime.valueOf(value);
 	}	
 	
@@ -122,13 +120,8 @@ public enum Settings
 		for(int doseTime : doseTimes)
 		{
 			if(offset >= getDoseTimeBeginOffset(doseTime) && offset < getDoseTimeEndOffset(doseTime))
-			{
-				Log.d(TAG, "getDoseTime: active=" + doseTime);
 				return doseTime;
-			}
 		}
-		
-		Log.d(TAG, "getActiveDoseTime: none active");
 		
 		return -1;		
 	}	
@@ -157,15 +150,11 @@ public enum Settings
 					retDoseTime = doseTime;							
 				}
 			}			
-			Log.d(TAG, "getNextDoseTime: diff was " + diff + "ms for doseTime=" + doseTime);
 		}
 		
 		if(retDoseTime == -1 && !useNextDay)
-		{
-			Log.d(TAG, "getNextDoseTime: retrying with next day");
 			return getNextDoseTime(true);
-		}			
-		
+				
 		return retDoseTime;		
 	}
 
@@ -184,12 +173,7 @@ public enum Settings
 			Log.d(TAG, "Getting offset from tomorrow");
 		}
 		
-		long diff = beginTime - DateTime.currentTimeMillis();
-		
-		//final DumbTime ret = new DumbTime(beginTime - Util.DateTime.currentTimeMillis());
-		//Log.d(TAG, "Time until " + (getMillisUntilBegin ? "begin" : "end") + " of doseTime " + doseTime + ": " + ret.toString(true));
-				
-		return diff;
+		return beginTime - DateTime.currentTimeMillis();
 	}
 	
 	

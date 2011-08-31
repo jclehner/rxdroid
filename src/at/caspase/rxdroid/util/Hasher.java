@@ -98,8 +98,7 @@ public class Hasher
 		}    		
 		
 		return result;    		
-	}
-	
+	}	
 	
 	private static int mult(int seed) {
 		return PRIME * seed;

@@ -47,6 +47,7 @@ import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.L10N;
+import at.caspase.rxdroid.util.Util;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 import com.j256.ormlite.dao.Dao;
@@ -71,6 +72,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 	private NotificationManager mNotificationManager;
 	private String[] mNotificationMessages;
+	private int mLastNotificationHash;
 	
 	Thread mThread;
 
@@ -231,9 +233,10 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 				cancelAllNotifications();
 				
-				if(!wasRunning || forceSupplyCheck)
-					checkSupplies();
-				
+				final boolean doCheckSupplies = !wasRunning || forceSupplyCheck;
+				if(doCheckSupplies)
+					checkSupplies(true);
+								
 				boolean delayFirstNotification = true;
 								
 				try
@@ -247,11 +250,11 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 						final int nextDoseTime = Settings.INSTANCE.getNextDoseTime();
 						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
 
-						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
-
+						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);						
+						
 						if(lastDoseTime >= 0)
-							checkIntakes(date, lastDoseTime);
-
+							checkIntakes(date, lastDoseTime);						
+						
 						if(activeDoseTime == -1)
 						{
 							long sleepTime = Settings.INSTANCE.getMillisFromNowUntilDoseTimeBegin(nextDoseTime);
@@ -268,8 +271,8 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 						}
 						else if(activeDoseTime == Drug.TIME_MORNING)
 						{
-							mNotificationManager.cancel(R.id.notification_intake_forgotten);
-							checkSupplies();
+							cancelNotification(R.id.notification_intake_forgotten);
+							checkSupplies(false);
 						}
 
 						long millisUntilDoseTimeEnd = Settings.INSTANCE.getMillisFromNowUntilDoseTimeEnd(activeDoseTime);
@@ -291,13 +294,14 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 							final String contentText = Integer.toString(pendingIntakes.size());
 							final long snoozeTime = Settings.INSTANCE.getSnoozeTime();
 							
-							do
+							postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
+							
+							while(millisUntilDoseTimeEnd > snoozeTime)
 							{
-								postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
 								Thread.sleep(snoozeTime);
 								millisUntilDoseTimeEnd -= snoozeTime;
-								
-							} while(millisUntilDoseTimeEnd > snoozeTime);
+								postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
+							}
 							
 							Log.d(TAG, "Finished loop");
 						}
@@ -309,6 +313,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 						}
 						
 						cancelNotification(R.id.notification_intake_pending);
+						checkIntakes(date, activeDoseTime);
 					}
 				}
 				catch(InterruptedException e)
@@ -394,7 +399,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		}
 	}
 
-	private void checkSupplies()
+	private void checkSupplies(boolean doEnqueueNotification)
 	{
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		final int minDays = Integer.parseInt(prefs.getString("num_min_supply_days", "7"), 10);
@@ -410,7 +415,10 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			else
 				contentText = getString(R.string._msg_low_supply_multiple, firstDrugName, drugsWithLowSupply.size() - 1);
 			
-			postNotification(R.id.notification_low_supplies, Notification.DEFAULT_LIGHTS, contentText);
+			if(!doEnqueueNotification)
+				postNotification(R.id.notification_low_supplies, Notification.DEFAULT_LIGHTS, contentText);
+			else
+				enqueueNotification(R.id.notification_low_supplies, contentText);
 		}
 		else
 			cancelNotification(R.id.notification_low_supplies);
@@ -459,14 +467,26 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		return drugsWithLowSupply;
 	}
 	
+	private void enqueueNotification(int id, String message) {
+		mNotificationMessages[notificationIdToIndex(id)] = message;
+	}
+	
 	private void postNotification(int id, int defaults, String message)
 	{
-		mNotificationMessages[notificationIdToIndex(id)] = message;
+		enqueueNotification(id, message);
+		postAllNotifications(defaults);
+	}
+	
+	private void postAllNotifications(int defaults)
+	{
 		int notificationCount;
 		
+		for(int i = 0; i != mNotificationMessages.length; ++i)
+			Log.d(TAG, "postNotification: mNotificationMessages[" + i + "]=" + mNotificationMessages[i]);
+				
 		if((notificationCount = getNotificationCount()) == 0)
 		{
-			mNotificationManager.cancel(R.id.notification);
+			cancelAllNotifications(false);
 			return;
 		}
 		
@@ -495,18 +515,26 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			stringId = R.string._msg_doses_f;
 		
 		if(stringId != -1)
-			msgBuilder.append(bullet + getString(stringId, doseMsgForgotten, doseMsgPending) + "\n");
+			msgBuilder.append(bullet + getString(stringId, doseMsgForgotten, doseMsgPending));
 				
 		final String doseMsgLowSupply = mNotificationMessages[2];
 		
 		if(doseMsgLowSupply != null)
+		{
+			if(stringId != -1)
+			{
+				// if we appended this line-break in the append() call above, the layout would look 
+				// messed up in case there was no "low supply" message
+				msgBuilder.append("\n");
+			}				
+			
 			msgBuilder.append(bullet + doseMsgLowSupply);
-		
+		}
 				
 		final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
 		views.setTextViewText(R.id.stat_title, getString(R.string._title_notifications));
 		views.setTextViewText(R.id.stat_text, msgBuilder.toString());
-		views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(new Date(System.currentTimeMillis())));
+		views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(DateTime.now()));
 		
 		final Notification notification = new Notification();
 		notification.icon = R.drawable.ic_stat_pill;
@@ -517,17 +545,35 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		notification.contentView = views;
 		if(notificationCount > 1)
 			notification.number = notificationCount;
-				
-		mNotificationManager.notify(R.id.notification, notification);		
+		
+		final int notificationHash = Util.getNotificationHashCode(notification);
+		
+		if(mLastNotificationHash != notificationHash)
+		{
+			Log.d(TAG, "last hash: " + mLastNotificationHash + ", this hash: " + notificationHash);
+			mNotificationManager.cancel(R.id.notification);
+			mNotificationManager.notify(R.id.notification, notification);
+			mLastNotificationHash = notificationHash;			
+		}
+		else
+			Log.d(TAG, "Ignorning Notification with hash " + notificationHash);		
 	}
 	
 	private void cancelNotification(int id) {
 		postNotification(id, 0, null);			
 	}
 	
+	
 	private void cancelAllNotifications() {
+		cancelAllNotifications(true);
+	}	
+
+	private void cancelAllNotifications(boolean zapMessages)
+	{
 		mNotificationManager.cancel(R.id.notification);
-		mNotificationMessages = new String[3];
+		mLastNotificationHash = 0;
+		if(zapMessages)
+			mNotificationMessages = new String[3];
 	}
 	
 	private static int notificationIdToIndex(int id)

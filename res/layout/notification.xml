@@ -22,36 +22,38 @@
   	android:layout_height="wrap_content"
   	android:layout_toRightOf="@id/stat_icon"
   	android:layout_alignTop="@id/stat_icon"
+  	android:layout_alignBottom="@id/stat_icon"
   	  	  	
   	android:gravity="center_vertical"
   	android:singleLine="true"
   	android:text="Title"
   	  	
-  	style="@android:style/TextAppearance.StatusBar.EventContent.Title"/>
+  	style="@android:style/TextAppearance.StatusBar.EventContent.Title"/>  	
+
+  <TextView android:id="@+id/stat_text" 
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:layout_below="@id/stat_title"
+  	android:layout_alignParentLeft="true"
+  	android:layout_alignParentBottom="true"
+  	
+  	android:gravity="center_vertical"
+  	android:ellipsize="marquee"
+  	android:text="Message"
+  	
+  	style="@android:style/TextAppearance.StatusBar.EventContent"/>
   	
   <TextView android:id="@+id/stat_time"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   	android:layout_alignParentRight="true"
-   	android:layout_alignTop="@id/stat_icon"
-  	android:layout_alignBottom="@id/stat_icon"
+	android:layout_alignTop="@id/stat_title"
+	android:layout_alignBottom="@id/stat_title"
   	 	
   	android:gravity="right|center_vertical"
   	android:text="20:15"
   	
   	style="@android:style/TextAppearance.StatusBar.EventContent"/>
     
-  <TextView android:id="@+id/stat_text" 
-  	android:layout_width="fill_parent"
-  	android:layout_height="wrap_content"
-  	android:layout_below="@id/stat_title"
-  	android:layout_toRightOf="@id/stat_icon"
-  	
-  	android:gravity="left|center_vertical"
-  	android:maxLines="2"
-  	android:ellipsize="marquee"
-  	android:text="Message"
-  	
-  	style="@android:style/TextAppearance.StatusBar.EventContent"/>  
     
 </RelativeLayout>
