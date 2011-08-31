@@ -21,7 +21,6 @@
 
 package at.caspase.rxdroid.util;
 
-import android.app.Notification;
 import at.caspase.rxdroid.Database;
 import at.caspase.rxdroid.R;
 
@@ -59,29 +58,5 @@ public class Util
         }
         
         throw new IllegalArgumentException();           
-    }
-    
-    public static int getNotificationHashCode(Notification n)
-    {
-    	final int contentViewLayoutId = (n.contentView != null) ? n.contentView.getLayoutId() : 0;
-    	int result = Hasher.SEED;
-    	
-    	result = Hasher.hash(result, n.audioStreamType);
-    	result = Hasher.hash(result, n.contentIntent != null);
-    	result = Hasher.hash(result, contentViewLayoutId);
-    	//result = Hasher.hash(result, n.defaults);
-    	result = Hasher.hash(result, n.deleteIntent != null);
-    	result = Hasher.hash(result, n.fullScreenIntent != null);
-    	result = Hasher.hash(result, n.icon);
-    	result = Hasher.hash(result, n.iconLevel);
-    	result = Hasher.hash(result, n.ledARGB);
-    	result = Hasher.hash(result, n.ledOffMS);
-    	result = Hasher.hash(result, n.ledOnMS);
-    	result = Hasher.hash(result, n.number);    	
-    	result = Hasher.hash(result, n.sound);
-    	result = Hasher.hash(result, n.tickerText);
-    	result = Hasher.hash(result, n.vibrate);
-    	
-    	return result;    	
     }
 }

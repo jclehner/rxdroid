@@ -25,7 +25,6 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Currency;
 import java.util.List;
 
 import android.app.AlertDialog;

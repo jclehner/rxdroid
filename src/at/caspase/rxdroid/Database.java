@@ -55,38 +55,38 @@ import com.j256.ormlite.table.TableUtils;
  */
 public class Database 
 {
-	private static final String TAG = Database.class.getName();
+	@SuppressWarnings("unused") private static final String TAG = Database.class.getName();
 	
 	private static HashSet<OnDatabaseChangedListener> sWatchers = new HashSet<OnDatabaseChangedListener>();
 	
 	/**
-	 * Add an object to the DatabseWatcher registry.
+	 * Add a listener to the registry.
 	 * 
 	 * Whenever the methods create(), update(), or delete() are used, all
 	 * objects that were registered using this method will have their
-	 * callback functions called accordingly (see DatabaseWatcher).
+	 * callback functions called accordingly.
 	 * 
-	 * @param watcher
+	 * @see #Database.OnDatabaseChangedListener
+	 * @param listener The listener to register.
 	 */
-	public static synchronized void registerOnChangedListener(OnDatabaseChangedListener watcher) {
-		sWatchers.add(watcher);		
-	}
-	
+	public static synchronized void registerOnChangedListener(OnDatabaseChangedListener listener) {
+		sWatchers.add(listener);		
+	}	
 	
 	/**
-	 * Removes an object from the DatabaseWatcher registry.
+	 * Removes a listener from the registry.
 	 * 
-	 * @param watcher
+	 * @see #Database.OnDatabaseChangedListener
+	 * @param listener The listener to remove.
 	 */
 	public static synchronized void unregisterOnChangedListener(OnDatabaseChangedListener watcher) {
 		sWatchers.remove(watcher);
-	}
-	
+	}	
 	
 	/**
 	 * Creates a new database entry.
 	 * 
-	 * Using this function will ensure that all DatabaseWatcher objects registered
+	 * Using this function will ensure that all OnDatabaseChangedListener objects registered
 	 * via addWatcher are notified of the change.
 	 * 
 	 * @param <T>
@@ -193,6 +193,9 @@ public class Database
 			watcher.onDatabaseDropped();
 	}
 	
+	/**
+	 * Find all intakes matching the specified criteria.
+	 */
 	public static List<Intake> findIntakes(Dao<Intake, Integer> dao, Drug drug, Date date, int doseTime)
 	{		
 		try

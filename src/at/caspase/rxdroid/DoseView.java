@@ -52,7 +52,7 @@ import com.j256.ormlite.dao.Dao;
  */
 public class DoseView extends FrameLayout implements OnDatabaseChangedListener, OnTouchListener
 {
-	private static final String TAG = DoseView.class.getName();
+	@SuppressWarnings("unused") private static final String TAG = DoseView.class.getName();
 	
 	private ImageView mIntakeStatus;
 	private TextView mDoseText;

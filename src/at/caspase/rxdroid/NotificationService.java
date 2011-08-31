@@ -46,8 +46,7 @@ import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
-import at.caspase.rxdroid.util.L10N;
-import at.caspase.rxdroid.util.Util;
+import at.caspase.rxdroid.util.Hasher;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 import com.j256.ormlite.dao.Dao;
@@ -96,6 +95,11 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		Database.registerOnChangedListener(this);
 	}
 
+	/**
+	 * Starts the service if it has not been started yet.
+	 * 
+	 * You can force the service thread to restart by passing the EXTRA_FORCE_RESTART=true extra.
+	 */	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
@@ -120,50 +124,37 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	}
 
 	@Override
-	public IBinder onBind(Intent arg0)
-	{
-		// TODO Auto-generated method stub
+	public IBinder onBind(Intent arg0) {
 		return null;
 	}
 
 	@Override
-	public void onCreateEntry(Drug drug)
-	{
-		// checkForgottenIntakes(drug, null, false);
+	public void onCreateEntry(Drug drug) {
 		restartThread(true, true);
 	}
 
 	@Override
-	public void onDeleteEntry(Drug drug)
-	{
-		// checkForgottenIntakes(drug, null, true);
+	public void onDeleteEntry(Drug drug) {
 		restartThread(true, true);
 	}
 
 	@Override
-	public void onUpdateEntry(Drug drug)
-	{
-		// checkForgottenIntakes(drug, null, false);
+	public void onUpdateEntry(Drug drug) {
 		restartThread(true, true);
 	}
 
 	@Override
-	public void onCreateEntry(Intake intake)
-	{
-		// checkForgottenIntakes(null, intake, false);
+	public void onCreateEntry(Intake intake) {
 		restartThread(true);
 	}
 
 	@Override
-	public void onDeleteEntry(Intake intake)
-	{
-		// checkForgottenIntakes(null, intake, true);
+	public void onDeleteEntry(Intake intake) {
 		restartThread(true);
 	}
 
 	@Override
-	public void onDatabaseDropped()
-	{
+	public void onDatabaseDropped() {
 		restartThread(true, true);
 	}
 
@@ -174,8 +165,8 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			restartThread(true);
 		else
 			Log.d(TAG, "Ignoring preference change of " + key);
-	}
-
+	}	
+	
 	/**
 	 * (Re)starts the worker thread.
 	 * 
@@ -183,12 +174,12 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	 * to determine when the next notification should be posted. Currently, the
 	 * worker thread is restarted when <em>any</em> database changes occur (see
 	 * DatabaseWatcher) or when the user opens the app.
-	 */
-
-	private void restartThread(boolean forceRestart) {
-		restartThread(forceRestart, false);
-	}
-	
+	 * 
+	 * @param forceRestart Forces the thread to restart, even if it was running.
+	 * @param forceSupplyCheck Force a drug-supply check as soon as the thread is up. 
+	 * 	Supply checks are normally done only when <code>activeDoseTime == Drug.TIME_MORNING</code>,
+	 * 	i.e. only once per day.
+	 */	
 	private synchronized void restartThread(boolean forceRestart, final boolean forceSupplyCheck)
 	{
 		final boolean wasRunning;
@@ -287,8 +278,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 							{
 								delayFirstNotification = false;
 								Log.d(TAG, "Delaying first notification");
-								// FIXME export this
-								Thread.sleep(10000);
+								Thread.sleep(Constants.NOTIFICATION_INITIAL_DELAY);
 							}
 
 							final String contentText = Integer.toString(pendingIntakes.size());
@@ -325,6 +315,15 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 		mThread.start();
 	}
+	
+	/**
+	 * Same as restartThread(forceRestart, false).
+	 * 
+	 * @see #restartThread(boolean, boolean)
+	 */	
+	private void restartThread(boolean forceRestart) {
+		restartThread(forceRestart, false);
+	}	
 
 	private Set<Intake> getAllOpenIntakes(Date date, int doseTime)
 	{
@@ -546,7 +545,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		if(notificationCount > 1)
 			notification.number = notificationCount;
 		
-		final int notificationHash = Util.getNotificationHashCode(notification);
+		final int notificationHash = getNotificationHashCode(notification);
 		
 		if(mLastNotificationHash != notificationHash)
 		{
@@ -576,6 +575,19 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			mNotificationMessages = new String[3];
 	}
 	
+	private int getNotificationCount()
+	{
+		int count = 0;
+		
+		for(String msg : mNotificationMessages)
+		{
+			if(msg != null)
+				++count;
+		}
+		
+		return count;
+	}
+	
 	private static int notificationIdToIndex(int id)
 	{
 		switch(id)
@@ -593,16 +605,27 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		throw new IllegalArgumentException();
 	}
 	
-	private int getNotificationCount()
-	{
-		int count = 0;
-		
-		for(String msg : mNotificationMessages)
-		{
-			if(msg != null)
-				++count;
-		}
-		
-		return count;
-	}
+    public static int getNotificationHashCode(Notification n)
+    {
+    	final int contentViewLayoutId = (n.contentView != null) ? n.contentView.getLayoutId() : 0;
+    	int result = Hasher.SEED;
+    	
+    	result = Hasher.hash(result, n.audioStreamType);
+    	result = Hasher.hash(result, n.contentIntent != null);
+    	result = Hasher.hash(result, contentViewLayoutId);
+    	//result = Hasher.hash(result, n.defaults);
+    	result = Hasher.hash(result, n.deleteIntent != null);
+    	result = Hasher.hash(result, n.fullScreenIntent != null);
+    	result = Hasher.hash(result, n.icon);
+    	result = Hasher.hash(result, n.iconLevel);
+    	result = Hasher.hash(result, n.ledARGB);
+    	result = Hasher.hash(result, n.ledOffMS);
+    	result = Hasher.hash(result, n.ledOnMS);
+    	result = Hasher.hash(result, n.number);    	
+    	result = Hasher.hash(result, n.sound);
+    	result = Hasher.hash(result, n.tickerText);
+    	result = Hasher.hash(result, n.vibrate);
+    	
+    	return result;    	
+    }
 }
