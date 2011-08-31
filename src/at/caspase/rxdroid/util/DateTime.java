@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
- * 
+ *
  * This file is part of RxDroid.
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
+ *
+ *
  */
 
 package at.caspase.rxdroid.util;
@@ -30,33 +30,33 @@ import java.util.TimeZone;
 
 public class DateTime
 {
-	public static Date today() 
+	public static Date today()
 	{
 		final Timestamp today = new Timestamp(currentTimeMillis());
 		today.setHours(0);
 		today.setMinutes(0);
 		today.setSeconds(0);
 		today.setNanos(0);
-		
+
 		return new Date(today.getTime());
 	}
-	
+
 	public static String toString(Time time)
 	{
 		final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-		
-		return sdf.format(time);	
+
+		return sdf.format(time);
 	}
-	    	
+
 	public static long getOffsetFromMidnight(Date today) {
 		return now().getTime() - today.getTime();
 	}
-	
+
 	public static Time now() {
 		return new Time(currentTimeMillis());
 	}
-	    	
+
 	public static long currentTimeMillis()
 	{
 		Calendar now = Calendar.getInstance();

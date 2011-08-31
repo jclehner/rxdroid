@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
- * 
+ *
  * This file is part of RxDroid.
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
+ *
+ *
  */
 
 package at.caspase.rxdroid.util;
@@ -25,7 +25,7 @@ import android.content.Context;
 
 /**
  * Localization utilities.
- * 
+ *
  * @author Joseph Lehner
  *
  */
@@ -35,12 +35,12 @@ public class L10N
 	public static String getText(Context context, int resId, Object... args) {
 		return getText(context.getString(resId), args);
 	}
-	
+
 	public static String getText(String format, Object... args)
 	{
 		for(int i = 0; i != args.length; ++i)
 			format = format.replaceAll("([^%])%\\{?" + (i + 1) + "(?:\\}|(\\D))", "$1" + args[i].toString() + "$2");
-		
+
 		return format.replaceAll("%%", "%");
 	}
 }

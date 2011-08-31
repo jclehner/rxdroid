@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
- * 
+ *
  * This file is part of RxDroid.
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
+ *
+ *
  */
 
 package at.caspase.rxdroid;
@@ -34,37 +34,37 @@ import android.util.Log;
 public class PreferencesActivity extends PreferenceActivity implements OnPreferenceChangeListener
 {
 	private static final String TAG = PreferencesActivity.class.getName();
-	
+
 	SharedPreferences mSharedPreferences;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		
+
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
-		addPreferencesFromResource(R.xml.preferences);		
+		addPreferencesFromResource(R.xml.preferences);
 	}
 
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue)
 	{
 		final String key = preference.getKey();
-		
+
 		Log.d(TAG, "onPreferenceChange: key=" + key);
-		
+
 		if("time_night_end".equals(key))
 		{
 			final Time begin = getTimeSharedPreference("time_night_begin");
 			final Time end = getTimeSharedPreference("time_night_end");
-			
+
 			if(end.before(begin))
 				preference.setSummary(preference.getSummary() + " (on the next day)");
 		}
-		
+
 		return false;
 	}
-	
+
 	private Time getTimeSharedPreference(String key)
 	{
 		try
@@ -75,5 +75,5 @@ public class PreferencesActivity extends PreferenceActivity implements OnPrefere
 		{
 			return new Time(0, 0, 0);
 		}
-	}	
+	}
 }

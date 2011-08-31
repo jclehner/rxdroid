@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
- * 
+ *
  * This file is part of RxDroid.
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
+ *
+ *
  */
 
 package at.caspase.rxdroid;
@@ -53,11 +53,11 @@ import com.j256.ormlite.dao.Dao;
 
 /**
  * Primary notification service.
- * 
+ *
  * @author Joseph Lehner
- * 
+ *
  */
-public class NotificationService extends OrmLiteBaseService<Database.Helper> implements 
+public class NotificationService extends OrmLiteBaseService<Database.Helper> implements
 		OnDatabaseChangedListener, OnSharedPreferenceChangeListener
 {
 	public static final String EXTRA_FORCE_RESTART = "force_restart";
@@ -72,7 +72,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	private NotificationManager mNotificationManager;
 	private String[] mNotificationMessages;
 	private int mLastNotificationHash;
-	
+
 	Thread mThread;
 
 	@Override
@@ -84,10 +84,10 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		cancelAllNotifications();
-		
+
 		mIntent = new Intent(Intent.ACTION_VIEW);
 		mIntent.setClass(getApplicationContext(), DrugListActivity.class);
-		
+
 		Settings.INSTANCE.setApplicationContext(getApplicationContext());
 
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -97,19 +97,19 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 	/**
 	 * Starts the service if it has not been started yet.
-	 * 
+	 *
 	 * You can force the service thread to restart by passing the EXTRA_FORCE_RESTART=true extra.
-	 */	
+	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
 		super.onStartCommand(intent, flags, startId);
-		
+
 		if(intent != null)
 			restartThread(intent.getBooleanExtra(EXTRA_FORCE_RESTART, false));
 		else
 			Log.w(TAG, "Intent was null");
-		
+
 		return START_STICKY;
 	}
 
@@ -165,25 +165,25 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			restartThread(true);
 		else
 			Log.d(TAG, "Ignoring preference change of " + key);
-	}	
-	
+	}
+
 	/**
 	 * (Re)starts the worker thread.
-	 * 
+	 *
 	 * Calling this function will cause the service to consult the DB in order
 	 * to determine when the next notification should be posted. Currently, the
 	 * worker thread is restarted when <em>any</em> database changes occur (see
 	 * DatabaseWatcher) or when the user opens the app.
-	 * 
+	 *
 	 * @param forceRestart Forces the thread to restart, even if it was running.
-	 * @param forceSupplyCheck Force a drug-supply check as soon as the thread is up. 
-	 * 	Supply checks are normally done only when <code>activeDoseTime == Drug.TIME_MORNING</code>,
-	 * 	i.e. only once per day.
-	 */	
+	 * @param forceSupplyCheck Force a drug-supply check as soon as the thread is up.
+	 *     Supply checks are normally done only when <code>activeDoseTime == Drug.TIME_MORNING</code>,
+	 *     i.e. only once per day.
+	 */
 	private synchronized void restartThread(boolean forceRestart, final boolean forceSupplyCheck)
 	{
 		final boolean wasRunning;
-		
+
 		if(mThread != null)
 		{
 			if(!forceRestart)
@@ -197,7 +197,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		}
 		else
 			wasRunning = false;
-		
+
 		Log.d(TAG, "restartThread(" + forceRestart + "): wasRunning=" + wasRunning);
 
 		mThread = new Thread(new Runnable() {
@@ -207,31 +207,31 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			{
 				/**
 				 * - on start, clear all notifications
-				 * 
+				 *
 				 * - collect forgotten intakes & display notifications if
 				 * necessary - if a dose time is active, collect pending intakes
 				 * & display notifications if neccessary. do so every N minutes
 				 * (as specified by the snooze time), until the next dose time
 				 * becomes active
-				 * 
+				 *
 				 * - if the active dose time is TIME_MORNING, also check supply
 				 * levels & display notifications, if applicable
-				 * 
+				 *
 				 * - if no dose time is active, sleep until the start of the
 				 * next dose time
-				 * 
+				 *
 				 */
 
 				cancelAllNotifications();
-				
+
 				final boolean doCheckSupplies = !wasRunning || forceSupplyCheck;
 				if(doCheckSupplies)
 					checkSupplies(true);
-								
+
 				boolean delayFirstNotification = true;
-								
+
 				try
-				{					
+				{
 					while(true)
 					{
 						final Date date = DateTime.today();
@@ -241,11 +241,11 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 						final int nextDoseTime = Settings.INSTANCE.getNextDoseTime();
 						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
 
-						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);						
-						
+						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
+
 						if(lastDoseTime >= 0)
-							checkIntakes(date, lastDoseTime);						
-						
+							checkIntakes(date, lastDoseTime);
+
 						if(activeDoseTime == -1)
 						{
 							long sleepTime = Settings.INSTANCE.getMillisFromNowUntilDoseTimeBegin(nextDoseTime);
@@ -257,7 +257,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 							if(Settings.INSTANCE.getActiveDoseTime() != nextDoseTime)
 								Log.e(TAG, "Unexpected dose time, expected " + nextDoseTime);
-							
+
 							continue;
 						}
 						else if(activeDoseTime == Drug.TIME_MORNING)
@@ -271,7 +271,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 						final Set<Intake> pendingIntakes = getAllOpenIntakes(date, activeDoseTime);
 
 						Log.d(TAG, "Pending intakes: " + pendingIntakes.size());
-						
+
 						if(!pendingIntakes.isEmpty())
 						{
 							if(delayFirstNotification && wasRunning)
@@ -283,16 +283,16 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 							final String contentText = Integer.toString(pendingIntakes.size());
 							final long snoozeTime = Settings.INSTANCE.getSnoozeTime();
-							
+
 							postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
-							
+
 							while(millisUntilDoseTimeEnd > snoozeTime)
 							{
 								Thread.sleep(snoozeTime);
 								millisUntilDoseTimeEnd -= snoozeTime;
 								postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
 							}
-							
+
 							Log.d(TAG, "Finished loop");
 						}
 
@@ -301,7 +301,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms until end of dose time " + activeDoseTime);
 							Thread.sleep(millisUntilDoseTimeEnd);
 						}
-						
+
 						cancelNotification(R.id.notification_intake_pending);
 						checkIntakes(date, activeDoseTime);
 					}
@@ -315,15 +315,15 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 		mThread.start();
 	}
-	
+
 	/**
 	 * Same as restartThread(forceRestart, false).
-	 * 
+	 *
 	 * @see #restartThread(boolean, boolean)
-	 */	
+	 */
 	private void restartThread(boolean forceRestart) {
 		restartThread(forceRestart, false);
-	}	
+	}
 
 	private Set<Intake> getAllOpenIntakes(Date date, int doseTime)
 	{
@@ -383,7 +383,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	private void checkIntakes(Date date, int lastDoseTime)
 	{
 		final Set<Intake> forgottenIntakes = getAllForgottenIntakes(date, lastDoseTime);
-		
+
 		Log.d(TAG, forgottenIntakes.size() + " forgotten intakes");
 
 		if(!forgottenIntakes.isEmpty())
@@ -403,17 +403,17 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		final int minDays = Integer.parseInt(prefs.getString("num_min_supply_days", "7"), 10);
 		final List<Drug> drugsWithLowSupply = getAllDrugsWithLowSupply(minDays);
-		
+
 		if(!drugsWithLowSupply.isEmpty())
 		{
 			final String firstDrugName = drugsWithLowSupply.get(0).getName();
 			final String contentText;
-			
+
 			if(drugsWithLowSupply.size() == 1)
 				contentText = getString(R.string._msg_low_supply_single, firstDrugName);
 			else
 				contentText = getString(R.string._msg_low_supply_multiple, firstDrugName, drugsWithLowSupply.size() - 1);
-			
+
 			if(!doEnqueueNotification)
 				postNotification(R.id.notification_low_supplies, Notification.DEFAULT_LIGHTS, contentText);
 			else
@@ -465,32 +465,32 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 		return drugsWithLowSupply;
 	}
-	
+
 	private void enqueueNotification(int id, String message) {
 		mNotificationMessages[notificationIdToIndex(id)] = message;
 	}
-	
+
 	private void postNotification(int id, int defaults, String message)
 	{
 		enqueueNotification(id, message);
 		postAllNotifications(defaults);
 	}
-	
+
 	private void postAllNotifications(int defaults)
 	{
 		int notificationCount;
-		
+
 		for(int i = 0; i != mNotificationMessages.length; ++i)
 			Log.d(TAG, "postNotification: mNotificationMessages[" + i + "]=" + mNotificationMessages[i]);
-				
+
 		if((notificationCount = getNotificationCount()) == 0)
 		{
 			cancelAllNotifications(false);
 			return;
 		}
-		
+
 		final String bullet;
-		
+
 		if(mNotificationMessages[2] != null && notificationCount != 1)
 		{
 			// we have 2 notifications, use bullets!
@@ -498,43 +498,43 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		}
 		else
 			bullet = "";
-				
+
 		StringBuilder msgBuilder = new StringBuilder();
-				
+
 		final String doseMsgPending = mNotificationMessages[0];
 		final String doseMsgForgotten = mNotificationMessages[1];
-		
+
 		int stringId = -1;
-		
+
 		if(doseMsgPending != null && doseMsgForgotten != null)
 			stringId = R.string._msg_doses_fp;
 		else if(doseMsgPending != null)
 			stringId = R.string._msg_doses_p;
 		else if(doseMsgForgotten != null)
 			stringId = R.string._msg_doses_f;
-		
+
 		if(stringId != -1)
 			msgBuilder.append(bullet + getString(stringId, doseMsgForgotten, doseMsgPending));
-				
+
 		final String doseMsgLowSupply = mNotificationMessages[2];
-		
+
 		if(doseMsgLowSupply != null)
 		{
 			if(stringId != -1)
 			{
-				// if we appended this line-break in the append() call above, the layout would look 
+				// if we appended this line-break in the append() call above, the layout would look
 				// messed up in case there was no "low supply" message
 				msgBuilder.append("\n");
-			}				
-			
+			}
+
 			msgBuilder.append(bullet + doseMsgLowSupply);
 		}
-				
+
 		final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
 		views.setTextViewText(R.id.stat_title, getString(R.string._title_notifications));
 		views.setTextViewText(R.id.stat_text, msgBuilder.toString());
 		views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(DateTime.now()));
-		
+
 		final Notification notification = new Notification();
 		notification.icon = R.drawable.ic_stat_pill;
 		notification.tickerText = getString(R.string._msg_new_notification);
@@ -544,28 +544,28 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		notification.contentView = views;
 		if(notificationCount > 1)
 			notification.number = notificationCount;
-		
+
 		final int notificationHash = getNotificationHashCode(notification);
-		
+
 		if(mLastNotificationHash != notificationHash)
 		{
 			Log.d(TAG, "last hash: " + mLastNotificationHash + ", this hash: " + notificationHash);
 			mNotificationManager.cancel(R.id.notification);
 			mNotificationManager.notify(R.id.notification, notification);
-			mLastNotificationHash = notificationHash;			
+			mLastNotificationHash = notificationHash;
 		}
 		else
-			Log.d(TAG, "Ignorning Notification with hash " + notificationHash);		
+			Log.d(TAG, "Ignorning Notification with hash " + notificationHash);
 	}
-	
+
 	private void cancelNotification(int id) {
-		postNotification(id, 0, null);			
+		postNotification(id, 0, null);
 	}
-	
-	
+
+
 	private void cancelAllNotifications() {
 		cancelAllNotifications(true);
-	}	
+	}
 
 	private void cancelAllNotifications(boolean zapMessages)
 	{
@@ -574,58 +574,58 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		if(zapMessages)
 			mNotificationMessages = new String[3];
 	}
-	
+
 	private int getNotificationCount()
 	{
 		int count = 0;
-		
+
 		for(String msg : mNotificationMessages)
 		{
 			if(msg != null)
 				++count;
 		}
-		
+
 		return count;
 	}
-	
+
 	private static int notificationIdToIndex(int id)
 	{
 		switch(id)
 		{
 			case R.id.notification_intake_pending:
 				return 0;
-				
+
 			case R.id.notification_intake_forgotten:
 				return 1;
-				
+
 			case R.id.notification_low_supplies:
 				return 2;
 		}
-		
+
 		throw new IllegalArgumentException();
 	}
-	
-    public static int getNotificationHashCode(Notification n)
-    {
-    	final int contentViewLayoutId = (n.contentView != null) ? n.contentView.getLayoutId() : 0;
-    	int result = Hasher.SEED;
-    	
-    	result = Hasher.hash(result, n.audioStreamType);
-    	result = Hasher.hash(result, n.contentIntent != null);
-    	result = Hasher.hash(result, contentViewLayoutId);
-    	//result = Hasher.hash(result, n.defaults);
-    	result = Hasher.hash(result, n.deleteIntent != null);
-    	result = Hasher.hash(result, n.fullScreenIntent != null);
-    	result = Hasher.hash(result, n.icon);
-    	result = Hasher.hash(result, n.iconLevel);
-    	result = Hasher.hash(result, n.ledARGB);
-    	result = Hasher.hash(result, n.ledOffMS);
-    	result = Hasher.hash(result, n.ledOnMS);
-    	result = Hasher.hash(result, n.number);    	
-    	result = Hasher.hash(result, n.sound);
-    	result = Hasher.hash(result, n.tickerText);
-    	result = Hasher.hash(result, n.vibrate);
-    	
-    	return result;    	
-    }
+
+	public static int getNotificationHashCode(Notification n)
+	{
+		final int contentViewLayoutId = (n.contentView != null) ? n.contentView.getLayoutId() : 0;
+		int result = Hasher.SEED;
+
+		result = Hasher.hash(result, n.audioStreamType);
+		result = Hasher.hash(result, n.contentIntent != null);
+		result = Hasher.hash(result, contentViewLayoutId);
+		//result = Hasher.hash(result, n.defaults);
+		result = Hasher.hash(result, n.deleteIntent != null);
+		result = Hasher.hash(result, n.fullScreenIntent != null);
+		result = Hasher.hash(result, n.icon);
+		result = Hasher.hash(result, n.iconLevel);
+		result = Hasher.hash(result, n.ledARGB);
+		result = Hasher.hash(result, n.ledOffMS);
+		result = Hasher.hash(result, n.ledOnMS);
+		result = Hasher.hash(result, n.number);
+		result = Hasher.hash(result, n.sound);
+		result = Hasher.hash(result, n.tickerText);
+		result = Hasher.hash(result, n.vibrate);
+
+		return result;
+	}
 }

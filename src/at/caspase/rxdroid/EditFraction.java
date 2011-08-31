@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
- * 
+ *
  * This file is part of RxDroid.
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
+ *
+ *
  */
 
 package at.caspase.rxdroid;
@@ -41,10 +41,10 @@ import android.widget.TextView;
 
 /**
  * An EditText field to input fractions.
- * 
+ *
  * This class enables the user to input fractions. Once the EditText is focused/touched,
  * a Dialog will open, presenting the user with a method of typing fractions.
- * 
+ *
  * @author Joseph Lehner
  *
  */
@@ -52,58 +52,58 @@ import android.widget.TextView;
 public class EditFraction extends EditText implements OnTouchListener
 {
 	private static final String TAG = EditFraction.class.getName();
-	
+
 	private FractionPickerDialog mDialog;
-	
-	public EditFraction(Context context) 
+
+	public EditFraction(Context context)
 	{
 		super(context);
 		setup(context, null);
 	}
-	
-	public EditFraction(Context context, AttributeSet attrs) 
+
+	public EditFraction(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
 		setup(context, attrs);
 	}
-	
-	public EditFraction(Context context, AttributeSet attrs, int defStyle) 
+
+	public EditFraction(Context context, AttributeSet attrs, int defStyle)
 	{
 		super(context, attrs, defStyle);
 		setup(context, attrs);
 	}
-	
-	@Override 
+
+	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)
 	{
 		boolean ret = super.onKeyDown(keyCode, event);
 		Log.d(TAG, "onKeyDown: keyCode=" + keyCode + ", event=" + event);
-		return ret;		
+		return ret;
 	}
-	
-	@Override 
+
+	@Override
 	public boolean onKeyLongPress(int keyCode, KeyEvent event)
 	{
 		boolean ret = super.onKeyLongPress(keyCode, event);
 		Log.d(TAG, "onKeyLongPress: keyCode=" + keyCode + ", event=" + event);
-		return ret;		
+		return ret;
 	}
-	
-	@Override 
+
+	@Override
 	public boolean onKeyMultiple(int keyCode, int count, KeyEvent event)
 	{
 		boolean ret = super.onKeyMultiple(keyCode, count, event);
 		Log.d(TAG, "onKeyMultiple: keyCode=" + keyCode + ", count=" + count + ", event=" + event);
-		return ret;		
+		return ret;
 	}
-	
-	@Override 
+
+	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event)
 	{
 		boolean ret = super.onKeyUp(keyCode, event);
 		Log.d(TAG, "onKeyDown: keyCode=" + keyCode + ", event=" + event);
-		return ret;		
-	}	
+		return ret;
+	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
@@ -112,14 +112,14 @@ public class EditFraction extends EditText implements OnTouchListener
 		mDialog.show();
 		return true;
 	}
-	
-	private void setup(Context context, AttributeSet attrs) 
+
+	private void setup(Context context, AttributeSet attrs)
 	{
 		if(isClickable())
 		{
 			mDialog = new FractionPickerDialog(context, this);
 			setHint(null);
-				
+
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(getWindowToken(), 0);
 			setInputType(InputType.TYPE_NULL);
@@ -128,42 +128,42 @@ public class EditFraction extends EditText implements OnTouchListener
 		else
 			Log.d(TAG, "Not clickable. Ignoring");
 	}
-		
+
 	public static class FractionPickerDialog extends AlertDialog implements OnKeyboardActionListener
 	{
 		private TextView mParent;
-		
+
 		private View mButtonPlus;
 		private View mButtonMinus;
 		private EditText mFractionInput;
 		private StringBuffer mText;
-		private KeyboardView mKeypad;		
-		
+		private KeyboardView mKeypad;
+
 		private Fraction mValue = new Fraction(0);
 		private boolean mAllowNegative = false;
-		
-		public FractionPickerDialog(Context context, TextView parent) 
+
+		public FractionPickerDialog(Context context, TextView parent)
 		{
 			super(context, true, null);
-			
+
 			LayoutInflater inflater = LayoutInflater.from(context);
 			View view = inflater.inflate(R.layout.fraction_picker_dialog, null);
 			setView(view);
-			
+
 			mParent = parent;
-			
+
 			CharSequence hint = mParent.getHint();
 			if(hint != null && hint.length() != 0)
 				setTitle(hint);
-							
+
 			mButtonPlus = view.findViewById(R.id.fraction_input_btn_plus);
 			mButtonMinus = view.findViewById(R.id.fraction_input_btn_minus);
 			mFractionInput = (EditText) view.findViewById(R.id.fraction_input);
 			mKeypad = (KeyboardView) view.findViewById(R.id.fraction_picker_keypad);
-			
+
 			mText = new StringBuffer(mParent.getText());
-						
-			android.view.View.OnClickListener onClickListener = new android.view.View.OnClickListener() {			
+
+			android.view.View.OnClickListener onClickListener = new android.view.View.OnClickListener() {
 				@Override
 				public void onClick(View v)
 				{
@@ -174,7 +174,7 @@ public class EditFraction extends EditText implements OnTouchListener
 						mText.append("0");
 						updateFractionInput();
 					}
-										
+
 					switch(v.getId())
 					{
 						case R.id.fraction_input_btn_plus:
@@ -186,7 +186,7 @@ public class EditFraction extends EditText implements OnTouchListener
 								mValue = mValue.minus(1);
 							else
 								mValue = new Fraction(0);
-							
+
 							break;
 						}
 						default:
@@ -195,26 +195,26 @@ public class EditFraction extends EditText implements OnTouchListener
 					mFractionInput.setText(mValue.toString());
 				}
 			};
-			
+
 			mButtonPlus.setOnClickListener(onClickListener);
 			mButtonMinus.setOnClickListener(onClickListener);
-			
+
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(mFractionInput.getWindowToken(), 0);
-						
+
 			mKeypad.setKeyboard(new Keyboard(context, R.xml.fraction));
 			mKeypad.setOnKeyboardActionListener(this);
-			
+
 			setIcon(android.R.drawable.ic_dialog_dialer);
-						
+
 			updateFractionInput();
 		}
-		
+
 		@Override
 		public void onKey(int primaryCode, int[] keyCodes)
 		{
 			mText = new StringBuffer(mFractionInput.getText());
-						
+
 			switch(primaryCode)
 			{
 				// TODO export this to R
@@ -229,7 +229,7 @@ public class EditFraction extends EditText implements OnTouchListener
 				{
 					if(hasValidFraction())
 						mParent.setText(mValue.toString());
-										
+
 					dismiss();
 					return;
 				}
@@ -237,12 +237,12 @@ public class EditFraction extends EditText implements OnTouchListener
 				{
 					/*
 					AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-					
+
 					builder.setIcon(android.R.drawable.ic_dialog_info);
 					builder.setTitle("Help");
 					builder.setMessage("This input field accepts fraction values. Examples for valid input include '1 1/4', '5/4' or '5' " +
 							"(not including the single quotes).");
-					
+
 					builder.show();
 					*/
 					break;
@@ -253,20 +253,20 @@ public class EditFraction extends EditText implements OnTouchListener
 						break;
 					// fall through otherwise
 				}
-				
+
 				default:
 					mText.insert(mText.length(), Character.toString((char) primaryCode));
 			}
-			
+
 			updateFractionInput();
 		}
-		
+
 		@Override
 		public void onPress(int primaryCode) {}
 
 		@Override
 		public void onRelease(int primaryCode) {}
-		
+
 		@Override
 		public void onText(CharSequence text) {}
 
@@ -275,34 +275,34 @@ public class EditFraction extends EditText implements OnTouchListener
 
 		@Override
 		public void swipeLeft() {}
-		
+
 		@Override
-		public void swipeRight() {}		
+		public void swipeRight() {}
 
 		@Override
 		public void swipeUp() {}
-		
+
 		@Override
-		protected void onStart() 
+		protected void onStart()
 		{
 			mText = new StringBuffer(mParent.getText());
 			updateFractionInput();
 		}
-		
+
 		private boolean hasValidFraction()
 		{
 			try
 			{
 				Fraction.decode(mText.toString());
-				
+
 				return true;
 			}
 			catch(NumberFormatException e)
 			{
 				return false;
 			}
-			
-		}		
+
+		}
 
 		private void updateFractionInput()
 		{
@@ -320,7 +320,7 @@ public class EditFraction extends EditText implements OnTouchListener
 				//mFractionInput.setBackgroundColor(Color.WHITE);
 				mFractionInput.setTextColor(Color.RED);
 			}
-			
+
 			mFractionInput.setText(mText);
 			//mFractionInput.setT
 		}

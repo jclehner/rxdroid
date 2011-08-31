@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
- * 
+ *
  * This file is part of RxDroid.
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
+ *
+ *
  */
 
 package at.caspase.rxdroid;
@@ -24,23 +24,23 @@ package at.caspase.rxdroid;
 public class Timer
 {
 	private long mBegin;
-	
+
 	public Timer() {
 		reset();
 	}
-	
+
 	public void reset() {
 		mBegin = System.currentTimeMillis();
 	}
-	
+
 	public long elapsed() {
 		return System.currentTimeMillis() - mBegin;
 	}
-	
+
 	public double elapsedSeconds() {
 		return (double) elapsed() / 1000;
 	}
-	
+
 	@Override
 	public String toString() {
 		return elapsedSeconds() + "s";
