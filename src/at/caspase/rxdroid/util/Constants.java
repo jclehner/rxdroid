@@ -21,7 +21,7 @@
 
 package at.caspase.rxdroid.util;
 
-public class Constants
+public final class Constants
 {
 	public static final long MILLIS_PER_DAY = 24L * 3600 * 1000;
 	public static final String NOTIFICATION_BULLET = "\u2022 ";

@@ -28,7 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class DateTime
+public final class DateTime
 {
 	public static Date today()
 	{

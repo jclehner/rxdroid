@@ -24,7 +24,7 @@ package at.caspase.rxdroid.util;
 import at.caspase.rxdroid.Database;
 import at.caspase.rxdroid.R;
 
-public class Util
+public final class Util
 {
 	public static int getDoseTimeDrawableFromDoseViewId(int doseViewId)
 	{

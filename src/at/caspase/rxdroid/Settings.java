@@ -29,45 +29,72 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.debug.FakeSettings;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
-public enum Settings
+public class Settings
 {
-	INSTANCE;
-
 	private static final String TAG = Settings.class.getName();
 
 	private static final String prefKeyPrefixes[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 	private static final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 
-	private Context mApplicationContext = null;
-	private SharedPreferences mSharedPrefs = null;
+	private static Context sApplicationContext = null;
+	private static SharedPreferences sSharedPrefs = null;
 
-	public void setApplicationContext(Context context)
+	private static Settings instance;
+	
+	public synchronized static Settings instance(Context context)
 	{
-		if(mApplicationContext == null)
+		setContext(context.getApplicationContext());
+		return instance();
+	}
+	
+	public synchronized static Settings instance() 
+	{
+		if(sApplicationContext == null)
+			throw new IllegalStateException("No Context available. Use setContext(Context) or instance(Context) instead.");
+				
+		if(instance == null)
 		{
-			mApplicationContext = context.getApplicationContext();
-			mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
+			if(sSharedPrefs.getBoolean("debug_fake_dosetimes", false))
+			{
+				instance = new FakeSettings();
+				Log.d(TAG, "Using FakeSettings");
+			}
+			else
+			{
+				instance = new Settings();
+				Log.d(TAG, "Using Settings");
+			}
+		}		
+		
+		return instance;
+	}
+	
+	
+	public synchronized static void setContext(Context context)
+	{
+		if(sApplicationContext == null)
+		{
+			sApplicationContext = context.getApplicationContext();
+			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sApplicationContext);
 		}
 	}
 
-	public Notification blessNotification(Notification notification)
+	public int filterNotificationDefaults(int defaults)
 	{
-		int flags = notification.flags;
+		if(!sSharedPrefs.getBoolean("use_led", true))
+			defaults ^= Notification.DEFAULT_LIGHTS;
 
-		if(mSharedPrefs.getBoolean("use_led", true))
-			flags |= Notification.DEFAULT_LIGHTS;
+		if(!sSharedPrefs.getBoolean("use_sound", true))
+			defaults ^= Notification.DEFAULT_SOUND;
 
-		if(mSharedPrefs.getBoolean("use_sound", true))
-			flags |= Notification.DEFAULT_SOUND;
+		if(!sSharedPrefs.getBoolean("use_vibrator", true))
+			defaults ^= Notification.DEFAULT_VIBRATE;
 
-		if(mSharedPrefs.getBoolean("use_vibrator", true))
-			flags |= Notification.DEFAULT_VIBRATE;
-
-		notification.flags = flags;
-		return notification;
+		return defaults;
 	}
 
 	public long getMillisFromNowUntilDoseTimeBegin(int doseTime) {
@@ -80,10 +107,9 @@ public enum Settings
 
 	public long getSnoozeTime() {
 		return getTimePreference("time_snooze").getTime();
-		//return 10 * 1000;
 	}
 
-	public long getDoseTimeBeginOffset(int doseTime) {
+	private long getDoseTimeBeginOffset(int doseTime) {
 		return getTimePreference(prefKeyPrefixes[doseTime] + "_begin").getTime();
 	}
 
@@ -96,11 +122,11 @@ public enum Settings
 		if(key == null)
 			return null;
 
-		String value = mSharedPrefs.getString(key, null);
+		String value = sSharedPrefs.getString(key, null);
 		if(value == null)
 		{
-			int resId = mApplicationContext.getResources().getIdentifier("at.caspase.rxdroid:string/pref_default_" + key, null, null);
-			value = mApplicationContext.getString(resId);
+			int resId = sApplicationContext.getResources().getIdentifier("at.caspase.rxdroid:string/pref_default_" + key, null, null);
+			value = sApplicationContext.getString(resId);
 		}
 
 		return DumbTime.valueOf(value);

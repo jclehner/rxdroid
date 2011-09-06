@@ -117,12 +117,9 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		mTextDate.setOnLongClickListener(this);
 
-		Intent serviceIntent = new Intent();
-		serviceIntent.setClass(this, NotificationService.class);
-
-		startService(serviceIntent);
-
-		Settings.INSTANCE.setApplicationContext(getApplicationContext());
+		startNotificationService();
+		
+		Settings.setContext(getApplicationContext());
 
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		Database.registerOnChangedListener(this);
@@ -143,6 +140,22 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		}
 		else
 			throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());
+		
+		if(!NotificationService.isRunning())
+		{
+			startNotificationService();
+			Log.w(TAG, "onResume: Notification service was not running");
+			
+			if(!mSharedPreferences.getBoolean("debug_enabled", false))
+			{			
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string._title_warning);
+				builder.setIcon(android.R.drawable.ic_dialog_alert);
+				builder.setMessage(R.string._msg_warning_svc_not_running);
+				builder.setPositiveButton(android.R.string.ok, null);
+				builder.show();
+			}
+		}
 	}
 
 	@Override
@@ -448,6 +461,14 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
 		setDate(mDate);
 	}
+	
+	private void startNotificationService()
+	{
+		Intent serviceIntent = new Intent();
+		serviceIntent.setClass(this, NotificationService.class);
+
+		startService(serviceIntent);
+	}
 
 	private void setDate(Date newDate) {
 		setOrShiftDate(0, newDate);
@@ -512,7 +533,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		Log.d(TAG, "Current date: " + mDate + " (" + mDate.getTime() + ")");
 		Log.d(TAG, "Today: " + today + " (" + today.getTime() + ")");
-		Log.d(TAG, "mDate == today: " + (mDate.equals(DateTime.today())));
 
 		if(mDate.equals(DateTime.today()))
 			   dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);

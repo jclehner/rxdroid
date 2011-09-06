@@ -157,7 +157,7 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 			DumbTime time = mConstraintTimes[i];
 
 			if(time == null)
-				time = Settings.INSTANCE.getTimePreference(mConstraintTimePrefKeys[i]);
+				time = Settings.instance().getTimePreference(mConstraintTimePrefKeys[i]);
 
 			if(i == IDX_AFTER)
 				mDialog.setConstraintAfter(time);

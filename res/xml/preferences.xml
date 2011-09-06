@@ -114,6 +114,23 @@
 				android:title="@string/_title_pref_use_vibrator" />
 		
 		</PreferenceCategory>
-		
 	</PreferenceScreen>
+	
+	<!--  no need to localize debugging options -->
+	<PreferenceScreen android:key="prefscreen_debug"
+		android:title="Debugging options">
+		
+		<CheckBoxPreference android:key="debug_enabled"
+			android:title="Enable debugging mode"
+			android:defaultValue="false" />
+			
+		<CheckBoxPreference android:key="debug_fake_dosetimes"
+			android:title="Fake doseTimes"
+			android:summary="Switch doseTimes every minute"
+			android:defaultValue="false"
+			android:dependency="debug_enabled" />
+	
+	</PreferenceScreen>
+	
+	
 </PreferenceScreen>

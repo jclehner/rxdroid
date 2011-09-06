@@ -51,7 +51,7 @@ import java.lang.reflect.Array;
  * @author Joseph Lehner
  *
  */
-public class Hasher
+public final class Hasher
 {
 	/**
 	 * Initial seed for the hash.
