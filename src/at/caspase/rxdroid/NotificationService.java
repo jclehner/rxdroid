@@ -656,26 +656,27 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	private static int getNotificationHashCode(Notification n, String msg)
 	{
 		final int contentViewLayoutId = (n.contentView != null) ? n.contentView.getLayoutId() : 0;
-		int result = Hasher.SEED;
+		
+		final Hasher hasher = new Hasher();
+		
+		hasher.hash(n.audioStreamType);
+		hasher.hash(n.contentIntent != null);
+		hasher.hash(contentViewLayoutId);
+		hasher.hash(n.defaults);
+		hasher.hash(n.deleteIntent != null);
+		hasher.hash(n.fullScreenIntent != null);
+		hasher.hash(n.icon);
+		hasher.hash(n.iconLevel);
+		hasher.hash(n.ledARGB);
+		hasher.hash(n.ledOffMS);
+		hasher.hash(n.ledOnMS);
+		hasher.hash(n.number);
+		hasher.hash(n.sound);
+		hasher.hash(n.tickerText);
+		hasher.hash(n.vibrate);
+		hasher.hash(msg);
 
-		result = Hasher.hash(result, n.audioStreamType);
-		result = Hasher.hash(result, n.contentIntent != null);
-		result = Hasher.hash(result, contentViewLayoutId);
-		result = Hasher.hash(result, n.defaults);
-		result = Hasher.hash(result, n.deleteIntent != null);
-		result = Hasher.hash(result, n.fullScreenIntent != null);
-		result = Hasher.hash(result, n.icon);
-		result = Hasher.hash(result, n.iconLevel);
-		result = Hasher.hash(result, n.ledARGB);
-		result = Hasher.hash(result, n.ledOffMS);
-		result = Hasher.hash(result, n.ledOnMS);
-		result = Hasher.hash(result, n.number);
-		result = Hasher.hash(result, n.sound);
-		result = Hasher.hash(result, n.tickerText);
-		result = Hasher.hash(result, n.vibrate);
-		result = Hasher.hash(result, msg);
-
-		return result;
+		return hasher.getHashCode();
 	}
 	
 	private static void sleep(long time) throws InterruptedException

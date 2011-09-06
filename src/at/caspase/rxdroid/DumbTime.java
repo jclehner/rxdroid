@@ -183,14 +183,14 @@ public class DumbTime extends Date
 	@Override
 	public int hashCode()
 	{
-		int result = Hasher.SEED;
+		final Hasher hasher = new Hasher();
+		
+		hasher.hash(mMillis);
+		hasher.hash(mSeconds);
+		hasher.hash(mMinutes);
+		hasher.hash(mHours);
 
-		result = Hasher.hash(result, mMillis);
-		result = Hasher.hash(result, mSeconds);
-		result = Hasher.hash(result, mMinutes);
-		result = Hasher.hash(result, mHours);
-
-		return result;
+		return hasher.getHashCode();
 	}
 
 	@Override

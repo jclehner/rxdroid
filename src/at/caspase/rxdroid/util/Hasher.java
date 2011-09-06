@@ -36,14 +36,14 @@ import java.lang.reflect.Array;
  * &#64;Override
  * public int hashCode()
  * {
- *     int result = Hasher.SEED;
+ *     Hasher hasher = new Hasher();
  *
- *     result = Hasher.hash(result, mMember1);
- *     result = Hasher.hash(result, mMember2);
+ *     hasher.hash(mMember1);
+ *     hasher.hash(mMember2);
  *     // ...
- *     result = Hasher.hash(result, mMemberX);
+ *     hasher.hash(mMemberX);
  *
- *     return result;
+ *     return hasher.getHashCode();
  * }
  * // ...
  * </pre>
@@ -51,57 +51,54 @@ import java.lang.reflect.Array;
  * @author Joseph Lehner
  *
  */
-public final class Hasher
+public class Hasher
 {
-	/**
-	 * Initial seed for the hash.
-	 */
-	public static final int SEED = 23;
+	private int mHash = 23;
 
-	public static int hash(int seed, boolean b) {
-		return mult(seed) + (b ? 1 : 0);
+	public void hash(boolean b) {
+		mHash = term() + (b ? 1 : 0);
 	}
 
-	public static int hash(int seed, char c) {
-		return hash(seed, (int) c);
+	public void hash(char c) {
+		hash((int) c);
 	}
 
-	public static int hash(int seed, int i) {
-		return mult(seed) + i;
+	public void hash(int i) {
+		mHash = term() + i;
 	}
 
-	public static int hash(int seed, long l) {
-		return mult(seed) + (int) (l ^ (l >>> 32));
+	public void hash(long l) {
+		mHash = term() + (int) (l ^ (l >>> 32));
 	}
 
-	public static int hash(int seed, float f) {
-		return hash(seed, Float.floatToIntBits(f));
+	public void hash(float f) {
+		hash(Float.floatToIntBits(f));
 	}
 
-	public static int hash(int seed, double d) {
-		return hash(seed, Double.doubleToLongBits(d));
+	public void hash(double d) {
+		hash(Double.doubleToLongBits(d));
 	}
 
-	public static int hash(int seed, Object o)
+	public void hash(Object o)
 	{
-		int result = seed;
-
 		if(o == null)
-			result = hash(result, 0);
+			hash(0);
 		else if(!o.getClass().isArray())
-			result = hash(result, o.hashCode());
+			hash(o.hashCode());
 		else
 		{
 			final int length = Array.getLength(o);
 			for(int i = 0; i != length; ++i)
-				result = hash(result, Array.get(o, i));
+				hash(Array.get(o, i));
 		}
-
-		return result;
+	}
+	
+	public int getHashCode() {
+		return mHash;
 	}
 
-	private static int mult(int seed) {
-		return PRIME * seed;
+	private int term() {
+		return PRIME * mHash;
 	}
 
 	private static final int PRIME = 37;

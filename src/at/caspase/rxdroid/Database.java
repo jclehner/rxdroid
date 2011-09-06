@@ -494,14 +494,13 @@ public class Database
 		@Override
 		public int hashCode()
 		{
-			int result = Hasher.SEED;
-
+			final Hasher hasher = new Hasher();
 			final Object[] thisMembers = this.getFieldValues();
 
 			for(Object o : thisMembers)
-				result = Hasher.hash(result, o);
+				hasher.hash(o);
 
-			return result;
+			return hasher.getHashCode();
 		}
 
 		@Override
@@ -615,14 +614,14 @@ public class Database
 		@Override
 		public int hashCode()
 		{
-			int result = Hasher.SEED;
+			final Hasher hasher = new Hasher();
 
-			result = Hasher.hash(result, drug);
-			result = Hasher.hash(result, date);
-			result = Hasher.hash(result, timestamp);
-			result = Hasher.hash(result, doseTime);
+			hasher.hash(drug);
+			hasher.hash(date);
+			hasher.hash(timestamp);
+			hasher.hash(doseTime);
 
-			return result;
+			return hasher.getHashCode();
 		}
 
 		@Override

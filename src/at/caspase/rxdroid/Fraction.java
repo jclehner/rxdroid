@@ -143,12 +143,12 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	@Override
 	public int hashCode()
 	{
-		int result = Hasher.SEED;
-
-		result = Hasher.hash(result, mNumerator);
-		result = Hasher.hash(result, mDenominator);
-
-		return result;
+		final Hasher hasher = new Hasher();
+		
+		hasher.hash(mNumerator);
+		hasher.hash(mDenominator);
+		
+		return hasher.getHashCode();
 	}
 
 	@Override
