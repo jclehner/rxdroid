@@ -2,17 +2,17 @@ package at.caspase.rxdroid.debug;
 
 import android.util.Log;
 import at.caspase.rxdroid.Database.Drug;
-import at.caspase.rxdroid.Settings;
+import at.caspase.rxdroid.Preferences;
 
 
 /**
  * Fake Settings class for debugging.
  * 
- * @see at.caspase.rxdroid.Settings
+ * @see at.caspase.rxdroid.Preferences
  * @author Joseph Lehner
  *
  */
-public class FakeSettings extends Settings
+public class FakeSettings extends Preferences
 {
 	static final String TAG = FakeSettings.class.getName();
 	static int sActiveDoseTime = Drug.TIME_MORNING;

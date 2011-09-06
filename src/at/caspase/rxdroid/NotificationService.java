@@ -91,7 +91,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		mIntent = new Intent(Intent.ACTION_VIEW);
 		mIntent.setClass(getApplicationContext(), DrugListActivity.class);
 
-		Settings.setContext(getApplicationContext());
+		Preferences.setContext(getApplicationContext());
 
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -259,7 +259,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 				boolean delayFirstNotification = true;
 
-				final Settings settings = Settings.instance();
+				final Preferences settings = Preferences.instance();
 				
 				try
 				{
@@ -587,7 +587,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		notification.icon = R.drawable.ic_stat_pill;
 		notification.tickerText = getString(R.string._msg_new_notification);
 		notification.flags |= Notification.FLAG_NO_CLEAR;
-		notification.defaults = Settings.instance().filterNotificationDefaults(defaults);
+		notification.defaults = Preferences.instance().filterNotificationDefaults(defaults);
 		notification.contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mIntent, 0);
 		notification.contentView = views;
 		if(notificationCount > 1)
@@ -609,7 +609,6 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	private void cancelNotification(int id) {
 		postNotification(id, 0, null);
 	}
-
 
 	private void cancelAllNotifications() {
 		cancelAllNotifications(true);

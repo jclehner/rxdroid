@@ -54,7 +54,6 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 	private String[] mConstraintTimePrefKeys = new String[2];
 
 	private DumbTime mTime;
-	private String mDefaultValue;
 
 	private SharedPreferences mPrefs;;
 
@@ -86,13 +85,10 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 				}
 			}
 		}
-
-		mDefaultValue = a.getString(R.styleable.TimePreference_defaultValue);
-		if(mDefaultValue == null)
-			mDefaultValue = DEFAULT_TIME;
+		
+		a.recycle();
 
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-		a.recycle();
 	}
 
 	@Override
@@ -141,10 +137,10 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 	{
 		super.onAttachedToActivity();
 
-		// getPersistedString returns null in the constructor, so we have to set the summary here
-		final String persisted = getPersistedString(mDefaultValue);
-		setSummary(persisted);
-		mTime = DumbTime.valueOf(persisted);
+		// FIXME this is hackish at best, but it works for now
+		final String value = Preferences.instance().getTimePreference(getKey()).toString();
+		setSummary(value);
+		mTime = DumbTime.valueOf(value);
 	}
 
 	@Override
@@ -157,7 +153,7 @@ public class TimePreference extends DialogPreference implements OnTimeSetListene
 			DumbTime time = mConstraintTimes[i];
 
 			if(time == null)
-				time = Settings.instance().getTimePreference(mConstraintTimePrefKeys[i]);
+				time = Preferences.instance().getTimePreference(mConstraintTimePrefKeys[i]);
 
 			if(i == IDX_AFTER)
 				mDialog.setConstraintAfter(time);

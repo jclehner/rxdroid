@@ -33,9 +33,9 @@ import at.caspase.rxdroid.debug.FakeSettings;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
-public class Settings
+public class Preferences
 {
-	private static final String TAG = Settings.class.getName();
+	private static final String TAG = Preferences.class.getName();
 
 	private static final String prefKeyPrefixes[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 	private static final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
@@ -43,15 +43,15 @@ public class Settings
 	private static Context sApplicationContext = null;
 	private static SharedPreferences sSharedPrefs = null;
 
-	private static Settings instance;
+	private static Preferences instance;
 	
-	public synchronized static Settings instance(Context context)
+	public synchronized static Preferences instance(Context context)
 	{
 		setContext(context.getApplicationContext());
 		return instance();
 	}
 	
-	public synchronized static Settings instance() 
+	public synchronized static Preferences instance() 
 	{
 		if(sApplicationContext == null)
 			throw new IllegalStateException("No Context available. Use setContext(Context) or instance(Context) instead.");
@@ -65,7 +65,7 @@ public class Settings
 			}
 			else
 			{
-				instance = new Settings();
+				instance = new Preferences();
 				Log.d(TAG, "Using Settings");
 			}
 		}		
@@ -201,8 +201,4 @@ public class Settings
 
 		return beginTime - DateTime.currentTimeMillis();
 	}
-
-
-
-
 }

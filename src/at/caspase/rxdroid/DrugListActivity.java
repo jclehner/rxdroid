@@ -119,7 +119,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		startNotificationService();
 		
-		Settings.setContext(getApplicationContext());
+		Preferences.setContext(getApplicationContext());
 
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		Database.registerOnChangedListener(this);
