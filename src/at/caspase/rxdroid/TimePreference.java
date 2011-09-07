@@ -21,227 +21,148 @@
 
 package at.caspase.rxdroid;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.content.res.TypedArray;
-import android.os.Bundle;
-import android.preference.DialogPreference;
-import android.preference.PreferenceManager;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.View;
 import android.widget.TimePicker;
 
-public class TimePreference extends DialogPreference implements OnTimeSetListener
+public class TimePreference extends Preference implements OnTimeSetListener, OnPreferenceClickListener
 {
+	@SuppressWarnings("unused")
 	private static final String TAG = TimePreference.class.getName();
-	private static final String DEFAULT_TIME = "00:00";
-
-	private static final int IDX_AFTER = 0;
-	private static final int IDX_BEFORE = 1;
-
-	private MyTimePickerDialog mDialog;
-
-	private DumbTime[] mConstraintTimes = new DumbTime[2];
-	private String[] mConstraintTimePrefKeys = new String[2];
-
+	
+	private String mDefaultValue;
 	private DumbTime mTime;
-
-	private SharedPreferences mPrefs;;
-
+	
+	private DumbTime[] mConstraintTimes = new DumbTime[2];
+	private String[] mConstraintKeys = new String[2];
+	
 	public TimePreference(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
-	public TimePreference(Context context, AttributeSet attrs, int defStyle)
+	public TimePreference(Context context, AttributeSet attrs, int defStyle) 
 	{
 		super(context, attrs, defStyle);
-
-		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TimePreference, defStyle, 0);
-
-		final int[] attrIds = { R.styleable.TimePreference_after, R.styleable.TimePreference_before };
-
-		for(int i = 0; i != 2; ++i)
+				
+		mDefaultValue = getStringAttribute(context, attrs, NS_ANDROID, "defaultValue", "00:00");		
+				
+		final String[] attributeNames = { "after", "before" };
+		
+		for(int i = 0; i != attributeNames.length; ++i)
 		{
-			final String value = a.getString(attrIds[i]);
-
-			if(value != null)
+			String value = attrs.getAttributeValue(NS_PREF, attributeNames[i]);
+			try
 			{
-				try
-				{
-					mConstraintTimes[i] = DumbTime.valueOf(value);
-				}
-				catch(IllegalArgumentException e)
-				{
-					mConstraintTimePrefKeys[i] = value;
-				}
+				mConstraintTimes[i] = DumbTime.valueOf(value);
 			}
+			catch(IllegalArgumentException e)
+			{
+				mConstraintKeys[i] = value;
+			}			
 		}
 		
-		a.recycle();
-
-		mPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+		setOnPreferenceClickListener(this);		
+		updateTime();
+	}
+	
+	@Override
+	public CharSequence getSummary() {
+		return mTime == null ? null : mTime.toString();
 	}
 
 	@Override
-	public Dialog getDialog() {
-		return mDialog;
+	public boolean onPreferenceClick(Preference preference)
+	{
+		showDialog();
+		return true;
 	}
 
 	@Override
 	public void onTimeSet(TimePicker view, int hourOfDay, int minute)
 	{
-		// FIXME
-		if(!mDialog.checkConstraints(hourOfDay, minute))
-		{
-			AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-			builder.setTitle(R.string._title_error);
-			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setMessage(R.string._msg_timepreference_constraint_failed);
-			builder.setNeutralButton(android.R.string.ok, new OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					if(which == Dialog.BUTTON_NEUTRAL)
-						showDialog(null);
-				}
-			});
-			builder.show();
-		}
-		else
-		{
-			final DumbTime time = new DumbTime(hourOfDay, minute, 0);
-
-			final String timeString = time.toString();
-			mTime = time;
-			//persistString(timeString);
-			setSummary(timeString);
-
-			Editor editor = mPrefs.edit();
-			editor.putString(getKey(), timeString);
-			editor.commit();
-		}
+		mTime = new DumbTime(hourOfDay, minute);
+		
+		if(shouldPersist())
+			persistString(mTime.toString());
+		
+		notifyChanged();		
 	}
-
-	@Override
-	protected void onAttachedToActivity()
+	
+	private void showDialog()
 	{
-		super.onAttachedToActivity();
-
-		// FIXME this is hackish at best, but it works for now
-		final String value = Preferences.instance().getTimePreference(getKey()).toString();
-		setSummary(value);
-		mTime = DumbTime.valueOf(value);
+		updateTime();
+		
+		final boolean is24HourView = DateFormat.is24HourFormat(getContext());
+		TimePickerDialog dialog = new TimePickerDialog(getContext(), this, mTime.getHours(), mTime.getMinutes(), is24HourView);
+		
+		dialog.setMessage(generateDialogMessage());		
+		dialog.show();
 	}
-
-	@Override
-	protected void showDialog(Bundle state)
+	
+	private String generateDialogMessage()
 	{
-		mDialog = new MyTimePickerDialog(getContext(), this, mTime.getHours(), mTime.getMinutes(), DateFormat.is24HourFormat(getContext()));
+		int msgId = -1;
 
-		for(int i = 0; i != 2; ++i)
-		{
-			DumbTime time = mConstraintTimes[i];
+		DumbTime after = getConstraint(IDX_AFTER);
+		DumbTime before = getConstraint(IDX_BEFORE);
+		
+		if(after != null && before != null)
+			msgId = R.string._msg_constraints_ab;
+		else if(after != null)
+			msgId = R.string._msg_constraints_a;
+		else if(before != null)
+			msgId = R.string._msg_constraints_b;
 
-			if(time == null)
-				time = Preferences.instance().getTimePreference(mConstraintTimePrefKeys[i]);
-
-			if(i == IDX_AFTER)
-				mDialog.setConstraintAfter(time);
-			else if(i == IDX_BEFORE)
-				mDialog.setConstraintBefore(time);
-			else
-				throw new RuntimeException();
-		}
-		mDialog.show();
+		if(msgId == -1)
+			return null;
+		
+		return getContext().getString(msgId, after, before);		
 	}
-
-	@Override
-	protected View onCreateDialogView() {
+	
+	private DumbTime getConstraint(int index)
+	{
+		if(mConstraintTimes[index] != null)
+			return mConstraintTimes[index];
+		
+		final String key = mConstraintKeys[index];
+		if(key != null)
+		{
+			final TimePreference constraintPref = (TimePreference) findPreferenceInHierarchy(key);
+			if(constraintPref == null)
+				throw new IllegalStateException("No such TimePreference: " + key);
+			
+			return constraintPref.mTime;
+		}
+		
 		return null;
 	}
-
-	private static class MyTimePickerDialog extends TimePickerDialog
-	{
-		private DumbTime mAfter = null;
-		private DumbTime mBefore = null;
-
-		public MyTimePickerDialog(Context context, int theme, OnTimeSetListener callBack, int hourOfDay, int minute, boolean is24HourView) {
-			super(context, theme, callBack, hourOfDay, minute, is24HourView);
-		}
-
-		public MyTimePickerDialog(Context context, OnTimeSetListener callBack, int hourOfDay, int minute, boolean is24HourView) {
-			super(context, callBack, hourOfDay, minute, is24HourView);
-		}
-
-		public void setConstraintAfter(DumbTime after)
-		{
-			mAfter = after;
-			updateMessage();
-		}
-
-		public void setConstraintBefore(DumbTime before)
-		{
-			mBefore = before;
-			updateMessage();
-		}
-
-		@Override
-		public void onTimeChanged(TimePicker view, int hourOfDay, int minute)
-		{
-			Log.d(TAG, "onTimeChanged");
-
-			if(checkConstraints(hourOfDay, minute))
-				super.onTimeChanged(view, hourOfDay, minute);
-		}
-
-		@Override
-		public void onClick(DialogInterface dialog, int which)
-		{
-			Log.d(TAG, "onClick");
-			super.onClick(dialog, which);
-		}
-
-		public boolean checkConstraints(int hourOfDay, int minute)
-		{
-			final DumbTime time = new DumbTime(hourOfDay, minute);
-
-			boolean isValid;
-
-			if((mAfter != null && !time.after(mAfter)) || (mBefore != null && !time.before(mBefore)))
-				isValid = false;
-			else
-				isValid = true;
-
-			getButton(BUTTON_POSITIVE).setEnabled(isValid);
-
-			return isValid;
-		}
-
-		private void updateMessage()
-		{
-			int msgId = -1;
-
-			if(mAfter != null && mBefore != null)
-				msgId = R.string._msg_constraints_ab;
-			else if(mAfter != null)
-				msgId = R.string._msg_constraints_a;
-			else if(mBefore != null)
-				msgId = R.string._msg_constraints_b;
-
-			if(msgId != -1)
-				setMessage(getContext().getString(msgId, mAfter, mBefore));
-			else
-				setMessage(null);
-		}
+	
+	private void updateTime() {
+		mTime = DumbTime.valueOf(getPersistedString(mDefaultValue));
 	}
+	
+	private static String getStringAttribute(Context context, AttributeSet attrs, String namespace, String attribute, String defaultValue)
+	{
+		int resId = attrs.getAttributeResourceValue(namespace, attribute, -1);
+		String value;
+		
+		if(resId == -1)
+			value = attrs.getAttributeValue(namespace, attribute);
+		else
+			value = context.getString(resId);
+		
+		return value == null ? defaultValue : value;		
+	}
+	
+	private static final String NS_BASE = "http://schemas.android.com/apk/res/";
+	private static final String NS_ANDROID = NS_BASE + "android";
+	private static final String NS_PREF = NS_BASE + TimePreference.class.getPackage().getName();
+	
+	private static final int IDX_AFTER = 0;
+	private static final int IDX_BEFORE = 1;
 }

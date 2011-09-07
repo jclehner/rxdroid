@@ -11,6 +11,5 @@
     <declare-styleable name="TimePreference">
     	<attr name="before" format="string" />
     	<attr name="after" format="string" />
-    	<attr name="defaultValue" format="string|reference" />
     </declare-styleable>    
 </resources>
