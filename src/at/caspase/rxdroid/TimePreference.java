@@ -32,6 +32,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.widget.TimePicker;
+import at.caspase.rxdroid.util.Util;
 
 public class TimePreference extends Preference implements OnTimeSetListener, OnPreferenceClickListener
 {
@@ -52,7 +53,7 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	{
 		super(context, attrs, defStyle);
 				
-		mDefaultValue = getStringAttribute(context, attrs, NS_ANDROID, "defaultValue", "00:00");		
+		mDefaultValue = Util.getStringAttribute(context, attrs, NS_ANDROID, "defaultValue", "00:00");		
 				
 		final String[] attributeNames = { "after", "before" };
 		
@@ -174,19 +175,6 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 		DumbTime before = getConstraint(IDX_BEFORE);
 		
 		return mTime.after(after) && mTime.before(before);		
-	}
-	
-	private static String getStringAttribute(Context context, AttributeSet attrs, String namespace, String attribute, String defaultValue)
-	{
-		int resId = attrs.getAttributeResourceValue(namespace, attribute, -1);
-		String value;
-		
-		if(resId == -1)
-			value = attrs.getAttributeValue(namespace, attribute);
-		else
-			value = context.getString(resId);
-		
-		return value == null ? defaultValue : value;		
 	}
 	
 	private static final String NS_BASE = "http://schemas.android.com/apk/res/";
