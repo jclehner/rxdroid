@@ -81,28 +81,22 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 		mDoseText = (TextView) findViewById(R.id.text_dose);
 		mDoseTimeIcon = (ImageView) findViewById(R.id.icon_dose_time);
 
-		String hint = null;
-
 		switch(getId())
 		{
 			case R.id.morning:
 				setDoseTime(Database.Drug.TIME_MORNING);
-				hint = "Morning";
 				break;
 
 			case R.id.noon:
 				setDoseTime(Database.Drug.TIME_NOON);
-				hint = "Noon";
 				break;
 
 			case R.id.evening:
 				setDoseTime(Database.Drug.TIME_EVENING);
-				hint = "Evening";
 				break;
 
 			case R.id.night:
 				setDoseTime(Database.Drug.TIME_NIGHT);
-				hint = "Night";
 				break;
 
 			default:
@@ -111,7 +105,6 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 
 		setBackgroundResource(R.drawable.doseview_background);
 
-		mDoseText.setHint(hint);
 		mDoseText.setText("0");
 
 		setClickable(true);
@@ -129,7 +122,9 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 			throw new IllegalArgumentException();
 
 		final int drawableIds[] = { R.drawable.ic_morning, R.drawable.ic_noon, R.drawable.ic_evening, R.drawable.ic_night };
-
+		final String[] hints = { "Morning", "Noon", "Evening", "Night" };
+		
+		mDoseText.setHint(hints[doseTime]);
 		mDoseTimeIcon.setImageResource(drawableIds[doseTime]);
 		mDoseTime = doseTime;
 	}
@@ -278,7 +273,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 	{
 		if(mDate == null || mIntakeDao == null)
 			return;
-
+		
 		if(checkDbForIntake)
 		{
 			final int intakeCount = getIntakes().size();
@@ -291,7 +286,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 
 		final Date end = new Date(mDate.getTime() + Preferences.instance().getDoseTimeEndOffset(mDoseTime));
 
-		if(!mDoseText.getText().equals("0") && DateTime.now().compareTo(end) != -1)
+		if(mDrug.isActive() && !mDoseText.getText().equals("0") && DateTime.now().compareTo(end) != -1)
 			mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
 		else
 			mIntakeStatus.setImageDrawable(null);

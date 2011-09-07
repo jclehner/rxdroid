@@ -26,9 +26,10 @@ import java.sql.Time;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.util.Log;
+import at.caspase.rxdroid.Database.Drug;
 
 
 public class PreferencesActivity extends PreferenceActivity implements OnPreferenceChangeListener
@@ -44,6 +45,8 @@ public class PreferencesActivity extends PreferenceActivity implements OnPrefere
 
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
 		addPreferencesFromResource(R.xml.preferences);
+		
+		((DosePreference) findPreference("morning")).setDrug(new Drug());
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public final class DateTime
@@ -40,6 +41,14 @@ public final class DateTime
 
 		return new Date(today.getTime());
 	}
+	
+	public static Time now() {
+		return new Time(currentTimeMillis());
+	}
+	
+	public static GregorianCalendar calendarFromDate(Date date) {
+		return new GregorianCalendar(date.getYear(), date.getMonth(), date.getDay());
+	}
 
 	public static String toString(Time time)
 	{
@@ -51,10 +60,6 @@ public final class DateTime
 
 	public static long getOffsetFromMidnight(Date today) {
 		return now().getTime() - today.getTime();
-	}
-
-	public static Time now() {
-		return new Time(currentTimeMillis());
 	}
 
 	public static long currentTimeMillis()

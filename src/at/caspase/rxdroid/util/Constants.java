@@ -21,9 +21,21 @@
 
 package at.caspase.rxdroid.util;
 
+import java.util.Calendar;
+
 public final class Constants
 {
 	public static final long MILLIS_PER_DAY = 24L * 3600 * 1000;
 	public static final String NOTIFICATION_BULLET = "\u2022 ";
 	public static final long NOTIFICATION_INITIAL_DELAY = 10000;
+	
+	public static final int[] WEEK_DAYS = {
+			Calendar.MONDAY, 
+			Calendar.TUESDAY, 
+			Calendar.WEDNESDAY, 
+			Calendar.THURSDAY,
+			Calendar.FRIDAY,
+			Calendar.SATURDAY,
+			Calendar.SUNDAY			
+	};
 }

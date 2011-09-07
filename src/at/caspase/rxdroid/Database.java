@@ -26,12 +26,15 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import at.caspase.rxdroid.util.Constants;
+import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
@@ -350,9 +353,22 @@ public class Database
 		@DatabaseField(dataType = DataType.SERIALIZABLE)
 		private Fraction doseWholeDay = new Fraction();
 		
-		@DatabaseField(canBeNull = true)
+		@DatabaseField(canBeNull = true, useGetSet = true)
 		private int frequency = FREQ_DAILY;
 		
+		/**
+		 * Defines the frequency origin.
+		 * 
+		 * For every frequency other than {@link #FREQ_DAILY}, this field holds a specific value,
+		 * allowing {@link #hasDoseOnDate(Date)} to determine whether a dose is pending
+		 * on a specific date.
+		 * 
+		 * <ul>
+		 * 	<li><code>FREQ_EVERY_OTHER_DAY</code>: field is set to a date (in milliseconds) where this drug's
+		 * 		intake should be set, i.e. if the date corresponds to 2011-09-07, there's an intake on that day,
+		 * 		another one on 2011-09-09, and so forth.</li>
+		 * 	<li><code>FREQ_WEEKLY</code>: field is set to a week day value from {@link java.util.Calendar}.</li> 
+		 */
 		@DatabaseField(canBeNull = true)
 		private long frequencyArg = 0;
 
@@ -363,8 +379,21 @@ public class Database
 
 		public boolean hasDoseOnDate(Date date)
 		{
-			// FIXME 
-			return true;
+			if(frequency == FREQ_DAILY)
+				return true;
+			
+			if(frequency == FREQ_EVERY_OTHER_DAY)
+			{
+				final long diffDays = Math.abs(frequencyArg - date.getTime()) / Constants.MILLIS_PER_DAY;				
+				return diffDays % 2 == 0;
+			}
+			else if(frequency == FREQ_WEEKLY)
+			{
+				Calendar calendar = DateTime.calendarFromDate(date);
+				return calendar.get(Calendar.DAY_OF_WEEK) == frequencyArg;
+			}
+			
+			throw new AssertionError("WTF");
 		}
 		
 		public String getName() {
@@ -393,6 +422,14 @@ public class Database
 
 				// FIXME
 			}
+		}
+		
+		public int getFrequency() {
+			return frequency;
+		}
+		
+		public long getFrequencyArg() {
+			return frequencyArg;
 		}
 
 		public boolean isActive() {
@@ -437,6 +474,17 @@ public class Database
 			if(form > FORM_OTHER)
 				throw new IllegalArgumentException();
 			this.form = form;
+		}
+		
+		public void setFrequency(int frequency)
+		{
+			if(frequency > FREQ_WEEKLY)
+				throw new IllegalArgumentException();
+			this.frequency = frequency;
+		}
+		
+		public void setFrequencyArg(long frequencyArg) {
+			this.frequencyArg = frequencyArg;
 		}
 
 		public void setActive(boolean active) {

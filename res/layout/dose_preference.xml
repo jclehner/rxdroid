@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@android:id/widget_frame"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+>
+  	
+  	<!-- 
+  
+  	<LinearLayout
+  		android:layout_height="wrap_content"
+  		android:layout_width="wrap_content"
+  		android:gravity="center_vertical"
+  		android:orientation="vertical"
+  		
+  		android:layout_alignTop="@+id/morning"
+  		android:layout_alignBottom="@+id/morning" 
+  	>
+  	
+	  	<TextView android:id="@android:id/title" 
+	  		android:layout_width="match_parent"
+	  		android:layout_height="wrap_content"	  			
+	  		
+	  		android:textAppearance="?android:attr/textAppearanceMedium"
+	  		android:gravity="center_vertical"
+	  		
+	  		android:text="Morning"	  		
+	  	/>
+	  	
+	  	<TextView android:id="@android:id/summary"
+	  		android:layout_width="match_parent"
+	  		android:layout_height="wrap_content"
+	  		
+	  		android:text="Summary"
+	  	/>  	
+  	</LinearLayout>
+  	
+  	 -->
+  		
+  	<at.caspase.rxdroid.DoseView android:id="@+id/morning" 
+  		android:layout_width="wrap_content"
+  		android:layout_height="wrap_content"
+  	/>
+</LinearLayout>

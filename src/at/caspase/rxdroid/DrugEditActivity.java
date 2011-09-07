@@ -22,25 +22,30 @@
 package at.caspase.rxdroid;
 
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Date;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.DialogInterface.OnClickListener;
+import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.EditFraction.FractionPickerDialog;
+import at.caspase.rxdroid.util.Constants;
+import at.caspase.rxdroid.util.DateTime;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import com.j256.ormlite.dao.Dao;
@@ -53,7 +58,7 @@ import com.j256.ormlite.stmt.Where;
  *
  */
 
-public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> implements TextWatcher, View.OnClickListener
+public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> implements OnItemSelectedListener, View.OnClickListener
 {
 	public static final String EXTRA_DRUG = "drug";
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
@@ -62,14 +67,14 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 	private EditText mTextName;
 	private DoseView[] mDoses;
+	private Spinner mFrequencyChooser;
 	private EditText mTextCurrentSupply;
 	private EditText mTextRefillSize;
 	private Spinner mDrugFormChooser;
-	private int mDrugForm;
 	private CheckBox mIsActive;
-
-	// indicates whether a change was made to the drug we're editing
-	private boolean mChanged = false;
+	
+	private int mFrequency = Drug.FREQ_DAILY;
+	private long mFrequencyArg = 0;
 
 	private Dao<Database.Drug, Integer> mDao;
 	private Database.Drug mDrug;
@@ -86,34 +91,13 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		Log.d(TAG, "onCreate: setContentView: " + t);
 
 		mTextName = (EditText) findViewById(R.id.drug_name);
+		mFrequencyChooser = (Spinner) findViewById(R.id.drug_frequency_chooser);
 		mTextCurrentSupply = (EditText) findViewById(R.id.current_supply);
 		mTextRefillSize = (EditText) findViewById(R.id.refill_size);
 		mDrugFormChooser = (Spinner) findViewById(R.id.drug_form_chooser);
 		mIsActive = (CheckBox) findViewById(R.id.drug_active);
-
-		mTextName.addTextChangedListener(this);
-		mTextCurrentSupply.addTextChangedListener(this);
-		mTextRefillSize.addTextChangedListener(this);
-
-		final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				this, R.array.drug_forms, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-		mDrugFormChooser.setAdapter(adapter);
-		mDrugFormChooser.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				mDrugForm = position;
-				mChanged = true;
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-				mDrugForm = Drug.FORM_TABLET;
-			}
-		});
-
+				
+		mFrequencyChooser.setOnItemSelectedListener(this);		
 		mDoses = new DoseView[4];
 
 		final int[] viewIds = { R.id.morning, R.id.noon, R.id.evening, R.id.night };
@@ -121,7 +105,6 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		for(int i = 0; i != viewIds.length; ++i)
 		{
 			mDoses[i] = (DoseView) findViewById(viewIds[i]);
-			mDoses[i].addTextChangedListener(this);
 			mDoses[i].setOnClickListener(this);
 		}
 
@@ -144,22 +127,27 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG!");
 
 			mTextName.setText(mDrug.getName());
-
+			mFrequencyChooser.setSelection(mDrug.getFrequency());
 			mTextCurrentSupply.setText(mDrug.getCurrentSupply().toString());
 			mTextRefillSize.setText(Integer.toString(mDrug.getRefillSize()));
 			mIsActive.setChecked(mDrug.isActive());
 			mDrugFormChooser.setSelection(mDrug.getForm());
+			
+			mFrequency = mDrug.getFrequency();
+			mFrequencyArg = mDrug.getFrequencyArg();
 
 			final boolean focusOnCurrentSupply = intent.getBooleanExtra(EXTRA_FOCUS_ON_CURRENT_SUPPLY, false);
 			if(focusOnCurrentSupply)
 				mTextCurrentSupply.requestFocus();
 
 			setTitle("Edit " + mDrug.getName());
+			mTextName.clearFocus();
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
 		{
 			findViewById(R.id.delete_drug).setVisibility(View.GONE);
 			setTitle("Add new drug");
+			mTextName.requestFocus();
 		}
 		else
 			throw new RuntimeException("Unexpected intent action: " + action);
@@ -169,9 +157,6 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			if(mDrug != null)
 				v.setDrug(mDrug);
 		}
-
-		mChanged = false;
-		Log.d(TAG, "onResume: setting mChanged to false");
 	}
 
 	@Override
@@ -188,10 +173,17 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		if(!verifyDrugName())
 			return;
 
-		mDrug.setForm(Database.Drug.FORM_TABLET);
+		int selection = mDrugFormChooser.getSelectedItemPosition();
+		if(selection != Spinner.INVALID_POSITION)
+			mDrug.setForm(selection);
+		else
+			mDrug.setForm(Drug.FORM_TABLET);
+		
+		mDrug.setFrequency(mFrequency);
+		mDrug.setFrequencyArg(mFrequencyArg);
+		
 		mDrug.setCurrentSupply(Fraction.decode(mTextCurrentSupply.getText().toString()));
 		mDrug.setRefillSize(Integer.parseInt(mTextRefillSize.getText().toString(), 10));
-		mDrug.setForm(mDrugForm);
 		mDrug.setActive(mIsActive.isChecked());
 
 		for(DoseView v : mDoses)
@@ -267,23 +259,80 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	}
 
 	@Override
-	public void afterTextChanged(Editable arg0)
-	{
-		mChanged = true;
-		Log.d(TAG, "onTextChanged: arg0=" + arg0.toString());
-	}
-
-	@Override
-	public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {}
-
-	@Override
-	public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {}
-
-	@Override
 	public void onClick(View v)
 	{
 		FractionPickerDialog dialog = new FractionPickerDialog(this, ((DoseView) v).getTextView());
 		dialog.show();
+	}	
+
+
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+	{	
+		if(mFrequency == position)
+		{
+			Log.d(TAG, "onItemSelected: IDs match, ignoring selection");
+			return;
+		}
+		
+		mFrequency = position;
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		
+		switch(position)
+		{
+			case Drug.FREQ_EVERY_OTHER_DAY:
+				initFrequencyEveryOtherDayDialog(builder);
+				break;
+				
+			case Drug.FREQ_WEEKLY:
+				initFrequencyWeeklyDialog(builder);
+				break;
+				
+			default:
+				return;
+		}
+		
+		builder.show();		
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> parent) {
+		mFrequency = Drug.FREQ_DAILY;
+	}
+	
+	private void initFrequencyEveryOtherDayDialog(AlertDialog.Builder builder) 
+	{
+		builder.setTitle("Select a starting day");
+		builder.setItems(R.array.frequency_every_other_day, new OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				Date today = DateTime.today();
+				
+				if(which == 0)
+					mFrequencyArg = today.getTime();
+				else
+					mFrequencyArg = today.getTime() + Constants.MILLIS_PER_DAY;
+			}
+		});
+	}
+	
+	private void initFrequencyWeeklyDialog(AlertDialog.Builder builder)
+	{
+		final String[] weekDayNames = new String[Constants.WEEK_DAYS.length];		
+		
+		for(int i = 0; i != weekDayNames.length; ++i)
+			weekDayNames[i] = DateUtils.getDayOfWeekString(Constants.WEEK_DAYS[i], DateUtils.LENGTH_LONG);
+		
+		builder.setItems(weekDayNames, new OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				mFrequencyArg = Constants.WEEK_DAYS[which];				
+			}
+		});
 	}
 
 	private boolean isUniqueDrugName(String name)
@@ -326,7 +375,6 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 				mDrug.setName(name);
 				return true;
 			}
-
 		}
 		else
 		{
@@ -340,10 +388,4 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		return false;
 	}
-
-
-
-
-
-
 }

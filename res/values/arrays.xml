@@ -7,5 +7,16 @@
     	<item>Drop</item>
     	<item>Gel</item>
     	<item>Other</item>
-    </string-array>    
+    </string-array>
+    
+    <string-array name="drug_frequency">
+    	<item>Daily</item>
+    	<item>Every other day</item>
+    	<item>Weekly</item>
+    </string-array>
+    
+    <string-array name="frequency_every_other_day">
+    	<item>Today</item>
+    	<item>Tomorrow</item>
+    </string-array>
 </resources>

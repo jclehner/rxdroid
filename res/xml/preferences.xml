@@ -132,5 +132,9 @@
 	
 	</PreferenceScreen>
 	
+	<PreferenceCategory android:title="Testing">
+		<at.caspase.rxdroid.DosePreference android:key="morning" android:title="Morning" android:summary="06:00 - 10:00"/>	
+	</PreferenceCategory>
+	
 	
 </PreferenceScreen>
