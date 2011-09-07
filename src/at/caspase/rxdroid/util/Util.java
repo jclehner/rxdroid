@@ -73,8 +73,7 @@ public final class Util
 	 * @param attribute The name of the attribute to query.
 	 * @param defaultValue A default value, in case there's no such attribute.
 	 * @return The attribute's value, or <code>null</code> if it does not exist.
-	 */
-	
+	 */	
 	public static String getStringAttribute(Context context, AttributeSet attrs, String namespace, String attribute, String defaultValue)
 	{
 		int resId = attrs.getAttributeResourceValue(namespace, attribute, -1);

@@ -182,6 +182,8 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		if(mDrug == null)
 			mDrug = new Database.Drug();
+		
+		final int oldHash = mDrug.hashCode();
 
 		if(!verifyDrugName())
 			return;
@@ -194,10 +196,12 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		for(DoseView v : mDoses)
 			mDrug.setDose(v.getDoseTime(), v.getDose());
+		
+		final int newHash = mDrug.hashCode();
 
 		if(Intent.ACTION_EDIT.equals(action))
 		{
-			if(mChanged)
+			if(oldHash != newHash)
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle("Save changes");
@@ -211,7 +215,6 @@ public class DrugEditActivity extends OrmLiteBaseActivity<Database.Helper> imple
 					{
 						if(which == AlertDialog.BUTTON_POSITIVE)
 						{
-							Log.d(TAG, "saving drug: " + mDrug);
 							Database.update(mDao, mDrug);
 							setResult(RESULT_OK);
 							Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
