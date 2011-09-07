@@ -21,9 +21,12 @@
 
 package at.caspase.rxdroid;
 
+import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.text.format.DateFormat;
@@ -78,7 +81,7 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	@Override
 	public boolean onPreferenceClick(Preference preference)
 	{
-		showDialog();
+		showTimePicker();
 		return true;
 	}
 
@@ -87,13 +90,32 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	{
 		mTime = new DumbTime(hourOfDay, minute);
 		
-		if(shouldPersist())
-			persistString(mTime.toString());
-		
-		notifyChanged();		
+		if(!isTimeWithinConstraints())
+		{
+			AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+			builder.setIcon(android.R.drawable.ic_dialog_alert);
+			builder.setTitle(R.string._title_error);
+			builder.setMessage(R.string._msg_timepreference_constraint_failed);
+			builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					showTimePicker();					
+				}
+			});
+			builder.show();
+		}
+		else
+		{
+			if(shouldPersist())
+				persistString(mTime.toString());
+			
+			notifyChanged();
+		}
 	}
 	
-	private void showDialog()
+	private void showTimePicker()
 	{
 		updateTime();
 		
@@ -144,6 +166,14 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	
 	private void updateTime() {
 		mTime = DumbTime.valueOf(getPersistedString(mDefaultValue));
+	}
+	
+	private boolean isTimeWithinConstraints()
+	{
+		DumbTime after = getConstraint(IDX_AFTER);
+		DumbTime before = getConstraint(IDX_BEFORE);
+		
+		return mTime.after(after) && mTime.before(before);		
 	}
 	
 	private static String getStringAttribute(Context context, AttributeSet attrs, String namespace, String attribute, String defaultValue)

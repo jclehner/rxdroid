@@ -34,13 +34,19 @@
 	<string name="_msg_constraints_a">Select a time after %1$s.</string>
 	<string name="_msg_constraints_b">Select a time before %2$s.</string>
 	
-	<string name="_msg_warning_svc_not_running">It appears that the notification service was not running. 
+	
+    
+    <!--  Dialogs: Errors -->    
+    <string name="_title_error">Error</string>    
+	<string name="_msg_timepreference_constraint_failed">Time is not within specified bounds.</string>
+    
+    <!--  Dialogs: Warnings -->
+	<string name="_title_warning">Warning</string>       
+    <string name="_msg_warning_svc_not_running">It appears that the notification service was not running. 
 			If this is the first time that you\'ve started this app, this is perfectly normal; if not, the service
 			might have crashed, or was stopped through other means (e.g. task killers). Be aware that you may have
 			missed intakes due to the service not being active.</string>
     
-    <string name="_title_warning">Warning</string>       
-    <string name="_title_error">Error</string>
     <string name="_title_preferences">Preferences</string>
     
     <string name="_title_prefscreen_times">Times</string>
@@ -58,6 +64,6 @@
     <string name="_title_pref_use_sound">Sound</string>
     <string name="_title_pref_use_vibrator">Vibration</string>    
     
-    <string name="_msg_timepreference_constraint_failed">Time is not within specified bounds.</string>
+    
     <string name="_Snooze_time">Snooze time</string>
 </resources>
