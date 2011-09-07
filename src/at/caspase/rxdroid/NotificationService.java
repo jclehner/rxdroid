@@ -393,7 +393,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			{
 				final List<Intake> intakes = Database.findIntakes(mIntakeDao, drug, date, doseTime);
 
-				if(drug.getDose(doseTime).compareTo(0) != 0 && intakes.size() == 0)
+				if(intakes.isEmpty() && drug.hasDoseOnDate(date) && drug.getDose(doseTime).compareTo(0) != 0)
 				{
 					Log.d(TAG, "getAllOpenIntakes: adding " + drug);
 					openIntakes.add(new Intake(drug, date, doseTime));

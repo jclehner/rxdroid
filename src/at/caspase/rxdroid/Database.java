@@ -31,6 +31,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import at.caspase.rxdroid.util.Hasher;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
@@ -311,6 +312,10 @@ public class Database
 		public static final int TIME_EVENING = 2;
 		public static final int TIME_NIGHT = 3;
 		public static final int TIME_WHOLE_DAY = 4;
+		
+		public static final int FREQ_DAILY = 0;
+		public static final int FREQ_EVERY_OTHER_DAY = 1;
+		public static final int FREQ_WEEKLY = 2;
 
 		public static final String COLUMN_NAME = "name";
 
@@ -344,12 +349,24 @@ public class Database
 
 		@DatabaseField(dataType = DataType.SERIALIZABLE)
 		private Fraction doseWholeDay = new Fraction();
+		
+		@DatabaseField(canBeNull = true)
+		private int frequency = FREQ_DAILY;
+		
+		@DatabaseField(canBeNull = true)
+		private long frequencyArg = 0;
 
 		@DatabaseField(canBeNull = true)
 		private String comment;
 
 		public Drug() {}
 
+		public boolean hasDoseOnDate(Date date)
+		{
+			// FIXME 
+			return true;
+		}
+		
 		public String getName() {
 			return name;
 		}
@@ -421,7 +438,6 @@ public class Database
 				throw new IllegalArgumentException();
 			this.form = form;
 		}
-
 
 		public void setActive(boolean active) {
 			this.active = active;
@@ -529,6 +545,8 @@ public class Database
 				this.doseNight,
 				this.currentSupply,
 				this.refillSize,
+				this.frequency,
+				this.frequencyArg,
 				this.comment
 			};
 
@@ -665,7 +683,7 @@ public class Database
 	public static class Helper extends OrmLiteSqliteOpenHelper
 	{
 		private static final String DB_NAME = "db.sqlite";
-		private static final int DB_VERSION = 39;
+		private static final int DB_VERSION = 41;
 
 		private Dao<Database.Drug, Integer> mDrugDao = null;
 		private Dao<Database.Intake, Integer> mIntakeDao = null;
@@ -699,7 +717,7 @@ public class Database
 			}
 			catch (SQLException e)
 			{
-				throw new RuntimeException("Error while deleting tables", e);
+				Log.w(TAG, "onUpgrade", e);
 			}
 		}
 
@@ -773,4 +791,3 @@ public class Database
 		public void onDatabaseDropped();
 	}
 }
-
