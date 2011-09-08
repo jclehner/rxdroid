@@ -133,7 +133,8 @@
 	</PreferenceScreen>
 	
 	<PreferenceCategory android:title="Testing">
-		<at.caspase.rxdroid.DosePreference android:key="morning" android:title="Morning" android:summary="06:00 - 10:00"/>	
+		<at.caspase.rxdroid.DosePreference android:key="morning" android:title="Morning" android:summary="06:00 - 10:00"/>
+		<at.caspase.rxdroid.FractionPreference android:key="fraction" android:title="Fraction" android:summary="1 1/4" />
 	</PreferenceCategory>
 	
 	

@@ -55,6 +55,13 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	public Fraction() {}
 
 	/**
+	 * Copy constructor.
+	 */
+	public Fraction(Fraction other) {
+		this(other.mNumerator, other.mDenominator);		
+	}
+	
+	/**
 	 * Construct a fraction from a whole number.
 	 */
 	public Fraction(int wholeNum) {
@@ -124,6 +131,24 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	 */
 	public Fraction negate() {
 		return new Fraction(-mNumerator, mDenominator);
+	}
+	
+	/**
+	 * Gets the raw fraction data.
+	 * 
+	 * @param returnAsMixedNumber
+	 * @return an <code>int[]</code> with the values <code>{ wholeNum, numerator, denominator }</code>, where <code>wholeNum</code> will
+	 * 	be zero if <code>returnAsMixedNumber</code> is <code>true</code>
+	 */
+	public int[] getFractionData(boolean returnAsMixedNumber)
+	{
+		if(!returnAsMixedNumber)
+			return new int[] { 0, mNumerator, mDenominator };
+		
+		int wholeNum = mNumerator / mDenominator;
+		int numerator = Math.abs(mNumerator % mDenominator);
+		
+		return new int[] { wholeNum, numerator, mDenominator };
 	}
 
 	@Override
