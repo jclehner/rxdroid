@@ -59,7 +59,6 @@ import com.j256.ormlite.table.TableUtils;
  */
 public class Database
 {
-	@SuppressWarnings("unused")
 	private static final String TAG = Database.class.getName();
 
 	private static HashSet<OnDatabaseChangedListener> sWatchers = new HashSet<OnDatabaseChangedListener>();

@@ -108,7 +108,7 @@ public class EditFraction extends EditText implements OnTouchListener
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		requestFocus();
+		//requestFocus();
 		mDialog.show();
 		return true;
 	}
@@ -119,7 +119,7 @@ public class EditFraction extends EditText implements OnTouchListener
 		{
 			mDialog = new FractionPickerDialog(context, this);
 			setHint(null);
-
+			
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(getWindowToken(), 0);
 			setInputType(InputType.TYPE_NULL);

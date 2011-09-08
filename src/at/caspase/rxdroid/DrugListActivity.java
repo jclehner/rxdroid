@@ -191,43 +191,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 				return true;
 			}
-			case MENU_DELETE:
-			{
-				//getHelper().dropTables();
-
-				return true;
-			}
-			case MENU_DEBUG_FILL:
-			{
-				final String[] names = { "Rivaroxaban", "Propranolol", "Thiamazole",
-						"2-(3,4,5-trimethoxyphenyl)ethanamine", "N-Acetyl-5-Methoxytryptamine" };
-
-				for(String name : names)
-				{
-					Drug drug = new Drug();
-					drug.setName(name);
-					drug.setForm(Drug.FORM_TABLET);
-
-					int doseTime = 0;
-					do
-					{
-						if(doseTime % 2 == 0)
-							drug.setDose(doseTime, Fraction.decode("1/2"));
-
-					} while(++doseTime <= Drug.TIME_NIGHT);
-
-					try
-					{
-						Database.create(mDao, drug);
-					}
-					catch(RuntimeException e)
-					{
-						// ignore
-					}
-				}
-
-				return true;
-			}
 			case MENU_PREFERENCES:
 			{
 				Intent intent = new Intent();
