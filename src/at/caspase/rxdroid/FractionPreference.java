@@ -14,6 +14,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,7 +47,6 @@ public class FractionPreference extends DialogPreference implements OnClickListe
 	private Fraction mLongClickSummand;
 	private boolean mAllowNegativeValues;
 	
-	private String mLastInput;
 	private boolean mIgnoreTextWatcherEvents = false;
 	
 	private SharedPreferences mSharedPrefs;
@@ -161,7 +161,10 @@ public class FractionPreference extends DialogPreference implements OnClickListe
 	public void afterTextChanged(Editable s)
 	{
 		if(mIgnoreTextWatcherEvents)
+		{
+			Log.d(TAG, "afterTextChanged: mIgnoreTextWatcherEvents == true");
 			return;
+		}
 		
 		int wholeNum, numerator, denominator;
 		
@@ -179,16 +182,13 @@ public class FractionPreference extends DialogPreference implements OnClickListe
 				
 		if(denominator == 0)
 		{
+			Log.d(TAG, "afterTextChanged: mDialogValue=" + mDialogValue);
+			
 			Toast.makeText(getContext(), "Denominator must not be zero!", Toast.LENGTH_SHORT).show();
-			if(mLastInput == null || (denominator = Integer.parseInt(mLastInput, 10)) == 0)
-			{
-				Log.e(TAG, "afterTextChanged: last input was still zero");
-				denominator = 1;
-			}
-			mInputDenominator.setText(Integer.toString(denominator));
+			mInputDenominator.setText(Integer.toString(mDialogValue.getFractionData(false)[2]));
+			mInputDenominator.selectAll();
+			return;
 		}
-		
-		mLastInput = null;
 				
 		try
 		{
@@ -196,17 +196,12 @@ public class FractionPreference extends DialogPreference implements OnClickListe
 		}
 		catch(IllegalArgumentException e)
 		{
-			Log.d(TAG, "afterTextChanged: ignoring { " + wholeNum + ", " + numerator  + ", " + denominator + " }");
-			
+			Log.d(TAG, "afterTextChanged: ignoring { " + wholeNum + ", " + numerator  + ", " + denominator + " }");			
 		}
 	}
 
 	@Override
-	public void beforeTextChanged(CharSequence s, int start, int count, int after) 
-	{
-		if(!mIgnoreTextWatcherEvents)
-			mLastInput = s.toString();
-	}
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -261,8 +256,6 @@ public class FractionPreference extends DialogPreference implements OnClickListe
 		mModeToggler.setOnClickListener(this);
 
 		onDialogValueChanged();
-		
-		mLastInput = mInputDenominator.getText().toString();
 		
 		return view;
 	}
