@@ -73,8 +73,25 @@ public class FractionPreference extends DialogPreference implements OnClickListe
 		return new Fraction(mValue);
 	}
 	
-	public void setAllowNegativeValues(boolean allowNegativeValues) {
+	public void setAllowNegativeValues(boolean allowNegativeValues) 
+	{
 		mAllowNegativeValues = allowNegativeValues;
+		
+		if(!allowNegativeValues)
+		{
+			mInputNumber.setInputType(InputType.TYPE_CLASS_NUMBER);
+			mInputNumerator.setInputType(InputType.TYPE_CLASS_NUMBER);			
+		}
+		else
+		{
+			if(mIsInMixedNumberMode)
+			{
+				mInputNumber.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+				mInputNumerator.setInputType(InputType.TYPE_CLASS_NUMBER);				
+			}
+			else
+				mInputNumerator.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);			
+		}
 	}
 	
 	public boolean getAllowNegativeValues() {
@@ -111,15 +128,13 @@ public class FractionPreference extends DialogPreference implements OnClickListe
 		{
 			mIsInMixedNumberMode = !mIsInMixedNumberMode;
 			mInputNumber.setVisibility(mIsInMixedNumberMode ? View.VISIBLE : View.GONE);
-			
-			int inputType;
+						
+			int inputType = InputType.TYPE_CLASS_NUMBER;
 
-			if (mIsInMixedNumberMode)
-				inputType = InputType.TYPE_CLASS_NUMBER;
-			else
-				inputType = InputType.TYPE_NUMBER_FLAG_SIGNED;
+			if(!mIsInMixedNumberMode && mAllowNegativeValues)
+				inputType |= InputType.TYPE_NUMBER_FLAG_SIGNED;
 
-			mInputNumerator.setRawInputType(inputType);
+			mInputNumerator.setInputType(inputType);
 			onDialogValueChanged();
 			
 		}
@@ -161,10 +176,7 @@ public class FractionPreference extends DialogPreference implements OnClickListe
 	public void afterTextChanged(Editable s)
 	{
 		if(mIgnoreTextWatcherEvents)
-		{
-			Log.d(TAG, "afterTextChanged: mIgnoreTextWatcherEvents == true");
 			return;
-		}
 		
 		int wholeNum, numerator, denominator;
 		
@@ -254,6 +266,9 @@ public class FractionPreference extends DialogPreference implements OnClickListe
 
 		mModeToggler = (Button) view.findViewById(R.id.btn_mode_toggle);
 		mModeToggler.setOnClickListener(this);
+				
+		// XXX
+		setAllowNegativeValues(true);
 
 		onDialogValueChanged();
 		
