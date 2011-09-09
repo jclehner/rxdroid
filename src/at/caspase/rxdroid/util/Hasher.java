@@ -54,21 +54,26 @@ import java.lang.reflect.Array;
 public class Hasher
 {
 	private int mHash = 23;
+	private int mHashedCount = 0;
 
 	public void hash(boolean b) {
-		mHash = term() + (b ? 1 : 0);
+		hash(b ? 1 : 0);
 	}
 
 	public void hash(char c) {
 		hash((int) c);
 	}
 
-	public void hash(int i) {
-		mHash = term() + i;
+	public void hash(int i) 
+	{
+		// In case a class with two int members, a and b, were to have the values a = 1 and b = 2,
+		// the hash would be the same if the values were a = 2 and b = 1. By multiplying the actual
+		// value + 1 with the number of hashed values, this problem should be alleviated.
+		mHash = term() + ((i + 1) * ++mHashedCount);
 	}
 
 	public void hash(long l) {
-		mHash = term() + (int) (l ^ (l >>> 32));
+		hash((int) (l ^ (l >>> 32)));
 	}
 
 	public void hash(float f) {

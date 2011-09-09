@@ -244,7 +244,7 @@ public class FractionPreference extends DialogPreference implements OnClickListe
 
 	@Override
 	protected View onCreateDialogView()
-	{
+	{		
 		LayoutInflater inflater = LayoutInflater.from(getContext());
 		View view = inflater.inflate(R.layout.fraction_preference, null);
 
