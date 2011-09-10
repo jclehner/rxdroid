@@ -34,7 +34,7 @@
 	<string name="_msg_constraints_a">Select a time after %1$s.</string>
 	<string name="_msg_constraints_b">Select a time before %2$s.</string>
 	
-	
+	<string name="_btn_set">Set</string>
     
     <!--  Dialogs: Errors -->    
     <string name="_title_error">Error</string>    
@@ -48,7 +48,7 @@
 			missed intakes due to the service not being active.</string>
     
     <string name="_title_preferences">Preferences</string>
-    
+        
     <string name="_title_prefscreen_times">Times</string>
     <string name="_summary_prefscreen_times">Definitions of morning, noon, etc.</string>
     
