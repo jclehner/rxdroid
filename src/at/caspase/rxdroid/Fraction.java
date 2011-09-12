@@ -21,7 +21,6 @@
 
 package at.caspase.rxdroid;
 
-import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +32,7 @@ import at.caspase.rxdroid.util.Hasher;
  *
  * @author Joseph Lehner
  */
-public class Fraction extends Number implements Serializable, Comparable<Number>
+public class Fraction extends Number implements Comparable<Number>
 {
 	private static final long serialVersionUID = 2050536341303052796L;
 	@SuppressWarnings("unused") private static final String TAG = Fraction.class.getName();
