@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Primitive helper script, scanning for occurences of @string/_<foobar> and R.string._<foobar>, 
-# marking translatable strings in RxDroid. All values not defined in res/values/strings.xml will
+# which are translatable strings in RxDroid. All values not defined in res/values/strings.xml will
 # be echoed in copy-'n-pastable XML. 
 #
 
@@ -49,3 +49,4 @@ scan_dir res
 
 scan_string_xml
 
+rm $temp
