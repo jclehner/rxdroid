@@ -38,7 +38,6 @@ import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
-import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
@@ -548,6 +547,9 @@ public class Database
 
 			for(int i = 0; i != thisMembers.length; ++i)
 			{
+				if(thisMembers[i] == null && otherMembers[i] != null)
+					return false;
+				
 				if(!thisMembers[i].equals(otherMembers[i]))
 					return false;
 			}
@@ -777,7 +779,7 @@ public class Database
 			try
 			{
 				if(mDrugDao == null)
-					mDrugDao = BaseDaoImpl.createDao(getConnectionSource(), Database.Drug.class);
+					mDrugDao = getDao(Database.Drug.class);
 			}
 			catch(SQLException e)
 			{
@@ -791,7 +793,7 @@ public class Database
 			try
 			{
 				if(mIntakeDao == null)
-					mIntakeDao = BaseDaoImpl.createDao(getConnectionSource(), Database.Intake.class);
+					mIntakeDao = getDao(Database.Intake.class);
 			}
 			catch(SQLException e)
 			{

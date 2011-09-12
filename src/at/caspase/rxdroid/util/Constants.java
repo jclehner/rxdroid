@@ -23,6 +23,8 @@ package at.caspase.rxdroid.util;
 
 import java.util.Calendar;
 
+import android.text.format.DateUtils;
+
 public final class Constants
 {
 	public static final long MILLIS_PER_DAY = 24L * 3600 * 1000;
@@ -38,4 +40,14 @@ public final class Constants
 			Calendar.SATURDAY,
 			Calendar.SUNDAY			
 	};
+	
+	public static final String[] WEEK_DAY_NAMES;
+	
+	static
+	{
+		WEEK_DAY_NAMES = new String[WEEK_DAYS.length];
+		
+		for(int i = 0; i != WEEK_DAY_NAMES.length; ++i)
+			WEEK_DAY_NAMES[i] = DateUtils.getDayOfWeekString(WEEK_DAYS[i], DateUtils.LENGTH_LONG);		
+	}
 }

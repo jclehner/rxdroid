@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<at.caspase.rxdroid.DrugNamePreference android:key="drug_name"
+		android:hint="Drug name"
+		android:inputType="textCapWords"
+	/>
+	
+	<Preference android:key="delete"
+		android:title="@string/_title_delete"
+	/>
+	
+	<PreferenceCategory android:title="Intake schedule">
+		
+		<at.caspase.rxdroid.DosePreference android:key="morning"
+			android:title="Morning"
+		/>
+		
+		<at.caspase.rxdroid.DosePreference android:key="noon"
+			android:title="Noon"
+		/>
+		
+		<at.caspase.rxdroid.DosePreference android:key="evening"
+			android:title="Evening"
+		/>
+		
+		<at.caspase.rxdroid.DosePreference android:key="night"
+			android:title="Night"
+		/>
+				
+		<ListPreference android:key="frequency" 
+			android:title="Frequency" 
+			android:entries="@array/drug_frequency" 
+		/>
+					
+	</PreferenceCategory>
+	
+	<PreferenceCategory android:title="Miscellaneous">
+	
+		<ListPreference android:key="drug_form"
+			android:title="Drug form"
+			android:entries="@array/drug_forms"
+		/>
+		
+		<at.caspase.rxdroid.FractionPreference android:key="current_supply"
+			android:title="Current supply"
+		/>
+		
+		<EditTextPreference android:key="refill_size"
+			android:title="Refill size"
+			android:inputType="number"
+			android:selectAllOnFocus="true"
+		/>
+		
+		<CheckBoxPreference android:key="is_active"
+			android:title="Active"
+		/>
+		
+	</PreferenceCategory>
+	
+    
+</PreferenceScreen>

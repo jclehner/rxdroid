@@ -1,5 +1,25 @@
+/**
+ * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
+ *
+ * This file is part of RxDroid.
+ *
+ * RxDroid is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * RxDroid is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
 
-package at.caspase.rxdroid;
+package at.caspase.rxdroid.preferences;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -7,6 +27,8 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.util.AttributeSet;
 import android.util.Log;
+import at.caspase.rxdroid.Fraction;
+import at.caspase.rxdroid.FractionInputDialog;
 import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 
 public class FractionPreference extends Preference implements OnPreferenceClickListener, OnFractionSetListener
@@ -25,7 +47,11 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 		
 		mValue = Fraction.decode(getPersistedString("0"));
 		setOnPreferenceClickListener(this);
-	}	
+	}
+	
+	public void setValue(Fraction value) {
+		mValue = value;
+	}
 	
 	public Fraction getValue() {
 		return mValue;
@@ -47,12 +73,15 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 	@Override
 	public void onFractionSet(FractionInputDialog dialog, Fraction value)
 	{
-		if(shouldPersist())
+		boolean canPersist = callChangeListener(value);
+		
+		if(canPersist && shouldPersist())
 			persistString(value.toString());
 		
 		mValue = dialog.getValue();		
 		setSummary(mValue.toString());
 		notifyChanged();
+		
 	}
 	
 	@Override

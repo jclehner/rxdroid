@@ -29,8 +29,8 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.util.Log;
-import android.view.View;
 import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.preferences.DosePreference;
 
 
 public class PreferencesActivity extends PreferenceActivity implements OnPreferenceChangeListener

@@ -19,7 +19,7 @@
  *
  */
 
-package at.caspase.rxdroid;
+package at.caspase.rxdroid.preferences;
 
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
@@ -32,6 +32,8 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.widget.TimePicker;
+import at.caspase.rxdroid.DumbTime;
+import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.util.Util;
 
 public class TimePreference extends Preference implements OnTimeSetListener, OnPreferenceClickListener
@@ -174,7 +176,14 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 		DumbTime after = getConstraint(IDX_AFTER);
 		DumbTime before = getConstraint(IDX_BEFORE);
 		
-		return mTime.after(after) && mTime.before(before);		
+		if(after != null && before != null)
+			return mTime.after(after) && mTime.before(before);
+		else if(after != null)
+			return mTime.after(after);
+		else if(before != null)
+			return mTime.before(before);
+		
+		return true;
 	}
 	
 	private static final String NS_BASE = "http://schemas.android.com/apk/res/";

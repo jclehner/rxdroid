@@ -42,9 +42,13 @@ public final class DateTime
 		return new Date(today.getTime());
 	}
 	
+	public static Date tomorrow() {
+		return new Date(today().getTime() + Constants.MILLIS_PER_DAY);		
+	}
+	
 	public static Time now() {
 		return new Time(currentTimeMillis());
-	}
+	}	
 	
 	public static GregorianCalendar calendarFromDate(Date date) {
 		return new GregorianCalendar(date.getYear(), date.getMonth(), date.getDay());
