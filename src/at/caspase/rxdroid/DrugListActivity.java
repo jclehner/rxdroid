@@ -98,17 +98,15 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	private Dao<Database.Intake, Integer> mIntakeDao;
 
 	private SharedPreferences mSharedPreferences;
-	
-	private boolean mShowOnlyActiveDrugs = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		requestWindowFeature(Window.FEATURE_LEFT_ICON);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.drug_list);
-
+		
 		mDao = getHelper().getDrugDao();
 		mIntakeDao = getHelper().getIntakeDao();
 		mViewSwitcher = (ViewSwitcher) findViewById(R.id.drug_list_view_flipper);
@@ -449,6 +447,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	// if newDate is -1
 	private void setOrShiftDate(long shiftBy, Date newDate)
 	{
+		setProgressBarIndeterminateVisibility(true);
+		
 		if(mViewSwitcher.getChildCount() != 0)
 			mViewSwitcher.removeAllViews();
 
@@ -513,6 +513,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left));
 			mViewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right));
 		}
+		
+		setProgressBarIndeterminateVisibility(false);
 	}
 
 	private void updateDrugList()

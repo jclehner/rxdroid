@@ -6,6 +6,9 @@
   android:orderingFromXml="true"
   
 >
+	
+	<!-- TIMES -->
+
 	<PreferenceScreen android:key="prefscreen_times"
 		android:title="@string/_title_prefscreen_times"
 		android:summary="@string/_summary_prefscreen_times"
@@ -81,6 +84,34 @@
 		</PreferenceCategory>
 	
 	</PreferenceScreen>
+	
+	<!-- DISPLAY -->
+	
+	<PreferenceScreen 
+		android:key="prefscreen_display"
+		android:title="@string/_title_prefscreen_display"
+		android:summary="@string/_summary_prefscreen_display"
+	>
+	
+		<CheckBoxPreference
+			android:key="show_inactive"
+			android:title="@string/_title_pref_show_inactive"
+			android:summaryOn="@string/_summary_pref_show_inactive_on"
+			android:summaryOff="@string/_summary_pref_show_inactive_off"
+			android:defaultValue="true"
+		/>
+		
+		<CheckBoxPreference
+			android:key="show_days_without_intakes"
+			android:title="@string/_title_pref_show_days_without_intakes"
+			android:summaryOn="@string/_summary_pref_show_days_without_intakes_on"
+			android:summaryOff="@string/_summary_pref_show_days_without_intakes_off"
+			android:defaultValue="false"
+		/>
+	
+	</PreferenceScreen>
+	
+	<!-- NOTIFICATIONS -->
 	
 	<PreferenceScreen
 		android:key="prefscreen_notifications"
