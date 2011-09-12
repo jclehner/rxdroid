@@ -1,0 +1,51 @@
+#!/bin/bash
+#
+# Primitive helper script, scanning for occurences of @string/_<foobar> and R.string._<foobar>, 
+# marking translatable strings in RxDroid. All values not defined in res/values/strings.xml will
+# be echoed in copy-'n-pastable XML. 
+#
+
+patterns="@string/_\w* R.string._\w*"
+temp=$(mktemp)
+
+scan_file()
+{
+	for p in $patterns; do
+		for t in $(grep -o -P $p $1 | grep -o -P '_\w*'); do
+			echo $t >> $temp
+		done
+	done
+
+}
+
+scan_dir()
+{
+	for f in $1/*.{java,xml}; do
+		if [[ -f "$f" ]]; then
+			scan_file $f
+		fi
+	done
+
+	for d in $1/*; do
+		if [[ -d "$d" ]]; then
+			scan_dir "$d"
+		fi
+	done
+}
+
+scan_string_xml()
+{
+	for t in $(cat $temp | sort | uniq); do
+		if ! grep -q $t res/values/strings.xml; then
+			echo "<string name=\"$t\"> !!EMPTY!! </string>"
+		fi
+	done
+}
+
+
+
+scan_dir src
+scan_dir res
+
+scan_string_xml
+
