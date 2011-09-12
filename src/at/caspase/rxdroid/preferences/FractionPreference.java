@@ -31,6 +31,12 @@ import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.FractionInputDialog;
 import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 
+/**
+ * A preference for storing fractions.
+ * 
+ * @author Joseph Lehner
+ *
+ */
 public class FractionPreference extends Preference implements OnPreferenceClickListener, OnFractionSetListener
 {
 	private static final String TAG = FractionPreference.class.getName();

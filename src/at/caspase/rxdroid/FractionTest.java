@@ -22,8 +22,11 @@
 package at.caspase.rxdroid;
 
 import android.test.AndroidTestCase;
+import android.util.Log;
 
-public class FractionTest extends AndroidTestCase {
+public class FractionTest extends AndroidTestCase 
+{
+	private static final String TAG = FractionTest.class.getName();	
 
 	private static final String[] FRACTIONS = {
 			"1 1       /4",
@@ -40,20 +43,8 @@ public class FractionTest extends AndroidTestCase {
 		Fraction.setDisplayMixedNumbers(false);
 	}
 
-	public void testFractionIntIntInt()
-	{
-		//final Fraction expected1 = new Fraction(-21, 4);
-		//final Fraction expected2 = new Fraction(-313, 77);
-		//assertEquals(expected1.toString(), f1.toString());
-		//assertEquals(expected2.toString(), f2.toString());
-	}
-
 	public void testDecode()
 	{
-		//invalidFractionString("4 -5/4");
-		//invalidFractionString("5/4/1");
-		//invalidFractionString("4 5/-5");
-
 		final String[] expected = {
 				"5/4",
 				"23/9",
@@ -66,7 +57,7 @@ public class FractionTest extends AndroidTestCase {
 		};
 
 		for(int i = 0; i != FRACTIONS.length; ++i)
-			assertEquals(expected[i].toString(), Fraction.decode(FRACTIONS[i]).toString());
+			assertEquals(expected[i], Fraction.decode(FRACTIONS[i]).toString());
 	}
 
 	public void testDecodeWithInvalidStrings()
@@ -107,24 +98,56 @@ public class FractionTest extends AndroidTestCase {
 			"-1"
 		};
 
-		assert FRACTIONS.length == expected.length;
 
-		for(int i = 0; i != FRACTIONS.length; ++i)
+		for(int i = 0; i != expected.length; ++i)
 		{
-			Fraction result = f1.plus(Fraction.decode(FRACTIONS[i]));
+			Fraction f2 = Fraction.decode(FRACTIONS[i]);
+			Fraction result = f1.plus(f2);
+			
+			Log.d(TAG, f1 + " + " + f2 + " = " + result); 
 			assertEqualsAsString(expected[i], result);
 		}
 	}
 
 	public void testMinus()
 	{
-		//final Fraction expected = new Fraction(-365, 308);
-		//final Fraction actual = f1.minus(f2);
-		//assertEqualsAsString(expected, actual);
+		final Fraction f1 = new Fraction(1, 4);
+		final String[] expected = {
+			"-1",
+			"-83/36",
+			"-5/8",
+			"-11/4",
+			"21/4",
+			"11/2",
+			"3/2",
+			"-25/28"
+		};
+
+		for(int i = 0; i != expected.length; ++i)
+		{
+			Fraction f2 = Fraction.decode(FRACTIONS[i]);
+			Fraction result = f1.minus(f2);
+			
+			Log.d(TAG, f1 + " - " + f2 + " = " + result); 
+			assertEqualsAsString(expected[i], result);
+		}
 	}
 
-	public void testNegate() {
-		//assertEqualsAsString("21/4", f1.negate());
+	public void testNegate() 
+	{
+		final String[] expected = {
+			/*"-1",
+			"-83/36",
+			"-5/8",
+			"-11/4",
+			"21/4",
+			"11/2",
+			"3/2",
+			"-25/28"*/
+		};
+		
+		for(int i = 0; i != expected.length; ++i)
+			assertEqualsAsString(expected[i], Fraction.decode(FRACTIONS[i]).negate());  
 	}
 
 	//public void testToString() {

@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.util.Log;
 import at.caspase.rxdroid.util.Hasher;
 
 
@@ -95,6 +96,8 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 	{
 		int numerator, denominator;
 
+		//Log.d(TAG, "plus: this=" + this + ", other=" + other);
+		
 		if(this.mDenominator != other.mDenominator)
 		{
 			int lcm = findLCM(this.mDenominator, other.mDenominator);
@@ -110,8 +113,13 @@ public class Fraction extends Number implements Serializable, Comparable<Number>
 			numerator = this.mNumerator + other.mNumerator;
 			denominator = this.mDenominator;
 		}
-
-		return new Fraction(numerator, denominator);
+		
+		Fraction result = new Fraction(numerator, denominator);
+		
+		//Log.d(TAG, "plus: result 1=" + numerator + "/" + denominator);
+		//Log.d(TAG, "plus: result 2=" + result);
+		
+		return result;
 	}
 
 	public Fraction plus(Integer integer) {
