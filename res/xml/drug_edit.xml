@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<at.caspase.rxdroid.DrugNamePreference android:key="drug_name"
+	<at.caspase.rxdroid.preferences.DrugNamePreference android:key="drug_name"
 		android:hint="Drug name"
 		android:inputType="textCapWords"
 	/>
@@ -12,19 +12,19 @@
 	
 	<PreferenceCategory android:title="Intake schedule">
 		
-		<at.caspase.rxdroid.DosePreference android:key="morning"
+		<at.caspase.rxdroid.preferences.DosePreference android:key="morning"
 			android:title="Morning"
 		/>
 		
-		<at.caspase.rxdroid.DosePreference android:key="noon"
+		<at.caspase.rxdroid.preferences.DosePreference android:key="noon"
 			android:title="Noon"
 		/>
 		
-		<at.caspase.rxdroid.DosePreference android:key="evening"
+		<at.caspase.rxdroid.preferences.DosePreference android:key="evening"
 			android:title="Evening"
 		/>
 		
-		<at.caspase.rxdroid.DosePreference android:key="night"
+		<at.caspase.rxdroid.preferences.DosePreference android:key="night"
 			android:title="Night"
 		/>
 				
@@ -42,7 +42,7 @@
 			android:entries="@array/drug_forms"
 		/>
 		
-		<at.caspase.rxdroid.FractionPreference android:key="current_supply"
+		<at.caspase.rxdroid.preferences.FractionPreference android:key="current_supply"
 			android:title="Current supply"
 		/>
 		
