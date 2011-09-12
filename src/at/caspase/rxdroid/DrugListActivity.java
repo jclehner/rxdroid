@@ -61,6 +61,7 @@ import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.Util;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
@@ -97,6 +98,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	private Dao<Database.Intake, Integer> mIntakeDao;
 
 	private SharedPreferences mSharedPreferences;
+	
+	private boolean mShowOnlyActiveDrugs = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -170,8 +173,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add(0, MENU_ADD, 0, "Add").setIcon(android.R.drawable.ic_menu_add);
-		menu.add(0, MENU_DELETE, 0, "Delete").setIcon(android.R.drawable.ic_menu_delete);
-		menu.add(0, MENU_DEBUG_FILL, 0, "Fill DB").setIcon(android.R.drawable.ic_menu_agenda);
+		//menu.add(0, MENU_DELETE, 0, "Delete").setIcon(android.R.drawable.ic_menu_delete);
+		//menu.add(0, MENU_DEBUG_FILL, 0, "Fill DB").setIcon(android.R.drawable.ic_menu_agenda);
 		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(android.R.drawable.ic_menu_preferences);
 
 		return super.onCreateOptionsMenu(menu);

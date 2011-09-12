@@ -49,6 +49,7 @@
 
 	</application>
 
-	<instrumentation android:name="android.test.InstrumentationTestRunner" android:targetPackage="at.caspase.rxdroid" android:label="Open MedMind Tests" />
+	<instrumentation android:name="android.test.InstrumentationTestRunner" android:targetPackage="at.caspase.rxdroid" android:label="RxDroid Tests" />
+	
 	<uses-sdk android:minSdkVersion="9"></uses-sdk>
 </manifest> 

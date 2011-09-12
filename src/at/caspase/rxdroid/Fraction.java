@@ -25,7 +25,6 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.util.Log;
 import at.caspase.rxdroid.util.Hasher;
 
 

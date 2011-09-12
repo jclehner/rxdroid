@@ -97,6 +97,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 	
+		mDbHelper = new Database.Helper(this);
+		mDao = mDbHelper.getDrugDao();
+		
 		if(Intent.ACTION_EDIT.equals(action))
 		{
 			if(mDrugHash != mDrug.hashCode())
@@ -168,7 +171,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 						
 					case Drug.FREQ_WEEKLY:
 						initFrequencyWeeklyDialog(builder);
-						break;					
+						break;
+						
+					default:
+						throw new IllegalStateException("Invalid frequency value");
 				}
 				
 				builder.show();			
@@ -228,14 +234,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	{
 		super.onCreate(savedInstanceState);
 				
-		mDbHelper = new Database.Helper(this);
-		mDao = mDbHelper.getDrugDao();		
-
-		mDosePrefs = new DosePreference[4];
-		
 		addPreferencesFromResource(R.xml.drug_edit);
-		
+				
 		mDrugName = (DrugNamePreference) findPreference("drug_name");
+		mDosePrefs = new DosePreference[4];
 		
 		String[] dosePrefKeys = { "morning", "noon", "evening", "night" };
 		for(int i = 0; i != dosePrefKeys.length; ++i)
@@ -246,7 +248,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		mCurrentSupply = (FractionPreference) findPreference("current_supply");
 		mRefillSize = (EditTextPreference) findPreference("refill_size");
 		mIsActive = (CheckBoxPreference) findPreference("is_active");
-				
+			
 		// mark all preferences as non-persisting!
 		for(String key : PREF_KEYS)
 		{
@@ -254,7 +256,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			pref.setPersistent(false);
 			pref.setOnPreferenceChangeListener(this);
 		}
-		
+				
 		populateEntryValues("frequency");
 		populateEntryValues("drug_form");
 	}
@@ -293,7 +295,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		else if(deletePref != null)
 			getPreferenceScreen().removePreference(deletePref);
 				
-		initializePreferences();		
+		initializePreferences();
 	}
 	
 	private void initializePreferences()
@@ -340,6 +342,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				int dayOfWeek = (int) mDrug.getFrequencyArg();
 				summary = getString(R.string._msg_freq_weekly, DateUtils.getDayOfWeekString(dayOfWeek, DateUtils.LENGTH_LONG));
 				break;
+				
+			default:
+				throw new IllegalStateException("Invalid frequency value");
 		}
 		
 		mFreqPreference.setSummary(summary);

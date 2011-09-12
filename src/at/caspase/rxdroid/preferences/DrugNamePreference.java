@@ -57,10 +57,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 		
 		mInput = getEditText();
 		mInput.addTextChangedListener(this);
-		
-		mDbHelper = new Database.Helper(context);
-		mDao = mDbHelper.getDrugDao();
-		
+				
 		setSummary(null);
 	}
 	
@@ -108,7 +105,15 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	protected void onPrepareDialogBuilder(AlertDialog.Builder builder)
 	{
 		super.onPrepareDialogBuilder(builder);
-		builder.setCancelable(false);		
+		builder.setCancelable(false);
+		
+		// if we did this in the constructor, there'd be a noticeable lag when instantiating 
+		// an object of this Preference
+		if(mDbHelper == null)
+		{
+			mDbHelper = new Database.Helper(getContext());
+			mDao = mDbHelper.getDrugDao();
+		}
 	}
 	
 	@Override
@@ -143,7 +148,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	}
 	
 	private boolean isUniqueDrugName(String name)
-	{
+	{		
 		QueryBuilder<Drug, Integer> qb = mDao.queryBuilder();
 		Where<Drug, Integer> where = qb.where();
 				
