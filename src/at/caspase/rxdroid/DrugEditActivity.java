@@ -96,9 +96,22 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	{
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
-	
-		mDbHelper = new Database.Helper(this);
-		mDao = mDbHelper.getDrugDao();
+			
+		String drugName = mDrug.getName();
+		
+		if(drugName == null || drugName.isEmpty())
+		{
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(R.string._title_error);
+			builder.setIcon(android.R.drawable.ic_dialog_alert);
+			builder.setMessage(R.string._msg_err_empty_drug_name);
+			builder.setPositiveButton(android.R.string.ok, null);
+			builder.show();
+			
+			return;
+		}
+		
+		initDao();
 		
 		if(Intent.ACTION_EDIT.equals(action))
 		{
@@ -149,7 +162,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		boolean postponePrefUpdate = false;
 				
 		if("drug_name".equals(key))
+		{
+			Log.d(TAG, "onPreferenceChange: drugName=" + newValue);
 			mDrug.setName((String) newValue);
+		}
 		else if("morning".equals(key) || "noon".equals(key) || "evening".equals(key) || "night".equals(key))
 			mDrug.setDose(DosePreference.getDoseTimeFromKey(key), (Fraction) newValue);
 		else if("frequency".equals(key))
@@ -214,6 +230,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
+					initDao();
 					Database.delete(mDao, mDrug);
 					Toast.makeText(getApplicationContext(), R.string._toast_deleted, Toast.LENGTH_SHORT).show();
 					finish();
@@ -413,6 +430,15 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				updatePreferences();
 			}
 		});
+	}
+	
+	private void initDao()
+	{
+		if(mDao == null)
+		{
+			mDbHelper = new Database.Helper(this);
+			mDao = mDbHelper.getDrugDao();
+		}
 	}
 	
 	private static int toInt(Object string) {

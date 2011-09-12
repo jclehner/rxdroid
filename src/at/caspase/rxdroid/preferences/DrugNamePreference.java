@@ -47,7 +47,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	
 	private EditText mInput;
 	private String mInitialName = null;
-	
+		
 	private Database.Helper mDbHelper;
 	private Dao<Drug, Integer> mDao;
 	
@@ -71,9 +71,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	}
 	
 	public void setName(String name)
-	{
-		Log.d(TAG, "setName: name=" + name);
-		
+	{		
 		if(name != null)
 		{
 			setTitle(name);
@@ -82,7 +80,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 		else
 		{
 			setTitle(R.string._title_drug_name);
-			setText(null);
+			setText("");
 		}
 	}
 
@@ -92,7 +90,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 		if(!s.toString().equals(mInitialName) && !isUniqueDrugName(s.toString()))
 			mInput.setError("Another drug with that name already exists!");
 		else
-			mInput.setError(null);				
+			mInput.setError(null);			
 	}
 
 	@Override
@@ -106,49 +104,64 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	{
 		super.onPrepareDialogBuilder(builder);
 		builder.setCancelable(false);
+		builder.setNegativeButton(null, null);
 		
-		// if we did this in the constructor, there'd be a noticeable lag when instantiating 
-		// an object of this Preference
-		if(mDbHelper == null)
-		{
-			mDbHelper = new Database.Helper(getContext());
-			mDao = mDbHelper.getDrugDao();
-		}
+		initDao();
 	}
 	
 	@Override
 	protected void onDialogClosed(boolean positiveResult)
 	{
-		super.onDialogClosed(true);
-		
 		if(positiveResult)
 		{
 			String name = mInput.getText().toString();
-			Log.d(TAG, "onDialogClosed: name=" + name);
+			boolean isUniqueName = isUniqueDrugName(name);
 			
-			if(!isUniqueDrugName(name))
-			{				
+			if(name.isEmpty() || !isUniqueName)
+			{
+				if(name.equals(mInitialName))
+					return;
+				
 				AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 				builder.setIcon(android.R.drawable.ic_dialog_alert);
-				builder.setTitle(R.string._title_error);
-				builder.setMessage(R.string._msg_err_non_unique_drug_name);
 				builder.setCancelable(false);
 				builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which)
 					{
+						mInput.setSelectAllOnFocus(true);
 						showDialog(null);						
 					}
-				});				
+				});
+				
+				if(name.isEmpty())
+				{
+					builder.setTitle(R.string._title_error);
+					builder.setMessage(R.string._msg_err_empty_drug_name);
+				}					
+				else if(!isUniqueDrugName(name))
+				{
+					builder.setTitle(name);
+					builder.setMessage(R.string._msg_err_non_unique_drug_name);
+				}
 				
 				builder.show();
+				return;
 			}
 		}
+		
+		super.onDialogClosed(positiveResult);
 	}
 	
 	private boolean isUniqueDrugName(String name)
-	{		
+	{
+		if(mDao == null)
+		{
+			Log.d(TAG, "isUniqueDrugName: mDao == null, returning true");
+			return true;
+		}
+		
 		QueryBuilder<Drug, Integer> qb = mDao.queryBuilder();
 		Where<Drug, Integer> where = qb.where();
 				
@@ -161,6 +174,17 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 		{
 			Log.e(TAG, "isUniqueDrugName", e);
 			return false;
+		}
+	}
+	
+	private void initDao()
+	{
+		// if we did this in the constructor, there'd be a noticeable lag when instantiating 
+		// an object of this Preference
+		if(mDao == null)
+		{
+			mDbHelper = new Database.Helper(getContext());
+			mDao = mDbHelper.getDrugDao();
 		}
 	}
 }
