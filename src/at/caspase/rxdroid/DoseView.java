@@ -25,15 +25,10 @@ import java.sql.Date;
 import java.util.List;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -55,7 +50,8 @@ import com.j256.ormlite.dao.Dao;
  */
 public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 {
-	@SuppressWarnings("unused") private static final String TAG = DoseView.class.getName();
+	@SuppressWarnings("unused") 
+	private static final String TAG = DoseView.class.getName();
 
 	private ImageView mIntakeStatus;
 	private TextView mDoseText;
@@ -101,9 +97,6 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			case R.id.night:
 				setDoseTime(Database.Drug.TIME_NIGHT);
 				break;
-
-			default:
-				throw new RuntimeException("Invalid DoseView id");
 		}
 
 		setBackgroundResource(R.drawable.doseview_background);
@@ -149,9 +142,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		return mDate;
 	}
 
-	public int getDrugId()
-	{
-		assert mDrug != null;
+	public int getDrugId() {
 		return mDrug.getId();
 	}
 

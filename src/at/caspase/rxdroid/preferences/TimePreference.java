@@ -72,13 +72,18 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 			}			
 		}
 		
-		setOnPreferenceClickListener(this);		
+		super.setOnPreferenceClickListener(this);		
 		updateTime();
 	}
 	
 	@Override
 	public CharSequence getSummary() {
 		return mTime == null ? null : mTime.toString();
+	}
+	
+	@Override
+	public void setOnPreferenceClickListener(OnPreferenceClickListener listener) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

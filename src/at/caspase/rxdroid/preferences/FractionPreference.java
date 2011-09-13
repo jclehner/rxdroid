@@ -86,8 +86,7 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 		
 		mValue = dialog.getValue();		
 		setSummary(mValue.toString());
-		notifyChanged();
-		
+		notifyChanged();		
 	}
 	
 	@Override

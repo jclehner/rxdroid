@@ -92,7 +92,7 @@ public class DosePreference extends FractionPreference implements OnClickListene
 		if(view != null)
 		{
 			// FIXME
-			mDoseView = (DoseView) view.findViewById(R.id.morning);
+			mDoseView = (DoseView) view.findViewById(R.id.dose_view);
 			if(mDoseView == null)
 				return;
 			

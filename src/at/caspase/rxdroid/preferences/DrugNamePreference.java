@@ -103,8 +103,8 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	protected void onPrepareDialogBuilder(AlertDialog.Builder builder)
 	{
 		super.onPrepareDialogBuilder(builder);
-		builder.setCancelable(false);
-		builder.setNegativeButton(null, null);
+		//builder.setCancelable(false);
+		//builder.setNegativeButton(null, null);
 		
 		initDao();
 	}

@@ -56,6 +56,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
+import android.widget.ViewSwitcher.ViewFactory;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
@@ -68,7 +69,7 @@ import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import com.j256.ormlite.dao.Dao;
 
 public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> implements
-	OnDatabaseChangedListener, OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener
+	OnDatabaseChangedListener, OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
 {
 	public static final String TAG = DrugListActivity.class.getName();
 
@@ -116,6 +117,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		updateDrugList();
 
+		mViewSwitcher.setFactory(this);
 		mTextDate.setOnLongClickListener(this);
 
 		startNotificationService();
@@ -426,6 +428,15 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		setDate(mDate);
 	}
 	
+	@Override
+	public View makeView()
+	{
+		ListView listView = new ListView(this);
+		listView.setAdapter(new DrugAdapter(this, R.layout.dose_view, mDrugs, mDate));
+		
+		return listView;
+	}
+	
 	private void startNotificationService()
 	{
 		Intent serviceIntent = new Intent();
@@ -449,9 +460,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	{
 		setProgressBarIndeterminateVisibility(true);
 		
-		if(mViewSwitcher.getChildCount() != 0)
-			mViewSwitcher.removeAllViews();
-
 		if(shiftBy == 0)
 		{
 			if(newDate == null)
@@ -483,16 +491,9 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 				throw new IllegalArgumentException();
 
 			Log.d(TAG, "Setting interpolators took " + t + " with shiftBy=" + shiftBy);
-			mViewSwitcher.addView(mListView);
 		}
 
-		ListView newListView = new ListView(this);
-		newListView.setAdapter(new DrugAdapter(this, R.layout.dose_view, mDrugs, mDate));
-
-		mViewSwitcher.addView(newListView);
 		mViewSwitcher.showNext();
-
-		mListView = newListView;
 
 		final SpannableString dateString = new SpannableString(mDate.toString());
 		final Date today = DateTime.today();
