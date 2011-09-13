@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.sql.Date;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
@@ -219,7 +220,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	public boolean onPreferenceClick(Preference preference)
 	{
 		if(preference.getKey().equals("delete"))
-		{
+		{			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setTitle(mDrug.getName());

@@ -46,8 +46,6 @@ public class PreferencesActivity extends PreferenceActivity implements OnPrefere
 
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
 		addPreferencesFromResource(R.xml.preferences);
-		
-		((DosePreference) findPreference("morning")).setDrug(new Drug());
 	}
 
 	@Override

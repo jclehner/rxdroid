@@ -91,7 +91,7 @@
 		android:key="prefscreen_display"
 		android:title="@string/_title_prefscreen_display"
 		android:summary="@string/_summary_prefscreen_display"
-	>
+	>	
 	
 		<CheckBoxPreference
 			android:key="show_inactive"
@@ -106,7 +106,15 @@
 			android:title="@string/_title_pref_show_days_without_intakes"
 			android:summaryOn="@string/_summary_pref_show_days_without_intakes_on"
 			android:summaryOff="@string/_summary_pref_show_days_without_intakes_off"
-			android:defaultValue="false"
+			android:defaultValue="true"
+		/>
+		
+		
+		<Preference
+			android:title="@string/_title_prefscreen_display_info"
+			android:summary="@string/_summary_prefscreen_display_info"
+			android:enabled="false"
+			android:selectable="false"
 		/>
 	
 	</PreferenceScreen>
@@ -162,11 +170,4 @@
 			android:dependency="debug_enabled" />
 	
 	</PreferenceScreen>
-	
-	<PreferenceCategory android:title="Testing">
-		<at.caspase.rxdroid.preferences.DosePreference android:key="morning" android:title="Morning" android:summary="06:00 - 10:00"/>
-		<at.caspase.rxdroid.preferences.FractionPreference android:key="fraction" android:title="Fraction" android:summary="1 1/4" />
-	</PreferenceCategory>
-	
-	
 </PreferenceScreen>

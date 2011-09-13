@@ -42,6 +42,10 @@ public final class DateTime
 		return new Date(today.getTime());
 	}
 	
+	public static Date addDays(Date date, int days) {
+		return new Date(date.getTime() + days * Constants.MILLIS_PER_DAY);		
+	}
+	
 	public static Date tomorrow() {
 		return new Date(today().getTime() + Constants.MILLIS_PER_DAY);		
 	}

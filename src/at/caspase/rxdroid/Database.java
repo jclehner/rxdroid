@@ -394,7 +394,11 @@ public class Database
 			throw new AssertionError("WTF");
 		}
 		
-		public String getName() {
+		public String getName() 
+		{
+			if(name == null)
+				Log.w(TAG, "getName: name == null");
+			
 			return name;
 		}
 
@@ -547,10 +551,13 @@ public class Database
 
 			for(int i = 0; i != thisMembers.length; ++i)
 			{
-				if(thisMembers[i] == null && otherMembers[i] != null)
-					return false;
+				Log.d(TAG, "Drug.equals: i=" + i + ", thisMember=" + thisMembers[i] + ", otherMember=" + otherMembers[i]);
 				
-				if(!thisMembers[i].equals(otherMembers[i]))
+				if(thisMembers[i] == null && otherMembers[i] == null)
+					continue;
+				else if(thisMembers[i] == null || otherMembers[i] == null)
+					return false;
+				else if(!thisMembers[i].equals(otherMembers[i]))
 					return false;
 			}
 

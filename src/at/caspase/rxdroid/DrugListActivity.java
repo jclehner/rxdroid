@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -52,6 +53,7 @@ import android.view.animation.Interpolator;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,16 +84,11 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 	private static final int TAG_ID = R.id.tag_drug_id;
 
-	// stores the ListViews for the ViewFlipper.
-	//
-	// 0 ... ListView for previous day
-	// 1 ... ListView for current day
-	// 2 ... ListView for next day
-
-	private ListView mListView;
 	private ViewSwitcher mViewSwitcher;
 	private TextView mTextDate;
 
+	private DrugAdapter mAdapter;
+	
 	private List<Database.Drug> mDrugs;
 	private Date mDate;
 
@@ -112,10 +109,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		mIntakeDao = getHelper().getIntakeDao();
 		mViewSwitcher = (ViewSwitcher) findViewById(R.id.drug_list_view_flipper);
 		mTextDate = (TextView) findViewById(R.id.med_list_footer);
-
+		
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-		updateDrugList();
 
 		mViewSwitcher.setFactory(this);
 		mTextDate.setOnLongClickListener(this);
@@ -138,8 +133,10 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		if(Intent.ACTION_VIEW.equals(action) || Intent.ACTION_MAIN.equals(action))
 		{
-			final Date date = (Date) intent.getSerializableExtra(EXTRA_DAY);
-			setDate(date);
+			//mViewSwitcher.removeAllViews();
+			//mAdapter = makeAdapter();
+						
+			setDate((Date) intent.getSerializableExtra(EXTRA_DAY));			
 		}
 		else
 			throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());
@@ -208,8 +205,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
-		if(resultCode == RESULT_OK)
-			updateListView();
+		//if(resultCode == RESULT_OK)
+		//	updateAdapter();
 	}
 
 	public void onDateChangeRequest(View view)
@@ -379,39 +376,19 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	@Override
 	public void onCreateEntry(Drug drug)
 	{
-		mDrugs.add(drug);
-		((DrugAdapter) mListView.getAdapter()).notifyDataSetChanged();
-		Log.d(TAG, "onDrugCreate: drug=" + drug);
+		mAdapter.add(drug);
 	}
 
 	@Override
 	public void onDeleteEntry(Drug drug)
 	{
-		for(Drug storedDrug : mDrugs)
-		{
-			if(storedDrug.getId() == drug.getId())
-			{
-				mDrugs.remove(storedDrug);
-				break;
-			}
-		}
-
-		((DrugAdapter) mListView.getAdapter()).notifyDataSetChanged();
+		mAdapter.remove(drug);
 	}
 
 	@Override
 	public void onUpdateEntry(Drug drug)
 	{
-		for(int i = 0; i != mDrugs.size(); ++i)
-		{
-			if(mDrugs.get(i).getId() == drug.getId())
-			{
-				mDrugs.remove(i);
-				mDrugs.add(i, drug);
-				break;
-			}
-		}
-		((DrugAdapter) mListView.getAdapter()).notifyDataSetChanged();
+		mAdapter.update(drug);
 	}
 
 	@Override
@@ -431,10 +408,30 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	@Override
 	public View makeView()
 	{
-		ListView listView = new ListView(this);
-		listView.setAdapter(new DrugAdapter(this, R.layout.dose_view, mDrugs, mDate));
+		ListView lv = new ListView(this);
 		
-		return listView;
+		if(mAdapter == null)
+			mAdapter = makeAdapter();
+		
+		lv.setAdapter(mAdapter);
+		
+		return lv;
+	}
+		
+	private DrugAdapter makeAdapter()
+	{
+		List<Drug> drugs;
+		
+		try
+		{
+			drugs = mDao.queryForAll();
+		}
+		catch (SQLException e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		return new DrugAdapter(this, R.layout.dose_view, drugs, mDate);
 	}
 	
 	private void startNotificationService()
@@ -517,29 +514,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		
 		setProgressBarIndeterminateVisibility(false);
 	}
-
-	private void updateDrugList()
-	{
-		try
-		{
-			mDrugs = mDao.queryForAll();
-		}
-		catch (SQLException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
-
-	private void updateListView()
-	{
-		Timer t = new Timer();
-
-		updateDrugList();
-		((DrugAdapter) mListView.getAdapter()).notifyDataSetChanged();
-
-		Log.d(TAG, "updateListView: " + t);
-	}
-
+	
 	private class DrugAdapter extends ArrayAdapter<Database.Drug>
 	{
 		private final Date mDate;
@@ -547,6 +522,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		public DrugAdapter(Context context, int textViewResId, List<Database.Drug> items, Date date)
 		{
 			super(context, textViewResId, items);
+			setNotifyOnChange(true);
 			mDate = date;
 		}
 
@@ -580,6 +556,20 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			}
 
 			return v;
+		}
+		
+		public void update(Drug drug)
+		{
+			for(int i = 0; i != getCount(); ++i)
+			{
+				Drug d = getItem(i);
+				
+				if(d.getId() == drug.getId())
+				{
+					remove(d);
+					insert(drug, i);			
+				}	
+			}			
 		}
 	}
 

@@ -253,12 +253,10 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 				cancelAllNotifications();
 
-				final boolean doCheckSupplies = !wasRunning || forceSupplyCheck;
-				if(doCheckSupplies)
+				if(!wasRunning || forceSupplyCheck)
 					checkSupplies(true);
 
 				boolean delayFirstNotification = true;
-
 				final Preferences settings = Preferences.instance();
 				
 				try
@@ -273,16 +271,18 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
 
 						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
-
+						
 						if(lastDoseTime >= 0)
 							checkIntakes(date, lastDoseTime);
+						else if(lastDoseTime == -1)
+							checkIntakes(DateTime.addDays(date, -1), Drug.TIME_NIGHT);
+						else
+							Log.w(TAG, "lastDoseTime=" + lastDoseTime);
 
 						if(activeDoseTime == -1)
 						{
 							long sleepTime = settings.getMillisFromNowUntilDoseTimeBegin(nextDoseTime);
-
-							Log.d(TAG, "Time until next dose time (" + nextDoseTime + "): " + sleepTime + "ms");
-
+							
 							sleep(sleepTime);
 							delayFirstNotification = false;
 
@@ -528,9 +528,6 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	{
 		int notificationCount;
 
-		for(int i = 0; i != mNotificationMessages.length; ++i)
-			Log.d(TAG, "postNotification: mNotificationMessages[" + i + "]=" + mNotificationMessages[i]);
-
 		if((notificationCount = getNotificationCount()) == 0)
 		{
 			cancelAllNotifications(false);
@@ -607,7 +604,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	}
 
 	private void cancelNotification(int id) {
-		postNotification(id, 0, null);
+		postNotification(id, Notification.DEFAULT_LIGHTS, null);
 	}
 
 	private void cancelAllNotifications() {

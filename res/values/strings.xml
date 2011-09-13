@@ -83,13 +83,15 @@
     <string name="_title_prefscreen_display">Display</string>
     <string name="_summary_prefscreen_display">Display settings, mainly for the main drug list.</string>
     
-    <string name="_title_pref_show_days_without_intakes">Show drugs without doses</string>
-	<string name="_summary_pref_show_days_without_intakes_on">Drugs will always be displayed in the drug list.</string>
-	<string name="_summary_pref_show_days_without_intakes_off">Drugs will be hidden in the drug list if they do not have at least one dose on that day.</string>
+    <string name="_title_pref_show_days_without_intakes">Show doseless</string>
+	<string name="_summary_pref_show_days_without_intakes_on">All drugs will be displayed</string>
+	<string name="_summary_pref_show_days_without_intakes_off">Drugs having no doses on the currently displayed day will be hidden</string>
 	
-	<string name="_title_pref_show_inactive">Show inactive drugs.</string>
-	<string name="_summary_pref_show_inactive_off">All drugs will be displayed in the drug list.</string>
-	<string name="_summary_pref_show_inactive_on">Drugs not marked as being active are hidden in the drug list. This may be overriden by selecting MENU &gt; Show all.</string>
-		
+	<string name="_title_pref_show_inactive">Show inactive</string>
+	<string name="_summary_pref_show_inactive_off">Drugs marked as inactive will be hidden</string>
+	<string name="_summary_pref_show_inactive_on">@string/_summary_pref_show_days_without_intakes_on</string>
+	
+	<string name="_title_prefscreen_display_info">Information</string>
+	<string name="_summary_prefscreen_display_info">Note that these settings may be overridden temporarily using MENU &gt; Show all</string>		
 	
 </resources>
