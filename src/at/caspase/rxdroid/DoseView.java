@@ -25,12 +25,15 @@ import java.sql.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
+import android.view.View.OnLongClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -50,7 +53,7 @@ import com.j256.ormlite.dao.Dao;
  * @author Joseph Lehner
  *
  */
-public class DoseView extends FrameLayout implements OnDatabaseChangedListener, OnTouchListener
+public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 {
 	@SuppressWarnings("unused") private static final String TAG = DoseView.class.getName();
 
@@ -109,8 +112,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 
 		setClickable(true);
 		setFocusable(true);
-		setOnTouchListener(this);
-
+				
 		updateIntakeStatusIcon(true);
 
 		Database.registerOnChangedListener(this);
@@ -172,25 +174,27 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener, 
 	}
 
 	@Override
-	public boolean onTouch(View v, MotionEvent event)
+	public boolean onTouchEvent(final MotionEvent event)
 	{
-		// TODO i'm sure there's a better way to do this...
-		switch(event.getAction() & MotionEvent.ACTION_MASK)
+		int action = event.getAction() & MotionEvent.ACTION_MASK;
+		
+		switch(action)
 		{
 			case MotionEvent.ACTION_DOWN:
-				v.setBackgroundResource(R.drawable.doseview_background_focus);
-				return true;
-
+				setBackgroundResource(R.drawable.doseview_background_focus);
+				break;
+			
 			case MotionEvent.ACTION_UP:
-				v.performClick();
-				// fall through
-
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_OUTSIDE:
-				v.setBackgroundResource(R.drawable.doseview_background);
-				return true;
+				setBackgroundResource(R.drawable.doseview_background);
+				break;
+				
+			default:
+				// do nothing					
 		}
-		return false;
+		
+		return super.onTouchEvent(event);
 	}
 
 	@Override
