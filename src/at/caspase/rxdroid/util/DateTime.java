@@ -57,6 +57,20 @@ public final class DateTime
 	public static GregorianCalendar calendarFromDate(Date date) {
 		return new GregorianCalendar(date.getYear(), date.getMonth(), date.getDay());
 	}
+	
+	public static Date date(int year, int month, int day) 
+	{
+		final Timestamp timestamp = new Timestamp(0);
+		timestamp.setYear(year - 1900);
+		timestamp.setMonth(month);
+		timestamp.setDate(day);
+		timestamp.setHours(0);
+		timestamp.setMinutes(0);
+		timestamp.setSeconds(0);
+		timestamp.setNanos(0);
+		
+		return new Date(timestamp.getTime());
+	}
 
 	public static String toString(Time time)
 	{

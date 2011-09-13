@@ -25,8 +25,10 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -264,16 +266,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	@Override
 	public void onDateSet(DatePicker view, int year, int month, int day)
 	{
-		final Timestamp timestamp = new Timestamp(0);
-		timestamp.setYear(year - 1900);
-		timestamp.setMonth(month);
-		timestamp.setDate(day);
-		timestamp.setHours(0);
-		timestamp.setMinutes(0);
-		timestamp.setSeconds(0);
-		timestamp.setNanos(0);
-
-		setDate(new Date(timestamp.getTime()));
+		setDate(DateTime.date(year, month, day));
 	}
 
 	public void onDoseClick(final View view)
@@ -374,20 +367,17 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	}
 
 	@Override
-	public void onCreateEntry(Drug drug)
-	{
+	public void onCreateEntry(Drug drug) {
 		mAdapter.add(drug);
 	}
 
 	@Override
-	public void onDeleteEntry(Drug drug)
-	{
+	public void onDeleteEntry(Drug drug) {
 		mAdapter.remove(drug);
 	}
 
 	@Override
-	public void onUpdateEntry(Drug drug)
-	{
+	public void onUpdateEntry(Drug drug) {
 		mAdapter.update(drug);
 	}
 
@@ -493,13 +483,9 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		mViewSwitcher.showNext();
 
 		final SpannableString dateString = new SpannableString(mDate.toString());
-		final Date today = DateTime.today();
-
-		Log.d(TAG, "Current date: " + mDate + " (" + mDate.getTime() + ")");
-		Log.d(TAG, "Today: " + today + " (" + today.getTime() + ")");
 
 		if(mDate.equals(DateTime.today()))
-			   dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
+			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
 
 		mTextDate.setText(dateString);
 
@@ -558,18 +544,30 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			return v;
 		}
 		
+		/**
+		 * Update a drug, based on its ID.
+		 *  
+		 * @param drug the drug to update. If there's an item in the adapter data
+		 * 	with a matching ID, it will be replaced with this one.
+		 */
 		public void update(Drug drug)
 		{
-			for(int i = 0; i != getCount(); ++i)
+			int i = 0;
+			
+			for(; i != getCount(); ++i)
 			{
 				Drug d = getItem(i);
 				
 				if(d.getId() == drug.getId())
 				{
 					remove(d);
-					insert(drug, i);			
+					insert(drug, i);
+					return;
 				}	
-			}			
+			}
+			
+			if(i == getCount())
+				throw new NoSuchElementException("No such drug in adapter data: " + drug);
 		}
 	}
 
