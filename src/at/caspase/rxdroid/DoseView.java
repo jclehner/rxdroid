@@ -259,7 +259,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		if(mDate == null || mDrug.hasDoseOnDate(mDate))
 			mDoseText.setText(mDrug.getDose(mDoseTime).toString());
 		else
-			mDoseText.setText("0");		
+			mDoseText.setText("0");
 		
 		updateIntakeStatusIcon(true);
 	}

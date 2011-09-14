@@ -20,6 +20,7 @@
 			<at.caspase.rxdroid.preferences.TimePreference android:key="time_morning_begin"
 				android:title="@string/_Begin"
 				android:defaultValue="@string/pref_default_time_morning_begin"
+				rxdroid:after="time_night_end"
 				rxdroid:before="time_morning_end" />
 				
 			<at.caspase.rxdroid.preferences.TimePreference android:key="time_morning_end"
@@ -79,6 +80,7 @@
 				android:title="@string/_End"
 				android:defaultValue="@string/pref_default_time_night_end"
 				rxdroid:after="time_night_begin"
+				rxdroid:before="time_morning_begin"
 			/>	
 				
 		</PreferenceCategory>

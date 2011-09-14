@@ -62,13 +62,24 @@ public class DumbTime extends Date
 	}
 
 	/**
-	 * Creates an instance with an offset.
+	 * Creates an instance using an offset from midnight.
 	 *
 	 * @param offset An offset from midnight, in milliseconds. The permissible range is thus [0, 86400000).
-	 */
-	public DumbTime(long offset)
+	 */	
+	public DumbTime(long offset) {
+		this(offset, false);	
+	}
+	
+	/**
+	 * Creates an instance using an offset from midnight.
+	 *
+	 * @param offset An offset from midnight, in milliseconds. The permissible range is thus [0, 86400000), unless <code>
+	 * 	allowMoreThan24Hours</code> is <true>.
+	 * @param allowMoreThan24Hours See above.
+	 */	
+	public DumbTime(long offset, boolean allowMoreThan24Hours)
 	{
-		if(offset >= 86400000)
+		if(offset >= 86400000 && !allowMoreThan24Hours)
 			throw new IllegalArgumentException(offset + " is out of range");
 
 		mHours = (int) offset % 3600000;

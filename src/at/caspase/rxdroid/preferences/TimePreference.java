@@ -21,6 +21,8 @@
 
 package at.caspase.rxdroid.preferences;
 
+import java.util.Date;
+
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
@@ -35,6 +37,8 @@ import android.util.Log;
 import android.widget.TimePicker;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
+import at.caspase.rxdroid.util.Constants;
+import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
 public class TimePreference extends Preference implements OnTimeSetListener, OnPreferenceClickListener
@@ -47,6 +51,8 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	
 	private DumbTime[] mConstraintTimes = new DumbTime[2];
 	private String[] mConstraintKeys = new String[2];
+		
+	private boolean mWrapsAroundMidnight;
 	
 	public TimePreference(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
@@ -143,7 +149,12 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 		DumbTime before = getConstraint(IDX_BEFORE);
 		
 		if(after != null && before != null)
-			msgId = R.string._msg_constraints_ab;
+		{
+			if(after.after(before)) // see comment in isTimeWithinConstraints for an explanation
+				msgId = R.string._msg_constraints_b;
+			else			
+				msgId = R.string._msg_constraints_ab;
+		}			
 		else if(after != null)
 			msgId = R.string._msg_constraints_a;
 		else if(before != null)
@@ -183,7 +194,26 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 		DumbTime before = getConstraint(IDX_BEFORE);
 		
 		if(after != null && before != null)
+		{
+			if(before.before(after))
+			{
+				// if the time constraint specified by 'before' is also before the 
+				// time specified by the 'after' constraint, the dates wrap around
+				// midnight!
+				Log.d(TAG, getKey() + ": constraint 'before' wraps around midnight");				
+				return mTime.after(after) || mTime.before(before);				
+			}
+			else if(after.after(before))
+			{
+				// the time constraint specified by 'after' is before our 'before'
+				// constraint. we thus ignore that value and only check against the
+				// 'before' constraint
+				Log.d(TAG, getKey() + ": constraint 'after' wraps around midnight");				
+				return mTime.before(before);
+			}			
+						
 			return mTime.after(after) && mTime.before(before);
+		}
 		else if(after != null)
 			return mTime.after(after);
 		else if(before != null)
