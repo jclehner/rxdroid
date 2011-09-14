@@ -31,6 +31,7 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.TimePicker;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
@@ -61,7 +62,7 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 		
 		for(int i = 0; i != attributeNames.length; ++i)
 		{
-			String value = attrs.getAttributeValue(NS_PREF, attributeNames[i]);
+			String value = attrs.getAttributeValue(NS_PREF, attributeNames[i]);			
 			try
 			{
 				mConstraintTimes[i] = DumbTime.valueOf(value);
@@ -130,7 +131,7 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 		final boolean is24HourView = DateFormat.is24HourFormat(getContext());
 		TimePickerDialog dialog = new TimePickerDialog(getContext(), this, mTime.getHours(), mTime.getMinutes(), is24HourView);
 		
-		dialog.setMessage(generateDialogMessage());		
+		dialog.setMessage(generateDialogMessage());
 		dialog.show();
 	}
 	
@@ -193,8 +194,8 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	
 	private static final String NS_BASE = "http://schemas.android.com/apk/res/";
 	private static final String NS_ANDROID = NS_BASE + "android";
-	private static final String NS_PREF = NS_BASE + TimePreference.class.getPackage().getName();
-	
+	private static final String NS_PREF = NS_BASE + "at.caspase.rxdroid";
+		
 	private static final int IDX_AFTER = 0;
 	private static final int IDX_BEFORE = 1;
 }
