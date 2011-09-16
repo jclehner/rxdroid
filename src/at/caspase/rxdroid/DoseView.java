@@ -27,6 +27,7 @@ import java.util.List;
 import android.content.Context;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
@@ -106,7 +107,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		setClickable(true);
 		setFocusable(true);
 				
-		updateIntakeStatusIcon(true);
+		//updateIntakeStatusIcon(true);
 
 		Database.registerOnChangedListener(this);
 	}
@@ -130,12 +131,11 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	public void setDrug(final Drug drug)
 	{
-		mDrug = drug;
-		updateView();
+		setInfo(null, null, drug);
 	}
 
 	public void setDate(Date date) {
-		mDate = date;
+		setInfo(null, date, null);
 	}
 
 	public Date getDate() {
@@ -156,12 +156,29 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	public void setDao(Dao<Intake, Integer> dao)
 	{
-		mIntakeDao = dao;
-		updateIntakeStatusIcon(true);
+		setInfo(dao, null, null);
 	}
 
 	public void addTextChangedListener(TextWatcher watcher) {
 		mDoseText.addTextChangedListener(watcher);
+	}
+	
+	public void setInfo(Dao<Intake, Integer> dao, Date date, Drug drug)
+	{
+		if(dao != null)
+			mIntakeDao = dao;
+		
+		if(date != null)
+			mDate = date;
+		
+		if(drug != null)
+		{
+			mDrug = drug;
+			updateView();
+		}
+		
+		if(mDate != null && mIntakeDao != null && mDrug != null)
+			updateIntakeStatusIcon(true);
 	}
 
 	@Override

@@ -66,7 +66,6 @@ import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
-import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.Util;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
@@ -91,7 +90,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 	private DrugAdapter mAdapter;
 	
-	private List<Database.Drug> mDrugs;
 	private Date mDate;
 
 	private Dao<Database.Drug, Integer> mDao;
@@ -421,7 +419,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			throw new RuntimeException(e);
 		}
 		
-		return new DrugAdapter(this, R.layout.dose_view, drugs, mDate);
+		return new DrugAdapter(this, R.layout.dose_view, drugs);
 	}
 	
 	private void startNotificationService()
@@ -481,7 +479,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		}
 
 		mViewSwitcher.showNext();
-
+		((ListView) mViewSwitcher.getCurrentView()).setAdapter(mAdapter);
+		
 		final SpannableString dateString = new SpannableString(mDate.toString());
 
 		if(mDate.equals(DateTime.today()))
@@ -503,13 +502,10 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	
 	private class DrugAdapter extends ArrayAdapter<Database.Drug>
 	{
-		private final Date mDate;
-
-		public DrugAdapter(Context context, int textViewResId, List<Database.Drug> items, Date date)
+		public DrugAdapter(Context context, int textViewResId, List<Database.Drug> items)
 		{
 			super(context, textViewResId, items);
 			setNotifyOnChange(true);
-			mDate = date;
 		}
 
 		@Override
@@ -536,9 +532,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			for(int doseViewId : doseViewIds)
 			{
 				DoseView doseView = (DoseView) v.findViewById(doseViewId);
-				doseView.setDate(mDate);
-				doseView.setDrug(drug);
-				doseView.setDao(mIntakeDao);
+				doseView.setInfo(mIntakeDao, mDate, drug);
 			}
 
 			return v;
