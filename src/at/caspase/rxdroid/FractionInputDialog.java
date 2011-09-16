@@ -34,7 +34,10 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnLongClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -287,6 +290,17 @@ public class FractionInputDialog extends AlertDialog implements DialogInterface.
 
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {}
+		
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
+		
+		// taken from Android's DialogPreference.java
+		Window window = getWindow();
+		window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
+				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+	}
 	
 	private void setDialogValue(Fraction value)
 	{
