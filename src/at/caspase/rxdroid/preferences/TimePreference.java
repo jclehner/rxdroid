@@ -37,8 +37,6 @@ import android.util.Log;
 import android.widget.TimePicker;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
-import at.caspase.rxdroid.util.Constants;
-import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
 public class TimePreference extends Preference implements OnTimeSetListener, OnPreferenceClickListener
@@ -51,8 +49,6 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	
 	private DumbTime[] mConstraintTimes = new DumbTime[2];
 	private String[] mConstraintKeys = new String[2];
-		
-	private boolean mWrapsAroundMidnight;
 	
 	public TimePreference(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
