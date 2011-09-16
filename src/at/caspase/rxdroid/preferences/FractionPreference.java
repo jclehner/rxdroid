@@ -43,6 +43,9 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 	
 	private Fraction mValue;
 	
+	private CharSequence mDialogTitle;
+	private int mDialogIcon = -1;
+	
 	public FractionPreference(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
@@ -63,6 +66,14 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 		return mValue;
 	}
 	
+	public void setDialogTitle(CharSequence title) {
+		mDialogTitle = title;
+	}
+	
+	public void setDialogIcon(int resId) {
+		mDialogIcon = resId;
+	}
+	
 	@Override
 	public CharSequence getSummary() {
 		return mValue.toString();
@@ -72,6 +83,11 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 	public boolean onPreferenceClick(Preference preference)
 	{
 		FractionInputDialog dialog = new FractionInputDialog(getContext(), mValue, this);
+		dialog.setTitle(mDialogTitle);
+		
+		if(mDialogIcon != -1)
+			dialog.setIcon(mDialogIcon);
+		
 		dialog.show();
 		return true;
 	}
