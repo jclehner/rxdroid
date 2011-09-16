@@ -4,6 +4,7 @@
 
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 	<application android:icon="@drawable/ic_launcher"
 		android:debuggable="true" android:label="RxDroid" android:theme="@android:style/Theme.Black">

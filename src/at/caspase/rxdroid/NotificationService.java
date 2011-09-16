@@ -21,6 +21,10 @@
 
 package at.caspase.rxdroid;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -346,6 +350,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 				{
 					Log.e(TAG, "Service died due to exception", e);
 					stopSelf();
+					writeCrashLog(e);
 				}
 				finally
 				{
@@ -682,5 +687,27 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			Thread.sleep(time);
 		else
 			Log.d(TAG, "sleep: ignoring time of " + time);
+	}
+	
+	private void writeCrashLog(Exception cause)
+	{
+		long timestamp = System.currentTimeMillis() / 1000;
+		File crashLog = new File(getExternalFilesDir(null), "crash-" + timestamp + ".log");
+		
+		try
+		{
+			OutputStream os = new FileOutputStream(crashLog);
+			String msg = 
+					"Time: " + DateTime.now() + "\n\n" +
+					cause + "\n\n" +
+					"Closing thread...";
+			
+			os.write(msg.getBytes());
+			os.close();
+		}
+		catch(IOException e)
+		{
+			Log.e(TAG, "Error writing crash log", e);
+		}		
 	}
 }
