@@ -90,6 +90,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 		mIntent = new Intent(Intent.ACTION_VIEW);
 		mIntent.setClass(getApplicationContext(), DrugListActivity.class);
+		mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 		Preferences.setContext(getApplicationContext());
 
