@@ -37,12 +37,12 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnLongClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class FractionInputDialog extends AlertDialog implements DialogInterface.OnClickListener, View.OnClickListener, OnLongClickListener, TextWatcher
+public class FractionInputDialog extends AlertDialog implements 
+		DialogInterface.OnClickListener, View.OnClickListener, OnLongClickListener, TextWatcher
 {
 	public interface OnFractionSetListener
 	{
