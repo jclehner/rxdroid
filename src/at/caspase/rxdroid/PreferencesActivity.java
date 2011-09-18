@@ -21,19 +21,20 @@
 
 package at.caspase.rxdroid;
 
-import java.sql.Time;
-
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.Preference.OnPreferenceChangeListener;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
-public class PreferencesActivity extends PreferenceActivity implements OnPreferenceChangeListener
+public class PreferencesActivity extends PreferenceActivity
 {
+	@SuppressWarnings("unused")
 	private static final String TAG = PreferencesActivity.class.getName();
 
+	private static final int MENU_RESTORE_DEFAULTS = 0;
+	
 	SharedPreferences mSharedPreferences;
 
 	@Override
@@ -44,35 +45,28 @@ public class PreferencesActivity extends PreferenceActivity implements OnPrefere
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
 		addPreferencesFromResource(R.xml.preferences);
 	}
-
+	
 	@Override
-	public boolean onPreferenceChange(Preference preference, Object newValue)
+	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		final String key = preference.getKey();
-
-		Log.d(TAG, "onPreferenceChange: key=" + key);
-
-		if("time_night_end".equals(key))
-		{
-			final Time begin = getTimeSharedPreference("time_night_begin");
-			final Time end = getTimeSharedPreference("time_night_end");
-
-			if(end.before(begin))
-				preference.setSummary(preference.getSummary() + " (on the next day)");
-		}
-
-		return false;
+		menu.add(0, MENU_RESTORE_DEFAULTS, 0, "Restore defaults").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		
+		return super.onCreateOptionsMenu(menu);
 	}
 
-	private Time getTimeSharedPreference(String key)
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		try
+		switch(item.getItemId())
 		{
-			return Time.valueOf(mSharedPreferences.getString(key, null));
+			case MENU_RESTORE_DEFAULTS:
+			{
+				mSharedPreferences.edit().clear().commit();
+				break;
+			}
+			default:
+				// ignore
 		}
-		catch(IllegalArgumentException e)
-		{
-			return new Time(0, 0, 0);
-		}
+		return super.onOptionsItemSelected(item);
 	}
 }

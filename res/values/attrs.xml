@@ -11,5 +11,7 @@
     <declare-styleable name="TimePreference">
     	<attr name="before" format="string" />
     	<attr name="after" format="string" />
+    	<attr name="allowBeforeWrap" format="boolean" />
+    	<attr name="allowAfterWrap" format="boolean" />
     </declare-styleable>
 </resources>

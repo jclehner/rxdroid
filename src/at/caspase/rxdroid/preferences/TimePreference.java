@@ -44,9 +44,14 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	@SuppressWarnings("unused")
 	private static final String TAG = TimePreference.class.getName();
 	
+	private static final int WRAP_AFTER = 1;
+	private static final int WRAP_BEFORE = (1 << 1);
+		
 	private String mDefaultValue;
 	private DumbTime mTime;
 	
+	private int mWrapFlags;
+		
 	private DumbTime[] mConstraintTimes = new DumbTime[2];
 	private String[] mConstraintKeys = new String[2];
 	
@@ -75,6 +80,14 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 			}			
 		}
 		
+		mWrapFlags = 0;
+		
+		if(attrs.getAttributeBooleanValue(NS_PREF, "allowAfterWrap", false))
+			mWrapFlags |= WRAP_AFTER;
+		
+		if(attrs.getAttributeBooleanValue(NS_PREF, "allowBeforeWrap", false))
+			mWrapFlags |= WRAP_BEFORE;
+				
 		super.setOnPreferenceClickListener(this);		
 		updateTime();
 	}
@@ -141,16 +154,14 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	{
 		int msgId = -1;
 
-		DumbTime after = getConstraint(IDX_AFTER);
-		DumbTime before = getConstraint(IDX_BEFORE);
+		final DumbTime constraintTimes[] = { null, null };
+		getConstraints(constraintTimes);
+		
+		final DumbTime after = constraintTimes[IDX_AFTER];
+		final DumbTime before = constraintTimes[IDX_BEFORE];
 		
 		if(after != null && before != null)
-		{
-			if(after.after(before)) // see comment in isTimeWithinConstraints for an explanation
-				msgId = R.string._msg_constraints_b;
-			else			
-				msgId = R.string._msg_constraints_ab;
-		}			
+			msgId = R.string._msg_constraints_ab;
 		else if(after != null)
 			msgId = R.string._msg_constraints_a;
 		else if(before != null)
@@ -180,34 +191,68 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 		return null;
 	}
 	
+	private boolean getConstraints(DumbTime[] constraintTimes)
+	{
+		DumbTime after = getConstraint(IDX_AFTER);
+		DumbTime before = getConstraint(IDX_BEFORE);
+		
+		boolean isWrapping = false;		
+		
+		if(after != null && before != null)
+		{
+			Log.d(TAG, "getConstraints: key=" + getKey());
+			Log.d(TAG, "  before=" + before + ", after=" + after);
+			
+			if(after.after(before))
+			{
+				if((mWrapFlags & WRAP_BEFORE) == 0)
+					after = null;
+				
+				if((mWrapFlags & WRAP_AFTER) == 0)
+					before = null;
+				
+				isWrapping = true;
+			}
+			
+			Log.d(TAG, "  before=" + before + ", after=" + after);
+			Log.d(TAG, "  isWrapping=" + isWrapping);
+		}
+		
+		constraintTimes[IDX_AFTER] = after;
+		constraintTimes[IDX_BEFORE] = before;
+		
+		return isWrapping;
+	}
+	
 	private void updateTime() {
 		mTime = DumbTime.valueOf(getPersistedString(mDefaultValue));
 	}
 	
 	private boolean isTimeWithinConstraints()
 	{
+		boolean ret = isTimeWithinConstraints_();
+		Log.d(TAG, "isTimeWithinConstraints: key=" + getKey() + ", ret=" + ret);
+		return ret;
+	}
+	
+	private boolean isTimeWithinConstraints_()
+	{
+		/*final DumbTime constraintTimes[] = { null, null };
+		getConstraints(constraintTimes);
+		
+		DumbTime after = constraintTimes[IDX_AFTER];
+		DumbTime before = constraintTimes[IDX_BEFORE];*/
+		
 		DumbTime after = getConstraint(IDX_AFTER);
 		DumbTime before = getConstraint(IDX_BEFORE);
 		
 		if(after != null && before != null)
 		{
-			if(before.before(after))
-			{
-				// if the time constraint specified by 'before' is also before the 
-				// time specified by the 'after' constraint, the dates wrap around
-				// midnight!
-				Log.d(TAG, getKey() + ": constraint 'before' wraps around midnight");				
-				return mTime.after(after) || mTime.before(before);				
-			}
-			else if(after.after(before))
-			{
-				// the time constraint specified by 'after' is before our 'before'
-				// constraint. we thus ignore that value and only check against the
-				// 'before' constraint
-				Log.d(TAG, getKey() + ": constraint 'after' wraps around midnight");				
-				return mTime.before(before);
-			}			
+			if(mWrapFlags != 0 && before.before(after))
+				return mTime.after(after) || mTime.before(before);
 						
+			Log.d(TAG, "--------------------------------------");
+				
 			return mTime.after(after) && mTime.before(before);
 		}
 		else if(after != null)

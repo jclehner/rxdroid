@@ -104,7 +104,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.drug_list);
 		
-		mInflater = LayoutInflater.from(getApplicationContext());
+		mInflater = LayoutInflater.from(this);
 		
 		mDao = getHelper().getDrugDao();
 		mIntakeDao = getHelper().getIntakeDao();
@@ -170,8 +170,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add(0, MENU_ADD, 0, "Add").setIcon(android.R.drawable.ic_menu_add);
-		//menu.add(0, MENU_DELETE, 0, "Delete").setIcon(android.R.drawable.ic_menu_delete);
-		//menu.add(0, MENU_DEBUG_FILL, 0, "Fill DB").setIcon(android.R.drawable.ic_menu_agenda);
 		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(android.R.drawable.ic_menu_preferences);
 
 		return super.onCreateOptionsMenu(menu);
@@ -185,10 +183,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			case MENU_ADD:
 			{
 				Intent intent = new Intent(Intent.ACTION_INSERT);
-				intent.setClass(this, DrugEditActivity.class);
-
-				startActivityForResult(intent, 0);
-
+				intent.setClass(getApplicationContext(), DrugEditActivity.class);
+				startActivity(intent);
 				return true;
 			}
 			case MENU_PREFERENCES:

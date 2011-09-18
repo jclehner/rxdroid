@@ -21,7 +21,9 @@
 				android:title="@string/_Begin"
 				android:defaultValue="@string/pref_default_time_morning_begin"
 				rxdroid:after="time_night_end"
-				rxdroid:before="time_morning_end" />
+				rxdroid:before="time_morning_end"
+				rxdroid:allowAfterWrap="true"
+			/>
 				
 			<at.caspase.rxdroid.preferences.TimePreference android:key="time_morning_end"
 				android:title="@string/_End"
@@ -74,6 +76,8 @@
 				android:title="@string/_Begin"
 				android:defaultValue="@string/pref_default_time_night_begin"
 				rxdroid:after="time_evening_end"
+				rxdroid:before="time_night_end"
+				rxdroid:allowBeforeWrap="true"
 			/>
 			
 			<at.caspase.rxdroid.preferences.TimePreference android:key="time_night_end"
@@ -81,6 +85,8 @@
 				android:defaultValue="@string/pref_default_time_night_end"
 				rxdroid:after="time_night_begin"
 				rxdroid:before="time_morning_begin"
+				rxdroid:allowBeforeWrap="true"
+				rxdroid:allowAfterWrap="true"
 			/>	
 				
 		</PreferenceCategory>

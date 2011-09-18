@@ -81,7 +81,7 @@
     <string name="_Snooze_time">Snooze time</string>
     
     <string name="_title_prefscreen_display">Display</string>
-    <string name="_summary_prefscreen_display">Display settings, mainly for the main drug list.</string>
+    <string name="_summary_prefscreen_display">Choose which drugs to display</string>
     
     <string name="_title_pref_show_days_without_intakes">Show doseless</string>
 	<string name="_summary_pref_show_days_without_intakes_on">All drugs will be displayed</string>
@@ -90,6 +90,9 @@
 	<string name="_title_pref_show_inactive">Show inactive</string>
 	<string name="_summary_pref_show_inactive_off">Drugs marked as inactive will be hidden</string>
 	<string name="_summary_pref_show_inactive_on">@string/_summary_pref_show_days_without_intakes_on</string>
+	
+	<string name="_title_pref_restore_defaults">Restore defaults</string>
+	<string name="_summary_pref_restore_defaults">Resets all preferences to default values</string>
 	
 	<string name="_title_prefscreen_display_info">Information</string>
 	<string name="_summary_prefscreen_display_info">Note that these settings may be overridden temporarily using MENU &gt; Show all</string>		
