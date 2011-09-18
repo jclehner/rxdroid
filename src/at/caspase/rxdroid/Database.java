@@ -27,8 +27,9 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -60,8 +61,9 @@ public class Database
 {
 	private static final String TAG = Database.class.getName();
 
-	private static HashSet<OnDatabaseChangedListener> sWatchers = new HashSet<OnDatabaseChangedListener>();
-
+	// hackish, but there's no IdentityHashSet
+	private static Map<OnDatabaseChangedListener, Void> sOnChangedListeners = new IdentityHashMap<OnDatabaseChangedListener, Void>();
+	
 	/**
 	 * Add a listener to the registry.
 	 *
@@ -73,7 +75,7 @@ public class Database
 	 * @param listener The listener to register.
 	 */
 	public static synchronized void registerOnChangedListener(OnDatabaseChangedListener listener) {
-		sWatchers.add(listener);
+		sOnChangedListeners.put(listener, null);
 	}
 
 	/**
@@ -82,8 +84,9 @@ public class Database
 	 * @see #Database.OnDatabaseChangedListener
 	 * @param listener The listener to remove.
 	 */
-	public static synchronized void unregisterOnChangedListener(OnDatabaseChangedListener watcher) {
-		sWatchers.remove(watcher);
+	public static synchronized void unregisterOnChangedListener(OnDatabaseChangedListener listener) 
+	{
+		sOnChangedListeners.remove(listener);
 	}
 
 	/**
@@ -119,12 +122,12 @@ public class Database
 
 		if(t instanceof Drug)
 		{
-			for(OnDatabaseChangedListener watcher : sWatchers)
+			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onCreateEntry((Drug) t);
 		}
 		else if(t instanceof Intake)
 		{
-			for(OnDatabaseChangedListener watcher : sWatchers)
+			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onCreateEntry((Intake) t);
 		}
 	}
@@ -151,7 +154,7 @@ public class Database
 
 		if(t instanceof Drug)
 		{
-			for(OnDatabaseChangedListener watcher : sWatchers)
+			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onUpdateEntry((Drug) t);
 		}
 	}
@@ -178,12 +181,12 @@ public class Database
 
 		if(t instanceof Drug)
 		{
-			for(OnDatabaseChangedListener watcher : sWatchers)
+			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onDeleteEntry((Drug) t);
 		}
 		else if(t instanceof Intake)
 		{
-			for(OnDatabaseChangedListener watcher : sWatchers)
+			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onDeleteEntry((Intake) t);
 		}
 	}
@@ -192,7 +195,7 @@ public class Database
 	{
 		helper.onUpgrade(helper.getWritableDatabase(), 0, Helper.DB_VERSION);
 
-		for(OnDatabaseChangedListener watcher : sWatchers)
+		for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 			watcher.onDatabaseDropped();
 	}
 

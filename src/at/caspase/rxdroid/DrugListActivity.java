@@ -82,10 +82,12 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 	private static final int TAG_ID = R.id.tag_drug_id;
 
+	private LayoutInflater mInflater;
+	
 	private ViewSwitcher mViewSwitcher;
-	private TextView mTextDate;
-
 	private DrugAdapter mAdapter;
+		
+	private TextView mTextDate;
 	
 	private Date mDate;
 
@@ -102,6 +104,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.drug_list);
 		
+		mInflater = LayoutInflater.from(getApplicationContext());
+		
 		mDao = getHelper().getDrugDao();
 		mIntakeDao = getHelper().getIntakeDao();
 		mViewSwitcher = (ViewSwitcher) findViewById(R.id.drug_list_view_flipper);
@@ -110,14 +114,13 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		mViewSwitcher.setFactory(this);
-		mTextDate.setOnLongClickListener(this);
+		mTextDate.setOnLongClickListener(this);		
 
-		startNotificationService();
+		mAdapter = makeAdapter();
 		
-		Preferences.setContext(getApplicationContext());
-
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		Database.registerOnChangedListener(this);
+		Preferences.setContext(getApplicationContext());
 	}
 
 	@Override
@@ -206,10 +209,10 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		//	updateAdapter();
 	}
 
-	public void onDateChangeRequest(View view)
+	public void onNavigationClick(View view)
 	{
-		Timer t = new Timer();
-
+		setProgressBarIndeterminateVisibility(true);
+		
 		switch(view.getId())
 		{
 			case R.id.med_list_footer:
@@ -224,8 +227,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			default:
 				throw new IllegalArgumentException("Unhandled view " + view.getClass().getSimpleName() + ", id=" + view.getId());
 		}
-
-		Log.d(TAG, "onDateChangeRequest: " + t);
+		
+		setProgressBarIndeterminateVisibility(false);
 	}
 
 	public void onDrugNameClick(View view)
@@ -391,16 +394,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	}
 	
 	@Override
-	public View makeView()
-	{
-		ListView lv = new ListView(this);
-		
-		if(mAdapter == null)
-			mAdapter = makeAdapter();
-		
-		lv.setAdapter(mAdapter);
-		
-		return lv;
+	public View makeView() {
+		return new ListView(this);
 	}
 		
 	private DrugAdapter makeAdapter()
@@ -511,11 +506,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			View v = convertView;
 
 			if(v == null)
-			{
-				LayoutInflater li = LayoutInflater.from(getContext());
-				v = li.inflate(R.layout.drug_view2, null);
-			}
-
+				v = mInflater.inflate(R.layout.drug_view2, null);
+			
 			final Drug drug = getItem(position);
 
 			final TextView drugName = (TextView) v.findViewById(R.id.drug_name);
@@ -531,7 +523,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 				DoseView doseView = (DoseView) v.findViewById(doseViewId);
 				doseView.setInfo(mIntakeDao, mDate, drug);
 			}
-
+			
 			return v;
 		}
 		

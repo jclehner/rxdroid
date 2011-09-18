@@ -78,13 +78,13 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	private int mLastNotificationHash;
 
 	Thread mThread;
-	static NotificationService mInstance = null;
+	static NotificationService sInstance = null;
 	
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
-		mInstance = this;
+		sInstance = this;
 		
 		mDrugDao = getHelper().getDrugDao();
 		mIntakeDao = getHelper().getIntakeDao();
@@ -113,19 +113,17 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	{
 		super.onStartCommand(intent, flags, startId);
 
-		if(intent != null)
-			restartThread(intent.getBooleanExtra(EXTRA_FORCE_RESTART, false));
-		else
-			Log.w(TAG, "Intent was null");
+		boolean forceRestart = (intent != null && intent.getBooleanExtra(EXTRA_FORCE_RESTART, false));
+		restartThread(forceRestart);			
 
-		return START_REDELIVER_INTENT;
+		return START_STICKY;
 	}
 
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
-		mInstance = null;
+		sInstance = null;
 		
 		stopThread();
 		mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
@@ -189,16 +187,23 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	 */
 	public static boolean isRunning() 
 	{
-		if(mInstance == null)
+		if(sInstance == null)
 			return false;
 		
-		return mInstance.isThreadRunning();		
+		return sInstance.isThreadRunning();
 	}
 	
 	private synchronized boolean isThreadRunning() 
 	{
 		if(mThread == null)
 			return false;
+		
+		boolean isAlive = mThread.isAlive();
+		boolean isInterrupted = mThread.isInterrupted();
+		
+		Log.d(TAG, "isThreadRunning: ");
+		Log.d(TAG, "  mThread.isAlive(): " + isAlive);
+		Log.d(TAG, "  mThread.isInterrupted(): " + isInterrupted);
 		
 		// TODO does isAlive() imply !isInterrupted() ?
 		return mThread.isAlive() && !mThread.isInterrupted();		
@@ -279,11 +284,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 						
 						if(lastDoseTime >= 0)
 							checkIntakes(date, lastDoseTime);
-						else if(lastDoseTime == -1)
-							checkIntakes(DateTime.addDays(date, -1), Drug.TIME_NIGHT);
-						else
-							Log.w(TAG, "lastDoseTime=" + lastDoseTime);
-
+						
 						if(activeDoseTime == -1)
 						{
 							long sleepTime = settings.getMillisFromNowUntilDoseTimeBegin(nextDoseTime);

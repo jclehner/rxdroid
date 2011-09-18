@@ -27,9 +27,9 @@ import java.util.List;
 import android.content.Context;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -61,8 +61,6 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	private Drug mDrug;
 	private int mDoseTime = -1;
 	private Date mDate;
-
-	private boolean mWasHidden = false;
 
 	private Dao<Database.Intake, Integer> mIntakeDao = null;
 
@@ -105,11 +103,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		mDoseText.setText("0");
 
 		setClickable(true);
-		setFocusable(true);
-				
-		//updateIntakeStatusIcon(true);
-
-		Database.registerOnChangedListener(this);
+		setFocusable(true);		
 	}
 
 	public void setDoseTime(int doseTime)
@@ -176,9 +170,6 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			mDrug = drug;
 			updateView();
 		}
-		
-		if(mDate != null && mIntakeDao != null && mDrug != null)
-			updateIntakeStatusIcon(true);
 	}
 
 	@Override
@@ -240,21 +231,23 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	@Override
 	public void onDatabaseDropped() {}
-
+		
 	@Override
-	public void onWindowVisibilityChanged(int visibility)
+	protected void onAttachedToWindow()
 	{
-		if(visibility != VISIBLE)
-		{
-			Database.unregisterOnChangedListener(this);
-			mWasHidden = true;
-		}
-		else
-		{
-			Database.registerOnChangedListener(this);
-			if(mWasHidden)
-				updateView();
-		}
+		super.onAttachedToWindow();
+		
+		registerDbListener();
+		updateView();
+		updateIntakeStatusIcon(true);
+	}
+	
+	@Override
+	protected void onDetachedFromWindow()
+	{
+		super.onDetachedFromWindow();
+
+		unregisterDbListener();
 	}
 
 	private boolean isApplicableIntake(Intake intake)
@@ -277,8 +270,6 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			mDoseText.setText(mDrug.getDose(mDoseTime).toString());
 		else
 			mDoseText.setText("0");
-		
-		updateIntakeStatusIcon(true);
 	}
 
 	private void updateIntakeStatusIcon(boolean checkDbForIntake)
@@ -310,5 +301,15 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			throw new IllegalStateException("Cannot obtain intake data from DoseView with unset date and/or drug");
 
 		return Database.findIntakes(mIntakeDao, mDrug, mDate, mDoseTime);
+	}
+	
+	private synchronized void registerDbListener()
+	{
+		Database.registerOnChangedListener(this);
+	}
+	
+	private synchronized void unregisterDbListener()
+	{
+		Database.unregisterOnChangedListener(this);
 	}
 }

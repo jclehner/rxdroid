@@ -22,7 +22,7 @@
 	 		android:layout_width="wrap_content"
 	 		android:layout_height="wrap_content"
 	 		android:layout_gravity="left"
-	 		android:onClick="onDateChangeRequest"
+	 		android:onClick="onNavigationClick"
 	 		android:src="@drawable/arrow_left"
 	 	/>	 	
 		 
@@ -37,7 +37,7 @@
 			android:textColor="#000000"
 			android:gravity="center"			
 			android:clickable="true"
-			android:onClick="onDateChangeRequest"
+			android:onClick="onNavigationClick"
 		/>		
 		
 		
@@ -45,7 +45,7 @@
 	 		android:layout_width="wrap_content"
 	 		android:layout_height="wrap_content"	 			 		
 	 		android:layout_gravity="right"
-	 		android:onClick="onDateChangeRequest"
+	 		android:onClick="onNavigationClick"
 	 		android:src="@drawable/arrow_right"
 	 	/>
 	
