@@ -83,12 +83,12 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	private static final int TAG_ID = R.id.tag_drug_id;
 
 	private LayoutInflater mInflater;
-	
+
 	private ViewSwitcher mViewSwitcher;
 	private DrugAdapter mAdapter;
-		
+
 	private TextView mTextDate;
-	
+
 	private Date mDate;
 
 	private Dao<Database.Drug, Integer> mDao;
@@ -103,21 +103,21 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.drug_list);
-		
+
 		mInflater = LayoutInflater.from(this);
-		
+
 		mDao = getHelper().getDrugDao();
 		mIntakeDao = getHelper().getIntakeDao();
 		mViewSwitcher = (ViewSwitcher) findViewById(R.id.drug_list_view_flipper);
 		mTextDate = (TextView) findViewById(R.id.med_list_footer);
-		
+
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		mViewSwitcher.setFactory(this);
-		mTextDate.setOnLongClickListener(this);		
+		mTextDate.setOnLongClickListener(this);
 
 		mAdapter = makeAdapter();
-		
+
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		Database.registerOnChangedListener(this);
 		Preferences.setContext(getApplicationContext());
@@ -135,19 +135,19 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		{
 			//mViewSwitcher.removeAllViews();
 			//mAdapter = makeAdapter();
-						
-			setDate((Date) intent.getSerializableExtra(EXTRA_DAY));			
+
+			setDate((Date) intent.getSerializableExtra(EXTRA_DAY));
 		}
 		else
 			throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());
-		
+
 		if(!NotificationService.isRunning())
 		{
 			startNotificationService();
 			Log.w(TAG, "onResume: Notification service was not running");
-			
+
 			if(!mSharedPreferences.getBoolean("debug_enabled", false))
-			{			
+			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string._title_warning);
 				builder.setIcon(android.R.drawable.ic_dialog_alert);
@@ -202,13 +202,13 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	public void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 		//if(resultCode == RESULT_OK)
-		//	updateAdapter();
+		//    updateAdapter();
 	}
 
 	public void onNavigationClick(View view)
 	{
 		setProgressBarIndeterminateVisibility(true);
-		
+
 		switch(view.getId())
 		{
 			case R.id.med_list_footer:
@@ -223,7 +223,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			default:
 				throw new IllegalArgumentException("Unhandled view " + view.getClass().getSimpleName() + ", id=" + view.getId());
 		}
-		
+
 		setProgressBarIndeterminateVisibility(false);
 	}
 
@@ -388,16 +388,16 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
 		setDate(mDate);
 	}
-	
+
 	@Override
 	public View makeView() {
 		return new ListView(this);
 	}
-		
+
 	private DrugAdapter makeAdapter()
 	{
 		List<Drug> drugs;
-		
+
 		try
 		{
 			drugs = mDao.queryForAll();
@@ -406,10 +406,10 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		{
 			throw new RuntimeException(e);
 		}
-		
+
 		return new DrugAdapter(this, R.layout.dose_view, drugs);
 	}
-	
+
 	private void startNotificationService()
 	{
 		Intent serviceIntent = new Intent();
@@ -432,7 +432,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	private void setOrShiftDate(long shiftBy, Date newDate)
 	{
 		setProgressBarIndeterminateVisibility(true);
-		
+
 		if(shiftBy == 0)
 		{
 			if(newDate == null)
@@ -468,7 +468,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		mViewSwitcher.showNext();
 		((ListView) mViewSwitcher.getCurrentView()).setAdapter(mAdapter);
-		
+
 		final SpannableString dateString = new SpannableString(mDate.toString());
 
 		if(mDate.equals(DateTime.today()))
@@ -484,10 +484,10 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left));
 			mViewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right));
 		}
-		
+
 		setProgressBarIndeterminateVisibility(false);
 	}
-	
+
 	private class DrugAdapter extends ArrayAdapter<Database.Drug>
 	{
 		public DrugAdapter(Context context, int textViewResId, List<Database.Drug> items)
@@ -503,7 +503,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 			if(v == null)
 				v = mInflater.inflate(R.layout.drug_view2, null);
-			
+
 			final Drug drug = getItem(position);
 
 			final TextView drugName = (TextView) v.findViewById(R.id.drug_name);
@@ -519,32 +519,32 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 				DoseView doseView = (DoseView) v.findViewById(doseViewId);
 				doseView.setInfo(mIntakeDao, mDate, drug);
 			}
-			
+
 			return v;
 		}
-		
+
 		/**
 		 * Update a drug, based on its ID.
-		 *  
+		 *
 		 * @param drug the drug to update. If there's an item in the adapter data
-		 * 	with a matching ID, it will be replaced with this one.
+		 *     with a matching ID, it will be replaced with this one.
 		 */
 		public void update(Drug drug)
 		{
 			int i = 0;
-			
+
 			for(; i != getCount(); ++i)
 			{
 				Drug d = getItem(i);
-				
+
 				if(d.getId() == drug.getId())
 				{
 					remove(d);
 					insert(drug, i);
 					return;
-				}	
+				}
 			}
-			
+
 			if(i == getCount())
 				throw new NoSuchElementException("No such drug in adapter data: " + drug);
 		}

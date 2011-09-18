@@ -61,29 +61,29 @@ public final class Util
 
 		throw new IllegalArgumentException();
 	}
-	
+
 	/**
 	 * Obtains a string attribute from an AttributeSet.
 	 * <p>
 	 * Note that this function automatically resolves string references.
-	 * 
+	 *
 	 * @param context The context
 	 * @param attrs An AttributeSet to query
 	 * @param namespace The attribute's namespace (in the form of <code>http://schemas.android.com/apk/res/&lt;package&gt;</code>)
 	 * @param attribute The name of the attribute to query
 	 * @param defaultValue A default value, in case there's no such attribute
 	 * @return The attribute's value, or <code>null</code> if it does not exist
-	 */	
+	 */
 	public static String getStringAttribute(Context context, AttributeSet attrs, String namespace, String attribute, String defaultValue)
 	{
 		int resId = attrs.getAttributeResourceValue(namespace, attribute, -1);
 		String value;
-		
+
 		if(resId == -1)
 			value = attrs.getAttributeValue(namespace, attribute);
 		else
 			value = context.getString(resId);
-		
-		return value == null ? defaultValue : value;		
+
+		return value == null ? defaultValue : value;
 	}
 }

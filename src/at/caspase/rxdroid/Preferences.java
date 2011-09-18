@@ -44,18 +44,18 @@ public class Preferences
 	private static SharedPreferences sSharedPrefs = null;
 
 	private static Preferences instance;
-	
+
 	public synchronized static Preferences instance(Context context)
 	{
 		setContext(context.getApplicationContext());
 		return instance();
 	}
-	
-	public synchronized static Preferences instance() 
+
+	public synchronized static Preferences instance()
 	{
 		if(sApplicationContext == null)
 			throw new IllegalStateException("No Context available. Use setContext(Context) or instance(Context) instead.");
-				
+
 		if(instance == null)
 		{
 			if(sSharedPrefs.getBoolean("debug_fake_dosetimes", false))
@@ -68,12 +68,12 @@ public class Preferences
 				instance = new Preferences();
 				Log.d(TAG, "Using Settings");
 			}
-		}		
-		
+		}
+
 		return instance;
 	}
-	
-	
+
+
 	public synchronized static void setContext(Context context)
 	{
 		if(sApplicationContext == null)

@@ -64,7 +64,7 @@ public class Hasher
 		hash((int) c);
 	}
 
-	public void hash(int i) 
+	public void hash(int i)
 	{
 		// In case a class with two int members, a and b, were to have the values a = 1 and b = 2,
 		// the hash would be the same if the values were a = 2 and b = 1. By multiplying the actual
@@ -97,7 +97,7 @@ public class Hasher
 				hash(Array.get(o, i));
 		}
 	}
-	
+
 	public int getHashCode() {
 		return mHash;
 	}

@@ -41,24 +41,24 @@ public final class DateTime
 
 		return new Date(today.getTime());
 	}
-	
+
 	public static Date addDays(Date date, int days) {
-		return new Date(date.getTime() + days * Constants.MILLIS_PER_DAY);		
+		return new Date(date.getTime() + days * Constants.MILLIS_PER_DAY);
 	}
-	
+
 	public static Date tomorrow() {
-		return new Date(today().getTime() + Constants.MILLIS_PER_DAY);		
+		return new Date(today().getTime() + Constants.MILLIS_PER_DAY);
 	}
-	
+
 	public static Time now() {
 		return new Time(currentTimeMillis());
-	}	
-	
+	}
+
 	public static GregorianCalendar calendarFromDate(Date date) {
 		return new GregorianCalendar(date.getYear(), date.getMonth(), date.getDay());
 	}
-	
-	public static Date date(int year, int month, int day) 
+
+	public static Date date(int year, int month, int day)
 	{
 		final Timestamp timestamp = new Timestamp(0);
 		timestamp.setYear(year - 1900);
@@ -68,7 +68,7 @@ public final class DateTime
 		timestamp.setMinutes(0);
 		timestamp.setSeconds(0);
 		timestamp.setNanos(0);
-		
+
 		return new Date(timestamp.getTime());
 	}
 

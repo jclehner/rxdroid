@@ -30,24 +30,24 @@ public final class Constants
 	public static final long MILLIS_PER_DAY = 24L * 3600 * 1000;
 	public static final String NOTIFICATION_BULLET = "\u2022 ";
 	public static final long NOTIFICATION_INITIAL_DELAY = 10000;
-	
+
 	public static final int[] WEEK_DAYS = {
-			Calendar.MONDAY, 
-			Calendar.TUESDAY, 
-			Calendar.WEDNESDAY, 
+			Calendar.MONDAY,
+			Calendar.TUESDAY,
+			Calendar.WEDNESDAY,
 			Calendar.THURSDAY,
 			Calendar.FRIDAY,
 			Calendar.SATURDAY,
-			Calendar.SUNDAY			
+			Calendar.SUNDAY
 	};
-	
+
 	public static final String[] WEEK_DAY_NAMES;
-	
+
 	static
 	{
 		WEEK_DAY_NAMES = new String[WEEK_DAYS.length];
-		
+
 		for(int i = 0; i != WEEK_DAY_NAMES.length; ++i)
-			WEEK_DAY_NAMES[i] = DateUtils.getDayOfWeekString(WEEK_DAYS[i], DateUtils.LENGTH_LONG);		
+			WEEK_DAY_NAMES[i] = DateUtils.getDayOfWeekString(WEEK_DAYS[i], DateUtils.LENGTH_LONG);
 	}
 }

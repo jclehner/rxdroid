@@ -57,9 +57,9 @@ public class Fraction extends Number implements Comparable<Number>
 	 * Copy constructor.
 	 */
 	public Fraction(Fraction other) {
-		this(other.mNumerator, other.mDenominator);		
+		this(other.mNumerator, other.mDenominator);
 	}
-	
+
 	/**
 	 * Construct a fraction from a whole number.
 	 */
@@ -95,7 +95,7 @@ public class Fraction extends Number implements Comparable<Number>
 		int numerator, denominator;
 
 		//Log.d(TAG, "plus: this=" + this + ", other=" + other);
-		
+
 		if(this.mDenominator != other.mDenominator)
 		{
 			int lcm = findLCM(this.mDenominator, other.mDenominator);
@@ -111,12 +111,12 @@ public class Fraction extends Number implements Comparable<Number>
 			numerator = this.mNumerator + other.mNumerator;
 			denominator = this.mDenominator;
 		}
-		
+
 		Fraction result = new Fraction(numerator, denominator);
-		
+
 		//Log.d(TAG, "plus: result 1=" + numerator + "/" + denominator);
 		//Log.d(TAG, "plus: result 2=" + result);
-		
+
 		return result;
 	}
 
@@ -138,22 +138,22 @@ public class Fraction extends Number implements Comparable<Number>
 	public Fraction negate() {
 		return new Fraction(-mNumerator, mDenominator);
 	}
-	
+
 	/**
 	 * Gets the raw fraction data.
-	 * 
+	 *
 	 * @param returnAsMixedNumber
 	 * @return an <code>int[]</code> with the values <code>{ wholeNum, numerator, denominator }</code>, where <code>wholeNum</code> will
-	 * 	be zero if <code>returnAsMixedNumber</code> is <code>true</code>
+	 *     be zero if <code>returnAsMixedNumber</code> is <code>true</code>
 	 */
 	public int[] getFractionData(boolean returnAsMixedNumber)
 	{
 		if(!returnAsMixedNumber)
 			return new int[] { 0, mNumerator, mDenominator };
-		
+
 		int wholeNum = mNumerator / mDenominator;
 		int numerator = Math.abs(mNumerator % mDenominator);
-		
+
 		return new int[] { wholeNum, numerator, mDenominator };
 	}
 
@@ -175,10 +175,10 @@ public class Fraction extends Number implements Comparable<Number>
 	public int hashCode()
 	{
 		final Hasher hasher = new Hasher();
-		
+
 		hasher.hash(mNumerator);
 		hasher.hash(mDenominator);
-		
+
 		return hasher.getHashCode();
 	}
 

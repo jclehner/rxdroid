@@ -51,7 +51,7 @@ import com.j256.ormlite.dao.Dao;
  */
 public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 {
-	@SuppressWarnings("unused") 
+	@SuppressWarnings("unused")
 	private static final String TAG = DoseView.class.getName();
 
 	private ImageView mIntakeStatus;
@@ -103,7 +103,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		mDoseText.setText("0");
 
 		setClickable(true);
-		setFocusable(true);		
+		setFocusable(true);
 	}
 
 	public void setDoseTime(int doseTime)
@@ -113,7 +113,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 		final int drawableIds[] = { R.drawable.ic_morning, R.drawable.ic_noon, R.drawable.ic_evening, R.drawable.ic_night };
 		final String[] hints = { "Morning", "Noon", "Evening", "Night" };
-		
+
 		mDoseText.setHint(hints[doseTime]);
 		mDoseTimeIcon.setImageResource(drawableIds[doseTime]);
 		mDoseTime = doseTime;
@@ -156,15 +156,15 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	public void addTextChangedListener(TextWatcher watcher) {
 		mDoseText.addTextChangedListener(watcher);
 	}
-	
+
 	public void setInfo(Dao<Intake, Integer> dao, Date date, Drug drug)
 	{
 		if(dao != null)
 			mIntakeDao = dao;
-		
+
 		if(date != null)
 			mDate = date;
-		
+
 		if(drug != null)
 		{
 			mDrug = drug;
@@ -176,23 +176,23 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	public boolean onTouchEvent(final MotionEvent event)
 	{
 		int action = event.getAction() & MotionEvent.ACTION_MASK;
-		
+
 		switch(action)
 		{
 			case MotionEvent.ACTION_DOWN:
 				setBackgroundResource(R.drawable.doseview_background_focus);
 				break;
-			
+
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_OUTSIDE:
 				setBackgroundResource(R.drawable.doseview_background);
 				break;
-				
+
 			default:
-				// do nothing					
+				// do nothing
 		}
-		
+
 		return super.onTouchEvent(event);
 	}
 
@@ -231,17 +231,17 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	@Override
 	public void onDatabaseDropped() {}
-		
+
 	@Override
 	protected void onAttachedToWindow()
 	{
 		super.onAttachedToWindow();
-		
+
 		registerDbListener();
 		updateView();
 		updateIntakeStatusIcon(true);
 	}
-	
+
 	@Override
 	protected void onDetachedFromWindow()
 	{
@@ -265,7 +265,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	{
 		if(mDrug == null)
 			return;
-		
+
 		if(mDate == null || mDrug.hasDoseOnDate(mDate))
 			mDoseText.setText(mDrug.getDose(mDoseTime).toString());
 		else
@@ -276,7 +276,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	{
 		if(mDate == null || mIntakeDao == null)
 			return;
-		
+
 		if(checkDbForIntake)
 		{
 			final int intakeCount = getIntakes().size();
@@ -302,12 +302,12 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 		return Database.findIntakes(mIntakeDao, mDrug, mDate, mDoseTime);
 	}
-	
+
 	private synchronized void registerDbListener()
 	{
 		Database.registerOnChangedListener(this);
 	}
-	
+
 	private synchronized void unregisterDbListener()
 	{
 		Database.unregisterOnChangedListener(this);

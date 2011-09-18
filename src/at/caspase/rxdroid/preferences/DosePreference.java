@@ -33,31 +33,31 @@ public class DosePreference extends FractionPreference implements OnClickListene
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = DosePreference.class.getName();
-	
+
 	private int mDoseTime = -1;
 	private Drug mDrug;
 	private DoseView mDoseView;
-	
-	public DosePreference(Context context, AttributeSet attrs) 
+
+	public DosePreference(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		
+
 		mDoseTime = getDoseTimeFromKey(getKey());
-		
+
 		//final int[] doseTimeIcons = { R.drawable.ic_morning, R.drawable.ic_noon, R.drawable.ic_evening, R.drawable.ic_night };
 		//setDialogIcon(doseTimeIcons[mDoseTime]);
 		setDialogIcon(android.R.drawable.ic_dialog_dialer);
 		setDialogTitle(getTitle());
-				
+
 		setWidgetLayoutResource(R.layout.dose_preference);
-	} 
-	
-	public void setDrug(Drug drug) 
+	}
+
+	public void setDrug(Drug drug)
 	{
 		mDrug = drug;
 		setValue(mDrug.getDose(mDoseTime));
 	}
-	
+
 	@Override
 	public CharSequence getSummary() {
 		return null;
@@ -65,16 +65,16 @@ public class DosePreference extends FractionPreference implements OnClickListene
 
 	@Override
 	public void onClick(View v) {
-		onPreferenceClick(this);		
+		onPreferenceClick(this);
 	}
-	
+
 	public static int getDoseTimeFromKey(String key)
 	{
 		final String[] keys = { "morning", "noon", "evening", "night" };
 		//mDoseTime = Arrays.binarySearch(keys, 0, keys.length, getKey());
-		
+
 		int doseTime = -1;
-		
+
 		for(int i = 0; i != keys.length; ++i)
 		{
 			if(keys[i].equals(key))
@@ -83,24 +83,24 @@ public class DosePreference extends FractionPreference implements OnClickListene
 				break;
 			}
 		}
-				
+
 		if(doseTime == -1)
 			throw new IllegalStateException("Illegal key '" + key + "' for DosePreference. Valid keys: morning, noon, evening, night");
-		
-		return doseTime;		
+
+		return doseTime;
 	}
-	
+
 	@Override
 	protected void onBindView(View view)
 	{
 		super.onBindView(view);
-		
+
 		if(view != null)
 		{
 			mDoseView = (DoseView) view.findViewById(R.id.dose_view);
 			if(mDoseView == null)
 				return;
-			
+
 			mDoseView.setDoseTime(mDoseTime);
 			mDoseView.setDrug(mDrug);
 			mDoseView.setOnClickListener(this);

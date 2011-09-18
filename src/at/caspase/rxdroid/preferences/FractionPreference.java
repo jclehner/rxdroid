@@ -33,61 +33,61 @@ import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 
 /**
  * A preference for storing fractions.
- * 
+ *
  * @author Joseph Lehner
  *
  */
 public class FractionPreference extends Preference implements OnPreferenceClickListener, OnFractionSetListener
 {
 	private static final String TAG = FractionPreference.class.getName();
-	
+
 	private Fraction mValue;
-	
+
 	private CharSequence mDialogTitle;
 	private int mDialogIcon = -1;
-	
+
 	public FractionPreference(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
-	
-	public FractionPreference(Context context, AttributeSet attrs, int defStyle) 
+
+	public FractionPreference(Context context, AttributeSet attrs, int defStyle)
 	{
 		super(context, attrs, defStyle);
-		
+
 		mValue = Fraction.decode(getPersistedString("0"));
 		setOnPreferenceClickListener(this);
 	}
-	
+
 	public void setValue(Fraction value) {
 		mValue = value;
 	}
-	
+
 	public Fraction getValue() {
 		return mValue;
 	}
-	
+
 	public void setDialogTitle(CharSequence title) {
 		mDialogTitle = title;
 	}
-	
+
 	public void setDialogIcon(int resId) {
 		mDialogIcon = resId;
 	}
-	
+
 	@Override
 	public CharSequence getSummary() {
 		return mValue.toString();
 	}
-	
+
 	@Override
 	public boolean onPreferenceClick(Preference preference)
 	{
 		FractionInputDialog dialog = new FractionInputDialog(getContext(), mValue, this);
 		dialog.setTitle(mDialogTitle);
-		
+
 		if(mDialogIcon != -1)
 			dialog.setIcon(mDialogIcon);
-		
+
 		dialog.show();
 		return true;
 	}
@@ -96,20 +96,20 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 	public void onFractionSet(FractionInputDialog dialog, Fraction value)
 	{
 		boolean canPersist = callChangeListener(value);
-		
+
 		if(canPersist && shouldPersist())
 			persistString(value.toString());
-		
-		mValue = dialog.getValue();		
+
+		mValue = dialog.getValue();
 		setSummary(mValue.toString());
-		notifyChanged();		
+		notifyChanged();
 	}
-	
+
 	@Override
-	protected Object onGetDefaultValue(TypedArray a, int index) 
+	protected Object onGetDefaultValue(TypedArray a, int index)
 	{
 		String value = a.getString(index);
 		Log.d(TAG, "onGetDefaultValue: value=" + value);
-		return value != null ? value : "0"; 
+		return value != null ? value : "0";
 	}
 }

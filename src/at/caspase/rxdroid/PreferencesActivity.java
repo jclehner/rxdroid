@@ -34,7 +34,7 @@ public class PreferencesActivity extends PreferenceActivity
 	private static final String TAG = PreferencesActivity.class.getName();
 
 	private static final int MENU_RESTORE_DEFAULTS = 0;
-	
+
 	SharedPreferences mSharedPreferences;
 
 	@Override
@@ -45,12 +45,12 @@ public class PreferencesActivity extends PreferenceActivity
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
 		addPreferencesFromResource(R.xml.preferences);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add(0, MENU_RESTORE_DEFAULTS, 0, "Restore defaults").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-		
+
 		return super.onCreateOptionsMenu(menu);
 	}
 

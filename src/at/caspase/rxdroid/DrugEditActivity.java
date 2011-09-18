@@ -59,9 +59,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 {
 	public static final String EXTRA_DRUG = "drug";
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
-	
+
 	private static final String TAG = DrugEditActivity.class.getName();
-	
+
 	private static final String[] PREF_KEYS = {
 			"drug_name",
 			"morning",
@@ -72,34 +72,34 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			"drug_form",
 			"current_supply",
 			"refill_size",
-			"is_active"		
+			"is_active"
 	};
-	
+
 	private Drug mDrug;
 	private int mDrugHash = 0;
-	
+
 	private Database.Helper mDbHelper;
 	private Dao<Drug, Integer> mDao;
-	
+
 	private DrugNamePreference mDrugName;
-	private DosePreference[] mDosePrefs; 
+	private DosePreference[] mDosePrefs;
 	private ListPreference mFreqPreference;
 	private ListPreference mDrugForm;
 	private FractionPreference mCurrentSupply;
 	private EditTextPreference mRefillSize;
 	private CheckBoxPreference mIsActive;
-	
+
 	// if true, we're editing an existing drug; if false, we're adding a new one
 	private boolean mIsEditing;
-	
+
 	@Override
 	public void onBackPressed()
 	{
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
-			
+
 		String drugName = mDrug.getName();
-		
+
 		if(drugName == null || drugName.isEmpty())
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -108,12 +108,12 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			builder.setMessage(R.string._msg_err_empty_drug_name);
 			builder.setPositiveButton(android.R.string.ok, null);
 			builder.show();
-			
+
 			return;
 		}
-		
+
 		initDao();
-		
+
 		if(Intent.ACTION_EDIT.equals(action))
 		{
 			if(mDrugHash != mDrug.hashCode())
@@ -155,13 +155,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		finish();
 	}
-	
+
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue)
 	{
 		String key = preference.getKey();
 		boolean postponePrefUpdate = false;
-				
+
 		if("drug_name".equals(key))
 		{
 			Log.d(TAG, "onPreferenceChange: drugName=" + newValue);
@@ -172,31 +172,31 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		else if("frequency".equals(key))
 		{
 			int frequency = toInt(newValue);
-			
+
 			if(frequency != Drug.FREQ_DAILY)
 			{
 				postponePrefUpdate = true;
-				
+
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCancelable(false);
-				
+
 				switch(frequency)
 				{
 					case Drug.FREQ_EVERY_OTHER_DAY:
 						initFrequencyEveryOtherDayDialog(builder);
 						break;
-						
+
 					case Drug.FREQ_WEEKLY:
 						initFrequencyWeeklyDialog(builder);
 						break;
-						
+
 					default:
 						throw new IllegalStateException("Invalid frequency value");
 				}
-				
-				builder.show();			
-			}			
-			
+
+				builder.show();
+			}
+
 			mDrug.setFrequency(toInt(newValue));
 		}
 		else if("drug_form".equals(key))
@@ -209,25 +209,25 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mDrug.setActive((Boolean) newValue);
 		else
 			Log.d(TAG, "onPreferenceChange: Ignoring " + key);
-		
+
 		if(!postponePrefUpdate)
 			updatePreferences();
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public boolean onPreferenceClick(Preference preference)
 	{
 		if(preference.getKey().equals("delete"))
-		{			
+		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setTitle(mDrug.getName());
 			builder.setMessage(R.string._msg_delete_drug);
-			
+
 			builder.setPositiveButton(android.R.string.yes, new OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
@@ -237,36 +237,36 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					finish();
 				}
 			});
-			
+
 			builder.setNegativeButton(android.R.string.no, null);
 			builder.show();
-			
-			return true;			
+
+			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-				
+
 		addPreferencesFromResource(R.xml.drug_edit);
-				
+
 		mDrugName = (DrugNamePreference) findPreference("drug_name");
 		mDosePrefs = new DosePreference[4];
-		
+
 		String[] dosePrefKeys = { "morning", "noon", "evening", "night" };
 		for(int i = 0; i != dosePrefKeys.length; ++i)
 			mDosePrefs[i] = (DosePreference) findPreference(dosePrefKeys[i]);
-		
+
 		mFreqPreference = (ListPreference) findPreference("frequency");
-		mDrugForm = (ListPreference) findPreference("drug_form");		
+		mDrugForm = (ListPreference) findPreference("drug_form");
 		mCurrentSupply = (FractionPreference) findPreference("current_supply");
 		mRefillSize = (EditTextPreference) findPreference("refill_size");
 		mIsActive = (CheckBoxPreference) findPreference("is_active");
-			
+
 		// mark all preferences as non-persisting!
 		for(String key : PREF_KEYS)
 		{
@@ -274,156 +274,156 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			pref.setPersistent(false);
 			pref.setOnPreferenceChangeListener(this);
 		}
-				
+
 		populateEntryValues("frequency");
 		populateEntryValues("drug_form");
 	}
-	
+
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		
+
 		Intent intent = getIntent();
 		String action = intent.getAction();
-		
+
 		if(Intent.ACTION_EDIT.equals(action))
 		{
 			Serializable extra = intent.getSerializableExtra(EXTRA_DRUG);
 			if(extra == null)
 				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG");
-			
+
 			mIsEditing = true;
 			mDrug = (Drug) extra;
 			mDrugHash = mDrug.hashCode();
 		}
 		else if(!Intent.ACTION_INSERT.equals(action))
 			throw new IllegalArgumentException("Unhandled action " + action);
-		
+
 		if(mDrug == null)
 		{
 			mIsEditing = false;
 			mDrug = new Drug();
-		}		
-			
+		}
+
 		Preference deletePref = findPreference("delete");
-		
+
 		if(mIsEditing)
 			deletePref.setOnPreferenceClickListener(this);
 		else if(deletePref != null)
 			getPreferenceScreen().removePreference(deletePref);
-				
+
 		initializePreferences();
 	}
-	
+
 	private void initializePreferences()
 	{
 		mDrugName.setInitialName(mDrug.getName());
 
 		for(DosePreference dosePref : mDosePrefs)
 			dosePref.setDrug(mDrug);
-		
+
 		mFreqPreference.setValueIndex(mDrug.getFrequency());
 		mCurrentSupply.setValue(mDrug.getCurrentSupply());
 		mRefillSize.setText(Integer.toString(mDrug.getRefillSize()));
 		mIsActive.setChecked(mDrug.isActive());
-		
+
 		updatePreferences();
 	}
-	
+
 	/**
-	 * Updates the preference values with the 
+	 * Updates the preference values with the
 	 */
 	private void updatePreferences()
 	{
 		mDrugName.setName(mDrug.getName());
-								
-		// intake frequency 
-			
-		int frequency = mDrug.getFrequency();	
-		String summary = null;		
-		
+
+		// intake frequency
+
+		int frequency = mDrug.getFrequency();
+		String summary = null;
+
 		switch(frequency)
 		{
 			case Drug.FREQ_DAILY:
 				summary = getString(R.string._msg_freq_daily);
 				break;
-				
+
 			case Drug.FREQ_EVERY_OTHER_DAY:
 				Date next = DateTime.tomorrow();
 				if(!mDrug.hasDoseOnDate(next))
 					next = new Date(next.getTime() + at.caspase.rxdroid.util.Constants.MILLIS_PER_DAY);
 				summary = getString(R.string._msg_freq_every_other, next);
 				break;
-				
+
 			case Drug.FREQ_WEEKLY:
 				int dayOfWeek = (int) mDrug.getFrequencyArg();
 				summary = getString(R.string._msg_freq_weekly, DateUtils.getDayOfWeekString(dayOfWeek, DateUtils.LENGTH_LONG));
 				break;
-				
+
 			default:
 				throw new IllegalStateException("Invalid frequency value");
 		}
-		
+
 		mFreqPreference.setSummary(summary);
 		mFreqPreference.setValueIndex(frequency);
-		
+
 		// drug form
 		int form = mDrug.getForm();
-		String[] forms = getResources().getStringArray(R.array.drug_forms);		
+		String[] forms = getResources().getStringArray(R.array.drug_forms);
 		mDrugForm.setSummary(forms[form]);
 		mDrugForm.setValueIndex(form);
-		
+
 		// current supply
 		Fraction currentSupply = mDrug.getCurrentSupply();
-		mCurrentSupply.setSummary(currentSupply.toString());	
+		mCurrentSupply.setSummary(currentSupply.toString());
 		mCurrentSupply.setValue(currentSupply);
-		
+
 		// refill size
 		String refillSize = Integer.toString(mDrug.getRefillSize());
 		mRefillSize.setSummary(refillSize);
 		mRefillSize.setText(refillSize);
-		
+
 		// active?
 		mIsActive.setChecked(mDrug.isActive());
 	}
-	
+
 	private void populateEntryValues(String preferenceKey)
 	{
 		ListPreference pref = (ListPreference) findPreference(preferenceKey);
 		int entryCount = pref.getEntries().length;
-		
+
 		String[] values = new String[entryCount];
 		for(int i = 0; i != entryCount; ++i)
 			values[i] = Integer.toString(i);
-		
-		pref.setEntryValues(values);		
+
+		pref.setEntryValues(values);
 	}
-	
-	private void initFrequencyEveryOtherDayDialog(AlertDialog.Builder builder) 
+
+	private void initFrequencyEveryOtherDayDialog(AlertDialog.Builder builder)
 	{
 		builder.setTitle("Select a starting day");
 		builder.setItems(R.array.frequency_every_other_day, new OnClickListener() {
-			
+
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
 				Date today = DateTime.today();
-				
+
 				if(which == 0)
 					mDrug.setFrequencyArg(today.getTime());
 				else
 					mDrug.setFrequencyArg(today.getTime() + Constants.MILLIS_PER_DAY);
-				
+
 				updatePreferences();
 			}
 		});
 	}
-	
+
 	private void initFrequencyWeeklyDialog(AlertDialog.Builder builder)
 	{
 		builder.setItems(Constants.WEEK_DAY_NAMES, new OnClickListener() {
-			
+
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
@@ -432,7 +432,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			}
 		});
 	}
-	
+
 	private void initDao()
 	{
 		if(mDao == null)
@@ -441,7 +441,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mDao = mDbHelper.getDrugDao();
 		}
 	}
-	
+
 	private static int toInt(Object string) {
 		return Integer.parseInt((String) string, 10);
 	}

@@ -44,34 +44,34 @@ import com.j256.ormlite.stmt.Where;
 public class DrugNamePreference extends EditTextPreference implements TextWatcher
 {
 	private static final String TAG = DrugNamePreference.class.getName();
-	
+
 	private EditText mInput;
 	private String mInitialName = null;
-		
+
 	private Database.Helper mDbHelper;
 	private Dao<Drug, Integer> mDao;
-	
-	public DrugNamePreference(Context context, AttributeSet attrs) 
+
+	public DrugNamePreference(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		
+
 		mInput = getEditText();
 		mInput.addTextChangedListener(this);
-				
+
 		setSummary(null);
 	}
-	
+
 	public void setInitialName(String name)
 	{
 		if(name != null && !name.isEmpty())
 		{
 			mInitialName = name;
 			setName(mInitialName);
-		}			
+		}
 	}
-	
+
 	public void setName(String name)
-	{		
+	{
 		if(name != null)
 		{
 			setTitle(name);
@@ -90,25 +90,25 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 		if(!s.toString().equals(mInitialName) && !isUniqueDrugName(s.toString()))
 			mInput.setError("Another drug with that name already exists!");
 		else
-			mInput.setError(null);			
+			mInput.setError(null);
 	}
 
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-	
+
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {}
-	
+
 	@Override
 	protected void onPrepareDialogBuilder(AlertDialog.Builder builder)
 	{
 		super.onPrepareDialogBuilder(builder);
 		//builder.setCancelable(false);
 		//builder.setNegativeButton(null, null);
-		
+
 		initDao();
 	}
-	
+
 	@Override
 	protected void onDialogClosed(boolean positiveResult)
 	{
@@ -116,44 +116,44 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 		{
 			String name = mInput.getText().toString();
 			boolean isUniqueName = isUniqueDrugName(name);
-			
+
 			if(name.isEmpty() || !isUniqueName)
 			{
 				if(name.equals(mInitialName))
 					return;
-				
+
 				AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 				builder.setIcon(android.R.drawable.ic_dialog_alert);
 				builder.setCancelable(false);
 				builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-					
+
 					@Override
 					public void onClick(DialogInterface dialog, int which)
 					{
 						mInput.setSelectAllOnFocus(true);
-						showDialog(null);						
+						showDialog(null);
 					}
 				});
-				
+
 				if(name.isEmpty())
 				{
 					builder.setTitle(R.string._title_error);
 					builder.setMessage(R.string._msg_err_empty_drug_name);
-				}					
+				}
 				else if(!isUniqueDrugName(name))
 				{
 					builder.setTitle(name);
 					builder.setMessage(R.string._msg_err_non_unique_drug_name);
 				}
-				
+
 				builder.show();
 				return;
 			}
 		}
-		
+
 		super.onDialogClosed(positiveResult);
 	}
-	
+
 	private boolean isUniqueDrugName(String name)
 	{
 		if(mDao == null)
@@ -161,10 +161,10 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 			Log.d(TAG, "isUniqueDrugName: mDao == null, returning true");
 			return true;
 		}
-		
+
 		QueryBuilder<Drug, Integer> qb = mDao.queryBuilder();
 		Where<Drug, Integer> where = qb.where();
-				
+
 		try
 		{
 			where.eq(Database.Drug.COLUMN_NAME, name);
@@ -176,10 +176,10 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 			return false;
 		}
 	}
-	
+
 	private void initDao()
 	{
-		// if we did this in the constructor, there'd be a noticeable lag when instantiating 
+		// if we did this in the constructor, there'd be a noticeable lag when instantiating
 		// an object of this Preference
 		if(mDao == null)
 		{

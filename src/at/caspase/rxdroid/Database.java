@@ -63,7 +63,7 @@ public class Database
 
 	// hackish, but there's no IdentityHashSet
 	private static Map<OnDatabaseChangedListener, Void> sOnChangedListeners = new IdentityHashMap<OnDatabaseChangedListener, Void>();
-	
+
 	/**
 	 * Add a listener to the registry.
 	 *
@@ -84,7 +84,7 @@ public class Database
 	 * @see #Database.OnDatabaseChangedListener
 	 * @param listener The listener to remove.
 	 */
-	public static synchronized void unregisterOnChangedListener(OnDatabaseChangedListener listener) 
+	public static synchronized void unregisterOnChangedListener(OnDatabaseChangedListener listener)
 	{
 		sOnChangedListeners.remove(listener);
 	}
@@ -316,7 +316,7 @@ public class Database
 		public static final int TIME_EVENING = 2;
 		public static final int TIME_NIGHT = 3;
 		public static final int TIME_WHOLE_DAY = 4;
-		
+
 		public static final int FREQ_DAILY = 0;
 		public static final int FREQ_EVERY_OTHER_DAY = 1;
 		public static final int FREQ_WEEKLY = 2;
@@ -353,22 +353,22 @@ public class Database
 
 		@DatabaseField(dataType = DataType.SERIALIZABLE)
 		private Fraction doseWholeDay = new Fraction();
-		
+
 		@DatabaseField(canBeNull = true, useGetSet = true)
 		private int frequency = FREQ_DAILY;
-		
+
 		/**
 		 * Defines the frequency origin.
-		 * 
+		 *
 		 * For every frequency other than {@link #FREQ_DAILY}, this field holds a specific value,
 		 * allowing {@link #hasDoseOnDate(Date)} to determine whether a dose is pending
 		 * on a specific date.
-		 * 
+		 *
 		 * <ul>
-		 * 	<li><code>FREQ_EVERY_OTHER_DAY</code>: field is set to a date (in milliseconds) where this drug's
-		 * 		intake should be set, i.e. if the date corresponds to 2011-09-07, there's an intake on that day,
-		 * 		another one on 2011-09-09, and so forth.</li>
-		 * 	<li><code>FREQ_WEEKLY</code>: field is set to a week day value from {@link java.util.Calendar}.</li> 
+		 *     <li><code>FREQ_EVERY_OTHER_DAY</code>: field is set to a date (in milliseconds) where this drug's
+		 *         intake should be set, i.e. if the date corresponds to 2011-09-07, there's an intake on that day,
+		 *         another one on 2011-09-09, and so forth.</li>
+		 *     <li><code>FREQ_WEEKLY</code>: field is set to a week day value from {@link java.util.Calendar}.</li>
 		 */
 		@DatabaseField(canBeNull = true)
 		private long frequencyArg = 0;
@@ -382,10 +382,10 @@ public class Database
 		{
 			if(frequency == FREQ_DAILY)
 				return true;
-			
+
 			if(frequency == FREQ_EVERY_OTHER_DAY)
 			{
-				final long diffDays = Math.abs(frequencyArg - date.getTime()) / Constants.MILLIS_PER_DAY;				
+				final long diffDays = Math.abs(frequencyArg - date.getTime()) / Constants.MILLIS_PER_DAY;
 				return diffDays % 2 == 0;
 			}
 			else if(frequency == FREQ_WEEKLY)
@@ -393,15 +393,15 @@ public class Database
 				Calendar calendar = DateTime.calendarFromDate(date);
 				return calendar.get(Calendar.DAY_OF_WEEK) == frequencyArg;
 			}
-			
+
 			throw new AssertionError("WTF");
 		}
-		
-		public String getName() 
+
+		public String getName()
 		{
 			if(name == null)
 				Log.w(TAG, "getName: name == null");
-			
+
 			return name;
 		}
 
@@ -428,11 +428,11 @@ public class Database
 				// FIXME
 			}
 		}
-		
+
 		public int getFrequency() {
 			return frequency;
 		}
-		
+
 		public long getFrequencyArg() {
 			return frequencyArg;
 		}
@@ -480,14 +480,14 @@ public class Database
 				throw new IllegalArgumentException();
 			this.form = form;
 		}
-		
+
 		public void setFrequency(int frequency)
 		{
 			if(frequency > FREQ_WEEKLY)
 				throw new IllegalArgumentException();
 			this.frequency = frequency;
 		}
-		
+
 		public void setFrequencyArg(long frequencyArg) {
 			this.frequencyArg = frequencyArg;
 		}
@@ -555,7 +555,7 @@ public class Database
 			for(int i = 0; i != thisMembers.length; ++i)
 			{
 				Log.d(TAG, "Drug.equals: i=" + i + ", thisMember=" + thisMembers[i] + ", otherMember=" + otherMembers[i]);
-				
+
 				if(thisMembers[i] == null && otherMembers[i] == null)
 					continue;
 				else if(thisMembers[i] == null || otherMembers[i] == null)

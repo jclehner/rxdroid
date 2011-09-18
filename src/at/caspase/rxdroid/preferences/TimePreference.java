@@ -43,33 +43,33 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = TimePreference.class.getName();
-	
+
 	private static final int WRAP_AFTER = 1;
 	private static final int WRAP_BEFORE = (1 << 1);
-		
+
 	private String mDefaultValue;
 	private DumbTime mTime;
-	
+
 	private int mWrapFlags;
-		
+
 	private DumbTime[] mConstraintTimes = new DumbTime[2];
 	private String[] mConstraintKeys = new String[2];
-	
+
 	public TimePreference(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
-	public TimePreference(Context context, AttributeSet attrs, int defStyle) 
+	public TimePreference(Context context, AttributeSet attrs, int defStyle)
 	{
 		super(context, attrs, defStyle);
-				
-		mDefaultValue = Util.getStringAttribute(context, attrs, NS_ANDROID, "defaultValue", "00:00");		
-				
+
+		mDefaultValue = Util.getStringAttribute(context, attrs, NS_ANDROID, "defaultValue", "00:00");
+
 		final String[] attributeNames = { "after", "before" };
-		
+
 		for(int i = 0; i != attributeNames.length; ++i)
 		{
-			String value = attrs.getAttributeValue(NS_PREF, attributeNames[i]);			
+			String value = attrs.getAttributeValue(NS_PREF, attributeNames[i]);
 			try
 			{
 				mConstraintTimes[i] = DumbTime.valueOf(value);
@@ -77,26 +77,26 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 			catch(IllegalArgumentException e)
 			{
 				mConstraintKeys[i] = value;
-			}			
+			}
 		}
-		
+
 		mWrapFlags = 0;
-		
+
 		if(attrs.getAttributeBooleanValue(NS_PREF, "allowAfterWrap", false))
 			mWrapFlags |= WRAP_AFTER;
-		
+
 		if(attrs.getAttributeBooleanValue(NS_PREF, "allowBeforeWrap", false))
 			mWrapFlags |= WRAP_BEFORE;
-				
-		super.setOnPreferenceClickListener(this);		
+
+		super.setOnPreferenceClickListener(this);
 		updateTime();
 	}
-	
+
 	@Override
 	public CharSequence getSummary() {
 		return mTime == null ? null : mTime.toString();
 	}
-	
+
 	@Override
 	public void setOnPreferenceClickListener(OnPreferenceClickListener listener) {
 		throw new UnsupportedOperationException();
@@ -113,7 +113,7 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	public void onTimeSet(TimePicker view, int hourOfDay, int minute)
 	{
 		mTime = new DumbTime(hourOfDay, minute);
-		
+
 		if(!isTimeWithinConstraints())
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -121,11 +121,11 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 			builder.setTitle(R.string._title_error);
 			builder.setMessage(R.string._msg_timepreference_constraint_failed);
 			builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					showTimePicker();					
+					showTimePicker();
 				}
 			});
 			builder.show();
@@ -134,32 +134,32 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 		{
 			if(shouldPersist())
 				persistString(mTime.toString());
-			
+
 			notifyChanged();
 		}
 	}
-	
+
 	private void showTimePicker()
 	{
 		updateTime();
-		
+
 		final boolean is24HourView = DateFormat.is24HourFormat(getContext());
 		TimePickerDialog dialog = new TimePickerDialog(getContext(), this, mTime.getHours(), mTime.getMinutes(), is24HourView);
-		
+
 		dialog.setMessage(generateDialogMessage());
 		dialog.show();
 	}
-	
+
 	private String generateDialogMessage()
 	{
 		int msgId = -1;
 
 		final DumbTime constraintTimes[] = { null, null };
 		getConstraints(constraintTimes);
-		
+
 		final DumbTime after = constraintTimes[IDX_AFTER];
 		final DumbTime before = constraintTimes[IDX_BEFORE];
-		
+
 		if(after != null && before != null)
 			msgId = R.string._msg_constraints_ab;
 		else if(after != null)
@@ -169,104 +169,104 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 
 		if(msgId == -1)
 			return null;
-		
-		return getContext().getString(msgId, after, before);		
+
+		return getContext().getString(msgId, after, before);
 	}
-	
+
 	private DumbTime getConstraint(int index)
 	{
 		if(mConstraintTimes[index] != null)
 			return mConstraintTimes[index];
-		
+
 		final String key = mConstraintKeys[index];
 		if(key != null)
 		{
 			final TimePreference constraintPref = (TimePreference) findPreferenceInHierarchy(key);
 			if(constraintPref == null)
 				throw new IllegalStateException("No such TimePreference: " + key);
-			
+
 			return constraintPref.mTime;
 		}
-		
+
 		return null;
 	}
-	
+
 	private boolean getConstraints(DumbTime[] constraintTimes)
 	{
 		DumbTime after = getConstraint(IDX_AFTER);
 		DumbTime before = getConstraint(IDX_BEFORE);
-		
-		boolean isWrapping = false;		
-		
+
+		boolean isWrapping = false;
+
 		if(after != null && before != null)
 		{
 			Log.d(TAG, "getConstraints: key=" + getKey());
 			Log.d(TAG, "  before=" + before + ", after=" + after);
-			
+
 			if(after.after(before))
 			{
 				if((mWrapFlags & WRAP_BEFORE) == 0)
 					after = null;
-				
+
 				if((mWrapFlags & WRAP_AFTER) == 0)
 					before = null;
-				
+
 				isWrapping = true;
 			}
-			
+
 			Log.d(TAG, "  before=" + before + ", after=" + after);
 			Log.d(TAG, "  isWrapping=" + isWrapping);
 		}
-		
+
 		constraintTimes[IDX_AFTER] = after;
 		constraintTimes[IDX_BEFORE] = before;
-		
+
 		return isWrapping;
 	}
-	
+
 	private void updateTime() {
 		mTime = DumbTime.valueOf(getPersistedString(mDefaultValue));
 	}
-	
+
 	private boolean isTimeWithinConstraints()
 	{
 		boolean ret = isTimeWithinConstraints_();
 		Log.d(TAG, "isTimeWithinConstraints: key=" + getKey() + ", ret=" + ret);
 		return ret;
 	}
-	
+
 	private boolean isTimeWithinConstraints_()
 	{
 		/*final DumbTime constraintTimes[] = { null, null };
 		getConstraints(constraintTimes);
-		
+
 		DumbTime after = constraintTimes[IDX_AFTER];
 		DumbTime before = constraintTimes[IDX_BEFORE];*/
-		
+
 		DumbTime after = getConstraint(IDX_AFTER);
 		DumbTime before = getConstraint(IDX_BEFORE);
-		
+
 		if(after != null && before != null)
 		{
 			if(mWrapFlags != 0 && before.before(after))
 				return mTime.after(after) || mTime.before(before);
-						
+
 			Log.d(TAG, "--------------------------------------");
-				
+
 			return mTime.after(after) && mTime.before(before);
 		}
 		else if(after != null)
 			return mTime.after(after);
 		else if(before != null)
 			return mTime.before(before);
-		
+
 		return true;
 	}
-	
+
 	private static final String NS_BASE = "http://schemas.android.com/apk/res/";
 	private static final String NS_ANDROID = NS_BASE + "android";
 	private static final String NS_PREF = NS_BASE + "at.caspase.rxdroid";
-		
+
 	private static final int IDX_AFTER = 0;
 	private static final int IDX_BEFORE = 1;
 }
