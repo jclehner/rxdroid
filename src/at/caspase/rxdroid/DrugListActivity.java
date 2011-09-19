@@ -503,7 +503,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 			if(v == null)
 				v = mInflater.inflate(R.layout.drug_view2, null);
-
+			
 			final Drug drug = getItem(position);
 
 			final TextView drugName = (TextView) v.findViewById(R.id.drug_name);

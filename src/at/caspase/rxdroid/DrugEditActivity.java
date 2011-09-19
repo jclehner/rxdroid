@@ -332,7 +332,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	}
 
 	/**
-	 * Updates the preference values with the
+	 * Syncs the preference values with the drug's fields.
 	 */
 	private void updatePreferences()
 	{
