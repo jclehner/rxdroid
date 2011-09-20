@@ -44,6 +44,11 @@ public final class Util
 
 		throw new IllegalArgumentException();
 	}
+	
+	public static int getDoseTimeDrawableFromDoseTime(int doseTime)
+	{
+		return getDoseTimeDrawableFromDoseViewId(Constants.DOSE_VIEW_IDS[doseTime]);
+	}
 
 	public static int getDoseTimeFromDoseViewId(int doseViewId)
 	{
@@ -61,6 +66,7 @@ public final class Util
 
 		throw new IllegalArgumentException();
 	}
+	
 
 	/**
 	 * Obtains a string attribute from an AttributeSet.

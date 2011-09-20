@@ -162,13 +162,18 @@ public class Fraction extends Number implements Comparable<Number>
 	{
 		if(!(o instanceof Fraction))
 			return false;
-
-		Fraction other = (Fraction) o;
-
-		if(other == this)
-			return true;
-
-		return compareTo(other) == 0;
+		
+		if(o instanceof Number)
+		{	
+			Number other = (Number) o;
+	
+			if(other == this)
+				return true;
+	
+			return compareTo(other) == 0;
+		}
+		
+		return false;
 	}
 
 	@Override

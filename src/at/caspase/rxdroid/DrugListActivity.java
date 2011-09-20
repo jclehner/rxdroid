@@ -29,11 +29,13 @@ import java.util.NoSuchElementException;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -60,6 +62,7 @@ import android.widget.ViewSwitcher.ViewFactory;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Timer;
@@ -69,7 +72,7 @@ import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import com.j256.ormlite.dao.Dao;
 
 public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> implements
-	OnDatabaseChangedListener, OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
+	OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
 {
 	public static final String TAG = DrugListActivity.class.getName();
 
@@ -113,9 +116,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());		
 		mTextDate.setOnLongClickListener(this);
 
-
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-		Database.registerOnChangedListener(this);
 		
 		ContextStorage.set(getApplicationContext());
 		Database.load(); // must be called before mViewSwitcher.setFactory!
@@ -163,7 +164,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	{
 		super.onDestroy();
 		mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-		Database.unregisterOnChangedListener(this);
 	}
 
 	@Override
@@ -259,123 +259,13 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	public void onDoseClick(final View view)
 	{
 		final DoseView v = (DoseView) view;
-		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		final Database.Drug drug;
-
-		try
-		{
-			drug = mDao.queryForId(v.getDrugId());
-		}
-		catch(SQLException e)
-		{
-			throw new RuntimeException(e);
-		}
+		final Database.Drug drug = Database.findDrug(v.getDrugId());
 
 		final int doseTime = v.getDoseTime();
 		final Fraction dose = drug.getDose(doseTime);
-		final Fraction newSupply = drug.getCurrentSupply().minus(dose);
-
-		final DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which)
-			{
-				if(which == AlertDialog.BUTTON_POSITIVE)
-				{
-					final Database.Intake intake = new Database.Intake(drug, mDate, doseTime);
-
-					if(newSupply.compareTo(0) != -1)
-						drug.setCurrentSupply(newSupply);
-					else
-						drug.setCurrentSupply(Fraction.ZERO);
-
-					Database.create(mIntakeDao, intake);
-					Database.update(mDao, drug);
-
-					Toast.makeText(getApplicationContext(), "Dose intake noted.", Toast.LENGTH_SHORT).show();
-				}
-				else if(which == AlertDialog.BUTTON_NEUTRAL)
-				{
-					Intent intent = new Intent(Intent.ACTION_EDIT);
-					intent.setClass(getBaseContext(), DrugEditActivity.class);
-					intent.putExtra(DrugEditActivity.EXTRA_DRUG, (Serializable) drug);
-					intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
-
-					startActivityForResult(intent, 0);
-				}
-			}
-		};
-
-
-		if(newSupply.compareTo(0) == -1 && drug.getRefillSize() != 0)
-		{
-			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setTitle(drug.getName());
-			builder.setMessage("According to the database, the current supplies are not sufficient for this dose!");
-			builder.setPositiveButton("Ignore", onClickListener);
-			builder.setNeutralButton("Edit drug", onClickListener);
-
-			builder.show();
-
-			return;
-		}
-
-		if(!dose.equals(Fraction.ZERO))
-		{
-			builder.setTitle(drug.getName() + ": " + drug.getDose(doseTime));
-
-			boolean hasIntake = Database.findIntakes(mIntakeDao, drug, mDate, doseTime).size() != 0;
-
-			if(!hasIntake)
-			{
-				builder.setMessage("Take the above mentioned dose now and press OK.");
-				builder.setPositiveButton("OK", onClickListener);
-				builder.setNegativeButton("Cancel", null);
-			}
-			else
-			{
-				builder.setMessage("You have already taken the above mentioned dose. Do you want to take it regardless?");
-				builder.setPositiveButton("Yes", onClickListener);
-				builder.setNegativeButton("No", null);
-			}
-		}
-		else
-		{
-			builder.setTitle(drug.getName());
-			builder.setMessage("No intake is scheduled at this time. Do you still want to take a dose?");
-			builder.setPositiveButton("Yes", onClickListener);
-			builder.setNegativeButton("No", null);
-
-			// TODO we should ask the user how much he wants to take
-		}
-
-		builder.setIcon(Util.getDoseTimeDrawableFromDoseViewId(view.getId()));
-		builder.show();
+		
+		requestIntake(drug, mDate, doseTime, dose);
 	}
-
-	@Override
-	public void onCreateEntry(Drug drug) {
-		mAdapter.add(drug);
-	}
-
-	@Override
-	public void onDeleteEntry(Drug drug) {
-		mAdapter.remove(drug);
-	}
-
-	@Override
-	public void onUpdateEntry(Drug drug) {
-		mAdapter.update(drug);
-	}
-
-	@Override
-	public void onCreateEntry(Intake intake) {}
-
-	@Override
-	public void onDeleteEntry(Intake intake) {}
-
-	@Override
-	public void onDatabaseDropped() {}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
@@ -470,6 +360,101 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		}
 
 		setProgressBarIndeterminateVisibility(false);
+	}
+	
+	private void requestIntake(final Drug drug, Date date, int doseTime, Fraction dose)
+	{
+		if(dose.equals(Fraction.ZERO))
+		{
+			requestUnscheduledIntake(drug, date, doseTime);
+			return;
+		}
+
+		Log.d(TAG, "requestIntake");
+		
+		final Database.Intake intake = new Database.Intake(drug, mDate, doseTime);
+		final Fraction newSupply = drug.getCurrentSupply().minus(dose);
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(drug.getName() + ": " + dose);
+		
+		//////////////////
+		final OnClickListener defaultOnClickListener = new OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				Database.create(intake);
+				//Database.update(drug);
+
+				Toast.makeText(getApplicationContext(), "Dose intake noted.", Toast.LENGTH_SHORT).show();
+			}
+		};
+		//////////////////
+		
+		if(newSupply.compareTo(0) == -1)
+		{
+			builder.setIcon(android.R.drawable.ic_dialog_alert);
+			builder.setMessage("According to the database the current supplies are not sufficient for this dose.");
+			builder.setPositiveButton("Ignore", defaultOnClickListener);
+			//////////////////
+			builder.setNeutralButton("Edit drug", new OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					Intent intent = new Intent(Intent.ACTION_EDIT);
+                    intent.setClass(getApplicationContext(), DrugEditActivity.class);
+                    intent.putExtra(DrugEditActivity.EXTRA_DRUG, (Serializable) drug);
+                    intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
+
+                    startActivityForResult(intent, 0);		
+				}
+			});
+			//////////////////
+		}
+		else
+		{
+			builder.setIcon(Util.getDoseTimeDrawableFromDoseTime(doseTime));
+			
+			final boolean hasIntakes = !Database.findIntakes(drug, date, doseTime).isEmpty();
+			if(!hasIntakes)
+			{
+				builder.setMessage("Take the above mentioned dose now and press OK.");
+                builder.setPositiveButton(android.R.string.ok, defaultOnClickListener);
+                builder.setNegativeButton(android.R.string.cancel, null);
+			}
+			else
+			{
+				builder.setMessage("You have already taken this dose. Do you want to take it regardless?");
+                builder.setPositiveButton(android.R.string.yes, defaultOnClickListener);
+                builder.setNegativeButton(android.R.string.no, null);
+			}			
+		}
+		
+		builder.show();
+	}	
+	
+	private void requestUnscheduledIntake(final Drug drug, final Date date, final int doseTime)
+	{
+		final FractionInputDialog dialog = new FractionInputDialog(this, Fraction.ZERO, null);
+		dialog.setTitle(drug.getName());
+		//dialog.setIcon(Util.getDoseTimeDrawableFromDoseTime(doseTime));
+		dialog.setIcon(android.R.drawable.ic_dialog_info);
+		dialog.setMessage("No dose is scheduled at this time - choose one now.");
+		dialog.setButton(Dialog.BUTTON_NEGATIVE, getString(android.R.string.no), (OnClickListener) null);
+		dialog.setButton(Dialog.BUTTON_POSITIVE, getString(android.R.string.yes), (OnClickListener) null);
+		//////////////////	
+		dialog.setOnFractionSetListener(new OnFractionSetListener() {
+			
+			@Override
+			public void onFractionSet(FractionInputDialog dialog, Fraction value)
+			{
+				Log.d(TAG, "requestUnscheduledIntake$onFractionSet");
+				requestIntake(drug, date, doseTime, value);				
+			}
+		});
+		//////////////////
+		dialog.show();
 	}
 
 	private class DrugAdapter extends ArrayAdapter<Database.Drug>

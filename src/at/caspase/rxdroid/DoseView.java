@@ -27,6 +27,7 @@ import java.util.List;
 import android.content.Context;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -263,10 +264,11 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	{
 		if(intake.getDrug().getId() != mDrug.getId())
 			return false;
-		else if(intake.getDate() != mDate)
-			return false;
 		else if(intake.getDoseTime() != mDoseTime)
 			return false;
+		else if(!intake.getDate().equals(mDate))
+			return false;
+		
 		return true;
 	}
 

@@ -1,106 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView 
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:orientation="vertical"
+	android:layout_height="wrap_content"
+	android:overScrollMode="ifContentScrolls"
 >
-
-	<TextView android:id="@android:id/message"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_margin="7dip"
-		
-		style="@android:style/TextAppearance.Theme.Dialog"
-	/>
-  
-  <LinearLayout
-  	android:layout_width="wrap_content"
- 	android:layout_height="wrap_content"
- 	android:layout_gravity="center"
- 	android:orientation="horizontal"
-  >
-  
-	  <EditText android:id="@+id/number"
-	  	android:layout_width="wrap_content"
-	  	android:layout_height="wrap_content"
-	  	android:layout_marginRight="5dip"
-	  	  	
-	  	android:minEms="2"
-	  	android:inputType="numberSigned"
-	  	android:selectAllOnFocus="true"
-	  	android:visibility="visible"
-	  	android:text="0"
-	  />
-	  
-	  <EditText android:id="@+id/numerator"
-	  	android:layout_width="wrap_content"
-	  	android:layout_height="wrap_content"
-	  	android:layout_toRightOf="@id/number"
-	  	
-	  	android:minEms="2"
-	  	android:inputType="numberSigned"
-	  	android:selectAllOnFocus="true"
-	  	android:text="0"
-	  />
-	  
-	  <TextView android:id="@+id/fraction_bar"
-	  	android:layout_width="wrap_content"
-	  	android:layout_height="wrap_content"
-		android:layout_toRightOf="@id/numerator"
-		android:layout_alignTop="@id/numerator"
-		android:layout_alignBottom="@id/numerator"
-			
-		android:minEms="2"
-		android:gravity="center"
-	  	android:textAppearance="?android:attr/textAppearanceLarge"
-	  	android:textStyle="bold"
-	  	android:text="/"
-	  />
-	  
-	  <EditText android:id="@+id/denominator"
-		android:layout_width="wrap_content"
-	  	android:layout_height="wrap_content"
-	  	android:layout_toRightOf="@id/fraction_bar"
-	  	
-	  	android:minEms="2"
-	  	android:inputType="number"
-	  	android:selectAllOnFocus="true"
-	  	android:text="1"
-	  />
-  
-  </LinearLayout>
-  
-  
 	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+	>		
+		<TextView android:id="@android:id/message"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+					
+			style="?android:attr/textAppearanceSmall"
+		/>		
+		
+	  
+	  <LinearLayout
 	  	android:layout_width="wrap_content"
 	 	android:layout_height="wrap_content"
-	 	android:layout_gravity="center"
+	 	android:layout_gravity="center_horizontal" 	
 	 	android:orientation="horizontal"
-	>
-  
-		<Button android:id="@+id/btn_mode_toggle" 
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:minEms="5"
-			android:text="1¾ ↔ ¼"
-		/>
-		
-		<Button android:id="@+id/btn_minus"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			
-			android:minEms="5"
-			android:text="-"
-		/>
-		
-		<Button android:id="@+id/btn_plus"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"			
-			
-			android:minEms="5"
-			android:text="+"
-		/>
+	  >
 	  
-	</LinearLayout>  
-</LinearLayout>
+		  <EditText android:id="@+id/number"
+		  	android:layout_width="wrap_content"
+		  	android:layout_height="wrap_content"
+		  	android:layout_marginRight="5dip"
+		  	  	
+		  	android:minEms="2"
+		  	android:inputType="numberSigned"
+		  	android:selectAllOnFocus="true"
+		  	android:visibility="visible"
+		  	android:text="0"
+		  />
+		  
+		  <EditText android:id="@+id/numerator"
+		  	android:layout_width="wrap_content"
+		  	android:layout_height="wrap_content"
+		  		  	
+		  	android:minEms="2"
+		  	android:inputType="numberSigned"
+		  	android:selectAllOnFocus="true"
+		  	android:text="0"
+		  />
+		  
+		  <TextView android:id="@+id/fraction_bar"
+		  	android:layout_width="wrap_content"
+		  	android:layout_height="wrap_content"
+						
+			android:minEms="2"
+			android:gravity="center"
+		  	android:textAppearance="?android:attr/textAppearanceLarge"
+		  	android:textStyle="bold"
+		  	android:text="/"
+		  />
+		  
+		  <EditText android:id="@+id/denominator"
+			android:layout_width="wrap_content"
+		  	android:layout_height="wrap_content"
+		  		  	
+		  	android:minEms="2"
+		  	android:inputType="number"
+		  	android:selectAllOnFocus="true"
+		  	android:text="1"
+		  />
+	  
+	  </LinearLayout>
+	  
+	  
+		<LinearLayout
+		  	android:layout_width="wrap_content"
+		 	android:layout_height="wrap_content"
+		 	android:layout_gravity="center"
+		 	android:orientation="horizontal"
+		>
+	  
+			<Button android:id="@+id/btn_mode_toggle" 
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:minEms="5"
+				android:text="1¾ ↔ ¼"
+			/>
+			
+			<Button android:id="@+id/btn_minus"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				
+				android:minEms="5"
+				android:text="-"
+			/>
+			
+			<Button android:id="@+id/btn_plus"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"			
+				
+				android:minEms="5"
+				android:text="+"
+			/>
+		  
+		</LinearLayout>  
+	</LinearLayout>
+</ScrollView>
+	

@@ -816,7 +816,7 @@ public final class Database
 		}
 
 		public void setDate(Date date) {
-			this.date = new java.util.Date(date.getTime());
+			this.date = date;
 		}
 
 		public void setTimestamp(Timestamp timestamp) {
