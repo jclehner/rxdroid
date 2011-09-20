@@ -78,9 +78,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	private Drug mDrug;
 	private int mDrugHash = 0;
 
-	private Database.Helper mDbHelper;
-	private Dao<Drug, Integer> mDao;
-
 	private DrugNamePreference mDrugName;
 	private DosePreference[] mDosePrefs;
 	private ListPreference mFreqPreference;
@@ -112,8 +109,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			return;
 		}
 
-		initDao();
-
 		if(Intent.ACTION_EDIT.equals(action))
 		{
 			if(mDrugHash != mDrug.hashCode())
@@ -130,7 +125,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					{
 						if(which == AlertDialog.BUTTON_POSITIVE)
 						{
-							Database.update(mDao, mDrug);
+							Database.update(mDrug);
 							setResult(RESULT_OK);
 							Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
 						}
@@ -148,7 +143,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
 		{
-			Database.create(mDao, mDrug);
+			Database.create(mDrug);
 			setResult(RESULT_OK);
 			Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
 		}
@@ -231,8 +226,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					initDao();
-					Database.delete(mDao, mDrug);
+					Database.delete(mDrug);
 					Toast.makeText(getApplicationContext(), R.string._toast_deleted, Toast.LENGTH_SHORT).show();
 					finish();
 				}
@@ -431,15 +425,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				updatePreferences();
 			}
 		});
-	}
-
-	private void initDao()
-	{
-		if(mDao == null)
-		{
-			mDbHelper = new Database.Helper(this);
-			mDao = mDbHelper.getDrugDao();
-		}
 	}
 
 	private static int toInt(Object string) {

@@ -40,22 +40,21 @@ public class Preferences
 	private static final String prefKeyPrefixes[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 	private static final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 
-	private static Context sApplicationContext = null;
 	private static SharedPreferences sSharedPrefs = null;
-
+	private static Context sApplicationContext;
+	
 	private static Preferences instance;
-
-	public synchronized static Preferences instance(Context context)
-	{
-		setContext(context.getApplicationContext());
-		return instance();
-	}
 
 	public synchronized static Preferences instance()
 	{
 		if(sApplicationContext == null)
-			throw new IllegalStateException("No Context available. Use setContext(Context) or instance(Context) instead.");
+			sApplicationContext = ContextStorage.get();
+		
+		if(sApplicationContext == null)
+			throw new IllegalStateException("No Context available");
 
+		sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sApplicationContext);
+		
 		if(instance == null)
 		{
 			if(sSharedPrefs.getBoolean("debug_fake_dosetimes", false))
@@ -71,16 +70,6 @@ public class Preferences
 		}
 
 		return instance;
-	}
-
-
-	public synchronized static void setContext(Context context)
-	{
-		if(sApplicationContext == null)
-		{
-			sApplicationContext = context.getApplicationContext();
-			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sApplicationContext);
-		}
 	}
 
 	public int filterNotificationDefaults(int defaults)

@@ -57,12 +57,10 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	private ImageView mIntakeStatus;
 	private TextView mDoseText;
 	private ImageView mDoseTimeIcon;
-
+	
 	private Drug mDrug;
 	private int mDoseTime = -1;
 	private Date mDate;
-
-	private Dao<Database.Intake, Integer> mIntakeDao = null;
 
 	public DoseView(Context context) {
 		this(context, null);
@@ -125,11 +123,11 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	public void setDrug(final Drug drug)
 	{
-		setInfo(null, null, drug);
+		setInfo(null, drug);
 	}
 
 	public void setDate(Date date) {
-		setInfo(null, date, null);
+		setInfo(date, null);
 	}
 
 	public Date getDate() {
@@ -148,20 +146,12 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		return mDoseText;
 	}
 
-	public void setDao(Dao<Intake, Integer> dao)
-	{
-		setInfo(dao, null, null);
-	}
-
 	public void addTextChangedListener(TextWatcher watcher) {
 		mDoseText.addTextChangedListener(watcher);
 	}
 
-	public void setInfo(Dao<Intake, Integer> dao, Date date, Drug drug)
+	public void setInfo(Date date, Drug drug)
 	{
-		if(dao != null)
-			mIntakeDao = dao;
-
 		if(date != null)
 			mDate = date;
 
@@ -170,6 +160,25 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			mDrug = drug;
 			updateView();
 		}
+		
+		if(mDate != null && mDrug != null)
+			updateIntakeStatusIcon();
+	}
+	
+	public boolean hasInfo(Date date, Drug drug)
+	{		
+		if(mDate == null || !mDate.equals(date))
+			return false;
+		
+		if(mDrug == null || !mDrug.equals(drug))
+			return false;
+		
+		return true;		
+	}
+	
+	public boolean hasSameInfo(DoseView other)
+	{
+		return hasInfo(other.mDate, other.mDrug);
 	}
 
 	@Override
@@ -226,7 +235,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			return;
 
 		if(isApplicableIntake(intake))
-			updateIntakeStatusIcon(true);
+			updateIntakeStatusIcon();
 	}
 
 	@Override
@@ -239,7 +248,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 		registerDbListener();
 		updateView();
-		updateIntakeStatusIcon(true);
+		updateIntakeStatusIcon();
 	}
 
 	@Override
@@ -272,21 +281,17 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			mDoseText.setText("0");
 	}
 
-	private void updateIntakeStatusIcon(boolean checkDbForIntake)
+	private void updateIntakeStatusIcon()
 	{
-		if(mDate == null || mIntakeDao == null)
+		if(mDate == null || mDrug == null)
 			return;
 
-		if(checkDbForIntake)
+		if(countIntakes() != 0)
 		{
-			final int intakeCount = getIntakes().size();
-			if(intakeCount != 0)
-			{
-				mIntakeStatus.setImageResource(R.drawable.bg_dose_taken);
-				return;
-			}
+			mIntakeStatus.setImageResource(R.drawable.bg_dose_taken);
+			return;
 		}
-
+		
 		final Date end = new Date(mDate.getTime() + Preferences.instance().getDoseTimeEndOffset(mDoseTime));
 
 		if(mDrug.isActive() && !mDoseText.getText().equals("0") && DateTime.now().compareTo(end) != -1)
@@ -295,12 +300,12 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			mIntakeStatus.setImageDrawable(null);
 	}
 
-	private List<Database.Intake> getIntakes()
+	private int countIntakes()
 	{
 		if(mDate == null || mDrug == null)
 			throw new IllegalStateException("Cannot obtain intake data from DoseView with unset date and/or drug");
 
-		return Database.findIntakes(mIntakeDao, mDrug, mDate, mDoseTime);
+		return Database.findIntakes(mDrug, mDate, mDoseTime).size();
 	}
 
 	private synchronized void registerDbListener()

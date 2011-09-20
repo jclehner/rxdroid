@@ -96,11 +96,12 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		mIntent.setClass(getApplicationContext(), DrugListActivity.class);
 		mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-		Preferences.setContext(getApplicationContext());
-
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-		Database.registerOnChangedListener(this);
+		Database.registerOnChangedListener(this);		
+
+		ContextStorage.set(getApplicationContext());
+		Database.load();
 	}
 
 	/**

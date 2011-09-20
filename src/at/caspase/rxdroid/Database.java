@@ -27,9 +27,12 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -57,13 +60,42 @@ import com.j256.ormlite.table.TableUtils;
  * @author Joseph Lehner
  *
  */
-public class Database
+public final class Database
 {
 	private static final String TAG = Database.class.getName();
 
+	private static List<Drug> sDrugCache;
+	private static List<Intake> sIntakeCache;
+	
+	private static Helper mHelper;
+	private static Dao<Drug, Integer> mDrugDao;
+	private static Dao<Intake, Integer> mIntakeDao;
+	
+	private static boolean sIsLoaded = false;
+	
 	// hackish, but there's no IdentityHashSet
 	private static Map<OnDatabaseChangedListener, Void> sOnChangedListeners = new IdentityHashMap<OnDatabaseChangedListener, Void>();
 
+	public static synchronized void load() {
+		load(ContextStorage.get());
+	}	
+
+	public static synchronized void load(Context context)
+	{
+		if(!sIsLoaded)
+		{
+			mHelper = new Helper(context);
+			
+			mDrugDao = mHelper.getDrugDao();
+			mIntakeDao = mHelper.getIntakeDao();
+			
+			getDrugCache(mDrugDao);
+			getIntakeCache(mIntakeDao);
+			
+			sIsLoaded = true;
+		}
+	}
+	
 	/**
 	 * Add a listener to the registry.
 	 *
@@ -84,8 +116,7 @@ public class Database
 	 * @see #Database.OnDatabaseChangedListener
 	 * @param listener The listener to remove.
 	 */
-	public static synchronized void unregisterOnChangedListener(OnDatabaseChangedListener listener)
-	{
+	public static synchronized void unregisterOnChangedListener(OnDatabaseChangedListener listener) {
 		sOnChangedListeners.remove(listener);
 	}
 
@@ -124,14 +155,28 @@ public class Database
 		{
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onCreateEntry((Drug) t);
+			
+			List<Drug> drugCache = getDrugCache((Dao<Drug, Integer>) dao);
+			drugCache.add((Drug) t);
 		}
 		else if(t instanceof Intake)
 		{
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onCreateEntry((Intake) t);
+			
+			List<Intake> intakeCache = getIntakeCache((Dao<Intake, Integer>) dao);
+			intakeCache.add((Intake) t);
 		}
 	}
 
+	public static <T extends Entry, ID> void create(final T t)
+	{
+		if(t instanceof Drug)
+			create(mDrugDao, (Drug) t);
+		else if(t instanceof Intake)
+			create(mIntakeDao, (Intake) t);
+	}	
+	
 	public static <T extends Entry, ID> void update(final Dao<T, ID> dao, final T t)
 	{
 		Thread th = new Thread(new Runnable() {
@@ -154,9 +199,29 @@ public class Database
 
 		if(t instanceof Drug)
 		{
+			Drug newDrug = (Drug) t;
+			
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
-				watcher.onUpdateEntry((Drug) t);
+				watcher.onUpdateEntry(newDrug);
+			
+			List<Drug> drugCache = getDrugCache((Dao<Drug, Integer>) dao);
+			
+			Drug oldDrug = Entry.findInCollection(drugCache, newDrug.getId());
+			int index = drugCache.indexOf(oldDrug);
+			
+			drugCache.remove(index);
+			drugCache.add(index, newDrug);	
 		}
+		else if(t instanceof Intake)
+			throw new UnsupportedOperationException();
+	}	
+
+	public static <T extends Entry, ID> void update(final T t)
+	{
+		if(t instanceof Drug)
+			update(mDrugDao, (Drug) t);
+		else if(t instanceof Intake)
+			update(mIntakeDao, (Intake) t);
 	}
 
 	public static <T extends Entry, ID> void delete(final Dao<T, ID> dao, final T t)
@@ -183,20 +248,26 @@ public class Database
 		{
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onDeleteEntry((Drug) t);
+			
+			List<Drug> drugCache = getDrugCache((Dao<Drug, Integer>) dao);
+			drugCache.remove((Drug) t);
 		}
 		else if(t instanceof Intake)
 		{
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onDeleteEntry((Intake) t);
+			
+			List<Intake> intakeCache = getIntakeCache((Dao<Intake, Integer>) dao);
+			intakeCache.remove((Intake) t);
 		}
-	}
+	}	
 
-	public static void dropDatabase(Helper helper)
+	public static <T extends Entry, ID> void delete(final T t)
 	{
-		helper.onUpgrade(helper.getWritableDatabase(), 0, Helper.DB_VERSION);
-
-		for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
-			watcher.onDatabaseDropped();
+		if(t instanceof Drug)
+			delete(mDrugDao, (Drug) t);
+		else if(t instanceof Intake)
+			delete(mIntakeDao, (Intake) t);
 	}
 
 	/**
@@ -204,17 +275,48 @@ public class Database
 	 */
 	public static List<Intake> findIntakes(Dao<Intake, Integer> dao, Drug drug, Date date, int doseTime)
 	{
+		final List<Intake> intakeCache = getIntakeCache(dao);
+		final List<Intake> intakes = new LinkedList<Intake>();
+				
+		for(Intake intake : intakeCache)
+		{
+			if(intake.getDoseTime() != doseTime)
+				continue;
+			if(intake.getDrug().getId() != drug.getId())
+				continue;
+			if(!intake.getDate().equals(date))
+				continue;						
+			
+			intakes.add(intake);
+		}
+		
+		return intakes;	
+	}
+	
+	public static List<Intake> findIntakes(Drug drug, Date date, int doseTime)
+	{
+		return findIntakes(mIntakeDao, drug, date, doseTime);
+	}
+		
+	private static synchronized<T> List<Drug> getDrugCache(Dao<Drug, Integer> dao)
+	{
+		if(sDrugCache == null)
+			sDrugCache = queryForAll(dao);			
+		return sDrugCache;
+	}
+	
+	private static synchronized<T> List<Intake> getIntakeCache(Dao<Intake, Integer> dao)
+	{
+		if(sIntakeCache == null)
+			sIntakeCache = queryForAll(dao);			
+		return sIntakeCache;
+	}
+	
+	private static<T> List<T> queryForAll(Dao<T, Integer> dao)
+	{
 		try
 		{
-			QueryBuilder<Database.Intake, Integer> qb = dao.queryBuilder();
-			Where<Database.Intake, Integer> where = qb.where();
-			where.eq(Database.Intake.COLUMN_DRUG_ID, drug.getId());
-			where.and();
-			where.eq(Database.Intake.COLUMN_DATE, (java.util.Date) date);
-			where.and();
-			where.eq(Database.Intake.COLUMN_DOSE_TIME, doseTime);
-
-			return dao.query(qb.prepare());
+			return dao.queryForAll();
 		}
 		catch(SQLException e)
 		{
@@ -264,6 +366,17 @@ public class Database
 
 		public int getId() {
 			return id;
+		}
+		
+		public static<T extends Entry> T findInCollection(Collection<T> collection, int id)
+		{
+			for(T t : collection)
+			{
+				if(t.getId() == id)
+					return t;
+			}
+			
+			return null;
 		}
 	}
 
@@ -553,8 +666,6 @@ public class Database
 
 			for(int i = 0; i != thisMembers.length; ++i)
 			{
-				Log.d(TAG, "Drug.equals: i=" + i + ", thisMember=" + thisMembers[i] + ", otherMember=" + otherMembers[i]);
-
 				if(thisMembers[i] == null && otherMembers[i] == null)
 					continue;
 				else if(thisMembers[i] == null || otherMembers[i] == null)

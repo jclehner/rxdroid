@@ -86,7 +86,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 	private ViewSwitcher mViewSwitcher;
 	private DrugAdapter mAdapter;
-
 	private TextView mTextDate;
 
 	private Date mDate;
@@ -95,7 +94,7 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	private Dao<Database.Intake, Integer> mIntakeDao;
 
 	private SharedPreferences mSharedPreferences;
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -120,7 +119,9 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		Database.registerOnChangedListener(this);
-		Preferences.setContext(getApplicationContext());
+		
+		ContextStorage.set(getApplicationContext());
+		Database.load();
 	}
 
 	@Override
@@ -499,27 +500,41 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
+			// This function currently is the bottleneck when switching between dates, causing
+			// laggish animations if there are more than 3 or 4 drugs (i.e. 12-16 DoseViews)
+			//
+			// All measurements were done using an HTC Desire running Cyanogenmod 7!
+						
 			View v = convertView;
 
 			if(v == null)
 				v = mInflater.inflate(R.layout.drug_view2, null);
-			
+									
 			final Drug drug = getItem(position);
-
+			
 			final TextView drugName = (TextView) v.findViewById(R.id.drug_name);
 			drugName.setText(drug.getName());
 			drugName.setTag(TAG_ID, drug.getId());
-
+			
 			final ImageView drugIcon = (ImageView) v.findViewById(R.id.drug_icon);
 			drugIcon.setImageResource(drug.getFormResourceId());
-
+			
+			// This part often takes more than 90% of the time spent in this function,
+			// being rougly 0.025s when hasInfo returns false, and 0.008s when it
+			// returns true.
+			//
+			// Assuming that, in the worst case, all calls to hasInfo return false, this
+			// means that this part alone will, in total, take more than 100ms to complete 
+			// for 4 drugs.
+			
 			final int doseViewIds[] = { R.id.morning, R.id.noon, R.id.evening, R.id.night };
 			for(int doseViewId : doseViewIds)
 			{
 				DoseView doseView = (DoseView) v.findViewById(doseViewId);
-				doseView.setInfo(mIntakeDao, mDate, drug);
+				if(!doseView.hasInfo(mDate, drug))
+					doseView.setInfo(mDate, drug);
 			}
-
+			
 			return v;
 		}
 
