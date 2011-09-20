@@ -24,6 +24,7 @@ package at.caspase.rxdroid.util;
 import java.util.Calendar;
 
 import android.text.format.DateUtils;
+import at.caspase.rxdroid.R;
 
 public final class Constants
 {
@@ -31,6 +32,13 @@ public final class Constants
 	public static final String NOTIFICATION_BULLET = "\u2022 ";
 	public static final long NOTIFICATION_INITIAL_DELAY = 10000;
 
+	public static final int[] DOSE_VIEW_IDS = {
+		R.id.morning,
+		R.id.noon,
+		R.id.evening,
+		R.id.night
+	};
+	
 	public static final int[] WEEK_DAYS = {
 			Calendar.MONDAY,
 			Calendar.TUESDAY,

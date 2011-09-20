@@ -82,6 +82,9 @@ public final class Database
 
 	public static synchronized void load(Context context)
 	{
+		if(context == null)
+			throw new IllegalArgumentException("Argument 'context' must not be null. Did you call ContextStorage.set() ?");
+		
 		if(!sIsLoaded)
 		{
 			mHelper = new Helper(context);
@@ -89,8 +92,8 @@ public final class Database
 			mDrugDao = mHelper.getDrugDao();
 			mIntakeDao = mHelper.getIntakeDao();
 			
-			getDrugCache(mDrugDao);
-			getIntakeCache(mIntakeDao);
+			getCachedDrugs(mDrugDao);
+			getCachedIntakes(mIntakeDao);
 			
 			sIsLoaded = true;
 		}
@@ -156,7 +159,7 @@ public final class Database
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onCreateEntry((Drug) t);
 			
-			List<Drug> drugCache = getDrugCache((Dao<Drug, Integer>) dao);
+			List<Drug> drugCache = getCachedDrugs((Dao<Drug, Integer>) dao);
 			drugCache.add((Drug) t);
 		}
 		else if(t instanceof Intake)
@@ -164,7 +167,7 @@ public final class Database
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onCreateEntry((Intake) t);
 			
-			List<Intake> intakeCache = getIntakeCache((Dao<Intake, Integer>) dao);
+			List<Intake> intakeCache = getCachedIntakes((Dao<Intake, Integer>) dao);
 			intakeCache.add((Intake) t);
 		}
 	}
@@ -204,7 +207,7 @@ public final class Database
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onUpdateEntry(newDrug);
 			
-			List<Drug> drugCache = getDrugCache((Dao<Drug, Integer>) dao);
+			List<Drug> drugCache = getCachedDrugs((Dao<Drug, Integer>) dao);
 			
 			Drug oldDrug = Entry.findInCollection(drugCache, newDrug.getId());
 			int index = drugCache.indexOf(oldDrug);
@@ -249,7 +252,7 @@ public final class Database
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onDeleteEntry((Drug) t);
 			
-			List<Drug> drugCache = getDrugCache((Dao<Drug, Integer>) dao);
+			List<Drug> drugCache = getCachedDrugs((Dao<Drug, Integer>) dao);
 			drugCache.remove((Drug) t);
 		}
 		else if(t instanceof Intake)
@@ -257,7 +260,7 @@ public final class Database
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onDeleteEntry((Intake) t);
 			
-			List<Intake> intakeCache = getIntakeCache((Dao<Intake, Integer>) dao);
+			List<Intake> intakeCache = getCachedIntakes((Dao<Intake, Integer>) dao);
 			intakeCache.remove((Intake) t);
 		}
 	}	
@@ -270,12 +273,23 @@ public final class Database
 			delete(mIntakeDao, (Intake) t);
 	}
 
+	public static Drug findDrug(int drugId)
+	{
+		for(Drug drug : sDrugCache)
+		{
+			if(drug.getId() == drugId)
+				return drug;
+		}
+		
+		throw new NoSuchElementException("No drug with id=" + drugId);
+	}
+	
 	/**
 	 * Find all intakes matching the specified criteria.
 	 */
 	public static List<Intake> findIntakes(Dao<Intake, Integer> dao, Drug drug, Date date, int doseTime)
 	{
-		final List<Intake> intakeCache = getIntakeCache(dao);
+		final List<Intake> intakeCache = getCachedIntakes(dao);
 		final List<Intake> intakes = new LinkedList<Intake>();
 				
 		for(Intake intake : intakeCache)
@@ -297,18 +311,32 @@ public final class Database
 	{
 		return findIntakes(mIntakeDao, drug, date, doseTime);
 	}
+	
+	public static List<Drug> getCachedDrugs() {
+		return getCachedDrugs(mDrugDao);
+	}
+	
+	public static List<Intake> getCachedIntakes() {
+		return getCachedIntakes(mIntakeDao);
+	}
 		
-	private static synchronized<T> List<Drug> getDrugCache(Dao<Drug, Integer> dao)
+	private static synchronized<T> List<Drug> getCachedDrugs(Dao<Drug, Integer> dao)
 	{
 		if(sDrugCache == null)
-			sDrugCache = queryForAll(dao);			
+		{
+			sDrugCache = queryForAll(dao);
+			Log.d(TAG, "Loaded " + sDrugCache.size() + " drugs into cache");
+		}
 		return sDrugCache;
 	}
 	
-	private static synchronized<T> List<Intake> getIntakeCache(Dao<Intake, Integer> dao)
+	private static synchronized<T> List<Intake> getCachedIntakes(Dao<Intake, Integer> dao)
 	{
 		if(sIntakeCache == null)
-			sIntakeCache = queryForAll(dao);			
+		{
+			sIntakeCache = queryForAll(dao);
+			Log.d(TAG, "Loaded " + sIntakeCache.size() + " intakes into cache");
+		}
 		return sIntakeCache;
 	}
 	

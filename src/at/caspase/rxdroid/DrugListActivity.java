@@ -110,18 +110,17 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		mViewSwitcher = (ViewSwitcher) findViewById(R.id.drug_list_view_flipper);
 		mTextDate = (TextView) findViewById(R.id.med_list_footer);
 
-		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-		mViewSwitcher.setFactory(this);
+		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());		
 		mTextDate.setOnLongClickListener(this);
 
-		mAdapter = makeAdapter();
 
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		Database.registerOnChangedListener(this);
 		
 		ContextStorage.set(getApplicationContext());
-		Database.load();
+		Database.load(); // must be called before mViewSwitcher.setFactory!
+		
+		mViewSwitcher.setFactory(this);
 	}
 
 	@Override
@@ -231,18 +230,11 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	public void onDrugNameClick(View view)
 	{
 		Intent intent = new Intent(Intent.ACTION_EDIT);
-		intent.setClass(this, DrugEditActivity.class);
-
-		try
-		{
-			Database.Drug drug = mDao.queryForId((Integer) view.getTag(TAG_ID));
-			intent.putExtra(DrugEditActivity.EXTRA_DRUG, (Serializable) drug);
-		}
-		catch(SQLException e)
-		{
-			throw new RuntimeException(e);
-		}
-
+		intent.setClass(this, DrugEditActivity.class);		
+		
+		Drug drug = Database.findDrug((Integer) view.getTag(TAG_ID));
+		intent.putExtra(DrugEditActivity.EXTRA_DRUG, (Serializable) drug);
+		
 		startActivityForResult(intent, 0);
 	}
 
@@ -391,24 +383,19 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 	}
 
 	@Override
-	public View makeView() {
-		return new ListView(this);
+	public View makeView() 
+	{
+		ListView lv = new ListView(this);
+		
+		if(mAdapter == null)
+			mAdapter = makeAdapter();
+		
+		return lv;
 	}
 
 	private DrugAdapter makeAdapter()
 	{
-		List<Drug> drugs;
-
-		try
-		{
-			drugs = mDao.queryForAll();
-		}
-		catch (SQLException e)
-		{
-			throw new RuntimeException(e);
-		}
-
-		return new DrugAdapter(this, R.layout.dose_view, drugs);
+		return new DrugAdapter(this, R.layout.dose_view, Database.getCachedDrugs());
 	}
 
 	private void startNotificationService()
@@ -449,8 +436,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			final long shiftedTime = mDate.getTime() + shiftBy * Constants.MILLIS_PER_DAY;
 			mDate.setTime(shiftedTime);
 
-			Timer t = new Timer();
-
 			if(shiftBy == 1)
 			{
 				mViewSwitcher.getInAnimation().setInterpolator(ReverseInterpolator.INSTANCE);
@@ -463,10 +448,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			}
 			else
 				throw new IllegalArgumentException();
-
-			Log.d(TAG, "Setting interpolators took " + t + " with shiftBy=" + shiftBy);
 		}
-
+		
 		mViewSwitcher.showNext();
 		((ListView) mViewSwitcher.getCurrentView()).setAdapter(mAdapter);
 
@@ -498,26 +481,40 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
+		public View getView(int position, View v, ViewGroup parent)
 		{
 			// This function currently is the bottleneck when switching between dates, causing
 			// laggish animations if there are more than 3 or 4 drugs (i.e. 12-16 DoseViews)
 			//
 			// All measurements were done using an HTC Desire running Cyanogenmod 7!
-						
-			View v = convertView;
+			
+			ViewHolder holder;
 
 			if(v == null)
+			{
 				v = mInflater.inflate(R.layout.drug_view2, null);
+				
+				holder = new ViewHolder();
+				
+				holder.name = (TextView) v.findViewById(R.id.drug_name);
+				holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
+				
+				for(int i = 0; i != holder.doseViews.length; ++i)
+				{
+					final int doseViewId = Constants.DOSE_VIEW_IDS[i];
+					holder.doseViews[i] = (DoseView) v.findViewById(doseViewId);
+				}
+				
+				v.setTag(holder);
+			}
+			else
+				holder = (ViewHolder) v.getTag();
+				
+			Drug drug = getItem(position);
 									
-			final Drug drug = getItem(position);
-			
-			final TextView drugName = (TextView) v.findViewById(R.id.drug_name);
-			drugName.setText(drug.getName());
-			drugName.setTag(TAG_ID, drug.getId());
-			
-			final ImageView drugIcon = (ImageView) v.findViewById(R.id.drug_icon);
-			drugIcon.setImageResource(drug.getFormResourceId());
+			holder.name.setText(drug.getName());
+			holder.name.setTag(TAG_ID, drug.getId());
+			holder.icon.setImageResource(drug.getFormResourceId());
 			
 			// This part often takes more than 90% of the time spent in this function,
 			// being rougly 0.025s when hasInfo returns false, and 0.008s when it
@@ -527,10 +524,8 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 			// means that this part alone will, in total, take more than 100ms to complete 
 			// for 4 drugs.
 			
-			final int doseViewIds[] = { R.id.morning, R.id.noon, R.id.evening, R.id.night };
-			for(int doseViewId : doseViewIds)
+			for(DoseView doseView : holder.doseViews)
 			{
-				DoseView doseView = (DoseView) v.findViewById(doseViewId);
 				if(!doseView.hasInfo(mDate, drug))
 					doseView.setInfo(mDate, drug);
 			}
@@ -562,6 +557,13 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 			if(i == getCount())
 				throw new NoSuchElementException("No such drug in adapter data: " + drug);
+		}
+		
+		private class ViewHolder
+		{
+			TextView name;
+			ImageView icon;
+			DoseView[] doseViews = new DoseView[4];			
 		}
 	}
 

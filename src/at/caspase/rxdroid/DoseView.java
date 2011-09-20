@@ -247,8 +247,8 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		super.onAttachedToWindow();
 
 		registerDbListener();
-		updateView();
-		updateIntakeStatusIcon();
+		//updateView();
+		//updateIntakeStatusIcon();
 	}
 
 	@Override
