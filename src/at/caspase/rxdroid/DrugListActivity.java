@@ -24,7 +24,6 @@ package at.caspase.rxdroid;
 import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -42,13 +41,17 @@ import android.preference.PreferenceManager;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.View.OnLongClickListener;
+import android.view.View.OnTouchListener;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.ArrayAdapter;
@@ -66,7 +69,8 @@ import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
 public class DrugListActivity extends Activity implements
-	OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
+	OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener,
+	ViewFactory, OnGestureListener, OnTouchListener
 {
 	public static final String TAG = DrugListActivity.class.getName();
 
@@ -82,6 +86,7 @@ public class DrugListActivity extends Activity implements
 	private LayoutInflater mInflater;
 
 	private ViewSwitcher mViewSwitcher;
+	private GestureDetector mGestureDetector;	
 	private DrugAdapter mAdapter;
 	private TextView mTextDate;
 
@@ -111,6 +116,8 @@ public class DrugListActivity extends Activity implements
 		Database.load(); // must be called before mViewSwitcher.setFactory!
 		
 		mViewSwitcher.setFactory(this);
+		
+		mGestureDetector = new GestureDetector(this, this);
 	}
 
 	@Override
@@ -271,7 +278,64 @@ public class DrugListActivity extends Activity implements
 		
 		return lv;
 	}
-
+	
+	/////////////	
+	
+	@Override
+	public boolean onDown(MotionEvent e) {
+		return false;
+	}
+	
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
+	{		
+		if(velocityY != 0.0f)
+		{
+			float ratio = velocityX / velocityY;
+			
+			// TODO search for a reasonable minimum ratio
+			if(Math.abs(ratio) < 5)
+			{
+				Log.d(TAG, "onFling: ignoring fling; ratio=" + ratio);
+				return false;
+			}
+		}
+		else if(velocityX == 0.0f)
+		{
+			Log.d(TAG, "onFling: strange; velocityX=0.0");
+			return false;
+		}
+		
+		shiftDate(Math.signum(velocityX) == 1.0f ? -1 : 1);
+		
+		return true;
+	}
+	
+	@Override
+	public void onLongPress(MotionEvent e) {}
+	
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		return false;
+	}
+	
+	@Override
+	public void onShowPress(MotionEvent e) {}
+	
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		return false;
+	}
+	
+	/////////////
+	
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		return mGestureDetector.onTouchEvent(event);
+	}
+	
+	/////////////
+	
 	private DrugAdapter makeAdapter()
 	{
 		return new DrugAdapter(this, R.layout.dose_view, Database.getCachedDrugs());
@@ -331,7 +395,8 @@ public class DrugListActivity extends Activity implements
 		
 		mViewSwitcher.showNext();
 		((ListView) mViewSwitcher.getCurrentView()).setAdapter(mAdapter);
-
+		mViewSwitcher.getCurrentView().setOnTouchListener(this);			
+		
 		final SpannableString dateString = new SpannableString(mDate.toString());
 
 		if(mDate.equals(DateTime.today()))

@@ -6,6 +6,7 @@
 	android:layout_gravity="center"
 	
 >
+
 	<ViewSwitcher android:id="@+id/drug_list_view_flipper"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
