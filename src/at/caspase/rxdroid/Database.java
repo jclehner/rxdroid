@@ -252,15 +252,22 @@ public final class Database
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onDeleteEntry((Drug) t);
 			
-			List<Drug> drugCache = getCachedDrugs((Dao<Drug, Integer>) dao);
+			final List<Drug> drugCache = getCachedDrugs();
 			drugCache.remove((Drug) t);
+			
+			final List<Intake> intakeCache = getCachedIntakes();
+			for(Intake intake : intakeCache)
+			{
+				if(intake.getDrug().getId() == ((Drug) t).getId())
+					delete(intake);			
+			}			
 		}
 		else if(t instanceof Intake)
 		{
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onDeleteEntry((Intake) t);
 			
-			List<Intake> intakeCache = getCachedIntakes((Dao<Intake, Integer>) dao);
+			List<Intake> intakeCache = getCachedIntakes();
 			intakeCache.remove((Intake) t);
 		}
 	}	
@@ -815,8 +822,8 @@ public final class Database
 			this.drug = drug;
 		}
 
-		public void setDate(Date date) {
-			this.date = date;
+		public void setDate(final Date date) {
+			this.date = new Date(date.getTime());
 		}
 
 		public void setTimestamp(Timestamp timestamp) {

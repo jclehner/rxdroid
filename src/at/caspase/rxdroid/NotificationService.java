@@ -696,9 +696,11 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		long timestamp = System.currentTimeMillis() / 1000;
 		File crashLog = new File(getExternalFilesDir(null), "crash-" + timestamp + ".log");
 
+		OutputStream os = null;
+		
 		try
 		{
-			OutputStream os = new FileOutputStream(crashLog);
+			os = new FileOutputStream(crashLog);
 			String msg =
 					"Time: " + DateTime.now() + "\n\n" +
 					cause + "\n\n" +
@@ -710,6 +712,18 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		catch(IOException e)
 		{
 			Log.e(TAG, "Error writing crash log", e);
+		}
+		finally
+		{
+			try
+			{
+				if(os != null)
+					os.close();
+			}
+			catch(IOException e)
+			{
+				Log.e(TAG, "Error writing crash log", e);
+			}
 		}
 	}
 }

@@ -253,7 +253,7 @@ public class DrugListActivity extends Activity implements
 		final int doseTime = v.getDoseTime();
 		final Fraction dose = drug.getDose(doseTime);
 		
-		requestIntake(drug, mDate, doseTime, dose);
+		requestIntake(drug, mDate, doseTime, dose, true);
 	}
 
 	@Override
@@ -351,7 +351,7 @@ public class DrugListActivity extends Activity implements
 		setProgressBarIndeterminateVisibility(false);
 	}
 	
-	private void requestIntake(final Drug drug, Date date, int doseTime, Fraction dose)
+	private void requestIntake(final Drug drug, Date date, int doseTime, Fraction dose, boolean askOnNormalIntake)
 	{
 		if(dose.equals(Fraction.ZERO))
 		{
@@ -408,9 +408,18 @@ public class DrugListActivity extends Activity implements
 			final boolean hasIntakes = !Database.findIntakes(drug, date, doseTime).isEmpty();
 			if(!hasIntakes)
 			{
-				builder.setMessage("Take the above mentioned dose now and press OK.");
-                builder.setPositiveButton(android.R.string.ok, defaultOnClickListener);
-                builder.setNegativeButton(android.R.string.cancel, null);
+				if(askOnNormalIntake)
+				{				
+					builder.setMessage("Take the above mentioned dose now and press OK.");
+	                builder.setPositiveButton(android.R.string.ok, defaultOnClickListener);
+	                builder.setNegativeButton(android.R.string.cancel, null);
+				}
+				else
+				{
+					// we pretend the user clicked the "OK" button
+					defaultOnClickListener.onClick(null, Dialog.BUTTON_POSITIVE);
+					return;
+				}
 			}
 			else
 			{
@@ -430,8 +439,6 @@ public class DrugListActivity extends Activity implements
 		//dialog.setIcon(Util.getDoseTimeDrawableFromDoseTime(doseTime));
 		dialog.setIcon(android.R.drawable.ic_dialog_info);
 		dialog.setMessage("No dose is scheduled at this time - choose one now.");
-		dialog.setButton(Dialog.BUTTON_NEGATIVE, getString(android.R.string.no), (OnClickListener) null);
-		dialog.setButton(Dialog.BUTTON_POSITIVE, getString(android.R.string.yes), (OnClickListener) null);
 		//////////////////	
 		dialog.setOnFractionSetListener(new OnFractionSetListener() {
 			
@@ -439,7 +446,7 @@ public class DrugListActivity extends Activity implements
 			public void onFractionSet(FractionInputDialog dialog, Fraction value)
 			{
 				Log.d(TAG, "requestUnscheduledIntake$onFractionSet");
-				requestIntake(drug, date, doseTime, value);				
+				requestIntake(drug, date, doseTime, value, false);				
 			}
 		});
 		//////////////////
@@ -506,33 +513,7 @@ public class DrugListActivity extends Activity implements
 			
 			return v;
 		}
-
-		/**
-		 * Update a drug, based on its ID.
-		 *
-		 * @param drug the drug to update. If there's an item in the adapter data
-		 *     with a matching ID, it will be replaced with this one.
-		 */
-		public void update(Drug drug)
-		{
-			int i = 0;
-
-			for(; i != getCount(); ++i)
-			{
-				Drug d = getItem(i);
-
-				if(d.getId() == drug.getId())
-				{
-					remove(d);
-					insert(drug, i);
-					return;
-				}
-			}
-
-			if(i == getCount())
-				throw new NoSuchElementException("No such drug in adapter data: " + drug);
-		}
-		
+				
 		private class ViewHolder
 		{
 			TextView name;

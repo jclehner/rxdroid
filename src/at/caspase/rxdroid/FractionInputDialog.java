@@ -262,8 +262,6 @@ public class FractionInputDialog extends AlertDialog implements
 
 		if(denominator == 0)
 		{
-			Log.d(TAG, "afterTextChanged: mDialogValue=" + mDialogValue);
-
 			Toast toast = Toast.makeText(getContext(), "Denominator must not be zero!", Toast.LENGTH_SHORT);
 			// display the Toast on top, as it might get lost when being displayed on the keypad (the default Toast
 			// style and the keypad have very similar colors)
@@ -297,9 +295,9 @@ public class FractionInputDialog extends AlertDialog implements
 		super.onStart();
 
 		// taken from Android's DialogPreference.java
-		Window window = getWindow();
-		window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
-				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+		//Window window = getWindow();
+		//window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
+		//		WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 	}
 
 	private void setDialogValue(Fraction value)

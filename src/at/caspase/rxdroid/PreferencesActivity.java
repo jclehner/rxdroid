@@ -21,8 +21,10 @@
 
 package at.caspase.rxdroid;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
@@ -61,7 +63,21 @@ public class PreferencesActivity extends PreferenceActivity
 		{
 			case MENU_RESTORE_DEFAULTS:
 			{
-				mSharedPreferences.edit().clear().commit();
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setIcon(android.R.drawable.ic_dialog_alert);
+				builder.setTitle("This will reset all settings to their default values.");
+				builder.setNegativeButton(android.R.string.cancel, null);
+				/////////////////////
+				builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						mSharedPreferences.edit().clear().commit();						
+					}
+				});
+				/////////////////////
+				builder.show();
 				break;
 			}
 			default:
