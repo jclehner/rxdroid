@@ -23,10 +23,10 @@ package at.caspase.rxdroid;
 
 import java.io.Serializable;
 import java.sql.Date;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -60,18 +60,12 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
 import at.caspase.rxdroid.Database.Drug;
-import at.caspase.rxdroid.Database.Intake;
-import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
-import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.Util;
 
-import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
-import com.j256.ormlite.dao.Dao;
-
-public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> implements
+public class DrugListActivity extends Activity implements
 	OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
 {
 	public static final String TAG = DrugListActivity.class.getName();
@@ -93,9 +87,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 	private Date mDate;
 
-	private Dao<Database.Drug, Integer> mDao;
-	private Dao<Database.Intake, Integer> mIntakeDao;
-
 	private SharedPreferences mSharedPreferences;
 	
 	@Override
@@ -108,8 +99,6 @@ public class DrugListActivity extends OrmLiteBaseActivity<Database.Helper> imple
 
 		mInflater = LayoutInflater.from(this);
 
-		mDao = getHelper().getDrugDao();
-		mIntakeDao = getHelper().getIntakeDao();
 		mViewSwitcher = (ViewSwitcher) findViewById(R.id.drug_list_view_flipper);
 		mTextDate = (TextView) findViewById(R.id.med_list_footer);
 
