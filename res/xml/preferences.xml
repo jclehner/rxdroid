@@ -178,4 +178,11 @@
 			android:dependency="debug_enabled" />
 	
 	</PreferenceScreen>
+	
+	<Preference 
+		android:title="Version"
+		android:summary="@string/version_with_revision"
+		android:enabled="false"
+		android:selectable="false"
+	/>
 </PreferenceScreen>
