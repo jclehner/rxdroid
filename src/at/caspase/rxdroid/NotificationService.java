@@ -84,7 +84,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	public void onCreate()
 	{
 		super.onCreate();
-		sInstance = this;
+		setInstance(this);
 
 		mDrugDao = getHelper().getDrugDao();
 		mIntakeDao = getHelper().getIntakeDao();
@@ -124,7 +124,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	public void onDestroy()
 	{
 		super.onDestroy();
-		sInstance = null;
+		setInstance(null);
 
 		stopThread();
 		mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
@@ -681,6 +681,10 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		hasher.hash(msg);
 
 		return hasher.getHashCode();
+	}
+	
+	private static void setInstance(NotificationService instance) {
+		sInstance = instance;
 	}
 
 	private static void sleep(long time) throws InterruptedException

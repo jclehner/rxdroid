@@ -25,7 +25,6 @@ import java.io.Serializable;
 import java.sql.Date;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
@@ -46,8 +45,6 @@ import at.caspase.rxdroid.preferences.DrugNamePreference;
 import at.caspase.rxdroid.preferences.FractionPreference;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
-
-import com.j256.ormlite.dao.Dao;
 
 /**
  * Edit a drug's database entry.

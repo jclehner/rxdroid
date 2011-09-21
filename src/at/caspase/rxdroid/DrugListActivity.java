@@ -293,8 +293,7 @@ public class DrugListActivity extends Activity implements
 		{
 			float ratio = velocityX / velocityY;
 			
-			// TODO search for a reasonable minimum ratio
-			if(Math.abs(ratio) < 5)
+			if(Math.abs(ratio) < 1)
 			{
 				Log.d(TAG, "onFling: ignoring fling; ratio=" + ratio);
 				return false;
@@ -330,7 +329,11 @@ public class DrugListActivity extends Activity implements
 	/////////////
 	
 	@Override
-	public boolean onTouch(View v, MotionEvent event) {
+	public boolean onTouch(View v, MotionEvent event) 
+	{		
+		Log.d(TAG, "onTouch: action=" + event.getActionMasked() + 
+				", x=" + event.getX() + ", y=" + event.getY());
+			
 		return mGestureDetector.onTouchEvent(event);
 	}
 	

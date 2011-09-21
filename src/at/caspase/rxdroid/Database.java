@@ -45,8 +45,6 @@ import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.DatabaseTable;
 import com.j256.ormlite.table.TableUtils;
@@ -123,17 +121,7 @@ public final class Database
 		sOnChangedListeners.remove(listener);
 	}
 
-	/**
-	 * Creates a new database entry.
-	 *
-	 * Using this function will ensure that all OnDatabaseChangedListener objects registered
-	 * via addWatcher are notified of the change.
-	 *
-	 * @param <T>
-	 * @param <ID>
-	 * @param dao
-	 * @param t
-	 */
+	@Deprecated
 	public static <T extends Entry, ID> void create(final Dao<T, ID> dao, final T t)
 	{
 		Thread th = new Thread(new Runnable() {
@@ -159,7 +147,7 @@ public final class Database
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onCreateEntry((Drug) t);
 			
-			List<Drug> drugCache = getCachedDrugs((Dao<Drug, Integer>) dao);
+			List<Drug> drugCache = getCachedDrugs();
 			drugCache.add((Drug) t);
 		}
 		else if(t instanceof Intake)
@@ -167,11 +155,22 @@ public final class Database
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onCreateEntry((Intake) t);
 			
-			List<Intake> intakeCache = getCachedIntakes((Dao<Intake, Integer>) dao);
+			List<Intake> intakeCache = getCachedIntakes();
 			intakeCache.add((Intake) t);
 		}
 	}
 
+	/**
+	 * Creates a new database entry.
+	 *
+	 * Using this function will ensure that all OnDatabaseChangedListener objects registered
+	 * via addWatcher are notified of the change.
+	 *
+	 * @param <T>
+	 * @param <ID>
+	 * @param dao
+	 * @param t
+	 */
 	public static <T extends Entry, ID> void create(final T t)
 	{
 		if(t instanceof Drug)
@@ -180,6 +179,7 @@ public final class Database
 			create(mIntakeDao, (Intake) t);
 	}	
 	
+	@Deprecated
 	public static <T extends Entry, ID> void update(final Dao<T, ID> dao, final T t)
 	{
 		Thread th = new Thread(new Runnable() {
@@ -207,7 +207,7 @@ public final class Database
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
 				watcher.onUpdateEntry(newDrug);
 			
-			List<Drug> drugCache = getCachedDrugs((Dao<Drug, Integer>) dao);
+			List<Drug> drugCache = getCachedDrugs();
 			
 			Drug oldDrug = Entry.findInCollection(drugCache, newDrug.getId());
 			int index = drugCache.indexOf(oldDrug);
@@ -227,6 +227,7 @@ public final class Database
 			update(mIntakeDao, (Intake) t);
 	}
 
+	@Deprecated
 	public static <T extends Entry, ID> void delete(final Dao<T, ID> dao, final T t)
 	{
 		Thread th = new Thread(new Runnable() {

@@ -22,15 +22,12 @@
 package at.caspase.rxdroid;
 
 import java.sql.Date;
-import java.util.List;
 
 import android.content.Context;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,8 +35,6 @@ import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.util.DateTime;
-
-import com.j256.ormlite.dao.Dao;
 
 /**
  * A class for viewing drug doses.
@@ -95,6 +90,8 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			case R.id.night:
 				setDoseTime(Database.Drug.TIME_NIGHT);
 				break;
+				
+			default:
 		}
 
 		setBackgroundResource(R.drawable.doseview_background);
