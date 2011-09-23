@@ -35,7 +35,9 @@ import at.caspase.rxdroid.util.Hasher;
 public class Fraction extends Number implements Comparable<Number>
 {
 	private static final long serialVersionUID = 2050536341303052796L;
-	@SuppressWarnings("unused") private static final String TAG = Fraction.class.getName();
+	
+	@SuppressWarnings("unused") 
+	private static final String TAG = Fraction.class.getName();
 	private static final Pattern REGEX = Pattern.compile("^\\s*(?:(-?\\d+)\\s+)?\\s*(?:(-?\\d+)\\s*/\\s*(\\d+)\\s*)\\s*$");
 
 	private static boolean sDisplayMixedNumbers = true;

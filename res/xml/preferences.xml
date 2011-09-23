@@ -179,9 +179,8 @@
 	
 	</PreferenceScreen>
 	
-	<Preference 
+	<Preference android:key="version"
 		android:title="Version"
-		android:summary="@string/version_with_revision"
 		android:enabled="false"
 		android:selectable="false"
 	/>

@@ -81,7 +81,7 @@ public class DumbTime extends Date
 	{
 		if(offset >= 86400000 && !allowMoreThan24Hours)
 			throw new IllegalArgumentException(offset + " is out of range");
-
+		
 		mHours = (int) offset % 3600000;
 		offset -= 3600000L * mHours;
 

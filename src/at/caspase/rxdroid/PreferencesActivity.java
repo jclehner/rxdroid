@@ -26,6 +26,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,6 +47,10 @@ public class PreferencesActivity extends PreferenceActivity
 
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
 		addPreferencesFromResource(R.xml.preferences);
+		
+		final Preference versionPref = findPreference("version");
+		if(versionPref != null)
+			versionPref.setSummary(Version.get(Version.FORMAT_FULL));
 	}
 
 	@Override

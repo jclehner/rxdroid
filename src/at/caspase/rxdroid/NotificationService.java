@@ -51,6 +51,7 @@ import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
+import at.caspase.rxdroid.debug.NotificationServiceInfo;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 import com.j256.ormlite.dao.Dao;
@@ -66,7 +67,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 {
 	public static final String EXTRA_FORCE_RESTART = "force_restart";
 
-	private static final String TAG = NotificationService.class.getName();
+	private static final String TAG = NotificationService.class.getSimpleName();
 
 	private Dao<Drug, Integer> mDrugDao;
 	private Dao<Intake, Integer> mIntakeDao;
@@ -77,14 +78,17 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	private String[] mNotificationMessages;
 	private int mLastNotificationHash;
 
-	Thread mThread;
-	static NotificationService sInstance = null;
+	private Thread mThread;
+	private static NotificationService sInstance = null;
+	
+	private static NotificationServiceInfo sSvcInfo = new NotificationServiceInfo();
 
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
 		setInstance(this);
+		sSvcInfo.isStarted = true;
 
 		mDrugDao = getHelper().getDrugDao();
 		mIntakeDao = getHelper().getIntakeDao();
@@ -102,6 +106,28 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 		ContextStorage.set(getApplicationContext());
 		Database.load();
+		
+		Thread monitorThread = new Thread(new Runnable() {
+			
+			@Override
+			public void run()
+			{
+				while(true)
+				{
+					Log.d(TAG + ":MonitorThread", sSvcInfo.toString());
+					try
+					{						
+						Thread.sleep(60000);
+					}
+					catch (InterruptedException e)
+					{
+						continue;
+					}					
+				}				
+			}
+		});
+		
+		monitorThread.start();
 	}
 
 	/**
@@ -125,7 +151,8 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	{
 		super.onDestroy();
 		setInstance(null);
-
+		sSvcInfo.isStarted = false;
+		
 		stopThread();
 		mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
 		Database.unregisterOnChangedListener(this);
@@ -192,6 +219,10 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			return false;
 
 		return sInstance.isThreadRunning();
+	}
+	
+	public static NotificationServiceInfo getNotificationServiceInfo() {
+		return sSvcInfo;
 	}
 
 	private synchronized boolean isThreadRunning()
@@ -274,11 +305,11 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 				{
 					while(true)
 					{
-						final Date date = DateTime.today();
+						final Date date = sSvcInfo.date = DateTime.today();
 						mIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
 
-						final int activeDoseTime = settings.getActiveDoseTime();
-						final int nextDoseTime = settings.getNextDoseTime();
+						final int activeDoseTime = sSvcInfo.activeDoseTime = settings.getActiveDoseTime();
+						final int nextDoseTime = sSvcInfo.nextDoseTime = settings.getNextDoseTime();
 						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
 
 						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
@@ -319,7 +350,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 								sleep(Constants.NOTIFICATION_INITIAL_DELAY);
 							}
 
-							final String contentText = Integer.toString(pendingIntakes.size());
+							final String contentText = Integer.toString(sSvcInfo.pendingIntakes = pendingIntakes.size());
 							final long snoozeTime = settings.getSnoozeTime();
 
 							postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
@@ -357,11 +388,13 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 				finally
 				{
 					cancelAllNotifications();
+					sSvcInfo.isThreadStarted = false;
 				}
 			}
 		});
 
 		mThread.start();
+		sSvcInfo.isThreadStarted = true;
 	}
 
 	/**
@@ -440,7 +473,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	{
 		final Set<Intake> forgottenIntakes = getAllForgottenIntakes(date, lastDoseTime);
 
-		Log.d(TAG, forgottenIntakes.size() + " forgotten intakes");
+		Log.d(TAG, (sSvcInfo.forgottenIntakes = forgottenIntakes.size()) + " forgotten intakes");
 
 		if(!forgottenIntakes.isEmpty())
 		{
@@ -605,7 +638,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			Log.d(TAG, "last hash: " + mLastNotificationHash + ", this hash: " + notificationHash);
 			//mNotificationManager.cancel(R.id.notification);
 			mNotificationManager.notify(R.id.notification, notification);
-			mLastNotificationHash = notificationHash;
+			mLastNotificationHash = sSvcInfo.lastNotificationHash = notificationHash;
 		}
 		else
 			Log.d(TAG, "Ignorning Notification with hash " + notificationHash);
@@ -690,9 +723,15 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	private static void sleep(long time) throws InterruptedException
 	{
 		if(time > 0)
+		{
+			sSvcInfo.sleepingUntil = System.currentTimeMillis() + time;
 			Thread.sleep(time);
+		}
 		else
+		{
+			sSvcInfo.sleepingUntil = -1;
 			Log.d(TAG, "sleep: ignoring time of " + time);
+		}
 	}
 
 	private void writeCrashLog(Exception cause)
