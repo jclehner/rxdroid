@@ -725,13 +725,14 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		if(time > 0)
 		{
 			sSvcInfo.sleepingUntil = System.currentTimeMillis() + time;
+			sSvcInfo.timeOfSleepBegin = DateTime.now();
 			Thread.sleep(time);
 		}
 		else
-		{
-			sSvcInfo.sleepingUntil = -1;
 			Log.d(TAG, "sleep: ignoring time of " + time);
-		}
+		
+		sSvcInfo.sleepingUntil = -1;
+		sSvcInfo.timeOfSleepBegin = null;
 	}
 
 	private void writeCrashLog(Exception cause)

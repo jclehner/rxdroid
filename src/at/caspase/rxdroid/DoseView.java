@@ -291,8 +291,8 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			return;
 		}
 		
-		final Date end = new Date(mDate.getTime() + Preferences.instance().getDoseTimeEndOffset(mDoseTime));
-
+		final Date end = new Date(mDate.getTime() + Preferences.instance().getDoseTimeEndOffset(mDoseTime));		
+		
 		if(mDrug.isActive() && !mDoseText.getText().equals("0") && DateTime.now().compareTo(end) != -1)
 			mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
 		else

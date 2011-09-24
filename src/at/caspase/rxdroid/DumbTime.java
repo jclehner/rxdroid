@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -74,7 +75,7 @@ public class DumbTime extends Date
 	 * Creates an instance using an offset from midnight.
 	 *
 	 * @param offset An offset from midnight, in milliseconds. The permissible range is thus [0, 86400000), unless <code>
-	 *     allowMoreThan24Hours</code> is <true>.
+	 *     allowMoreThan24Hours</code> is <code>true</code>.
 	 * @param allowMoreThan24Hours See above.
 	 */
 	public DumbTime(long offset, boolean allowMoreThan24Hours)
@@ -236,6 +237,10 @@ public class DumbTime extends Date
 		}
 
 		throw new IllegalArgumentException("timeString=" + timeString);
+	}
+	
+	public static DumbTime fromTime(Time time) {
+		return new DumbTime(time.getHours(), time.getMinutes(), time.getSeconds());
 	}
 }
 

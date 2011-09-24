@@ -202,7 +202,7 @@ public class Fraction extends Number implements Comparable<Number>
 
 	/**
 	 * Returns the fraction's textual representation.
-	 *
+	 * <p>
 	 * The generated string's format depends on whether you've disabled the displaying of
 	 * 'mixed numbers' (it's enabled by default) by calling setDisplayMixedNumbers().
 	 * Note that regardless of that setting's state, the returned string is guaranteed
@@ -253,9 +253,9 @@ public class Fraction extends Number implements Comparable<Number>
 
 	/**
 	 * Parses the textual representation of a fraction.
-	 *
+	 * <p>
 	 * This function will accept strings like {@literal -3 1/4} or {@literal 5/4}.
-	 * Superfluous whitespace will be trimmed.     *
+	 * Superfluous whitespace will be trimmed.
 	 *
 	 * @throws NumberFormatException
 	 */
@@ -294,7 +294,7 @@ public class Fraction extends Number implements Comparable<Number>
 				throw new NumberFormatException();
 
 			// TODO the regex currently fails to handle single numbers correctly,
-			// so we assume try to parse the whole string in case the regex-matching
+			// so we try to parse the whole string in case the regex-matching
 			// failed
 			wholeNum = Integer.parseInt(string, 10);
 		}
@@ -338,8 +338,10 @@ public class Fraction extends Number implements Comparable<Number>
 	{
 		int product = n1 * n2;
 
-		do {
-			if(n1 < n2) {
+		do 
+		{
+			if(n1 < n2) 
+			{
 				int tmp = n1;
 				n1 = n2;
 				n2 = tmp;

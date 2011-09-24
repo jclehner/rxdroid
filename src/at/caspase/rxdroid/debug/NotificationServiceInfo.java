@@ -1,6 +1,7 @@
 package at.caspase.rxdroid.debug;
 
 import java.sql.Date;
+import java.sql.Time;
 
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.util.DateTime;
@@ -12,6 +13,7 @@ public class NotificationServiceInfo
 	public Date date;
 	public int activeDoseTime = 0xdeadbeef;
 	public int nextDoseTime = 0xdeadbeef;
+	public Time timeOfSleepBegin = null;
 	public long sleepingUntil = -1;
 	public int lastNotificationHash;
 	public int pendingIntakes;
@@ -20,7 +22,17 @@ public class NotificationServiceInfo
 	@Override
 	public String toString()
 	{
-		long sleepingUntilOffset = sleepingUntil - DateTime.today().getTime();
+		final String sleepingUntilInfo;
+		
+		if(sleepingUntil != -1)
+		{
+			final long sleepingUntilOffset = sleepingUntil - DateTime.today().getTime();
+			final DumbTime time = new DumbTime(sleepingUntilOffset, true);
+			
+			sleepingUntilInfo = time.toString();
+		}
+		else
+			sleepingUntilInfo = "(not sleeping)";		
 		
 		return
 			"NotificationService Info:" +
@@ -29,7 +41,8 @@ public class NotificationServiceInfo
 			"\n  date                : " + date +
 			"\n  activeDoseTime      : " + activeDoseTime +
 			"\n  nextDoseTime        : " + nextDoseTime +
-			"\n  sleepingUntil       : " + (sleepingUntil == -1 ? "(not sleeping)" : new DumbTime(sleepingUntilOffset, true)) +
+			"\n  timeOfSleepBegin    : " + timeOfSleepBegin +
+			"\n  sleepingUntil       : " + sleepingUntilInfo +
 			"\n  lastNotificationHash: " + lastNotificationHash +
 			"\n  pendingIntakes      : " + pendingIntakes +
 			"\n  forgottenIntakes    : " + forgottenIntakes +

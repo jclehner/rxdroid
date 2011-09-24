@@ -105,7 +105,15 @@ public class Preferences
 	public long getDoseTimeEndOffset(int doseTime) {
 		return getTimePreference(prefKeyPrefixes[doseTime] + "_end").getTime();
 	}
-
+	
+	public DumbTime getTimePreferenceBegin(int doseTime) {
+		return getTimePreference(doseTime, "_begin");
+	}
+	
+	public DumbTime getTimePreferenceEnd(int doseTime) {
+		return getTimePreference(doseTime, "_end");
+	}
+	
 	public DumbTime getTimePreference(String key)
 	{
 		if(key == null)
@@ -120,6 +128,10 @@ public class Preferences
 
 		return DumbTime.valueOf(value);
 	}
+	
+	private DumbTime getTimePreference(int doseTime, String suffix) {
+		return getTimePreference(prefKeyPrefixes[doseTime] + suffix);
+	}	
 
 	public int getActiveOrNextDoseTime()
 	{
@@ -131,10 +143,9 @@ public class Preferences
 
 	public int getActiveDoseTime()
 	{
-		final long offset = DateTime.getOffsetFromMidnight(DateTime.today());
 		for(int doseTime : doseTimes)
 		{
-			if(offset >= getDoseTimeBeginOffset(doseTime) && offset < getDoseTimeEndOffset(doseTime))
+			if(DateTime.isWithinRange(DateTime.now(), getTimePreferenceBegin(doseTime), getTimePreferenceEnd(doseTime)))
 				return doseTime;
 		}
 

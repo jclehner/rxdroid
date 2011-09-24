@@ -29,6 +29,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import at.caspase.rxdroid.DumbTime;
+
 public final class DateTime
 {
 	public static Date today()
@@ -88,5 +90,16 @@ public final class DateTime
 	{
 		Calendar now = Calendar.getInstance();
 		return now.getTimeInMillis();
+	}
+
+	public static boolean isWithinRange(Time time, DumbTime begin, DumbTime end)
+	{
+		long endTimeMillis = end.getTime();
+		
+		if(end.before(begin))
+			endTimeMillis += Constants.MILLIS_PER_DAY;
+		
+		final DumbTime theTime = DumbTime.fromTime(time);
+		return theTime.after(begin) && theTime.getTime() < endTimeMillis;		
 	}
 }
