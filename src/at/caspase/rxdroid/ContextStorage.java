@@ -31,35 +31,37 @@ import android.content.Context;
 public final class ContextStorage
 {
 	static Context sContext;
-	static boolean sIsInitialized = false;
 	
 	/**
 	 * Set the globally available context.
 	 *
 	 * @param context a context to obtain the application context from.
 	 */
-	static public synchronized void set(Context context)
+	public static synchronized void set(Context context)
 	{
 		if(sContext == null)
-		{
 			sContext = context.getApplicationContext();
-			sIsInitialized = true;
-		}
 	}
 	
 	/**
 	 * Calls {@link #get(boolean)} with <code>allowNullContext=false</code>.
-	 * @return
 	 */
-	static public synchronized Context get() {
+	public static synchronized Context get() {
 		return get(false);
 	}
 	
-	static public synchronized Context get(boolean allowNullContext)
+	/**
+	 * Gets the stored context.
+	 * 
+	 * @param allowNullContext If set to <code>true</code>, the function will <em>not</em> throw
+	 * 	an exception if the currently stored context is <code>null</code> 
+	 * @return a reference to the stored context
+	 */
+	public static synchronized Context get(boolean allowNullContext)
 	{
 		if(sContext == null)
 		{
-			if(!allowNullContext || !sIsInitialized)
+			if(!allowNullContext)
 				throw new IllegalStateException("Context is null");
 		}
 				

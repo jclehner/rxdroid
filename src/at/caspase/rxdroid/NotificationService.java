@@ -123,7 +123,7 @@ public class NotificationService extends Service implements
 					}					
 				}				
 			}
-		});
+		}, "Monitor Thread");
 		
 		monitorThread.start();
 	}
@@ -131,7 +131,7 @@ public class NotificationService extends Service implements
 	/**
 	 * Starts the service if it has not been started yet.
 	 *
-	 * You can force the service thread to restart by passing the EXTRA_FORCE_RESTART=true extra.
+	 * You can force the service thread to restart by passing the <code>EXTRA_FORCE_RESTART=true</code> extra.
 	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
@@ -247,7 +247,7 @@ public class NotificationService extends Service implements
 
 	/**
 	 * (Re)starts the worker thread.
-	 *
+	 * <p>
 	 * Calling this function will cause the service to consult the DB in order
 	 * to determine when the next notification should be posted. Currently, the
 	 * worker thread is restarted when <em>any</em> database changes occur (see
@@ -393,7 +393,7 @@ public class NotificationService extends Service implements
 					sSvcInfo.isThreadStarted = false;
 				}
 			}
-		});
+		}, "Service Thread");
 
 		mThread.start();
 		sSvcInfo.isThreadStarted = true;
@@ -465,10 +465,7 @@ public class NotificationService extends Service implements
 			postNotification(R.id.notification_intake_forgotten, Notification.DEFAULT_LIGHTS, contentText);
 		}
 		else
-		{
 			cancelNotification(R.id.notification_intake_forgotten);
-			//mNotificationManager.cancel(R.id.notification_intake_forgotten);
-		}
 	}
 
 	private void checkSupplies(boolean doEnqueueNotification)
@@ -499,8 +496,7 @@ public class NotificationService extends Service implements
 	private List<Drug> getAllDrugsWithLowSupply(int minDays)
 	{
 		final List<Drug> drugs = Database.getCachedDrugs();
-
-		ArrayList<Drug> drugsWithLowSupply = new ArrayList<Drug>();
+		final List<Drug> drugsWithLowSupply = new ArrayList<Drug>();
 
 		for(Drug drug : drugs)
 		{
@@ -596,8 +592,6 @@ public class NotificationService extends Service implements
 
 			msgBuilder.append(bullet + doseMsgLowSupply);
 		}
-		
-		Log.d(TAG, "  msgBuilder=" + msgBuilder);
 
 		final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
 		views.setTextViewText(R.id.stat_title, getString(R.string._title_notifications));

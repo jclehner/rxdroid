@@ -56,10 +56,9 @@
     
     <!--  Dialogs: Warnings -->
 	<string name="_title_warning">Warning</string>       
-    <string name="_msg_warning_svc_not_running">It appears that the notification service was not running. 
-			If this is the first time that you\'ve started this app, this is perfectly normal; if not, the service
-			might have crashed, or was stopped through other means (e.g. task killers). Be aware that you may have
-			missed intakes due to the service not being active.</string>
+    <string name="_msg_warning_svc_not_running">The notification service was not running. 
+			It might have crashed, or was stopped through other means (e.g. task killers). 
+			Be aware that you may have missed doses!</string>
     
     <string name="_title_preferences">Preferences</string>
         
@@ -96,6 +95,6 @@
 	<string name="_summary_pref_restore_defaults">Resets all preferences to default values</string>
 	
 	<string name="_title_prefscreen_display_info">Information</string>
-	<string name="_summary_prefscreen_display_info">Note that these settings may be overridden temporarily using MENU &gt; Show all</string>		
+	<string name="_summary_prefscreen_display_info">Note that these settings may be overridden temporarily using MENU -&gt; Show all</string>		
 	
 </resources>
