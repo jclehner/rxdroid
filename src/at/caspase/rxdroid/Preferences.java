@@ -50,9 +50,6 @@ public class Preferences
 		if(sApplicationContext == null)
 			sApplicationContext = ContextStorage.get();
 		
-		if(sApplicationContext == null)
-			throw new IllegalStateException("No Context available");
-
 		sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sApplicationContext);
 		
 		if(instance == null)

@@ -28,11 +28,11 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.IdentityHashMap;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.WeakHashMap;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -77,8 +77,8 @@ public final class Database
 	
 	private static boolean sIsLoaded = false;
 	
-	// hackish, but there's no IdentityHashSet
-	private static Map<OnDatabaseChangedListener, Void> sOnChangedListeners = new IdentityHashMap<OnDatabaseChangedListener, Void>();
+	private static WeakHashMap<OnDatabaseChangedListener, Void> sOnChangedListeners = 
+		new WeakHashMap<OnDatabaseChangedListener, Void>();
 
 	/**
 	 * Initializes the DB.
@@ -139,8 +139,81 @@ public final class Database
 		sOnChangedListeners.remove(listener);
 	}
 
-	@Deprecated
-	public static <T extends Entry, ID> void create(final Dao<T, ID> dao, final T t)
+	/**
+	 * Creates a new database entry.
+	 *
+	 * Using this function will ensure that all OnDatabaseChangedListener objects registered
+	 * via addWatcher are notified of the change.
+	 *
+	 * @param <T>
+	 * @param <ID>
+	 * @param dao
+	 * @param t
+	 */
+	public static <T extends Entry, ID> void create(final T t, int listenerFlags)
+	{
+		if(t instanceof Drug)
+			create(mDrugDao, (Drug) t, listenerFlags);
+		else if(t instanceof Intake)
+			create(mIntakeDao, (Intake) t, listenerFlags);
+	}
+	
+	public static <T extends Entry, ID> void create(final T t) {
+		create(t, 0);
+	}
+	
+	public static <T extends Entry, ID> void update(final T t, int listenerFlags)
+	{
+		if(t instanceof Drug)
+			update(mDrugDao, (Drug) t, listenerFlags);
+		else if(t instanceof Intake)
+			update(mIntakeDao, (Intake) t, listenerFlags);
+	}
+	
+	public static <T extends Entry, ID> void update(final T t) {
+		update(t, 0);
+	}
+	
+	public static <T extends Entry, ID> void delete(final T t, int listenerFlags)
+	{
+		if(t instanceof Drug)
+			delete(mDrugDao, (Drug) t, listenerFlags);
+		else if(t instanceof Intake)
+			delete(mIntakeDao, (Intake) t, listenerFlags);
+	}
+	
+	public static <T extends Entry, ID> void delete(final T t) {
+		delete(t, 0);
+	}
+
+	public static Drug findDrug(int drugId)
+	{
+		for(Drug drug : sDrugCache)
+		{
+			if(drug.getId() == drugId)
+				return drug;
+		}
+		
+		throw new NoSuchElementException("No drug with id=" + drugId);
+	}
+	
+	/**
+	 * Find all intakes matching the specified criteria.
+	 */
+	public static List<Intake> findIntakes(Drug drug, Date date, int doseTime)
+	{
+		return findIntakes(mIntakeDao, drug, date, doseTime);
+	}
+	
+	public static List<Drug> getCachedDrugs() {
+		return getCachedDrugs(mDrugDao);
+	}
+	
+	public static List<Intake> getCachedIntakes() {
+		return getCachedIntakes(mIntakeDao);
+	}
+	
+	private static synchronized <T extends Entry, ID> void create(final Dao<T, ID> dao, final T t, int listenerFlags)
 	{
 		Thread th = new Thread(new Runnable() {
 
@@ -159,46 +232,26 @@ public final class Database
 		});
 
 		th.start();
-
+		
 		if(t instanceof Drug)
 		{
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
-				watcher.onCreateEntry((Drug) t);
+				watcher.onCreateEntry((Drug) t, listenerFlags);
 			
-			List<Drug> drugCache = getCachedDrugs();
+			final List<Drug> drugCache = getCachedDrugs();
 			drugCache.add((Drug) t);
 		}
 		else if(t instanceof Intake)
 		{
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
-				watcher.onCreateEntry((Intake) t);
+				watcher.onCreateEntry((Intake) t, listenerFlags);
 			
-			List<Intake> intakeCache = getCachedIntakes();
+			final List<Intake> intakeCache = getCachedIntakes();
 			intakeCache.add((Intake) t);
 		}
-	}
-
-	/**
-	 * Creates a new database entry.
-	 *
-	 * Using this function will ensure that all OnDatabaseChangedListener objects registered
-	 * via addWatcher are notified of the change.
-	 *
-	 * @param <T>
-	 * @param <ID>
-	 * @param dao
-	 * @param t
-	 */
-	public static <T extends Entry, ID> void create(final T t)
-	{
-		if(t instanceof Drug)
-			create(mDrugDao, (Drug) t);
-		else if(t instanceof Intake)
-			create(mIntakeDao, (Intake) t);
 	}	
-	
-	@Deprecated
-	public static <T extends Entry, ID> void update(final Dao<T, ID> dao, final T t)
+
+	private static synchronized <T extends Entry, ID> void update(final Dao<T, ID> dao, final T t, int listenerFlags)
 	{
 		Thread th = new Thread(new Runnable() {
 
@@ -223,9 +276,9 @@ public final class Database
 			Drug newDrug = (Drug) t;
 			
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
-				watcher.onUpdateEntry(newDrug);
+				watcher.onUpdateEntry(newDrug, listenerFlags);
 			
-			List<Drug> drugCache = getCachedDrugs();
+			final List<Drug> drugCache = getCachedDrugs();
 			
 			Drug oldDrug = Entry.findInCollection(drugCache, newDrug.getId());
 			int index = drugCache.indexOf(oldDrug);
@@ -235,18 +288,9 @@ public final class Database
 		}
 		else if(t instanceof Intake)
 			throw new UnsupportedOperationException();
-	}	
-
-	public static <T extends Entry, ID> void update(final T t)
-	{
-		if(t instanceof Drug)
-			update(mDrugDao, (Drug) t);
-		else if(t instanceof Intake)
-			update(mIntakeDao, (Intake) t);
 	}
-
-	@Deprecated
-	public static <T extends Entry, ID> void delete(final Dao<T, ID> dao, final T t)
+	
+	private static synchronized <T extends Entry, ID> void delete(final Dao<T, ID> dao, final T t, int listenerFlags)
 	{
 		Thread th = new Thread(new Runnable() {
 
@@ -269,51 +313,75 @@ public final class Database
 		if(t instanceof Drug)
 		{
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
-				watcher.onDeleteEntry((Drug) t);
+				watcher.onDeleteEntry((Drug) t, listenerFlags);
 			
 			final List<Drug> drugCache = getCachedDrugs();
 			drugCache.remove((Drug) t);
 			
 			final List<Intake> intakeCache = getCachedIntakes();
+			
 			for(Intake intake : intakeCache)
 			{
 				if(intake.getDrug().getId() == ((Drug) t).getId())
-					delete(intake);			
+				{
+					// TODO this is kinda redundant, but we can't use
+					// Database.delete(Intake) as it may cause a
+					// ConcurrentModificationException to be thrown
+					intakeCache.remove(intake);
+					try
+					{
+						mIntakeDao.delete(intake);
+					}
+					catch (SQLException e)
+					{
+						Log.e(TAG, "delete", e);
+					}					
+				}
 			}			
 		}
 		else if(t instanceof Intake)
 		{
 			for(OnDatabaseChangedListener watcher : sOnChangedListeners.keySet())
-				watcher.onDeleteEntry((Intake) t);
+				watcher.onDeleteEntry((Intake) t, listenerFlags);
 			
-			List<Intake> intakeCache = getCachedIntakes();
+			final List<Intake> intakeCache = getCachedIntakes();
 			intakeCache.remove((Intake) t);
 		}
-	}	
-
-	public static <T extends Entry, ID> void delete(final T t)
-	{
-		if(t instanceof Drug)
-			delete(mDrugDao, (Drug) t);
-		else if(t instanceof Intake)
-			delete(mIntakeDao, (Intake) t);
-	}
-
-	public static Drug findDrug(int drugId)
-	{
-		for(Drug drug : sDrugCache)
-		{
-			if(drug.getId() == drugId)
-				return drug;
-		}
-		
-		throw new NoSuchElementException("No drug with id=" + drugId);
 	}
 	
-	/**
-	 * Find all intakes matching the specified criteria.
-	 */
-	public static List<Intake> findIntakes(Dao<Intake, Integer> dao, Drug drug, Date date, int doseTime)
+	private static synchronized<T> List<Drug> getCachedDrugs(Dao<Drug, Integer> dao)
+	{
+		if(sDrugCache == null)
+		{
+			sDrugCache = Collections.synchronizedList(queryForAll(dao));
+			Log.d(TAG, "Loaded " + sDrugCache.size() + " drugs into cache");
+		}
+		return sDrugCache;
+	}
+	
+	private static synchronized<T> List<Intake> getCachedIntakes(Dao<Intake, Integer> dao)
+	{
+		if(sIntakeCache == null)
+		{
+			sIntakeCache = Collections.synchronizedList(queryForAll(dao));
+			Log.d(TAG, "Loaded " + sIntakeCache.size() + " intakes into cache");
+		}
+		return sIntakeCache;
+	}
+	
+	private static<T> List<T> queryForAll(Dao<T, Integer> dao)
+	{
+		try
+		{
+			return dao.queryForAll();
+		}
+		catch(SQLException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static List<Intake> findIntakes(Dao<Intake, Integer> dao, Drug drug, Date date, int doseTime)
 	{
 		final List<Intake> intakeCache = getCachedIntakes(dao);
 		final List<Intake> intakes = new LinkedList<Intake>();
@@ -331,51 +399,6 @@ public final class Database
 		}
 		
 		return intakes;	
-	}
-	
-	public static List<Intake> findIntakes(Drug drug, Date date, int doseTime)
-	{
-		return findIntakes(mIntakeDao, drug, date, doseTime);
-	}
-	
-	public static List<Drug> getCachedDrugs() {
-		return getCachedDrugs(mDrugDao);
-	}
-	
-	public static List<Intake> getCachedIntakes() {
-		return getCachedIntakes(mIntakeDao);
-	}
-		
-	private static synchronized<T> List<Drug> getCachedDrugs(Dao<Drug, Integer> dao)
-	{
-		if(sDrugCache == null)
-		{
-			sDrugCache = queryForAll(dao);
-			Log.d(TAG, "Loaded " + sDrugCache.size() + " drugs into cache");
-		}
-		return sDrugCache;
-	}
-	
-	private static synchronized<T> List<Intake> getCachedIntakes(Dao<Intake, Integer> dao)
-	{
-		if(sIntakeCache == null)
-		{
-			sIntakeCache = queryForAll(dao);
-			Log.d(TAG, "Loaded " + sIntakeCache.size() + " intakes into cache");
-		}
-		return sIntakeCache;
-	}
-	
-	private static<T> List<T> queryForAll(Dao<T, Integer> dao)
-	{
-		try
-		{
-			return dao.queryForAll();
-		}
-		catch(SQLException e)
-		{
-			throw new RuntimeException(e);
-		}
 	}
 
 	private Database() {}
@@ -1001,15 +1024,15 @@ public final class Database
 	 */
 	public interface OnDatabaseChangedListener
 	{
-		public void onCreateEntry(Drug drug);
+		public void onCreateEntry(Drug drug, int listenerFlags);
 
-		public void onDeleteEntry(Drug drug);
+		public void onDeleteEntry(Drug drug, int listenerFlags);
 
-		public void onUpdateEntry(Drug drug);
+		public void onUpdateEntry(Drug drug, int listenerFlags);
 
-		public void onCreateEntry(Intake intake);
+		public void onCreateEntry(Intake intake, int listenerFlags);
 
-		public void onDeleteEntry(Intake intake);
+		public void onDeleteEntry(Intake intake, int listenerFlags);
 
 		public void onDatabaseDropped();
 	}

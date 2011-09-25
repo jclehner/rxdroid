@@ -47,6 +47,13 @@ import at.caspase.rxdroid.util.DateTime;
  */
 public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 {
+	static class ViewHolder
+	{
+		TextView name;
+		ImageView icon;
+		DoseView[] doseViews = new DoseView[4];			
+	}	
+	
 	@SuppressWarnings("unused")
 	private static final String TAG = DoseView.class.getName();
 
@@ -204,20 +211,20 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	}
 
 	@Override
-	public void onCreateEntry(Drug drug) {}
+	public void onCreateEntry(Drug drug, int listenerFlags) {}
 
 	@Override
-	public void onDeleteEntry(Drug drug) {}
+	public void onDeleteEntry(Drug drug, int listenerFlags) {}
 
 	@Override
-	public void onUpdateEntry(Drug drug)
+	public void onUpdateEntry(Drug drug, int listenerFlags)
 	{
 		if(mDrug == null || drug.getId() == mDrug.getId())
 			setDrug(drug);
 	}
 
 	@Override
-	public void onCreateEntry(Intake intake)
+	public void onCreateEntry(Intake intake, int listenerFlags)
 	{
 		if(mDate == null)
 			return;
@@ -227,7 +234,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	}
 
 	@Override
-	public void onDeleteEntry(Intake intake)
+	public void onDeleteEntry(Intake intake, int listenerFlags)
 	{
 		if(mDate == null)
 			return;
@@ -238,23 +245,19 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	@Override
 	public void onDatabaseDropped() {}
-
+	
 	@Override
 	protected void onAttachedToWindow()
 	{
 		super.onAttachedToWindow();
-
-		registerDbListener();
-		//updateView();
-		//updateIntakeStatusIcon();
+		Database.registerOnChangedListener(this);
 	}
 
 	@Override
 	protected void onDetachedFromWindow()
 	{
 		super.onDetachedFromWindow();
-
-		unregisterDbListener();
+		Database.unregisterOnChangedListener(this);
 	}
 
 	private boolean isApplicableIntake(Intake intake)
@@ -305,15 +308,5 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			throw new IllegalStateException("Cannot obtain intake data from DoseView with unset date and/or drug");
 
 		return Database.findIntakes(mDrug, mDate, mDoseTime).size();
-	}
-
-	private synchronized void registerDbListener()
-	{
-		Database.registerOnChangedListener(this);
-	}
-
-	private synchronized void unregisterDbListener()
-	{
-		Database.unregisterOnChangedListener(this);
 	}
 }

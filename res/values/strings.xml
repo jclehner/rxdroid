@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RxDroid</string>
-    <string name="open_helper_classname">at.caspase.rxdroid.Database$Helper</string>
     <string name="version">0.6</string>
     <string name="vcs_revision">$Revision$</string>
     

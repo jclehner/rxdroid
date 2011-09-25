@@ -274,7 +274,7 @@ public class DrugListActivity extends Activity implements
 		ListView lv = new ListView(this);
 		
 		if(mAdapter == null)
-			mAdapter = makeAdapter();
+			mAdapter = new DrugAdapter(this, R.layout.dose_view, Database.getCachedDrugs());
 		
 		return lv;
 	}
@@ -301,7 +301,7 @@ public class DrugListActivity extends Activity implements
 		}
 		else if(velocityX == 0.0f)
 		{
-			Log.d(TAG, "onFling: strange; velocityX=0.0");
+			Log.d(TAG, "onFling: strange; both velocities are zero");
 			return false;
 		}
 		
@@ -329,20 +329,11 @@ public class DrugListActivity extends Activity implements
 	/////////////
 	
 	@Override
-	public boolean onTouch(View v, MotionEvent event) 
-	{		
-		Log.d(TAG, "onTouch: action=" + event.getActionMasked() + 
-				", x=" + event.getX() + ", y=" + event.getY());
-			
+	public boolean onTouch(View v, MotionEvent event) {		
 		return mGestureDetector.onTouchEvent(event);
 	}
 	
 	/////////////
-	
-	private DrugAdapter makeAdapter()
-	{
-		return new DrugAdapter(this, R.layout.dose_view, Database.getCachedDrugs());
-	}
 
 	private void startNotificationService()
 	{
@@ -397,8 +388,10 @@ public class DrugListActivity extends Activity implements
 		}
 		
 		mViewSwitcher.showNext();
-		((ListView) mViewSwitcher.getCurrentView()).setAdapter(mAdapter);
-		mViewSwitcher.getCurrentView().setOnTouchListener(this);			
+		
+		final ListView currentView = (ListView) mViewSwitcher.getCurrentView();
+		currentView.setAdapter(mAdapter);
+		currentView.setOnTouchListener(this);			
 		
 		final SpannableString dateString = new SpannableString(mDate.toString());
 
@@ -440,8 +433,8 @@ public class DrugListActivity extends Activity implements
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
-				Database.create(intake);
-				//Database.update(drug);
+				Database.create(intake, NotificationService.LISTENER_FLAG_DONT_RESTART);
+				Database.update(drug);
 
 				Toast.makeText(getApplicationContext(), "Dose intake noted.", Toast.LENGTH_SHORT).show();
 			}
@@ -450,6 +443,8 @@ public class DrugListActivity extends Activity implements
 		
 		if(newSupply.compareTo(0) == -1)
 		{
+			drug.setCurrentSupply(Fraction.ZERO);
+			
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setMessage("According to the database the current supplies are not sufficient for this dose.");
 			builder.setPositiveButton("Ignore", defaultOnClickListener);
@@ -471,6 +466,8 @@ public class DrugListActivity extends Activity implements
 		}
 		else
 		{
+			drug.setCurrentSupply(newSupply);
+			
 			builder.setIcon(Util.getDoseTimeDrawableFromDoseTime(doseTime));
 			
 			final boolean hasIntakes = !Database.findIntakes(drug, date, doseTime).isEmpty();
@@ -537,13 +534,13 @@ public class DrugListActivity extends Activity implements
 			//
 			// All measurements were done using an HTC Desire running Cyanogenmod 7!
 			
-			ViewHolder holder;
+			DoseView.ViewHolder holder;
 
 			if(v == null)
 			{
 				v = mInflater.inflate(R.layout.drug_view2, null);
 				
-				holder = new ViewHolder();
+				holder = new DoseView.ViewHolder();
 				
 				holder.name = (TextView) v.findViewById(R.id.drug_name);
 				holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
@@ -557,7 +554,7 @@ public class DrugListActivity extends Activity implements
 				v.setTag(holder);
 			}
 			else
-				holder = (ViewHolder) v.getTag();
+				holder = (DoseView.ViewHolder) v.getTag();
 				
 			Drug drug = getItem(position);
 									
@@ -580,13 +577,6 @@ public class DrugListActivity extends Activity implements
 			}
 			
 			return v;
-		}
-				
-		private class ViewHolder
-		{
-			TextView name;
-			ImageView icon;
-			DoseView[] doseViews = new DoseView[4];			
 		}
 	}
 

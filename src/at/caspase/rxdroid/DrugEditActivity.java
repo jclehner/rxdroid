@@ -140,7 +140,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
 		{
-			Database.create(mDrug);
+			Database.create(mDrug, 0);
 			setResult(RESULT_OK);
 			Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
 		}

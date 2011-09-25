@@ -47,13 +47,24 @@ public final class ContextStorage
 		}
 	}
 	
-	static public synchronized Context get() 
-	{
-		if(!sIsInitialized)
-			throw new IllegalStateException("Called get() without having called set()");		
-		
-		return sContext;
+	/**
+	 * Calls {@link #get(boolean)} with <code>allowNullContext=false</code>.
+	 * @return
+	 */
+	static public synchronized Context get() {
+		return get(false);
 	}
+	
+	static public synchronized Context get(boolean allowNullContext)
+	{
+		if(sContext == null)
+		{
+			if(!allowNullContext || !sIsInitialized)
+				throw new IllegalStateException("Context is null");
+		}
+				
+		return sContext;
+	}	
 	
 	private ContextStorage() {}
 }

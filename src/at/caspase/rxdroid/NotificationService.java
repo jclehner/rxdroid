@@ -37,6 +37,7 @@ import java.util.Set;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -62,21 +63,21 @@ import com.j256.ormlite.dao.Dao;
  * @author Joseph Lehner
  *
  */
-public class NotificationService extends OrmLiteBaseService<Database.Helper> implements
+public class NotificationService extends Service implements
 		OnDatabaseChangedListener, OnSharedPreferenceChangeListener
 {
 	public static final String EXTRA_FORCE_RESTART = "force_restart";
 
+	public static final int LISTENER_FLAG_DONT_RESTART = 1;
+	
 	private static final String TAG = NotificationService.class.getSimpleName();
 
-	private Dao<Drug, Integer> mDrugDao;
-	private Dao<Intake, Integer> mIntakeDao;
 	private Intent mIntent;
 	private SharedPreferences mSharedPreferences;
 
 	private NotificationManager mNotificationManager;
 	private String[] mNotificationMessages;
-	private int mLastNotificationHash;
+	private int mLastNotificationHash = 0;
 
 	private Thread mThread;
 	private static NotificationService sInstance = null;
@@ -90,11 +91,8 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		setInstance(this);
 		sSvcInfo.isStarted = true;
 
-		mDrugDao = getHelper().getDrugDao();
-		mIntakeDao = getHelper().getIntakeDao();
-
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		cancelAllNotifications();
+		clearAllNotifications();
 
 		mIntent = new Intent(Intent.ACTION_VIEW);
 		mIntent.setClass(getApplicationContext(), DrugListActivity.class);
@@ -166,33 +164,33 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	}
 
 	@Override
-	public void onCreateEntry(Drug drug) {
-		restartThread(true, true);
+	public void onCreateEntry(Drug drug, int listenerFlags) {
+		restartThread(listenerFlags);
 	}
 
 	@Override
-	public void onDeleteEntry(Drug drug) {
-		restartThread(true, true);
+	public void onDeleteEntry(Drug drug, int listenerFlags) {
+		restartThread(listenerFlags);
 	}
 
 	@Override
-	public void onUpdateEntry(Drug drug) {
-		restartThread(true, true);
+	public void onUpdateEntry(Drug drug, int listenerFlags) {
+		restartThread(listenerFlags);
 	}
 
 	@Override
-	public void onCreateEntry(Intake intake) {
-		restartThread(true);
+	public void onCreateEntry(Intake intake, int listenerFlags) {
+		restartThread(listenerFlags);
 	}
 
 	@Override
-	public void onDeleteEntry(Intake intake) {
-		restartThread(true);
+	public void onDeleteEntry(Intake intake, int listenerFlags) {
+		restartThread(listenerFlags);
 	}
 
 	@Override
 	public void onDatabaseDropped() {
-		restartThread(true, true);
+		restartThread(true);
 	}
 
 	@Override
@@ -240,6 +238,12 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 		// TODO does isAlive() imply !isInterrupted() ?
 		return mThread.isAlive() && !mThread.isInterrupted();
 	}
+	
+	private void restartThread(int listenerFlags)
+	{
+		if((listenerFlags & LISTENER_FLAG_DONT_RESTART) == 0)
+			restartThread(true);	
+	}
 
 	/**
 	 * (Re)starts the worker thread.
@@ -254,7 +258,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	 *     Supply checks are normally done only when <code>activeDoseTime == Drug.TIME_MORNING</code>,
 	 *     i.e. only once per day.
 	 */
-	private synchronized void restartThread(boolean forceRestart, final boolean forceSupplyCheck)
+	private synchronized void restartThread(boolean forceRestart)
 	{
 		final boolean wasRunning = isThreadRunning();
 
@@ -269,7 +273,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			mThread.interrupt();
 		}
 
-		Log.d(TAG, "restartThread(" + forceRestart + ", " + forceSupplyCheck + "): wasRunning=" + wasRunning);
+		Log.d(TAG, "restartThread(" + forceRestart + "): wasRunning=" + wasRunning);
 
 		mThread = new Thread(new Runnable() {
 
@@ -293,10 +297,8 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 				 *
 				 */
 
-				cancelAllNotifications();
-
-				if(!wasRunning || forceSupplyCheck)
-					checkSupplies(true);
+				clearAllNotifications();
+				checkSupplies(true);
 
 				boolean delayFirstNotification = true;
 				final Preferences settings = Preferences.instance();
@@ -387,7 +389,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 				}
 				finally
 				{
-					cancelAllNotifications();
+					//cancelAllNotifications();
 					sSvcInfo.isThreadStarted = false;
 				}
 			}
@@ -395,15 +397,6 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 		mThread.start();
 		sSvcInfo.isThreadStarted = true;
-	}
-
-	/**
-	 * Same as restartThread(forceRestart, false).
-	 *
-	 * @see #restartThread(boolean, boolean)
-	 */
-	private void restartThread(boolean forceRestart) {
-		restartThread(forceRestart, false);
 	}
 
 	private synchronized void stopThread()
@@ -417,22 +410,13 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 	private Set<Intake> getAllOpenIntakes(Date date, int doseTime)
 	{
 		final Set<Intake> openIntakes = new HashSet<Database.Intake>();
-		final List<Drug> drugs;
-
-		try
-		{
-			drugs = mDrugDao.queryForAll();
-		}
-		catch(SQLException e)
-		{
-			throw new RuntimeException(e);
-		}
+		final List<Drug> drugs = Database.getCachedDrugs();
 
 		for(Drug drug : drugs)
 		{
 			if(drug.isActive())
 			{
-				final List<Intake> intakes = Database.findIntakes(mIntakeDao, drug, date, doseTime);
+				final List<Intake> intakes = Database.findIntakes(drug, date, doseTime);
 
 				if(intakes.isEmpty() && drug.hasDoseOnDate(date) && drug.getDose(doseTime).compareTo(0) != 0)
 				{
@@ -514,16 +498,7 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 	private List<Drug> getAllDrugsWithLowSupply(int minDays)
 	{
-		final List<Drug> drugs;
-
-		try
-		{
-			drugs = mDrugDao.queryForAll();
-		}
-		catch(SQLException e)
-		{
-			throw new RuntimeException(e);
-		}
+		final List<Drug> drugs = Database.getCachedDrugs();
 
 		ArrayList<Drug> drugsWithLowSupply = new ArrayList<Drug>();
 
@@ -546,6 +521,8 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 			if(dailyDose != 0)
 			{
 				final double currentSupply = drug.getCurrentSupply().doubleValue();
+				
+				Log.d(TAG, "Supplies left for " + drug + ": " + currentSupply / dailyDose);
 
 				if(Double.compare(currentSupply / dailyDose, (double) minDays) == -1)
 					drugsWithLowSupply.add(drug);
@@ -571,9 +548,13 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 		if((notificationCount = getNotificationCount()) == 0)
 		{
-			cancelAllNotifications(false);
+			cancelAllNotifications(true);
 			return;
 		}
+		
+		Log.d(TAG, "postAllNotifications: notificationCount=" + notificationCount);
+		for(String msg : mNotificationMessages)
+			Log.d(TAG, "  msg=" + msg);
 
 		final String bullet;
 
@@ -615,6 +596,8 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 			msgBuilder.append(bullet + doseMsgLowSupply);
 		}
+		
+		Log.d(TAG, "  msgBuilder=" + msgBuilder);
 
 		final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
 		views.setTextViewText(R.id.stat_title, getString(R.string._title_notifications));
@@ -633,29 +616,33 @@ public class NotificationService extends OrmLiteBaseService<Database.Helper> imp
 
 		final int notificationHash = getNotificationHashCode(notification, msgBuilder.toString());
 
-		if(mLastNotificationHash != notificationHash)
-		{
-			Log.d(TAG, "last hash: " + mLastNotificationHash + ", this hash: " + notificationHash);
-			//mNotificationManager.cancel(R.id.notification);
-			mNotificationManager.notify(R.id.notification, notification);
-			mLastNotificationHash = sSvcInfo.lastNotificationHash = notificationHash;
-		}
+		if(mLastNotificationHash == notificationHash)
+			notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
 		else
-			Log.d(TAG, "Ignorning Notification with hash " + notificationHash);
+			mLastNotificationHash = sSvcInfo.lastNotificationHash = notificationHash;		
+		
+		mNotificationManager.notify(R.id.notification, notification);
 	}
 
 	private void cancelNotification(int id) {
 		postNotification(id, Notification.DEFAULT_LIGHTS, null);
 	}
-
-	private void cancelAllNotifications() {
-		cancelAllNotifications(true);
+	
+	private void cancelAllNotifications(boolean resetHash) {
+		clearAllNotifications(true);
+		mNotificationManager.cancel(R.id.notification);
+		if(resetHash)
+			mLastNotificationHash = 0;
+	}
+	
+	private void clearAllNotifications() {
+		clearAllNotifications(true);
 	}
 
-	private void cancelAllNotifications(boolean zapMessages)
+	private void clearAllNotifications(boolean zapMessages)
 	{
-		mNotificationManager.cancel(R.id.notification);
-		mLastNotificationHash = 0;
+		//mNotificationManager.cancel(R.id.notification);
+		//mLastNotificationHash = 0;
 		if(zapMessages)
 			mNotificationMessages = new String[3];
 	}
