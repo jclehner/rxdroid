@@ -23,17 +23,35 @@ package at.caspase.rxdroid;
 
 import android.content.Context;
 
+/**
+ * Provides a globally available context.
+ * 
+ * @author Joseph Lehner
+ */
 public final class ContextStorage
 {
 	static Context sContext;
+	static boolean sIsInitialized = false;
 	
-	static public void set(Context context)
+	/**
+	 * Set the globally available context.
+	 *
+	 * @param context a context to obtain the application context from.
+	 */
+	static public synchronized void set(Context context)
 	{
 		if(sContext == null)
-			sContext = context;
+		{
+			sContext = context.getApplicationContext();
+			sIsInitialized = true;
+		}
 	}
 	
-	static public Context get() {
+	static public synchronized Context get() 
+	{
+		if(!sIsInitialized)
+			throw new IllegalStateException("Called get() without having called set()");		
+		
 		return sContext;
 	}
 	

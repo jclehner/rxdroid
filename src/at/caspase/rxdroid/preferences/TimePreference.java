@@ -21,8 +21,6 @@
 
 package at.caspase.rxdroid.preferences;
 
-import java.util.Date;
-
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
@@ -89,12 +87,19 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 			mWrapFlags |= WRAP_BEFORE;
 
 		super.setOnPreferenceClickListener(this);
-		updateTime();
 	}
 
 	@Override
 	public CharSequence getSummary() {
 		return mTime == null ? null : mTime.toString();
+	}
+	
+	@Override
+	public void onAttachedToActivity() 
+	{
+		// if we did this in the constructor, getPersistedString would not
+		// return the actual value
+		updateTime();
 	}
 
 	@Override
@@ -133,7 +138,9 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 		else
 		{
 			if(shouldPersist())
-				persistString(mTime.toString());
+			{
+				Log.d(TAG, "persistString(" + mTime + ") = " + persistString(mTime.toString()));
+			}
 
 			notifyChanged();
 		}
@@ -200,9 +207,6 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 
 		if(after != null && before != null)
 		{
-			Log.d(TAG, "getConstraints: key=" + getKey());
-			Log.d(TAG, "  before=" + before + ", after=" + after);
-
 			if(after.after(before))
 			{
 				if((mWrapFlags & WRAP_BEFORE) == 0)
@@ -213,9 +217,6 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 
 				isWrapping = true;
 			}
-
-			Log.d(TAG, "  before=" + before + ", after=" + after);
-			Log.d(TAG, "  isWrapping=" + isWrapping);
 		}
 
 		constraintTimes[IDX_AFTER] = after;
@@ -228,21 +229,12 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 		mTime = DumbTime.valueOf(getPersistedString(mDefaultValue));
 	}
 
-	private boolean isTimeWithinConstraints()
-	{
-		boolean ret = isTimeWithinConstraints_();
-		Log.d(TAG, "isTimeWithinConstraints: key=" + getKey() + ", ret=" + ret);
-		return ret;
+	private boolean isTimeWithinConstraints() {
+		return isTimeWithinConstraints_();
 	}
 
 	private boolean isTimeWithinConstraints_()
 	{
-		/*final DumbTime constraintTimes[] = { null, null };
-		getConstraints(constraintTimes);
-
-		DumbTime after = constraintTimes[IDX_AFTER];
-		DumbTime before = constraintTimes[IDX_BEFORE];*/
-
 		DumbTime after = getConstraint(IDX_AFTER);
 		DumbTime before = getConstraint(IDX_BEFORE);
 
@@ -250,8 +242,6 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 		{
 			if(mWrapFlags != 0 && before.before(after))
 				return mTime.after(after) || mTime.before(before);
-
-			Log.d(TAG, "--------------------------------------");
 
 			return mTime.after(after) && mTime.before(before);
 		}

@@ -51,7 +51,13 @@ import com.j256.ormlite.table.TableUtils;
 
 /**
  * All DB access goes here.
- *
+ * <p>
+ * Even though DB access is handled by ORMLite, it should not be neccessary to deal with the library
+ * directly outside this class. For this to work, {@link #load(Context)} has to be called before using any
+ * other function. If using {@link #load()}, you must ensure that the {@link #ContextStorage} has been
+ * initialized. 
+ * </p>
+ * <p>
  * Note that all ORMLite related classes will have members prefixed without the
  * usual "m" (i.e. "comment" instead of "mComment").
  *
@@ -74,10 +80,22 @@ public final class Database
 	// hackish, but there's no IdentityHashSet
 	private static Map<OnDatabaseChangedListener, Void> sOnChangedListeners = new IdentityHashMap<OnDatabaseChangedListener, Void>();
 
+	/**
+	 * Initializes the DB.
+	 * <p>
+	 * This function uses the Context provided by #ContextStorage.
+	 * 
+	 * @throws NullPointerException if #ContextStorage was not intialized.
+	 */
 	public static synchronized void load() {
 		load(ContextStorage.get());
-	}	
-
+	}
+	
+	/**
+	 * Initializes the DB.
+	 * 
+	 * @param context an android Context for creating the ORMLite database helper.
+	 */
 	public static synchronized void load(Context context)
 	{
 		if(context == null)
