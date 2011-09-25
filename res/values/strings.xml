@@ -32,9 +32,9 @@
     <string name="_msg_low_supply_single">Low supplies for %1$s.</string>
     <string name="_msg_low_supply_multiple">Low supplies for %1$s and %2$d other(s).</string>
     
-	<string name="_msg_constraints_ab">Select a time after %1$s and before %2$s.</string>
-	<string name="_msg_constraints_a">Select a time after %1$s.</string>
-	<string name="_msg_constraints_b">Select a time before %2$s.</string>
+	<string name="_msg_constraints_ab">Pick a time between %1$s and %2$s.</string>
+	<string name="_msg_constraints_a">Pick a time after %1$s.</string>
+	<string name="_msg_constraints_b">Pick a time before %2$s.</string>
 	
 	<string name="_btn_set">Set</string>
     

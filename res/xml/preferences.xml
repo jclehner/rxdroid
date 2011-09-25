@@ -182,6 +182,5 @@
 	<Preference android:key="version"
 		android:title="Version"
 		android:enabled="false"
-		android:selectable="false"
 	/>
 </PreferenceScreen>
