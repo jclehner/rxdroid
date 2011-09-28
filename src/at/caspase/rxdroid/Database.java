@@ -207,18 +207,18 @@ public final class Database
 	
 	public static synchronized List<Drug> getCachedDrugs() 
 	{
-		final List<Drug> cachedDrugs = new LinkedList<Drug>();
-		cachedDrugs.addAll(getCachedDrugs(mDrugDao));
+		//final List<Drug> cachedDrugs = new LinkedList<Drug>();
+		//cachedDrugs.addAll(getCachedDrugs(mDrugDao));
 		
-		return cachedDrugs;
+		return getCachedDrugs(mDrugDao);
 	}
 	
 	public static synchronized List<Intake> getCachedIntakes() 
 	{
-		final List<Intake> cachedIntakes = new LinkedList<Intake>();
-		cachedIntakes.addAll(getCachedIntakes(mIntakeDao));
+		//final List<Intake> cachedIntakes = new LinkedList<Intake>();
+		//cachedIntakes.addAll(getCachedIntakes(mIntakeDao));
 		
-		return cachedIntakes;
+		return getCachedIntakes(mIntakeDao);
 	}
 	
 	private static synchronized <T extends Entry, ID> void create(final Dao<T, ID> dao, final T t, int listenerFlags)
