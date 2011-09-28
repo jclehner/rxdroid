@@ -40,10 +40,8 @@ import at.caspase.rxdroid.util.Hasher;
  * @author Joseph Lehner
  *
  */
-public class DumbTime extends Date
+public class DumbTime implements Comparable<DumbTime>
 {
-	private static final long serialVersionUID = -8142558717636198167L;
-
 	private static final String[] FORMATS = { "HH:mm:ss", "HH:mm" };
 
 	private int mHours;
@@ -95,48 +93,22 @@ public class DumbTime extends Date
 		mMillis = (int) offset;
 	}
 
-	@Override
 	public int getHours() {
 		return mHours;
 	}
 
-	@Override
 	public int getMinutes() {
 		return mMinutes;
 	}
 
-	@Override
 	public int getSeconds() {
 		return mSeconds;
 	}
 
-	@Override
 	public long getTime() {
 		return mMillis + 1000 * (mHours * 3600 + mMinutes * 60 + mSeconds);
 	}
 
-	@Override
-	public int getTimezoneOffset() {
-		return 0;
-	}
-
-	@Override
-	public int getYear() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getMonth() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getDay() {
-		throw new UnsupportedOperationException();
-	}
-
-
-	@Override
 	public void setHours(int hours)
 	{
 		if(hours < 0 || hours > 23)
@@ -145,7 +117,6 @@ public class DumbTime extends Date
 		mHours = hours;
 	}
 
-	@Override
 	public void setMinutes(int minutes)
 	{
 		if(minutes < 0 || minutes > 59)
@@ -154,7 +125,6 @@ public class DumbTime extends Date
 		mMinutes = minutes;
 	}
 
-	@Override
 	public void setSeconds(int seconds)
 	{
 		if(seconds < 0 || seconds > 59)
@@ -162,28 +132,13 @@ public class DumbTime extends Date
 
 		mSeconds = seconds;
 	}
-
-	@Override
-	public boolean before(Date time) {
-		throw new UnsupportedOperationException("Can only compare DumbTime objects");
-	}
 	
 	public boolean before(DumbTime time) {
 		return getTime() < time.getTime();
 	}
 
-	@Override
-	public boolean after(Date time) {
-		throw new UnsupportedOperationException("Can only compare DumbTime objects");
-	}
-	
 	public boolean after(DumbTime time) {
 		return getTime() > time.getTime();
-	}
-
-	@Override
-	public int compareTo(Date other) {
-		throw new UnsupportedOperationException("Can only compare DumbTime objects");
 	}
 	
 	public int compareTo(DumbTime other)
@@ -197,11 +152,10 @@ public class DumbTime extends Date
 	@Override
 	public boolean equals(Object o)
 	{
-		boolean result = super.equals(o);
-
-		Log.w("DumbTime", "Use of equals()", new RuntimeException());
-
-		return result;
+		if(o == null || !(o instanceof DumbTime))
+			return false;
+		
+		return getTime() == ((DumbTime) o).getTime();
 	}
 
 	@Override
