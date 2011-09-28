@@ -180,9 +180,12 @@ public class DumbTime implements Comparable<DumbTime>
 
 	public String toString(boolean withSeconds)
 	{
+		// this java.sql.Time will have a date of 1970-01-01 
+		// which we can ignore, as we only need the time
+		final Time time = new Time(getTime());
 		final SimpleDateFormat sdf = new SimpleDateFormat(withSeconds ? FORMATS[0] + ".SSS" : FORMATS[1]);
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-		return sdf.format(this);
+		return sdf.format(time);
 	}
 
 	public static DumbTime valueOf(String timeString)
