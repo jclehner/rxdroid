@@ -50,7 +50,7 @@
 
 	</application>
 
-	<instrumentation android:name="android.test.InstrumentationTestRunner" android:targetPackage="at.caspase.rxdroid" android:label="RxDroid Tests" />
+	<instrumentation android:targetPackage="at.caspase.rxdroid" android:label="RxDroid Tests" android:name="android.test.InstrumentationTestRunner"/>
 	
 	<uses-sdk android:minSdkVersion="10" />
 </manifest> 

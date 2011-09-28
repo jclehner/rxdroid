@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid;
 
+import java.sql.Time;
 import java.util.Date;
 
 import android.app.Notification;
@@ -84,11 +85,19 @@ public class Preferences
 	}
 
 	public long getMillisFromNowUntilDoseTimeBegin(int doseTime) {
-		return getMillisFromNowUntilDoseTimeBeginOrEnd(doseTime, true);
+		return getMillisFromNowUntilDoseTimeBeginOrEnd(DateTime.now(), doseTime, true);
+	}
+	
+	public long getMillisUntilDoseTimeBegin(Time time, int doseTime) {
+		return getMillisFromNowUntilDoseTimeBeginOrEnd(time, doseTime, true);
 	}
 
 	public long getMillisFromNowUntilDoseTimeEnd(int doseTime) {
-		return getMillisFromNowUntilDoseTimeBeginOrEnd(doseTime, false);
+		return getMillisFromNowUntilDoseTimeBeginOrEnd(DateTime.now(), doseTime, false);
+	}
+	
+	public long getMillisUntilDoseTimeEnd(Time time, int doseTime) {
+		return getMillisFromNowUntilDoseTimeBeginOrEnd(time, doseTime, false);
 	}
 
 	public long getSnoozeTime() {
@@ -130,72 +139,88 @@ public class Preferences
 		return getTimePreference(prefKeyPrefixes[doseTime] + suffix);
 	}	
 
-	public int getActiveOrNextDoseTime()
+	public int getActiveOrNextDoseTime() {
+		return getActiveDoseTime(DateTime.now());
+	}
+	
+	public int getActiveOrNextDoseTime(Time time)
 	{
-		int ret = getActiveDoseTime();
+		int ret = getActiveDoseTime(time);
 		if(ret == -1)
-			return getNextDoseTime();
+			return getNextDoseTime(time);
 		return ret;
 	}
 
-	public int getActiveDoseTime()
+	public int getActiveDoseTime(Time time)
 	{
 		for(int doseTime : doseTimes)
 		{
-			if(DateTime.isWithinRange(DateTime.now(), getTimePreferenceBegin(doseTime), getTimePreferenceEnd(doseTime)))
+			if(DateTime.isWithinRange(time, getTimePreferenceBegin(doseTime), getTimePreferenceEnd(doseTime)))
 				return doseTime;
 		}
 
 		return -1;
 	}
-
-	public int getNextDoseTime() {
-		return getNextDoseTime(false);
+	
+	public int getActiveDoseTime() {
+		return getActiveDoseTime(DateTime.now());
 	}
 
-	private int getNextDoseTime(boolean useNextDay)
+	public int getNextDoseTime(Time time) {
+		return getNextDoseTime(time, false);
+	}
+	
+	public int getNextDoseTime(Time time, boolean useNextDayOffsets)
 	{
-		long offset = DateTime.getOffsetFromMidnight(DateTime.today());
-		if(useNextDay)
-			offset -= Constants.MILLIS_PER_DAY;
-
 		int retDoseTime = -1;
 		long smallestDiff = 0;
-
+		
+		//Log.d(TAG, "getNextDoseTime: time=" + time);
+		
 		for(int doseTime : doseTimes)
 		{
-			final long diff = getDoseTimeBeginOffset(doseTime) - offset;
-			if(diff >= 0)
+			long diff = getMillisUntilDoseTimeBegin(time, doseTime);
+			if(useNextDayOffsets)
+				diff += Constants.MILLIS_PER_DAY;
+			
+			//Log.d(TAG, "  diff " + diff + " for doseTime=" + doseTime);
+			
+			if(diff > 0 && (smallestDiff == 0 || diff < smallestDiff))
 			{
-				if(retDoseTime == -1 || diff < smallestDiff)
-				{
-					smallestDiff = diff;
-					retDoseTime = doseTime;
-				}
+				smallestDiff = diff;
+				retDoseTime = doseTime;
 			}
 		}
+		
+		if(retDoseTime == -1)
+		{
+			if(!useNextDayOffsets)
+			{
+				//Log.d(TAG, "  retrying with offsets from next day");
+				return getNextDoseTime(time, true);
+			}
+			
+			throw new RuntimeException("retDoseTime == -1");
+		}		
+		
+		//Log.d(TAG, "  retDoseTime=" + retDoseTime);
+		return retDoseTime;	
+	}	
 
-		if(retDoseTime == -1 && !useNextDay)
-			return getNextDoseTime(true);
-
-		return retDoseTime;
+	public int getNextDoseTime() {
+		return getNextDoseTime(DateTime.now());
 	}
 
-	private long getMillisFromNowUntilDoseTimeBeginOrEnd(int doseTime, boolean getMillisUntilBegin)
+	private long getMillisFromNowUntilDoseTimeBeginOrEnd(Time time, int doseTime, boolean getMillisUntilBegin)
 	{
-		final long offset = getMillisUntilBegin ? getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
-		final Date today = DateTime.today();
-
-		long beginTime = today.getTime() + offset;
-
-		if(beginTime < DateTime.currentTimeMillis())
-		{
-			final Date tomorrow = new Date(today.getTime() + Constants.MILLIS_PER_DAY);
-			beginTime = tomorrow.getTime() + offset;
-
-			Log.d(TAG, "Getting offset from tomorrow");
-		}
-
-		return beginTime - DateTime.currentTimeMillis();
+		final long beginOffset = getDoseTimeBeginOffset(doseTime);
+		final long endOffset = getDoseTimeEndOffset(doseTime);
+		final long timeOffset = time.getTime() - DateTime.date(time).getTime();
+		long offset = getMillisUntilBegin ? beginOffset : endOffset;
+		
+		if(timeOffset > offset)
+			offset += Constants.MILLIS_PER_DAY;
+			
+		return offset - timeOffset;
 	}
 }

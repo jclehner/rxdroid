@@ -29,10 +29,13 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import android.util.Log;
 import at.caspase.rxdroid.DumbTime;
 
 public final class DateTime
 {
+	private static final String TAG = DateTime.class.getName();
+	
 	public static Date today()
 	{
 		final Timestamp today = new Timestamp(currentTimeMillis());
@@ -59,7 +62,13 @@ public final class DateTime
 	public static GregorianCalendar calendarFromDate(Date date) {
 		return new GregorianCalendar(date.getYear(), date.getMonth(), date.getDay());
 	}
-
+	
+	public static Date date(Time time)
+	{
+		Date date = new Date(time.getTime());
+		return date(date.getYear() + 1900, date.getMonth(), date.getDate());
+	}
+	
 	public static Date date(int year, int month, int day)
 	{
 		final Timestamp timestamp = new Timestamp(0);
@@ -94,12 +103,11 @@ public final class DateTime
 
 	public static boolean isWithinRange(Time time, DumbTime begin, DumbTime end)
 	{
-		long endTimeMillis = end.getTime();
+		final DumbTime theTime = DumbTime.fromTime(time);
 		
 		if(end.before(begin))
-			endTimeMillis += Constants.MILLIS_PER_DAY;
-		
-		final DumbTime theTime = DumbTime.fromTime(time);
-		return theTime.after(begin) && theTime.getTime() < endTimeMillis;		
+			return theTime.before(end) || theTime.compareTo(begin) != -1;
+				
+		return theTime.compareTo(begin) != -1 && theTime.before(end);
 	}
 }

@@ -24,7 +24,7 @@ public final class Version
 	 */
 	public static final int FORMAT_LONG = 1;
 	/**
-	 * Full format. Example: <code>RxDroid 1.2.3 (r6666)</code>
+	 * Full format. Example: <code>RxDroid 1.2.3-r6666</code>
 	 */
 	public static final int FORMAT_FULL = 2;
 	

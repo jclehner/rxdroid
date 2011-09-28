@@ -165,16 +165,28 @@ public class DumbTime extends Date
 
 	@Override
 	public boolean before(Date time) {
+		throw new UnsupportedOperationException("Can only compare DumbTime objects");
+	}
+	
+	public boolean before(DumbTime time) {
 		return getTime() < time.getTime();
 	}
 
 	@Override
 	public boolean after(Date time) {
+		throw new UnsupportedOperationException("Can only compare DumbTime objects");
+	}
+	
+	public boolean after(DumbTime time) {
 		return getTime() > time.getTime();
 	}
 
 	@Override
-	public int compareTo(Date other)
+	public int compareTo(Date other) {
+		throw new UnsupportedOperationException("Can only compare DumbTime objects");
+	}
+	
+	public int compareTo(DumbTime other)
 	{
 		if(this.getTime() == other.getTime())
 			return 0;

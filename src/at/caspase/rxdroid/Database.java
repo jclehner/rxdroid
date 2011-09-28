@@ -200,17 +200,25 @@ public final class Database
 	/**
 	 * Find all intakes matching the specified criteria.
 	 */
-	public static List<Intake> findIntakes(Drug drug, Date date, int doseTime)
+	public static synchronized List<Intake> findIntakes(Drug drug, Date date, int doseTime)
 	{
 		return findIntakes(mIntakeDao, drug, date, doseTime);
 	}
 	
-	public static List<Drug> getCachedDrugs() {
-		return getCachedDrugs(mDrugDao);
+	public static synchronized List<Drug> getCachedDrugs() 
+	{
+		final List<Drug> cachedDrugs = new LinkedList<Drug>();
+		cachedDrugs.addAll(getCachedDrugs(mDrugDao));
+		
+		return cachedDrugs;
 	}
 	
-	public static List<Intake> getCachedIntakes() {
-		return getCachedIntakes(mIntakeDao);
+	public static synchronized List<Intake> getCachedIntakes() 
+	{
+		final List<Intake> cachedIntakes = new LinkedList<Intake>();
+		cachedIntakes.addAll(getCachedIntakes(mIntakeDao));
+		
+		return cachedIntakes;
 	}
 	
 	private static synchronized <T extends Entry, ID> void create(final Dao<T, ID> dao, final T t, int listenerFlags)
