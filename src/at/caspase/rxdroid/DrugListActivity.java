@@ -436,7 +436,7 @@ public class DrugListActivity extends Activity implements
 				Database.create(intake, NotificationService.LISTENER_FLAG_DONT_RESTART);
 				Database.update(drug);
 
-				Toast.makeText(getApplicationContext(), "Dose intake noted.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), R.string._toast_intake_noted, Toast.LENGTH_SHORT).show();
 			}
 		};
 		//////////////////

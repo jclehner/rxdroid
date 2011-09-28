@@ -124,15 +124,15 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 						{
 							Database.update(mDrug);
 							setResult(RESULT_OK);
-							Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getApplicationContext(), R.string._toast_saved, Toast.LENGTH_SHORT).show();
 						}
 
 						finish();
 					}
 				};
 
-				builder.setPositiveButton("Save", onClickListener);
-				builder.setNegativeButton("Discard", onClickListener);
+				builder.setPositiveButton(R.string._btn_save, onClickListener);
+				builder.setNegativeButton(R.string._btn_discard, onClickListener);
 
 				builder.show();
 				return;

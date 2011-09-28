@@ -97,4 +97,10 @@
 	<string name="_title_prefscreen_display_info">Information</string>
 	<string name="_summary_prefscreen_display_info">Note that these settings may be overridden temporarily using MENU -&gt; Show all</string>		
 	
+	<string name="_btn_discard">Discard</string>
+	<string name="_btn_save">Save</string>
+	<string name="_toast_intake_noted">Noted</string>
+	<string name="_toast_saved">Saved</string>
+
+	
 </resources>
