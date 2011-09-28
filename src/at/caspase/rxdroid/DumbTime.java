@@ -27,16 +27,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import android.util.Log;
 import at.caspase.rxdroid.util.Hasher;
 
 /**
- * A time class that is not aware of time zones.
- *
+ * A crude time class that is not aware of time zones.
+ * <p>
  * The purpose of this class is to handle the time offsets frequently encountered
  * in RxDroid without having to deal with unexpected timezone issues. Thus, in the
  * context of this application, it could actually be considered smart.
- *
+ * <p>
+ * Also note that, even though the interface shares similarity with <code>java.util.Date</code>,
+ * DumbTime intentionally does not extend this class as it would only cause confusion and enable
+ * operations that make no sense, like comparing a DumbTime with a <code>java.util.Date</code>.
  * @author Joseph Lehner
  *
  */
@@ -92,7 +94,7 @@ public class DumbTime implements Comparable<DumbTime>
 
 		mMillis = (int) offset;
 	}
-
+	
 	public int getHours() {
 		return mHours;
 	}
