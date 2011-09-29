@@ -125,8 +125,10 @@ public final class Database
 	 * @see #Database.OnDatabaseChangedListener
 	 * @param listener The listener to register.
 	 */
-	public static synchronized void registerOnChangedListener(OnDatabaseChangedListener listener) {
+	public static synchronized void registerOnChangedListener(OnDatabaseChangedListener listener) 
+	{
 		sOnChangedListeners.put(listener, null);
+		//Log.d(TAG, "register: Objects in listener registry: " + sOnChangedListeners.size());
 	}
 
 	/**
@@ -135,8 +137,10 @@ public final class Database
 	 * @see #Database.OnDatabaseChangedListener
 	 * @param listener The listener to remove.
 	 */
-	public static synchronized void unregisterOnChangedListener(OnDatabaseChangedListener listener) {
+	public static synchronized void unregisterOnChangedListener(OnDatabaseChangedListener listener) 
+	{
 		sOnChangedListeners.remove(listener);
+		//Log.d(TAG, "unregister: Objects in listener registry: " + sOnChangedListeners.size());
 	}
 
 	/**

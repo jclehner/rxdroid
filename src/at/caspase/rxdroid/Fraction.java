@@ -162,20 +162,10 @@ public class Fraction extends Number implements Comparable<Number>
 	@Override
 	public boolean equals(Object o)
 	{
-		if(!(o instanceof Fraction))
+		if(!(o instanceof Number))
 			return false;
 		
-		if(o instanceof Number)
-		{	
-			Number other = (Number) o;
-	
-			if(other == this)
-				return true;
-	
-			return compareTo(other) == 0;
-		}
-		
-		return false;
+		return compareTo((Number) o) == 0;
 	}
 
 	@Override
@@ -192,6 +182,9 @@ public class Fraction extends Number implements Comparable<Number>
 	@Override
 	public int compareTo(Number other)
 	{
+		if(this == other)
+			return 0;
+		
 		// TODO ugly, change to equalizing to the same denominator and
 		// then comparing the nominators!
 		if(this.doubleValue() == other.doubleValue())
