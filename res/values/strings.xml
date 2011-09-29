@@ -77,8 +77,7 @@
     <string name="_title_pref_use_sound">Sound</string>
     <string name="_title_pref_use_vibrator">Vibration</string>    
     
-    
-    <string name="_Snooze_time">Snooze time</string>
+ 	<string name="_Snooze_time">Snooze time</string>
     
     <string name="_title_prefscreen_display">Display</string>
     <string name="_summary_prefscreen_display">Choose which drugs to display</string>

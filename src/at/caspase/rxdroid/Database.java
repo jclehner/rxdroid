@@ -83,12 +83,12 @@ public final class Database
 	/**
 	 * Initializes the DB.
 	 * <p>
-	 * This function uses the Context provided by #ContextStorage.
+	 * This function uses the Context provided by GlobalContext
 	 * 
-	 * @throws NullPointerException if #ContextStorage was not intialized.
+	 * @throws NullPointerException if GlobalContext was not initialized.
 	 */
 	public static synchronized void load() {
-		load(ContextStorage.get());
+		load(GlobalContext.get());
 	}
 	
 	/**
@@ -108,8 +108,8 @@ public final class Database
 			mDrugDao = mHelper.getDrugDao();
 			mIntakeDao = mHelper.getIntakeDao();
 			
-			getCachedDrugs(mDrugDao);
-			getCachedIntakes(mIntakeDao);
+			getCachedDrugs();
+			getCachedIntakes();
 			
 			sIsLoaded = true;
 		}
@@ -188,7 +188,7 @@ public final class Database
 
 	public static Drug findDrug(int drugId)
 	{
-		for(Drug drug : sDrugCache)
+		for(Drug drug : getCachedDrugs())
 		{
 			if(drug.getId() == drugId)
 				return drug;
@@ -198,28 +198,70 @@ public final class Database
 	}
 	
 	/**
-	 * Find all intakes matching the specified criteria.
+	 * Find all intakes meeting the specified criteria.
 	 */
 	public static synchronized List<Intake> findIntakes(Drug drug, Date date, int doseTime)
 	{
-		return findIntakes(mIntakeDao, drug, date, doseTime);
+		final List<Intake> intakes = new LinkedList<Intake>();
+				
+		for(Intake intake : getCachedIntakes())
+		{
+			if(intake.getDoseTime() != doseTime)
+				continue;
+			if(intake.getDrug().getId() != drug.getId())
+				continue;
+			if(!intake.getDate().equals(date))
+				continue;						
+			
+			intakes.add(intake);
+		}
+		
+		return intakes;	
 	}
 	
+	/**
+	 * Gets the cached drugs.
+	 * @return a reference to the <em>actual</em> cache. Use {@link #getDrugs()} to get a copy of the cache.
+	 */
 	public static synchronized List<Drug> getCachedDrugs() 
 	{
-		//final List<Drug> cachedDrugs = new LinkedList<Drug>();
-		//cachedDrugs.addAll(getCachedDrugs(mDrugDao));
-		
-		return getCachedDrugs(mDrugDao);
+		if(sDrugCache == null)
+		{
+			sDrugCache = Collections.synchronizedList(queryForAll(mDrugDao));
+			Log.d(TAG, "Loaded " + sDrugCache.size() + " intakes into cache");
+		}
+		return sDrugCache;
 	}
 	
+	/**
+	 * Gets a copy of the cached drugs.
+	 * @return a copy of the current cache.
+	 */
+	public static List<Drug> getDrugs() {
+		return new LinkedList<Drug>(getCachedDrugs());
+	}
+	
+	/**
+	 * Gets the cached intakes.
+	 * @return a reference to the <em>actual</em> cache. Use {@link #getIntakes()} to get a copy of the cache.
+	 */
 	public static synchronized List<Intake> getCachedIntakes() 
 	{
-		//final List<Intake> cachedIntakes = new LinkedList<Intake>();
-		//cachedIntakes.addAll(getCachedIntakes(mIntakeDao));
-		
-		return getCachedIntakes(mIntakeDao);
-	}
+		if(sIntakeCache == null)
+		{
+			sIntakeCache = Collections.synchronizedList(queryForAll(mIntakeDao));
+			Log.d(TAG, "Loaded " + sIntakeCache.size() + " intakes into cache");
+		}
+		return sIntakeCache;
+	}	
+
+	/**
+	 * Gets a copy of the cached intakes.
+	 * @return a copy of the current cache.
+	 */
+	public static List<Intake> getIntakes() {
+		return new LinkedList<Intake>(getCachedIntakes());
+	}	
 	
 	private static synchronized <T extends Entry, ID> void create(final Dao<T, ID> dao, final T t, int listenerFlags)
 	{
@@ -326,7 +368,7 @@ public final class Database
 			final List<Drug> drugCache = getCachedDrugs();
 			drugCache.remove((Drug) t);
 			
-			final List<Intake> intakeCache = getCachedIntakes();
+			final List<Intake> intakeCache = new LinkedList<Intake>(getCachedIntakes());
 			
 			for(Intake intake : intakeCache)
 			{
@@ -335,7 +377,7 @@ public final class Database
 					// TODO this is kinda redundant, but we can't use
 					// Database.delete(Intake) as it may cause a
 					// ConcurrentModificationException to be thrown
-					intakeCache.remove(intake);
+					sIntakeCache.remove(intake);
 					try
 					{
 						mIntakeDao.delete(intake);
@@ -357,26 +399,6 @@ public final class Database
 		}
 	}
 	
-	private static synchronized<T> List<Drug> getCachedDrugs(Dao<Drug, Integer> dao)
-	{
-		if(sDrugCache == null)
-		{
-			sDrugCache = Collections.synchronizedList(queryForAll(dao));
-			Log.d(TAG, "Loaded " + sDrugCache.size() + " drugs into cache");
-		}
-		return sDrugCache;
-	}
-	
-	private static synchronized<T> List<Intake> getCachedIntakes(Dao<Intake, Integer> dao)
-	{
-		if(sIntakeCache == null)
-		{
-			sIntakeCache = Collections.synchronizedList(queryForAll(dao));
-			Log.d(TAG, "Loaded " + sIntakeCache.size() + " intakes into cache");
-		}
-		return sIntakeCache;
-	}
-	
 	private static<T> List<T> queryForAll(Dao<T, Integer> dao)
 	{
 		try
@@ -387,26 +409,6 @@ public final class Database
 		{
 			throw new RuntimeException(e);
 		}
-	}
-
-	private static List<Intake> findIntakes(Dao<Intake, Integer> dao, Drug drug, Date date, int doseTime)
-	{
-		final List<Intake> intakeCache = getCachedIntakes(dao);
-		final List<Intake> intakes = new LinkedList<Intake>();
-				
-		for(Intake intake : intakeCache)
-		{
-			if(intake.getDoseTime() != doseTime)
-				continue;
-			if(intake.getDrug().getId() != drug.getId())
-				continue;
-			if(!intake.getDate().equals(date))
-				continue;						
-			
-			intakes.add(intake);
-		}
-		
-		return intakes;	
 	}
 
 	private Database() {}

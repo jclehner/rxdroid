@@ -22,7 +22,6 @@
 package at.caspase.rxdroid;
 
 import java.sql.Time;
-import java.util.Date;
 
 import android.app.Notification;
 import android.content.Context;
@@ -49,7 +48,7 @@ public class Preferences
 	public synchronized static Preferences instance()
 	{
 		if(sApplicationContext == null)
-			sApplicationContext = ContextStorage.get();
+			sApplicationContext = GlobalContext.get();
 		
 		sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sApplicationContext);
 		
@@ -84,6 +83,7 @@ public class Preferences
 		return defaults;
 	}
 
+	@Deprecated
 	public long getMillisFromNowUntilDoseTimeBegin(int doseTime) {
 		return getMillisFromNowUntilDoseTimeBeginOrEnd(DateTime.now(), doseTime, true);
 	}
@@ -92,6 +92,7 @@ public class Preferences
 		return getMillisFromNowUntilDoseTimeBeginOrEnd(time, doseTime, true);
 	}
 
+	@Deprecated
 	public long getMillisFromNowUntilDoseTimeEnd(int doseTime) {
 		return getMillisFromNowUntilDoseTimeBeginOrEnd(DateTime.now(), doseTime, false);
 	}

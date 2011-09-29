@@ -1,3 +1,23 @@
+/**
+ * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
+ *
+ * This file is part of RxDroid.
+ *
+ * RxDroid is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * RxDroid is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
 
 package at.caspase.rxdroid.test;
 
@@ -11,7 +31,7 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import at.caspase.rxdroid.ContextStorage;
+import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.Preferences;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.util.DateTime;
@@ -139,7 +159,7 @@ public class PreferencesTest extends AndroidTestCase
 			throw new RuntimeException(e);
 		}
 
-		ContextStorage.set(mContext);
+		GlobalContext.set(mContext);
 		
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		mPrefBackup = new HashMap<String, String>();

@@ -36,7 +36,7 @@ import at.caspase.rxdroid.util.Hasher;
  * in RxDroid without having to deal with unexpected timezone issues. Thus, in the
  * context of this application, it could actually be considered smart.
  * <p>
- * Also note that, even though the interface shares similarity with <code>java.util.Date</code>,
+ * Also note that, even though the interface shows a great similarity to <code>java.util.Date</code>,
  * DumbTime intentionally does not extend this class as it would only cause confusion and enable
  * operations that make no sense, like comparing a DumbTime with a <code>java.util.Date</code>.
  * @author Joseph Lehner

@@ -26,7 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Date;
-import java.sql.SQLException;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,13 +49,10 @@ import android.widget.RemoteViews;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.debug.NotificationServiceInfo;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
-import at.caspase.rxdroid.debug.NotificationServiceInfo;
-
-import com.j256.ormlite.android.apptools.OrmLiteBaseService;
-import com.j256.ormlite.dao.Dao;
 
 /**
  * Primary notification service.
@@ -102,7 +99,7 @@ public class NotificationService extends Service implements
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		Database.registerOnChangedListener(this);		
 
-		ContextStorage.set(getApplicationContext());
+		GlobalContext.set(getApplicationContext());
 		Database.load();
 		
 		Thread monitorThread = new Thread(new Runnable() {
@@ -236,7 +233,7 @@ public class NotificationService extends Service implements
 		Log.d(TAG, "  mThread.isInterrupted(): " + isInterrupted);
 
 		// TODO does isAlive() imply !isInterrupted() ?
-		return mThread.isAlive() && !mThread.isInterrupted();
+		return mThread.isAlive() /*&& !mThread.isInterrupted()*/;
 	}
 	
 	private void restartThread(int listenerFlags)
@@ -308,10 +305,11 @@ public class NotificationService extends Service implements
 					while(true)
 					{
 						final Date date = sSvcInfo.date = DateTime.today();
+						final Time time = DateTime.now();
 						mIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
 
-						final int activeDoseTime = sSvcInfo.activeDoseTime = settings.getActiveDoseTime();
-						final int nextDoseTime = sSvcInfo.nextDoseTime = settings.getNextDoseTime();
+						final int activeDoseTime = sSvcInfo.activeDoseTime = settings.getActiveDoseTime(time);
+						final int nextDoseTime = sSvcInfo.nextDoseTime = settings.getNextDoseTime(time);
 						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
 
 						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
@@ -321,7 +319,7 @@ public class NotificationService extends Service implements
 
 						if(activeDoseTime == -1)
 						{
-							long sleepTime = settings.getMillisFromNowUntilDoseTimeBegin(nextDoseTime);
+							long sleepTime = settings.getMillisUntilDoseTimeBegin(time, nextDoseTime);
 
 							sleep(sleepTime);
 							delayFirstNotification = false;
@@ -337,7 +335,7 @@ public class NotificationService extends Service implements
 							checkSupplies(false);
 						}
 
-						long millisUntilDoseTimeEnd = settings.getMillisFromNowUntilDoseTimeEnd(activeDoseTime);
+						long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(time, activeDoseTime);
 
 						final Set<Intake> pendingIntakes = getAllOpenIntakes(date, activeDoseTime);
 
@@ -410,7 +408,7 @@ public class NotificationService extends Service implements
 	private Set<Intake> getAllOpenIntakes(Date date, int doseTime)
 	{
 		final Set<Intake> openIntakes = new HashSet<Database.Intake>();
-		final List<Drug> drugs = Database.getCachedDrugs();
+		final List<Drug> drugs = Database.getDrugs();
 
 		for(Drug drug : drugs)
 		{
@@ -495,10 +493,9 @@ public class NotificationService extends Service implements
 
 	private List<Drug> getAllDrugsWithLowSupply(int minDays)
 	{
-		final List<Drug> drugs = Database.getCachedDrugs();
 		final List<Drug> drugsWithLowSupply = new ArrayList<Drug>();
 
-		for(Drug drug : drugs)
+		for(Drug drug : Database.getDrugs())
 		{
 			// refill size of zero means ignore supply values
 			if(drug.getRefillSize() == 0)

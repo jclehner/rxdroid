@@ -63,6 +63,7 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
 import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
@@ -77,7 +78,7 @@ public class DrugListActivity extends Activity implements
 	public static final int MENU_ADD = Menu.FIRST;
 	public static final int MENU_DELETE = MENU_ADD + 1;
 	public static final int MENU_PREFERENCES = MENU_ADD + 2;
-	public static final int MENU_DEBUG_FILL = MENU_ADD + 3;
+	public static final int MENU_TESTING = MENU_ADD + 3;
 
 	public static final String EXTRA_DAY = "day";
 
@@ -112,7 +113,7 @@ public class DrugListActivity extends Activity implements
 
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		
-		ContextStorage.set(getApplicationContext());
+		GlobalContext.set(getApplicationContext());
 		Database.load(); // must be called before mViewSwitcher.setFactory!
 		
 		mViewSwitcher.setFactory(this);
@@ -167,7 +168,8 @@ public class DrugListActivity extends Activity implements
 	{
 		menu.add(0, MENU_ADD, 0, "Add").setIcon(android.R.drawable.ic_menu_add);
 		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(android.R.drawable.ic_menu_preferences);
-
+		menu.add(0, MENU_TESTING, 0, "Add testing drug").setIcon(android.R.drawable.ic_menu_add);
+		
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -189,6 +191,22 @@ public class DrugListActivity extends Activity implements
 				intent.setClass(getApplicationContext(), PreferencesActivity.class);
 				startActivity(intent);
 				return true;
+			}
+			case MENU_TESTING:
+			{
+				final Drug drug = new Drug();
+				drug.setName("Testingin");
+				drug.setDose(Drug.TIME_MORNING, new Fraction(3));
+				Database.create(drug);
+				
+				final Date today = DateTime.today();
+								
+				for(int i = 0; i != 4; ++i)
+				{
+					final Date date = new Date(today.getTime() - i * Constants.MILLIS_PER_DAY);
+					final Intake intake = new Intake(drug, date, Drug.TIME_MORNING);
+					Database.create(intake);
+				}				
 			}
 		}
 		return super.onOptionsItemSelected(item);

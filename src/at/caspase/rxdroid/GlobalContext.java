@@ -28,7 +28,7 @@ import android.content.Context;
  * 
  * @author Joseph Lehner
  */
-public final class ContextStorage
+public final class GlobalContext
 {
 	static Context sContext;
 	
@@ -68,5 +68,5 @@ public final class ContextStorage
 		return sContext;
 	}	
 	
-	private ContextStorage() {}
+	private GlobalContext() {}
 }
