@@ -46,17 +46,14 @@ import at.caspase.rxdroid.util.DateTime;
  *
  */
 public class DoseView extends FrameLayout implements OnDatabaseChangedListener
-{
-	static class ViewHolder
-	{
-		TextView name;
-		ImageView icon;
-		DoseView[] doseViews = new DoseView[4];			
-	}	
-	
+{	
 	@SuppressWarnings("unused")
 	private static final String TAG = DoseView.class.getName();
 
+	public static final int STATUS_INDETERMINATE = 0;
+	public static final int STATUS_TAKEN = 1;
+	public static final int STATUS_FORGOTTEN = 2;	
+	
 	private ImageView mIntakeStatus;
 	private TextView mDoseText;
 	private ImageView mDoseTimeIcon;
@@ -64,6 +61,8 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	private Drug mDrug;
 	private int mDoseTime = -1;
 	private Date mDate;
+	
+	private int mStatus = STATUS_INDETERMINATE;
 
 	public DoseView(Context context) {
 		this(context, null);
@@ -97,8 +96,6 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			case R.id.night:
 				setDoseTime(Database.Drug.TIME_NIGHT);
 				break;
-				
-			default:
 		}
 
 		setBackgroundResource(R.drawable.doseview_background);
@@ -185,6 +182,10 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	{
 		return hasInfo(other.mDate, other.mDrug);
 	}
+	
+	public int getIntakeStatus() {
+		return mStatus;
+	}
 
 	@Override
 	public boolean onTouchEvent(final MotionEvent event)
@@ -201,12 +202,9 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_OUTSIDE:
 				setBackgroundResource(R.drawable.doseview_background);
-				break;
-
-			default:
-				// do nothing
+				break;				
 		}
-
+		
 		return super.onTouchEvent(event);
 	}
 
@@ -230,7 +228,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			return;
 
 		if(isApplicableIntake(intake))
-			mIntakeStatus.setImageResource(R.drawable.bg_dose_taken);
+			markAsTaken();
 	}
 
 	@Override
@@ -262,7 +260,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	private boolean isApplicableIntake(Intake intake)
 	{
-		if(intake.getDrug().getId() != mDrug.getId())
+		if(intake.getDrugId() != mDrug.getId())
 			return false;
 		else if(intake.getDoseTime() != mDoseTime)
 			return false;
@@ -290,16 +288,25 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 		if(countIntakes() != 0)
 		{
-			mIntakeStatus.setImageResource(R.drawable.bg_dose_taken);
+			markAsTaken();
 			return;
 		}
 		
 		final Date end = new Date(mDate.getTime() + Preferences.instance().getDoseTimeEndOffset(mDoseTime));		
 		
 		if(mDrug.isActive() && !mDoseText.getText().equals("0") && DateTime.now().compareTo(end) != -1)
+		{
 			mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
+			mStatus = STATUS_FORGOTTEN;
+		}
 		else
 			mIntakeStatus.setImageDrawable(null);
+	}
+	
+	private void markAsTaken()
+	{
+		mIntakeStatus.setImageResource(R.drawable.bg_dose_taken);
+		mStatus = STATUS_TAKEN;
 	}
 
 	private int countIntakes()

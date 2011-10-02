@@ -149,6 +149,7 @@ public class NotificationService extends Service implements
 		sSvcInfo.isStarted = false;
 		
 		stopThread();
+		cancelAllNotifications(true);
 		mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
 		Database.unregisterOnChangedListener(this);
 
@@ -619,7 +620,8 @@ public class NotificationService extends Service implements
 		postNotification(id, Notification.DEFAULT_LIGHTS, null);
 	}
 	
-	private void cancelAllNotifications(boolean resetHash) {
+	private void cancelAllNotifications(boolean resetHash) 
+	{
 		clearAllNotifications(true);
 		mNotificationManager.cancel(R.id.notification);
 		if(resetHash)

@@ -41,6 +41,7 @@ import android.preference.PreferenceManager;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,6 +50,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
@@ -63,7 +65,6 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
 import at.caspase.rxdroid.Database.Drug;
-import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
@@ -76,9 +77,8 @@ public class DrugListActivity extends Activity implements
 	public static final String TAG = DrugListActivity.class.getName();
 
 	public static final int MENU_ADD = Menu.FIRST;
-	public static final int MENU_DELETE = MENU_ADD + 1;
+	//public static final int MENU_DELETE = MENU_ADD + 1;
 	public static final int MENU_PREFERENCES = MENU_ADD + 2;
-	public static final int MENU_TESTING = MENU_ADD + 3;
 
 	public static final String EXTRA_DAY = "day";
 
@@ -157,7 +157,7 @@ public class DrugListActivity extends Activity implements
 	}
 
 	@Override
-	public void onDestroy()
+	protected void onDestroy()
 	{
 		super.onDestroy();
 		mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
@@ -168,8 +168,6 @@ public class DrugListActivity extends Activity implements
 	{
 		menu.add(0, MENU_ADD, 0, "Add").setIcon(android.R.drawable.ic_menu_add);
 		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(android.R.drawable.ic_menu_preferences);
-		menu.add(0, MENU_TESTING, 0, "Add testing drug").setIcon(android.R.drawable.ic_menu_add);
-		
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -192,24 +190,30 @@ public class DrugListActivity extends Activity implements
 				startActivity(intent);
 				return true;
 			}
-			case MENU_TESTING:
-			{
-				final Drug drug = new Drug();
-				drug.setName("Testingin");
-				drug.setDose(Drug.TIME_MORNING, new Fraction(3));
-				Database.create(drug);
-				
-				final Date today = DateTime.today();
-								
-				for(int i = 0; i != 4; ++i)
-				{
-					final Date date = new Date(today.getTime() - i * Constants.MILLIS_PER_DAY);
-					final Intake intake = new Intake(drug, date, Drug.TIME_MORNING);
-					Database.create(intake);
-				}				
-			}
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+	{
+		final DoseView doseView = (DoseView) v;
+		final Drug drug = Database.findDrug(doseView.getDrugId());
+		
+		//menu.setHeaderIcon(android.R.drawable.ic_menu_agenda);
+		menu.setHeaderTitle(drug.getName());
+		
+		if(doseView.getIntakeStatus() == DoseView.STATUS_TAKEN)
+			menu.add("Mark as not taken");
+		else
+			menu.add("Mark as taken");
+		
+		menu.add("Change dose");
+		
+		final Intent editIntent = new Intent(this, DrugEditActivity.class);
+		editIntent.setAction(Intent.ACTION_EDIT);
+		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
+		menu.add("Edit drug").setIcon(android.R.drawable.ic_menu_edit).setIntent(editIntent);
 	}
 
 	@Override
@@ -552,13 +556,13 @@ public class DrugListActivity extends Activity implements
 			//
 			// All measurements were done using an HTC Desire running Cyanogenmod 7!
 			
-			DoseView.ViewHolder holder;
+			DoseViewHolder holder;
 
 			if(v == null)
 			{
 				v = mInflater.inflate(R.layout.drug_view2, null);
 				
-				holder = new DoseView.ViewHolder();
+				holder = new DoseViewHolder();
 				
 				holder.name = (TextView) v.findViewById(R.id.drug_name);
 				holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
@@ -567,12 +571,13 @@ public class DrugListActivity extends Activity implements
 				{
 					final int doseViewId = Constants.DOSE_VIEW_IDS[i];
 					holder.doseViews[i] = (DoseView) v.findViewById(doseViewId);
+					registerForContextMenu(holder.doseViews[i]);
 				}
 				
 				v.setTag(holder);
 			}
 			else
-				holder = (DoseView.ViewHolder) v.getTag();
+				holder = (DoseViewHolder) v.getTag();
 				
 			Drug drug = getItem(position);
 									
@@ -595,8 +600,15 @@ public class DrugListActivity extends Activity implements
 			}
 			
 			return v;
-		}
+		}		
 	}
+	
+	private static class DoseViewHolder
+	{
+		TextView name;
+		ImageView icon;
+		DoseView[] doseViews = new DoseView[4];			
+	}	
 
 	private enum ReverseInterpolator implements Interpolator
 	{

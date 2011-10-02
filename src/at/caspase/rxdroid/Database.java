@@ -54,7 +54,7 @@ import com.j256.ormlite.table.TableUtils;
  * <p>
  * Even though DB access is handled by ORMLite, it should not be neccessary to deal with the library
  * directly outside this class. For this to work, {@link #load(Context)} has to be called before using any
- * other function. If using {@link #load()}, you must ensure that the {@link #ContextStorage} has been
+ * other function. If using {@link #load()}, you must ensure that the {@link #GlobalContext} has been
  * initialized. 
  * </p>
  * <p>
@@ -212,7 +212,7 @@ public final class Database
 		{
 			if(intake.getDoseTime() != doseTime)
 				continue;
-			if(intake.getDrug().getId() != drug.getId())
+			if(intake.getDrugId() != drug.getId())
 				continue;
 			if(!intake.getDate().equals(date))
 				continue;						
@@ -372,11 +372,11 @@ public final class Database
 			final List<Drug> drugCache = getCachedDrugs();
 			drugCache.remove((Drug) t);
 			
-			final List<Intake> intakeCache = new LinkedList<Intake>(getCachedIntakes());
+			/*final List<Intake> intakeCache = new LinkedList<Intake>(getCachedIntakes());
 			
 			for(Intake intake : intakeCache)
 			{
-				if(intake.getDrug().getId() == ((Drug) t).getId())
+				if(intake.getDrugId() == ((Drug) t).getId())
 				{
 					// TODO this is kinda redundant, but we can't use
 					// Database.delete(Intake) as it may cause a
@@ -391,7 +391,7 @@ public final class Database
 						Log.e(TAG, "delete", e);
 					}					
 				}
-			}			
+			}*/			
 		}
 		else if(t instanceof Intake)
 		{
@@ -857,9 +857,9 @@ public final class Database
 			this.timestamp = new Timestamp(System.currentTimeMillis());
 			this.doseTime = doseTime;
 		}
-
-		public Drug getDrug() {
-			return drug;
+		
+		public int getDrugId() {
+			return drug.getId();
 		}
 
 		public Date getDate() {

@@ -30,7 +30,7 @@ import android.content.Context;
  */
 public final class GlobalContext
 {
-	static Context sContext;
+	private static Context sContext;
 	
 	/**
 	 * Set the globally available context.
