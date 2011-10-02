@@ -26,12 +26,14 @@ import java.sql.Date;
 import android.content.Context;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.Database.Entry;
 import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.util.DateTime;
@@ -207,42 +209,44 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		
 		return super.onTouchEvent(event);
 	}
-
+	
 	@Override
-	public void onCreateEntry(Drug drug, int listenerFlags) {}
-
-	@Override
-	public void onDeleteEntry(Drug drug, int listenerFlags) {}
-
-	@Override
-	public void onUpdateEntry(Drug drug, int listenerFlags)
+	public void onEntryCreated(Entry entry, int flags) 
 	{
-		if(mDrug == null || drug.getId() == mDrug.getId())
-			setDrug(drug);
+		if(entry instanceof Intake)
+		{			
+			if(mDate == null)
+				return;
+	
+			if(isApplicableIntake((Intake) entry))
+				markAsTaken();
+		}		
 	}
 
 	@Override
-	public void onCreateEntry(Intake intake, int listenerFlags)
+	public void onEntryUpdated(Entry entry, int flags)
 	{
-		if(mDate == null)
-			return;
-
-		if(isApplicableIntake(intake))
-			markAsTaken();
+		if(entry instanceof Drug)
+		{
+			Drug drug = (Drug) entry;
+			
+			if(mDrug == null || drug.getId() == mDrug.getId())
+				setDrug(drug);
+		}
 	}
 
 	@Override
-	public void onDeleteEntry(Intake intake, int listenerFlags)
+	public void onEntryDeleted(Entry entry, int flags)
 	{
-		if(mDate == null)
-			return;
-
-		if(isApplicableIntake(intake))
-			updateIntakeStatusIcon();
+		if(entry instanceof Intake)
+		{
+			if(mDate == null)
+				return;
+	
+			if(isApplicableIntake((Intake) entry))
+				updateIntakeStatusIcon();
+		}
 	}
-
-	@Override
-	public void onDatabaseDropped() {}
 	
 	@Override
 	protected void onAttachedToWindow()
@@ -300,7 +304,10 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			mStatus = STATUS_FORGOTTEN;
 		}
 		else
+		{
 			mIntakeStatus.setImageDrawable(null);
+			mStatus = STATUS_INDETERMINATE;
+		}
 	}
 	
 	private void markAsTaken()

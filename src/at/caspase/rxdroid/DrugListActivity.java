@@ -52,6 +52,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector.OnGestureListener;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.animation.AnimationUtils;
@@ -65,6 +66,8 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
 import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.Database.Intake;
+import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
@@ -76,9 +79,12 @@ public class DrugListActivity extends Activity implements
 {
 	public static final String TAG = DrugListActivity.class.getName();
 
-	public static final int MENU_ADD = Menu.FIRST;
-	//public static final int MENU_DELETE = MENU_ADD + 1;
-	public static final int MENU_PREFERENCES = MENU_ADD + 2;
+	public static final int MENU_ADD = 0;
+	public static final int MENU_PREFERENCES = 1;
+	
+	public static final int CMENU_TOGGLE_INTAKE = 0;
+	public static final int CMENU_CHANGE_DOSE = 1;
+	public static final int CMENU_EDIT_DRUG = 2;
 
 	public static final String EXTRA_DAY = "day";
 
@@ -199,21 +205,68 @@ public class DrugListActivity extends Activity implements
 	{
 		final DoseView doseView = (DoseView) v;
 		final Drug drug = Database.findDrug(doseView.getDrugId());
+		final int doseTime = doseView.getDoseTime();
 		
 		//menu.setHeaderIcon(android.R.drawable.ic_menu_agenda);
 		menu.setHeaderTitle(drug.getName());
 		
-		if(doseView.getIntakeStatus() == DoseView.STATUS_TAKEN)
-			menu.add("Mark as not taken");
-		else
-			menu.add("Mark as taken");
 		
-		menu.add("Change dose");
+		final int intakeStatus = doseView.getIntakeStatus();
+		final String toggleMessage;
+		
+		if(intakeStatus == DoseView.STATUS_TAKEN)
+			toggleMessage = "Mark as not taken";
+		else
+			toggleMessage = "Mark as taken";
+		
+		//////////////////////////////////////////////////
+		menu.add(0, CMENU_TOGGLE_INTAKE, 0, toggleMessage).setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			
+			@Override
+			public boolean onMenuItemClick(MenuItem item)
+			{
+				if(intakeStatus != DoseView.STATUS_TAKEN)
+					requestIntake(drug, mDate, doseTime, doseView.getDose(), true);
+				else
+				{
+					for(Intake intake : Database.findIntakes(drug, mDate, doseTime))
+						Database.delete(intake);					
+				}
+				
+				return true;				
+			}
+		});	
+		/////////////////////////////////////////////////
+				
+		menu.add(0, CMENU_CHANGE_DOSE, 0, "Change dose");
 		
 		final Intent editIntent = new Intent(this, DrugEditActivity.class);
 		editIntent.setAction(Intent.ACTION_EDIT);
 		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
-		menu.add("Edit drug").setIcon(android.R.drawable.ic_menu_edit).setIntent(editIntent);
+		menu.add(0, CMENU_EDIT_DRUG, 0, "Edit drug").setIcon(android.R.drawable.ic_menu_edit).setIntent(editIntent);
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item)
+	{
+		switch(item.getItemId())
+		{
+			case CMENU_CHANGE_DOSE:
+			{
+				Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show();
+				break;
+			}
+			
+			case CMENU_EDIT_DRUG:
+			{
+				
+			}
+			
+			default:
+				return super.onContextItemSelected(item);
+		}
+		
+		return true;
 	}
 
 	@Override
@@ -444,7 +497,7 @@ public class DrugListActivity extends Activity implements
 
 		Log.d(TAG, "requestIntake");
 		
-		final Database.Intake intake = new Database.Intake(drug, mDate, doseTime);
+		final Database.Intake intake = new Database.Intake(drug, mDate, doseTime, dose);
 		final Fraction newSupply = drug.getCurrentSupply().minus(dose);
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(drug.getName() + ": " + dose);
@@ -455,7 +508,7 @@ public class DrugListActivity extends Activity implements
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
-				Database.create(intake, NotificationService.LISTENER_FLAG_DONT_RESTART);
+				Database.create(intake, OnDatabaseChangedListener.FLAG_IGNORE);
 				Database.update(drug);
 
 				Toast.makeText(getApplicationContext(), R.string._toast_intake_noted, Toast.LENGTH_SHORT).show();

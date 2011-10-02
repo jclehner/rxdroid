@@ -47,6 +47,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.Database.Entry;
 import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.debug.NotificationServiceInfo;
@@ -64,8 +65,6 @@ public class NotificationService extends Service implements
 		OnDatabaseChangedListener, OnSharedPreferenceChangeListener
 {
 	public static final String EXTRA_FORCE_RESTART = "force_restart";
-
-	public static final int LISTENER_FLAG_DONT_RESTART = 1;
 	
 	private static final String TAG = NotificationService.class.getSimpleName();
 
@@ -160,35 +159,20 @@ public class NotificationService extends Service implements
 	public IBinder onBind(Intent arg0) {
 		return null;
 	}
-
+	
 	@Override
-	public void onCreateEntry(Drug drug, int listenerFlags) {
-		restartThread(listenerFlags);
+	public void onEntryCreated(Entry entry, int flags) {
+		restartThread(flags);
 	}
-
+	
 	@Override
-	public void onDeleteEntry(Drug drug, int listenerFlags) {
-		restartThread(listenerFlags);
+	public void onEntryUpdated(Entry entry, int flags) {
+		restartThread(flags);
 	}
-
+	
 	@Override
-	public void onUpdateEntry(Drug drug, int listenerFlags) {
-		restartThread(listenerFlags);
-	}
-
-	@Override
-	public void onCreateEntry(Intake intake, int listenerFlags) {
-		restartThread(listenerFlags);
-	}
-
-	@Override
-	public void onDeleteEntry(Intake intake, int listenerFlags) {
-		restartThread(listenerFlags);
-	}
-
-	@Override
-	public void onDatabaseDropped() {
-		restartThread(true);
+	public void onEntryDeleted(Entry entry, int flags) {
+		restartThread(flags);
 	}
 
 	@Override
@@ -237,10 +221,10 @@ public class NotificationService extends Service implements
 		return mThread.isAlive() /*&& !mThread.isInterrupted()*/;
 	}
 	
-	private void restartThread(int listenerFlags)
+	private void restartThread(int flags)
 	{
-		if((listenerFlags & LISTENER_FLAG_DONT_RESTART) == 0)
-			restartThread(true);	
+		if((flags & OnDatabaseChangedListener.FLAG_IGNORE) == 0)
+			restartThread(true);
 	}
 
 	/**
@@ -409,18 +393,18 @@ public class NotificationService extends Service implements
 	private Set<Intake> getAllOpenIntakes(Date date, int doseTime)
 	{
 		final Set<Intake> openIntakes = new HashSet<Database.Intake>();
-		final List<Drug> drugs = Database.getDrugs();
 
-		for(Drug drug : drugs)
+		for(Drug drug : Database.getDrugs())
 		{
 			if(drug.isActive())
 			{
 				final List<Intake> intakes = Database.findIntakes(drug, date, doseTime);
-
-				if(intakes.isEmpty() && drug.hasDoseOnDate(date) && drug.getDose(doseTime).compareTo(0) != 0)
+				final Fraction dose = drug.getDose(doseTime);
+				
+				if(intakes.isEmpty() && drug.hasDoseOnDate(date) && dose.compareTo(0) != 0)
 				{
 					Log.d(TAG, "getAllOpenIntakes: adding " + drug);
-					openIntakes.add(new Intake(drug, date, doseTime));
+					openIntakes.add(new Intake(drug, date, doseTime, dose));
 				}
 			}
 		}
