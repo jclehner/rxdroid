@@ -24,9 +24,11 @@ package at.caspase.rxdroid;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
 
 /**
@@ -80,7 +82,7 @@ public class DumbTime implements Comparable<DumbTime>
 	 */
 	public DumbTime(long offset, boolean allowMoreThan24Hours)
 	{
-		if(offset >= 86400000 && !allowMoreThan24Hours)
+		if(offset >= Constants.MILLIS_PER_DAY && !allowMoreThan24Hours)
 			throw new IllegalArgumentException(offset + " is out of range");
 		
 		mHours = (int) offset % 3600000;
@@ -210,8 +212,8 @@ public class DumbTime implements Comparable<DumbTime>
 		throw new IllegalArgumentException("timeString=" + timeString);
 	}
 	
-	public static DumbTime fromTime(Time time) {
-		return new DumbTime(time.getHours(), time.getMinutes(), time.getSeconds());
+	public static DumbTime fromCalendar(Calendar calendar) {
+		return new DumbTime(calendar.getTimeInMillis() % Constants.MILLIS_PER_DAY);
 	}
 }
 

@@ -217,7 +217,7 @@ public final class Database
 	/**
 	 * Find all intakes meeting the specified criteria.
 	 */
-	public static synchronized List<Intake> findIntakes(Drug drug, Date date, int doseTime)
+	public static synchronized List<Intake> findIntakes(Drug drug, Calendar date, int doseTime)
 	{
 		final List<Intake> intakes = new LinkedList<Intake>();
 				
@@ -227,8 +227,8 @@ public final class Database
 				continue;
 			if(intake.getDrugId() != drug.getId())
 				continue;
-			if(!intake.getDate().equals(date))
-				continue;						
+			if(!intake.getDate().equals(DateTime.toSqlDate(date)))
+				continue;
 			
 			intakes.add(intake);
 		}
@@ -558,22 +558,19 @@ public final class Database
 
 		public Drug() {}
 
-		public boolean hasDoseOnDate(Date date)
+		public boolean hasDoseOnDate(Calendar cal)
 		{
 			if(frequency == FREQ_DAILY)
 				return true;
 
 			if(frequency == FREQ_EVERY_OTHER_DAY)
 			{
-				final long diffDays = Math.abs(frequencyArg - date.getTime()) / Constants.MILLIS_PER_DAY;
+				final long diffDays = Math.abs(frequencyArg - cal.getTimeInMillis()) / Constants.MILLIS_PER_DAY;
 				return diffDays % 2 == 0;
 			}
 			else if(frequency == FREQ_WEEKLY)
-			{
-				Calendar calendar = DateTime.calendarFromDate(date);
-				return calendar.get(Calendar.DAY_OF_WEEK) == frequencyArg;
-			}
-
+				return cal.get(Calendar.DAY_OF_WEEK) == frequencyArg;
+			
 			throw new AssertionError("WTF");
 		}
 
@@ -826,7 +823,7 @@ public final class Database
 		public Intake(Drug drug, Date date, int doseTime, Fraction dose)
 		{
 			this.drug = drug;
-			setDate(date);
+			this.date = (java.util.Date) date.clone();
 			this.timestamp = new Timestamp(System.currentTimeMillis());
 			this.doseTime = doseTime;
 			this.dose = dose;
@@ -854,26 +851,6 @@ public final class Database
 
 		public int getDoseTime() {
 			return doseTime;
-		}
-
-		public void setDrug(Drug drug) {
-			this.drug = drug;
-		}
-
-		public void setDate(final Date date) {
-			this.date = new Date(date.getTime());
-		}
-
-		public void setTimestamp(Timestamp timestamp) {
-			this.timestamp = new Timestamp(timestamp.getTime());
-		}
-
-		public void setDoseTime(int doseTime) {
-			this.doseTime = doseTime;
-		}
-		
-		public void setDose(Fraction dose) {
-			this.dose = dose;
 		}
 
 		@Override

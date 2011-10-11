@@ -22,7 +22,7 @@
 package at.caspase.rxdroid;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Calendar;
 import java.util.List;
 
 import android.app.Activity;
@@ -39,6 +39,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.SpannableString;
+import android.text.format.DateFormat;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -97,7 +98,7 @@ public class DrugListActivity extends Activity implements
 	private DrugAdapter mAdapter;
 	private TextView mTextDate;
 
-	private Date mDate;
+	private Calendar mDate;
 
 	private SharedPreferences mSharedPreferences;
 	
@@ -140,7 +141,7 @@ public class DrugListActivity extends Activity implements
 			//mViewSwitcher.removeAllViews();
 			//mAdapter = makeAdapter();
 
-			setDate((Date) intent.getSerializableExtra(EXTRA_DAY));
+			setDate((Calendar) intent.getSerializableExtra(EXTRA_DAY));
 		}
 		else
 			throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());
@@ -229,8 +230,14 @@ public class DrugListActivity extends Activity implements
 					requestIntake(drug, mDate, doseTime, doseView.getDose(), true);
 				else
 				{
+					Fraction dose = Fraction.ZERO;
+					
 					for(Intake intake : Database.findIntakes(drug, mDate, doseTime))
-						Database.delete(intake);					
+						Database.delete(intake);
+					
+					Log.d(TAG, "onMenuItemClick: adding " + dose + " to current supply of " + drug.getName());
+					drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
+					Database.update(drug);
 				}
 				
 				return true;				
@@ -255,11 +262,6 @@ public class DrugListActivity extends Activity implements
 			{
 				Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show();
 				break;
-			}
-			
-			case CMENU_EDIT_DRUG:
-			{
-				
 			}
 			
 			default:
@@ -314,7 +316,11 @@ public class DrugListActivity extends Activity implements
 	{
 		if(view.getId() == R.id.med_list_footer)
 		{
-			DatePickerDialog dialog = new DatePickerDialog(this, this, mDate.getYear() + 1900, mDate.getMonth(), mDate.getDate());
+			final int year = mDate.get(Calendar.YEAR);
+			final int month = mDate.get(Calendar.MONTH);
+			final int day = mDate.get(Calendar.DAY_OF_MONTH);
+			
+			DatePickerDialog dialog = new DatePickerDialog(this, this, year, month, day);
 			dialog.show();
 			return true;
 		}
@@ -418,7 +424,7 @@ public class DrugListActivity extends Activity implements
 		startService(serviceIntent);
 	}
 
-	private void setDate(Date newDate) {
+	private void setDate(Calendar newDate) {
 		setOrShiftDate(0, newDate);
 	}
 
@@ -429,7 +435,7 @@ public class DrugListActivity extends Activity implements
 	// shift to previous (-1) or next(1) date. passing 0
 	// will reset to specified date, or current date
 	// if newDate is -1
-	private void setOrShiftDate(long shiftBy, Date newDate)
+	private void setOrShiftDate(int shiftBy, Calendar newDate)
 	{
 		setProgressBarIndeterminateVisibility(true);
 
@@ -444,9 +450,8 @@ public class DrugListActivity extends Activity implements
 			mViewSwitcher.setOutAnimation(null);
 		}
 		else
-		{
-			final long shiftedTime = mDate.getTime() + shiftBy * Constants.MILLIS_PER_DAY;
-			mDate.setTime(shiftedTime);
+		{			
+			mDate.add(Calendar.MILLISECOND, (int) (shiftBy * Constants.MILLIS_PER_DAY));
 
 			if(shiftBy == 1)
 			{
@@ -468,7 +473,7 @@ public class DrugListActivity extends Activity implements
 		currentView.setAdapter(mAdapter);
 		currentView.setOnTouchListener(this);			
 		
-		final SpannableString dateString = new SpannableString(mDate.toString());
+		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
 
 		if(mDate.equals(DateTime.today()))
 			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
@@ -487,7 +492,7 @@ public class DrugListActivity extends Activity implements
 		setProgressBarIndeterminateVisibility(false);
 	}
 	
-	private void requestIntake(final Drug drug, Date date, int doseTime, Fraction dose, boolean askOnNormalIntake)
+	private void requestIntake(final Drug drug, Calendar date, int doseTime, Fraction dose, boolean askOnNormalIntake)
 	{
 		if(dose.equals(Fraction.ZERO))
 		{
@@ -497,7 +502,7 @@ public class DrugListActivity extends Activity implements
 
 		Log.d(TAG, "requestIntake");
 		
-		final Database.Intake intake = new Database.Intake(drug, mDate, doseTime, dose);
+		final Database.Intake intake = new Database.Intake(drug, DateTime.toSqlDate(mDate), doseTime, dose);
 		final Fraction newSupply = drug.getCurrentSupply().minus(dose);
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(drug.getName() + ": " + dose);
@@ -572,7 +577,7 @@ public class DrugListActivity extends Activity implements
 		builder.show();
 	}	
 	
-	private void requestUnscheduledIntake(final Drug drug, final Date date, final int doseTime)
+	private void requestUnscheduledIntake(final Drug drug, final Calendar date, final int doseTime)
 	{
 		final FractionInputDialog dialog = new FractionInputDialog(this, Fraction.ZERO, null);
 		dialog.setTitle(drug.getName());
@@ -608,8 +613,8 @@ public class DrugListActivity extends Activity implements
 			// laggish animations if there are more than 3 or 4 drugs (i.e. 12-16 DoseViews)
 			//
 			// All measurements were done using an HTC Desire running Cyanogenmod 7!
-			
-			DoseViewHolder holder;
+						
+			final DoseViewHolder holder;
 
 			if(v == null)
 			{
@@ -631,13 +636,13 @@ public class DrugListActivity extends Activity implements
 			}
 			else
 				holder = (DoseViewHolder) v.getTag();
-				
-			Drug drug = getItem(position);
-									
+			
+			final Drug drug = getItem(position);
+			
 			holder.name.setText(drug.getName());
 			holder.name.setTag(TAG_ID, drug.getId());
-			holder.icon.setImageResource(drug.getFormResourceId());
-			
+			holder.icon.setImageResource(drug.getFormResourceId());			
+						
 			// This part often takes more than 90% of the time spent in this function,
 			// being rougly 0.025s when hasInfo returns false, and 0.008s when it
 			// returns true.
@@ -650,6 +655,14 @@ public class DrugListActivity extends Activity implements
 			{
 				if(!doseView.hasInfo(mDate, drug))
 					doseView.setInfo(mDate, drug);
+			}		
+
+			boolean showDoseless = mSharedPreferences.getBoolean("show_doseless", true);
+			boolean showInactive = mSharedPreferences.getBoolean("show_inactive", true);
+			
+			if((!showDoseless && !drug.hasDoseOnDate(mDate)) || (!showInactive && !drug.isActive()))
+			{
+				//v.setVisibility(View.GONE);
 			}
 			
 			return v;

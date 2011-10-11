@@ -110,7 +110,7 @@
 		/>
 		
 		<CheckBoxPreference
-			android:key="show_days_without_intakes"
+			android:key="show_doseless"
 			android:title="@string/_title_pref_show_days_without_intakes"
 			android:summaryOn="@string/_summary_pref_show_days_without_intakes_on"
 			android:summaryOff="@string/_summary_pref_show_days_without_intakes_off"

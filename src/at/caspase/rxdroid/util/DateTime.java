@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import android.graphics.YuvImage;
 import android.util.Log;
 import at.caspase.rxdroid.DumbTime;
 
@@ -36,51 +37,71 @@ public final class DateTime
 {
 	private static final String TAG = DateTime.class.getName();
 	
-	public static Date today()
+	public static Calendar today()
 	{
-		final Timestamp today = new Timestamp(currentTimeMillis());
-		today.setHours(0);
-		today.setMinutes(0);
-		today.setSeconds(0);
-		today.setNanos(0);
+		final Calendar today = now();
+		today.set(Calendar.HOUR, 0);
+		today.set(Calendar.MINUTE, 0);
+		today.set(Calendar.SECOND, 0);
+		today.set(Calendar.MILLISECOND, 0);
 
-		return new Date(today.getTime());
+		return today;
 	}
 
-	public static Date addDays(Date date, int days) {
-		return new Date(date.getTime() + days * Constants.MILLIS_PER_DAY);
+	public static Calendar tomorrow() 
+	{
+		final Calendar day = today();
+		day.add(Calendar.HOUR, 24);
+		return day;
 	}
 
-	public static Date tomorrow() {
-		return new Date(today().getTime() + Constants.MILLIS_PER_DAY);
-	}
-
-	public static Time now() {
-		return new Time(currentTimeMillis());
-	}
-
-	public static GregorianCalendar calendarFromDate(Date date) {
-		return new GregorianCalendar(date.getYear(), date.getMonth(), date.getDay());
+	public static Calendar now() 
+	{
+		final Calendar now = Calendar.getInstance();
+		now.setTimeZone(TimeZone.getTimeZone("UTC"));
+		now.setTimeInMillis(System.currentTimeMillis());
+		return now;
 	}
 	
-	public static Date date(Time time)
+	public static Calendar date(Calendar time)
 	{
-		Date date = new Date(time.getTime());
-		return date(date.getYear() + 1900, date.getMonth(), date.getDate());
+		final Calendar date = (Calendar) time.clone();
+		final int calFields[] = { Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND };
+		
+		for(int calField: calFields)
+			date.set(calField, 0);
+		
+		return date;		
 	}
 	
-	public static Date date(int year, int month, int day)
+	public static Calendar date(int year, int month, int day)
 	{
-		final Timestamp timestamp = new Timestamp(0);
-		timestamp.setYear(year - 1900);
-		timestamp.setMonth(month);
-		timestamp.setDate(day);
-		timestamp.setHours(0);
-		timestamp.setMinutes(0);
-		timestamp.setSeconds(0);
-		timestamp.setNanos(0);
-
-		return new Date(timestamp.getTime());
+		final Calendar date = Calendar.getInstance();
+		date.set(Calendar.HOUR, 0);
+		date.set(Calendar.MINUTE, 0);
+		date.set(Calendar.SECOND, 0);
+		date.set(Calendar.MILLISECOND, 0);
+		
+		date.set(Calendar.YEAR, year);
+		date.set(Calendar.MONTH, month);
+		date.set(Calendar.DAY_OF_MONTH, day);
+		
+		return date;
+	}
+	
+	public static java.sql.Date toSqlDate(Calendar cal)
+	{
+		final int year = cal.get(Calendar.YEAR);
+		final int month = cal.get(Calendar.MONTH);
+		final int day = cal.get(Calendar.DAY_OF_MONTH);		
+		
+		return new java.sql.Date(year - 1900, month, day);	
+	}
+	
+	public static Time toSqlTime(Calendar cal)
+	{
+		final Time time = new java.sql.Time(cal.getTimeInMillis());
+		return time;
 	}
 
 	public static String toString(Time time)
@@ -91,19 +112,19 @@ public final class DateTime
 		return sdf.format(time);
 	}
 
-	public static long getOffsetFromMidnight(Date today) {
-		return now().getTime() - today.getTime();
+	public static long getOffsetFromMidnight(Calendar date)
+	{
+		final int hour = date.get(Calendar.HOUR_OF_DAY);
+		final int minute = date.get(Calendar.MINUTE);
+		final int second = date.get(Calendar.SECOND);
+		final int millis = date.get(Calendar.MILLISECOND);
+		
+		return millis + 1000 * (hour * 3600 + minute * 60 + second);		
 	}
 
-	public static long currentTimeMillis()
+	public static boolean isWithinRange(Calendar time, DumbTime begin, DumbTime end)
 	{
-		Calendar now = Calendar.getInstance();
-		return now.getTimeInMillis();
-	}
-
-	public static boolean isWithinRange(Time time, DumbTime begin, DumbTime end)
-	{
-		final DumbTime theTime = DumbTime.fromTime(time);
+		final DumbTime theTime = DumbTime.fromCalendar(time);
 		
 		if(end.before(begin))
 			return theTime.before(end) || theTime.compareTo(begin) != -1;

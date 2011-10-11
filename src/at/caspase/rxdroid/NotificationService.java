@@ -26,9 +26,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Date;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +49,6 @@ import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Entry;
 import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
-import at.caspase.rxdroid.debug.NotificationServiceInfo;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
@@ -77,15 +75,12 @@ public class NotificationService extends Service implements
 
 	private Thread mThread;
 	private static NotificationService sInstance = null;
-	
-	private static NotificationServiceInfo sSvcInfo = new NotificationServiceInfo();
 
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
 		setInstance(this);
-		sSvcInfo.isStarted = true;
 
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		clearAllNotifications();
@@ -100,28 +95,6 @@ public class NotificationService extends Service implements
 
 		GlobalContext.set(getApplicationContext());
 		Database.load();
-		
-		Thread monitorThread = new Thread(new Runnable() {
-			
-			@Override
-			public void run()
-			{
-				while(true)
-				{
-					Log.d(TAG + ":MonitorThread", sSvcInfo.toString());
-					try
-					{						
-						Thread.sleep(60000);
-					}
-					catch (InterruptedException e)
-					{
-						continue;
-					}					
-				}				
-			}
-		}, "Monitor Thread");
-		
-		monitorThread.start();
 	}
 
 	/**
@@ -145,7 +118,6 @@ public class NotificationService extends Service implements
 	{
 		super.onDestroy();
 		setInstance(null);
-		sSvcInfo.isStarted = false;
 		
 		stopThread();
 		cancelAllNotifications(true);
@@ -199,10 +171,6 @@ public class NotificationService extends Service implements
 			return false;
 
 		return sInstance.isThreadRunning();
-	}
-	
-	public static NotificationServiceInfo getNotificationServiceInfo() {
-		return sSvcInfo;
 	}
 
 	private synchronized boolean isThreadRunning()
@@ -289,12 +257,12 @@ public class NotificationService extends Service implements
 				{
 					while(true)
 					{
-						final Date date = sSvcInfo.date = DateTime.today();
-						final Time time = DateTime.now();
+						final Calendar date = DateTime.today();
+						final Calendar time = DateTime.now();
 						mIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
 
-						final int activeDoseTime = sSvcInfo.activeDoseTime = settings.getActiveDoseTime(time);
-						final int nextDoseTime = sSvcInfo.nextDoseTime = settings.getNextDoseTime(time);
+						final int activeDoseTime = settings.getActiveDoseTime(time);
+						final int nextDoseTime = settings.getNextDoseTime(time);
 						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
 
 						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
@@ -335,16 +303,18 @@ public class NotificationService extends Service implements
 								sleep(Constants.NOTIFICATION_INITIAL_DELAY);
 							}
 
-							final String contentText = Integer.toString(sSvcInfo.pendingIntakes = pendingIntakes.size());
+							final String contentText = Integer.toString(pendingIntakes.size());
 							final long snoozeTime = settings.getSnoozeTime();
 
-							postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
-
-							while(millisUntilDoseTimeEnd > snoozeTime)
-							{
-								sleep(snoozeTime);
-								millisUntilDoseTimeEnd -= snoozeTime;
-								postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
+							if(snoozeTime != 0)
+							{								
+								do
+								{
+									postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
+									sleep(snoozeTime);
+									millisUntilDoseTimeEnd -= snoozeTime;
+									
+								} while(millisUntilDoseTimeEnd > snoozeTime);
 							}
 
 							Log.d(TAG, "Finished loop");
@@ -373,13 +343,11 @@ public class NotificationService extends Service implements
 				finally
 				{
 					//cancelAllNotifications();
-					sSvcInfo.isThreadStarted = false;
 				}
 			}
 		}, "Service Thread");
 
 		mThread.start();
-		sSvcInfo.isThreadStarted = true;
 	}
 
 	private synchronized void stopThread()
@@ -390,7 +358,7 @@ public class NotificationService extends Service implements
 		mThread = null;
 	}
 
-	private Set<Intake> getAllOpenIntakes(Date date, int doseTime)
+	private Set<Intake> getAllOpenIntakes(Calendar date, int doseTime)
 	{
 		final Set<Intake> openIntakes = new HashSet<Database.Intake>();
 
@@ -404,7 +372,7 @@ public class NotificationService extends Service implements
 				if(intakes.isEmpty() && drug.hasDoseOnDate(date) && dose.compareTo(0) != 0)
 				{
 					Log.d(TAG, "getAllOpenIntakes: adding " + drug);
-					openIntakes.add(new Intake(drug, date, doseTime, dose));
+					openIntakes.add(new Intake(drug, DateTime.toSqlDate(date), doseTime, dose));
 				}
 			}
 		}
@@ -412,9 +380,9 @@ public class NotificationService extends Service implements
 		return openIntakes;
 	}
 
-	private Set<Intake> getAllForgottenIntakes(Date date, int lastDoseTime)
+	private Set<Intake> getAllForgottenIntakes(Calendar date, int lastDoseTime)
 	{
-		final Date today = DateTime.today();
+		final Calendar today = DateTime.today();
 
 		if(date.after(today))
 			return Collections.emptySet();
@@ -436,11 +404,11 @@ public class NotificationService extends Service implements
 		return forgottenIntakes;
 	}
 
-	private void checkIntakes(Date date, int lastDoseTime)
+	private void checkIntakes(Calendar date, int lastDoseTime)
 	{
 		final Set<Intake> forgottenIntakes = getAllForgottenIntakes(date, lastDoseTime);
 
-		Log.d(TAG, (sSvcInfo.forgottenIntakes = forgottenIntakes.size()) + " forgotten intakes");
+		Log.d(TAG, forgottenIntakes.size() + " forgotten intakes");
 
 		if(!forgottenIntakes.isEmpty())
 		{
@@ -578,7 +546,8 @@ public class NotificationService extends Service implements
 		final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
 		views.setTextViewText(R.id.stat_title, getString(R.string._title_notifications));
 		views.setTextViewText(R.id.stat_text, msgBuilder.toString());
-		views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(DateTime.now()));
+		//views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(DateTime.now()));
+		views.setTextViewText(R.id.stat_time, "");
 
 		final Notification notification = new Notification();
 		notification.icon = R.drawable.ic_stat_pill;
@@ -595,7 +564,7 @@ public class NotificationService extends Service implements
 		if(mLastNotificationHash == notificationHash)
 			notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
 		else
-			mLastNotificationHash = sSvcInfo.lastNotificationHash = notificationHash;		
+			mLastNotificationHash = notificationHash;		
 		
 		mNotificationManager.notify(R.id.notification, notification);
 	}
@@ -687,16 +656,9 @@ public class NotificationService extends Service implements
 	private static void sleep(long time) throws InterruptedException
 	{
 		if(time > 0)
-		{
-			sSvcInfo.sleepingUntil = System.currentTimeMillis() + time;
-			sSvcInfo.timeOfSleepBegin = DateTime.now();
 			Thread.sleep(time);
-		}
 		else
 			Log.d(TAG, "sleep: ignoring time of " + time);
-		
-		sSvcInfo.sleepingUntil = -1;
-		sSvcInfo.timeOfSleepBegin = null;
 	}
 
 	private void writeCrashLog(Exception cause)

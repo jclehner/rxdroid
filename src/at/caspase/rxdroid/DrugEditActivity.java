@@ -22,7 +22,7 @@
 package at.caspase.rxdroid;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Calendar;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -341,9 +341,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				break;
 
 			case Drug.FREQ_EVERY_OTHER_DAY:
-				Date next = DateTime.tomorrow();
+				final Calendar next = DateTime.tomorrow();
 				if(!mDrug.hasDoseOnDate(next))
-					next = new Date(next.getTime() + at.caspase.rxdroid.util.Constants.MILLIS_PER_DAY);
+					next.add(Calendar.HOUR_OF_DAY, 24);
 				summary = getString(R.string._msg_freq_every_other, next);
 				break;
 
@@ -399,12 +399,12 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
-				Date today = DateTime.today();
+				Calendar today = DateTime.today();
 
 				if(which == 0)
-					mDrug.setFrequencyArg(today.getTime());
+					mDrug.setFrequencyArg(today.getTimeInMillis());
 				else
-					mDrug.setFrequencyArg(today.getTime() + Constants.MILLIS_PER_DAY);
+					mDrug.setFrequencyArg(today.getTimeInMillis() + Constants.MILLIS_PER_DAY);
 
 				updatePreferences();
 			}

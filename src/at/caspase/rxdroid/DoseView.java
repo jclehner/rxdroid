@@ -22,6 +22,9 @@
 package at.caspase.rxdroid;
 
 import java.sql.Date;
+import java.sql.Time;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import android.content.Context;
 import android.text.TextWatcher;
@@ -62,7 +65,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	
 	private Drug mDrug;
 	private int mDoseTime = -1;
-	private Date mDate;
+	private Calendar mDate;
 	
 	private int mStatus = STATUS_INDETERMINATE;
 
@@ -130,11 +133,11 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		setInfo(null, drug);
 	}
 
-	public void setDate(Date date) {
+	public void setDate(Calendar date) {
 		setInfo(date, null);
 	}
 
-	public Date getDate() {
+	public Calendar getDate() {
 		return mDate;
 	}
 
@@ -154,7 +157,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		mDoseText.addTextChangedListener(watcher);
 	}
 
-	public void setInfo(Date date, Drug drug)
+	public void setInfo(Calendar date, Drug drug)
 	{
 		if(date != null)
 			mDate = date;
@@ -169,7 +172,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			updateIntakeStatusIcon();
 	}
 	
-	public boolean hasInfo(Date date, Drug drug)
+	public boolean hasInfo(Calendar date, Drug drug)
 	{		
 		if(mDate == null || !mDate.equals(date))
 			return false;
@@ -292,11 +295,15 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 		if(countIntakes() != 0)
 		{
+			Log.d(TAG, "Marking as taken");
 			markAsTaken();
 			return;
 		}
+
+		final Calendar end = (Calendar) mDate.clone();
+		end.add(Calendar.MILLISECOND, (int) Preferences.instance().getDoseTimeEndOffset(mDoseTime));
 		
-		final Date end = new Date(mDate.getTime() + Preferences.instance().getDoseTimeEndOffset(mDoseTime));		
+		Log.d(TAG, "end=" + end);
 		
 		if(mDrug.isActive() && !mDoseText.getText().equals("0") && DateTime.now().compareTo(end) != -1)
 		{

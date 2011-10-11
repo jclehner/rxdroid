@@ -23,6 +23,7 @@ package at.caspase.rxdroid.test;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,9 +78,13 @@ public class PreferencesTest extends AndroidTestCase
 			final int minutes      = testCases[i][1];
 			final int doseTime     = testCases[i][2];
 			final int nextDoseTime = testCases[i][3];
-						
-			final Time time = new Time(DateTime.today().getTime() + ((hours * 60L + minutes) * 60000L));
-			final Date date = new Date(time.getTime());
+			
+			final Calendar date = DateTime.today();
+			final Calendar time = (Calendar) date.clone();
+			
+			time.set(Calendar.HOUR_OF_DAY, hours);
+			time.set(Calendar.MINUTE, minutes);
+			
 			final Preferences prefs = Preferences.instance();
 			
 			Log.d(TAG, "testGetActiveDoseTimeAndGetNextDoseTime:");
@@ -98,7 +103,7 @@ public class PreferencesTest extends AndroidTestCase
 	public void testTimeOffsets()
 	{		
 		final long[][] testCases = {
-				{      18, 00, -1, 10800000 }, // (21:00 - 18:01) = 180min in millis
+				{      18, 00, -1, 10800000 }, // (21:00 - 18:00) = 180min in millis
 				{      21, 00, 7200000, -1 }, // (23:00 - 21:00) = 120min in millis
 				{      23, 00, 0, 9000000 }, // ((24 + 01:30) - 23:00 = 150min in millis
 				{ 24 + 00, 00, -1, 5400000 }, // (01:30 - 00:00) = 90min in millis
@@ -112,9 +117,13 @@ public class PreferencesTest extends AndroidTestCase
 			final long minutes          = testCases[i][1];
 			final long millisUntilBegin = testCases[i][2];
 			final long millisUntilEnd   = testCases[i][3];
-						
-			final Time time = new Time(DateTime.today().getTime() + ((hours * 60L + minutes) * 60000L));
-			final Date date = new Date(time.getTime());
+
+			final Calendar date = DateTime.today();
+			final Calendar time = (Calendar) date.clone();
+			
+			time.set(Calendar.HOUR_OF_DAY, (int) hours);
+			time.set(Calendar.MINUTE, (int) minutes);
+			
 			final Preferences prefs = Preferences.instance();
 
 			final int activeOrNextDoseTime = prefs.getActiveOrNextDoseTime(time);

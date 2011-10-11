@@ -21,7 +21,7 @@
 
 package at.caspase.rxdroid;
 
-import java.sql.Time;
+import java.util.Calendar;
 
 import android.app.Notification;
 import android.content.Context;
@@ -88,7 +88,7 @@ public class Preferences
 		return getMillisFromNowUntilDoseTimeBeginOrEnd(DateTime.now(), doseTime, true);
 	}
 	
-	public long getMillisUntilDoseTimeBegin(Time time, int doseTime) {
+	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
 		return getMillisFromNowUntilDoseTimeBeginOrEnd(time, doseTime, true);
 	}
 
@@ -97,12 +97,15 @@ public class Preferences
 		return getMillisFromNowUntilDoseTimeBeginOrEnd(DateTime.now(), doseTime, false);
 	}
 	
-	public long getMillisUntilDoseTimeEnd(Time time, int doseTime) {
+	public long getMillisUntilDoseTimeEnd(Calendar time, int doseTime) {
 		return getMillisFromNowUntilDoseTimeBeginOrEnd(time, doseTime, false);
 	}
 
-	public long getSnoozeTime() {
-		return getTimePreference("time_snooze").getTime();
+	public long getSnoozeTime() 
+	{
+		final long snoozeTime = getTimePreference("time_snooze").getTime();
+		Log.d(TAG, "snoozeTime=" + snoozeTime);
+		return snoozeTime;
 	}
 
 	private long getDoseTimeBeginOffset(int doseTime) {
@@ -144,7 +147,7 @@ public class Preferences
 		return getActiveDoseTime(DateTime.now());
 	}
 	
-	public int getActiveOrNextDoseTime(Time time)
+	public int getActiveOrNextDoseTime(Calendar time)
 	{
 		int ret = getActiveDoseTime(time);
 		if(ret == -1)
@@ -152,7 +155,7 @@ public class Preferences
 		return ret;
 	}
 
-	public int getActiveDoseTime(Time time)
+	public int getActiveDoseTime(Calendar time)
 	{
 		for(int doseTime : doseTimes)
 		{
@@ -167,11 +170,11 @@ public class Preferences
 		return getActiveDoseTime(DateTime.now());
 	}
 
-	public int getNextDoseTime(Time time) {
+	public int getNextDoseTime(Calendar time) {
 		return getNextDoseTime(time, false);
 	}
 	
-	public int getNextDoseTime(Time time, boolean useNextDayOffsets)
+	public int getNextDoseTime(Calendar time, boolean useNextDayOffsets)
 	{
 		int retDoseTime = -1;
 		long smallestDiff = 0;
@@ -212,11 +215,11 @@ public class Preferences
 		return getNextDoseTime(DateTime.now());
 	}
 
-	private long getMillisFromNowUntilDoseTimeBeginOrEnd(Time time, int doseTime, boolean getMillisUntilBegin)
+	private long getMillisFromNowUntilDoseTimeBeginOrEnd(Calendar time, int doseTime, boolean getMillisUntilBegin)
 	{
 		final long beginOffset = getDoseTimeBeginOffset(doseTime);
 		final long endOffset = getDoseTimeEndOffset(doseTime);
-		final long timeOffset = time.getTime() - DateTime.date(time).getTime();
+		final long timeOffset = time.getTimeInMillis() - DateTime.date(time).getTimeInMillis();
 		long offset = getMillisUntilBegin ? beginOffset : endOffset;
 		
 		if(timeOffset > offset)
