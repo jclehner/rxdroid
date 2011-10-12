@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2[011 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  * This file is part of RxDroid.
  *
@@ -21,8 +21,10 @@
 
 package at.caspase.rxdroid.debug;
 
-import at.caspase.rxdroid.Database.Drug;
+import java.util.Calendar;
+
 import at.caspase.rxdroid.Preferences;
+import at.caspase.rxdroid.Database.Drug;
 
 
 /**
@@ -36,38 +38,34 @@ public class FakeSettings extends Preferences
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = FakeSettings.class.getName();
-	private static int sActiveDoseTime = Drug.TIME_MORNING;
-
+	private static int counter = 0;
+	
 	@Override
-	public long getMillisFromNowUntilDoseTimeBegin(int doseTime) {
-		return 30 * 1000;
+	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
+		return 10 * 1000;
 	}
 
 	@Override
-	public long getMillisFromNowUntilDoseTimeEnd(int doseTime) {
-		return 30 * 1000;
+	public long getMillisUntilDoseTimeEnd(Calendar time, int doseTime) {
+		return 10 * 1000;
 	}
 
 	@Override
 	public long getSnoozeTime() {
-		return 15 * 1000;
+		return 5 * 1000;
 	}
 
 	@Override
-	public int getActiveDoseTime()
+	public int getActiveDoseTime(Calendar time)
 	{
-		if(sActiveDoseTime == Drug.TIME_NIGHT)
-			sActiveDoseTime = Drug.TIME_MORNING;
-
-		return sActiveDoseTime++;
+		final int doseTime = counter % (Drug.TIME_NIGHT + 1);
+		++counter;
+		
+		return doseTime;
 	}
 
 	@Override
-	public int getNextDoseTime()
-	{
-		if(sActiveDoseTime == Drug.TIME_NIGHT)
-			return Drug.TIME_MORNING;
-
-		return sActiveDoseTime;
+	public int getNextDoseTime(Calendar time) {
+		return (counter % (Drug.TIME_NIGHT + 1));
 	}
 }

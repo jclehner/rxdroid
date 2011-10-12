@@ -30,7 +30,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.debug.FakeSettings;
-import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
 public class Preferences
@@ -82,23 +81,13 @@ public class Preferences
 
 		return defaults;
 	}
-
-	@Deprecated
-	public long getMillisFromNowUntilDoseTimeBegin(int doseTime) {
-		return getMillisFromNowUntilDoseTimeBeginOrEnd(DateTime.now(), doseTime, true);
-	}
 	
 	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
-		return getMillisFromNowUntilDoseTimeBeginOrEnd(time, doseTime, true);
-	}
-
-	@Deprecated
-	public long getMillisFromNowUntilDoseTimeEnd(int doseTime) {
-		return getMillisFromNowUntilDoseTimeBeginOrEnd(DateTime.now(), doseTime, false);
+		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, true);
 	}
 	
 	public long getMillisUntilDoseTimeEnd(Calendar time, int doseTime) {
-		return getMillisFromNowUntilDoseTimeBeginOrEnd(time, doseTime, false);
+		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, false);
 	}
 
 	public long getSnoozeTime() 
@@ -215,16 +204,16 @@ public class Preferences
 		return getNextDoseTime(DateTime.now());
 	}
 
-	private long getMillisFromNowUntilDoseTimeBeginOrEnd(Calendar time, int doseTime, boolean getMillisUntilBegin)
+	private long getMillisUntilDoseTimeBeginOrEnd(Calendar time, int doseTime, boolean getMillisUntilBegin)
 	{
-		final long beginOffset = getDoseTimeBeginOffset(doseTime);
-		final long endOffset = getDoseTimeEndOffset(doseTime);
-		final long timeOffset = time.getTimeInMillis() - DateTime.date(time).getTimeInMillis();
-		long offset = getMillisUntilBegin ? beginOffset : endOffset;
+		final long timeOffset = DateTime.getOffsetFromMidnight(time);
+		final long doseTimeOffset = getMillisUntilBegin ? getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
 		
-		if(timeOffset > offset)
-			offset += Constants.MILLIS_PER_DAY;
-			
-		return offset - timeOffset;
+		long ret = doseTimeOffset - timeOffset;
+		
+		if(ret < 0)
+			ret += Constants.MILLIS_PER_DAY;
+		
+		return ret;
 	}
 }

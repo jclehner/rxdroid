@@ -43,7 +43,6 @@ import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.preferences.DosePreference;
 import at.caspase.rxdroid.preferences.DrugNamePreference;
 import at.caspase.rxdroid.preferences.FractionPreference;
-import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
 /**
@@ -304,10 +303,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		else if(deletePref != null)
 			getPreferenceScreen().removePreference(deletePref);
 
-		initializePreferences();
+		initPreferences();
 	}
 
-	private void initializePreferences()
+	private void initPreferences()
 	{
 		mDrugName.setInitialName(mDrug.getName());
 

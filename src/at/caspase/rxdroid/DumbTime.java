@@ -28,7 +28,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
 
 /**
@@ -145,11 +144,11 @@ public class DumbTime implements Comparable<DumbTime>
 		return getTime() > time.getTime();
 	}
 	
+	@Override
 	public int compareTo(DumbTime other)
 	{
 		if(this.getTime() == other.getTime())
 			return 0;
-
 		return this.before(other) ? -1 : 1;
 	}
 
@@ -212,8 +211,8 @@ public class DumbTime implements Comparable<DumbTime>
 		throw new IllegalArgumentException("timeString=" + timeString);
 	}
 	
-	public static DumbTime fromCalendar(Calendar calendar) {
-		return new DumbTime(calendar.getTimeInMillis() % Constants.MILLIS_PER_DAY);
+	public static DumbTime fromCalendar(Calendar cal) {
+		return new DumbTime(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
 	}
 }
 

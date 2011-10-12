@@ -23,6 +23,7 @@ package at.caspase.rxdroid.util;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import at.caspase.rxdroid.Constants;
 import at.caspase.rxdroid.Database;
 import at.caspase.rxdroid.R;
 
@@ -47,7 +48,7 @@ public final class Util
 	
 	public static int getDoseTimeDrawableFromDoseTime(int doseTime)
 	{
-		return getDoseTimeDrawableFromDoseViewId(Constants.DOSE_VIEW_IDS[doseTime]);
+		return getDoseTimeDrawableFromDoseViewId(Constants.getDoseViewId(doseTime));
 	}
 
 	public static int getDoseTimeFromDoseViewId(int doseViewId)

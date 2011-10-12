@@ -49,7 +49,6 @@ import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Entry;
 import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
-import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
 
@@ -268,12 +267,14 @@ public class NotificationService extends Service implements
 						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
 
 						if(lastDoseTime >= 0)
-							checkIntakes(date, lastDoseTime);
+							checkForForgottenIntakes(date, lastDoseTime);
 
 						if(activeDoseTime == -1)
 						{
 							long sleepTime = settings.getMillisUntilDoseTimeBegin(time, nextDoseTime);
 
+							Log.d(TAG, "Sleeping " + new DumbTime(sleepTime)  +" until beginning of dose time " + nextDoseTime);
+							
 							sleep(sleepTime);
 							delayFirstNotification = false;
 
@@ -290,11 +291,11 @@ public class NotificationService extends Service implements
 
 						long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(time, activeDoseTime);
 
-						final Set<Intake> pendingIntakes = getAllOpenIntakes(date, activeDoseTime);
+						final int pendingIntakeCount = countOpenIntakes(date, activeDoseTime);
 
-						Log.d(TAG, "Pending intakes: " + pendingIntakes.size());
+						Log.d(TAG, "Pending intakes: " + pendingIntakeCount);
 
-						if(!pendingIntakes.isEmpty())
+						if(pendingIntakeCount != 0)
 						{
 							if(delayFirstNotification && wasRunning)
 							{
@@ -303,7 +304,7 @@ public class NotificationService extends Service implements
 								sleep(Constants.NOTIFICATION_INITIAL_DELAY);
 							}
 
-							final String contentText = Integer.toString(pendingIntakes.size());
+							final String contentText = Integer.toString(pendingIntakeCount);
 							final long snoozeTime = settings.getSnoozeTime();
 
 							if(snoozeTime != 0)
@@ -327,7 +328,7 @@ public class NotificationService extends Service implements
 						}
 
 						cancelNotification(R.id.notification_intake_pending);
-						checkIntakes(date, activeDoseTime);
+						checkForForgottenIntakes(date, activeDoseTime);
 					}
 				}
 				catch(InterruptedException e)
@@ -358,9 +359,9 @@ public class NotificationService extends Service implements
 		mThread = null;
 	}
 
-	private Set<Intake> getAllOpenIntakes(Calendar date, int doseTime)
+	private int countOpenIntakes(Calendar date, int doseTime)
 	{
-		final Set<Intake> openIntakes = new HashSet<Database.Intake>();
+		int count = 0;
 
 		for(Drug drug : Database.getDrugs())
 		{
@@ -370,49 +371,47 @@ public class NotificationService extends Service implements
 				final Fraction dose = drug.getDose(doseTime);
 				
 				if(intakes.isEmpty() && drug.hasDoseOnDate(date) && dose.compareTo(0) != 0)
-				{
-					Log.d(TAG, "getAllOpenIntakes: adding " + drug);
-					openIntakes.add(new Intake(drug, DateTime.toSqlDate(date), doseTime, dose));
-				}
+					++count;
 			}
 		}
 
-		return openIntakes;
+		return count;
 	}
 
-	private Set<Intake> getAllForgottenIntakes(Calendar date, int lastDoseTime)
+	private int countForgottenIntakes(Calendar date, int lastDoseTime)
 	{
 		final Calendar today = DateTime.today();
 
 		if(date.after(today))
-			return Collections.emptySet();
+			return 0;
 
 		if(date.before(today))
 			lastDoseTime = -1;
 
 		final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
-		final Set<Intake> forgottenIntakes = new HashSet<Database.Intake>();
+		
+		int count = 0;
 
 		for(int doseTime : doseTimes)
 		{
-			forgottenIntakes.addAll(getAllOpenIntakes(date, doseTime));
+			count += countOpenIntakes(date, doseTime);
 
 			if(doseTime == lastDoseTime)
 				break;
 		}
 
-		return forgottenIntakes;
+		return count;
 	}
 
-	private void checkIntakes(Calendar date, int lastDoseTime)
+	private void checkForForgottenIntakes(Calendar date, int lastDoseTime)
 	{
-		final Set<Intake> forgottenIntakes = getAllForgottenIntakes(date, lastDoseTime);
+		int count = countForgottenIntakes(date, lastDoseTime);
 
-		Log.d(TAG, forgottenIntakes.size() + " forgotten intakes");
+		Log.d(TAG, count + " forgotten intakes");
 
-		if(!forgottenIntakes.isEmpty())
+		if(count != 0)
 		{
-			final String contentText = Integer.toString(forgottenIntakes.size());
+			final String contentText = Integer.toString(count);
 			postNotification(R.id.notification_intake_forgotten, Notification.DEFAULT_LIGHTS, contentText);
 		}
 		else

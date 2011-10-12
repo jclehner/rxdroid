@@ -183,11 +183,6 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		return true;		
 	}
 	
-	public boolean hasSameInfo(DoseView other)
-	{
-		return hasInfo(other.mDate, other.mDrug);
-	}
-	
 	public int getIntakeStatus() {
 		return mStatus;
 	}
@@ -302,8 +297,6 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 		final Calendar end = (Calendar) mDate.clone();
 		end.add(Calendar.MILLISECOND, (int) Preferences.instance().getDoseTimeEndOffset(mDoseTime));
-		
-		Log.d(TAG, "end=" + end);
 		
 		if(mDrug.isActive() && !mDoseText.getText().equals("0") && DateTime.now().compareTo(end) != -1)
 		{

@@ -21,15 +21,11 @@
 
 package at.caspase.rxdroid.util;
 
-import java.sql.Date;
 import java.sql.Time;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
-import android.graphics.YuvImage;
 import android.util.Log;
 import at.caspase.rxdroid.DumbTime;
 
@@ -40,11 +36,12 @@ public final class DateTime
 	public static Calendar today()
 	{
 		final Calendar today = now();
-		today.set(Calendar.HOUR, 0);
+		today.set(Calendar.HOUR_OF_DAY, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MILLISECOND, 0);
-
+		//today.setTimeZone(Constants.TZ_UTC);
+		//Log.d(TAG, "today: " + toString(today));
 		return today;
 	}
 
@@ -57,9 +54,8 @@ public final class DateTime
 
 	public static Calendar now() 
 	{
-		final Calendar now = Calendar.getInstance();
-		now.setTimeZone(TimeZone.getTimeZone("UTC"));
-		now.setTimeInMillis(System.currentTimeMillis());
+		final Calendar now = GregorianCalendar.getInstance();
+		//Log.d(TAG, "now: " + toString(now));		
 		return now;
 	}
 	
@@ -71,13 +67,18 @@ public final class DateTime
 		for(int calField: calFields)
 			date.set(calField, 0);
 		
+		/*final Calendar date = GregorianCalendar.getInstance();
+		date.setTimeInMillis((time.getTimeInMillis() / Constants.MILLIS_PER_DAY) * Constants.MILLIS_PER_DAY);*/
+		
+		//Log.d(TAG, "date: " + toString(time) + " -> " + toString(date));
+		
 		return date;		
 	}
 	
 	public static Calendar date(int year, int month, int day)
 	{
-		final Calendar date = Calendar.getInstance();
-		date.set(Calendar.HOUR, 0);
+		final Calendar date = new GregorianCalendar();
+		date.set(Calendar.HOUR_OF_DAY, 0);
 		date.set(Calendar.MINUTE, 0);
 		date.set(Calendar.SECOND, 0);
 		date.set(Calendar.MILLISECOND, 0);
@@ -85,7 +86,7 @@ public final class DateTime
 		date.set(Calendar.YEAR, year);
 		date.set(Calendar.MONTH, month);
 		date.set(Calendar.DAY_OF_MONTH, day);
-		
+				
 		return date;
 	}
 	
@@ -104,12 +105,12 @@ public final class DateTime
 		return time;
 	}
 
-	public static String toString(Time time)
+	public static String toString(Calendar calendar)
 	{
-		final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-		return sdf.format(time);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
+		//sdf.setTimeZone(Constants.TZ_UTC);
+		
+		return sdf.format(calendar.getTime());
 	}
 
 	public static long getOffsetFromMidnight(Calendar date)
@@ -124,8 +125,15 @@ public final class DateTime
 
 	public static boolean isWithinRange(Calendar time, DumbTime begin, DumbTime end)
 	{
+		boolean ret = isWithinRange_(time, begin, end);
+		Log.d(TAG, "isWithinRange(" + toString(time) + ", " + begin + ", " + end + ") = " + ret);
+		return ret;
+	}
+	
+	public static boolean isWithinRange_(Calendar time, DumbTime begin, DumbTime end)
+	{
 		final DumbTime theTime = DumbTime.fromCalendar(time);
-		
+						
 		if(end.before(begin))
 			return theTime.before(end) || theTime.compareTo(begin) != -1;
 				

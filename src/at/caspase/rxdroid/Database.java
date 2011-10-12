@@ -37,7 +37,6 @@ import java.util.WeakHashMap;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
 
@@ -245,7 +244,7 @@ public final class Database
 		if(sDrugCache == null)
 		{
 			sDrugCache = Collections.synchronizedList(queryForAll(mDrugDao));
-			Log.d(TAG, "Loaded " + sDrugCache.size() + " intakes into cache");
+			Log.d(TAG, "Loaded " + sDrugCache.size() + " drugs into cache");
 		}
 		return sDrugCache;
 	}
@@ -823,7 +822,7 @@ public final class Database
 		public Intake(Drug drug, Date date, int doseTime, Fraction dose)
 		{
 			this.drug = drug;
-			this.date = (java.util.Date) date.clone();
+			this.date = date;
 			this.timestamp = new Timestamp(System.currentTimeMillis());
 			this.doseTime = doseTime;
 			this.dose = dose;
@@ -1035,5 +1034,10 @@ public final class Database
 		 * @param flags for private implementation details.
 		 */
 		public void onEntryDeleted(Entry entry, int flags);
+	}
+	
+	public interface Filter<T extends Entry>
+	{
+		boolean matches(T t);
 	}
 }

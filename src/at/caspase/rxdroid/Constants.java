@@ -19,7 +19,7 @@
  *
  */
 
-package at.caspase.rxdroid.util;
+package at.caspase.rxdroid;
 
 import java.util.Calendar;
 
@@ -32,14 +32,18 @@ public final class Constants
 	public static final String NOTIFICATION_BULLET = "\u2022 ";
 	public static final long NOTIFICATION_INITIAL_DELAY = 10000;
 
-	public static final int[] DOSE_VIEW_IDS = {
+	public static int getDoseViewId(int doseTime) {
+		return DOSE_VIEW_IDS[doseTime];
+	}
+	
+	static final int[] DOSE_VIEW_IDS = {
 		R.id.morning,
 		R.id.noon,
 		R.id.evening,
 		R.id.night
 	};
-	
-	public static final int[] WEEK_DAYS = {
+		
+	static final int[] WEEK_DAYS = {
 			Calendar.MONDAY,
 			Calendar.TUESDAY,
 			Calendar.WEDNESDAY,
@@ -49,7 +53,7 @@ public final class Constants
 			Calendar.SUNDAY
 	};
 
-	public static final String[] WEEK_DAY_NAMES;
+	static final String[] WEEK_DAY_NAMES;
 
 	static
 	{

@@ -100,6 +100,20 @@
 	<string name="_btn_save">Save</string>
 	<string name="_toast_intake_noted">Noted</string>
 	<string name="_toast_saved">Saved</string>
-
+	
+	<string name="_title_add">Add</string>
+	<string name="_title_toggle_filtering">Show all / Apply filter</string>
+	
+	<string name="_btn_edit_drug">Edit drug</string>
+	<string name="_btn_ignore">Ignore</string>
+	<string name="_msg_intake_already_taken">You have already taken this dose. Do you want to continue?</string>
+	<string name="_msg_intake_normal">Take the above stated dose and press OK.</string>
+	<string name="_msg_intake_unscheduled">No dose is scheduled at this time. Do you want to continue?</string>
+	<string name="_title_change_dose">Change dose</string>
+	<string name="_title_edit_drug">Edit drug</string>
+	<string name="_title_mark_not_taken">Mark as not taken</string>
+	<string name="_title_mark_taken">Mark as taken</string>
+	
+	
 	
 </resources>

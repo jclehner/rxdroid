@@ -22,6 +22,7 @@
 package at.caspase.rxdroid;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -70,9 +71,10 @@ import at.caspase.rxdroid.Database.Drug;
 import at.caspase.rxdroid.Database.Intake;
 import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
-import at.caspase.rxdroid.util.Constants;
+import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
+import at.caspase.rxdroid.util.CollectionUtils.Filter;
 
 public class DrugListActivity extends Activity implements
 	OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener,
@@ -82,10 +84,12 @@ public class DrugListActivity extends Activity implements
 
 	public static final int MENU_ADD = 0;
 	public static final int MENU_PREFERENCES = 1;
+	public static final int MENU_TOGGLE_FILTERING = 2;
 	
 	public static final int CMENU_TOGGLE_INTAKE = 0;
 	public static final int CMENU_CHANGE_DOSE = 1;
 	public static final int CMENU_EDIT_DRUG = 2;
+	public static final int CMENU_SHOW_SUPPLY_STATUS = 3;
 
 	public static final String EXTRA_DAY = "day";
 
@@ -99,6 +103,8 @@ public class DrugListActivity extends Activity implements
 	private TextView mTextDate;
 
 	private Calendar mDate;
+	
+	private boolean mShowingAll = false;
 
 	private SharedPreferences mSharedPreferences;
 	
@@ -173,8 +179,10 @@ public class DrugListActivity extends Activity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		menu.add(0, MENU_ADD, 0, "Add").setIcon(android.R.drawable.ic_menu_add);
-		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(android.R.drawable.ic_menu_preferences);
+		menu.add(0, MENU_TOGGLE_FILTERING, 0, R.string._title_toggle_filtering).setIcon(android.R.drawable.ic_menu_agenda);
+		menu.add(0, MENU_ADD, 0, R.string._title_add).setIcon(android.R.drawable.ic_menu_add);
+		menu.add(0, MENU_PREFERENCES, 0, R.string._title_preferences).setIcon(android.R.drawable.ic_menu_preferences);
+		
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -197,6 +205,17 @@ public class DrugListActivity extends Activity implements
 				startActivity(intent);
 				return true;
 			}
+			case MENU_TOGGLE_FILTERING:
+			{
+				mShowingAll = !mShowingAll;
+								
+				if(mShowingAll)
+					mAdapter.setFilter(null);
+				else
+					mAdapter.setFilter(new DrugFilter());
+									
+				return true;
+			}
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -211,17 +230,16 @@ public class DrugListActivity extends Activity implements
 		//menu.setHeaderIcon(android.R.drawable.ic_menu_agenda);
 		menu.setHeaderTitle(drug.getName());
 		
-		
 		final int intakeStatus = doseView.getIntakeStatus();
-		final String toggleMessage;
+		final int toggleMessageId;
 		
 		if(intakeStatus == DoseView.STATUS_TAKEN)
-			toggleMessage = "Mark as not taken";
+			toggleMessageId = R.string._title_mark_not_taken;
 		else
-			toggleMessage = "Mark as taken";
+			toggleMessageId = R.string._title_mark_taken;
 		
 		//////////////////////////////////////////////////
-		menu.add(0, CMENU_TOGGLE_INTAKE, 0, toggleMessage).setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		menu.add(0, CMENU_TOGGLE_INTAKE, 0, toggleMessageId).setOnMenuItemClickListener(new OnMenuItemClickListener() {
 			
 			@Override
 			public boolean onMenuItemClick(MenuItem item)
@@ -233,7 +251,10 @@ public class DrugListActivity extends Activity implements
 					Fraction dose = Fraction.ZERO;
 					
 					for(Intake intake : Database.findIntakes(drug, mDate, doseTime))
+					{
+						dose.add(intake.getDose());
 						Database.delete(intake);
+					}
 					
 					Log.d(TAG, "onMenuItemClick: adding " + dose + " to current supply of " + drug.getName());
 					drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
@@ -245,12 +266,13 @@ public class DrugListActivity extends Activity implements
 		});	
 		/////////////////////////////////////////////////
 				
-		menu.add(0, CMENU_CHANGE_DOSE, 0, "Change dose");
+		menu.add(0, CMENU_CHANGE_DOSE, 0, R.string._title_change_dose);
 		
 		final Intent editIntent = new Intent(this, DrugEditActivity.class);
 		editIntent.setAction(Intent.ACTION_EDIT);
 		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
-		menu.add(0, CMENU_EDIT_DRUG, 0, "Edit drug").setIcon(android.R.drawable.ic_menu_edit).setIntent(editIntent);
+		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
+		menu.add(0, CMENU_SHOW_SUPPLY_STATUS, 0, "Show supply status");
 	}
 	
 	@Override
@@ -258,17 +280,12 @@ public class DrugListActivity extends Activity implements
 	{
 		switch(item.getItemId())
 		{
-			case CMENU_CHANGE_DOSE:
+			default:
 			{
 				Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show();
-				break;
-			}
-			
-			default:
-				return super.onContextItemSelected(item);
+				return true;
+			}				
 		}
-		
-		return true;
 	}
 
 	@Override
@@ -294,7 +311,7 @@ public class DrugListActivity extends Activity implements
 				shiftDate(+1);
 				break;
 			default:
-				throw new IllegalArgumentException("Unhandled view " + view.getClass().getSimpleName() + ", id=" + view.getId());
+				Log.w(TAG, "onNavigationClick: unhandled view id " + view.getId());
 		}
 
 		setProgressBarIndeterminateVisibility(false);
@@ -355,7 +372,10 @@ public class DrugListActivity extends Activity implements
 		ListView lv = new ListView(this);
 		
 		if(mAdapter == null)
+		{
 			mAdapter = new DrugAdapter(this, R.layout.dose_view, Database.getCachedDrugs());
+			mAdapter.setFilter(new DrugFilter());
+		}
 		
 		return lv;
 	}
@@ -370,25 +390,18 @@ public class DrugListActivity extends Activity implements
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
 	{		
-		if(velocityY != 0.0f)
+		final float begX = e1 != null ? e1.getX() : 0.0f;
+		final float endX = e2 != null ? e2.getX() : 0.0f;
+		final float diffX = Math.abs(begX - endX);
+		
+		if(diffX > 50 && Math.abs(velocityX) > 10)
 		{
-			float ratio = velocityX / velocityY;
-			
-			if(Math.abs(ratio) < 1)
-			{
-				Log.d(TAG, "onFling: ignoring fling; ratio=" + ratio);
-				return false;
-			}
-		}
-		else if(velocityX == 0.0f)
-		{
-			Log.d(TAG, "onFling: strange; both velocities are zero");
-			return false;
+			shiftDate(begX < endX ? -1 : 1);
+			return true;
 		}
 		
-		shiftDate(Math.signum(velocityX) == 1.0f ? -1 : 1);
-		
-		return true;
+		Log.d(TAG, "onFling: ignoring fling with velocityX=" + velocityX + " and diffX=" + diffX);
+		return false;
 	}
 	
 	@Override
@@ -411,6 +424,7 @@ public class DrugListActivity extends Activity implements
 	
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {		
+		super.onTouchEvent(event);
 		return mGestureDetector.onTouchEvent(event);
 	}
 	
@@ -468,11 +482,8 @@ public class DrugListActivity extends Activity implements
 		}
 		
 		mViewSwitcher.showNext();
-		
-		final ListView currentView = (ListView) mViewSwitcher.getCurrentView();
-		currentView.setAdapter(mAdapter);
-		currentView.setOnTouchListener(this);			
-		
+		refreshCurrentView();
+				
 		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
 
 		if(mDate.equals(DateTime.today()))
@@ -490,6 +501,15 @@ public class DrugListActivity extends Activity implements
 		}
 
 		setProgressBarIndeterminateVisibility(false);
+	}
+	
+	private void refreshCurrentView()
+	{
+		final ListView currentView = (ListView) mViewSwitcher.getCurrentView();
+		mAdapter = new DrugAdapter(this, R.layout.dose_view, Database.getCachedDrugs());
+		mAdapter.setFilter(mShowingAll ? null : new DrugFilter());
+		currentView.setAdapter(mAdapter);
+		currentView.setOnTouchListener(this);
 	}
 	
 	private void requestIntake(final Drug drug, Calendar date, int doseTime, Fraction dose, boolean askOnNormalIntake)
@@ -527,9 +547,9 @@ public class DrugListActivity extends Activity implements
 			
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setMessage("According to the database the current supplies are not sufficient for this dose.");
-			builder.setPositiveButton("Ignore", defaultOnClickListener);
+			builder.setPositiveButton(R.string._btn_ignore, defaultOnClickListener);
 			//////////////////
-			builder.setNeutralButton("Edit drug", new OnClickListener() {
+			builder.setNeutralButton(R.string._btn_edit_drug, new OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which)
@@ -555,7 +575,8 @@ public class DrugListActivity extends Activity implements
 			{
 				if(askOnNormalIntake)
 				{				
-					builder.setMessage("Take the above mentioned dose now and press OK.");
+					//builder.setMessage("Take the above mentioned dose now and press OK.");
+					builder.setMessage(R.string._msg_intake_normal);
 	                builder.setPositiveButton(android.R.string.ok, defaultOnClickListener);
 	                builder.setNegativeButton(android.R.string.cancel, null);
 				}
@@ -568,7 +589,8 @@ public class DrugListActivity extends Activity implements
 			}
 			else
 			{
-				builder.setMessage("You have already taken this dose. Do you want to take it regardless?");
+				//builder.setMessage("You have already taken this dose. Do you want to take it regardless?");
+				builder.setMessage(R.string._msg_intake_already_taken);
                 builder.setPositiveButton(android.R.string.yes, defaultOnClickListener);
                 builder.setNegativeButton(android.R.string.no, null);
 			}			
@@ -583,7 +605,8 @@ public class DrugListActivity extends Activity implements
 		dialog.setTitle(drug.getName());
 		//dialog.setIcon(Util.getDoseTimeDrawableFromDoseTime(doseTime));
 		dialog.setIcon(android.R.drawable.ic_dialog_info);
-		dialog.setMessage("No dose is scheduled at this time - choose one now.");
+		dialog.setMessage(getString(R.string._msg_intake_unscheduled));
+		//dialog.setMessage("No dose is scheduled at this time - choose one now.");
 		//////////////////	
 		dialog.setOnFractionSetListener(new OnFractionSetListener() {
 			
@@ -599,11 +622,45 @@ public class DrugListActivity extends Activity implements
 	}
 
 	private class DrugAdapter extends ArrayAdapter<Database.Drug>
-	{
-		public DrugAdapter(Context context, int textViewResId, List<Database.Drug> items)
+	{		
+		private ArrayList<Drug> mAllItems;
+		private ArrayList<Drug> mItems;
+		
+		public DrugAdapter(Context context, int textViewResId, List<Drug> items) {
+			this(context, textViewResId, items, null);
+		}
+		
+		public DrugAdapter(Context context, int textViewResId, List<Drug> items, CollectionUtils.Filter<Drug> filter)
 		{
 			super(context, textViewResId, items);
-			setNotifyOnChange(true);
+
+			mAllItems = new ArrayList<Drug>(items);
+			setFilter(filter);
+		}
+		
+		public void setFilter(CollectionUtils.Filter<Drug> filter)
+		{			
+			if(filter != null)
+				mItems = (ArrayList<Drug>) CollectionUtils.filter(mAllItems, filter);
+			else
+				mItems = (ArrayList<Drug>) CollectionUtils.clone(mAllItems);
+			
+			notifyDataSetChanged();
+		}
+		
+		@Override
+		public Drug getItem(int position) {
+			return mItems.get(position);
+		}
+		
+		@Override
+		public int getPosition(Drug drug) {
+			return mItems.indexOf(drug);
+		}
+		
+		@Override
+		public int getCount() {
+			return mItems.size();
 		}
 
 		@Override
@@ -655,18 +712,25 @@ public class DrugListActivity extends Activity implements
 			{
 				if(!doseView.hasInfo(mDate, drug))
 					doseView.setInfo(mDate, drug);
-			}		
-
-			boolean showDoseless = mSharedPreferences.getBoolean("show_doseless", true);
-			boolean showInactive = mSharedPreferences.getBoolean("show_inactive", true);
-			
-			if((!showDoseless && !drug.hasDoseOnDate(mDate)) || (!showInactive && !drug.isActive()))
-			{
-				//v.setVisibility(View.GONE);
-			}
+			}	
 			
 			return v;
 		}		
+	}
+
+	private class DrugFilter implements CollectionUtils.Filter<Drug>
+	{
+		@Override
+		public boolean matches(Drug drug)
+		{
+			final boolean showDoseless = mSharedPreferences.getBoolean("show_doseless", true);
+			final boolean showInactive = mSharedPreferences.getBoolean("show_inactive", true);
+			
+			if((!showDoseless && !drug.hasDoseOnDate(mDate)) || (!showInactive && !drug.isActive()))
+				return false;
+			
+			return true;
+		}
 	}
 	
 	private static class DoseViewHolder
@@ -674,7 +738,7 @@ public class DrugListActivity extends Activity implements
 		TextView name;
 		ImageView icon;
 		DoseView[] doseViews = new DoseView[4];			
-	}	
+	}
 
 	private enum ReverseInterpolator implements Interpolator
 	{

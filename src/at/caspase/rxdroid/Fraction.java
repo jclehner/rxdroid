@@ -91,8 +91,19 @@ public class Fraction extends Number implements Comparable<Number>
 	public Fraction(int wholeNum, int numerator, int denominator) {
 		construct(wholeNum, numerator, denominator);
 	}
-
-	public Fraction plus(final Fraction other)
+	
+	/**
+	 * Returns <code>true</code> if <code>numerator / denominator</code> yields an integer.
+	 */
+	public boolean isInteger() {
+		return mNumerator % mDenominator == 0;
+	}
+	
+	/**
+	 * Adds another fraction to this object.
+	 * @return a reference to this object.
+	 */
+	public Fraction add(final Fraction other)
 	{
 		int numerator, denominator;
 
@@ -113,29 +124,53 @@ public class Fraction extends Number implements Comparable<Number>
 			numerator = this.mNumerator + other.mNumerator;
 			denominator = this.mDenominator;
 		}
-
-		Fraction result = new Fraction(numerator, denominator);
-
-		//Log.d(TAG, "plus: result 1=" + numerator + "/" + denominator);
-		//Log.d(TAG, "plus: result 2=" + result);
-
-		return result;
+		
+		this.mDenominator = denominator;
+		this.mNumerator = numerator;
+		
+		return this;
+	}
+	
+	/**
+	 * Adds an integer to this object.
+	 * @return a reference to this object.
+	 */
+	public Fraction add(int n)
+	{
+		mNumerator += n * mDenominator;
+		return this;
+	}
+	
+	public Fraction subtract(final Fraction other) {
+		return add(other.negate());
+	}
+	
+	public Fraction subtract(int n) {
+		return add(-n);
 	}
 
-	public Fraction plus(Integer integer) {
-		return plus(new Fraction(integer));
+	public Fraction plus(final Fraction other)
+	{
+		Fraction result = new Fraction(this);
+		return result.add(other);
 	}
 
-	public Fraction minus(Fraction other) {
+	public Fraction plus(int n) 
+	{
+		Fraction result = new Fraction(this);
+		return result.add(n);
+	}
+
+	public Fraction minus(final Fraction other) {
 		return plus(other.negate());
 	}
 
-	public Fraction minus(Integer integer) {
-		return minus(new Fraction(integer));
+	public Fraction minus(int n) {
+		return plus(-n);
 	}
 
 	/**
-	 * Return the fraction's negative.
+	 * Returns the fraction's negative form.
 	 */
 	public Fraction negate() {
 		return new Fraction(-mNumerator, mDenominator);
@@ -294,7 +329,6 @@ public class Fraction extends Number implements Comparable<Number>
 
 		return new Fraction(wholeNum, numerator, denominator);
 	}
-
 
 	public static void setDisplayMixedNumbers(boolean displayMixedNumbers) {
 		sDisplayMixedNumbers = displayMixedNumbers;
