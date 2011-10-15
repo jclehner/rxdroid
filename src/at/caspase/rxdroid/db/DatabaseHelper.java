@@ -25,17 +25,17 @@ import dalvik.system.PathClassLoader;
  * @author Joseph Lehner
  *
  */
-public class Helper extends OrmLiteSqliteOpenHelper
+public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 {
-	private static final String TAG = Helper.class.getName();
+	private static final String TAG = DatabaseHelper.class.getName();
 	
+	public static final int DB_VERSION = 45;
 	private static final String DB_NAME = "db.sqlite";
-	private static final int DB_VERSION = 45;
-
+	
 	private Dao<Drug, Integer> mDrugDao = null;
 	private Dao<Intake, Integer> mIntakeDao = null;
 
-	public Helper(Context context) {
+	public DatabaseHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
 	}
 

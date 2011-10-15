@@ -61,7 +61,7 @@ public final class Database
 	private static List<Drug> sDrugCache;
 	private static List<Intake> sIntakeCache;
 	
-	private static Helper mHelper;
+	private static DatabaseHelper mHelper;
 	private static Dao<Drug, Integer> mDrugDao;
 	private static Dao<Intake, Integer> mIntakeDao;
 	
@@ -93,7 +93,7 @@ public final class Database
 		
 		if(!sIsLoaded)
 		{
-			mHelper = new Helper(context);
+			mHelper = new DatabaseHelper(context);
 			
 			mDrugDao = mHelper.getDrugDao();
 			mIntakeDao = mHelper.getIntakeDao();
