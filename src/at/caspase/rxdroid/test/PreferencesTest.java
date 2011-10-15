@@ -34,7 +34,7 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.Preferences;
-import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.util.DateTime;
 
 /**

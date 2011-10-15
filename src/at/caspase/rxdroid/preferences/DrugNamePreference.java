@@ -21,8 +21,6 @@
 
 package at.caspase.rxdroid.preferences;
 
-import java.sql.SQLException;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,25 +29,18 @@ import android.preference.EditTextPreference;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.EditText;
-import at.caspase.rxdroid.Database;
 import at.caspase.rxdroid.R;
-import at.caspase.rxdroid.Database.Drug;
-
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
+import at.caspase.rxdroid.db.Database;
+import at.caspase.rxdroid.db.Drug;
 
 public class DrugNamePreference extends EditTextPreference implements TextWatcher
 {
+	@SuppressWarnings("unused")
 	private static final String TAG = DrugNamePreference.class.getName();
 
 	private EditText mInput;
 	private String mInitialName = null;
-
-	private Database.Helper mDbHelper;
-	private Dao<Drug, Integer> mDao;
 
 	public DrugNamePreference(Context context, AttributeSet attrs)
 	{
@@ -103,10 +94,6 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	protected void onPrepareDialogBuilder(AlertDialog.Builder builder)
 	{
 		super.onPrepareDialogBuilder(builder);
-		//builder.setCancelable(false);
-		//builder.setNegativeButton(null, null);
-
-		initDao();
 	}
 
 	@Override
@@ -155,36 +142,13 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	}
 
 	private boolean isUniqueDrugName(String name)
-	{
-		if(mDao == null)
+	{		
+		for(Drug drug : Database.getDrugs())
 		{
-			Log.d(TAG, "isUniqueDrugName: mDao == null, returning true");
-			return true;
+			if(name.equals(drug.getName()))
+				return false;
 		}
-
-		QueryBuilder<Drug, Integer> qb = mDao.queryBuilder();
-		Where<Drug, Integer> where = qb.where();
-
-		try
-		{
-			where.eq(Database.Drug.COLUMN_NAME, name);
-			return mDao.query(qb.prepare()).size() == 0;
-		}
-		catch (SQLException e)
-		{
-			Log.e(TAG, "isUniqueDrugName", e);
-			return false;
-		}
-	}
-
-	private void initDao()
-	{
-		// if we did this in the constructor, there'd be a noticeable lag when instantiating
-		// an object of this Preference
-		if(mDao == null)
-		{
-			mDbHelper = new Database.Helper(getContext());
-			mDao = mDbHelper.getDrugDao();
-		}
+		
+		return true;
 	}
 }

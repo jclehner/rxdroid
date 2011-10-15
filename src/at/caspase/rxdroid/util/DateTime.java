@@ -24,10 +24,13 @@ package at.caspase.rxdroid.util;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
+import android.text.format.DateFormat;
 import android.util.Log;
 import at.caspase.rxdroid.DumbTime;
+import at.caspase.rxdroid.GlobalContext;
 
 public final class DateTime
 {
@@ -40,8 +43,6 @@ public final class DateTime
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MILLISECOND, 0);
-		//today.setTimeZone(Constants.TZ_UTC);
-		//Log.d(TAG, "today: " + toString(today));
 		return today;
 	}
 
@@ -55,7 +56,6 @@ public final class DateTime
 	public static Calendar now() 
 	{
 		final Calendar now = GregorianCalendar.getInstance();
-		//Log.d(TAG, "now: " + toString(now));		
 		return now;
 	}
 	
@@ -66,11 +66,6 @@ public final class DateTime
 		
 		for(int calField: calFields)
 			date.set(calField, 0);
-		
-		/*final Calendar date = GregorianCalendar.getInstance();
-		date.setTimeInMillis((time.getTimeInMillis() / Constants.MILLIS_PER_DAY) * Constants.MILLIS_PER_DAY);*/
-		
-		//Log.d(TAG, "date: " + toString(time) + " -> " + toString(date));
 		
 		return date;		
 	}
@@ -108,9 +103,11 @@ public final class DateTime
 	public static String toString(Calendar calendar)
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
-		//sdf.setTimeZone(Constants.TZ_UTC);
-		
 		return sdf.format(calendar.getTime());
+	}
+	
+	public static String toNativeDate(Date date) {
+		return DateFormat.getDateFormat(GlobalContext.get()).format(date);
 	}
 
 	public static long getOffsetFromMidnight(Calendar date)

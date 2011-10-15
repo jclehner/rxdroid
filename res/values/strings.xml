@@ -45,7 +45,7 @@
 	<string name="_msg_freq_weekly">Every %1$s</string>
 
 	<string name="_msg_delete_drug">Are you sure that you want to delete this drug?</string>
-	<string name="_toast_deleted">Deleted.</string>
+	<string name="_toast_deleted">Deleted</string>
 	  
     <!--  Dialogs: Errors -->    
     <string name="_title_error">Error</string>    
@@ -114,6 +114,10 @@
 	<string name="_title_mark_not_taken">Mark as not taken</string>
 	<string name="_title_mark_taken">Mark as taken</string>
 	
+	<string name="_msg_freq_every_n_days">Every %1$s days, beginning on %2$s</string>
+	
+	<string name="_summary_intake_never">Never</string>
+	<string name="_msg_drug_frequency_gt_2">Must be greater than or equal to 2</string>
 	
 	
 </resources>

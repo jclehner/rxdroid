@@ -25,13 +25,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -45,10 +41,12 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
-import at.caspase.rxdroid.Database.Drug;
-import at.caspase.rxdroid.Database.Entry;
-import at.caspase.rxdroid.Database.Intake;
-import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.db.Database;
+import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Entry;
+import at.caspase.rxdroid.db.Intake;
+import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
 
@@ -465,9 +463,10 @@ public class NotificationService extends Service implements
 
 			if(dailyDose != 0)
 			{
-				final double currentSupply = drug.getCurrentSupply().doubleValue();
+				final double correctionFactor = drug.getSupplyCorrectionFactor();
+				final double currentSupply = drug.getCurrentSupply().doubleValue() * correctionFactor;
 				
-				Log.d(TAG, "Supplies left for " + drug + ": " + currentSupply / dailyDose);
+				Log.d(TAG, "Supplies left for " + drug + ": " + currentSupply / dailyDose + " with correctionFactor=" + correctionFactor);
 
 				if(Double.compare(currentSupply / dailyDose, (double) minDays) == -1)
 					drugsWithLowSupply.add(drug);

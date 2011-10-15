@@ -27,7 +27,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import at.caspase.rxdroid.DoseView;
 import at.caspase.rxdroid.R;
-import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.db.Drug;
 
 public class DosePreference extends FractionPreference implements OnClickListener
 {

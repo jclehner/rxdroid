@@ -24,7 +24,7 @@ package at.caspase.rxdroid.debug;
 import java.util.Calendar;
 
 import at.caspase.rxdroid.Preferences;
-import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.db.Drug;
 
 
 /**

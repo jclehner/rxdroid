@@ -23,9 +23,8 @@ package at.caspase.rxdroid.util;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import at.caspase.rxdroid.Constants;
-import at.caspase.rxdroid.Database;
 import at.caspase.rxdroid.R;
+import at.caspase.rxdroid.db.Drug;
 
 public final class Util
 {
@@ -56,18 +55,17 @@ public final class Util
 		switch(doseViewId)
 		{
 				case R.id.morning:
-						return Database.Drug.TIME_MORNING;
+						return Drug.TIME_MORNING;
 				case R.id.noon:
-						return Database.Drug.TIME_NOON;
+						return Drug.TIME_NOON;
 				case R.id.evening:
-						return Database.Drug.TIME_EVENING;
+						return Drug.TIME_EVENING;
 				case R.id.night:
-						return Database.Drug.TIME_NIGHT;
+						return Drug.TIME_NIGHT;
 		}
 
 		throw new IllegalArgumentException();
-	}
-	
+	}	
 
 	/**
 	 * Obtains a string attribute from an AttributeSet.

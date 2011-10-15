@@ -11,8 +11,8 @@
     
     <string-array name="drug_frequency">
     	<item>Daily</item>
-    	<item>Every other day</item>
-    	<item>Weekly</item>
+    	<item>Every N days</item>
+    	<item>Pick days</item>
     </string-array>
     
     <string-array name="frequency_every_other_day">

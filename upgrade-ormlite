@@ -1,0 +1,24 @@
+#!/bin/bash
+
+ORMLITE_DATA="http://ormlite.com/releases/4.27/ormlite-core-4.27.jar"
+ORMLITE_FETCHURL="http://ormlite.com/releases"
+PACKAGES="ormlite-core ormlite-android"
+
+if [[ $# -ne 2 ]]; then
+	echo "usage: upgrade-ormlite [old version] [new version]"
+	exit 1
+fi
+
+rm -f lib/ormlite*.jar
+
+for P in $PACKAGES; do
+	base="$P-$2"
+	lib="$base.jar"
+	javadoc="$base-javadoc.jar"
+
+	wget -nv "$ORMLITE_FETCHURL/$2/$lib" -O lib/$lib || exit 1
+	wget -nv "$ORMLITE_FETCHURL/$2/$javadoc" -O lib/$javadoc || exit 1
+
+	sed -i -e "s/$P-$1/$base/" .classpath
+done
+

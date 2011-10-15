@@ -67,14 +67,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
-import at.caspase.rxdroid.Database.Drug;
-import at.caspase.rxdroid.Database.Intake;
-import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
+import at.caspase.rxdroid.db.Database;
+import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Intake;
+import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.util.CollectionUtils;
+import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
-import at.caspase.rxdroid.util.CollectionUtils.Filter;
 
 public class DrugListActivity extends Activity implements
 	OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener,
@@ -130,6 +131,8 @@ public class DrugListActivity extends Activity implements
 		Database.load(); // must be called before mViewSwitcher.setFactory!
 		
 		mViewSwitcher.setFactory(this);
+		
+		findViewById(R.id.view_switcher_container).setOnTouchListener(this);
 		
 		mGestureDetector = new GestureDetector(this, this);
 	}
@@ -353,7 +356,7 @@ public class DrugListActivity extends Activity implements
 	public void onDoseClick(final View view)
 	{
 		final DoseView v = (DoseView) view;
-		final Database.Drug drug = Database.findDrug(v.getDrugId());
+		final Drug drug = Database.findDrug(v.getDrugId());
 
 		final int doseTime = v.getDoseTime();
 		final Fraction dose = drug.getDose(doseTime);
@@ -362,7 +365,9 @@ public class DrugListActivity extends Activity implements
 	}
 
 	@Override
-	public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
+	public void onSharedPreferenceChanged(SharedPreferences preferences, String key) 
+	{
+		// causes the ListView to be refreshed
 		setDate(mDate);
 	}
 
@@ -394,13 +399,14 @@ public class DrugListActivity extends Activity implements
 		final float endX = e2 != null ? e2.getX() : 0.0f;
 		final float diffX = Math.abs(begX - endX);
 		
+		Log.d(TAG, "onFling: diffX=" + diffX + ", velocityX=" + velocityX);
+		
 		if(diffX > 50 && Math.abs(velocityX) > 10)
 		{
 			shiftDate(begX < endX ? -1 : 1);
 			return true;
 		}
 		
-		Log.d(TAG, "onFling: ignoring fling with velocityX=" + velocityX + " and diffX=" + diffX);
 		return false;
 	}
 	
@@ -519,10 +525,8 @@ public class DrugListActivity extends Activity implements
 			requestUnscheduledIntake(drug, date, doseTime);
 			return;
 		}
-
-		Log.d(TAG, "requestIntake");
 		
-		final Database.Intake intake = new Database.Intake(drug, DateTime.toSqlDate(mDate), doseTime, dose);
+		final Intake intake = new Intake(drug, DateTime.toSqlDate(mDate), doseTime, dose);
 		final Fraction newSupply = drug.getCurrentSupply().minus(dose);
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(drug.getName() + ": " + dose);
@@ -621,7 +625,7 @@ public class DrugListActivity extends Activity implements
 		dialog.show();
 	}
 
-	private class DrugAdapter extends ArrayAdapter<Database.Drug>
+	private class DrugAdapter extends ArrayAdapter<Drug>
 	{		
 		private ArrayList<Drug> mAllItems;
 		private ArrayList<Drug> mItems;
@@ -643,7 +647,7 @@ public class DrugListActivity extends Activity implements
 			if(filter != null)
 				mItems = (ArrayList<Drug>) CollectionUtils.filter(mAllItems, filter);
 			else
-				mItems = (ArrayList<Drug>) CollectionUtils.clone(mAllItems);
+				mItems = (ArrayList<Drug>) CollectionUtils.copy(mAllItems);
 			
 			notifyDataSetChanged();
 		}
@@ -722,13 +726,13 @@ public class DrugListActivity extends Activity implements
 	{
 		@Override
 		public boolean matches(Drug drug)
-		{
+		{		
 			final boolean showDoseless = mSharedPreferences.getBoolean("show_doseless", true);
 			final boolean showInactive = mSharedPreferences.getBoolean("show_inactive", true);
 			
-			if((!showDoseless && !drug.hasDoseOnDate(mDate)) || (!showInactive && !drug.isActive()))
+			if((!showDoseless && mDate != null && !drug.hasDoseOnDate(mDate)) || (!showInactive && !drug.isActive()))
 				return false;
-			
+						
 			return true;
 		}
 	}

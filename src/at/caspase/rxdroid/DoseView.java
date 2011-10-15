@@ -21,34 +21,29 @@
 
 package at.caspase.rxdroid;
 
-import java.sql.Date;
-import java.sql.Time;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import android.content.Context;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import at.caspase.rxdroid.Database.Drug;
-import at.caspase.rxdroid.Database.Entry;
-import at.caspase.rxdroid.Database.Intake;
-import at.caspase.rxdroid.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.db.Database;
+import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Intake;
+import at.caspase.rxdroid.db.Entry;
+import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.util.DateTime;
 
 /**
- * A class for viewing drug doses.
- *
- *
- *
- *
+ * A class for displaying dose information.
+ * 
+ * 
+ * 
  * @author Joseph Lehner
- *
  */
 public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 {	
@@ -87,19 +82,19 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		switch(getId())
 		{
 			case R.id.morning:
-				setDoseTime(Database.Drug.TIME_MORNING);
+				setDoseTime(Drug.TIME_MORNING);
 				break;
 
 			case R.id.noon:
-				setDoseTime(Database.Drug.TIME_NOON);
+				setDoseTime(Drug.TIME_NOON);
 				break;
 
 			case R.id.evening:
-				setDoseTime(Database.Drug.TIME_EVENING);
+				setDoseTime(Drug.TIME_EVENING);
 				break;
 
 			case R.id.night:
-				setDoseTime(Database.Drug.TIME_NIGHT);
+				setDoseTime(Drug.TIME_NIGHT);
 				break;
 		}
 
@@ -113,7 +108,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	public void setDoseTime(int doseTime)
 	{
-		if(doseTime > Database.Drug.TIME_NIGHT)
+		if(doseTime > Drug.TIME_NIGHT)
 			throw new IllegalArgumentException();
 
 		final int drawableIds[] = { R.drawable.ic_morning, R.drawable.ic_noon, R.drawable.ic_evening, R.drawable.ic_night };
@@ -290,7 +285,6 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 		if(countIntakes() != 0)
 		{
-			Log.d(TAG, "Marking as taken");
 			markAsTaken();
 			return;
 		}

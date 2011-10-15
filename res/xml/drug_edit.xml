@@ -30,7 +30,7 @@
 				
 		<ListPreference android:key="frequency" 
 			android:title="Frequency" 
-			android:entries="@array/drug_frequency" 
+			android:entries="@array/drug_frequency"
 		/>
 					
 	</PreferenceCategory>

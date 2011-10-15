@@ -6,11 +6,18 @@
 	android:layout_gravity="center"	
 >
 
-	<ViewSwitcher android:id="@+id/drug_list_view_flipper"
+	<android.gesture.GestureOverlayView android:id="@+id/view_switcher_container"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
 		android:layout_weight="1"
-	/>
+		android:gestureColor="#000000ff"
+	>
+		<ViewSwitcher android:id="@+id/drug_list_view_flipper"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="1"
+		/>	
+	</android.gesture.GestureOverlayView>
 		 
 	 <LinearLayout 
 	 	android:layout_width="fill_parent"

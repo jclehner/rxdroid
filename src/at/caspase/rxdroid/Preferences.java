@@ -28,8 +28,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import at.caspase.rxdroid.Database.Drug;
+import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.debug.FakeSettings;
+import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
 public class Preferences
