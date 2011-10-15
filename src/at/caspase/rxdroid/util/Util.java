@@ -91,4 +91,17 @@ public final class Util
 
 		return value == null ? defaultValue : value;
 	}
+	
+	public static<T> int toInteger(T t)
+	{
+		if(t == null)
+			throw new NullPointerException();
+		
+		final String str = t.toString();
+		
+		if(str.isEmpty())
+			return 0;
+		
+		return Integer.parseInt(str, 10);	
+	}
 }

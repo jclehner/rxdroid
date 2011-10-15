@@ -25,11 +25,19 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
+import android.content.DialogInterface.OnDismissListener;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceScreen;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+import at.caspase.rxdroid.debug.SleepState;
+import at.caspase.rxdroid.util.DateTime;
 
 public class PreferencesActivity extends PreferenceActivity
 {
@@ -89,5 +97,76 @@ public class PreferencesActivity extends PreferenceActivity
 				// ignore
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public boolean onPreferenceTreeClick(PreferenceScreen prefScreen, Preference pref)
+	{
+		if(pref.getKey().equals("debug_view_sleep_state"))
+		{
+			final TextView textView = new TextView(this);
+			textView.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+			
+			final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Sleep state");
+			builder.setPositiveButton(android.R.string.ok, null);
+			builder.setView(textView);
+						
+			final Runnable dialogUpdater = new Runnable() {
+				
+				@Override
+				public void run()
+				{					
+					final String message = 
+						"Sleeping : " + SleepState.INSTANCE.isSleeping() + "\n" +
+						"Begin    : " + DateTime.toString(SleepState.INSTANCE.getBegin()) + "\n" + 
+						"End      : " + DateTime.toString(SleepState.INSTANCE.getEnd()) + "\n" + 
+						"Remaining: " + SleepState.INSTANCE.getRemainingTime().toString(true);
+					textView.setText(message);
+				}
+			};
+			
+			final Handler handler = new Handler(getMainLooper());
+			
+			final Thread updaterThread = new Thread(new Runnable() {
+				
+				@Override
+				public void run()
+				{
+					while(true)
+					{
+						handler.post(dialogUpdater);
+						try
+						{
+							Thread.sleep(1000);
+						}
+						catch (InterruptedException e)
+						{
+							break;
+						}
+					}
+				}
+			});
+			
+			updaterThread.start();
+			
+			AlertDialog dialog = builder.create();
+			
+			dialog.setOnDismissListener(new OnDismissListener() {
+				
+				@Override
+				public void onDismiss(DialogInterface dialog)
+				{
+					updaterThread.interrupt();					
+				}
+			});
+			
+			dialog.show();
+			
+			return true;
+		}
+		
+		return super.onPreferenceTreeClick(prefScreen, pref);
+		
 	}
 }

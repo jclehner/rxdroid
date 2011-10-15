@@ -167,15 +167,21 @@
 	<PreferenceScreen android:key="prefscreen_debug"
 		android:title="Debugging options">
 		
+		<Preference android:key="debug_view_sleep_state"
+			android:title="View sleep state"
+		/>
+		
 		<CheckBoxPreference android:key="debug_enabled"
 			android:title="Enable debugging mode"
-			android:defaultValue="false" />
+			android:defaultValue="false" 
+		/>
 			
 		<CheckBoxPreference android:key="debug_fake_dosetimes"
 			android:title="Fake doseTimes"
 			android:summary="Switch doseTimes every minute"
 			android:defaultValue="false"
-			android:dependency="debug_enabled" />
+			android:dependency="debug_enabled" 
+		/>	
 	
 	</PreferenceScreen>
 	

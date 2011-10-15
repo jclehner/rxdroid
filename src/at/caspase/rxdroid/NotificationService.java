@@ -46,6 +46,7 @@ import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.debug.SleepState;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
@@ -654,7 +655,11 @@ public class NotificationService extends Service implements
 	private static void sleep(long time) throws InterruptedException
 	{
 		if(time > 0)
+		{
+			SleepState.INSTANCE.onEnterSleep(time);
 			Thread.sleep(time);
+			SleepState.INSTANCE.onFinishedSleep();
+		}
 		else
 			Log.d(TAG, "sleep: ignoring time of " + time);
 	}

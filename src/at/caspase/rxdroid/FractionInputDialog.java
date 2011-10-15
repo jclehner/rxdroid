@@ -34,13 +34,17 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.View.OnFocusChangeListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import at.caspase.rxdroid.util.Util;
 
 public class FractionInputDialog extends AlertDialog implements
-		DialogInterface.OnClickListener, View.OnClickListener, OnLongClickListener, TextWatcher
+		DialogInterface.OnClickListener, View.OnClickListener, OnLongClickListener, TextWatcher, OnFocusChangeListener
 {
 	public interface OnFractionSetListener
 	{
@@ -90,12 +94,15 @@ public class FractionInputDialog extends AlertDialog implements
 
 		mInputNumber = (EditText) view.findViewById(R.id.number);
 		mInputNumber.addTextChangedListener(this);
+		mInputNumber.setOnFocusChangeListener(this);
 		mInputNumber.setVisibility(mIsInMixedNumberMode ? View.VISIBLE : View.GONE);
-
+				
 		mInputNumerator = (EditText) view.findViewById(R.id.numerator);
+		mInputNumerator.setOnFocusChangeListener(this);
 		mInputNumerator.addTextChangedListener(this);
 
 		mInputDenominator = (EditText) view.findViewById(R.id.denominator);
+		mInputDenominator.setOnFocusChangeListener(this);
 		mInputDenominator.addTextChangedListener(this);
 
 		mButtonPlus = (Button) view.findViewById(R.id.btn_plus);
@@ -204,15 +211,31 @@ public class FractionInputDialog extends AlertDialog implements
 			updateInputFields();
 
 		}
-		else if(view.getId() == R.id.btn_plus)
+		else
 		{
-			setDialogValue(mDialogValue.plus(1));
-			updateInputFields();
-		}
-		else if(view.getId() == R.id.btn_minus)
-		{
-			setDialogValue(mDialogValue.minus(1));
-			updateInputFields();
+			final int summand;
+			
+			if(view.getId() == R.id.btn_plus)
+				summand = 1;
+			else if(view.getId() == R.id.btn_minus)
+				summand = -1;
+			else
+				return;
+			
+			final View focused = getCurrentFocus();
+			
+			if(focused != null && focused instanceof EditText)
+			{
+				final EditText editText = (EditText) focused;
+				final int value = Util.toInteger(editText.getText());
+				editText.setText(Integer.toString(value + summand));
+				updateButtons();
+			}
+			else
+			{
+				setDialogValue(mDialogValue.plus(summand));
+				updateInputFields();
+			}
 		}
 	}
 
@@ -262,7 +285,7 @@ public class FractionInputDialog extends AlertDialog implements
 		{
 			Toast toast = Toast.makeText(getContext(), "Denominator must not be zero!", Toast.LENGTH_SHORT);
 			// display the Toast on top, as it might get lost when being displayed on the keypad (the default Toast
-			// style and the keypad have very similar colors)
+			// keypad styles have very similar colors)
 			toast.setGravity(Gravity.TOP, toast.getXOffset(), toast.getYOffset());
 			toast.show();
 
@@ -286,6 +309,11 @@ public class FractionInputDialog extends AlertDialog implements
 
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {}
+	
+	@Override
+	public void onFocusChange(View view, boolean hasFocus) {
+		updateButtons();
+	}
 
 	@Override
 	protected void onStart()
@@ -293,9 +321,9 @@ public class FractionInputDialog extends AlertDialog implements
 		super.onStart();
 
 		// taken from Android's DialogPreference.java
-		//Window window = getWindow();
-		//window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
-		//		WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+		Window window = getWindow();
+		window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
+				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 	}
 
 	private void setDialogValue(Fraction value)
@@ -331,10 +359,33 @@ public class FractionInputDialog extends AlertDialog implements
 
 		mIgnoreTextWatcherEvents = false;
 
-		if(!mAllowNegativeValues && mLongClickSummand == null && mDialogValue.minus(1).compareTo(0) == -1)
-			mButtonMinus.setEnabled(false);
+		updateButtons();
+	}
+	
+	private void updateButtons()
+	{
+		final boolean enabled;
+		final View focused = getCurrentFocus();
+				
+		if(focused == null || focused.getId() == R.id.number)
+		{
+			if(!mAllowNegativeValues && mLongClickSummand == null && mDialogValue.minus(1).compareTo(0) == -1)
+				enabled = false;
+			else
+				enabled = true;		
+		}
+		else if(focused instanceof EditText)
+		{
+			final int limit = focused.getId() == R.id.denominator ? 2 : 1;
+			enabled = Util.toInteger(((EditText) focused).getText()) >= limit;
+		}
 		else
-			mButtonMinus.setEnabled(true);
+		{
+			Log.w(TAG, "updateButtons: unexpected focus");
+			enabled = true; // just to be safe
+		}				
+		
+		mButtonMinus.setEnabled(enabled);
 	}
 
 	private void updateTitle()
