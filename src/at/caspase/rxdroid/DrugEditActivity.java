@@ -334,6 +334,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		mFreqPreference.setValueIndex(mDrug.getFrequency());
 		mCurrentSupply.setValue(mDrug.getCurrentSupply());
+		mCurrentSupply.setLongClickSummand(new Fraction(mDrug.getRefillSize()));
 		mRefillSize.setText(Integer.toString(mDrug.getRefillSize()));
 		mIsActive.setChecked(mDrug.isActive());
 
@@ -436,9 +437,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			
 			@Override
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-			{				
-				mDrug.setFrequencyOrigin(DateTime.date(year, monthOfYear, dayOfMonth).getTime());
+			{	
 				mDrug.setFrequency(Drug.FREQ_EVERY_N_DAYS);
+				mDrug.setFrequencyOrigin(DateTime.date(year, monthOfYear, dayOfMonth).getTime());
 				mDrug.setFrequencyArg(Long.valueOf(editText.getText().toString()));
 				updatePreferences();
 			}
@@ -517,7 +518,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		else
 		{
 			frequencyArg = mDrug.getFrequencyArg();
-			checkedItems = bitsToBooleanArray(frequencyArg, Constants.LONG_WEEK_DAY_NAMES.length);
+			checkedItems = SimpleBitSet.toBooleanArray(frequencyArg, Constants.LONG_WEEK_DAY_NAMES.length);
 			
 			if(frequencyArg == 0)
 			{
@@ -556,16 +557,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		});
 		
 		builder.show();
-	}
-	
-	private static boolean[] bitsToBooleanArray(long bits, int size)
-	{
-		boolean[] ret = new boolean[size];
-				
-		for(int i = 0; i != size; ++i)
-			ret[i] = ((bits & (1 << i)) != 0);
-					
-		return ret;
 	}
 	
 	private String getWeekdayFrequencySummary(long frequencyArgs)

@@ -69,6 +69,8 @@ public class Drug extends Entry
 	public static final int FREQ_DAILY = 0;
 	public static final int FREQ_EVERY_N_DAYS = 1;
 	public static final int FREQ_WEEKDAYS = 2;
+	// TODO valid arguments: 6, 8, 12, with automapping to doseTimes
+	public static final int FREQ_EVERY_N_HOURS = 3;
 	
 	public static final int FREQARG_DAY_MON = 1;
 	public static final int FREQARG_DAY_TUE = 1 << 1;
@@ -132,20 +134,30 @@ public class Drug extends Entry
 	@DatabaseField(canBeNull = true)
 	private String comment;
 
+	/**
+	 * Default constructor, required by ORMLite.
+	 */
 	public Drug() {}
 	
+	/**
+	 * Constructor for setting all fields.
+	 * <p>
+	 * This constructor should only be used by <code>OldDrug.convert()</code> as no
+	 * sanity checks are performed, possibly allowing the construction of an 
+	 * invalid object.
+	 */
 	public Drug(String name, int form, boolean active, int refillSize, Fraction currentSupply, Fraction[] schedule, 
 			int frequency, long frequencyArg, Date frequencyOrigin)
 	{
-		this.name = new String(name);
+		this.name = name;
 		this.form = form;
 		this.active = active;
 		this.refillSize = refillSize;
-		this.currentSupply = new Fraction(currentSupply);
-		this.doseMorning = new Fraction(schedule[0]);
-		this.doseNoon = new Fraction(schedule[1]);
-		this.doseEvening = new Fraction(schedule[2]);
-		this.doseNight = new Fraction(schedule[3]);
+		this.currentSupply = currentSupply;
+		this.doseMorning = schedule[0];
+		this.doseNoon = schedule[1];
+		this.doseEvening = schedule[2];
+		this.doseNight = schedule[3];
 		this.frequency = frequency;
 		this.frequencyArg = frequencyArg;
 		this.frequencyOrigin = new Date(frequencyOrigin != null ? frequencyOrigin.getTime() : 0);
@@ -167,9 +179,8 @@ public class Drug extends Entry
 		else if(frequency == FREQ_WEEKDAYS)
 			return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
 		
-		throw new AssertionError("WTF");
-	}
-	
+		throw new IllegalStateException("Frequency " + frequency + " not yet implemented");
+	}	
 
 	public String getName() {
 		return name;
@@ -226,19 +237,15 @@ public class Drug extends Entry
 	public double getSupplyCorrectionFactor()
 	{
 		switch(frequency)
-		{
-			case FREQ_DAILY:
-				return 1.0;
-				
+		{				
 			case FREQ_EVERY_N_DAYS:
 				return frequencyArg / 1.0;
 				
 			case FREQ_WEEKDAYS:
-				SimpleBitSet sbs = new SimpleBitSet(frequencyArg);
-				return 7.0 / sbs.cardinality();
+				return 7.0 / Long.bitCount(frequencyArg);
 				
 			default:
-				throw new AssertionError("WTF");
+				return 1.0;
 		}			
 	}
 
@@ -277,22 +284,68 @@ public class Drug extends Entry
 	{
 		if(frequency > FREQ_WEEKDAYS)
 			throw new IllegalArgumentException();
-		else	
-			this.frequency = frequency;
 		
-		if(frequency == FREQ_DAILY)
+		this.frequency = frequency;
+		
+		// sanitize database fields
+		switch(frequency)
 		{
-			frequencyArg = 0;
-			frequencyOrigin = null;
+			case FREQ_DAILY:
+				frequencyArg = 0;
+				// fall through
+				
+			case FREQ_WEEKDAYS:
+				frequencyOrigin = null;
+				break;			
 		}
 	}
 
-	public void setFrequencyArg(long frequencyArg) {
+	/**
+	 * Sets the frequency argument.
+	 * 
+	 * @param frequencyArg the exact interpretation of this value depends on currently set frequency.
+	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's frequency.
+	 * @throws IllegalStateException if this instance's frequency does not allow frequency arguments.
+	 */
+	public void setFrequencyArg(long frequencyArg) 
+	{
+		if(frequency == FREQ_EVERY_N_DAYS)
+		{
+			if(frequencyArg <= 1)
+				throw new IllegalArgumentException();			
+		}
+		else if(frequency == FREQ_WEEKDAYS)
+		{
+			// binary(01111111) = hex(0x7f) (all weekdays)
+			if(frequencyArg <= 0 || frequencyArg > 0x7f)
+				throw new IllegalArgumentException();		
+		}
+		else if(frequency == FREQ_EVERY_N_HOURS)
+		{
+			if(frequencyArg != 6 && frequencyArg != 8 && frequencyArg != 12)
+				throw new IllegalArgumentException();			
+		}
+		else
+			throw new IllegalStateException();	
+		
 		this.frequencyArg = frequencyArg;
 	}
 	
-	public void setFrequencyOrigin(Date frequencyOrigin) {
-		this.frequencyOrigin = frequencyOrigin;
+	/**
+	 * Sets the frequency origin.
+	 * @param frequencyOrigin
+	 * @throws IllegalStateException if this instance's frequency does not allow a frequency origin.
+	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's frequency.
+	 */
+	public void setFrequencyOrigin(Date frequencyOrigin) 
+	{
+		if(frequency != FREQ_EVERY_N_DAYS && frequency != FREQ_EVERY_N_HOURS)
+			throw new IllegalStateException();
+		
+		if(frequency == FREQ_EVERY_N_DAYS && DateTime.getOffsetFromMidnight(frequencyOrigin) != 0)
+			throw new IllegalArgumentException();
+		
+		this.frequencyOrigin = frequencyOrigin;	
 	}
 
 	public void setActive(boolean active) {

@@ -52,13 +52,16 @@ public enum SleepState
 	public long getRemainingMillis() 
 	{
 		if(isSleeping())
-			return (mTime + mMillis) - System.currentTimeMillis();
-		
+		{
+			long remaining = (mTime + mMillis) - System.currentTimeMillis();
+			return remaining >= 0 ? remaining : 0;			
+		}
+				
 		return 0;
 	}
 	
 	public DumbTime getRemainingTime() {
-		return new DumbTime(getRemainingMillis() % Constants.MILLIS_PER_DAY);
+		return new DumbTime(getRemainingMillis(), true);
 	}
 	
 	private void setTime() {

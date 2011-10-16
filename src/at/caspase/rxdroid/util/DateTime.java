@@ -119,6 +119,13 @@ public final class DateTime
 		
 		return millis + 1000 * (hour * 3600 + minute * 60 + second);		
 	}
+	
+	public static long getOffsetFromMidnight(Date date)
+	{
+		Calendar theDate = GregorianCalendar.getInstance();
+		theDate.setTime(date);
+		return getOffsetFromMidnight(theDate);
+	}
 
 	public static boolean isWithinRange(Calendar time, DumbTime begin, DumbTime end)
 	{

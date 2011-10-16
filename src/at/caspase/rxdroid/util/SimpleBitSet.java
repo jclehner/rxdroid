@@ -48,4 +48,22 @@ public class SimpleBitSet
 	public long longValue() {
 		return mValue;
 	}
+	
+	public boolean[] toBooleanArray() {
+		return toBooleanArray(64);
+	}
+	
+	public boolean[] toBooleanArray(int size) {
+		return toBooleanArray(mValue, size);
+	}
+
+	public static boolean[] toBooleanArray(long value, int size)
+	{
+		boolean[] ret = new boolean[size];
+				
+		for(int i = 0; i != size; ++i)
+			ret[i] = ((value & (1 << i)) != 0);
+					
+		return ret;
+	}
 }

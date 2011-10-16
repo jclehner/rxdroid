@@ -304,7 +304,9 @@ public class NotificationService extends Service implements
 							}
 
 							final String contentText = Integer.toString(pendingIntakeCount);
-							final long snoozeTime = settings.getSnoozeTime();
+							postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
+							
+							/*final long snoozeTime = settings.getSnoozeTime();
 
 							if(snoozeTime != 0)
 							{								
@@ -317,7 +319,7 @@ public class NotificationService extends Service implements
 								} while(millisUntilDoseTimeEnd > snoozeTime);
 							}
 
-							Log.d(TAG, "Finished loop");
+							Log.d(TAG, "Finished loop");*/
 						}
 
 						if(millisUntilDoseTimeEnd > 0)
@@ -362,6 +364,8 @@ public class NotificationService extends Service implements
 	{
 		int count = 0;
 
+		Log.d(TAG, "  countOpenIntakes: date=" + DateTime.toString(date) + ", doseTime=" + doseTime);
+		
 		for(Drug drug : Database.getDrugs())
 		{
 			if(drug.isActive())
@@ -370,7 +374,10 @@ public class NotificationService extends Service implements
 				final Fraction dose = drug.getDose(doseTime);
 				
 				if(intakes.isEmpty() && drug.hasDoseOnDate(date) && dose.compareTo(0) != 0)
+				{
+					Log.d(TAG, "    adding " + drug.getName());
 					++count;
+				}
 			}
 		}
 
@@ -386,6 +393,8 @@ public class NotificationService extends Service implements
 
 		if(date.before(today))
 			lastDoseTime = -1;
+		
+		Log.d(TAG, "countForgottenIntakes: date=" + DateTime.toString(date) + ", lastDoseTime=" + lastDoseTime);
 
 		final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 		

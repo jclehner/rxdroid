@@ -8,7 +8,7 @@
 
 	<android.gesture.GestureOverlayView android:id="@+id/view_switcher_container"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
+		android:layout_height="0dip"
 		android:layout_weight="1"
 		android:gestureColor="#000000ff"
 	>
@@ -34,7 +34,7 @@
 	 	/>	 	
 		 
 		 <TextView android:id="@+id/med_list_footer"
-			android:layout_width="fill_parent"
+			android:layout_width="0dip"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center"
 			android:layout_weight="1"

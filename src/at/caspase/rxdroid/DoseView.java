@@ -26,16 +26,17 @@ import java.util.Calendar;
 import android.content.Context;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import at.caspase.rxdroid.db.Database;
-import at.caspase.rxdroid.db.Drug;
-import at.caspase.rxdroid.db.Intake;
-import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Entry;
+import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.DateTime;
 
 /**
@@ -272,8 +273,19 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		if(mDrug == null)
 			return;
 
-		if(mDate == null || mDrug.hasDoseOnDate(mDate))
-			mDoseText.setText(mDrug.getDose(mDoseTime).toString());
+		final Fraction dose = mDrug.getDose(mDoseTime);
+		boolean hasDose = mDate != null ? mDrug.hasDoseOnDate(mDate) : true;
+		
+		if(!Fraction.ZERO.equals(dose))
+		{
+			if(hasDose)
+				mDoseText.setText(dose.toString());
+			else
+			{
+				//mDoseText.setText(Html.fromHtml(dose + "<sup>&#x02DA;</sup>"));
+				mDoseText.setText(dose + "\u02DA");
+			}
+		}
 		else
 			mDoseText.setText("0");
 	}
@@ -289,18 +301,32 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			return;
 		}
 
-		final Calendar end = (Calendar) mDate.clone();
-		end.add(Calendar.MILLISECOND, (int) Preferences.instance().getDoseTimeEndOffset(mDoseTime));
+		final Calendar today = DateTime.today();
 		
-		if(mDrug.isActive() && !mDoseText.getText().equals("0") && DateTime.now().compareTo(end) != -1)
+		mStatus = STATUS_INDETERMINATE;		
+		
+		if(mDrug.getDose(mDoseTime).compareTo(0) != 0)
 		{
-			mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
-			mStatus = STATUS_FORGOTTEN;
+			if(mDate.equals(today))
+			{
+				final Calendar end = (Calendar) mDate.clone();
+				end.add(Calendar.MILLISECOND, (int) Preferences.instance().getTrueDoseTimeEndOffset(mDoseTime));
+								
+				if(DateTime.now().compareTo(end) != -1)
+					mStatus = STATUS_FORGOTTEN;
+			}
+			else if(mDate.before(today))
+				mStatus = STATUS_FORGOTTEN;
 		}
-		else
+		
+		switch(mStatus)
 		{
-			mIntakeStatus.setImageDrawable(null);
-			mStatus = STATUS_INDETERMINATE;
+			case STATUS_FORGOTTEN:
+				mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
+				break;
+				
+			default:
+				mIntakeStatus.setImageDrawable(null);
 		}
 	}
 	

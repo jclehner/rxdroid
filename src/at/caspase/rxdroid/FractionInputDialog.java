@@ -171,7 +171,7 @@ public class FractionInputDialog extends AlertDialog implements
 	 *
 	 * @param value a fraction. Use <code>null</code> to disable the long-click behaviour.
 	 */
-	public void setOnLongClickSummand(Fraction summand)
+	public void setLongClickSummand(Fraction summand)
 	{
 		OnLongClickListener listener = null;
 

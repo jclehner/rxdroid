@@ -277,19 +277,6 @@ public class DrugListActivity extends Activity implements
 		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
 		menu.add(0, CMENU_SHOW_SUPPLY_STATUS, 0, "Show supply status");
 	}
-	
-	@Override
-	public boolean onContextItemSelected(MenuItem item)
-	{
-		switch(item.getItemId())
-		{
-			default:
-			{
-				Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show();
-				return true;
-			}				
-		}
-	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data)

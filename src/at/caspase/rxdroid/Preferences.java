@@ -106,6 +106,17 @@ public class Preferences
 		return getTimePreference(prefKeyPrefixes[doseTime] + "_end").getTime();
 	}
 	
+	public long getTrueDoseTimeEndOffset(int doseTime)
+	{
+		final long doseTimeBeginOffset = getDoseTimeBeginOffset(doseTime);
+		long doseTimeEndOffset = getDoseTimeEndOffset(doseTime);
+		
+		if(doseTimeEndOffset < doseTimeBeginOffset)
+			doseTimeEndOffset += Constants.MILLIS_PER_DAY;
+		
+		return doseTimeEndOffset;		
+	}
+	
 	public DumbTime getTimePreferenceBegin(int doseTime) {
 		return getTimePreference(doseTime, "_begin");
 	}
