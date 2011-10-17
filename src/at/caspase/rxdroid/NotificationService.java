@@ -247,23 +247,27 @@ public class NotificationService extends Service implements
 
 				clearAllNotifications();
 				checkSupplies(true);
-
-				boolean delayFirstNotification = true;
+				
 				final Preferences settings = Preferences.instance();
-
+				final boolean hasWrappingDoseTimeNight = settings.hasWrappingDoseTimeNight();
+				boolean delayFirstNotification = true;
+				
 				try
 				{
 					while(true)
 					{
-						final Calendar date = DateTime.today();
 						final Calendar time = DateTime.now();
-						mIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
-
+						
 						final int activeDoseTime = settings.getActiveDoseTime(time);
 						final int nextDoseTime = settings.getNextDoseTime(time);
-						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
+						int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
 
 						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
+						
+						final Calendar date = settings.getActiveDate();
+						
+						mIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
+						Log.d(TAG, "date: " + DateTime.toString(date));						
 
 						if(lastDoseTime >= 0)
 							checkForForgottenIntakes(date, lastDoseTime);
@@ -289,7 +293,6 @@ public class NotificationService extends Service implements
 						}
 
 						long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(time, activeDoseTime);
-
 						final int pendingIntakeCount = countOpenIntakes(date, activeDoseTime);
 
 						Log.d(TAG, "Pending intakes: " + pendingIntakeCount);
@@ -364,7 +367,7 @@ public class NotificationService extends Service implements
 	{
 		int count = 0;
 
-		Log.d(TAG, "  countOpenIntakes: date=" + DateTime.toString(date) + ", doseTime=" + doseTime);
+		//Log.d(TAG, "  countOpenIntakes: date=" + DateTime.toString(date) + ", doseTime=" + doseTime);
 		
 		for(Drug drug : Database.getDrugs())
 		{
@@ -375,7 +378,7 @@ public class NotificationService extends Service implements
 				
 				if(intakes.isEmpty() && drug.hasDoseOnDate(date) && dose.compareTo(0) != 0)
 				{
-					Log.d(TAG, "    adding " + drug.getName());
+					Log.d(TAG, "  adding " + drug.getName());
 					++count;
 				}
 			}
@@ -385,16 +388,8 @@ public class NotificationService extends Service implements
 	}
 
 	private int countForgottenIntakes(Calendar date, int lastDoseTime)
-	{
-		final Calendar today = DateTime.today();
-
-		if(date.after(today))
-			return 0;
-
-		if(date.before(today))
-			lastDoseTime = -1;
-		
-		Log.d(TAG, "countForgottenIntakes: date=" + DateTime.toString(date) + ", lastDoseTime=" + lastDoseTime);
+	{		
+		//Log.d(TAG, "countForgottenIntakes: date=" + DateTime.toString(date) + ", lastDoseTime=" + lastDoseTime);
 
 		final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 		
@@ -415,7 +410,7 @@ public class NotificationService extends Service implements
 	{
 		int count = countForgottenIntakes(date, lastDoseTime);
 
-		Log.d(TAG, count + " forgotten intakes");
+		Log.d(TAG, "Forgotten intakes: " + count);
 
 		if(count != 0)
 		{

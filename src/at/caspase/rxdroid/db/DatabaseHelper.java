@@ -28,17 +28,11 @@ import java.util.List;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-import at.caspase.rxdroid.GlobalContext;
-import at.caspase.rxdroid.Version;
-import at.caspase.rxdroid.db.v44.OldDrug;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-
-import dalvik.system.PathClassLoader;
-
 
 /**
  * Helper class for ORMLite related voodoo.
@@ -107,6 +101,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 						continue;
 					}					
 					
+					@SuppressWarnings("rawtypes")
 					final Dao newDao = getDao(newDataClass);
 					final List<?> oldData = getDao(oldDataClass).queryForAll();
 					
@@ -122,8 +117,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 					}			
 				}
 			}
-			else
+			else if(oldVersion < newVersion)
 				resetDatabase(db, cs);
+			else
+				throw new RuntimeException("Refusing to downgrade database from " + oldVersion + " to " + newVersion);
 		}
 		catch(Exception e)
 		{

@@ -83,6 +83,10 @@ public final class Version
 		}			
 	}
 	
+	public static String getRevision() {
+		return sRevision;
+	}
+	
 	private static synchronized void init()
 	{
 		if(sVersion == null)

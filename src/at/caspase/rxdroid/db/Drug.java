@@ -34,6 +34,7 @@ import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
 import at.caspase.rxdroid.util.SimpleBitSet;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -326,7 +327,7 @@ public class Drug extends Entry
 	 * 
 	 * @param frequencyArg the exact interpretation of this value depends on currently set frequency.
 	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's frequency.
-	 * @throws IllegalStateException if this instance's frequency does not allow frequency arguments.
+	 * @throws UnsupportedOperationException if this instance's frequency does not allow frequency arguments.
 	 */
 	public void setFrequencyArg(long frequencyArg) 
 	{
@@ -347,7 +348,7 @@ public class Drug extends Entry
 				throw new IllegalArgumentException();			
 		}
 		else
-			throw new IllegalStateException();	
+			throw new UnsupportedOperationException();	
 		
 		this.frequencyArg = frequencyArg;
 	}
@@ -355,13 +356,13 @@ public class Drug extends Entry
 	/**
 	 * Sets the frequency origin.
 	 * @param frequencyOrigin
-	 * @throws IllegalStateException if this instance's frequency does not allow a frequency origin.
+	 * @throws UnsupportedOperationException if this instance's frequency does not allow a frequency origin.
 	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's frequency.
 	 */
 	public void setFrequencyOrigin(Date frequencyOrigin) 
 	{
 		if(frequency != FREQ_EVERY_N_DAYS && frequency != FREQ_EVERY_N_HOURS)
-			throw new IllegalStateException();
+			throw new UnsupportedOperationException();
 		
 		if(frequency == FREQ_EVERY_N_DAYS && DateTime.getOffsetFromMidnight(frequencyOrigin) != 0)
 			throw new IllegalArgumentException();
@@ -456,7 +457,7 @@ public class Drug extends Entry
 
 	@Override
 	public String toString() {
-		return name + "(" + id + ")={ " + doseMorning + " - " + doseNoon + " - " + doseEvening + " - " + doseNight + "}";
+		return id + ":\"" + name + "\"=" + Arrays.toString(getSchedule());
 	}
 
 	/**

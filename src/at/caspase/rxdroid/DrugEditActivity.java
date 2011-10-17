@@ -57,6 +57,7 @@ import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.preferences.DosePreference;
 import at.caspase.rxdroid.preferences.DrugNamePreference;
 import at.caspase.rxdroid.preferences.FractionPreference;
+import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.SimpleBitSet;
@@ -507,12 +508,11 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	private void handleWeekdayFrequency()
 	{
 		final boolean[] checkedItems;
-		long frequencyArg;
+		long frequencyArg = 0;
 		
 		if(mDrug.getFrequency() != Drug.FREQ_WEEKDAYS)
 		{
 			mDrug.setFrequency(Drug.FREQ_WEEKDAYS);
-			mDrug.setFrequencyArg(frequencyArg = 0);
 			checkedItems = new boolean[Constants.LONG_WEEK_DAY_NAMES.length];
 		}
 		else
@@ -524,7 +524,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			{
 				// check the current weekday if none are selected
 				final int weekday = DateTime.now().get(Calendar.DAY_OF_WEEK);
-				final int index = Arrays.binarySearch(Constants.WEEK_DAYS, weekday);				
+				final int index = CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);				
 				checkedItems[index] = true;
 				frequencyArg |= 1 << index;
 			}

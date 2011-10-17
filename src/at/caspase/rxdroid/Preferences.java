@@ -117,6 +117,10 @@ public class Preferences
 		return doseTimeEndOffset;		
 	}
 	
+	public boolean hasWrappingDoseTimeNight() {
+		return getDoseTimeEndOffset(Drug.TIME_NIGHT) != getTrueDoseTimeEndOffset(Drug.TIME_NIGHT);
+	}
+	
 	public DumbTime getTimePreferenceBegin(int doseTime) {
 		return getTimePreference(doseTime, "_begin");
 	}
@@ -142,6 +146,22 @@ public class Preferences
 	
 	private DumbTime getTimePreference(int doseTime, String suffix) {
 		return getTimePreference(prefKeyPrefixes[doseTime] + suffix);
+	}
+	
+	public Calendar getActiveDate()
+	{
+		final Calendar now = DateTime.now();
+		final Calendar date = DateTime.date(now);
+		final int activeDoseTime = getActiveDoseTime(now);
+		
+		if(activeDoseTime == Drug.TIME_NIGHT && hasWrappingDoseTimeNight())
+		{
+			final DumbTime end = new DumbTime(getDoseTimeEndOffset(Drug.TIME_NIGHT));
+			if(DateTime.isWithinRange(now, new DumbTime(0), end))
+				date.add(Calendar.DAY_OF_MONTH, -1);
+		}
+		
+		return date;
 	}	
 
 	public int getActiveOrNextDoseTime() {

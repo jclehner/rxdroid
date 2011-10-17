@@ -22,6 +22,7 @@
 package at.caspase.rxdroid;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
@@ -36,6 +37,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.debug.SleepState;
 import at.caspase.rxdroid.util.DateTime;
 
@@ -58,7 +60,7 @@ public class PreferencesActivity extends PreferenceActivity
 		
 		final Preference versionPref = findPreference("version");
 		if(versionPref != null)
-			versionPref.setSummary(Version.get(Version.FORMAT_FULL));
+			versionPref.setSummary(Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION);
 	}
 
 	@Override

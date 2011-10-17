@@ -186,7 +186,7 @@
 	</PreferenceScreen>
 	
 	<Preference android:key="version"
-		android:title="Version"
+		android:title="@string/_title_version"
 		android:enabled="false"
 	/>
 </PreferenceScreen>

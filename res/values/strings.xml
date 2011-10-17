@@ -93,8 +93,8 @@
 	<string name="_title_pref_restore_defaults">Restore defaults</string>
 	<string name="_summary_pref_restore_defaults">Resets all preferences to default values</string>
 	
-	<string name="_title_prefscreen_display_info">Information</string>
-	<string name="_summary_prefscreen_display_info">Note that these settings may be overridden temporarily using MENU -&gt; Show all</string>		
+	<string name="_title_prefscreen_display_info">Note</string>
+	<string name="_summary_prefscreen_display_info">These settings may be overridden temporarily using MENU -&gt; Show all</string>		
 	
 	<string name="_btn_discard">Discard</string>
 	<string name="_btn_save">Save</string>
@@ -118,6 +118,6 @@
 	
 	<string name="_summary_intake_never">Never</string>
 	<string name="_msg_drug_frequency_gt_2">Must be greater than or equal to 2</string>
-	
+	<string name="_title_version">Version</string>
 	
 </resources>

@@ -26,7 +26,6 @@ import java.util.Calendar;
 import android.content.Context;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
@@ -281,10 +280,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			if(hasDose)
 				mDoseText.setText(dose.toString());
 			else
-			{
-				//mDoseText.setText(Html.fromHtml(dose + "<sup>&#x02DA;</sup>"));
 				mDoseText.setText(dose + "\u02DA");
-			}
 		}
 		else
 			mDoseText.setText("0");
@@ -300,23 +296,17 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			markAsTaken();
 			return;
 		}
-
-		final Calendar today = DateTime.today();
 		
 		mStatus = STATUS_INDETERMINATE;		
 		
 		if(mDrug.getDose(mDoseTime).compareTo(0) != 0)
 		{
-			if(mDate.equals(today))
-			{
-				final Calendar end = (Calendar) mDate.clone();
-				end.add(Calendar.MILLISECOND, (int) Preferences.instance().getTrueDoseTimeEndOffset(mDoseTime));
-								
-				if(DateTime.now().compareTo(end) != -1)
-					mStatus = STATUS_FORGOTTEN;
-			}
-			else if(mDate.before(today))
+			final Calendar end = (Calendar) mDate.clone();
+			end.add(Calendar.MILLISECOND, (int) Preferences.instance().getTrueDoseTimeEndOffset(mDoseTime));
+				
+			if(DateTime.now().compareTo(end) != -1)
 				mStatus = STATUS_FORGOTTEN;
+			
 		}
 		
 		switch(mStatus)

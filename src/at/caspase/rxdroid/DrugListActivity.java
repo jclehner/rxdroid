@@ -388,7 +388,8 @@ public class DrugListActivity extends Activity implements
 		
 		Log.d(TAG, "onFling: diffX=" + diffX + ", velocityX=" + velocityX);
 		
-		if(diffX > 50 && Math.abs(velocityX) > 10)
+		// TODO determine whether these are suitable values for this purpose
+		if(diffX > 50 && Math.abs(velocityX) > 800)
 		{
 			shiftDate(begX < endX ? -1 : 1);
 			return true;
@@ -483,7 +484,8 @@ public class DrugListActivity extends Activity implements
 			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
 
 		mTextDate.setText(dateString);
-
+		//setTitle(getString(R.string.app_name) + " - " + dateString.toString()); 
+		
 		// update the intent so our Activity is restarted with the last opened date
 		setIntent(getIntent().putExtra(EXTRA_DAY, (Serializable) mDate));
 
