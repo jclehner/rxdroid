@@ -23,6 +23,7 @@ package at.caspase.rxdroid.db;
 
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -33,6 +34,7 @@ import java.util.WeakHashMap;
 import android.content.Context;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
+import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Intake;
@@ -224,6 +226,20 @@ public final class Database
 		}
 		
 		return intakes;	
+	}
+	
+	public static synchronized List<Integer> getOpenIntakeDoseTimes(Drug drug, Calendar date)
+	{
+		final List<Integer> openIntakeDoseTimes = Arrays.asList(Constants.DOSE_TIMES);
+		
+		for(int doseTime = Drug.TIME_MORNING; doseTime != Drug.TIME_INVALID; ++doseTime)
+		{
+			if(!findIntakes(drug, date, doseTime).isEmpty())
+				openIntakeDoseTimes.remove(doseTime);			
+		}
+		
+		Log.d(TAG, "openIntakeDoseTimes=" + Arrays.toString(openIntakeDoseTimes.toArray()));
+		return openIntakeDoseTimes;		
 	}
 	
 	/**

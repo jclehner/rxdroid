@@ -340,15 +340,11 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	private void initPreferences()
 	{
 		mDrugName.setInitialName(mDrug.getName());
-
+		
 		for(DosePreference dosePref : mDosePrefs)
 			dosePref.setDrug(mDrug);
 
-		mFreqPreference.setValueIndex(mDrug.getFrequency());
-		mCurrentSupply.setValue(mDrug.getCurrentSupply());
 		mCurrentSupply.setLongClickSummand(new Fraction(mDrug.getRefillSize()));
-		mRefillSize.setText(Integer.toString(mDrug.getRefillSize()));
-		mIsActive.setChecked(mDrug.isActive());
 
 		updatePreferences();
 	}
@@ -358,6 +354,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	 */
 	private void updatePreferences()
 	{
+		Log.d(TAG, "updatePreferences: mDrug=" + mDrug);
+		
 		mDrugName.setName(mDrug.getName());
 
 		// intake frequency
@@ -397,14 +395,40 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		mDrugForm.setValueIndex(form);
 
 		// current supply
-		Fraction currentSupply = mDrug.getCurrentSupply();
-		mCurrentSupply.setSummary(currentSupply.toString());
-		mCurrentSupply.setValue(currentSupply);
+		final Fraction currentSupply = mDrug.getCurrentSupply();
+		if(currentSupply.compareTo(0) == 0)
+		{
+			mCurrentSupply.setSummary(R.string._summary_not_available);
+			mCurrentSupply.setValue(Fraction.ZERO);
+		}
+		else
+		{
+			mCurrentSupply.setSummary(currentSupply.toString());
+			mCurrentSupply.setValue(currentSupply);
+			
+			final int currentSupplyDays = mDrug.getCurrentSupplyDays();
+			if(currentSupplyDays > 0)
+			{
+				final Calendar end = DateTime.today();				
+				end.add(Calendar.DAY_OF_MONTH, currentSupplyDays);		
+				mCurrentSupply.setSummary(mCurrentSupply.getSummary() + " - lasts until " + DateTime.toNativeDate(end.getTime()));				
+			}		
+		}
 
 		// refill size
-		String refillSize = Integer.toString(mDrug.getRefillSize());
-		mRefillSize.setSummary(refillSize);
-		mRefillSize.setText(refillSize);
+		final int refillSize = mDrug.getRefillSize();
+		if(refillSize == 0)
+		{
+			mRefillSize.setSummary(R.string._summary_not_available);
+			mRefillSize.setText("0");
+		}
+		else
+		{		
+			final String refillSizeStr = Integer.toString(mDrug.getRefillSize());
+			mRefillSize.setSummary(refillSizeStr);
+			mRefillSize.setText(refillSizeStr);
+		}
+			
 
 		// active?
 		mIsActive.setChecked(mDrug.isActive());
@@ -513,7 +537,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			}
 		});
 		
-		dialog.show();	
+		dialog.show();
+		editText.performClick();
 	}
 	
 	private void handleWeekdayFrequency()

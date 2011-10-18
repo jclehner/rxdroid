@@ -88,9 +88,9 @@ public class DrugListActivity extends Activity implements
 	public static final int MENU_TOGGLE_FILTERING = 2;
 	
 	public static final int CMENU_TOGGLE_INTAKE = 0;
-	public static final int CMENU_CHANGE_DOSE = 1;
+	//public static final int CMENU_CHANGE_DOSE = 1;
 	public static final int CMENU_EDIT_DRUG = 2;
-	public static final int CMENU_SHOW_SUPPLY_STATUS = 3;
+	//public static final int CMENU_SHOW_SUPPLY_STATUS = 3;
 
 	public static final String EXTRA_DAY = "day";
 
@@ -269,13 +269,13 @@ public class DrugListActivity extends Activity implements
 		});	
 		/////////////////////////////////////////////////
 				
-		menu.add(0, CMENU_CHANGE_DOSE, 0, R.string._title_change_dose);
+		//menu.add(0, CMENU_CHANGE_DOSE, 0, R.string._title_change_dose);
 		
 		final Intent editIntent = new Intent(this, DrugEditActivity.class);
 		editIntent.setAction(Intent.ACTION_EDIT);
 		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
 		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
-		menu.add(0, CMENU_SHOW_SUPPLY_STATUS, 0, "Show supply status");
+		//menu.add(0, CMENU_SHOW_SUPPLY_STATUS, 0, "Show supply status");
 	}
 
 	@Override
@@ -595,6 +595,7 @@ public class DrugListActivity extends Activity implements
 	private void requestUnscheduledIntake(final Drug drug, final Calendar date, final int doseTime)
 	{
 		final FractionInputDialog dialog = new FractionInputDialog(this, Fraction.ZERO, null);
+		dialog.setKeypadEnabled(false);
 		dialog.setTitle(drug.getName());
 		//dialog.setIcon(Util.getDoseTimeDrawableFromDoseTime(doseTime));
 		dialog.setIcon(android.R.drawable.ic_dialog_info);

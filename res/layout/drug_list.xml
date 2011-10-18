@@ -40,7 +40,7 @@
 			android:layout_weight="1"
 			style="@style/android:TextAppearance.Large"
 			android:text="2011-02-07"
-			android:textSize="24sp"
+			android:textSize="24dp"
 			android:textColor="#000000"
 			android:gravity="center"			
 			android:clickable="true"

@@ -73,7 +73,8 @@ public class FractionInputDialog extends AlertDialog implements
 	private Fraction mLongClickSummand;
 	private OnFractionSetListener mOnFractionSetListener;
 	private boolean mAllowNegativeValues;
-
+	private boolean mIsKeypadEnabled = true;
+	
 	private boolean mIgnoreTextWatcherEvents = false;
 
 	private SharedPreferences mSharedPrefs;
@@ -163,6 +164,14 @@ public class FractionInputDialog extends AlertDialog implements
 
 	public OnFractionSetListener getOnFractionSetListener() {
 		return mOnFractionSetListener;
+	}
+	
+	public void setKeypadEnabled(boolean enabled) {
+		mIsKeypadEnabled = enabled;
+	}
+	
+	public boolean isKeypadEnabled() {
+		return mIsKeypadEnabled;
 	}
 
 	/**
@@ -320,10 +329,13 @@ public class FractionInputDialog extends AlertDialog implements
 	{
 		super.onStart();
 
-		// taken from Android's DialogPreference.java
-		Window window = getWindow();
-		window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
-				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+		if(mIsKeypadEnabled)
+		{
+			// taken from Android's DialogPreference.java
+			Window window = getWindow();
+			window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
+					WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+		}
 	}
 
 	private void setDialogValue(Fraction value)

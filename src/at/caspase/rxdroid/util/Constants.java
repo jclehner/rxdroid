@@ -26,6 +26,7 @@ import java.util.Calendar;
 import android.text.format.DateUtils;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.R.id;
+import at.caspase.rxdroid.db.Drug;
 
 public final class Constants
 {
@@ -53,6 +54,8 @@ public final class Constants
 			Calendar.SATURDAY,
 			Calendar.SUNDAY
 	};
+	
+	public static final Integer[] DOSE_TIMES = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 
 	public static final String[] LONG_WEEK_DAY_NAMES;
 	public static final String[] SHORT_WEEK_DAY_NAMES;

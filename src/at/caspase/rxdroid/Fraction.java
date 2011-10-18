@@ -45,11 +45,14 @@ public class Fraction extends Number implements Comparable<Number>
 
 	private int mNumerator = 0;
 	private int mDenominator = 1;
+	
+	// currently used to prevent accidental modification of ZERO
+	private boolean mImmutable = false;
 
 	/**
 	 * A zero value, just for convenience.
 	 */
-	public static final Fraction ZERO = new Fraction(0);
+	public static final Fraction ZERO = new Fraction(0, true);
 
 	/**
 	 * Construct a fraction of the value zero.
@@ -100,12 +103,18 @@ public class Fraction extends Number implements Comparable<Number>
 		return mNumerator % mDenominator == 0;
 	}
 	
+	public boolean isZero() {
+		return mNumerator == 0;
+	}
+	
 	/**
 	 * Adds another fraction to this object.
 	 * @return a reference to this object.
 	 */
 	public Fraction add(final Fraction other)
 	{
+		requireMutability();
+		
 		int numerator, denominator;
 
 		//Log.d(TAG, "plus: this=" + this + ", other=" + other);
@@ -138,6 +147,8 @@ public class Fraction extends Number implements Comparable<Number>
 	 */
 	public Fraction add(int n)
 	{
+		requireMutability();
+		
 		mNumerator += n * mDenominator;
 		return this;
 	}
@@ -365,6 +376,18 @@ public class Fraction extends Number implements Comparable<Number>
 
 		mNumerator = mNumerator / divisor;
 		mDenominator = denominator / divisor;
+	}
+	
+	private Fraction(int n, boolean immutable) 
+	{
+		this(n);
+		mImmutable = immutable;
+	}
+	
+	private void requireMutability()
+	{
+		if(mImmutable)
+			throw new UnsupportedOperationException("This instance is not mutable. Are you trying to modify Fraction.ZERO?");
 	}
 
 	/**

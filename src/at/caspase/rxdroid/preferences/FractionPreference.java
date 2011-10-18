@@ -43,6 +43,8 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 
 	private Fraction mValue;
 	private Fraction mLongClickSummand;
+	
+	private CharSequence mSummary;
 
 	private CharSequence mDialogTitle;
 	private int mDialogIcon = -1;
@@ -78,10 +80,18 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 	public void setLongClickSummand(Fraction value) {
 		mLongClickSummand = value;
 	}
+	
+	@Override
+	public void setSummary(CharSequence summary) {
+		mSummary = summary;
+	}
 
 	@Override
-	public CharSequence getSummary() {
-		return mValue.toString();
+	public CharSequence getSummary() 
+	{
+		if(mSummary == null)
+			return mValue.toString();
+		return mSummary;
 	}
 
 	@Override

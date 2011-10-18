@@ -24,6 +24,7 @@ package at.caspase.rxdroid.db;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import android.util.Log;
 import at.caspase.rxdroid.Fraction;
@@ -87,6 +88,7 @@ public class Drug extends Entry
 	public static final int TIME_NOON = 1;
 	public static final int TIME_EVENING = 2;
 	public static final int TIME_NIGHT = 3;
+	public static final int TIME_INVALID = 4;
 
 	public static final int FREQ_DAILY = 0;
 	public static final int FREQ_EVERY_N_DAYS = 1;
@@ -150,7 +152,7 @@ public class Drug extends Entry
 	@DatabaseField(canBeNull = true)
 	private long frequencyArg = 0;
 	
-	@DatabaseField
+	@DatabaseField(canBeNull = true)
 	private java.util.Date frequencyOrigin;
 	
 	@DatabaseField(canBeNull = true)
@@ -182,7 +184,7 @@ public class Drug extends Entry
 		this.doseNight = schedule[3];
 		this.frequency = frequency;
 		this.frequencyArg = frequencyArg;
-		this.frequencyOrigin = new Date(frequencyOrigin != null ? frequencyOrigin.getTime() : 0);
+		this.frequencyOrigin = frequencyOrigin;
 	}
 
 	public boolean hasDoseOnDate(Calendar cal)
@@ -256,6 +258,31 @@ public class Drug extends Entry
 		return currentSupply;
 	}
 	
+	public int getCurrentSupplyDays() 
+	{
+		final Calendar today = DateTime.today();
+		
+		double dailyDose = 0.0;
+		for(Fraction dose : getSchedule())
+			dailyDose += dose.doubleValue();
+				
+		if(dailyDose == 0.0)
+			return 0;
+		
+		// determine how many intakes are open today and subtract the dose's sum
+		// from the current supply
+		
+		double doseRemainingToday = 0.0;
+		final List<Integer> openIntakeDoseTimes = Database.getOpenIntakeDoseTimes(this, today);
+		for(Integer doseTime : openIntakeDoseTimes)
+			doseRemainingToday += getDose(doseTime).doubleValue();				
+		
+		final double supply = this.currentSupply.doubleValue() - doseRemainingToday;
+		final double correctionFactor = getSupplyCorrectionFactor();
+		
+		return (int) Math.floor((supply / dailyDose) * correctionFactor);
+	}
+	
 	public double getSupplyCorrectionFactor()
 	{
 		switch(frequency)
@@ -285,6 +312,19 @@ public class Drug extends Entry
 		};
 
 		return doses[doseTime];
+	}
+	
+	public Fraction getDailyDose()
+	{
+		final Fraction dailyDose = new Fraction();
+		
+		for(Fraction dose : getSchedule())
+			dailyDose.add(dose);
+		
+		Log.d(TAG, "dailyDose: " + dailyDose);
+		Log.d(TAG, "Fraction.ZERO: " + Fraction.ZERO);
+				
+		return dailyDose;		
 	}
 
 	public String getComment() {
