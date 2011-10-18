@@ -220,7 +220,7 @@ public class DrugListActivity extends Activity implements
 				if(mShowingAll)
 					adapter.setFilter(null);
 				else
-					adapter.setFilter(new DrugFilter(mDate));
+					adapter.setFilter(new DrugFilter());
 									
 				return true;
 			}
@@ -500,7 +500,7 @@ public class DrugListActivity extends Activity implements
 		final ListView nextView = (ListView) mViewSwitcher.getNextView();
 		
 		final DrugAdapter adapter = new DrugAdapter(this, R.layout.dose_view, Database.getDrugs(), mDate);
-		adapter.setFilter(mShowingAll ? null : new DrugFilter(mDate));
+		adapter.setFilter(mShowingAll ? null : new DrugFilter());
 		nextView.setAdapter(adapter);
 		nextView.setOnTouchListener(this);
 	}
