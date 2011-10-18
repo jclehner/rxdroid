@@ -24,19 +24,21 @@ package at.caspase.rxdroid;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.SpannableString;
@@ -44,19 +46,19 @@ import android.text.format.DateFormat;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.GestureDetector.OnGestureListener;
-import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.ArrayAdapter;
@@ -69,9 +71,9 @@ import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
 import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.caspase.rxdroid.db.Database;
+import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Intake;
-import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
@@ -97,10 +99,10 @@ public class DrugListActivity extends Activity implements
 	private static final int TAG_ID = R.id.tag_drug_id;
 
 	private LayoutInflater mInflater;
+	private int mViewFactoryId = 0;
 
 	private ViewSwitcher mViewSwitcher;
 	private GestureDetector mGestureDetector;	
-	private DrugAdapter mAdapter;
 	private TextView mTextDate;
 
 	private Calendar mDate;
@@ -110,7 +112,7 @@ public class DrugListActivity extends Activity implements
 	private SharedPreferences mSharedPreferences;
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState)
+	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
@@ -211,11 +213,14 @@ public class DrugListActivity extends Activity implements
 			case MENU_TOGGLE_FILTERING:
 			{
 				mShowingAll = !mShowingAll;
-								
+				
+				final ListView currentView = (ListView) mViewSwitcher.getCurrentView();
+				final DrugAdapter adapter = (DrugAdapter) currentView.getAdapter();
+				
 				if(mShowingAll)
-					mAdapter.setFilter(null);
+					adapter.setFilter(null);
 				else
-					mAdapter.setFilter(new DrugFilter());
+					adapter.setFilter(new DrugFilter(mDate));
 									
 				return true;
 			}
@@ -361,13 +366,11 @@ public class DrugListActivity extends Activity implements
 	@Override
 	public View makeView() 
 	{
-		ListView lv = new ListView(this);
+		final ListView lv = new ListView(this);
+		lv.setId(++mViewFactoryId);
+		lv.setBackgroundColor((mViewFactoryId % 2) == 0 ? Color.GREEN : Color.RED);
 		
-		if(mAdapter == null)
-		{
-			mAdapter = new DrugAdapter(this, R.layout.dose_view, Database.getCachedDrugs());
-			mAdapter.setFilter(new DrugFilter());
-		}
+		Log.d(TAG, "makeView: mViewFactoryId=" + mViewFactoryId);
 		
 		return lv;
 	}
@@ -463,21 +466,21 @@ public class DrugListActivity extends Activity implements
 
 			if(shiftBy == 1)
 			{
-				mViewSwitcher.getInAnimation().setInterpolator(ReverseInterpolator.INSTANCE);
-				mViewSwitcher.getOutAnimation().setInterpolator(ReverseInterpolator.INSTANCE);
+				mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_in_right));
+				mViewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_out_left));
 			}
 			else if(shiftBy == -1)
 			{
-				mViewSwitcher.getInAnimation().setInterpolator(null);
-				mViewSwitcher.getOutAnimation().setInterpolator(null);
+				mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left));
+				mViewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right));
 			}
 			else
 				throw new IllegalArgumentException();
 		}
 		
+		updateNextView();
 		mViewSwitcher.showNext();
-		refreshCurrentView();
-				
+								
 		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
 
 		if(mDate.equals(DateTime.today()))
@@ -489,22 +492,17 @@ public class DrugListActivity extends Activity implements
 		// update the intent so our Activity is restarted with the last opened date
 		setIntent(getIntent().putExtra(EXTRA_DAY, (Serializable) mDate));
 
-		if(shiftBy == 0)
-		{
-			mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left));
-			mViewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right));
-		}
-
 		setProgressBarIndeterminateVisibility(false);
 	}
 	
-	private void refreshCurrentView()
+	private void updateNextView()
 	{
-		final ListView currentView = (ListView) mViewSwitcher.getCurrentView();
-		mAdapter = new DrugAdapter(this, R.layout.dose_view, Database.getCachedDrugs());
-		mAdapter.setFilter(mShowingAll ? null : new DrugFilter());
-		currentView.setAdapter(mAdapter);
-		currentView.setOnTouchListener(this);
+		final ListView nextView = (ListView) mViewSwitcher.getNextView();
+		
+		final DrugAdapter adapter = new DrugAdapter(this, R.layout.dose_view, Database.getDrugs(), mDate);
+		adapter.setFilter(mShowingAll ? null : new DrugFilter(mDate));
+		nextView.setAdapter(adapter);
+		nextView.setOnTouchListener(this);
 	}
 	
 	private void requestIntake(final Drug drug, Calendar date, int doseTime, Fraction dose, boolean askOnNormalIntake)
@@ -619,17 +617,14 @@ public class DrugListActivity extends Activity implements
 	{		
 		private ArrayList<Drug> mAllItems;
 		private ArrayList<Drug> mItems;
+		private Calendar mAdapterDate;
 		
-		public DrugAdapter(Context context, int textViewResId, List<Drug> items) {
-			this(context, textViewResId, items, null);
-		}
-		
-		public DrugAdapter(Context context, int textViewResId, List<Drug> items, CollectionUtils.Filter<Drug> filter)
+		public DrugAdapter(Context context, int viewResId, List<Drug> items, Calendar date) 
 		{
-			super(context, textViewResId, items);
-
+			super(context, viewResId, items);
+			
 			mAllItems = new ArrayList<Drug>(items);
-			setFilter(filter);
+			mAdapterDate = (Calendar) date.clone();
 		}
 		
 		public void setFilter(CollectionUtils.Filter<Drug> filter)
@@ -637,7 +632,10 @@ public class DrugListActivity extends Activity implements
 			if(filter != null)
 				mItems = (ArrayList<Drug>) CollectionUtils.filter(mAllItems, filter);
 			else
-				mItems = (ArrayList<Drug>) CollectionUtils.copy(mAllItems);
+			{
+				//mItems = (ArrayList<Drug>) CollectionUtils.copy(mAllItems);
+				mItems = mAllItems;
+			}
 			
 			notifyDataSetChanged();
 		}
@@ -664,7 +662,10 @@ public class DrugListActivity extends Activity implements
 			// laggish animations if there are more than 3 or 4 drugs (i.e. 12-16 DoseViews)
 			//
 			// All measurements were done using an HTC Desire running Cyanogenmod 7!
-						
+			
+			Log.d(TAG, "getView: position=" + position);
+			Log.d(TAG, "  current view id: " + mViewSwitcher.getCurrentView().getId());
+			
 			final DoseViewHolder holder;
 
 			if(v == null)
@@ -704,8 +705,8 @@ public class DrugListActivity extends Activity implements
 			
 			for(DoseView doseView : holder.doseViews)
 			{
-				if(!doseView.hasInfo(mDate, drug))
-					doseView.setInfo(mDate, drug);
+				if(!doseView.hasInfo(mAdapterDate, drug))
+					doseView.setInfo(mAdapterDate, drug);
 			}	
 			
 			return v;
@@ -714,6 +715,15 @@ public class DrugListActivity extends Activity implements
 
 	private class DrugFilter implements CollectionUtils.Filter<Drug>
 	{
+		/*private Calendar mDate;
+		private SharedPreferences mSharedPrefs;
+		
+		public DrugFilter(Calendar date)
+		{
+			mDate = (Calendar) date.clone();
+			mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(GlobalContext.get());
+		}*/
+		
 		@Override
 		public boolean matches(Drug drug)
 		{		
@@ -732,15 +742,5 @@ public class DrugListActivity extends Activity implements
 		TextView name;
 		ImageView icon;
 		DoseView[] doseViews = new DoseView[4];			
-	}
-
-	private enum ReverseInterpolator implements Interpolator
-	{
-		INSTANCE;
-
-		@Override
-		public float getInterpolation(float f) {
-			return Math.abs(f - 1f);
-		}
 	}
 }
