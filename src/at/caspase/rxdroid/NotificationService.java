@@ -131,7 +131,7 @@ public class NotificationService extends Service implements
 	}
 	
 	@Override
-	public void onEntryCreated(Entry entry, int flags) {
+	public void onEntryCreated(Entry entry, int flags) {		
 		restartThread(flags);
 	}
 	
@@ -193,6 +193,14 @@ public class NotificationService extends Service implements
 			restartThread(true);
 	}
 
+	
+	/**
+	 * Calls <code>restartThread(forceRestart, true)</code>.
+	 */
+	private synchronized void restartThread(boolean forceRestart) {
+		restartThread(forceRestart, true);
+	}
+	
 	/**
 	 * (Re)starts the worker thread.
 	 * <p>
@@ -201,12 +209,10 @@ public class NotificationService extends Service implements
 	 * worker thread is restarted when <em>any</em> database changes occur (see
 	 * DatabaseWatcher) or when the user opens the app.
 	 *
-	 * @param forceRestart Forces the thread to restart, even if it was running.
-	 * @param forceSupplyCheck Force a drug-supply check as soon as the thread is up.
-	 *     Supply checks are normally done only when <code>activeDoseTime == Drug.TIME_MORNING</code>,
-	 *     i.e. only once per day.
+	 * @param forceRestart if set to <code>true</code> forces the thread to restart, even if it was running.
+	 * @param delayFirstNotification if set to <code>true</code> the first notification will be somewhat delayed.
 	 */
-	private synchronized void restartThread(boolean forceRestart)
+	private synchronized void restartThread(boolean forceRestart, final boolean delayFirstNotification)
 	{
 		final boolean wasRunning = isThreadRunning();
 
@@ -249,8 +255,7 @@ public class NotificationService extends Service implements
 				checkSupplies(true);
 				
 				final Preferences settings = Preferences.instance();
-				final boolean hasWrappingDoseTimeNight = settings.hasWrappingDoseTimeNight();
-				boolean delayFirstNotification = true;
+				boolean doDelayFirstNotification = delayFirstNotification;
 				
 				try
 				{
@@ -279,7 +284,7 @@ public class NotificationService extends Service implements
 							Log.d(TAG, "Sleeping " + new DumbTime(sleepTime)  +" until beginning of dose time " + nextDoseTime);
 							
 							sleep(sleepTime);
-							delayFirstNotification = false;
+							doDelayFirstNotification = false;
 
 							if(settings.getActiveDoseTime() != nextDoseTime)
 								Log.e(TAG, "Unexpected dose time, expected " + nextDoseTime);
@@ -299,9 +304,9 @@ public class NotificationService extends Service implements
 
 						if(pendingIntakeCount != 0)
 						{
-							if(delayFirstNotification && wasRunning)
+							if(doDelayFirstNotification && wasRunning)
 							{
-								delayFirstNotification = false;
+								doDelayFirstNotification = false;
 								Log.d(TAG, "Delaying first notification");
 								sleep(Constants.NOTIFICATION_INITIAL_DELAY);
 							}

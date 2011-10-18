@@ -24,8 +24,11 @@ package at.caspase.rxdroid;
 import java.util.Calendar;
 
 import android.content.Context;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.StrikethroughSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
@@ -61,6 +64,8 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	private Drug mDrug;
 	private int mDoseTime = -1;
 	private Calendar mDate;
+	
+	private boolean mHasDoseOnDate = true;
 	
 	private int mStatus = STATUS_INDETERMINATE;
 
@@ -154,17 +159,30 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	public void setInfo(Calendar date, Drug drug)
 	{
+		final boolean doUpdateView;
+		
 		if(date != null)
 			mDate = date;
 
 		if(drug != null)
 		{
 			mDrug = drug;
-			updateView();
+			doUpdateView = true;
 		}
+		else
+			doUpdateView = false;
 		
 		if(mDate != null && mDrug != null)
+		{			
+			mHasDoseOnDate = mDrug.hasDoseOnDate(mDate);
 			updateIntakeStatusIcon();
+		}
+		else
+			mHasDoseOnDate = true;
+		
+		// we have to delay the call to updateView as mHasDoseOnDate has to be set		
+		if(doUpdateView)
+			updateView();
 	}
 	
 	public boolean hasInfo(Calendar date, Drug drug)
@@ -273,14 +291,16 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			return;
 
 		final Fraction dose = mDrug.getDose(mDoseTime);
-		boolean hasDose = mDate != null ? mDrug.hasDoseOnDate(mDate) : true;
 		
 		if(!Fraction.ZERO.equals(dose))
 		{
-			if(hasDose)
+			if(mHasDoseOnDate)
 				mDoseText.setText(dose.toString());
 			else
-				mDoseText.setText(dose + "\u02DA");
+			{
+				// TODO this is ugly!			
+				mDoseText.setText("(" + dose + ")");
+			}
 		}
 		else
 			mDoseText.setText("0");
@@ -299,25 +319,22 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		
 		mStatus = STATUS_INDETERMINATE;		
 		
-		if(mDrug.getDose(mDoseTime).compareTo(0) != 0)
-		{
-			final Calendar end = (Calendar) mDate.clone();
-			end.add(Calendar.MILLISECOND, (int) Preferences.instance().getTrueDoseTimeEndOffset(mDoseTime));
-				
-			if(DateTime.now().compareTo(end) != -1)
-				mStatus = STATUS_FORGOTTEN;
-			
+		if(mHasDoseOnDate)
+		{		
+			if(mDrug.getDose(mDoseTime).compareTo(0) != 0)
+			{
+				final Calendar end = (Calendar) mDate.clone();
+				end.add(Calendar.MILLISECOND, (int) Preferences.instance().getTrueDoseTimeEndOffset(mDoseTime));
+					
+				if(DateTime.now().compareTo(end) != -1)
+					mStatus = STATUS_FORGOTTEN;			
+			}			
 		}
 		
-		switch(mStatus)
-		{
-			case STATUS_FORGOTTEN:
-				mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
-				break;
-				
-			default:
-				mIntakeStatus.setImageDrawable(null);
-		}
+		if(mStatus == STATUS_FORGOTTEN)			
+			mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
+		else
+			mIntakeStatus.setImageDrawable(null);
 	}
 	
 	private void markAsTaken()

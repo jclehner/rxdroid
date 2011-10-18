@@ -117,7 +117,15 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			builder.setTitle(R.string._title_error);
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setMessage(R.string._msg_err_empty_drug_name);
-			builder.setPositiveButton(android.R.string.ok, null);
+			builder.setNegativeButton(android.R.string.cancel, null);
+			builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					finish();					
+				}
+			});
 			builder.show();
 
 			return;
@@ -178,8 +186,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		else if("morning".equals(key) || "noon".equals(key) || "evening".equals(key) || "night".equals(key))
 			mDrug.setDose(DosePreference.getDoseTimeFromKey(key), (Fraction) newValue);
 		else if("frequency".equals(key))
-		{
-			int frequency = toInt(newValue);
+		{			
+			final int frequency = toInt(newValue);
 
 			if(frequency != Drug.FREQ_DAILY)
 			{
@@ -203,7 +211,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				updatePreferences();
 			}
 			
-			return true;
+			// the user might cancel a dialog in one of the handle<foobar>Frequency()
+			// functions. by returning false here, we ensure that setValueIndex() is
+			// only called if the frequency was actually changed
+			return false;
 		}
 		else if("drug_form".equals(key))
 			mDrug.setForm(toInt(newValue));
@@ -280,7 +291,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		// mark all preferences as non-persisting!
 		for(String key : PREF_KEYS)
 		{
-			Preference pref = findPreference(key);
+			final Preference pref = findPreference(key);
 			pref.setPersistent(false);
 			pref.setOnPreferenceChangeListener(this);
 		}
@@ -351,8 +362,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		// intake frequency
 
-		int frequency = mDrug.getFrequency();
-		String summary = null;
+		final int frequency = mDrug.getFrequency();
+		final String summary;
 
 		switch(frequency)
 		{
@@ -506,30 +517,23 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	}
 	
 	private void handleWeekdayFrequency()
-	{
-		final boolean[] checkedItems;
-		long frequencyArg = 0;
+	{	
+		// if this changes the drug's frequency, all frequency options are reset. if the
+		// drug's frequency already was FREQ_WEEKDAYS, this call will not change anything
+		mDrug.setFrequency(Drug.FREQ_WEEKDAYS);
 		
-		if(mDrug.getFrequency() != Drug.FREQ_WEEKDAYS)
+		long frequencyArg = mDrug.getFrequencyArg();
+		final boolean[] checkedItems = SimpleBitSet.toBooleanArray(frequencyArg, Constants.LONG_WEEK_DAY_NAMES.length);
+				
+		if(frequencyArg == 0)
 		{
-			mDrug.setFrequency(Drug.FREQ_WEEKDAYS);
-			checkedItems = new boolean[Constants.LONG_WEEK_DAY_NAMES.length];
+			// check the current weekday if none are selected
+			final int weekday = DateTime.now().get(Calendar.DAY_OF_WEEK);
+			final int index = CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);				
+			checkedItems[index] = true;
+			frequencyArg |= 1 << index;
 		}
-		else
-		{
-			frequencyArg = mDrug.getFrequencyArg();
-			checkedItems = SimpleBitSet.toBooleanArray(frequencyArg, Constants.LONG_WEEK_DAY_NAMES.length);
-			
-			if(frequencyArg == 0)
-			{
-				// check the current weekday if none are selected
-				final int weekday = DateTime.now().get(Calendar.DAY_OF_WEEK);
-				final int index = CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);				
-				checkedItems[index] = true;
-				frequencyArg |= 1 << index;
-			}
-		}	
-		
+				
 		final SimpleBitSet bitSet = new SimpleBitSet(frequencyArg);
 		
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);

@@ -24,6 +24,7 @@ package at.caspase.rxdroid;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.util.Log;
 import at.caspase.rxdroid.util.Hasher;
 
 
@@ -214,6 +215,14 @@ public class Fraction extends Number implements Comparable<Number>
 		return hasher.getHashCode();
 	}
 
+	
+	/*public int compareTo(Number other)
+	{
+		int cmp = compareTo_(other);
+		Log.d(TAG, "\"" + toString() + "\".compareTo((" + other.getClass().getSimpleName() + ") " + other + ") = " + cmp);
+		return cmp;		
+	}*/
+	
 	@Override
 	public int compareTo(Number other)
 	{

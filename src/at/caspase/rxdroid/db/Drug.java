@@ -307,19 +307,15 @@ public class Drug extends Entry
 		if(frequency > FREQ_WEEKDAYS)
 			throw new IllegalArgumentException();
 		
-		this.frequency = frequency;
+		if(frequency == this.frequency)
+			return;
 		
-		// sanitize database fields
-		switch(frequency)
-		{
-			case FREQ_DAILY:
-				frequencyArg = 0;
-				// fall through
-				
-			case FREQ_WEEKDAYS:
-				frequencyOrigin = null;
-				break;			
-		}
+		Log.d(TAG, "setFrequency(" + frequency + ") on " + toString());
+		
+		// the preference was changed, so reset all frequency-related settings		
+		this.frequency = frequency;
+		this.frequencyArg = 0;
+		this.frequencyOrigin = DateTime.today().getTime();
 	}
 
 	/**

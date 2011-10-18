@@ -102,6 +102,9 @@ public final class DateTime
 
 	public static String toString(Calendar calendar)
 	{
+		if(calendar == null)
+			return "null";
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
 		return sdf.format(calendar.getTime());
 	}
