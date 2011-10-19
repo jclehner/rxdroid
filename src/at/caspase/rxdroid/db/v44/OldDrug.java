@@ -68,6 +68,7 @@ public class OldDrug extends Entry
 		return drug;		
 	}
 	
+	@SuppressWarnings("unused")
 	private static final String TAG = OldDrug.class.getName();
 	private static final long serialVersionUID = -2569745648137404894L;
 

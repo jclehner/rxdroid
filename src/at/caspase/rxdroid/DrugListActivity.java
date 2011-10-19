@@ -24,7 +24,6 @@ package at.caspase.rxdroid;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.Activity;
@@ -38,7 +37,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.SpannableString;
@@ -60,7 +58,6 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
-import android.view.animation.Interpolator;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -77,6 +74,7 @@ import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.Util;
 
 public class DrugListActivity extends Activity implements
@@ -99,7 +97,6 @@ public class DrugListActivity extends Activity implements
 	private static final int TAG_ID = R.id.tag_drug_id;
 
 	private LayoutInflater mInflater;
-	private int mViewFactoryId = 0;
 
 	private ViewSwitcher mViewSwitcher;
 	private GestureDetector mGestureDetector;	
@@ -364,15 +361,8 @@ public class DrugListActivity extends Activity implements
 	}
 
 	@Override
-	public View makeView() 
-	{
-		final ListView lv = new ListView(this);
-		lv.setId(++mViewFactoryId);
-		lv.setBackgroundColor((mViewFactoryId % 2) == 0 ? Color.GREEN : Color.RED);
-		
-		Log.d(TAG, "makeView: mViewFactoryId=" + mViewFactoryId);
-		
-		return lv;
+	public View makeView() {
+		return new ListView(this);
 	}
 	
 	/////////////	
@@ -663,9 +653,6 @@ public class DrugListActivity extends Activity implements
 			//
 			// All measurements were done using an HTC Desire running Cyanogenmod 7!
 			
-			Log.d(TAG, "getView: position=" + position);
-			Log.d(TAG, "  current view id: " + mViewSwitcher.getCurrentView().getId());
-			
 			final DoseViewHolder holder;
 
 			if(v == null)
@@ -703,11 +690,14 @@ public class DrugListActivity extends Activity implements
 			// means that this part alone will, in total, take more than 100ms to complete 
 			// for 4 drugs.
 			
+			Timer t = new Timer();
 			for(DoseView doseView : holder.doseViews)
 			{
 				if(!doseView.hasInfo(mAdapterDate, drug))
 					doseView.setInfo(mAdapterDate, drug);
-			}	
+			}
+			
+			Log.d(TAG, "getView: " + t);
 			
 			return v;
 		}		

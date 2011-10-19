@@ -149,7 +149,10 @@ public class NotificationService extends Service implements
 	public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
 	{
 		if(key.startsWith("time_") || key.startsWith("debug_"))
+		{
+			Log.d(TAG, "Preference key " + key + " changed, restarting thread");
 			restartThread(true);
+		}
 		else
 			Log.d(TAG, "Ignoring preference change of " + key);
 	}
@@ -192,7 +195,6 @@ public class NotificationService extends Service implements
 		if((flags & OnDatabaseChangedListener.FLAG_IGNORE) == 0)
 			restartThread(true);
 	}
-
 	
 	/**
 	 * Calls <code>restartThread(forceRestart, true)</code>.

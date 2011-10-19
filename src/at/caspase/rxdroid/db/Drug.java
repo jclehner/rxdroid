@@ -33,9 +33,7 @@ import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
-import at.caspase.rxdroid.util.SimpleBitSet;
 
-import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;

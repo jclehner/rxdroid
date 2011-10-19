@@ -25,7 +25,6 @@ import java.util.Calendar;
 
 import android.text.format.DateUtils;
 import at.caspase.rxdroid.R;
-import at.caspase.rxdroid.R.id;
 import at.caspase.rxdroid.db.Drug;
 
 public final class Constants

@@ -26,7 +26,6 @@ import java.util.GregorianCalendar;
 
 import android.util.Log;
 import at.caspase.rxdroid.DumbTime;
-import at.caspase.rxdroid.util.Constants;
 
 public enum SleepState
 {

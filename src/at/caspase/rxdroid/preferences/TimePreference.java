@@ -39,7 +39,6 @@ import at.caspase.rxdroid.util.Util;
 
 public class TimePreference extends Preference implements OnTimeSetListener, OnPreferenceClickListener
 {
-	@SuppressWarnings("unused")
 	private static final String TAG = TimePreference.class.getName();
 
 	private static final int WRAP_AFTER = 1;

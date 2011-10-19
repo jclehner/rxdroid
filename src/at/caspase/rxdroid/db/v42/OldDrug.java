@@ -22,13 +22,10 @@
 package at.caspase.rxdroid.db.v42;
 
 import java.sql.Date;
-import java.util.Calendar;
 
 import at.caspase.rxdroid.Fraction;
-import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entry;
-import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
 
 import com.j256.ormlite.field.DataType;

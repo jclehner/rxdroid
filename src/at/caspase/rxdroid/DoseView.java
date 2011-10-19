@@ -24,11 +24,8 @@ package at.caspase.rxdroid;
 import java.util.Calendar;
 
 import android.content.Context;
-import android.text.SpannableString;
 import android.text.TextWatcher;
-import android.text.style.StrikethroughSpan;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;

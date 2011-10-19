@@ -22,7 +22,6 @@
 package at.caspase.rxdroid;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;

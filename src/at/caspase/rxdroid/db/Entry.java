@@ -24,8 +24,6 @@ package at.caspase.rxdroid.db;
 import java.io.Serializable;
 import java.util.Collection;
 
-import android.util.Log;
-
 import com.j256.ormlite.field.DatabaseField;
 
 /**
