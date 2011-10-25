@@ -41,6 +41,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entry;
@@ -53,9 +54,9 @@ import at.caspase.rxdroid.util.Hasher;
 
 /**
  * Primary notification service.
- * 
+ *
  * @author Joseph Lehner
- * 
+ *
  */
 public class NotificationService extends Service implements
 		OnDatabaseChangedListener, OnSharedPreferenceChangeListener
@@ -198,11 +199,11 @@ public class NotificationService extends Service implements
 
 	/**
 	 * Check if the service is currently running.
-	 * 
+	 *
 	 * Note that this function might return <code>false</code> even if the
 	 * service is running (from an Android point of view) when the service
 	 * thread is not currently running.
-	 * 
+	 *
 	 * @return <code>true</code> if the service thread is running.
 	 */
 	public static boolean isRunning()
@@ -236,7 +237,7 @@ public class NotificationService extends Service implements
 	 * to determine when the next notification should be posted. Currently, the
 	 * worker thread is restarted when <em>any</em> database changes occur (see
 	 * DatabaseWatcher) or when the user opens the app.
-	 * 
+	 *
 	 * @param forceRestart
 	 *            if set to <code>true</code> forces the thread to restart, even
 	 *            if it was running.
@@ -248,34 +249,34 @@ public class NotificationService extends Service implements
 	{
 		if((flags & FLAG_IGNORE) != 0)
 			return;
-		
+
 		final boolean forceRestart = (flags & RESTART_FORCE) != 0;
 		final boolean delayFirstNotification;
-		
+
 		if(forceRestart)
 			delayFirstNotification = true;
 		else
 			delayFirstNotification = (flags & RESTART_DELAYFIRST) != 0;
-				
-		Log.d(TAG, "restarThread(" + flags + ")");		
+
+		Log.d(TAG, "restarThread(" + flags + ")");
 		Log.d(TAG, "  forceRestart=" + forceRestart + ", delayFirstNotification=" + delayFirstNotification);
 		Log.d(TAG, "  mSnoozeType=" + mSnoozeType);
-		
+
 		final boolean wasRunning = isThreadRunning();
 		if(wasRunning)
 		{
 			if(!forceRestart)
 			{
-				Log.d(TAG, "  ignoring service restart request");			
+				Log.d(TAG, "  ignoring service restart request");
 				return;
 			}
-						
+
 			mThread.interrupt();
 		}
 
 		Log.d(TAG, "  wasRunning=" + wasRunning);
-		
-		mSnoozeLock = new Object();		
+
+		mSnoozeLock = new Object();
 		mThread = new Thread(new Runnable() {
 
 			@Override
@@ -300,26 +301,26 @@ public class NotificationService extends Service implements
 
 				clearAllNotifications();
 				checkSupplies(true);
-				
+
 				final Preferences settings = Preferences.instance();
-				boolean doDelayFirstNotification = delayFirstNotification;				
-				
+				boolean doDelayFirstNotification = delayFirstNotification;
+
 				try
 				{
 					while(true)
 					{
 						final Calendar time = DateTime.now();
-						
+
 						final int activeDoseTime = settings.getActiveDoseTime(time);
 						final int nextDoseTime = settings.getNextDoseTime(time);
 						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
-						
-						final Calendar date = settings.getActiveDate(time);						
+
+						final Calendar date = settings.getActiveDate(time);
 						mNotificationIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
-						
-						Log.d(TAG, "date: " + DateTime.toString(date));						
+
+						Log.d(TAG, "date: " + DateTime.toString(date));
 						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
-						
+
 						if(lastDoseTime >= 0)
 							checkForForgottenIntakes(date, lastDoseTime);
 
@@ -328,7 +329,7 @@ public class NotificationService extends Service implements
 							long sleepTime = settings.getMillisUntilDoseTimeBegin(time, nextDoseTime);
 
 							Log.d(TAG, "sleeping " + new DumbTime(sleepTime)  +" until beginning of dose time " + nextDoseTime);
-							
+
 							sleep(sleepTime);
 							doDelayFirstNotification = false;
 
@@ -342,7 +343,7 @@ public class NotificationService extends Service implements
 							cancelNotification(R.id.notification_intake_forgotten);
 							checkSupplies(false);
 						}
-						
+
 						final int pendingIntakeCount = countOpenIntakes(date, activeDoseTime);
 
 						Log.d(TAG, "Pending intakes: " + pendingIntakeCount);
@@ -358,34 +359,38 @@ public class NotificationService extends Service implements
 
 							final String contentText = Integer.toString(pendingIntakeCount);
 							final long snoozeTime = settings.getSnoozeTime();
-							
+
 							do
-							{								
-								postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, 
+							{
+								postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL,
 										contentText, mSnoozeType == SNOOZE_AUTO);
-								
+
 								final Calendar now = DateTime.now();
 								final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(now, activeDoseTime);
-								
+
 								if(mSnoozeType == SNOOZE_DISABLED || millisUntilDoseTimeEnd < snoozeTime)
 									break;
-								
+
 								if(mSnoozeType == SNOOZE_MANUAL)
 								{
 									final long waitMillis = millisUntilDoseTimeEnd - snoozeTime;
-									
-									SleepState.INSTANCE.onEnterSleep(waitMillis);
-									synchronized(mSnoozeLock) {
+
+									synchronized(mSnoozeLock)
+									{
+										SleepState.INSTANCE.onEnterSleep(waitMillis);
 										mSnoozeLock.wait(waitMillis);
+										SleepState.INSTANCE.onFinishedSleep();
 									}
-									SleepState.INSTANCE.onFinishedSleep();
+
+									//Toast.makeText(sInstance, "Snoozing", Toast.LENGTH_SHORT).show();
+
 									cancelNotification(R.id.notification_intake_pending);
 								}
-																
+
 								sleep(snoozeTime);
-								
+
 							} while(true);
-						}						
+						}
 
 						final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(DateTime.now(), activeDoseTime);
 						if(millisUntilDoseTimeEnd > 0)
@@ -756,16 +761,16 @@ public class NotificationService extends Service implements
 		try
 		{
 			os = new FileOutputStream(crashLog);
-			
+
 			StringBuilder sb = new StringBuilder();
 			sb.append("Time: " + DateTime.toString(DateTime.now()) + "\n\n");
 			sb.append("Cause: " + cause + "\n");
-			
+
 			for(StackTraceElement e : cause.getStackTrace())
 				sb.append("  " + e.getFileName() + ":" + e.getLineNumber() + ", in " + e.getMethodName() + "\n");
-			
+
 			sb.append("\n\n" + "Closing thread...");
-			
+
 			os.write(sb.toString().getBytes());
 			os.close();
 		}

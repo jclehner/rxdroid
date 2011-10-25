@@ -173,6 +173,7 @@ public class DrugListActivity extends Activity implements
 		{
 			Log.d(TAG, "onResume: Activity was started by notification");
 			NotificationService.requestSnooze();
+			intent.putExtra(EXTRA_STARTED_BY_NOTIFICATION, false);
 		}
 	}
 
