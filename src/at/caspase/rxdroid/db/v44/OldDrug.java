@@ -294,20 +294,5 @@ public class OldDrug extends Entry
 		};
 
 		return members;
-	}	
-
-	private boolean hasDoseOnWeekday(int calWeekday)
-	{
-		if(frequency != FREQ_WEEKDAYS)
-			throw new IllegalStateException("frequency != FREQ_WEEKDAYS");
-		
-		// first, translate Calendar's weekday representation to our
-		// own.
-		
-		int weekday = CollectionUtils.indexOf(calWeekday, Constants.WEEK_DAYS);
-		if(weekday == -1)
-			throw new IllegalArgumentException("Argument " + calWeekday + " does not map to a valid weekday");
-		
-		return (frequencyArg & (1 << weekday)) != 0;		
 	}
 }

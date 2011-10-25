@@ -22,6 +22,8 @@
 package at.caspase.rxdroid.util;
 
 import android.content.Context;
+import android.preference.ListPreference;
+import android.preference.Preference;
 import android.util.AttributeSet;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Drug;
@@ -103,5 +105,18 @@ public final class Util
 			return 0;
 		
 		return Integer.parseInt(str, 10);	
+	}
+	
+
+	public static void populateListPreferenceEntryValues(Preference preference)
+	{
+		ListPreference pref = (ListPreference) preference;
+		int entryCount = pref.getEntries().length;
+
+		String[] values = new String[entryCount];
+		for(int i = 0; i != entryCount; ++i)
+			values[i] = Integer.toString(i);
+
+		pref.setEntryValues(values);
 	}
 }

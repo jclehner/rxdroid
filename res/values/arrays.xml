@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="drug_forms">
-    	<item>Tablet</item>
-    	<item>Injection</item>
-    	<item>Spray</item>
-    	<item>Drop</item>
-    	<item>Gel</item>
-    	<item>Other</item>
+    	<item>@string/_title_tablet</item>
+    	<item>@string/_title_injection</item>
+    	<item>@string/_title_spray</item>
+    	<item>@string/_title_drop</item>
+    	<item>@string/_title_gel</item>
+    	<item>@string/_title_other</item>
     </string-array>
     
     <string-array name="drug_frequency">
-    	<item>Daily</item>
-    	<item>Every N days</item>
-    	<item>Pick days</item>
+    	<item>@string/_title_daily</item>
+    	<item>@string/_title_every_n_days</item>
+    	<item>@string/_title_pick_days</item>
     </string-array>
-    
-    <string-array name="frequency_every_other_day">
-    	<item>Today</item>
-    	<item>Tomorrow</item>
-    </string-array>
+   
+	<string-array name="snooze_types">
+		<item>@string/_title_dont_snooze</item>
+		<item>@string/_title_repeat_alarm</item>
+		<item>@string/_title_snooze</item>
+	</string-array>
 </resources>

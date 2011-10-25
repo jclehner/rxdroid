@@ -153,6 +153,39 @@ public class PreferencesTest extends AndroidTestCase
 			Log.d(TAG, "-----------------------------");		
 		}
 	}
+	
+	public void testGetActiveDate()
+	{
+		// [0] ... hours
+		// [1] ... minutes
+		// [2] ... + days
+		
+		final int[][] testCases = {
+			{      18, 30, 0 },
+			{      21, 30, 0 },
+			{ 24 + 00, 30, 0 },
+			{ 24 + 02, 30, 1 },
+			{ 24 + 05, 30, 1 },
+			{ 24 + 06, 30, 1 },
+			{ 24 + 24, 30, 1 },
+			{ 48 + 06, 30, 2 }
+		};
+		
+		final Calendar today = DateTime.today();
+		
+		for(int i = 0; i != testCases.length; ++i)
+		{
+			final Calendar time = (Calendar) today.clone();
+			time.add(Calendar.HOUR_OF_DAY, testCases[i][0]);
+			time.add(Calendar.MINUTE, testCases[i][1]);
+			
+			final Calendar expected = (Calendar) today.clone();
+			expected.add(Calendar.DAY_OF_MONTH, testCases[i][2]);
+			
+			assertEquals(expected, Preferences.instance().getActiveDate(time));		
+		}
+		
+	}
 
 	@Override
 	protected void setUp()
@@ -209,5 +242,9 @@ public class PreferencesTest extends AndroidTestCase
 			e.putString(key, mPrefBackup.get(key));
 
 		e.commit();
+	}
+	
+	private static void assertEquals(Calendar expected, Calendar actual) {
+		assertEquals(DateTime.toString(expected), DateTime.toString(actual));
 	}
 }

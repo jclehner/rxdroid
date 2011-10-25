@@ -38,6 +38,7 @@ import android.widget.TextView;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.debug.SleepState;
 import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Util;
 
 public class PreferencesActivity extends PreferenceActivity
 {
@@ -59,6 +60,8 @@ public class PreferencesActivity extends PreferenceActivity
 		final Preference versionPref = findPreference("version");
 		if(versionPref != null)
 			versionPref.setSummary(Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION);
+		
+		Util.populateListPreferenceEntryValues(findPreference("snooze_type"));		
 	}
 
 	@Override

@@ -230,12 +230,12 @@ public final class Database
 	
 	public static synchronized List<Integer> getOpenIntakeDoseTimes(Drug drug, Calendar date)
 	{
-		final List<Integer> openIntakeDoseTimes = Arrays.asList(Constants.DOSE_TIMES);
+		final LinkedList<Integer> openIntakeDoseTimes = new LinkedList<Integer>(Arrays.asList(Constants.DOSE_TIMES));
 		
 		for(int doseTime = Drug.TIME_MORNING; doseTime != Drug.TIME_INVALID; ++doseTime)
 		{
 			if(!findIntakes(drug, date, doseTime).isEmpty())
-				openIntakeDoseTimes.remove(doseTime);			
+				openIntakeDoseTimes.remove(doseTime);	
 		}
 		
 		Log.d(TAG, "openIntakeDoseTimes=" + Arrays.toString(openIntakeDoseTimes.toArray()));

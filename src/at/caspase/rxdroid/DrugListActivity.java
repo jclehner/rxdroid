@@ -93,6 +93,7 @@ public class DrugListActivity extends Activity implements
 	//public static final int CMENU_SHOW_SUPPLY_STATUS = 3;
 
 	public static final String EXTRA_DAY = "day";
+	public static final String EXTRA_STARTED_BY_NOTIFICATION = "started_from_notification";
 
 	private static final int TAG_ID = R.id.tag_drug_id;
 
@@ -153,12 +154,11 @@ public class DrugListActivity extends Activity implements
 		}
 		else
 			throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());
-
+		
 		if(!NotificationService.isRunning())
 		{
-			startNotificationService();
+			startNotificationService(0);			
 			Log.w(TAG, "onResume: Notification service was not running");
-
 			if(!mSharedPreferences.getBoolean("debug_enabled", false))
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -168,6 +168,11 @@ public class DrugListActivity extends Activity implements
 				builder.setPositiveButton(android.R.string.ok, null);
 				builder.show();
 			}
+		}
+		else if(intent.getBooleanExtra(EXTRA_STARTED_BY_NOTIFICATION, false))
+		{
+			Log.d(TAG, "onResume: Activity was started by notification");
+			NotificationService.requestSnooze();
 		}
 	}
 
@@ -417,10 +422,11 @@ public class DrugListActivity extends Activity implements
 	
 	/////////////
 
-	private void startNotificationService()
+	private void startNotificationService(int restartFlags)
 	{
 		Intent serviceIntent = new Intent();
 		serviceIntent.setClass(this, NotificationService.class);
+		serviceIntent.putExtra(NotificationService.EXTRA_RESTART_FLAGS, restartFlags);
 
 		startService(serviceIntent);
 	}

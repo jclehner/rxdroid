@@ -148,16 +148,15 @@ public class Preferences
 		return getTimePreference(prefKeyPrefixes[doseTime] + suffix);
 	}
 	
-	public Calendar getActiveDate()
+	public Calendar getActiveDate(Calendar time)
 	{
-		final Calendar now = DateTime.now();
-		final Calendar date = DateTime.date(now);
-		final int activeDoseTime = getActiveDoseTime(now);
+		final Calendar date = DateTime.date(time);
+		final int activeDoseTime = getActiveDoseTime(time);
 		
 		if(activeDoseTime == Drug.TIME_NIGHT && hasWrappingDoseTimeNight())
 		{
 			final DumbTime end = new DumbTime(getDoseTimeEndOffset(Drug.TIME_NIGHT));
-			if(DateTime.isWithinRange(now, new DumbTime(0), end))
+			if(DateTime.isWithinRange(time, new DumbTime(0), end))
 				date.add(Calendar.DAY_OF_MONTH, -1);
 		}
 		

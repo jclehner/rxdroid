@@ -53,18 +53,27 @@ import at.caspase.rxdroid.util.Hasher;
 
 /**
  * Primary notification service.
- *
+ * 
  * @author Joseph Lehner
- *
+ * 
  */
 public class NotificationService extends Service implements
 		OnDatabaseChangedListener, OnSharedPreferenceChangeListener
 {
-	public static final String EXTRA_FORCE_RESTART = "force_restart";
-	
+	public static final String EXTRA_RESTART_FLAGS = "restart_flags";
+
+	public static final int RESTART_FORCE = 64 << 1;
+	public static final int RESTART_DELAYFIRST = 64 << 2;
+
 	private static final String TAG = NotificationService.class.getSimpleName();
 
-	private Intent mIntent;
+	private static final int SNOOZE_DISABLED = 0;
+	private static final int SNOOZE_AUTO = 1;
+	private static final int SNOOZE_MANUAL = 2;
+
+	private int mSnoozeType = SNOOZE_DISABLED;
+
+	private Intent mNotificationIntent;
 	private SharedPreferences mSharedPreferences;
 
 	private NotificationManager mNotificationManager;
@@ -73,6 +82,8 @@ public class NotificationService extends Service implements
 
 	private Thread mThread;
 	private static NotificationService sInstance = null;
+
+	private Object mSnoozeLock;
 
 	@Override
 	public void onCreate()
@@ -83,13 +94,17 @@ public class NotificationService extends Service implements
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		clearAllNotifications();
 
-		mIntent = new Intent(Intent.ACTION_VIEW);
-		mIntent.setClass(getApplicationContext(), DrugListActivity.class);
-		mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		mNotificationIntent = new Intent(Intent.ACTION_VIEW);
+		mNotificationIntent.setClass(getApplicationContext(), DrugListActivity.class);
+		mNotificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		mNotificationIntent.putExtra(DrugListActivity.EXTRA_STARTED_BY_NOTIFICATION, true);
 
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-		Database.registerOnChangedListener(this);		
+
+		mSnoozeType = Integer.parseInt(mSharedPreferences.getString("snooze_type", "0"));
+
+		Database.registerOnChangedListener(this);
 
 		GlobalContext.set(getApplicationContext());
 		Database.load();
@@ -97,17 +112,18 @@ public class NotificationService extends Service implements
 
 	/**
 	 * Starts the service if it has not been started yet.
-	 *
-	 * You can force the service thread to restart by passing the <code>EXTRA_FORCE_RESTART=true</code> extra.
+	 * <p>
+	 * You can pass options to {@link #restartThread(int)} by setting flags from
+	 * <code>RESTART_*</code> in <code>EXTRA_RESTART_FLAGS</code>.
 	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
-		super.onStartCommand(intent, flags, startId);
+		// super.onStartCommand(intent, flags, startId);
 
-		boolean forceRestart = (intent != null && intent.getBooleanExtra(EXTRA_FORCE_RESTART, false));
-		restartThread(forceRestart);
+		Log.d(TAG, "onStartCommand: intent=" + intent);
 
+		restartThread(intent != null ? intent.getIntExtra(EXTRA_RESTART_FLAGS, 0) : 0);
 		return START_STICKY;
 	}
 
@@ -116,7 +132,7 @@ public class NotificationService extends Service implements
 	{
 		super.onDestroy();
 		setInstance(null);
-		
+
 		stopThread();
 		cancelAllNotifications(true);
 		mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
@@ -126,44 +142,67 @@ public class NotificationService extends Service implements
 	}
 
 	@Override
-	public IBinder onBind(Intent arg0) {
+	public IBinder onBind(Intent arg0)
+	{
 		return null;
 	}
-	
+
 	@Override
-	public void onEntryCreated(Entry entry, int flags) {		
-		restartThread(flags);
+	public void onEntryCreated(Entry entry, int flags)
+	{
+		restartThread(flags | RESTART_FORCE);
 	}
-	
+
 	@Override
-	public void onEntryUpdated(Entry entry, int flags) {
-		restartThread(flags);
+	public void onEntryUpdated(Entry entry, int flags)
+	{
+		restartThread(flags | RESTART_FORCE);
 	}
-	
+
 	@Override
-	public void onEntryDeleted(Entry entry, int flags) {
-		restartThread(flags);
+	public void onEntryDeleted(Entry entry, int flags)
+	{
+		restartThread(flags | RESTART_FORCE);
 	}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
 	{
-		if(key.startsWith("time_") || key.startsWith("debug_"))
+		if(key.startsWith("time_") || key.startsWith("debug_") || key.startsWith("snooze_"))
 		{
 			Log.d(TAG, "Preference key " + key + " changed, restarting thread");
-			restartThread(true);
+			restartThread(RESTART_FORCE);
 		}
+		else if(key.equals("snooze_type"))
+			mSnoozeType = Integer.parseInt(mSharedPreferences.getString("snooze_type", "0"), 10);
 		else
 			Log.d(TAG, "Ignoring preference change of " + key);
 	}
 
+	public static void requestSnooze()
+	{
+		if(sInstance != null && sInstance.mSnoozeLock != null && sInstance.mSnoozeType == SNOOZE_MANUAL)
+		{
+			try
+			{
+				synchronized (sInstance.mSnoozeLock) {
+					sInstance.mSnoozeLock.notify();
+				}
+			}
+			catch(IllegalStateException e)
+			{
+				Log.w(TAG, "requestSnooze: " + e.getMessage());
+			}
+		}
+	}
+
 	/**
 	 * Check if the service is currently running.
-	 *
-	 * Note that this function might return <code>false</code> even if the service is
-	 * running (from an Android point of view) when the service thread is not currently
-	 * running.
-	 *
+	 * 
+	 * Note that this function might return <code>false</code> even if the
+	 * service is running (from an Android point of view) when the service
+	 * thread is not currently running.
+	 * 
 	 * @return <code>true</code> if the service thread is running.
 	 */
 	public static boolean isRunning()
@@ -187,22 +226,9 @@ public class NotificationService extends Service implements
 		Log.d(TAG, "  mThread.isInterrupted(): " + isInterrupted);
 
 		// TODO does isAlive() imply !isInterrupted() ?
-		return mThread.isAlive() /*&& !mThread.isInterrupted()*/;
+		return mThread.isAlive() /* && !mThread.isInterrupted() */;
 	}
-	
-	private void restartThread(int flags)
-	{
-		if((flags & OnDatabaseChangedListener.FLAG_IGNORE) == 0)
-			restartThread(true);
-	}
-	
-	/**
-	 * Calls <code>restartThread(forceRestart, true)</code>.
-	 */
-	private synchronized void restartThread(boolean forceRestart) {
-		restartThread(forceRestart, true);
-	}
-	
+
 	/**
 	 * (Re)starts the worker thread.
 	 * <p>
@@ -210,27 +236,46 @@ public class NotificationService extends Service implements
 	 * to determine when the next notification should be posted. Currently, the
 	 * worker thread is restarted when <em>any</em> database changes occur (see
 	 * DatabaseWatcher) or when the user opens the app.
-	 *
-	 * @param forceRestart if set to <code>true</code> forces the thread to restart, even if it was running.
-	 * @param delayFirstNotification if set to <code>true</code> the first notification will be somewhat delayed.
+	 * 
+	 * @param forceRestart
+	 *            if set to <code>true</code> forces the thread to restart, even
+	 *            if it was running.
+	 * @param delayFirstNotification
+	 *            if set to <code>true</code> the first notification will be
+	 *            somewhat delayed.
 	 */
-	private synchronized void restartThread(boolean forceRestart, final boolean delayFirstNotification)
+	private synchronized void restartThread(int flags)
 	{
+		if((flags & FLAG_IGNORE) != 0)
+			return;
+		
+		final boolean forceRestart = (flags & RESTART_FORCE) != 0;
+		final boolean delayFirstNotification;
+		
+		if(forceRestart)
+			delayFirstNotification = true;
+		else
+			delayFirstNotification = (flags & RESTART_DELAYFIRST) != 0;
+				
+		Log.d(TAG, "restarThread(" + flags + ")");		
+		Log.d(TAG, "  forceRestart=" + forceRestart + ", delayFirstNotification=" + delayFirstNotification);
+		Log.d(TAG, "  mSnoozeType=" + mSnoozeType);
+		
 		final boolean wasRunning = isThreadRunning();
-
 		if(wasRunning)
 		{
 			if(!forceRestart)
 			{
-				Log.d(TAG, "Ignoring service restart request");
+				Log.d(TAG, "  ignoring service restart request");			
 				return;
 			}
-
+						
 			mThread.interrupt();
 		}
 
-		Log.d(TAG, "restartThread(" + forceRestart + "): wasRunning=" + wasRunning);
-
+		Log.d(TAG, "  wasRunning=" + wasRunning);
+		
+		mSnoozeLock = new Object();		
 		mThread = new Thread(new Runnable() {
 
 			@Override
@@ -257,7 +302,7 @@ public class NotificationService extends Service implements
 				checkSupplies(true);
 				
 				final Preferences settings = Preferences.instance();
-				boolean doDelayFirstNotification = delayFirstNotification;
+				boolean doDelayFirstNotification = delayFirstNotification;				
 				
 				try
 				{
@@ -267,15 +312,14 @@ public class NotificationService extends Service implements
 						
 						final int activeDoseTime = settings.getActiveDoseTime(time);
 						final int nextDoseTime = settings.getNextDoseTime(time);
-						int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
-
+						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
+						
+						final Calendar date = settings.getActiveDate(time);						
+						mNotificationIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
+						
+						Log.d(TAG, "date: " + DateTime.toString(date));						
 						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
 						
-						final Calendar date = settings.getActiveDate();
-						
-						mIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
-						Log.d(TAG, "date: " + DateTime.toString(date));						
-
 						if(lastDoseTime >= 0)
 							checkForForgottenIntakes(date, lastDoseTime);
 
@@ -283,13 +327,13 @@ public class NotificationService extends Service implements
 						{
 							long sleepTime = settings.getMillisUntilDoseTimeBegin(time, nextDoseTime);
 
-							Log.d(TAG, "Sleeping " + new DumbTime(sleepTime)  +" until beginning of dose time " + nextDoseTime);
+							Log.d(TAG, "sleeping " + new DumbTime(sleepTime)  +" until beginning of dose time " + nextDoseTime);
 							
 							sleep(sleepTime);
 							doDelayFirstNotification = false;
 
 							if(settings.getActiveDoseTime() != nextDoseTime)
-								Log.e(TAG, "Unexpected dose time, expected " + nextDoseTime);
+								Log.e(TAG, "unexpected dose time, expected " + nextDoseTime);
 
 							continue;
 						}
@@ -298,8 +342,7 @@ public class NotificationService extends Service implements
 							cancelNotification(R.id.notification_intake_forgotten);
 							checkSupplies(false);
 						}
-
-						long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(time, activeDoseTime);
+						
 						final int pendingIntakeCount = countOpenIntakes(date, activeDoseTime);
 
 						Log.d(TAG, "Pending intakes: " + pendingIntakeCount);
@@ -314,24 +357,37 @@ public class NotificationService extends Service implements
 							}
 
 							final String contentText = Integer.toString(pendingIntakeCount);
-							postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
+							final long snoozeTime = settings.getSnoozeTime();
 							
-							/*final long snoozeTime = settings.getSnoozeTime();
-
-							if(snoozeTime != 0)
+							do
 							{								
-								do
+								postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, 
+										contentText, mSnoozeType == SNOOZE_AUTO);
+								
+								final Calendar now = DateTime.now();
+								final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(now, activeDoseTime);
+								
+								if(mSnoozeType == SNOOZE_DISABLED || millisUntilDoseTimeEnd < snoozeTime)
+									break;
+								
+								if(mSnoozeType == SNOOZE_MANUAL)
 								{
-									postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, contentText);
-									sleep(snoozeTime);
-									millisUntilDoseTimeEnd -= snoozeTime;
+									final long waitMillis = millisUntilDoseTimeEnd - snoozeTime;
 									
-								} while(millisUntilDoseTimeEnd > snoozeTime);
-							}
+									SleepState.INSTANCE.onEnterSleep(waitMillis);
+									synchronized(mSnoozeLock) {
+										mSnoozeLock.wait(waitMillis);
+									}
+									SleepState.INSTANCE.onFinishedSleep();
+									cancelNotification(R.id.notification_intake_pending);
+								}
+																
+								sleep(snoozeTime);
+								
+							} while(true);
+						}						
 
-							Log.d(TAG, "Finished loop");*/
-						}
-
+						final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(DateTime.now(), activeDoseTime);
 						if(millisUntilDoseTimeEnd > 0)
 						{
 							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms until end of dose time " + activeDoseTime);
@@ -374,15 +430,16 @@ public class NotificationService extends Service implements
 	{
 		int count = 0;
 
-		//Log.d(TAG, "  countOpenIntakes: date=" + DateTime.toString(date) + ", doseTime=" + doseTime);
-		
+		// Log.d(TAG, "  countOpenIntakes: date=" + DateTime.toString(date) +
+		// ", doseTime=" + doseTime);
+
 		for(Drug drug : Database.getDrugs())
 		{
 			if(drug.isActive())
 			{
 				final List<Intake> intakes = Database.findIntakes(drug, date, doseTime);
 				final Fraction dose = drug.getDose(doseTime);
-				
+
 				if(intakes.isEmpty() && drug.hasDoseOnDate(date) && dose.compareTo(0) != 0)
 				{
 					Log.d(TAG, "  adding " + drug.getName());
@@ -395,11 +452,12 @@ public class NotificationService extends Service implements
 	}
 
 	private int countForgottenIntakes(Calendar date, int lastDoseTime)
-	{		
-		//Log.d(TAG, "countForgottenIntakes: date=" + DateTime.toString(date) + ", lastDoseTime=" + lastDoseTime);
+	{
+		// Log.d(TAG, "countForgottenIntakes: date=" + DateTime.toString(date) +
+		// ", lastDoseTime=" + lastDoseTime);
 
 		final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
-		
+
 		int count = 0;
 
 		for(int doseTime : doseTimes)
@@ -460,7 +518,7 @@ public class NotificationService extends Service implements
 		for(Drug drug : Database.getDrugs())
 		{
 			// refill size of zero means ignore supply values
-			if(drug.getRefillSize() == 0)
+			if (drug.getRefillSize() == 0)
 				continue;
 
 			final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
@@ -477,7 +535,7 @@ public class NotificationService extends Service implements
 			{
 				final double correctionFactor = drug.getSupplyCorrectionFactor();
 				final double currentSupply = drug.getCurrentSupply().doubleValue() * correctionFactor;
-				
+
 				Log.d(TAG, "Supplies left for " + drug + ": " + currentSupply / dailyDose + " with correctionFactor=" + correctionFactor);
 
 				if(Double.compare(currentSupply / dailyDose, (double) minDays) == -1)
@@ -492,13 +550,17 @@ public class NotificationService extends Service implements
 		mNotificationMessages[notificationIdToIndex(id)] = message;
 	}
 
-	private void postNotification(int id, int defaults, String message)
-	{
-		enqueueNotification(id, message);
-		postAllNotifications(defaults);
+	private void postNotification(int id, int defaults, String message) {
+		postNotification(id, defaults, message, false);
 	}
 
-	private void postAllNotifications(int defaults)
+	private void postNotification(int id, int defaults, String message, boolean forceNotification)
+	{
+		enqueueNotification(id, message);
+		postAllNotifications(defaults, forceNotification);
+	}
+
+	private void postAllNotifications(int defaults, boolean forceNotifcation)
 	{
 		int notificationCount;
 
@@ -507,14 +569,14 @@ public class NotificationService extends Service implements
 			cancelAllNotifications(true);
 			return;
 		}
-		
+
 		Log.d(TAG, "postAllNotifications: notificationCount=" + notificationCount);
 		for(String msg : mNotificationMessages)
 			Log.d(TAG, "  msg=" + msg);
 
 		final String bullet;
 
-		if(mNotificationMessages[2] != null && notificationCount != 1)
+		if (mNotificationMessages[2] != null && notificationCount != 1)
 		{
 			// we have 2 notifications, use bullets!
 			bullet = Constants.NOTIFICATION_BULLET;
@@ -545,7 +607,8 @@ public class NotificationService extends Service implements
 		{
 			if(stringId != -1)
 			{
-				// if we appended this line-break in the append() call above, the layout would look
+				// if we appended this line-break in the append() call above,
+				// the layout would look
 				// messed up in case there was no "low supply" message
 				msgBuilder.append("\n");
 			}
@@ -556,7 +619,8 @@ public class NotificationService extends Service implements
 		final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
 		views.setTextViewText(R.id.stat_title, getString(R.string._title_notifications));
 		views.setTextViewText(R.id.stat_text, msgBuilder.toString());
-		//views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(DateTime.now()));
+		// views.setTextViewText(R.id.stat_time, new
+		// SimpleDateFormat("HH:mm").format(DateTime.now()));
 		views.setTextViewText(R.id.stat_time, "");
 
 		final Notification notification = new Notification();
@@ -564,41 +628,42 @@ public class NotificationService extends Service implements
 		notification.tickerText = getString(R.string._msg_new_notification);
 		notification.flags |= Notification.FLAG_NO_CLEAR;
 		notification.defaults = Preferences.instance().filterNotificationDefaults(defaults);
-		notification.contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mIntent, 0);
+		notification.contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mNotificationIntent, 0);
 		notification.contentView = views;
 		if(notificationCount > 1)
 			notification.number = notificationCount;
 
 		final int notificationHash = getNotificationHashCode(notification, msgBuilder.toString());
 
-		if(mLastNotificationHash == notificationHash)
+		if(mLastNotificationHash == notificationHash && !forceNotifcation)
 			notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
 		else
-			mLastNotificationHash = notificationHash;		
-		
+			mLastNotificationHash = notificationHash;
+
 		mNotificationManager.notify(R.id.notification, notification);
 	}
 
 	private void cancelNotification(int id) {
 		postNotification(id, Notification.DEFAULT_LIGHTS, null);
 	}
-	
-	private void cancelAllNotifications(boolean resetHash) 
+
+	private void cancelAllNotifications(boolean resetHash)
 	{
 		clearAllNotifications(true);
 		mNotificationManager.cancel(R.id.notification);
 		if(resetHash)
 			mLastNotificationHash = 0;
 	}
-	
-	private void clearAllNotifications() {
+
+	private void clearAllNotifications()
+	{
 		clearAllNotifications(true);
 	}
 
 	private void clearAllNotifications(boolean zapMessages)
 	{
-		//mNotificationManager.cancel(R.id.notification);
-		//mLastNotificationHash = 0;
+		// mNotificationManager.cancel(R.id.notification);
+		// mLastNotificationHash = 0;
 		if(zapMessages)
 			mNotificationMessages = new String[3];
 	}
@@ -658,7 +723,7 @@ public class NotificationService extends Service implements
 
 		return hasher.getHashCode();
 	}
-	
+
 	private static void setInstance(NotificationService instance) {
 		sInstance = instance;
 	}
@@ -668,8 +733,14 @@ public class NotificationService extends Service implements
 		if(time > 0)
 		{
 			SleepState.INSTANCE.onEnterSleep(time);
-			Thread.sleep(time);
-			SleepState.INSTANCE.onFinishedSleep();
+			try
+			{
+				Thread.sleep(time);
+			}
+			finally
+			{
+				SleepState.INSTANCE.onFinishedSleep();
+			}
 		}
 		else
 			Log.d(TAG, "sleep: ignoring time of " + time);
@@ -681,19 +752,24 @@ public class NotificationService extends Service implements
 		File crashLog = new File(getExternalFilesDir(null), "crash-" + timestamp + ".log");
 
 		OutputStream os = null;
-		
+
 		try
 		{
 			os = new FileOutputStream(crashLog);
-			String msg =
-					"Time: " + DateTime.now() + "\n\n" +
-					cause + "\n\n" +
-					"Closing thread...";
-
-			os.write(msg.getBytes());
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append("Time: " + DateTime.toString(DateTime.now()) + "\n\n");
+			sb.append("Cause: " + cause + "\n");
+			
+			for(StackTraceElement e : cause.getStackTrace())
+				sb.append("  " + e.getFileName() + ":" + e.getLineNumber() + ", in " + e.getMethodName() + "\n");
+			
+			sb.append("\n\n" + "Closing thread...");
+			
+			os.write(sb.toString().getBytes());
 			os.close();
 		}
-		catch(IOException e)
+		catch (IOException e)
 		{
 			Log.e(TAG, "Error writing crash log", e);
 		}
@@ -701,13 +777,82 @@ public class NotificationService extends Service implements
 		{
 			try
 			{
-				if(os != null)
+				if (os != null)
 					os.close();
 			}
-			catch(IOException e)
+			catch (IOException e)
 			{
 				Log.e(TAG, "Error writing crash log", e);
 			}
+		}
+	}
+
+	private class PendingNotificationsThreadRunnable implements Runnable
+	{
+		private int mPendingCount = 0;
+		private Object mWaitLock;
+
+		public PendingNotificationsThreadRunnable() {
+			mWaitLock = new Object();
+		}
+
+		public void setPendingCount(int pendingCount)
+		{
+			mPendingCount = pendingCount;
+		}
+
+		public void snooze()
+		{
+			if (mSnoozeType == SNOOZE_MANUAL)
+			{
+				cancelNotification(R.id.notification_intake_pending);
+				synchronized (mWaitLock)
+				{
+					mWaitLock.notify();
+				}
+			}
+		}
+
+		@Override
+		public void run()
+		{
+			Thread.currentThread().setName("PendingNotificationsThread");
+
+			if (mPendingCount == 0)
+				return;
+
+			final long snoozeTime = Preferences.instance().getSnoozeTime();
+			final boolean doAutoSnooze = mSnoozeType == SNOOZE_AUTO;
+
+			do
+			{
+				final String contentText = Integer.toString(mPendingCount);
+				postNotification(R.id.notification_intake_pending,
+						Notification.DEFAULT_ALL, contentText, doAutoSnooze);
+
+				try
+				{
+					switch (mSnoozeType)
+					{
+						case SNOOZE_AUTO:
+							mWaitLock.wait(snoozeTime);
+							break;
+
+						case SNOOZE_MANUAL:
+							mWaitLock.wait();
+							sleep(snoozeTime);
+							break;
+
+						default:
+							return;
+					}
+				}
+				catch (InterruptedException e)
+				{
+					Log.d(TAG, "Exiting pending notifications thread");
+				}
+
+			} while (true);
 		}
 	}
 }

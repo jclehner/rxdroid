@@ -60,6 +60,7 @@ import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.SimpleBitSet;
+import at.caspase.rxdroid.util.Util;
 
 /**
  * Edit a drug's database entry.
@@ -295,8 +296,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			pref.setOnPreferenceChangeListener(this);
 		}
 
-		populateEntryValues("frequency");
-		populateEntryValues("drug_form");
+		Util.populateListPreferenceEntryValues(mFreqPreference);
+		Util.populateListPreferenceEntryValues(mDrugForm);
 	}
 
 	@Override
@@ -431,18 +432,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		// active?
 		mIsActive.setChecked(mDrug.isActive());
-	}
-
-	private void populateEntryValues(String preferenceKey)
-	{
-		ListPreference pref = (ListPreference) findPreference(preferenceKey);
-		int entryCount = pref.getEntries().length;
-
-		String[] values = new String[entryCount];
-		for(int i = 0; i != entryCount; ++i)
-			values[i] = Integer.toString(i);
-
-		pref.setEntryValues(values);
 	}
 	
 	private void handleEveryNDaysFrequency()

@@ -121,6 +121,21 @@
 	<string name="_title_version">Version</string>
 	
 	<string name="_summary_not_available">N/A</string>
+	<string name="_preftitle_snooze_type">Snooze type</string>
 	
+	<string name="_title_tablet">Tablet</string>
+	<string name="_title_injection">Injection</string>
+	<string name="_title_spray">Spray</string>
+	<string name="_title_drop">Drop</string>
+	<string name="_title_gel">Gel</string>
+	<string name="_title_other">Other</string>
+	
+	<string name="_title_daily">Daily</string>
+	<string name="_title_every_n_days">Every N days</string>
+	<string name="_title_pick_days">Pick days</string>
+	
+	<string name="_title_dont_snooze">Don\'t snooze</string>
+	<string name="_title_repeat_alarm">Repeat alarm</string>
+	<string name="_title_snooze">Snooze</string>	
 	
 </resources>

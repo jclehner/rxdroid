@@ -137,6 +137,12 @@
 		<at.caspase.rxdroid.preferences.TimePreference android:key="time_snooze"
 			android:title="@string/_Snooze_time"
 			android:defaultValue="@string/pref_default_time_snooze"
+		/>		
+		
+		<ListPreference android:key="snooze_type"
+			android:title="@string/_preftitle_snooze_type"
+			android:entries="@array/snooze_types"
+			android:defaultValue="0"
 		/>
 		
 		<EditTextPreference android:key="num_min_supply_days"

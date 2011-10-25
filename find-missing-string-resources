@@ -35,7 +35,8 @@ scan_dir()
 
 scan_string_xml()
 {
-	for t in $(cat $temp | sort | uniq); do
+	#for t in $(cat $temp | sort | uniq); do
+	for t in $(cat $temp); do
 		if ! grep -q $t res/values/strings.xml; then
 			echo "<string name=\"$t\"> !!EMPTY!! </string>"
 		fi

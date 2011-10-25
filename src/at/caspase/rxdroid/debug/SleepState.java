@@ -38,7 +38,6 @@ public enum SleepState
 	
 	public void onEnterSleep(long millis)
 	{
-		Log.d(TAG, "onEnterSleep: millis=" + millis);
 		setTime();
 		mMillis = millis;
 	}
