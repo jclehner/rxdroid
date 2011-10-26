@@ -459,7 +459,7 @@ public class DrugListActivity extends Activity implements
 		}
 		else
 		{			
-			mDate.add(Calendar.MILLISECOND, (int) (shiftBy * Constants.MILLIS_PER_DAY));
+			mDate.add(Calendar.DAY_OF_MONTH, shiftBy);
 
 			if(shiftBy == 1)
 			{
