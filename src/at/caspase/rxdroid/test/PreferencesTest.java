@@ -24,6 +24,7 @@ package at.caspase.rxdroid.test;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -86,7 +87,7 @@ public class PreferencesTest extends AndroidTestCase
 			final Preferences prefs = Preferences.instance();
 			
 			Log.d(TAG, "testGetActiveDoseTimeAndGetNextDoseTime:");
-			Log.d(TAG, "  date/time   : " + date + ", " + time);
+			//Log.d(TAG, "  date/time   : " + date + ", " + time);
 			Log.d(TAG, "  doseTime    : " + doseTime);
 			Log.d(TAG, "  nextDoseTime: " + nextDoseTime + "\n");
 						
@@ -98,8 +99,8 @@ public class PreferencesTest extends AndroidTestCase
 		}
 	}
 	
-	public void testTimeOffsets()
-	{		
+	public void testTimeOffsets() 
+	{
 		final long[][] testCases = {
 				{      18, 00, -1, 10800000 }, // (21:00 - 18:00) = 180min in millis
 				{      21, 00, 7200000, -1 }, // (23:00 - 21:00) = 120min in millis
@@ -107,8 +108,41 @@ public class PreferencesTest extends AndroidTestCase
 				{ 24 + 00, 00, -1, 5400000 }, // (01:30 - 00:00) = 90min in millis
 				{ 24 + 00, 30, -1, 3600000 }, // (01:30 - 00:30) = 60min in millis
 				{ 24 + 01, 30, 16200000, -1 } // (06:00 - 01:30) = 270min in millis
+				
 		};
 		
+		testTimeOffsets(DateTime.today(), testCases);
+	}
+	
+	public void testTimeOffsetsWithDst() 
+	{
+		final long[][] testCases = {
+			{ 00, 00, -1, 5400000 }, // (01:30 - 00:00) = 90min in millis
+			{ 00, 30, -1, 3600000 }, // (01:30 - 00:30) = 60min in millis
+			{ 01, 30, 16200000 + 3600000, -1 } // (06:00 - 01:30) = 270 + 90min due to DST switch
+			
+		};
+		
+		final TimeZone tzGmt = TimeZone.getTimeZone("GMT");
+		final TimeZone tzCet = TimeZone.getTimeZone("Europe/Paris");
+		
+		if(tzCet.hasSameRules(tzGmt))
+		{
+			Log.w(TAG, "Could not TimeZone instance for CET/CEST");
+			return;
+		}
+		
+		//     java.util.Calendar's October is 9 (January is 0)
+		//                                     |
+		//                                     v
+		Calendar date = DateTime.date(2011, 10 - 1, 30); // DST ends on this day in CEST
+		date.setTimeZone(tzCet);
+		
+		testTimeOffsets(date, testCases);
+	}
+	
+	private void testTimeOffsets(Calendar date, long[][] testCases)
+	{				
 		for(int i = 0; i != testCases.length; ++i)
 		{
 			final long hours            = testCases[i][0];
@@ -116,9 +150,9 @@ public class PreferencesTest extends AndroidTestCase
 			final long millisUntilBegin = testCases[i][2];
 			final long millisUntilEnd   = testCases[i][3];
 
-			final Calendar date = DateTime.today();
 			final Calendar time = (Calendar) date.clone();
 			
+			time.setTimeZone(date.getTimeZone());
 			time.set(Calendar.HOUR_OF_DAY, (int) hours);
 			time.set(Calendar.MINUTE, (int) minutes);
 			
@@ -127,7 +161,7 @@ public class PreferencesTest extends AndroidTestCase
 			final int activeOrNextDoseTime = prefs.getActiveOrNextDoseTime(time);
 			
 			Log.d(TAG, "testTimeOffsets:");
-			Log.d(TAG, "  date/time           : " + date + ", " + time);
+			Log.d(TAG, "  date/time           : " + DateTime.toSqlDate(date) + ", " + DateTime.toSqlTime(time));
 			Log.d(TAG, "  hours               : " + hours);
 			Log.d(TAG, "  minutes             : " + minutes);
 			Log.d(TAG, "  millisUntilBegin    : " + millisUntilBegin);
@@ -151,7 +185,7 @@ public class PreferencesTest extends AndroidTestCase
 				Log.d(TAG, "  [N/A] getMillisUntilDoseTimeEnd");
 			
 			Log.d(TAG, "-----------------------------");		
-		}
+		}		
 	}
 	
 	public void testGetActiveDate()

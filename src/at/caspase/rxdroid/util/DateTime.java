@@ -133,7 +133,7 @@ public final class DateTime
 	public static boolean isWithinRange(Calendar time, DumbTime begin, DumbTime end)
 	{
 		boolean ret = isWithinRange_(time, begin, end);
-		Log.d(TAG, "isWithinRange(" + toString(time) + ", " + begin + ", " + end + ") = " + ret);
+		//Log.d(TAG, "isWithinRange(" + toString(time) + ", " + begin + ", " + end + ") = " + ret);
 		return ret;
 	}
 	

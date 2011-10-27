@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import android.util.Log;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
 
@@ -46,6 +47,7 @@ import at.caspase.rxdroid.util.Hasher;
  */
 public class DumbTime implements Comparable<DumbTime>
 {
+	private static final String TAG = DumbTime.class.getName();
 	private static final String[] FORMATS = { "HH:mm:ss", "HH:mm" };
 
 	private int mHours;
@@ -73,6 +75,10 @@ public class DumbTime implements Comparable<DumbTime>
 		this(offset, false);
 	}
 
+	private static final long SMILLIS = 1000L;
+	private static final long MMILLIS = 60L * SMILLIS;
+	private static final long HMILLIS = 60L * MMILLIS;	
+	
 	/**
 	 * Creates an instance using an offset from midnight.
 	 *
@@ -81,19 +87,19 @@ public class DumbTime implements Comparable<DumbTime>
 	 * @param allowMoreThan24Hours See above.
 	 */
 	public DumbTime(long offset, boolean allowMoreThan24Hours)
-	{
+	{		
 		if(offset >= Constants.MILLIS_PER_DAY && !allowMoreThan24Hours)
 			throw new IllegalArgumentException(offset + " is out of range");
 		
-		mHours = (int) offset % 3600000;
-		offset -= 3600000L * mHours;
-
-		mMinutes = (int) offset % (60 * 1000);
-		offset -= 60000L * mMinutes;
-
-		mSeconds = (int) offset % 1000;
-		offset -= 1000L * mSeconds;
-
+		mHours = (int) (offset / HMILLIS);
+		offset -= mHours * HMILLIS;
+				
+		mMinutes = (int) (offset / MMILLIS);
+		offset -= mMinutes * MMILLIS;
+				
+		mSeconds = (int) (offset / SMILLIS);
+		offset -= mSeconds * SMILLIS;
+				
 		mMillis = (int) offset;
 	}
 	

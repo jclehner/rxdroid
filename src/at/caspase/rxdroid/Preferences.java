@@ -252,15 +252,22 @@ public class Preferences
 
 	private long getMillisUntilDoseTimeBeginOrEnd(Calendar time, int doseTime, int flags)
 	{
-		final long timeOffset = DateTime.getOffsetFromMidnight(time);
-		final long doseTimeOffset = (flags & FLAG_GET_MILLIS_UNTIL_BEGIN) != 0 ? 
+		final long doseTimeOffsetMillis = (flags & FLAG_GET_MILLIS_UNTIL_BEGIN) != 0 ? 
 				getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
 		
-		long ret = doseTimeOffset - timeOffset;
+		final DumbTime doseTimeOffset = new DumbTime(doseTimeOffsetMillis);		
+		final Calendar target = DateTime.date(time);
 		
-		if(ret < 0 && (flags & FLAG_DONT_CORRECT_TIME) == 0)
-			ret += Constants.MILLIS_PER_DAY;
-		
-		return ret;
+		// simply adding the millisecond offset is tempting, but leads to errors
+		// when the DST begins/ends in this interval
+				
+		target.set(Calendar.HOUR_OF_DAY, doseTimeOffset.getHours());
+		target.set(Calendar.MINUTE, doseTimeOffset.getMinutes());
+		target.set(Calendar.SECOND, doseTimeOffset.getSeconds());
+			
+		if(target.getTimeInMillis() < time.getTimeInMillis() && (flags & FLAG_DONT_CORRECT_TIME) == 0)
+			target.add(Calendar.DAY_OF_MONTH, 1);
+								
+		return target.getTimeInMillis() - time.getTimeInMillis();
 	}
 }
