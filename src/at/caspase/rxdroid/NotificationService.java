@@ -187,7 +187,7 @@ public class NotificationService extends Service implements
 			try
 			{
 				synchronized (sInstance.mSnoozeLock) {
-					sInstance.mSnoozeLock.notify();
+					sInstance.mSnoozeLock.notifyAll();
 				}
 			}
 			catch(IllegalStateException e)
@@ -360,36 +360,45 @@ public class NotificationService extends Service implements
 							final String contentText = Integer.toString(pendingIntakeCount);
 							final long snoozeTime = settings.getSnoozeTime();
 
+							long iterations = settings.getMillisUntilDoseTimeEnd(time, activeDoseTime) / snoozeTime;
+						
 							do
 							{
 								postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL,
-										contentText, mSnoozeType == SNOOZE_AUTO);
+										contentText, mSnoozeType == SNOOZE_AUTO);								
 
-								final Calendar now = DateTime.now();
-								final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(now, activeDoseTime);
-
-								if(mSnoozeType == SNOOZE_DISABLED || millisUntilDoseTimeEnd < snoozeTime)
+								if(mSnoozeType == SNOOZE_DISABLED)
 									break;
 
 								if(mSnoozeType == SNOOZE_MANUAL)
 								{
+									final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEndRaw(time, activeDoseTime);
 									final long waitMillis = millisUntilDoseTimeEnd - snoozeTime;
-
+									
+									if(waitMillis <= 0)
+										break;
+									
+									Log.d(TAG, "Snoozing...");
+									
 									synchronized(mSnoozeLock)
 									{
 										SleepState.INSTANCE.onEnterSleep(waitMillis);
 										mSnoozeLock.wait(waitMillis);
 										SleepState.INSTANCE.onFinishedSleep();
 									}
+									
+									Log.d(TAG, "Snooze cancelled");
 
 									//Toast.makeText(sInstance, "Snoozing", Toast.LENGTH_SHORT).show();
-
+									
 									cancelNotification(R.id.notification_intake_pending);
 								}
+								
+								Log.d(TAG, "Message loop will be finished after sleeping " + snoozeTime + "ms");
+								
+								sleep(snoozeTime);							
 
-								sleep(snoozeTime);
-
-							} while(true);
+							} while(--iterations > 0);
 						}
 
 						final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(DateTime.now(), activeDoseTime);
@@ -398,6 +407,8 @@ public class NotificationService extends Service implements
 							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms until end of dose time " + activeDoseTime);
 							sleep(millisUntilDoseTimeEnd);
 						}
+						
+						Log.d(TAG, "Reached end of main loop");
 
 						cancelNotification(R.id.notification_intake_pending);
 						checkForForgottenIntakes(date, activeDoseTime);

@@ -84,11 +84,23 @@ public class Preferences
 	}
 	
 	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
-		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, true);
+		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_GET_MILLIS_UNTIL_BEGIN);
 	}
 	
 	public long getMillisUntilDoseTimeEnd(Calendar time, int doseTime) {
-		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, false);
+		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, 0);
+	}
+	
+	/**
+	 * Gets the time until the end of that dose time in respect to
+	 * the given time.
+	 * <p>
+	 * As opposed to {@link #getMillisUntilDoseTimeEnd(Calendar, int)}, this
+	 * function will return a negative value if the start of the given dose time
+	 * lies in the past.
+	 */
+	public long getMillisUntilDoseTimeEndRaw(Calendar time, int doseTime) {
+		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_DONT_CORRECT_TIME);
 	}
 
 	public long getSnoozeTime() 
@@ -234,15 +246,19 @@ public class Preferences
 	public int getNextDoseTime() {
 		return getNextDoseTime(DateTime.now());
 	}
+	
+	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;
+	private static final int FLAG_DONT_CORRECT_TIME = 2;
 
-	private long getMillisUntilDoseTimeBeginOrEnd(Calendar time, int doseTime, boolean getMillisUntilBegin)
+	private long getMillisUntilDoseTimeBeginOrEnd(Calendar time, int doseTime, int flags)
 	{
 		final long timeOffset = DateTime.getOffsetFromMidnight(time);
-		final long doseTimeOffset = getMillisUntilBegin ? getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
+		final long doseTimeOffset = (flags & FLAG_GET_MILLIS_UNTIL_BEGIN) != 0 ? 
+				getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
 		
 		long ret = doseTimeOffset - timeOffset;
 		
-		if(ret < 0)
+		if(ret < 0 && (flags & FLAG_DONT_CORRECT_TIME) == 0)
 			ret += Constants.MILLIS_PER_DAY;
 		
 		return ret;
