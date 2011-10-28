@@ -107,8 +107,7 @@ public class PreferencesTest extends AndroidTestCase
 				{      23, 00, 0, 9000000 }, // ((24 + 01:30) - 23:00 = 150min in millis
 				{ 24 + 00, 00, -1, 5400000 }, // (01:30 - 00:00) = 90min in millis
 				{ 24 + 00, 30, -1, 3600000 }, // (01:30 - 00:30) = 60min in millis
-				{ 24 + 01, 30, 16200000, -1 } // (06:00 - 01:30) = 270min in millis
-				
+				{ 24 + 01, 30, 16200000, -1 } // (06:00 - 01:30) = 270min in millis				
 		};
 		
 		testTimeOffsets(DateTime.today(), testCases);
@@ -119,8 +118,7 @@ public class PreferencesTest extends AndroidTestCase
 		final long[][] testCases = {
 			{ 00, 00, -1, 5400000 }, // (01:30 - 00:00) = 90min in millis
 			{ 00, 30, -1, 3600000 }, // (01:30 - 00:30) = 60min in millis
-			{ 01, 30, 16200000 + 3600000, -1 } // (06:00 - 01:30) = 270 + 90min due to DST switch
-			
+			{ 01, 30, 16200000 + 3600000, -1 } // (06:00 - 01:30) = 270 + 90min due to DST switch			
 		};
 		
 		final TimeZone tzGmt = TimeZone.getTimeZone("GMT");
@@ -132,7 +130,8 @@ public class PreferencesTest extends AndroidTestCase
 			return;
 		}
 		
-		//     java.util.Calendar's October is 9 (January is 0)
+		//
+		//      java.util.Calendar's October is 9 (January is 0)
 		//                                     |
 		//                                     v
 		Calendar date = DateTime.date(2011, 10 - 1, 30); // DST ends on this day in CEST
@@ -151,7 +150,7 @@ public class PreferencesTest extends AndroidTestCase
 			final long millisUntilEnd   = testCases[i][3];
 
 			final Calendar time = (Calendar) date.clone();
-			
+
 			time.setTimeZone(date.getTimeZone());
 			time.set(Calendar.HOUR_OF_DAY, (int) hours);
 			time.set(Calendar.MINUTE, (int) minutes);

@@ -31,7 +31,7 @@ public final class Constants
 {
 	public static final long MILLIS_PER_DAY = 24L * 3600 * 1000;
 	public static final String NOTIFICATION_BULLET = "\u2022 ";
-	public static final long NOTIFICATION_INITIAL_DELAY = 10000;
+	public static final long NOTIFICATION_INITIAL_DELAY = 5000;
 
 	public static int getDoseViewId(int doseTime) {
 		return DOSE_VIEW_IDS[doseTime];

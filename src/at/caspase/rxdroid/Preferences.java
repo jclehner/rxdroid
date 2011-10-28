@@ -162,7 +162,7 @@ public class Preferences
 	
 	public Calendar getActiveDate(Calendar time)
 	{
-		final Calendar date = DateTime.date(time);
+		final Calendar date = DateTime.getDatePart(time);
 		final int activeDoseTime = getActiveDoseTime(time);
 		
 		if(activeDoseTime == Drug.TIME_NIGHT && hasWrappingDoseTimeNight())
@@ -256,7 +256,7 @@ public class Preferences
 				getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
 		
 		final DumbTime doseTimeOffset = new DumbTime(doseTimeOffsetMillis);		
-		final Calendar target = DateTime.date(time);
+		final Calendar target = DateTime.getDatePart(time);
 		
 		// simply adding the millisecond offset is tempting, but leads to errors
 		// when the DST begins/ends in this interval

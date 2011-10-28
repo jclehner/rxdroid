@@ -159,7 +159,7 @@ public class DrugListActivity extends Activity implements
 		{
 			startNotificationService(0);			
 			Log.w(TAG, "onResume: Notification service was not running");
-			if(!mSharedPreferences.getBoolean("debug_enabled", false))
+			if(/*!mSharedPreferences.getBoolean("debug_enabled", false)*/ true)
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string._title_warning);
@@ -259,7 +259,7 @@ public class DrugListActivity extends Activity implements
 					requestIntake(drug, mDate, doseTime, doseView.getDose(), true);
 				else
 				{
-					Fraction dose = Fraction.ZERO;
+					Fraction dose = new Fraction();
 					
 					for(Intake intake : Database.findIntakes(drug, mDate, doseTime))
 					{

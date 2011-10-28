@@ -28,38 +28,42 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import android.text.format.DateFormat;
-import android.util.Log;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.GlobalContext;
 
+/**
+ * Date/time utilities.
+ * 
+ * @author Joseph Lehner
+ */
 public final class DateTime
 {
 	private static final String TAG = DateTime.class.getName();
 	
-	public static Calendar today()
-	{
-		final Calendar today = now();
-		today.set(Calendar.HOUR_OF_DAY, 0);
-		today.set(Calendar.MINUTE, 0);
-		today.set(Calendar.SECOND, 0);
-		today.set(Calendar.MILLISECOND, 0);
-		return today;
+	
+	/**
+	 * Returns the current date.
+	 * 
+	 * @return a <code>Calendar</code> set to the current date, its time
+	 * 	set to 00:00:00
+	 */
+	public static Calendar today() {
+		return getDatePart(DateTime.now());
 	}
 
-	public static Calendar tomorrow() 
-	{
-		final Calendar day = today();
-		day.add(Calendar.HOUR, 24);
-		return day;
-	}
-
-	public static Calendar now() 
-	{
-		final Calendar now = GregorianCalendar.getInstance();
-		return now;
+	/**
+	 * Returns the current time.
+	 * 
+	 * @return the result of <code>Gregorian.getInstance()</code>
+	 */
+	public static Calendar now() {
+		return GregorianCalendar.getInstance();
 	}
 	
-	public static Calendar date(Calendar time)
+	/**
+	 * Sets a <code>Calendar's</code> time to 00:00:00.000.
+	 */
+	public static Calendar getDatePart(Calendar time)
 	{
 		final Calendar date = (Calendar) time.clone();
 		final int calFields[] = { Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND };
@@ -70,6 +74,13 @@ public final class DateTime
 		return date;		
 	}
 	
+	/**
+	 * Returns a <code>Calendar</code> with the specified date.
+	 * 
+	 * @param year The year
+	 * @param month The month (January is 0, December is 11!)
+	 * @param day The date
+	 */
 	public static Calendar date(int year, int month, int day)
 	{
 		final Calendar date = new GregorianCalendar();

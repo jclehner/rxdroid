@@ -23,6 +23,7 @@ package at.caspase.rxdroid.debug;
 
 import java.util.Calendar;
 
+import android.util.Log;
 import at.caspase.rxdroid.Preferences;
 import at.caspase.rxdroid.db.Drug;
 
@@ -40,6 +41,10 @@ public class FakeSettings extends Preferences
 	private static final String TAG = FakeSettings.class.getName();
 	private static int counter = 0;
 	
+	public FakeSettings() {
+		Log.d(TAG, "Creating instance");
+	}
+	
 	@Override
 	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
 		return 10 * 1000;
@@ -48,6 +53,11 @@ public class FakeSettings extends Preferences
 	@Override
 	public long getMillisUntilDoseTimeEnd(Calendar time, int doseTime) {
 		return 10 * 1000;
+	}
+	
+	@Override
+	public long getMillisUntilDoseTimeEndRaw(Calendar time, int doseTime) {
+		return getMillisUntilDoseTimeEnd(time, doseTime);
 	}
 
 	@Override

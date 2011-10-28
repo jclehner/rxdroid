@@ -59,7 +59,7 @@ import at.caspase.rxdroid.util.Hasher;
  *
  */
 public class NotificationService extends Service implements
-		OnDatabaseChangedListener, OnSharedPreferenceChangeListener
+		OnDatabaseChangedListener, OnSharedPreferenceChangeListener, Runnable
 {
 	public static final String EXTRA_RESTART_FLAGS = "restart_flags";
 
@@ -81,7 +81,10 @@ public class NotificationService extends Service implements
 	private String[] mNotificationMessages;
 	private int mLastNotificationHash = 0;
 
-	private Thread mThread;
+	private volatile Thread mThread;
+	private boolean mDelayFirstNotification;
+	private boolean mWasRunning;
+	
 	private static NotificationService sInstance = null;
 
 	private Object mSnoozeLock;
@@ -140,6 +143,8 @@ public class NotificationService extends Service implements
 		Database.unregisterOnChangedListener(this);
 
 		Log.d(TAG, "onDestroy");
+		
+		writeCrashLog(new RuntimeException("onDestroy called"));
 	}
 
 	@Override
@@ -169,7 +174,7 @@ public class NotificationService extends Service implements
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
 	{
-		if(key.startsWith("time_") || key.startsWith("debug_") || key.startsWith("snooze_"))
+		if(key.startsWith("time_") || key.startsWith("debug_") || key.startsWith("snooze_") || key.startsWith("debug_"))
 		{
 			Log.d(TAG, "Preference key " + key + " changed, restarting thread");
 			restartThread(RESTART_FORCE);
@@ -180,7 +185,7 @@ public class NotificationService extends Service implements
 			Log.d(TAG, "Ignoring preference change of " + key);
 	}
 
-	public static void requestSnooze()
+	public static synchronized void requestSnooze()
 	{
 		if(sInstance != null && sInstance.mSnoozeLock != null && sInstance.mSnoozeType == SNOOZE_MANUAL)
 		{
@@ -251,195 +256,202 @@ public class NotificationService extends Service implements
 			return;
 
 		final boolean forceRestart = (flags & RESTART_FORCE) != 0;
-		final boolean delayFirstNotification;
 
 		if(forceRestart)
-			delayFirstNotification = true;
+			mDelayFirstNotification = true;
 		else
-			delayFirstNotification = (flags & RESTART_DELAYFIRST) != 0;
+			mDelayFirstNotification = (flags & RESTART_DELAYFIRST) != 0;
 
-		Log.d(TAG, "restarThread(" + flags + ")");
-		Log.d(TAG, "  forceRestart=" + forceRestart + ", delayFirstNotification=" + delayFirstNotification);
-		Log.d(TAG, "  mSnoozeType=" + mSnoozeType);
-
-		final boolean wasRunning = isThreadRunning();
-		if(wasRunning)
+		mWasRunning = isThreadRunning();
+		if(mWasRunning)
 		{
 			if(!forceRestart)
-			{
-				Log.d(TAG, "  ignoring service restart request");
 				return;
-			}
-
-			mThread.interrupt();
+			
+			stopThread();
 		}
 
-		Log.d(TAG, "  wasRunning=" + wasRunning);
-
-		mSnoozeLock = new Object();
-		mThread = new Thread(new Runnable() {
-
-			@Override
-			public void run()
-			{
-				/**
-				 * - on start, clear all notifications
-				 *
-				 * - collect forgotten intakes & display notifications if
-				 * necessary - if a dose time is active, collect pending intakes
-				 * & display notifications if neccessary. do so every N minutes
-				 * (as specified by the snooze time), until the next dose time
-				 * becomes active
-				 *
-				 * - if the active dose time is TIME_MORNING, also check supply
-				 * levels & display notifications, if applicable
-				 *
-				 * - if no dose time is active, sleep until the start of the
-				 * next dose time
-				 *
-				 */
-
-				clearAllNotifications();
-				checkSupplies(true);
-
-				final Preferences settings = Preferences.instance();
-				boolean doDelayFirstNotification = delayFirstNotification;
-
-				try
-				{
-					while(true)
-					{
-						final Calendar time = DateTime.now();
-
-						final int activeDoseTime = settings.getActiveDoseTime(time);
-						final int nextDoseTime = settings.getNextDoseTime(time);
-						final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
-
-						final Calendar date = settings.getActiveDate(time);
-						mNotificationIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
-
-						Log.d(TAG, "date: " + DateTime.toString(date));
-						Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
-
-						if(lastDoseTime >= 0)
-							checkForForgottenIntakes(date, lastDoseTime);
-
-						if(activeDoseTime == -1)
-						{
-							long sleepTime = settings.getMillisUntilDoseTimeBegin(time, nextDoseTime);
-
-							Log.d(TAG, "sleeping " + new DumbTime(sleepTime)  +" until beginning of dose time " + nextDoseTime);
-
-							sleep(sleepTime);
-							doDelayFirstNotification = false;
-
-							if(settings.getActiveDoseTime() != nextDoseTime)
-								Log.e(TAG, "unexpected dose time, expected " + nextDoseTime);
-
-							continue;
-						}
-						else if(activeDoseTime == Drug.TIME_MORNING)
-						{
-							cancelNotification(R.id.notification_intake_forgotten);
-							checkSupplies(false);
-						}
-
-						final int pendingIntakeCount = countOpenIntakes(date, activeDoseTime);
-
-						Log.d(TAG, "Pending intakes: " + pendingIntakeCount);
-
-						if(pendingIntakeCount != 0)
-						{
-							if(doDelayFirstNotification && wasRunning)
-							{
-								doDelayFirstNotification = false;
-								Log.d(TAG, "Delaying first notification");
-								sleep(Constants.NOTIFICATION_INITIAL_DELAY);
-							}
-
-							final String contentText = Integer.toString(pendingIntakeCount);
-							final long snoozeTime = settings.getSnoozeTime();
-
-							long iterations = settings.getMillisUntilDoseTimeEnd(time, activeDoseTime) / snoozeTime;
-						
-							do
-							{
-								postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL,
-										contentText, mSnoozeType == SNOOZE_AUTO);								
-
-								if(mSnoozeType == SNOOZE_DISABLED)
-									break;
-
-								if(mSnoozeType == SNOOZE_MANUAL)
-								{
-									final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEndRaw(time, activeDoseTime);
-									final long waitMillis = millisUntilDoseTimeEnd - snoozeTime;
-									
-									if(waitMillis <= 0)
-										break;
-									
-									Log.d(TAG, "Snoozing...");
-									
-									synchronized(mSnoozeLock)
-									{
-										SleepState.INSTANCE.onEnterSleep(waitMillis);
-										mSnoozeLock.wait(waitMillis);
-										SleepState.INSTANCE.onFinishedSleep();
-									}
-									
-									Log.d(TAG, "Snooze cancelled");
-
-									//Toast.makeText(sInstance, "Snoozing", Toast.LENGTH_SHORT).show();
-									
-									cancelNotification(R.id.notification_intake_pending);
-								}
-								
-								Log.d(TAG, "Message loop will be finished after sleeping " + snoozeTime + "ms");
-								
-								sleep(snoozeTime);							
-
-							} while(--iterations > 0);
-						}
-
-						final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(DateTime.now(), activeDoseTime);
-						if(millisUntilDoseTimeEnd > 0)
-						{
-							Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms until end of dose time " + activeDoseTime);
-							sleep(millisUntilDoseTimeEnd);
-						}
-						
-						Log.d(TAG, "Reached end of main loop");
-
-						cancelNotification(R.id.notification_intake_pending);
-						checkForForgottenIntakes(date, activeDoseTime);
-					}
-				}
-				catch(InterruptedException e)
-				{
-					Log.d(TAG, "Thread interrupted, exiting...");
-				}
-				catch(Exception e)
-				{
-					Log.e(TAG, "Service died due to exception", e);
-					stopSelf();
-					writeCrashLog(e);
-				}
-				finally
-				{
-					//cancelAllNotifications();
-				}
-			}
-		}, "Service Thread");
-
-		mThread.start();
+		startThread();
 	}
+	
+	private synchronized void startThread()
+	{
+		if(mThread == null)
+		{
+			Log.d(TAG, "Starting thread");
+			
+			mSnoozeLock = new Object();
+			
+			mThread = new Thread(this, "Service Thread");
+			mThread.start();			
+		}
+	}
+		
 
 	private synchronized void stopThread()
 	{
 		if(mThread != null)
-			mThread.interrupt();
+		{
+			Log.d(TAG, "Interrupting thread");
+			
+			Thread moribund = mThread;
+			mThread = null;
+			moribund.interrupt();
+		}
+	}
+	
+	@Override
+	public void run()
+	{
+		if(Thread.currentThread() != mThread)
+		{
+			Log.d(TAG, "run() called from wrong thread");
+			return;
+		}	
+		
+		/**
+		 * - on start, clear all notifications
+		 *
+		 * - collect forgotten intakes & display notifications if
+		 * necessary - if a dose time is active, collect pending intakes
+		 * & display notifications if neccessary. do so every N minutes
+		 * (as specified by the snooze time), until the next dose time
+		 * becomes active
+		 *
+		 * - if the active dose time is TIME_MORNING, also check supply
+		 * levels & display notifications, if applicable
+		 *
+		 * - if no dose time is active, sleep until the start of the
+		 * next dose time
+		 *
+		 */
 
-		mThread = null;
+		clearAllNotifications();
+		checkSupplies(true);
+
+		final Preferences settings = Preferences.instance();
+		boolean doDelayFirstNotification = mDelayFirstNotification;
+
+		try
+		{
+			while(true)
+			{
+				final Calendar time = DateTime.now();
+
+				final int activeDoseTime = settings.getActiveDoseTime(time);
+				final int nextDoseTime = settings.getNextDoseTime(time);
+				final int lastDoseTime = (activeDoseTime == -1) ? (nextDoseTime - 1) : (activeDoseTime - 1);
+
+				final Calendar date = settings.getActiveDate(time);
+				mNotificationIntent.putExtra(DrugListActivity.EXTRA_DAY, date);
+
+				Log.d(TAG, "date: " + DateTime.toString(date));
+				Log.d(TAG, "times: active=" + activeDoseTime + ", next=" + nextDoseTime + ", last=" + lastDoseTime);
+
+				if(lastDoseTime >= 0)
+					checkForForgottenIntakes(date, lastDoseTime);
+
+				if(activeDoseTime == -1)
+				{
+					long sleepTime = settings.getMillisUntilDoseTimeBegin(time, nextDoseTime);
+
+					Log.d(TAG, "sleeping " + new DumbTime(sleepTime)  +" until beginning of dose time " + nextDoseTime);
+
+					sleep(sleepTime);
+					doDelayFirstNotification = false;
+
+					if(settings.getActiveDoseTime() != nextDoseTime)
+						Log.e(TAG, "unexpected dose time, expected " + nextDoseTime);
+
+					continue;
+				}
+				else if(activeDoseTime == Drug.TIME_MORNING)
+				{
+					cancelNotification(R.id.notification_intake_forgotten);
+					checkSupplies(false);
+				}
+
+				final int pendingIntakeCount = countOpenIntakes(date, activeDoseTime);
+
+				Log.d(TAG, "Pending intakes: " + pendingIntakeCount);
+
+				if(pendingIntakeCount != 0)
+				{
+					if(doDelayFirstNotification && mWasRunning)
+					{
+						doDelayFirstNotification = false;
+						Log.d(TAG, "Delaying first notification");
+						sleep(Constants.NOTIFICATION_INITIAL_DELAY);
+					}
+
+					final String contentText = Integer.toString(pendingIntakeCount);
+					final long snoozeTime = settings.getSnoozeTime();
+
+					long iterations = settings.getMillisUntilDoseTimeEnd(time, activeDoseTime) / snoozeTime;
+				
+					do
+					{
+						postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL,
+								contentText, mSnoozeType == SNOOZE_AUTO);								
+
+						if(mSnoozeType == SNOOZE_DISABLED)
+							break;
+
+						if(mSnoozeType == SNOOZE_MANUAL)
+						{
+							final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEndRaw(time, activeDoseTime);
+							final long waitMillis = millisUntilDoseTimeEnd - snoozeTime;
+							
+							if(waitMillis <= 0)
+								break;
+							
+							Log.d(TAG, "Snoozing...");
+							
+							synchronized(mSnoozeLock)
+							{
+								SleepState.INSTANCE.onEnterSleep(waitMillis);
+								mSnoozeLock.wait(waitMillis);
+								SleepState.INSTANCE.onFinishedSleep();
+							}
+							
+							Log.d(TAG, "Snooze cancelled");
+
+							//Toast.makeText(sInstance, "Snoozing", Toast.LENGTH_SHORT).show();
+							
+							cancelNotification(R.id.notification_intake_pending);
+						}
+						
+						Log.d(TAG, "Message loop will be finished after sleeping " + snoozeTime + "ms");
+						
+						sleep(snoozeTime);				
+
+					} while(--iterations > 0);
+				}
+
+				final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEndRaw(DateTime.now(), activeDoseTime);
+				if(millisUntilDoseTimeEnd > 0)
+				{
+					Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms until end of dose time " + activeDoseTime);
+					sleep(millisUntilDoseTimeEnd);
+				}
+				
+				Log.d(TAG, "Reached end of main loop");
+
+				cancelNotification(R.id.notification_intake_pending);
+				checkForForgottenIntakes(date, activeDoseTime);
+			}
+		}
+		catch(InterruptedException e)
+		{
+			Log.d(TAG, "Thread interrupted, exiting...");
+		}
+		catch(Exception e)
+		{
+			Log.e(TAG, "Service died due to exception", e);
+			writeCrashLog(e);
+		}
+		
+		Log.d(TAG, "Thread exited");
 	}
 
 	private int countOpenIntakes(Calendar date, int doseTime)
@@ -491,6 +503,7 @@ public class NotificationService extends Service implements
 	{
 		int count = countForgottenIntakes(date, lastDoseTime);
 
+		Log.d(TAG, "checkForForgottenIntakes(" + DateTime.toString(date) + ", " + lastDoseTime + ")");
 		Log.d(TAG, "Forgotten intakes: " + count);
 
 		if(count != 0)
@@ -641,7 +654,8 @@ public class NotificationService extends Service implements
 
 		final Notification notification = new Notification();
 		notification.icon = R.drawable.ic_stat_pill;
-		notification.tickerText = getString(R.string._msg_new_notification);
+		//notification.tickerText = getString(R.string._msg_new_notification);
+		notification.tickerText = msgBuilder.toString();
 		notification.flags |= Notification.FLAG_NO_CLEAR;
 		notification.defaults = Preferences.instance().filterNotificationDefaults(defaults);
 		notification.contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mNotificationIntent, 0);
@@ -660,7 +674,7 @@ public class NotificationService extends Service implements
 	}
 
 	private void cancelNotification(int id) {
-		postNotification(id, Notification.DEFAULT_LIGHTS, null);
+		postNotification(id, Notification.DEFAULT_LIGHTS, null, true);
 	}
 
 	private void cancelAllNotifications(boolean resetHash)
@@ -671,7 +685,7 @@ public class NotificationService extends Service implements
 			mLastNotificationHash = 0;
 	}
 
-	private void clearAllNotifications()
+	private void clearAllNotifications() 
 	{
 		clearAllNotifications(true);
 	}
@@ -720,7 +734,7 @@ public class NotificationService extends Service implements
 
 		final Hasher hasher = new Hasher();
 
-		hasher.hash(n.audioStreamType);
+		//hasher.hash(n.audioStreamType);
 		hasher.hash(n.contentIntent != null);
 		hasher.hash(contentViewLayoutId);
 		hasher.hash(n.defaults);
@@ -733,7 +747,7 @@ public class NotificationService extends Service implements
 		hasher.hash(n.ledOnMS);
 		hasher.hash(n.number);
 		hasher.hash(n.sound);
-		hasher.hash(n.tickerText);
+		//hasher.hash(n.tickerText);
 		hasher.hash(n.vibrate);
 		hasher.hash(msg);
 

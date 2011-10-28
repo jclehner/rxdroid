@@ -75,9 +75,9 @@ public class DumbTime implements Comparable<DumbTime>
 		this(offset, false);
 	}
 
-	private static final long SMILLIS = 1000L;
-	private static final long MMILLIS = 60L * SMILLIS;
-	private static final long HMILLIS = 60L * MMILLIS;	
+	private static final int S_MILLIS = 1000;
+	private static final int M_MILLIS = 60 * S_MILLIS;
+	private static final int H_MILLIS = 60 * M_MILLIS;	
 	
 	/**
 	 * Creates an instance using an offset from midnight.
@@ -91,14 +91,14 @@ public class DumbTime implements Comparable<DumbTime>
 		if(offset >= Constants.MILLIS_PER_DAY && !allowMoreThan24Hours)
 			throw new IllegalArgumentException(offset + " is out of range");
 		
-		mHours = (int) (offset / HMILLIS);
-		offset -= mHours * HMILLIS;
+		mHours = (int) (offset / H_MILLIS);
+		offset -= mHours * H_MILLIS;
 				
-		mMinutes = (int) (offset / MMILLIS);
-		offset -= mMinutes * MMILLIS;
+		mMinutes = (int) (offset / M_MILLIS);
+		offset -= mMinutes * M_MILLIS;
 				
-		mSeconds = (int) (offset / SMILLIS);
-		offset -= mSeconds * SMILLIS;
+		mSeconds = (int) (offset / S_MILLIS);
+		offset -= mSeconds * S_MILLIS;
 				
 		mMillis = (int) offset;
 	}
