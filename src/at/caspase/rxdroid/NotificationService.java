@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -51,6 +52,7 @@ import at.caspase.rxdroid.debug.SleepState;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
+import at.caspase.rxdroid.util.Sleeper;
 
 /**
  * Primary notification service.
@@ -66,7 +68,7 @@ public class NotificationService extends Service implements
 	public static final int RESTART_FORCE = 64 << 1;
 	public static final int RESTART_DELAYFIRST = 64 << 2;
 
-	private static final String TAG = NotificationService.class.getSimpleName();
+	private static final String TAG = NotificationService.class.getName();
 
 	private static final int SNOOZE_DISABLED = 0;
 	private static final int SNOOZE_AUTO = 1;
@@ -332,6 +334,8 @@ public class NotificationService extends Service implements
 		final Preferences settings = Preferences.instance();
 		boolean doDelayFirstNotification = mDelayFirstNotification;
 
+		Log.d(TAG, "mSnoozeType=" + mSnoozeType);
+		
 		try
 		{
 			while(true)
@@ -357,7 +361,7 @@ public class NotificationService extends Service implements
 
 					Log.d(TAG, "sleeping " + new DumbTime(sleepTime)  +" until beginning of dose time " + nextDoseTime);
 
-					sleep(sleepTime);
+					Thread.sleep(sleepTime);
 					doDelayFirstNotification = false;
 
 					if(settings.getActiveDoseTime() != nextDoseTime)
@@ -372,7 +376,10 @@ public class NotificationService extends Service implements
 				}
 
 				final int pendingIntakeCount = countOpenIntakes(date, activeDoseTime);
-
+				final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEnd(time, activeDoseTime);
+				
+				final Sleeper sleeper = new Sleeper(millisUntilDoseTimeEnd);
+				
 				Log.d(TAG, "Pending intakes: " + pendingIntakeCount);
 
 				if(pendingIntakeCount != 0)
@@ -381,15 +388,18 @@ public class NotificationService extends Service implements
 					{
 						doDelayFirstNotification = false;
 						Log.d(TAG, "Delaying first notification");
-						sleep(Constants.NOTIFICATION_INITIAL_DELAY);
+						sleeper.sleep(Constants.NOTIFICATION_INITIAL_DELAY);
 					}
 
 					final String contentText = Integer.toString(pendingIntakeCount);
 					final long snoozeTime = settings.getSnoozeTime();
-
-					long iterations = settings.getMillisUntilDoseTimeEnd(time, activeDoseTime) / snoozeTime;
+										
+					//long iterations = settings.getMillisUntilDoseTimeEnd(time, activeDoseTime) / snoozeTime;
 				
-					do
+					postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL, 
+							contentText, mSnoozeType == SNOOZE_AUTO);
+					
+					/*do
 					{
 						postNotification(R.id.notification_intake_pending, Notification.DEFAULT_ALL,
 								contentText, mSnoozeType == SNOOZE_AUTO);								
@@ -425,15 +435,10 @@ public class NotificationService extends Service implements
 						
 						sleep(snoozeTime);				
 
-					} while(--iterations > 0);
+					} while(--iterations > 0);*/
 				}
 
-				final long millisUntilDoseTimeEnd = settings.getMillisUntilDoseTimeEndRaw(DateTime.now(), activeDoseTime);
-				if(millisUntilDoseTimeEnd > 0)
-				{
-					Log.d(TAG, "Sleeping " + millisUntilDoseTimeEnd + "ms until end of dose time " + activeDoseTime);
-					sleep(millisUntilDoseTimeEnd);
-				}
+				sleeper.sleep();
 				
 				Log.d(TAG, "Reached end of main loop");
 
@@ -648,9 +653,8 @@ public class NotificationService extends Service implements
 		final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
 		views.setTextViewText(R.id.stat_title, getString(R.string._title_notifications));
 		views.setTextViewText(R.id.stat_text, msgBuilder.toString());
-		// views.setTextViewText(R.id.stat_time, new
-		// SimpleDateFormat("HH:mm").format(DateTime.now()));
-		views.setTextViewText(R.id.stat_time, "");
+		views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(DateTime.now().getTime()));
+		//views.setTextViewText(R.id.stat_time, "");
 
 		final Notification notification = new Notification();
 		notification.icon = R.drawable.ic_stat_pill;
@@ -756,24 +760,6 @@ public class NotificationService extends Service implements
 
 	private static void setInstance(NotificationService instance) {
 		sInstance = instance;
-	}
-
-	private static void sleep(long time) throws InterruptedException
-	{
-		if(time > 0)
-		{
-			SleepState.INSTANCE.onEnterSleep(time);
-			try
-			{
-				Thread.sleep(time);
-			}
-			finally
-			{
-				SleepState.INSTANCE.onFinishedSleep();
-			}
-		}
-		else
-			Log.d(TAG, "sleep: ignoring time of " + time);
 	}
 
 	private void writeCrashLog(Exception cause)
