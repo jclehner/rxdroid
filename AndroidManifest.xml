@@ -33,7 +33,7 @@
 
 		<uses-library android:name="android.test.runner" />
 
-		<service android:name=".NotificationService" />
+		<service android:name=".NotificationService2" />
 
 		<receiver android:name=".MyBroadcastReceiver">
 			<intent-filter>

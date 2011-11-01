@@ -58,35 +58,20 @@ public class Sleeper
 			notify();
 	}
 	
-	public void sleep(long millis) throws InterruptedException
+	public void sleepPart(long millis) throws InterruptedException
 	{
 		if(millis < 0)
 			throw new IllegalArgumentException();
 		
-		doSleep(getSleepTime(millis));
+		sleep(getSleepTime(millis));
 	}
 	
-	public void sleep() throws InterruptedException
+	public void sleepRemaining() throws InterruptedException
 	{
-		doSleep(mEnd - System.currentTimeMillis());
+		sleep(mEnd - System.currentTimeMillis());
 	}
 	
-	private long getSleepTime(long millis)
-	{
-		final long now = System.currentTimeMillis();
-		
-		if(now < mEnd)
-		{
-			if((now + millis) < mEnd)
-				return millis;
-			else
-				return mEnd - now;
-		}
-		
-		return 0;
-	}
-	
-	private static void doSleep(long time) throws InterruptedException
+	public static void sleep(long time) throws InterruptedException
 	{
 		if(time > 0)
 		{
@@ -103,4 +88,18 @@ public class Sleeper
 		}
 	}
 	
+	private long getSleepTime(long millis)
+	{
+		final long now = System.currentTimeMillis();
+		
+		if(now < mEnd)
+		{
+			if((now + millis) < mEnd)
+				return millis;
+			else
+				return mEnd - now;
+		}
+		
+		return 0;
+	}		
 }

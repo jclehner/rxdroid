@@ -155,26 +155,7 @@ public class DrugListActivity extends Activity implements
 		else
 			throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());
 		
-		if(!NotificationService.isRunning())
-		{
-			startNotificationService(0);			
-			Log.w(TAG, "onResume: Notification service was not running");
-			if(/*!mSharedPreferences.getBoolean("debug_enabled", false)*/ true)
-			{
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string._title_warning);
-				builder.setIcon(android.R.drawable.ic_dialog_alert);
-				builder.setMessage(R.string._msg_warning_svc_not_running);
-				builder.setPositiveButton(android.R.string.ok, null);
-				builder.show();
-			}
-		}
-		else if(intent.getBooleanExtra(EXTRA_STARTED_BY_NOTIFICATION, false))
-		{
-			Log.d(TAG, "onResume: Activity was started by notification");
-			NotificationService.requestSnooze();
-			intent.putExtra(EXTRA_STARTED_BY_NOTIFICATION, false);
-		}
+		startNotificationService();
 	}
 
 	@Override
@@ -416,19 +397,19 @@ public class DrugListActivity extends Activity implements
 	/////////////
 	
 	@Override
-	public boolean onTouch(View v, MotionEvent event) {		
+	public boolean onTouch(View v, MotionEvent event) 
+	{		
 		super.onTouchEvent(event);
 		return mGestureDetector.onTouchEvent(event);
 	}
 	
 	/////////////
 
-	private void startNotificationService(int restartFlags)
+	private void startNotificationService()
 	{
 		Intent serviceIntent = new Intent();
-		serviceIntent.setClass(this, NotificationService.class);
-		serviceIntent.putExtra(NotificationService.EXTRA_RESTART_FLAGS, restartFlags);
-
+		serviceIntent.setClass(this, NotificationService2.class);
+		
 		startService(serviceIntent);
 	}
 
