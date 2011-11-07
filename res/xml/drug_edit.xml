@@ -10,50 +10,50 @@
 		android:title="@string/_title_delete"
 	/>
 	
-	<PreferenceCategory android:title="Intake schedule">
+	<PreferenceCategory android:title="@string/_title_intake_schedule">
 		
 		<at.caspase.rxdroid.preferences.DosePreference android:key="morning"
-			android:title="Morning"
+			android:title="@string/_Morning"
 		/>
 		
 		<at.caspase.rxdroid.preferences.DosePreference android:key="noon"
-			android:title="Noon"
+			android:title="@string/_Noon"
 		/>
 		
 		<at.caspase.rxdroid.preferences.DosePreference android:key="evening"
-			android:title="Evening"
+			android:title="@string/_Evening"
 		/>
 		
 		<at.caspase.rxdroid.preferences.DosePreference android:key="night"
-			android:title="Night"
+			android:title="@string/_Night"
 		/>
 				
 		<ListPreference android:key="frequency" 
-			android:title="Frequency" 
+			android:title="@string/_title_repeat" 
 			android:entries="@array/drug_frequency"
 		/>
 					
 	</PreferenceCategory>
 	
-	<PreferenceCategory android:title="Miscellaneous">
+	<PreferenceCategory android:title="@string/_title_misc">
 	
 		<ListPreference android:key="drug_form"
-			android:title="Drug form"
+			android:title="@string/_title_icon"
 			android:entries="@array/drug_forms"
 		/>
 		
 		<at.caspase.rxdroid.preferences.FractionPreference android:key="current_supply"
-			android:title="Current supply"
+			android:title="@string/_title_current_supply"
 		/>
 		
 		<EditTextPreference android:key="refill_size"
-			android:title="Refill size"
+			android:title="@string/_title_refill_size"
 			android:inputType="number"
 			android:selectAllOnFocus="true"
 		/>
 		
 		<CheckBoxPreference android:key="is_active"
-			android:title="Active"
+			android:title="@string/_title_active"
 		/>
 		
 	</PreferenceCategory>

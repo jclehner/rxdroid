@@ -180,7 +180,8 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 			views.setTextViewText(R.id.stat_title, getString(R.string._title_notifications));
 			views.setTextViewText(R.id.stat_text, message);
 			//views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(DateTime.now().getTime()));
-
+			views.setTextViewText(R.id.stat_time, "");
+			
 			final Intent intent = new Intent(this, DrugListActivity.class);
 			intent.setAction(Intent.ACTION_VIEW);
 			intent.putExtra(DrugListActivity.EXTRA_DAY, date);
@@ -189,7 +190,7 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 			notification.icon = R.drawable.ic_stat_pill;
 			notification.tickerText = getString(R.string._msg_new_notification);
 			notification.flags |= Notification.FLAG_NO_CLEAR;
-			notification.defaults = Notification.DEFAULT_ALL;
+			notification.defaults |= Notification.DEFAULT_ALL;
 			notification.contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 			notification.contentView = views;
 			if(notificationCount > 1)

@@ -136,9 +136,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			if(mDrugHash != mDrug.hashCode())
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle("Save changes");
+				builder.setTitle(R.string._title_save_chanes);
 				builder.setIcon(android.R.drawable.ic_dialog_info);
-				builder.setMessage("Do you want to save changes made to this drug?");
+				builder.setMessage(R.string._msg_save_drug_changes /* "Do you want to save changes made to this drug?" */);
 
 				final DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
 
@@ -410,8 +410,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			if(currentSupplyDays > 0)
 			{
 				final Calendar end = DateTime.today();				
-				end.add(Calendar.DAY_OF_MONTH, currentSupplyDays);		
-				mCurrentSupply.setSummary(mCurrentSupply.getSummary() + " - lasts until " + DateTime.toNativeDate(end.getTime()));				
+				end.add(Calendar.DAY_OF_MONTH, currentSupplyDays);
+				
+				mCurrentSupply.setSummary(getString(R.string._msg_supply, 
+						currentSupply.toString(), DateTime.toNativeDate(end.getTime())));			
 			}		
 		}
 
@@ -472,8 +474,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		final Context context = this;
 		
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Every N days");
-		builder.setMessage("How many days between each occurence?");		
+		builder.setTitle(R.string._title_every_n_days);
+		builder.setMessage(R.string._msg_every_n_days_distance);		
 		builder.setView(editText);
 		builder.setCancelable(true);
 		builder.setNegativeButton(android.R.string.cancel, null);
@@ -490,7 +492,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 						new DatePickerDialog(context, onDateSetListener, year, month, day);
 				
 				datePickerDialog.setCancelable(false);
-				datePickerDialog.setMessage("Pick a starting date.");
+				datePickerDialog.setMessage(getString(R.string._msg_repetition_origin));
 				datePickerDialog.show();
 			}
 		});

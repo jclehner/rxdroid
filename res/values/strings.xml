@@ -41,7 +41,6 @@
     <string name="_title_delete">Delete</string>
     
     <string name="_msg_freq_daily">Daily</string>
-    <string name="_msg_freq_every_other">Every second day. Next: %1$s</string>
 	<string name="_msg_freq_weekly">Every %1$s</string>
 
 	<string name="_msg_delete_drug">Are you sure that you want to delete this drug?</string>
@@ -136,6 +135,23 @@
 	
 	<string name="_title_dont_snooze">Don\'t snooze</string>
 	<string name="_title_repeat_alarm">Repeat alarm</string>
-	<string name="_title_snooze">Snooze</string>	
+	<string name="_title_snooze">Snooze</string>
+	
+	<string name="_msg_supply">%1$s - lasts until %2$s</string>
+	
+	<string name="_title_save_chanes">Save changes</string>
+	<string name="_msg_save_drug_changes">Do you want to save changes made to this drug?</string>
+	<string name="_msg_every_n_days_distance">How many days between each repetition?</string>
+	<string name="_msg_repetition_origin">Pick a starting date.</string>
+	
+	<string name="_title_intake_schedule">Intake schedule</string>
+	<string name="_title_repeat">Repeat</string>
+	<string name="_title_misc">Miscellaneous</string>
+	<string name="_title_icon">Icon</string>
+	<string name="_title_current_supply">Current supply</string>
+	<string name="_title_refill_size">Refill size</string>
+	<string name="_title_active">Active</string>
+	    
+	    
 	
 </resources>
