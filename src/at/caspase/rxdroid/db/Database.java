@@ -401,6 +401,9 @@ public final class Database
 	
 	private static<T> List<T> queryForAll(Dao<T, Integer> dao)
 	{
+		if(dao == null)
+			throw new IllegalStateException("dao == null. Did you call Database.load() ?");
+		
 		try
 		{
 			return dao.queryForAll();

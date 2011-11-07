@@ -1,6 +1,5 @@
 package at.caspase.rxdroid;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -24,11 +23,13 @@ import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
-import at.caspase.rxdroid.util.Hasher;
 
 public class NotificationService2 extends Service implements OnDatabaseChangedListener, OnSharedPreferenceChangeListener
 {
 	private static final String TAG = NotificationService2.class.getName();
+	
+	private static final String EXTRA_SCHEDULED_START = "scheduled_start";
+	private static final String EXTRA_DATE = "date";
 	
 	private AlarmManager mAlarmMgr;
 	private Preferences mSettings;
@@ -38,9 +39,6 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 	private PendingIntent mOperation;
 	
 	private int mLastMessageHash = 0;
-	
-	public static final String EXTRA_DOSE_TIME = "dose_time";
-	public static final String EXTRA_DATE = "date";
 	
 	@Override
 	public void onEntryCreated(Entry entry, int flags)
@@ -74,6 +72,8 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		super.onCreate();
 		
 		GlobalContext.set(getApplicationContext());
+		Database.load();
+		Database.registerOnChangedListener(this);
 		
 		mAlarmMgr = (AlarmManager) getSystemService(ALARM_SERVICE);
 		mSettings = Preferences.instance();
@@ -81,9 +81,8 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		mNotificationMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		
 		Intent intent = new Intent(this, NotificationService2.class);
+		intent.putExtra(EXTRA_SCHEDULED_START, true);
 		mOperation = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
-		
-		Database.registerOnChangedListener(this);
 	}
 	
 	@Override
@@ -91,8 +90,6 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 	{
 		Log.d(TAG, "onDestroy");
 		super.onDestroy();
-		
-		cancelAllAlarms();
 		
 		Database.unregisterOnChangedListener(this);
 		mLastMessageHash = 0;
@@ -111,7 +108,7 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		Log.d(TAG, "onStartCommand: intent=" + intent);
 		rescheduleAlarms();
 		
-		return START_REDELIVER_INTENT;
+		return START_NOT_STICKY;
 	}
 	
 	private void rescheduleAlarms()
@@ -123,16 +120,19 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		final Calendar now = DateTime.now();
 		final Calendar activeDate = mSettings.getActiveDate(now);
 		int activeDoseTime = mSettings.getActiveDoseTime(now);
-				
-		if(activeDoseTime != -1)
-			updateNotifications(activeDate, activeDoseTime);
+		int nextDoseTime = mSettings.getNextDoseTime(now);
 		
-		scheduleNextAlarm(now, activeDate);	
+		if(activeDoseTime != -1)
+			updateNotifications(activeDate, activeDoseTime, false);
+		else if(nextDoseTime != Drug.TIME_MORNING)
+			updateNotifications(activeDate, nextDoseTime - 1, true);		
+			
+		scheduleNextAlarms(now, activeDate, activeDoseTime);	
 	}
 	
-	private void updateNotifications(Calendar date, int doseTime)
+	private void updateNotifications(Calendar date, int doseTime, boolean isDoseTimeEnd)
 	{
-		int pendingIntakes = countOpenIntakes(date, doseTime);
+		int pendingIntakes = isDoseTimeEnd ? 0 : countOpenIntakes(date, doseTime);
 		int forgottenIntakes = countForgottenIntakes(date, doseTime);
 		String lowSupplyMessage = getLowSupplyMessage(date, doseTime);
 		
@@ -152,14 +152,6 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 				doseMessage = getString(R.string._msg_doses_p, pendingIntakes);
 			else if(forgottenIntakes != 0)
 				doseMessage = getString(R.string._msg_doses_f, forgottenIntakes);
-						
-			/*
-			Hasher hasher = new Hasher();
-			hasher.hash(lowSupplyMessage);
-			hasher.hash(doseMessage);
-			
-			int notificationHash = hasher.getHashCode();
-			*/
 			
 			final String bullet;
 			
@@ -187,7 +179,7 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 			final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
 			views.setTextViewText(R.id.stat_title, getString(R.string._title_notifications));
 			views.setTextViewText(R.id.stat_text, message);
-			views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(DateTime.now().getTime()));
+			//views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(DateTime.now().getTime()));
 
 			final Intent intent = new Intent(this, DrugListActivity.class);
 			intent.setAction(Intent.ACTION_VIEW);
@@ -201,8 +193,7 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 			notification.contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 			notification.contentView = views;
 			if(notificationCount > 1)
-				notification.number = notificationCount;
-			
+				notification.number = notificationCount;			
 			
 			int messageHash = message.hashCode();
 			
@@ -215,21 +206,19 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		}		
 	}	
 
-	private void scheduleNextAlarm(Calendar time, Calendar activeDate)
+	private void scheduleNextAlarms(Calendar time, Calendar activeDate, int activeDoseTime)
 	{
 		final int nextDoseTime = mSettings.getNextDoseTime(time);
-		final long offset = mSettings.getMillisUntilDoseTimeBegin(time, nextDoseTime);
+		final long offsetBegin = mSettings.getMillisUntilDoseTimeBegin(time, nextDoseTime);
+		final long elapsed = SystemClock.elapsedRealtime();
 		
-		//final long atTime = SystemClock.elapsedRealtime() + ;
-				
-		/*Log.d(TAG, "scheduleNextAlarm: atTime=" + new DumbTime(atTime % Constants.MILLIS_PER_DAY));
-		Log.d(TAG, "  time=" + DateTime.toString(time));
-		Log.d(TAG, "  activeDate=" + DateTime.toString(activeDate));
-		Log.d(TAG, "  offset=")*/
+		mAlarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, elapsed + offsetBegin, mOperation);
 		
-		Log.d(TAG,"scheduleNextAlarm: next alarm in " + new DumbTime(offset).toString(true));
-		
-		mAlarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + offset, mOperation);
+		if(activeDoseTime != -1)
+		{
+			final long offsetEnd = mSettings.getMillisUntilDoseTimeEnd(time, activeDoseTime);
+			mAlarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, elapsed + offsetEnd, mOperation);
+		}
 	}
 	
 	private void cancelAllAlarms()

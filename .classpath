@@ -14,6 +14,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/RxDroid/lib/ormlite-core-4.27-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/opt/android-sdk/extras/android/compatibility/v13/android-support-v13.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

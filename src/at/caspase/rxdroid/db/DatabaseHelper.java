@@ -81,6 +81,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 				final String packageName = Database.class.getPackage().getName();
 				final String classNames[] = { "Drug", "Intake" };
 				
+				int updatedDataCount = 0;
+				
 				for(String className : classNames)
 				{
 					final String oldDataClassName = packageName + ".v" + oldVersion + ".Old" + className;
@@ -94,6 +96,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 					try
 					{
 						oldDataClass = Class.forName(oldDataClassName);
+						++updatedDataCount;
 					}
 					catch(Exception e)
 					{
@@ -114,7 +117,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 						
 						Entry entry = (Entry) convertMethod.invoke(data);
 						newDao.create(entry);
-					}			
+					}
+					
+					if(updatedDataCount == 0)
+						resetDatabase(db, cs);
 				}
 			}
 			else if(oldVersion < newVersion)
@@ -173,6 +179,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	
 	private void resetDatabase(SQLiteDatabase db, ConnectionSource cs)
 	{
+		Log.d(TAG, "Resetting DB");
+		
 		try
 		{
 			TableUtils.dropTable(cs, Drug.class, true);
