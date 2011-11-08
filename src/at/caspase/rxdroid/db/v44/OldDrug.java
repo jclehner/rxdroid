@@ -49,11 +49,11 @@ public class OldDrug extends Entry
 			switch(frequency)
 			{
 				case FREQ_EVERY_N_DAYS:
-					newFrequency = Drug.FREQ_EVERY_N_DAYS;
+					newFrequency = Drug.REPEAT_EVERY_N_DAYS;
 					break;
 					
 				case FREQ_WEEKDAYS:
-					newFrequency = Drug.FREQ_WEEKDAYS;
+					newFrequency = Drug.REPEAT_WEEKDAYS;
 					break;
 					
 				default:

@@ -82,7 +82,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			"noon",
 			"evening",
 			"night",
-			"frequency",
+			"repeat",
 			"drug_form",
 			"current_supply",
 			"refill_size",
@@ -185,35 +185,35 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 		else if("morning".equals(key) || "noon".equals(key) || "evening".equals(key) || "night".equals(key))
 			mDrug.setDose(DosePreference.getDoseTimeFromKey(key), (Fraction) newValue);
-		else if("frequency".equals(key))
+		else if("repeat".equals(key))
 		{			
-			final int frequency = toInt(newValue);
+			final int repeat = toInt(newValue);
 
-			if(frequency != Drug.FREQ_DAILY)
+			if(repeat != Drug.REPEAT_DAILY)
 			{
-				switch(frequency)
+				switch(repeat)
 				{
-					case Drug.FREQ_EVERY_N_DAYS:
-						handleEveryNDaysFrequency();
+					case Drug.REPEAT_EVERY_N_DAYS:
+						handleEveryNDaysRepeat();
 						break;
 						
-					case Drug.FREQ_WEEKDAYS:
-						handleWeekdayFrequency();
+					case Drug.REPEAT_WEEKDAYS:
+						handleWeekdayRepeat();
 						break;		
 
 					default:
-						throw new IllegalStateException("Invalid frequency value");
+						throw new IllegalStateException("Invalid repeat value");
 				}
 			}
 			else
 			{
-				mDrug.setFrequency(Drug.FREQ_DAILY);
+				mDrug.setRepeat(Drug.REPEAT_DAILY);
 				updatePreferences();
 			}
 			
-			// the user might cancel a dialog in one of the handle<foobar>Frequency()
+			// the user might cancel a dialog in one of the handle<foobar>Repeat()
 			// functions. by returning false here, we ensure that setValueIndex() is
-			// only called if the frequency was actually changed
+			// only called if the repeat was actually changed
 			return false;
 		}
 		else if("drug_form".equals(key))
@@ -282,7 +282,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		for(int i = 0; i != dosePrefKeys.length; ++i)
 			mDosePrefs[i] = (DosePreference) findPreference(dosePrefKeys[i]);
 
-		mFreqPreference = (ListPreference) findPreference("frequency");
+		mFreqPreference = (ListPreference) findPreference("repeat");
 		mDrugForm = (ListPreference) findPreference("drug_form");
 		mCurrentSupply = (FractionPreference) findPreference("current_supply");
 		mRefillSize = (EditTextPreference) findPreference("refill_size");
@@ -358,35 +358,35 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		
 		mDrugName.setName(mDrug.getName());
 
-		// intake frequency
+		// intake repeat
 
-		final int frequency = mDrug.getFrequency();
+		final int repeat = mDrug.getRepeat();
 		final String summary;
 
-		switch(frequency)
+		switch(repeat)
 		{
-			case Drug.FREQ_DAILY:
+			case Drug.REPEAT_DAILY:
 				summary = getString(R.string._msg_freq_daily);
 				break;
 				
-			case Drug.FREQ_EVERY_N_DAYS:
-				int distance = (int) mDrug.getFrequencyArg();
+			case Drug.REPEAT_EVERY_N_DAYS:
+				int distance = (int) mDrug.getRepeatArg();
 				// FIXME change to next occurence
-				String origin = DateTime.toNativeDate(mDrug.getFrequencyOrigin());			
+				String origin = DateTime.toNativeDate(mDrug.getRepeatOrigin());			
 				summary = getString(R.string._msg_freq_every_n_days, distance, origin);
 				break;
 				
-			case Drug.FREQ_WEEKDAYS:
-				long frequencyArg = mDrug.getFrequencyArg();				
-				summary = getWeekdayFrequencySummary(frequencyArg);
+			case Drug.REPEAT_WEEKDAYS:
+				long repeatArg = mDrug.getRepeatArg();				
+				summary = getWeekdayRepeatSummary(repeatArg);
 				break;
 
 			default:
-				throw new IllegalStateException("Invalid frequency value " + frequency);
+				throw new IllegalStateException("Invalid repeat value " + repeat);
 		}
 
 		mFreqPreference.setSummary(summary);
-		mFreqPreference.setValueIndex(frequency);
+		mFreqPreference.setValueIndex(repeat);
 
 		// drug form
 		int form = mDrug.getForm();
@@ -436,24 +436,24 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		mIsActive.setChecked(mDrug.isActive());
 	}
 	
-	private void handleEveryNDaysFrequency()
+	private void handleEveryNDaysRepeat()
 	{
-		final Date frequencyOrigin;
-		final long frequencyArg;
+		final Date repeatOrigin;
+		final long repeatArg;
 		
-		if(mDrug.getFrequency() != Drug.FREQ_EVERY_N_DAYS)
+		if(mDrug.getRepeat() != Drug.REPEAT_EVERY_N_DAYS)
 		{
-			frequencyOrigin = DateTime.today().getTime();
-			frequencyArg = 2;
+			repeatOrigin = DateTime.today().getTime();
+			repeatArg = 2;
 		}
 		else
 		{
-			frequencyOrigin = mDrug.getFrequencyOrigin();
-			frequencyArg = mDrug.getFrequencyArg();
+			repeatOrigin = mDrug.getRepeatOrigin();
+			repeatArg = mDrug.getRepeatArg();
 		}		
 		
 		final EditText editText = new EditText(this);
-		editText.setText(Long.toString(frequencyArg));
+		editText.setText(Long.toString(repeatArg));
 		editText.setEms(20);
 		editText.setMaxLines(1);
 		editText.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -464,9 +464,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			@Override
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
 			{	
-				mDrug.setFrequency(Drug.FREQ_EVERY_N_DAYS);
-				mDrug.setFrequencyOrigin(DateTime.date(year, monthOfYear, dayOfMonth).getTime());
-				mDrug.setFrequencyArg(Long.valueOf(editText.getText().toString()));
+				mDrug.setRepeat(Drug.REPEAT_EVERY_N_DAYS);
+				mDrug.setRepeatOrigin(DateTime.date(year, monthOfYear, dayOfMonth).getTime());
+				mDrug.setRepeatArg(Long.valueOf(editText.getText().toString()));
 				updatePreferences();
 			}
 		};
@@ -484,9 +484,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{				
-				int year = 1900 + frequencyOrigin.getYear();
-				int month = frequencyOrigin.getMonth();
-				int day = frequencyOrigin.getDate();
+				int year = 1900 + repeatOrigin.getYear();
+				int month = repeatOrigin.getMonth();
+				int day = repeatOrigin.getDate();
 				
 				DatePickerDialog datePickerDialog = 
 						new DatePickerDialog(context, onDateSetListener, year, month, day);
@@ -521,7 +521,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(enabled);	
 				
 				if(!enabled)
-					editText.setError(getString(R.string._msg_drug_frequency_gt_2));	
+					editText.setError(getString(R.string._msg_drug_repeat_ge_2));	
 				else
 					editText.setError(null);			
 			}
@@ -531,25 +531,25 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		editText.performClick();
 	}
 	
-	private void handleWeekdayFrequency()
+	private void handleWeekdayRepeat()
 	{	
-		// if this changes the drug's frequency, all frequency options are reset. if the
-		// drug's frequency already was FREQ_WEEKDAYS, this call will not change anything
-		mDrug.setFrequency(Drug.FREQ_WEEKDAYS);
+		// if this changes the drug's repeat, all repeat options are reset. if the
+		// drug's repeat already was FREQ_WEEKDAYS, this call will not change anything
+		mDrug.setRepeat(Drug.REPEAT_WEEKDAYS);
 		
-		long frequencyArg = mDrug.getFrequencyArg();
-		final boolean[] checkedItems = SimpleBitSet.toBooleanArray(frequencyArg, Constants.LONG_WEEK_DAY_NAMES.length);
+		long repeatArg = mDrug.getRepeatArg();
+		final boolean[] checkedItems = SimpleBitSet.toBooleanArray(repeatArg, Constants.LONG_WEEK_DAY_NAMES.length);
 				
-		if(frequencyArg == 0)
+		if(repeatArg == 0)
 		{
 			// check the current weekday if none are selected
 			final int weekday = DateTime.now().get(Calendar.DAY_OF_WEEK);
 			final int index = CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);				
 			checkedItems[index] = true;
-			frequencyArg |= 1 << index;
+			repeatArg |= 1 << index;
 		}
 				
-		final SimpleBitSet bitSet = new SimpleBitSet(frequencyArg);
+		final SimpleBitSet bitSet = new SimpleBitSet(repeatArg);
 		
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Weekydays");
@@ -570,7 +570,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
-				mDrug.setFrequencyArg(bitSet.longValue());
+				mDrug.setRepeatArg(bitSet.longValue());
 				updatePreferences();
 			}
 		});
@@ -578,13 +578,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		builder.show();
 	}
 	
-	private String getWeekdayFrequencySummary(long frequencyArgs)
+	private String getWeekdayRepeatSummary(long repeatArgs)
 	{
 		final LinkedList<String> weekdays = new LinkedList<String>();
 		
 		for(int i = 0; i != 7; ++i)
 		{
-			if((frequencyArgs & (1 << i)) != 0)
+			if((repeatArgs & (1 << i)) != 0)
 				weekdays.add(Constants.SHORT_WEEK_DAY_NAMES[i]);
 		}
 		

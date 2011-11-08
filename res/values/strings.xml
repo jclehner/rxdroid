@@ -116,7 +116,7 @@
 	<string name="_msg_freq_every_n_days">Every %1$s days, beginning on %2$s</string>
 	
 	<string name="_summary_intake_never">Never</string>
-	<string name="_msg_drug_frequency_gt_2">Must be greater than or equal to 2</string>
+	<string name="_msg_drug_repeat_ge_2">Must be greater than or equal to 2</string>
 	<string name="_title_version">Version</string>
 	
 	<string name="_summary_not_available">N/A</string>

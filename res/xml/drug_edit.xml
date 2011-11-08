@@ -28,9 +28,9 @@
 			android:title="@string/_Night"
 		/>
 				
-		<ListPreference android:key="frequency" 
+		<ListPreference android:key="repeat" 
 			android:title="@string/_title_repeat" 
-			android:entries="@array/drug_frequency"
+			android:entries="@array/drug_repeat"
 		/>
 					
 	</PreferenceCategory>

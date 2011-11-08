@@ -9,7 +9,7 @@
     	<item>@string/_title_other</item>
     </string-array>
     
-    <string-array name="drug_frequency">
+    <string-array name="drug_repeat">
     	<item>@string/_title_daily</item>
     	<item>@string/_title_every_n_days</item>
     	<item>@string/_title_pick_days</item>

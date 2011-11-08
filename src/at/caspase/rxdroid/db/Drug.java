@@ -88,19 +88,19 @@ public class Drug extends Entry
 	public static final int TIME_NIGHT = 3;
 	public static final int TIME_INVALID = 4;
 
-	public static final int FREQ_DAILY = 0;
-	public static final int FREQ_EVERY_N_DAYS = 1;
-	public static final int FREQ_WEEKDAYS = 2;
+	public static final int REPEAT_DAILY = 0;
+	public static final int REPEAT_EVERY_N_DAYS = 1;
+	public static final int REPEAT_WEEKDAYS = 2;
 	// TODO valid arguments: 6, 8, 12, with automapping to doseTimes
-	public static final int FREQ_EVERY_N_HOURS = 3;
+	public static final int REPEAT_EVERY_N_HOURS = 3;
 	
-	public static final int FREQARG_DAY_MON = 1;
-	public static final int FREQARG_DAY_TUE = 1 << 1;
-	public static final int FREQARG_DAY_WED = 1 << 2;
-	public static final int FREQARG_DAY_THU = 1 << 3;
-	public static final int FREQARG_DAY_FRI = 1 << 4;
-	public static final int FREQARG_DAY_SAT = 1 << 5;
-	public static final int FREQARG_DAY_SUN = 1 << 6;		
+	public static final int REPEATARG_DAY_MON = 1;
+	public static final int REPEATARG_DAY_TUE = 1 << 1;
+	public static final int REPEATARG_DAY_WED = 1 << 2;
+	public static final int REPEATARG_DAY_THU = 1 << 3;
+	public static final int REPEATARG_DAY_FRI = 1 << 4;
+	public static final int REPEATARG_DAY_SAT = 1 << 5;
+	public static final int REPEATARG_DAY_SUN = 1 << 6;		
 
 	@DatabaseField(unique = true)
 	private String name;
@@ -130,13 +130,14 @@ public class Drug extends Entry
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
 	private Fraction doseNight = new Fraction();
 
-	@DatabaseField(canBeNull = true, useGetSet = true)
-	private int frequency = FREQ_DAILY;
+	// TODO change column name
+	@DatabaseField(canBeNull = true)
+	private int repeat = REPEAT_DAILY;
 
 	/**
-	 * Defines the frequency origin.
+	 * Defines the repeat origin.
 	 *
-	 * For every frequency other than {@link #FREQ_DAILY}, this field holds a specific value,
+	 * For every repeat other than {@link #REPEAT_DAILY}, this field holds a specific value,
 	 * allowing {@link #hasDoseOnDate(Date)} to determine whether a dose is pending
 	 * on a specific date.
 	 *
@@ -148,10 +149,10 @@ public class Drug extends Entry
 	 * </ul>
 	 */
 	@DatabaseField(canBeNull = true)
-	private long frequencyArg = 0;
+	private long repeatArg = 0;
 	
 	@DatabaseField(canBeNull = true)
-	private java.util.Date frequencyOrigin;
+	private Date repeatOrigin;
 	
 	@DatabaseField(canBeNull = true)
 	private String comment;
@@ -169,7 +170,7 @@ public class Drug extends Entry
 	 * invalid object.
 	 */
 	public Drug(String name, int form, boolean active, int refillSize, Fraction currentSupply, Fraction[] schedule, 
-			int frequency, long frequencyArg, Date frequencyOrigin)
+			int repeat, long repeatArg, Date repeatOrigin)
 	{
 		this.name = name;
 		this.form = form;
@@ -180,9 +181,9 @@ public class Drug extends Entry
 		this.doseNoon = schedule[1];
 		this.doseEvening = schedule[2];
 		this.doseNight = schedule[3];
-		this.frequency = frequency;
-		this.frequencyArg = frequencyArg;
-		this.frequencyOrigin = frequencyOrigin;
+		this.repeat = repeat;
+		this.repeatArg = repeatArg;
+		this.repeatOrigin = repeatOrigin;
 	}
 
 	public boolean hasDoseOnDate(Calendar cal)
@@ -190,18 +191,18 @@ public class Drug extends Entry
 		if(cal == null)
 			throw new NullPointerException("cal == null");
 		
-		if(frequency == FREQ_DAILY)
+		if(repeat == REPEAT_DAILY)
 			return true;
 
-		if(frequency == FREQ_EVERY_N_DAYS)
+		if(repeat == REPEAT_EVERY_N_DAYS)
 		{
-			final long diffDays = Math.abs(frequencyOrigin.getTime() - cal.getTimeInMillis()) / Constants.MILLIS_PER_DAY;
-			return diffDays % frequencyArg == 0;
+			final long diffDays = Math.abs(repeatOrigin.getTime() - cal.getTimeInMillis()) / Constants.MILLIS_PER_DAY;
+			return diffDays % repeatArg == 0;
 		}
-		else if(frequency == FREQ_WEEKDAYS)
+		else if(repeat == REPEAT_WEEKDAYS)
 			return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
 		
-		throw new IllegalStateException("Frequency " + frequency + " not yet implemented");
+		throw new IllegalStateException("Repeat " + repeat + " not yet implemented");
 	}	
 
 	public String getName() {
@@ -232,16 +233,16 @@ public class Drug extends Entry
 		}
 	}
 
-	public int getFrequency() {
-		return frequency;
+	public int getRepeat() {
+		return repeat;
 	}
 
-	public long getFrequencyArg() {
-		return frequencyArg;
+	public long getRepeatArg() {
+		return repeatArg;
 	}
 	
-	public Date getFrequencyOrigin() {
-		return frequencyOrigin;
+	public Date getRepeatOrigin() {
+		return repeatOrigin;
 	}
 
 	public boolean isActive() {
@@ -283,13 +284,13 @@ public class Drug extends Entry
 	
 	public double getSupplyCorrectionFactor()
 	{
-		switch(frequency)
+		switch(repeat)
 		{				
-			case FREQ_EVERY_N_DAYS:
-				return frequencyArg / 1.0;
+			case REPEAT_EVERY_N_DAYS:
+				return repeatArg / 1.0;
 				
-			case FREQ_WEEKDAYS:
-				return 7.0 / Long.bitCount(frequencyArg);
+			case REPEAT_WEEKDAYS:
+				return 7.0 / Long.bitCount(repeatArg);
 				
 			default:
 				return 1.0;
@@ -340,68 +341,68 @@ public class Drug extends Entry
 		this.form = form;
 	}
 
-	public void setFrequency(int frequency)
+	public void setRepeat(int repeat)
 	{
-		if(frequency > FREQ_WEEKDAYS)
+		if(repeat > REPEAT_WEEKDAYS)
 			throw new IllegalArgumentException();
 		
-		if(frequency == this.frequency)
+		if(repeat == this.repeat)
 			return;
 		
-		Log.d(TAG, "setFrequency(" + frequency + ") on " + toString());
+		Log.d(TAG, "setRepeat(" + repeat + ") on " + toString());
 		
-		// the preference was changed, so reset all frequency-related settings		
-		this.frequency = frequency;
-		this.frequencyArg = 0;
-		this.frequencyOrigin = DateTime.today().getTime();
+		// the preference was changed, so reset all repeat-related settings		
+		this.repeat = repeat;
+		this.repeatArg = 0;
+		this.repeatOrigin = DateTime.today().getTime();
 	}
 
 	/**
-	 * Sets the frequency argument.
+	 * Sets the repeat argument.
 	 * 
-	 * @param frequencyArg the exact interpretation of this value depends on currently set frequency.
-	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's frequency.
-	 * @throws UnsupportedOperationException if this instance's frequency does not allow frequency arguments.
+	 * @param repeatArg the exact interpretation of this value depends on currently set repeat.
+	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's repeat.
+	 * @throws UnsupportedOperationException if this instance's repeat does not allow repeat arguments.
 	 */
-	public void setFrequencyArg(long frequencyArg) 
+	public void setRepeatArg(long repeatArg) 
 	{
-		if(frequency == FREQ_EVERY_N_DAYS)
+		if(repeat == REPEAT_EVERY_N_DAYS)
 		{
-			if(frequencyArg <= 1)
+			if(repeatArg <= 1)
 				throw new IllegalArgumentException();			
 		}
-		else if(frequency == FREQ_WEEKDAYS)
+		else if(repeat == REPEAT_WEEKDAYS)
 		{
 			// binary(01111111) = hex(0x7f) (all weekdays)
-			if(frequencyArg <= 0 || frequencyArg > 0x7f)
+			if(repeatArg <= 0 || repeatArg > 0x7f)
 				throw new IllegalArgumentException();		
 		}
-		else if(frequency == FREQ_EVERY_N_HOURS)
+		else if(repeat == REPEAT_EVERY_N_HOURS)
 		{
-			if(frequencyArg != 6 && frequencyArg != 8 && frequencyArg != 12)
+			if(repeatArg != 6 && repeatArg != 8 && repeatArg != 12)
 				throw new IllegalArgumentException();			
 		}
 		else
 			throw new UnsupportedOperationException();	
 		
-		this.frequencyArg = frequencyArg;
+		this.repeatArg = repeatArg;
 	}
 	
 	/**
-	 * Sets the frequency origin.
-	 * @param frequencyOrigin
-	 * @throws UnsupportedOperationException if this instance's frequency does not allow a frequency origin.
-	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's frequency.
+	 * Sets the repeat origin.
+	 * @param repeatOrigin
+	 * @throws UnsupportedOperationException if this instance's repeat does not allow a repeat origin.
+	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's repeat.
 	 */
-	public void setFrequencyOrigin(Date frequencyOrigin) 
+	public void setRepeatOrigin(Date repeatOrigin) 
 	{
-		if(frequency != FREQ_EVERY_N_DAYS && frequency != FREQ_EVERY_N_HOURS)
+		if(repeat != REPEAT_EVERY_N_DAYS && repeat != REPEAT_EVERY_N_HOURS)
 			throw new UnsupportedOperationException();
 		
-		if(frequency == FREQ_EVERY_N_DAYS && DateTime.getOffsetFromMidnight(frequencyOrigin) != 0)
+		if(repeat == REPEAT_EVERY_N_DAYS && DateTime.getOffsetFromMidnight(repeatOrigin) != 0)
 			throw new IllegalArgumentException();
 		
-		this.frequencyOrigin = frequencyOrigin;	
+		this.repeatOrigin = repeatOrigin;	
 	}
 
 	public void setActive(boolean active) {
@@ -514,9 +515,9 @@ public class Drug extends Entry
 			this.doseNight,
 			this.currentSupply,
 			this.refillSize,
-			this.frequency,
-			this.frequencyArg,
-			this.frequencyOrigin,
+			this.repeat,
+			this.repeatArg,
+			this.repeatOrigin,
 			this.comment
 		};
 
@@ -525,8 +526,8 @@ public class Drug extends Entry
 	
 	private boolean hasDoseOnWeekday(int calWeekday)
 	{
-		if(frequency != FREQ_WEEKDAYS)
-			throw new IllegalStateException("frequency != FREQ_WEEKDAYS");
+		if(repeat != REPEAT_WEEKDAYS)
+			throw new IllegalStateException("repeat != FREQ_WEEKDAYS");
 		
 		// first, translate Calendar's weekday representation to our
 		// own.
@@ -535,6 +536,6 @@ public class Drug extends Entry
 		if(weekday == -1)
 			throw new IllegalArgumentException("Argument " + calWeekday + " does not map to a valid weekday");
 		
-		return (frequencyArg & (1 << weekday)) != 0;		
+		return (repeatArg & (1 << weekday)) != 0;		
 	}
 }

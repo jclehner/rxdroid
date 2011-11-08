@@ -131,7 +131,7 @@
 							android:layout_height="wrap_content"
 							android:clipChildren="true"
 							android:layout_gravity="right"
-							android:entries="@array/drug_frequency"
+							android:entries="@array/drug_repeat"
 						/>		
 					
 					</TableRow>

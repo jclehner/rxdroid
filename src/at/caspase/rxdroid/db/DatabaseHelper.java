@@ -28,6 +28,7 @@ import java.util.List;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
@@ -44,7 +45,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 {
 	private static final String TAG = DatabaseHelper.class.getName();
 	
-	public static final int DB_VERSION = 45;
+	public static final int DB_VERSION = 46;
 	private static final String DB_NAME = "db.sqlite";
 	
 	private Dao<Drug, Integer> mDrugDao = null;
@@ -129,12 +130,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 				throw new RuntimeException("Refusing to downgrade database from " + oldVersion + " to " + newVersion);
 		}
 		catch(Exception e)
-		{
-			//Log.d(TAG, "Error while attempting database upgrade", e);
-			//onUpgrade(db, 0, 0);
-			
+		{			
 			throw new RuntimeException("Error while attempting database upgrade", e);
-		}		
+		}
 	}
 
 	public void dropTables() {
@@ -186,7 +184,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			TableUtils.dropTable(cs, Drug.class, true);
 			TableUtils.dropTable(cs, Intake.class, true);
 		}
-		catch (SQLException e)
+		catch(SQLException e)
 		{
 			Log.e(TAG, "resetDatabase", e);
 		}
