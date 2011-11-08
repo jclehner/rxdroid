@@ -244,12 +244,14 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		else
 			offset = mSettings.getMillisUntilDoseTimeBegin(time, doseTime);
 		
-		Log.d(TAG, "Scheduling " + (scheduleEnd ? "end" : "begin") + " of doseTime " + doseTime + " in " + Util.millis(offset));
+		time.add(Calendar.MILLISECOND, (int) offset);
+		
+		Log.d(TAG, "Scheduling " + (scheduleEnd ? "end" : "begin") + " of doseTime " + doseTime + " for " + DateTime.toString(time));
 		
 		mIntent.putExtra(EXTRA_DOSE_TIME, doseTime);
 		mIntent.putExtra(EXTRA_IS_END, scheduleEnd);
 		mIntent.putExtra(EXTRA_DATE, DateTime.getDatePart(time));
-		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis() + offset, createOperation());
+		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation());
 	}
 	
 	private void cancelAllAlarms() 

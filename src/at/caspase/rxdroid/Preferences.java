@@ -83,6 +83,42 @@ public class Preferences
 		return defaults;
 	}
 	
+	public Calendar getDoseTimeBegin(Calendar date, int doseTime) {
+		return getDoseTimeBeginOrEnd(date, doseTime, true);
+	}
+	
+	public Calendar getDoseTimeEnd(Calendar date, int doseTime) {
+		return getDoseTimeBeginOrEnd(date, doseTime, false);
+	}
+	
+	private Calendar getDoseTimeBeginOrEnd(Calendar date, int doseTime, boolean getDoseTimeBegin)
+	{
+		final DumbTime time;
+		
+		if(getDoseTimeBegin)
+			time = getTimePreferenceBegin(doseTime);			
+		else
+			time = getTimePreferenceEnd(doseTime);
+		
+		date.set(Calendar.HOUR, time.getHours());
+		date.set(Calendar.MINUTE, time.getMinutes());
+		date.set(Calendar.SECOND, 0);
+		date.set(Calendar.MILLISECOND, 0);
+				
+		if(doseTime == Drug.TIME_NIGHT && !getDoseTimeBegin)
+		{
+			DumbTime end = getTimePreferenceEnd(doseTime);
+			if(end.before(time))
+				date.add(Calendar.DAY_OF_MONTH, 1);			
+		}
+		
+		return date;		
+	}
+	
+	
+	
+	
+	
 	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_GET_MILLIS_UNTIL_BEGIN);
 	}

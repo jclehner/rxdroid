@@ -77,7 +77,7 @@ public final class Database
 	 * <p>
 	 * This function uses the Context provided by GlobalContext
 	 * 
-	 * @throws NullPointerException if GlobalContext was not initialized.
+	 * @throws IllegalArgumentException if GlobalContext was not initialized.
 	 */
 	public static synchronized void load() {
 		load(GlobalContext.get());
