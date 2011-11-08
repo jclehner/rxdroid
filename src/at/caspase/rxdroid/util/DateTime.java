@@ -38,9 +38,9 @@ import at.caspase.rxdroid.GlobalContext;
  */
 public final class DateTime
 {
+	@SuppressWarnings("unused")
 	private static final String TAG = DateTime.class.getName();
-	
-	
+		
 	/**
 	 * Returns the current date.
 	 * 

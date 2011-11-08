@@ -150,7 +150,14 @@ public class DrugListActivity extends Activity implements
 			//mViewSwitcher.removeAllViews();
 			//mAdapter = makeAdapter();
 
-			setDate((Calendar) intent.getSerializableExtra(EXTRA_DAY));
+			Serializable date = intent.getSerializableExtra(EXTRA_DAY);
+			if(!(date instanceof Calendar))
+			{
+				Log.e(TAG, "onResume: EXTRA_DAY set, but wrong type");
+				setDate(null);
+			}
+			else
+				setDate((Calendar) date);
 		}
 		else
 			throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());

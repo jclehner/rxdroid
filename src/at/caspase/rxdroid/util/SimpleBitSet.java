@@ -41,7 +41,7 @@ public class SimpleBitSet
 		return (mValue & (1 << n)) != 0;
 	}
 	
-	public int cardinality() {
+	public int bitCount() {
 		return Long.bitCount(mValue);
 	}
 	

@@ -36,6 +36,8 @@ public final class Version
 	@SuppressWarnings("unused")
 	private static final String TAG = Version.class.getName();
 	
+	public static final boolean LOGV = true;
+		
 	/**
 	 * Short format. Example: <code>1.2.3</code>
 	 */

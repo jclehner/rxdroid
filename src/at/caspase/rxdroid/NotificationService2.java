@@ -23,12 +23,15 @@ import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Util;
 
 public class NotificationService2 extends Service implements OnDatabaseChangedListener, OnSharedPreferenceChangeListener
 {
 	private static final String TAG = NotificationService2.class.getName();
 	
 	private static final String EXTRA_SCHEDULED_START = "scheduled_start";
+	private static final String EXTRA_DOSE_TIME = "dose_time";
+	private static final String EXTRA_IS_END = "is_end";
 	private static final String EXTRA_DATE = "date";
 	
 	private AlarmManager mAlarmMgr;
@@ -36,7 +39,8 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 	private SharedPreferences mSharedPrefs;
 	private NotificationManager mNotificationMgr;
 	
-	private PendingIntent mOperation;
+	private Intent mIntent;
+	//private PendingIntent mOperation;
 	
 	private int mLastMessageHash = 0;
 	
@@ -80,9 +84,8 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 		mNotificationMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		
-		Intent intent = new Intent(this, NotificationService2.class);
-		intent.putExtra(EXTRA_SCHEDULED_START, true);
-		mOperation = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
+		mIntent = new Intent(this, NotificationService2.class);
+		mIntent.putExtra(EXTRA_SCHEDULED_START, true);
 	}
 	
 	@Override
@@ -105,29 +108,44 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
-		Log.d(TAG, "onStartCommand: intent=" + intent);
-		rescheduleAlarms();
-		
+		if(intent.getBooleanExtra(EXTRA_SCHEDULED_START, false))
+		{
+			int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Drug.TIME_INVALID);
+			boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_END, true);
+			Calendar date = (Calendar) intent.getSerializableExtra(EXTRA_DATE);
+			
+			if(doseTime == Drug.TIME_INVALID || date == null)
+				throw new RuntimeException("EXTRA_SCHEDULED_START=true, but not all required extras set");
+			
+			updateNotifications(date, doseTime, isDoseTimeEnd);
+			
+			if(isDoseTimeEnd)
+				scheduleNextAlarms();
+		}
+		else
+			rescheduleAlarms();
+			
 		return START_NOT_STICKY;
 	}
 	
-	private void rescheduleAlarms()
+	private void rescheduleAlarms() 
 	{
-		Log.d(TAG, "rescheduleAlarms");
-		
 		cancelAllAlarms();
+		scheduleNextAlarms();
+	}
+	
+	private void scheduleNextAlarms()
+	{		
+		Log.d(TAG, "Scheduling next alarms...");
 		
 		final Calendar now = DateTime.now();
-		final Calendar activeDate = mSettings.getActiveDate(now);
 		int activeDoseTime = mSettings.getActiveDoseTime(now);
 		int nextDoseTime = mSettings.getNextDoseTime(now);
 		
 		if(activeDoseTime != -1)
-			updateNotifications(activeDate, activeDoseTime, false);
-		else if(nextDoseTime != Drug.TIME_MORNING)
-			updateNotifications(activeDate, nextDoseTime - 1, true);		
-			
-		scheduleNextAlarms(now, activeDate, activeDoseTime);	
+			scheduleEndAlarm(now, activeDoseTime);
+		
+		scheduleBeginAlarm(now, nextDoseTime);
 	}
 	
 	private void updateNotifications(Calendar date, int doseTime, boolean isDoseTimeEnd)
@@ -152,6 +170,8 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 				doseMessage = getString(R.string._msg_doses_p, pendingIntakes);
 			else if(forgottenIntakes != 0)
 				doseMessage = getString(R.string._msg_doses_f, forgottenIntakes);
+			else
+				notificationCount = 0;
 			
 			final String bullet;
 			
@@ -205,26 +225,41 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 			
 			mNotificationMgr.notify(R.id.notification, notification);			
 		}		
-	}	
-
-	private void scheduleNextAlarms(Calendar time, Calendar activeDate, int activeDoseTime)
-	{
-		final int nextDoseTime = mSettings.getNextDoseTime(time);
-		final long offsetBegin = mSettings.getMillisUntilDoseTimeBegin(time, nextDoseTime);
-		final long elapsed = SystemClock.elapsedRealtime();
-		
-		mAlarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, elapsed + offsetBegin, mOperation);
-		
-		if(activeDoseTime != -1)
-		{
-			final long offsetEnd = mSettings.getMillisUntilDoseTimeEnd(time, activeDoseTime);
-			mAlarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, elapsed + offsetEnd, mOperation);
-		}
 	}
 	
-	private void cancelAllAlarms()
+	private void scheduleBeginAlarm(Calendar time, int doseTime) {
+		scheduleNextBeginOrEndAlarm(time, doseTime, false);
+	}
+	
+	private void scheduleEndAlarm(Calendar time, int doseTime) {
+		scheduleNextBeginOrEndAlarm(time, doseTime, true);
+	}
+	
+	private void scheduleNextBeginOrEndAlarm(Calendar time, int doseTime, boolean scheduleEnd)
 	{
-		mAlarmMgr.cancel(mOperation);
+		final long offset;
+	
+		if(scheduleEnd)
+			offset = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);
+		else
+			offset = mSettings.getMillisUntilDoseTimeBegin(time, doseTime);
+		
+		Log.d(TAG, "Scheduling " + (scheduleEnd ? "end" : "begin") + " of doseTime " + doseTime + " in " + Util.millis(offset));
+		
+		mIntent.putExtra(EXTRA_DOSE_TIME, doseTime);
+		mIntent.putExtra(EXTRA_IS_END, scheduleEnd);
+		mIntent.putExtra(EXTRA_DATE, DateTime.getDatePart(time));
+		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis() + offset, createOperation());
+	}
+	
+	private void cancelAllAlarms() 
+	{
+		Log.d(TAG, "Cancelling all alarms...");
+		mAlarmMgr.cancel(createOperation());
+	}
+	
+	private PendingIntent createOperation() {
+		return PendingIntent.getService(getApplicationContext(), 0, mIntent, 0);
 	}
 	
 	private static int countOpenIntakes(Calendar date, int doseTime)

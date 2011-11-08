@@ -25,6 +25,7 @@ import android.content.Context;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.util.AttributeSet;
+import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Drug;
 
@@ -118,5 +119,10 @@ public final class Util
 			values[i] = Integer.toString(i);
 
 		pref.setEntryValues(values);
+	}
+	
+	public static String millis(long millis)
+	{
+		return millis + "ms (" + new DumbTime(millis, true).toString(true) + ")";
 	}
 }
