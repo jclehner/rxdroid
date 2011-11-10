@@ -111,9 +111,7 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 				return START_STICKY;
 			}
 		}
-		else
-			cancelNotifications();
-
+		
 		updateCurrentNotifications(false);
 		rescheduleAlarms();
 			
