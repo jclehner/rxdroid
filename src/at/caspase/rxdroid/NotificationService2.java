@@ -32,7 +32,6 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 	private static final String EXTRA_SCHEDULED_START = "scheduled_start";
 	private static final String EXTRA_DOSE_TIME = "dose_time";
 	private static final String EXTRA_IS_END = "is_end";
-	private static final String EXTRA_DATE = "date";
 	
 	private AlarmManager mAlarmMgr;
 	private Preferences mSettings;
@@ -112,15 +111,16 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		{
 			int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Drug.TIME_INVALID);
 			boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_END, true);
-			Calendar date = (Calendar) intent.getSerializableExtra(EXTRA_DATE);
 			
-			if(doseTime == Drug.TIME_INVALID || date == null)
-				throw new RuntimeException("EXTRA_SCHEDULED_START=true, but not all required extras set");
-			
-			updateNotifications(date, doseTime, isDoseTimeEnd);
-			
-			if(isDoseTimeEnd)
-				scheduleNextAlarms();
+			if(doseTime == Drug.TIME_INVALID)
+				rescheduleAlarms();
+			else
+			{
+				updateNotifications(mSettings.getActiveDate(), doseTime, isDoseTimeEnd);
+				
+				if(isDoseTimeEnd)
+					scheduleNextAlarms();
+			}
 		}
 		else
 			rescheduleAlarms();
@@ -250,7 +250,6 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		
 		mIntent.putExtra(EXTRA_DOSE_TIME, doseTime);
 		mIntent.putExtra(EXTRA_IS_END, scheduleEnd);
-		mIntent.putExtra(EXTRA_DATE, DateTime.getDatePart(time));
 		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation());
 	}
 	

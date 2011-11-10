@@ -209,7 +209,11 @@ public class Preferences
 		}
 		
 		return date;
-	}	
+	}
+	
+	public Calendar getActiveDate() {
+		return getActiveDate(DateTime.now());
+	}
 
 	public int getActiveOrNextDoseTime() {
 		return getActiveDoseTime(DateTime.now());
