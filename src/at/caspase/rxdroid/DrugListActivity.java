@@ -147,14 +147,11 @@ public class DrugListActivity extends Activity implements
 
 		if(Intent.ACTION_VIEW.equals(action) || Intent.ACTION_MAIN.equals(action))
 		{
-			//mViewSwitcher.removeAllViews();
-			//mAdapter = makeAdapter();
-
 			Serializable date = intent.getSerializableExtra(EXTRA_DAY);
 			if(!(date instanceof Calendar))
 			{
 				Log.e(TAG, "onResume: EXTRA_DAY set, but wrong type");
-				setDate(null);
+				shiftDate(0);
 			}
 			else
 				setDate((Calendar) date);
@@ -699,16 +696,7 @@ public class DrugListActivity extends Activity implements
 	}
 
 	private class DrugFilter implements CollectionUtils.Filter<Drug>
-	{
-		/*private Calendar mDate;
-		private SharedPreferences mSharedPrefs;
-		
-		public DrugFilter(Calendar date)
-		{
-			mDate = (Calendar) date.clone();
-			mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(GlobalContext.get());
-		}*/
-		
+	{		
 		@Override
 		public boolean matches(Drug drug)
 		{		

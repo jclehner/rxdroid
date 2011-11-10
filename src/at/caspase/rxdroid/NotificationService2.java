@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -23,12 +22,12 @@ import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
-import at.caspase.rxdroid.util.Util;
 
 public class NotificationService2 extends Service implements OnDatabaseChangedListener, OnSharedPreferenceChangeListener
 {
 	private static final String TAG = NotificationService2.class.getName();
 	
+	//public static final String EXTRA_DONT_CLEAR_NOTIFICATIONS = "dont_clear_notifications";
 	private static final String EXTRA_SCHEDULED_START = "scheduled_start";
 	private static final String EXTRA_DOSE_TIME = "dose_time";
 	private static final String EXTRA_IS_END = "is_end";
@@ -38,34 +37,30 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 	private SharedPreferences mSharedPrefs;
 	private NotificationManager mNotificationMgr;
 	
-	private Intent mIntent;
-	//private PendingIntent mOperation;
-	
-	private int mLastMessageHash = 0;
-	
 	@Override
 	public void onEntryCreated(Entry entry, int flags)
 	{
-		rescheduleAlarms();
+		updateCurrentNotifications(true);
 	}
 
 	@Override
 	public void onEntryUpdated(Entry entry, int flags)
 	{
-		rescheduleAlarms();
+		updateCurrentNotifications(true);
 	}
 
 	@Override
 	public void onEntryDeleted(Entry entry, int flags)
 	{
-		rescheduleAlarms();
+		updateCurrentNotifications(true);
 	}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
 	{
 		// TODO filter
-		rescheduleAlarms();		
+		cancelNotifications();
+		rescheduleAlarms();
 	}
 	
 	@Override
@@ -81,26 +76,20 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		mAlarmMgr = (AlarmManager) getSystemService(ALARM_SERVICE);
 		mSettings = Preferences.instance();
 		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-		mNotificationMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		
-		mIntent = new Intent(this, NotificationService2.class);
-		mIntent.putExtra(EXTRA_SCHEDULED_START, true);
+		mSharedPrefs.registerOnSharedPreferenceChangeListener(this);
+		mNotificationMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);		
 	}
 	
 	@Override
 	public void onDestroy()
 	{
-		Log.d(TAG, "onDestroy");
 		super.onDestroy();
-		
 		Database.unregisterOnChangedListener(this);
-		mLastMessageHash = 0;
+		mSharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
-	public IBinder onBind(Intent arg0)
-	{
-		// TODO Auto-generated method stub
+	public IBinder onBind(Intent arg0) {
 		return null;
 	}
 	
@@ -112,20 +101,23 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 			int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Drug.TIME_INVALID);
 			boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_END, true);
 			
-			if(doseTime == Drug.TIME_INVALID)
-				rescheduleAlarms();
-			else
+			if(doseTime != Drug.TIME_INVALID)
 			{
-				updateNotifications(mSettings.getActiveDate(), doseTime, isDoseTimeEnd);
+				updateNotifications(mSettings.getActiveDate(), doseTime, isDoseTimeEnd, false);
 				
 				if(isDoseTimeEnd)
 					scheduleNextAlarms();
+
+				return START_STICKY;
 			}
 		}
 		else
-			rescheduleAlarms();
+			cancelNotifications();
+
+		updateCurrentNotifications(false);
+		rescheduleAlarms();
 			
-		return START_NOT_STICKY;
+		return START_STICKY;
 	}
 	
 	private void rescheduleAlarms() 
@@ -148,7 +140,18 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		scheduleBeginAlarm(now, nextDoseTime);
 	}
 	
-	private void updateNotifications(Calendar date, int doseTime, boolean isDoseTimeEnd)
+	private void updateCurrentNotifications(boolean beQuiet)
+	{
+		Calendar now = DateTime.now();
+		int doseTime = mSettings.getActiveDoseTime(now);
+		if(doseTime == -1)
+			return;
+		
+		Calendar date = mSettings.getActiveDate(now);
+		updateNotifications(date, doseTime, false, beQuiet);
+	}
+	
+	private void updateNotifications(Calendar date, int doseTime, boolean isDoseTimeEnd, boolean beQuiet)
 	{
 		int pendingIntakes = isDoseTimeEnd ? 0 : countOpenIntakes(date, doseTime);
 		int forgottenIntakes = countForgottenIntakes(date, doseTime);
@@ -209,22 +212,22 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 			final Notification notification = new Notification();
 			notification.icon = R.drawable.ic_stat_pill;
 			notification.tickerText = getString(R.string._msg_new_notification);
-			notification.flags |= Notification.FLAG_NO_CLEAR;
+			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONLY_ALERT_ONCE;
 			notification.defaults |= Notification.DEFAULT_ALL;
 			notification.contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 			notification.contentView = views;
 			if(notificationCount > 1)
 				notification.number = notificationCount;			
-			
-			int messageHash = message.hashCode();
-			
-			if(messageHash == mLastMessageHash)
-				notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
-			else
-				mLastMessageHash = messageHash;
+						
+			if(beQuiet)
+				notification.defaults ^= Notification.DEFAULT_ALL;
 			
 			mNotificationMgr.notify(R.id.notification, notification);			
 		}		
+	}
+	
+	private void cancelNotifications() {
+		mNotificationMgr.cancel(R.id.notification);
 	}
 	
 	private void scheduleBeginAlarm(Calendar time, int doseTime) {
@@ -248,19 +251,27 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		
 		Log.d(TAG, "Scheduling " + (scheduleEnd ? "end" : "begin") + " of doseTime " + doseTime + " for " + DateTime.toString(time));
 		
-		mIntent.putExtra(EXTRA_DOSE_TIME, doseTime);
-		mIntent.putExtra(EXTRA_IS_END, scheduleEnd);
-		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation());
+		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation(doseTime, scheduleEnd));
 	}
 	
 	private void cancelAllAlarms() 
 	{
 		Log.d(TAG, "Cancelling all alarms...");
-		mAlarmMgr.cancel(createOperation());
+		mAlarmMgr.cancel(createEmptyOperation());
 	}
 	
-	private PendingIntent createOperation() {
-		return PendingIntent.getService(getApplicationContext(), 0, mIntent, 0);
+	private PendingIntent createEmptyOperation() {
+		return createOperation(Drug.TIME_INVALID, false);
+	}
+	
+	private PendingIntent createOperation(int doseTime, boolean isEnd) 
+	{
+		Intent intent = new Intent(this, NotificationService2.class);
+		intent.putExtra(EXTRA_SCHEDULED_START, true);
+		intent.putExtra(EXTRA_DOSE_TIME, doseTime);
+		intent.putExtra(EXTRA_IS_END, isEnd);
+		
+		return PendingIntent.getService(getApplicationContext(), 0, intent, 0);
 	}
 	
 	private static int countOpenIntakes(Calendar date, int doseTime)
@@ -272,7 +283,7 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 			final Fraction dose = drug.getDose(doseTime);
 			
 			if(!drug.isActive() || dose.equals(0) || !drug.hasDoseOnDate(date))
-				continue;			
+				continue;	
 			
 			if(Database.findIntakes(drug, date, doseTime).isEmpty())
 				++count;								

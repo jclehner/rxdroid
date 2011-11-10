@@ -251,7 +251,7 @@ public final class Database
 		if(sDrugCache == null)
 		{
 			sDrugCache = Collections.synchronizedList(queryForAll(mDrugDao));
-			Log.d(TAG, "Loaded " + sDrugCache.size() + " drugs into cache");
+			Log.d(TAG, "Cached " + sDrugCache.size() + " drugs");
 		}
 		return sDrugCache;
 	}
@@ -273,7 +273,7 @@ public final class Database
 		if(sIntakeCache == null)
 		{
 			sIntakeCache = Collections.synchronizedList(queryForAll(mIntakeDao));
-			Log.d(TAG, "Loaded " + sIntakeCache.size() + " intakes into cache");
+			Log.d(TAG, "Cached " + sIntakeCache.size() + " drugs");
 		}
 		return sIntakeCache;
 	}	
