@@ -3,7 +3,7 @@
     <string name="app_name">RxDroid</string>
     <string name="version">0.6</string>
     <string name="vcs_revision">$Revision$</string>
-    
+        
     <string name="pref_default_time_morning_begin">06:00</string>
     <string name="pref_default_time_morning_end">10:00</string>
     <string name="pref_default_time_noon_begin">12:00</string>
@@ -138,7 +138,6 @@
 	<string name="_title_snooze">Snooze</string>
 	
 	<string name="_msg_supply">%1$s - lasts until %2$s</string>
-	
 	<string name="_title_save_chanes">Save changes</string>
 	<string name="_msg_save_drug_changes">Do you want to save changes made to this drug?</string>
 	<string name="_msg_every_n_days_distance">How many days between each repetition?</string>
