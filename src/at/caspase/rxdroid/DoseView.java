@@ -56,7 +56,8 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	public static final int STATUS_INDETERMINATE = 0;
 	public static final int STATUS_TAKEN = 1;
-	public static final int STATUS_FORGOTTEN = 2;	
+	public static final int STATUS_FORGOTTEN = 2;
+	//public static final int STATUS_IGNORED = 3;
 	
 	private ImageView mIntakeStatus;
 	private TextView mDoseText;
@@ -66,8 +67,9 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	private int mDoseTime = -1;
 	private Calendar mDate;
 	
+	// this value is updated by a call to countIntakes()
 	private Fraction mCumulativeDose = new Fraction();
-	
+		
 	private boolean mHasDoseOnDate = true;
 	
 	private int mStatus = STATUS_INDETERMINATE;
@@ -203,8 +205,8 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		return true;		
 	}
 	
-	public int getIntakeStatus() {
-		return mStatus;
+	public boolean wasDoseTaken() {
+		return mStatus == STATUS_TAKEN;
 	}
 
 	@Override
@@ -240,6 +242,12 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			
 			if(isApplicableIntake(intake))
 			{
+				if(intake.isEmptyIntake() && mCumulativeDose.isZero())
+				{
+					markAsIgnored();
+					return;
+				}				
+				
 				mCumulativeDose.add(intake.getDose());
 				markAsTaken();
 			}
@@ -350,7 +358,10 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 		if(countIntakes() != 0)
 		{
-			markAsTaken();
+			if(mCumulativeDose.isZero())
+				markAsIgnored();
+			else
+				markAsTaken();
 			return;
 		}
 		
@@ -369,15 +380,21 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		}
 		
 		if(mStatus == STATUS_FORGOTTEN)			
-			mIntakeStatus.setImageResource(R.drawable.bg_dose_forgotten);
+			mIntakeStatus.setImageResource(R.drawable.ic_dose_forgotten);
 		else
 			mIntakeStatus.setImageDrawable(null);
 	}
 	
 	private void markAsTaken()
 	{
-		mIntakeStatus.setImageResource(R.drawable.bg_dose_taken);
+		mIntakeStatus.setImageResource(R.drawable.ic_dose_taken);
 		mStatus = STATUS_TAKEN;
+	}
+	
+	private void markAsIgnored()
+	{
+		mIntakeStatus.setImageResource(R.drawable.ic_dose_ignored);
+		mStatus = STATUS_TAKEN; // this is intentional!
 	}
 
 	private int countIntakes()

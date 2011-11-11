@@ -96,7 +96,7 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
-		if(intent.getBooleanExtra(EXTRA_SCHEDULED_START, false))
+		if(intent != null && intent.getBooleanExtra(EXTRA_SCHEDULED_START, false))
 		{
 			int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Drug.TIME_INVALID);
 			boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_END, true);

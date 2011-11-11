@@ -72,6 +72,16 @@ public class Intake extends Entry
 		this.dose = dose;
 	}
 	
+	/**
+	 * Constructs an empty intake.
+	 * <p>
+	 * Empty intakes (i.e. intakes with a dose of zero) are
+	 * used for ignoring a dose.
+	 */
+	public Intake(Drug drug, Date date, int doseTime) {
+		this(drug, date, doseTime, new Fraction());
+	}
+	
 	public int getDrugId() {
 		return drug.getId();
 	}
@@ -94,6 +104,10 @@ public class Intake extends Entry
 
 	public int getDoseTime() {
 		return doseTime;
+	}
+	
+	public boolean isEmptyIntake() {
+		return dose == null;
 	}
 
 	@Override

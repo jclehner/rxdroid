@@ -91,6 +91,7 @@ public class DrugListActivity extends Activity implements
 	//public static final int CMENU_CHANGE_DOSE = 1;
 	public static final int CMENU_EDIT_DRUG = 2;
 	//public static final int CMENU_SHOW_SUPPLY_STATUS = 3;
+	public static final int CMENU_IGNORE_DOSE = 4;
 
 	public static final String EXTRA_DAY = "day";
 	public static final String EXTRA_STARTED_BY_NOTIFICATION = "started_from_notification";
@@ -226,21 +227,21 @@ public class DrugListActivity extends Activity implements
 		//menu.setHeaderIcon(android.R.drawable.ic_menu_agenda);
 		menu.setHeaderTitle(drug.getName());
 		
-		final int intakeStatus = doseView.getIntakeStatus();
-		final int toggleMessageId;
+		final boolean wasDoseTaken = doseView.wasDoseTaken();
+		final int toggleIntakeMessageId;
 		
-		if(intakeStatus == DoseView.STATUS_TAKEN)
-			toggleMessageId = R.string._title_mark_not_taken;
+		if(wasDoseTaken)
+			toggleIntakeMessageId = R.string._title_mark_not_taken;
 		else
-			toggleMessageId = R.string._title_mark_taken;
+			toggleIntakeMessageId = R.string._title_mark_taken;
 		
 		//////////////////////////////////////////////////
-		menu.add(0, CMENU_TOGGLE_INTAKE, 0, toggleMessageId).setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		menu.add(0, CMENU_TOGGLE_INTAKE, 0, toggleIntakeMessageId).setOnMenuItemClickListener(new OnMenuItemClickListener() {
 			
 			@Override
 			public boolean onMenuItemClick(MenuItem item)
 			{
-				if(intakeStatus != DoseView.STATUS_TAKEN)
+				if(!wasDoseTaken)
 					requestIntake(drug, mDate, doseTime, doseView.getDose(), true);
 				else
 				{
@@ -269,6 +270,21 @@ public class DrugListActivity extends Activity implements
 		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
 		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
 		//menu.add(0, CMENU_SHOW_SUPPLY_STATUS, 0, "Show supply status");
+		
+		if(!wasDoseTaken)
+		{		
+			menu.add(0, CMENU_IGNORE_DOSE, 0, R.string._title_ignore_dose)
+					.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+						
+						@Override
+						public boolean onMenuItemClick(MenuItem item)
+						{
+							Database.create(new Intake(drug, mDate.getTime(), doseTime));
+							return true;
+						}
+					}
+			);
+		}
 	}
 
 	@Override

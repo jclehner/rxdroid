@@ -151,7 +151,6 @@
 	<string name="_title_current_supply">Current supply</string>
 	<string name="_title_refill_size">Refill size</string>
 	<string name="_title_active">Active</string>
-	    
-	    
+	<string name="_title_ignore_dose">Mark as ignored</string>	    
 	
 </resources>

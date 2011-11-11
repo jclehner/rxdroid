@@ -34,7 +34,9 @@
   		android:clickable="true"
   		android:onClick="onDrugNameClick"
   		
-  		style="@style/android:TextAppearance.Large"  	
+  		android:textColor="@color/text_fg_color"
+  		  		
+  		style="@style/android:TextAppearance.Large"	
 	/>
 	
 	<!-- second line: dose views android:layout_alignBottom="@id/drug_icon" -->
