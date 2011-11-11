@@ -428,7 +428,7 @@ public class DrugListActivity extends Activity implements
 	private void startNotificationService()
 	{
 		Intent serviceIntent = new Intent();
-		serviceIntent.setClass(this, NotificationService2.class);
+		serviceIntent.setClass(this, NotificationService.class);
 		
 		startService(serviceIntent);
 	}

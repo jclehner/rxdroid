@@ -1,24 +1,3 @@
-/**
- * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
- *
- * This file is part of RxDroid.
- *
- * RxDroid is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * RxDroid is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- */
-
 package at.caspase.rxdroid;
 
 import java.util.ArrayList;
@@ -29,114 +8,57 @@ import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.os.IBinder;
+import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
-import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
-import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
-public class NotificationService2 extends Service implements OnDatabaseChangedListener, OnSharedPreferenceChangeListener
+public class NotificationReceiver extends BroadcastReceiver
 {
-	private static final String TAG = NotificationService2.class.getName();
+	private static final String TAG = NotificationReceiver.class.getName();
 	
-	//public static final String EXTRA_DONT_CLEAR_NOTIFICATIONS = "dont_clear_notifications";
-	private static final String EXTRA_SCHEDULED_START = "scheduled_start";
-	private static final String EXTRA_DOSE_TIME = "dose_time";
-	private static final String EXTRA_IS_END = "is_end";
+	private static final String EXTRA_STARTED_BY_ALARM = "started_by_alarm";
+	private static final String KEY_LAST_MSG_HASH = "last_msg_hash";
+	
+	private Context mContext;
 	
 	private AlarmManager mAlarmMgr;
 	private Preferences mSettings;
 	private SharedPreferences mSharedPrefs;
 	private NotificationManager mNotificationMgr;
 	
-	@Override
-	public void onEntryCreated(Entry entry, int flags)
+	static public void sendInitialBroadcast(Context context)
 	{
-		updateCurrentNotifications(true);
-	}
-
-	@Override
-	public void onEntryUpdated(Entry entry, int flags)
-	{
-		updateCurrentNotifications(true);
-	}
-
-	@Override
-	public void onEntryDeleted(Entry entry, int flags)
-	{
-		updateCurrentNotifications(true);
-	}
-
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
-	{
-		// TODO filter
-		cancelNotifications();
-		rescheduleAlarms();
+		Intent intent = new Intent(context, NotificationReceiver.class);
+		context.sendBroadcast(intent);
 	}
 	
 	@Override
-	public void onCreate()
+	public void onReceive(Context context, Intent intent)
 	{
-		Log.d(TAG, "onCreate");
-		super.onCreate();
+		Log.d(TAG, "onReceive(" + context + ", " + intent + ")");
 		
-		GlobalContext.set(getApplicationContext());
+		GlobalContext.set(context.getApplicationContext());
 		Database.load();
-		Database.registerOnChangedListener(this);
 		
-		mAlarmMgr = (AlarmManager) getSystemService(ALARM_SERVICE);
+		mContext = context;
+		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mSettings = Preferences.instance();
-		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-		mSharedPrefs.registerOnSharedPreferenceChangeListener(this);
-		mNotificationMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);		
-	}
-	
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
-		Database.unregisterOnChangedListener(this);
-		mSharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
-	}
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return null;
-	}
-	
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId)
-	{
-		if(intent != null && intent.getBooleanExtra(EXTRA_SCHEDULED_START, false))
-		{
-			int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Drug.TIME_INVALID);
-			boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_END, true);
-			
-			if(doseTime != Drug.TIME_INVALID)
-			{
-				updateNotifications(mSettings.getActiveDate(), doseTime, isDoseTimeEnd, false);
-				
-				if(isDoseTimeEnd)
-					scheduleNextAlarms();
-
-				return START_STICKY;
-			}
-		}
+		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+		mNotificationMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		
-		updateCurrentNotifications(false);
+		final boolean beQuiet = intent != null && intent.getBooleanExtra(EXTRA_STARTED_BY_ALARM, false);
+				
 		rescheduleAlarms();
-			
-		return START_STICKY;
+		updateCurrentNotifications(beQuiet);		
 	}
 	
 	private void rescheduleAlarms() 
@@ -162,17 +84,23 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 	private void updateCurrentNotifications(boolean beQuiet)
 	{
 		Calendar now = DateTime.now();
+		final boolean ignorePendingIntakes;
 		int doseTime = mSettings.getActiveDoseTime(now);
 		if(doseTime == -1)
-			return;
+		{
+			ignorePendingIntakes = true;
+			doseTime = mSettings.getNextDoseTime(now);
+		}
+		else
+			ignorePendingIntakes = false;
 		
 		Calendar date = mSettings.getActiveDate(now);
-		updateNotifications(date, doseTime, false, beQuiet);
+		updateNotifications(date, doseTime, ignorePendingIntakes, beQuiet);
 	}
 	
-	private void updateNotifications(Calendar date, int doseTime, boolean isDoseTimeEnd, boolean beQuiet)
+	private void updateNotifications(Calendar date, int doseTime, boolean ignorePendingIntakes, boolean beQuiet)
 	{
-		int pendingIntakes = isDoseTimeEnd ? 0 : countOpenIntakes(date, doseTime);
+		int pendingIntakes = ignorePendingIntakes ? 0 : countOpenIntakes(date, doseTime);
 		int forgottenIntakes = countForgottenIntakes(date, doseTime);
 		String lowSupplyMessage = getLowSupplyMessage(date, doseTime);
 		
@@ -218,13 +146,13 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 			
 			final String message = sb.toString();
 			
-			final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
+			final RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.notification);
 			views.setTextViewText(R.id.stat_title, getString(R.string._title_notifications));
 			views.setTextViewText(R.id.stat_text, message);
 			//views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(DateTime.now().getTime()));
 			views.setTextViewText(R.id.stat_time, "");
 			
-			final Intent intent = new Intent(this, DrugListActivity.class);
+			final Intent intent = new Intent(mContext, DrugListActivity.class);
 			intent.setAction(Intent.ACTION_VIEW);
 			intent.putExtra(DrugListActivity.EXTRA_DAY, date);
 			
@@ -233,11 +161,18 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 			notification.tickerText = getString(R.string._msg_new_notification);
 			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONLY_ALERT_ONCE;
 			notification.defaults |= Notification.DEFAULT_ALL;
-			notification.contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+			notification.contentIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
 			notification.contentView = views;
 			if(notificationCount > 1)
 				notification.number = notificationCount;			
-						
+			
+			int messageHash = message.hashCode();
+			if(getLastMessageHash() != messageHash)
+			{
+				setLastMessageHash(messageHash);
+				notification.flags ^= Notification.FLAG_ONLY_ALERT_ONCE;				
+			}			
+			
 			if(beQuiet)
 				notification.defaults ^= Notification.DEFAULT_ALL;
 			
@@ -269,28 +204,23 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		time.add(Calendar.MILLISECOND, (int) offset);
 		
 		Log.d(TAG, "Scheduling " + (scheduleEnd ? "end" : "begin") + " of doseTime " + doseTime + " for " + DateTime.toString(time));
+		Log.d(TAG, "Alarm will fire in " + (time.getTimeInMillis() - System.currentTimeMillis()) + "ms");
 		
-		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation(doseTime, scheduleEnd));
+		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation());
 	}
 	
 	private void cancelAllAlarms() 
 	{
 		Log.d(TAG, "Cancelling all alarms...");
-		mAlarmMgr.cancel(createEmptyOperation());
+		mAlarmMgr.cancel(createOperation());
 	}
 	
-	private PendingIntent createEmptyOperation() {
-		return createOperation(Drug.TIME_INVALID, false);
-	}
-	
-	private PendingIntent createOperation(int doseTime, boolean isEnd) 
+	private PendingIntent createOperation() 
 	{
-		Intent intent = new Intent(this, NotificationService2.class);
-		intent.putExtra(EXTRA_SCHEDULED_START, true);
-		intent.putExtra(EXTRA_DOSE_TIME, doseTime);
-		intent.putExtra(EXTRA_IS_END, isEnd);
-		
-		return PendingIntent.getService(getApplicationContext(), 0, intent, 0);
+		Intent intent = new Intent(mContext, NotificationReceiver.class);
+		intent.putExtra(EXTRA_STARTED_BY_ALARM, true);
+				
+		return PendingIntent.getBroadcast(mContext, 0, intent, 0);
 	}
 	
 	private static int countOpenIntakes(Calendar date, int doseTime)
@@ -363,4 +293,24 @@ public class NotificationService2 extends Service implements OnDatabaseChangedLi
 		
 		return message;
 	}
+	
+	private int getLastMessageHash() {
+		return mSharedPrefs.getInt(KEY_LAST_MSG_HASH, 0);
+	}
+	
+	private void setLastMessageHash(int messageHash) 
+	{
+		Editor editor = mSharedPrefs.edit();
+		editor.putInt(KEY_LAST_MSG_HASH, messageHash);
+		editor.commit();
+	}
+	
+	private String getString(int resId) {
+		return mContext.getString(resId);
+	}
+	
+	private String getString(int resId, Object... formatArgs) {
+		return mContext.getString(resId, formatArgs);
+	}
+
 }

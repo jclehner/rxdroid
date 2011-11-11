@@ -33,7 +33,7 @@
 
 		<uses-library android:name="android.test.runner" />
 
-		<service android:name=".NotificationService2" />
+		<service android:name=".NotificationService" />
 
 		<receiver android:name=".MyBroadcastReceiver">
 			<intent-filter>
@@ -47,6 +47,8 @@
 				<category android:name="android.intent.category.PREFERENCE" />
 			</intent-filter>
 		</receiver>
+		
+		<receiver android:name=".NotificationReceiver" />
 
 	</application>
 

@@ -36,7 +36,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver
 		Log.d(TAG, "Received intent with action " + intent.getAction());
 
 		Intent service = new Intent();
-		service.setClass(context.getApplicationContext(), NotificationService2.class);
+		service.setClass(context.getApplicationContext(), NotificationService.class);
 		//service.putExtra(NotificationService.EXTRA_RESTART_FLAGS, NotificationService.RESTART_FORCE);
 		context.startService(service);
 	}
