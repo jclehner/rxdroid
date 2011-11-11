@@ -24,18 +24,18 @@ package at.caspase.rxdroid.debug;
 import java.util.Calendar;
 
 import android.util.Log;
-import at.caspase.rxdroid.Preferences;
+import at.caspase.rxdroid.Settings;
 import at.caspase.rxdroid.db.Drug;
 
 
 /**
  * Fake Settings class for debugging.
  *
- * @see at.caspase.rxdroid.Preferences
+ * @see at.caspase.rxdroid.Settings
  * @author Joseph Lehner
  *
  */
-public class FakeSettings extends Preferences
+public class FakeSettings extends Settings
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = FakeSettings.class.getName();

@@ -31,15 +31,8 @@ public class MyApplication extends Application
 	@Override
 	public void onCreate()
 	{
-		if(DEVELOPER_MODE) 
-		{
-	         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-	                 .detectLeakedSqlLiteObjects()
-	                 /*.detectLeakedClosableObjects()*/
-	                 .penaltyLog()
-	                 .build());
-	     }
-	     super.onCreate();	
-		
+		super.onCreate();
+		GlobalContext.set(getApplicationContext());
+		Settings.instance().setLastNotificationMessageHash(0);	     
 	}
 }

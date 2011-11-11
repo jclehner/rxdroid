@@ -32,7 +32,7 @@ import android.preference.PreferenceManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
-import at.caspase.rxdroid.Preferences;
+import at.caspase.rxdroid.Settings;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.util.DateTime;
 
@@ -84,7 +84,7 @@ public class PreferencesTest extends AndroidTestCase
 			time.set(Calendar.HOUR_OF_DAY, hours);
 			time.set(Calendar.MINUTE, minutes);
 			
-			final Preferences prefs = Preferences.instance();
+			final Settings prefs = Settings.instance();
 			
 			Log.d(TAG, "testGetActiveDoseTimeAndGetNextDoseTime:");
 			//Log.d(TAG, "  date/time   : " + date + ", " + time);
@@ -155,7 +155,7 @@ public class PreferencesTest extends AndroidTestCase
 			time.set(Calendar.HOUR_OF_DAY, (int) hours);
 			time.set(Calendar.MINUTE, (int) minutes);
 			
-			final Preferences prefs = Preferences.instance();
+			final Settings prefs = Settings.instance();
 
 			final int activeOrNextDoseTime = prefs.getActiveOrNextDoseTime(time);
 			
@@ -215,7 +215,7 @@ public class PreferencesTest extends AndroidTestCase
 			final Calendar expected = (Calendar) today.clone();
 			expected.add(Calendar.DAY_OF_MONTH, testCases[i][2]);
 			
-			assertEquals(expected, Preferences.instance().getActiveDate(time));		
+			assertEquals(expected, Settings.instance().getActiveDate(time));		
 		}
 		
 	}

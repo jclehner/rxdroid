@@ -372,7 +372,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			if(mDrug.getDose(mDoseTime).compareTo(0) != 0)
 			{
 				final Calendar end = (Calendar) mDate.clone();
-				end.add(Calendar.MILLISECOND, (int) Preferences.instance().getTrueDoseTimeEndOffset(mDoseTime));
+				end.add(Calendar.MILLISECOND, (int) Settings.instance().getTrueDoseTimeEndOffset(mDoseTime));
 					
 				if(DateTime.now().compareTo(end) != -1)
 					mStatus = STATUS_FORGOTTEN;			

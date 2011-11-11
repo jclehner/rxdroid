@@ -26,6 +26,7 @@ import java.util.Calendar;
 import android.app.Notification;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Drug;
@@ -33,40 +34,42 @@ import at.caspase.rxdroid.debug.FakeSettings;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
-public class Preferences
+public class Settings
 {
-	private static final String TAG = Preferences.class.getName();
+	private static final String TAG = Settings.class.getName();
 
-	private static final String prefKeyPrefixes[] = { "time_morning", "time_noon", "time_evening", "time_night" };
-	private static final int doseTimes[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
+	private static final String KEY_LAST_MSG_HASH = "last_msg_hash";
+	
+	private static final String KEY_PREFIXES[] = { "time_morning", "time_noon", "time_evening", "time_night" };
+	private static final int DOSE_TIMES[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 
 	private static SharedPreferences sSharedPrefs = null;
 	private static Context sApplicationContext;
 	
-	private static Preferences instance;
+	private static Settings sInstance;
 
-	public synchronized static Preferences instance()
+	public synchronized static Settings instance()
 	{
 		if(sApplicationContext == null)
 			sApplicationContext = GlobalContext.get();
 		
 		sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sApplicationContext);
 		
-		if(instance == null)
+		if(sInstance == null)
 		{
 			if(sSharedPrefs.getBoolean("debug_fake_dosetimes", false))
 			{
-				instance = new FakeSettings();
+				sInstance = new FakeSettings();
 				Log.d(TAG, "Using FakeSettings");
 			}
 			else
 			{
-				instance = new Preferences();
+				sInstance = new Settings();
 				Log.d(TAG, "Using Settings");
 			}
 		}
 
-		return instance;
+		return sInstance;
 	}
 
 	public int filterNotificationDefaults(int defaults)
@@ -147,11 +150,11 @@ public class Preferences
 	}
 
 	private long getDoseTimeBeginOffset(int doseTime) {
-		return getTimePreference(prefKeyPrefixes[doseTime] + "_begin").getTime();
+		return getTimePreference(KEY_PREFIXES[doseTime] + "_begin").getTime();
 	}
 
 	public long getDoseTimeEndOffset(int doseTime) {
-		return getTimePreference(prefKeyPrefixes[doseTime] + "_end").getTime();
+		return getTimePreference(KEY_PREFIXES[doseTime] + "_end").getTime();
 	}
 	
 	public long getTrueDoseTimeEndOffset(int doseTime)
@@ -193,7 +196,7 @@ public class Preferences
 	}
 	
 	private DumbTime getTimePreference(int doseTime, String suffix) {
-		return getTimePreference(prefKeyPrefixes[doseTime] + suffix);
+		return getTimePreference(KEY_PREFIXES[doseTime] + suffix);
 	}
 	
 	public Calendar getActiveDate(Calendar time)
@@ -229,7 +232,7 @@ public class Preferences
 
 	public int getActiveDoseTime(Calendar time)
 	{
-		for(int doseTime : doseTimes)
+		for(int doseTime : DOSE_TIMES)
 		{
 			if(DateTime.isWithinRange(time, getTimePreferenceBegin(doseTime), getTimePreferenceEnd(doseTime)))
 				return doseTime;
@@ -253,7 +256,7 @@ public class Preferences
 		
 		//Log.d(TAG, "getNextDoseTime: time=" + time);
 		
-		for(int doseTime : doseTimes)
+		for(int doseTime : DOSE_TIMES)
 		{
 			long diff = getMillisUntilDoseTimeBegin(time, doseTime);
 			if(useNextDayOffsets)
@@ -285,6 +288,18 @@ public class Preferences
 
 	public int getNextDoseTime() {
 		return getNextDoseTime(DateTime.now());
+	}
+
+	
+	public int getLastNotificationMessageHash() {
+		return sSharedPrefs.getInt(KEY_LAST_MSG_HASH, 0);
+	}
+	
+	public void setLastNotificationMessageHash(int messageHash) 
+	{
+		Editor editor = sSharedPrefs.edit();
+		editor.putInt(KEY_LAST_MSG_HASH, messageHash);
+		editor.commit();
 	}
 	
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;

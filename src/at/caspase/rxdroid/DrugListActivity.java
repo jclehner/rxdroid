@@ -151,7 +151,9 @@ public class DrugListActivity extends Activity implements
 			Serializable date = intent.getSerializableExtra(EXTRA_DAY);
 			if(!(date instanceof Calendar))
 			{
-				Log.e(TAG, "onResume: EXTRA_DAY set, but wrong type");
+				if(date != null)
+					Log.e(TAG, "onResume: EXTRA_DAY set, but wrong type");
+				
 				shiftDate(0);
 			}
 			else
@@ -188,14 +190,14 @@ public class DrugListActivity extends Activity implements
 			case MENU_ADD:
 			{
 				Intent intent = new Intent(Intent.ACTION_INSERT);
-				intent.setClass(getApplicationContext(), DrugEditActivity.class);
+				intent.setClass(this, DrugEditActivity.class);
 				startActivity(intent);
 				return true;
 			}
 			case MENU_PREFERENCES:
 			{
 				Intent intent = new Intent();
-				intent.setClass(getApplicationContext(), PreferencesActivity.class);
+				intent.setClass(this, PreferencesActivity.class);
 				startActivity(intent);
 				return true;
 			}
@@ -285,13 +287,6 @@ public class DrugListActivity extends Activity implements
 					}
 			);
 		}
-	}
-
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data)
-	{
-		//if(resultCode == RESULT_OK)
-		//    updateAdapter();
 	}
 
 	public void onNavigationClick(View view)
@@ -451,7 +446,7 @@ public class DrugListActivity extends Activity implements
 		if(shiftBy == 0)
 		{
 			if(newDate == null)
-				mDate = Preferences.instance().getActiveDate();
+				mDate = Settings.instance().getActiveDate();
 			else if(mDate != newDate)
 				mDate = newDate;
 
@@ -530,12 +525,12 @@ public class DrugListActivity extends Activity implements
 		};
 		//////////////////
 		
-		if(newSupply.compareTo(0) == -1)
+		if(newSupply.compareTo(0) == -1 && drug.getRefillSize() != 0)
 		{
 			drug.setCurrentSupply(Fraction.ZERO);
 			
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setMessage("According to the database the current supplies are not sufficient for this dose.");
+			builder.setMessage(R.string._msg_insufficient_supplies);
 			builder.setPositiveButton(R.string._btn_ignore, defaultOnClickListener);
 			//////////////////
 			builder.setNeutralButton(R.string._btn_edit_drug, new OnClickListener() {
@@ -555,7 +550,10 @@ public class DrugListActivity extends Activity implements
 		}
 		else
 		{
-			drug.setCurrentSupply(newSupply);
+			if(newSupply.compareTo(0) == -1)
+				drug.setCurrentSupply(Fraction.ZERO);
+			else
+				drug.setCurrentSupply(newSupply);
 			
 			builder.setIcon(Util.getDoseTimeDrawableFromDoseTime(doseTime));
 			

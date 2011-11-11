@@ -1,3 +1,24 @@
+/**
+ * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
+ *
+ * This file is part of RxDroid.
+ *
+ * RxDroid is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * RxDroid is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package at.caspase.rxdroid;
 
 import java.util.ArrayList;
@@ -26,18 +47,18 @@ public class NotificationReceiver extends BroadcastReceiver
 	private static final String TAG = NotificationReceiver.class.getName();
 	
 	private static final String EXTRA_STARTED_BY_ALARM = "started_by_alarm";
-	private static final String KEY_LAST_MSG_HASH = "last_msg_hash";
 	
 	private Context mContext;
 	
 	private AlarmManager mAlarmMgr;
-	private Preferences mSettings;
+	private Settings mSettings;
 	private SharedPreferences mSharedPrefs;
 	private NotificationManager mNotificationMgr;
 	
-	static public void sendInitialBroadcast(Context context)
+	static public void sendInitialBroadcast(Context context, boolean beQuiet)
 	{
 		Intent intent = new Intent(context, NotificationReceiver.class);
+		intent.putExtra(EXTRA_STARTED_BY_ALARM, beQuiet);
 		context.sendBroadcast(intent);
 	}
 	
@@ -51,7 +72,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		
 		mContext = context;
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		mSettings = Preferences.instance();
+		mSettings = Settings.instance();
 		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 		mNotificationMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		
@@ -167,13 +188,12 @@ public class NotificationReceiver extends BroadcastReceiver
 				notification.number = notificationCount;			
 			
 			int messageHash = message.hashCode();
-			if(getLastMessageHash() != messageHash)
+			if(mSettings.getLastNotificationMessageHash() != messageHash)
 			{
-				setLastMessageHash(messageHash);
+				mSettings.setLastNotificationMessageHash(messageHash);
 				notification.flags ^= Notification.FLAG_ONLY_ALERT_ONCE;				
 			}			
-			
-			if(beQuiet)
+			else if(beQuiet)
 				notification.defaults ^= Notification.DEFAULT_ALL;
 			
 			mNotificationMgr.notify(R.id.notification, notification);			
@@ -292,17 +312,6 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 		
 		return message;
-	}
-	
-	private int getLastMessageHash() {
-		return mSharedPrefs.getInt(KEY_LAST_MSG_HASH, 0);
-	}
-	
-	private void setLastMessageHash(int messageHash) 
-	{
-		Editor editor = mSharedPrefs.edit();
-		editor.putInt(KEY_LAST_MSG_HASH, messageHash);
-		editor.commit();
 	}
 	
 	private String getString(int resId) {
