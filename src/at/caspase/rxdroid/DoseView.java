@@ -22,10 +22,14 @@
 package at.caspase.rxdroid;
 
 import java.util.Calendar;
+import java.util.List;
 
 import android.content.Context;
+import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
+import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
@@ -61,6 +65,8 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	private Drug mDrug;
 	private int mDoseTime = -1;
 	private Calendar mDate;
+	
+	private Fraction mCumulativeDose = new Fraction();
 	
 	private boolean mHasDoseOnDate = true;
 	
@@ -142,8 +148,12 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		return mDrug.getId();
 	}
 
-	public Fraction getDose() {
-		return Fraction.decode(mDoseText.getText().toString());
+	public Fraction getDose() 
+	{
+		if(mDrug != null && mDoseTime != -1)
+			return mDrug.getDose(mDoseTime);
+		return new Fraction(0);
+		//return Fraction.decode(mDoseText.getText().toString());
 	}
 
 	public TextView getTextView() {
@@ -226,8 +236,13 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 			if(mDate == null)
 				return;
 	
-			if(isApplicableIntake((Intake) entry))
+			Intake intake = (Intake) entry;
+			
+			if(isApplicableIntake(intake))
+			{
+				mCumulativeDose.add(intake.getDose());
 				markAsTaken();
+			}
 		}		
 	}
 
@@ -286,17 +301,42 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 	{
 		if(mDrug == null)
 			return;
-
+		
 		final Fraction dose = mDrug.getDose(mDoseTime);
 		
 		if(!Fraction.ZERO.equals(dose))
 		{
+			SpannableStringBuilder sb = new SpannableStringBuilder(dose.toString());
+			
+			if(mDate != null && !mCumulativeDose.isZero())
+			{
+				final String suffix;
+				switch(mCumulativeDose.compareTo(getDose()))
+				{
+					case -1: 
+						suffix = "-"; 
+						break;
+					case +1: 
+						suffix = "+"; 
+						break;
+					default:
+						suffix = null;
+				}		
+			
+				if(suffix != null)
+				{
+					sb.append(suffix);
+					sb.setSpan(new SuperscriptSpan(), sb.length() - 1, sb.length(), 0);
+				}
+			}			
+			
 			if(mHasDoseOnDate)
-				mDoseText.setText(dose.toString());
+				mDoseText.setText(sb);
 			else
 			{
-				// TODO this is ugly!			
-				mDoseText.setText("(" + dose + ")");
+				sb.insert(0, "(");
+				sb.append(")");				
+				mDoseText.setText(sb);
 			}
 		}
 		else
@@ -345,6 +385,13 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		if(mDate == null || mDrug == null)
 			throw new IllegalStateException("Cannot obtain intake data from DoseView with unset date and/or drug");
 
-		return Database.findIntakes(mDrug, mDate, mDoseTime).size();
+		List<Intake> intakes = Database.findIntakes(mDrug, mDate, mDoseTime);
+		
+		mCumulativeDose = new Fraction();
+		
+		for(Intake intake : intakes)
+			mCumulativeDose.add(intake.getDose());
+				
+		return intakes.size();
 	}
 }

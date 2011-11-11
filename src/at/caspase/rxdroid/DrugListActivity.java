@@ -157,7 +157,7 @@ public class DrugListActivity extends Activity implements
 				setDate((Calendar) date);
 		}
 		else
-			throw new IllegalArgumentException("Received invalid intent; action=" + intent.getAction());
+			shiftDate(0);
 		
 		startNotificationService();
 	}
@@ -435,7 +435,7 @@ public class DrugListActivity extends Activity implements
 		if(shiftBy == 0)
 		{
 			if(newDate == null)
-				mDate = DateTime.today();
+				mDate = Preferences.instance().getActiveDate();
 			else if(mDate != newDate)
 				mDate = newDate;
 
@@ -682,14 +682,11 @@ public class DrugListActivity extends Activity implements
 			// means that this part alone will, in total, take more than 100ms to complete 
 			// for 4 drugs.
 			
-			Timer t = new Timer();
 			for(DoseView doseView : holder.doseViews)
 			{
 				if(!doseView.hasInfo(mAdapterDate, drug))
 					doseView.setInfo(mAdapterDate, drug);
 			}
-			
-			Log.d(TAG, "getView: " + t);
 			
 			return v;
 		}		
