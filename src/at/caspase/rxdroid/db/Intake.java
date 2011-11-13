@@ -87,7 +87,7 @@ public class Intake extends Entry
 	}
 	
 	public Drug getDrug() {
-		return Database.findDrug(getDrugId());			
+		return Database.getDrug(getDrugId());			
 	}
 	
 	public Fraction getDose() {

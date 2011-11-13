@@ -97,6 +97,8 @@ public class DrugListActivity extends Activity implements
 	public static final String EXTRA_STARTED_BY_NOTIFICATION = "started_from_notification";
 
 	private static final int TAG_ID = R.id.tag_drug_id;
+	
+	private static final boolean USE_INTAKE_ACTIVITY = false;
 
 	private LayoutInflater mInflater;
 
@@ -223,7 +225,7 @@ public class DrugListActivity extends Activity implements
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
 	{
 		final DoseView doseView = (DoseView) v;
-		final Drug drug = Database.findDrug(doseView.getDrugId());
+		final Drug drug = Database.getDrug(doseView.getDrugId());
 		final int doseTime = doseView.getDoseTime();
 		
 		//menu.setHeaderIcon(android.R.drawable.ic_menu_agenda);
@@ -316,7 +318,7 @@ public class DrugListActivity extends Activity implements
 		Intent intent = new Intent(Intent.ACTION_EDIT);
 		intent.setClass(this, DrugEditActivity.class);		
 		
-		Drug drug = Database.findDrug((Integer) view.getTag(TAG_ID));
+		Drug drug = Database.getDrug((Integer) view.getTag(TAG_ID));
 		intent.putExtra(DrugEditActivity.EXTRA_DRUG, (Serializable) drug);
 		
 		startActivityForResult(intent, 0);
@@ -347,7 +349,7 @@ public class DrugListActivity extends Activity implements
 	public void onDoseClick(final View view)
 	{
 		final DoseView v = (DoseView) view;
-		final Drug drug = Database.findDrug(v.getDrugId());
+		final Drug drug = Database.getDrug(v.getDrugId());
 
 		final int doseTime = v.getDoseTime();
 		final Fraction dose = drug.getDose(doseTime);
@@ -497,9 +499,20 @@ public class DrugListActivity extends Activity implements
 		nextView.setAdapter(adapter);
 		nextView.setOnTouchListener(this);
 	}
-	
+		
+	@SuppressWarnings("unused")
 	private void requestIntake(final Drug drug, Calendar date, int doseTime, Fraction dose, boolean askOnNormalIntake)
 	{
+		if(USE_INTAKE_ACTIVITY)
+		{
+			Intent intent = new Intent(this, IntakeActivity.class);
+			intent.putExtra(IntakeActivity.EXTRA_DRUG_ID, drug.getId());
+			intent.putExtra(IntakeActivity.EXTRA_DATE, date.getTime());
+			intent.putExtra(IntakeActivity.EXTRA_DOSE_TIME, doseTime);
+			startActivity(intent);
+			return;
+		}		
+		
 		if(dose.equals(Fraction.ZERO))
 		{
 			requestUnscheduledIntake(drug, date, doseTime);

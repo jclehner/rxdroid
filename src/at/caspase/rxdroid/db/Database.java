@@ -190,10 +190,10 @@ public final class Database
 	}
 
 	/**
-	 * Finds a drug with the specified id.
+	 * Returns the drug with the specified id (unchecked).
 	 * 
 	 * @param drugId the id to search for.
-	 * @throws NoSuchElementException if there is no drug with the specified id.
+	 * @return The drug or <code>null</code> if it doesn't exist.
 	 */
 	public static Drug findDrug(int drugId)
 	{
@@ -203,7 +203,21 @@ public final class Database
 				return drug;
 		}
 		
-		throw new NoSuchElementException("No drug with id=" + drugId);
+		return null;
+	}
+	
+	/**
+	 * Returns the drug with the specified id (checked).
+	 * 
+	 * @param drugId the id to search for.
+	 * @throws NoSuchElementException if there is no drug with the specified id.
+	 */
+	public static Drug getDrug(int drugId)
+	{
+		Drug drug = findDrug(drugId);
+		if(drug == null)		
+			throw new NoSuchElementException("No drug with id=" + drugId);
+		return drug;
 	}
 	
 	/**
