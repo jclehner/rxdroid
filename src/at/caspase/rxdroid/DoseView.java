@@ -310,19 +310,25 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		if(mDrug == null)
 			return;
 		
-		final Fraction dose = mDrug.getDose(mDoseTime);
+		final Fraction actualDose;
+		if(mDate == null || mCumulativeDose == null || mCumulativeDose.isZero())
+			actualDose = getDose();
+		else if(!mCumulativeDose.isZero())
+			actualDose = mCumulativeDose;
+		else
+			actualDose = null;
 		
-		if(!Fraction.isZero(dose))
+		if(actualDose != null && !Fraction.isZero(actualDose))
 		{
-			SpannableStringBuilder sb = new SpannableStringBuilder(dose.toString());
+			SpannableStringBuilder sb = new SpannableStringBuilder(actualDose.toString());
 			
-			if(mDate != null && !mCumulativeDose.isZero())
+			if(mDate != null)
 			{
 				final String suffix;
-				switch(mCumulativeDose.compareTo(getDose()))
+				switch(actualDose.compareTo(mDrug.getDose(mDoseTime, mDate)))
 				{
 					case -1: 
-						suffix = "-"; 
+						suffix = "-";
 						break;
 					case +1: 
 						suffix = "+"; 

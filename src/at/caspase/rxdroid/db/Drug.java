@@ -301,16 +301,15 @@ public class Drug extends Entry
 		return new Fraction[] { doseMorning, doseNoon, doseEvening, doseNight };
 	}
 
-	public Fraction getDose(int doseTime)
+	public Fraction getDose(int doseTime) {
+		return getSchedule()[doseTime];
+	}
+	
+	public Fraction getDose(int doseTime, Calendar calendar)
 	{
-		final Fraction doses[] = {
-				doseMorning,
-				doseNoon,
-				doseEvening,
-				doseNight
-		};
-
-		return doses[doseTime];
+		if(!hasDoseOnDate(calendar))
+			return new Fraction(0);
+		return getSchedule()[doseTime];
 	}
 	
 	public Fraction getDailyDose()

@@ -208,19 +208,23 @@ public final class Database
 	
 	/**
 	 * Find all intakes meeting the specified criteria.
+	 * <p>
+	 * @param drug The drug to search for (based on its database ID).
+	 * @param date The Intake's date. Can be <code>null</code>.
+	 * @param doseTime The Intake's doseTime. Can be <code>null</code>.
 	 */
-	public static synchronized List<Intake> findIntakes(Drug drug, Calendar date, int doseTime)
+	public static synchronized List<Intake> findIntakes(Drug drug, Calendar date, Integer doseTime)
 	{
-		final List<Intake> intakes = new LinkedList<Intake>();
-				
+		final List<Intake> intakes = new LinkedList<Intake>();		
+		
 		for(Intake intake : getCachedIntakes())
 		{
-			if(intake.getDoseTime() != doseTime)
-				continue;
 			if(intake.getDrugId() != drug.getId())
 				continue;
-			if(!intake.getDate().equals(DateTime.toSqlDate(date)))
+			if(date != null && !intake.getDate().equals(DateTime.toSqlDate(date)))
 				continue;
+			if(doseTime != null && intake.getDoseTime() != doseTime)
+				continue;			
 			
 			intakes.add(intake);
 		}
