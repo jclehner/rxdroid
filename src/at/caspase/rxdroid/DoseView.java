@@ -312,7 +312,7 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 		
 		final Fraction dose = mDrug.getDose(mDoseTime);
 		
-		if(!Fraction.ZERO.equals(dose))
+		if(!Fraction.isZero(dose))
 		{
 			SpannableStringBuilder sb = new SpannableStringBuilder(dose.toString());
 			

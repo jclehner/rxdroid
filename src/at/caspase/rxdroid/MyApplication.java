@@ -32,7 +32,6 @@ public class MyApplication extends Application
 	public void onCreate()
 	{
 		super.onCreate();
-		GlobalContext.set(getApplicationContext());
-		Settings.instance().setLastNotificationMessageHash(0);	     
+		GlobalContext.set(getApplicationContext());   
 	}
 }

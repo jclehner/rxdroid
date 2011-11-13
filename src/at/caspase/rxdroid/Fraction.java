@@ -100,7 +100,7 @@ public class Fraction extends Number implements Comparable<Number>
 	}
 	
 	public boolean isZero() {
-		return mNumerator == 0;
+		return isZero(this);
 	}
 	
 	/**
@@ -293,6 +293,10 @@ public class Fraction extends Number implements Comparable<Number>
 	@Override
 	public long longValue() {
 		return Math.round(doubleValue());
+	}
+	
+	public static boolean isZero(Fraction f) {
+		return f.mNumerator == 0;
 	}
 
 	/**

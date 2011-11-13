@@ -41,12 +41,13 @@ import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Util;
 
 public class NotificationReceiver extends BroadcastReceiver
 {
 	private static final String TAG = NotificationReceiver.class.getName();
 	
-	private static final String EXTRA_STARTED_BY_ALARM = "started_by_alarm";
+	private static final String EXTRA_BE_QUIET = "be_quiet";
 	
 	private Context mContext;
 	
@@ -58,7 +59,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	static public void sendInitialBroadcast(Context context, boolean beQuiet)
 	{
 		Intent intent = new Intent(context, NotificationReceiver.class);
-		intent.putExtra(EXTRA_STARTED_BY_ALARM, beQuiet);
+		intent.putExtra(EXTRA_BE_QUIET, beQuiet);
 		context.sendBroadcast(intent);
 	}
 	
@@ -76,7 +77,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 		mNotificationMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		
-		final boolean beQuiet = intent != null && intent.getBooleanExtra(EXTRA_STARTED_BY_ALARM, false);
+		final boolean beQuiet = intent != null && intent.getBooleanExtra(EXTRA_BE_QUIET, false);
 				
 		rescheduleAlarms();
 		updateCurrentNotifications(beQuiet);		
@@ -98,8 +99,8 @@ public class NotificationReceiver extends BroadcastReceiver
 		
 		if(activeDoseTime != -1)
 			scheduleEndAlarm(now, activeDoseTime);
-		
-		scheduleBeginAlarm(now, nextDoseTime);
+		else
+			scheduleBeginAlarm(now, nextDoseTime);
 	}
 	
 	private void updateCurrentNotifications(boolean beQuiet)
@@ -224,7 +225,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		time.add(Calendar.MILLISECOND, (int) offset);
 		
 		Log.d(TAG, "Scheduling " + (scheduleEnd ? "end" : "begin") + " of doseTime " + doseTime + " for " + DateTime.toString(time));
-		Log.d(TAG, "Alarm will fire in " + (time.getTimeInMillis() - System.currentTimeMillis()) + "ms");
+		Log.d(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
 		
 		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation());
 	}
@@ -238,7 +239,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	private PendingIntent createOperation() 
 	{
 		Intent intent = new Intent(mContext, NotificationReceiver.class);
-		intent.putExtra(EXTRA_STARTED_BY_ALARM, true);
+		intent.putExtra(EXTRA_BE_QUIET, true);
 				
 		return PendingIntent.getBroadcast(mContext, 0, intent, 0);
 	}
@@ -262,11 +263,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		
 	}
 	
-	private static int countForgottenIntakes(Calendar date, int activeDoseTime)
+	private static int countForgottenIntakes(Calendar date, int activeOrNextDoseTime)
 	{
 		int count = 0;
 		
-		for(int doseTime = 0; doseTime != activeDoseTime; ++doseTime)
+		for(int doseTime = 0; doseTime != activeOrNextDoseTime; ++doseTime)
 			count += countOpenIntakes(date, doseTime);
 		
 		return count;
