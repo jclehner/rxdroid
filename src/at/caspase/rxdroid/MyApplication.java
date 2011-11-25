@@ -22,7 +22,6 @@
 package at.caspase.rxdroid;
 
 import android.app.Application;
-import android.os.StrictMode;
 
 public class MyApplication extends Application
 {

@@ -503,16 +503,6 @@ public class DrugListActivity extends Activity implements
 	@SuppressWarnings("unused")
 	private void requestIntake(final Drug drug, Calendar date, int doseTime, Fraction dose, boolean askOnNormalIntake)
 	{
-		if(USE_INTAKE_ACTIVITY)
-		{
-			Intent intent = new Intent(this, IntakeActivity.class);
-			intent.putExtra(IntakeActivity.EXTRA_DRUG_ID, drug.getId());
-			intent.putExtra(IntakeActivity.EXTRA_DATE, date.getTime());
-			intent.putExtra(IntakeActivity.EXTRA_DOSE_TIME, doseTime);
-			startActivity(intent);
-			return;
-		}		
-		
 		if(dose.equals(Fraction.ZERO))
 		{
 			requestUnscheduledIntake(drug, date, doseTime);

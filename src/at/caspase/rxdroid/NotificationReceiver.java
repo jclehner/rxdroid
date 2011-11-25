@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -33,8 +34,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import android.text.SpannableString;
+import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 import android.widget.RemoteViews;
 import at.caspase.rxdroid.db.Database;
@@ -56,7 +58,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	private SharedPreferences mSharedPrefs;
 	private NotificationManager mNotificationMgr;
 	
-	static public void sendInitialBroadcast(Context context, boolean beQuiet)
+	static public void sendBroadcast(Context context, boolean beQuiet)
 	{
 		Intent intent = new Intent(context, NotificationReceiver.class);
 		intent.putExtra(EXTRA_BE_QUIET, beQuiet);
@@ -169,9 +171,8 @@ public class NotificationReceiver extends BroadcastReceiver
 			final String message = sb.toString();
 			
 			final RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.notification);
-			views.setTextViewText(R.id.stat_title, getString(R.string._title_notifications));
-			views.setTextViewText(R.id.stat_text, message);
-			//views.setTextViewText(R.id.stat_time, new SimpleDateFormat("HH:mm").format(DateTime.now().getTime()));
+			views.setCharSequence(R.id.stat_title, "setText", createTitle(getString(R.string._title_notifications)));
+			views.setCharSequence(R.id.stat_text, "setText", createContent(message));
 			views.setTextViewText(R.id.stat_time, "");
 			
 			final Intent intent = new Intent(mContext, DrugListActivity.class);
@@ -199,6 +200,53 @@ public class NotificationReceiver extends BroadcastReceiver
 			
 			mNotificationMgr.notify(R.id.notification, notification);			
 		}		
+	}
+	
+	private CharSequence createTitle(String title)
+	{
+		int appearance = getAppearanceResId("TextAppearance_StatusBar_EventContent_Title", 
+				android.R.style.TextAppearance_Medium_Inverse);
+		
+		return createSpannableWithAppearance(title, appearance);
+	}
+	
+	private CharSequence createContent(String content)
+	{
+		int appearance = getAppearanceResId("TextAppearance_StatusBar_EventContent", 
+				android.R.style.TextAppearance_Small_Inverse);
+		
+		return createSpannableWithAppearance(content, appearance);			
+	}
+	
+	private SpannableString createSpannableWithAppearance(String string, int appearance)
+	{
+		SpannableString s = new SpannableString(string);
+		s.setSpan(new TextAppearanceSpan(mContext, appearance), 0, s.length() - 1, 0);
+		return s;		
+	}
+	
+	private int getAppearanceResId(String resIdFieldName, int defaultResId)
+	{
+		Class<?> cls = android.R.style.class;
+		try
+		{
+			Field f = cls.getField(resIdFieldName);
+			return f.getInt(null);
+		}
+		catch(IllegalAccessException e)
+		{
+			// eat exception
+		}
+		catch(SecurityException e)
+		{
+			// eat exception
+		}
+		catch(NoSuchFieldException e)
+		{
+			Log.w(TAG, "getAppearance: no such field in android.R.style: " + resIdFieldName);
+		}
+		
+		return defaultResId;
 	}
 	
 	private void cancelNotifications() {

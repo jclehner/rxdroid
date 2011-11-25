@@ -34,7 +34,7 @@
 			</intent-filter>
 		</activity>
 		
-		<activity android:name=".IntakeActivity" android:theme="@style/android:Theme.Dialog">
+		<activity android:name=".IntakeDialog" android:theme="@style/android:Theme.Dialog">
 		    <intent-filter>
 		        <action android:name="android.intent.action.MAIN" />		        
 		    </intent-filter>		    
@@ -63,5 +63,5 @@
 
 	<instrumentation android:targetPackage="at.caspase.rxdroid" android:label="RxDroid Tests" android:name="android.test.InstrumentationTestRunner"/>
 	
-	<uses-sdk android:minSdkVersion="10" />
+	<uses-sdk android:minSdkVersion="8" />
 </manifest> 

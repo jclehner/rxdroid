@@ -111,7 +111,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		String drugName = mDrug.getName();
 
-		if(drugName == null || drugName.isEmpty())
+		if(drugName == null || drugName.length() == 0)
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(R.string._title_error);

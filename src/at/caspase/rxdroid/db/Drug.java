@@ -186,24 +186,30 @@ public class Drug extends Entry
 		this.repeatOrigin = repeatOrigin;
 	}
 
-	public boolean hasDoseOnDate(Calendar cal)
+	@Deprecated
+	public boolean hasDoseOnDate(Calendar cal) {
+		return hasDoseOnDate(cal.getTime());
+	}
+	
+	public boolean hasDoseOnDate(Date date)
 	{
-		if(cal == null)
-			throw new NullPointerException("cal == null");
-		
 		if(repeat == REPEAT_DAILY)
 			return true;
-
+		
 		if(repeat == REPEAT_EVERY_N_DAYS)
 		{
-			final long diffDays = Math.abs(repeatOrigin.getTime() - cal.getTimeInMillis()) / Constants.MILLIS_PER_DAY;
+			final long diffDays = Math.abs(repeatOrigin.getTime() - date.getTime()) / Constants.MILLIS_PER_DAY;
 			return diffDays % repeatArg == 0;
 		}
 		else if(repeat == REPEAT_WEEKDAYS)
+		{
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);			
 			return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
+		}
 		
-		throw new IllegalStateException("Repeat " + repeat + " not yet implemented");
-	}	
+		throw new RuntimeException("Repeat type " + repeat + " not yet implemented");
+	}
 
 	public String getName() {
 		return name;
@@ -305,11 +311,16 @@ public class Drug extends Entry
 		return getSchedule()[doseTime];
 	}
 	
-	public Fraction getDose(int doseTime, Calendar calendar)
+	public Fraction getDose(int doseTime, Date date)
 	{
-		if(!hasDoseOnDate(calendar))
+		if(!hasDoseOnDate(date))
 			return new Fraction(0);
-		return getSchedule()[doseTime];
+		return getSchedule()[doseTime];		
+	}
+	
+	@Deprecated
+	public Fraction getDose(int doseTime, Calendar calendar) {
+		return getDose(doseTime, calendar.getTime());
 	}
 	
 	public Fraction getDailyDose()

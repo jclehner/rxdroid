@@ -102,7 +102,7 @@ public final class Util
 		
 		final String str = t.toString();
 		
-		if(str.isEmpty())
+		if(str.length() == 0)
 			return 0;
 		
 		return Integer.parseInt(str, 10);	

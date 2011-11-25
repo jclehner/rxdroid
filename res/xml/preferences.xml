@@ -176,8 +176,8 @@
 	<PreferenceScreen android:key="prefscreen_debug"
 		android:title="Debugging options">
 		
-		<Preference android:key="debug_view_sleep_state"
-			android:title="View sleep state"
+		<Preference android:key="debug_show_intake_dialog"
+			android:title="Show intake dialog"
 		/>
 		
 		<CheckBoxPreference android:key="debug_enabled"

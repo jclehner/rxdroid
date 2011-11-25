@@ -54,7 +54,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 
 	public void setInitialName(String name)
 	{
-		if(name != null && !name.isEmpty())
+		if(name != null && name.length() != 0)
 		{
 			mInitialName = name;
 			setName(mInitialName);
@@ -104,7 +104,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 			String name = mInput.getText().toString();
 			boolean isUniqueName = isUniqueDrugName(name);
 
-			if(name.isEmpty() || !isUniqueName)
+			if(name.length() == 0 || !isUniqueName)
 			{
 				if(name.equals(mInitialName))
 					return;
@@ -122,7 +122,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 					}
 				});
 
-				if(name.isEmpty())
+				if(name.length() == 0)
 				{
 					builder.setTitle(R.string._title_error);
 					builder.setMessage(R.string._msg_err_empty_drug_name);

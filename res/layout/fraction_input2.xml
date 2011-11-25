@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+	
+	<com.quietlycoding.android.picker.NumberPicker android:id="@+id/numerator" 
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+	/>
+	
+	<TextView android:id="@+id/fraction_bar"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		
+		android:layout_gravity="center_vertical"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:textStyle="bold"
+		android:text="/"
+	/>
+	
+	<com.quietlycoding.android.picker.NumberPicker android:id="@+id/denominator" 
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+	/>   
+    
+</merge>

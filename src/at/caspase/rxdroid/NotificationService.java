@@ -25,13 +25,15 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
-import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entry;
+import at.caspase.rxdroid.db.Intake;
+import at.caspase.rxdroid.util.Constants;
 
 public class NotificationService extends Service implements OnDatabaseChangedListener, OnSharedPreferenceChangeListener
 {
@@ -40,35 +42,45 @@ public class NotificationService extends Service implements OnDatabaseChangedLis
 		
 	private SharedPreferences mSharedPrefs;
 	
+	private static boolean sIsStarted = false;
+	
 	@Override
 	public void onEntryCreated(Entry entry, int flags)
 	{
-		final boolean beQuiet = entry instanceof Drug ? true : false;
-		NotificationReceiver.sendInitialBroadcast(this, beQuiet);
+		if(entry instanceof Intake)
+		{
+			Handler handler = new Handler();
+			handler.postDelayed(new Runnable() {
+				
+				@Override
+				public void run()
+				{
+					NotificationReceiver.sendBroadcast(getApplicationContext(), true);				
+				}
+			}, Constants.NOTIFICATION_INITIAL_DELAY);
+			
+		}
+		else	
+			NotificationReceiver.sendBroadcast(this, false);		
 	}
 
 	@Override
 	public void onEntryUpdated(Entry entry, int flags)
 	{
-		NotificationReceiver.sendInitialBroadcast(this, false);
+		NotificationReceiver.sendBroadcast(this, false);
 	}
 
 	@Override
 	public void onEntryDeleted(Entry entry, int flags)
 	{
-		NotificationReceiver.sendInitialBroadcast(this, false);
+		NotificationReceiver.sendBroadcast(this, false);
 	}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
 	{
 		// TODO filter
-		NotificationReceiver.sendInitialBroadcast(this, true);
-	}
-	
-	public NotificationService()
-	{
-		Log.d(TAG, "<init>");
+		NotificationReceiver.sendBroadcast(this, true);
 	}
 	
 	@Override
@@ -89,6 +101,7 @@ public class NotificationService extends Service implements OnDatabaseChangedLis
 		Database.unregisterOnChangedListener(this);
 		mSharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
 		Settings.instance().setLastNotificationMessageHash(0);
+		sIsStarted = false;
 	}
 
 	@Override
@@ -99,7 +112,11 @@ public class NotificationService extends Service implements OnDatabaseChangedLis
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
-		NotificationReceiver.sendInitialBroadcast(this, true);			
+		if(!sIsStarted)
+		{
+			NotificationReceiver.sendBroadcast(this, true);
+			sIsStarted = true;
+		}
 		return START_STICKY;
 	}
 }

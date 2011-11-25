@@ -67,6 +67,8 @@ public class Settings
 				sInstance = new Settings();
 				Log.d(TAG, "Using Settings");
 			}
+			
+			sInstance.setLastNotificationMessageHash(0);
 		}
 
 		return sInstance;
