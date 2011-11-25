@@ -109,7 +109,7 @@ public class PreferencesActivity extends PreferenceActivity
 			for(int doseTime : Constants.DOSE_TIMES)
 				drug.setDose(doseTime, new Fraction(1));
 						
-			IntakeDialog d = new IntakeDialog(this, drug, Drug.TIME_MORNING, DateTime.today().getTime(), 0);
+			IntakeDialog d = new IntakeDialog(this, drug, Drug.TIME_MORNING, DateTime.today().getTime());
 			d.show();
 			
 			return true;

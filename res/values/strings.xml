@@ -106,7 +106,7 @@
 	<string name="_btn_edit_drug">Edit drug</string>
 	<string name="_btn_ignore">Ignore</string>
 	<string name="_msg_intake_already_taken">You have already taken this dose. Do you want to continue?</string>
-	<string name="_msg_intake_normal">Take the above stated dose and press OK.</string>
+	<string name="_msg_intake_normal">Take this dose and press OK.</string>
 	<string name="_msg_intake_unscheduled">No dose is scheduled at this time. Do you want to continue?</string>
 	<string name="_title_change_dose">Change dose</string>
 	<string name="_title_edit_drug">Edit drug</string>
