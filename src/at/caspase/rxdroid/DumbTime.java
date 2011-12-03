@@ -27,7 +27,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import android.util.Log;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
 

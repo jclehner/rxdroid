@@ -3,16 +3,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 >
+ 
     <TextView android:id="@+id/dose_text"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_gravity="center"
+		android:layout_gravity="center|top"
 		android:gravity="center"
 		
 		android:textAppearance="?android:attr/textAppearanceLarge"
 		android:textSize="50sp"
 		android:textStyle="bold"
-	/>   
+	/>
+    
+    <TextView android:id="@+id/dose_hint"
+        android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_gravity="center|bottom"
+		
+		android:gravity="center"
+		android:textAppearance="?android:attr/textAppearanceSmall"
+		android:text="@string/_msg_click_to_edit"
+	/>
     
     <at.caspase.rxdroid.FractionInput android:id="@+id/dose_edit"
 		android:layout_width="match_parent"

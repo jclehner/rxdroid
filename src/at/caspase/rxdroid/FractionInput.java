@@ -8,8 +8,21 @@ import android.widget.LinearLayout;
 
 import com.quietlycoding.android.picker.NumberPicker;
 
+/**
+ * A widget for fraction input.
+ * 
+ * This implementation basically uses the private NumberPicker implementation 
+ * available in the pre-Honeycomb sources.
+ * 
+ * @author Joseph Lehner
+ */
 public class FractionInput extends LinearLayout implements NumberPicker.OnChangedListener
 {
+	public interface OnChangedListener
+	{
+		public void onChanged(FractionInput widget, Fraction oldValue);
+	}	
+	
 	private static final int MAX = 99999;
 	
 	private NumberPicker mIntegerPicker;
@@ -21,6 +34,8 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	private int mDenominator = 1;
 	
 	private boolean mUseMixedNumberMode = false;
+	
+	private OnChangedListener mListener;
 	
 	public FractionInput(Context context, AttributeSet attrs) 
 	{
@@ -78,10 +93,20 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	public boolean isInMixedNumberMode() {
 		return mUseMixedNumberMode;
 	}
+	
+	public OnChangedListener getOnChangeListener() {
+		return mListener;
+	}
+	
+	public void setOnChangeListener(OnChangedListener listener) {
+		mListener = listener;
+	}	
 
 	@Override
 	public void onChanged(NumberPicker picker, int oldVal, int newVal)
 	{
+		Fraction oldValue = getValue();
+		
 		if(picker.getId() == R.id.integer)
 			mInteger = newVal;
 		if(picker.getId() == R.id.numerator)
@@ -93,6 +118,11 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 			else // this shouldn't happen
 				mDenominator = 1;
 		}
+		else
+			return;
+		
+		if(mListener != null)
+			mListener.onChanged(this, oldValue);			
 	}
 	
 	private void updateView()

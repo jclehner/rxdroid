@@ -74,7 +74,6 @@ import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
-import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.Util;
 
 public class DrugListActivity extends Activity implements
@@ -97,8 +96,6 @@ public class DrugListActivity extends Activity implements
 	public static final String EXTRA_STARTED_BY_NOTIFICATION = "started_from_notification";
 
 	private static final int TAG_ID = R.id.tag_drug_id;
-	
-	private static final boolean USE_INTAKE_ACTIVITY = false;
 
 	private LayoutInflater mInflater;
 
@@ -365,8 +362,18 @@ public class DrugListActivity extends Activity implements
 	}
 
 	@Override
-	public View makeView() {
-		return new ListView(this);
+	public View makeView() 
+	{
+		ListView lv = new ListView(this);		
+		
+		TextView emptyView = new TextView(this);
+		emptyView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
+		emptyView.setText(getString(R.string._msg_empty_list_text, getString(R.string._title_add)));
+		emptyView.setVisibility(View.GONE);
+				
+		lv.setEmptyView(emptyView);
+		
+		return lv;
 	}
 	
 	/////////////	
