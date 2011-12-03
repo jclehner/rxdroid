@@ -299,9 +299,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		Util.populateListPreferenceEntryValues(mFreqPreference);
 		Util.populateListPreferenceEntryValues(mDrugForm);
-		
-		InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE); 
-		inputManager.setInputMethod(getWindow(), id)
 	}
 
 	@Override
