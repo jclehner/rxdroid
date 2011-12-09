@@ -58,6 +58,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	private SharedPreferences mSharedPrefs;
 	private NotificationManager mNotificationMgr;
 	
+	private MyNotification mNotification = new MyNotification();
+	
 	static public void sendBroadcast(Context context, boolean beQuiet)
 	{
 		Intent intent = new Intent(context, NotificationReceiver.class);
@@ -128,129 +130,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		int forgottenIntakes = countForgottenIntakes(date, doseTime);
 		String lowSupplyMessage = getLowSupplyMessage(date, doseTime);
 		
-		if((pendingIntakes + forgottenIntakes) == 0 && lowSupplyMessage == null)
-			mNotificationMgr.cancel(R.id.notification);
-		else
-		{
-			String doseMessage = null;
-			int notificationCount = 1;
-			
-			if(pendingIntakes != 0 && forgottenIntakes != 0)
-			{
-				doseMessage = getString(R.string._msg_doses_fp, forgottenIntakes, pendingIntakes);
-				notificationCount = 2;
-			}
-			else if(pendingIntakes != 0)
-				doseMessage = getString(R.string._msg_doses_p, pendingIntakes);
-			else if(forgottenIntakes != 0)
-				doseMessage = getString(R.string._msg_doses_f, forgottenIntakes);
-			else
-				notificationCount = 0;
-			
-			final String bullet;
-			
-			if(doseMessage == null || lowSupplyMessage == null)
-				bullet = "";
-			else
-				bullet = Constants.NOTIFICATION_BULLET;
-			
-			final StringBuilder sb = new StringBuilder();
-			
-			if(doseMessage != null)
-				sb.append(bullet + doseMessage);
-			
-			if(lowSupplyMessage != null)
-			{
-				if(doseMessage != null)
-					sb.append("\n");
-				
-				sb.append(bullet + lowSupplyMessage);
-				++notificationCount;
-			}
-			
-			final String message = sb.toString();
-			
-			final RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.notification);
-			views.setCharSequence(R.id.stat_title, "setText", createTitle(getString(R.string._title_notifications)));
-			views.setCharSequence(R.id.stat_text, "setText", createContent(message));
-			views.setTextViewText(R.id.stat_time, "");
-			
-			final Intent intent = new Intent(mContext, DrugListActivity.class);
-			intent.setAction(Intent.ACTION_VIEW);
-			intent.putExtra(DrugListActivity.EXTRA_DAY, date);
-			
-			final Notification notification = new Notification();
-			notification.icon = R.drawable.ic_stat_pill;
-			notification.tickerText = getString(R.string._msg_new_notification);
-			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONLY_ALERT_ONCE;
-			notification.defaults |= Notification.DEFAULT_ALL;
-			notification.contentIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
-			notification.contentView = views;
-			if(notificationCount > 1)
-				notification.number = notificationCount;			
-			
-			int messageHash = message.hashCode();
-			if(mSettings.getLastNotificationMessageHash() != messageHash)
-			{
-				mSettings.setLastNotificationMessageHash(messageHash);
-				notification.flags ^= Notification.FLAG_ONLY_ALERT_ONCE;				
-			}			
-			else if(beQuiet)
-				notification.defaults ^= Notification.DEFAULT_ALL;
-			
-			mNotificationMgr.notify(R.id.notification, notification);			
-		}		
-	}
-	
-	private CharSequence createTitle(String title)
-	{
-		int appearance = getAppearanceResId("TextAppearance_StatusBar_EventContent_Title", 
-				android.R.style.TextAppearance_Medium_Inverse);
+		mNotification.setPendingCount(pendingIntakes);
+		mNotification.setForgottenCount(forgottenIntakes);
+		mNotification.setLowSupplyMessage(lowSupplyMessage);
 		
-		return createSpannableWithAppearance(title, appearance);
-	}
-	
-	private CharSequence createContent(String content)
-	{
-		int appearance = getAppearanceResId("TextAppearance_StatusBar_EventContent", 
-				android.R.style.TextAppearance_Small_Inverse);
-		
-		return createSpannableWithAppearance(content, appearance);			
-	}
-	
-	private SpannableString createSpannableWithAppearance(String string, int appearance)
-	{
-		SpannableString s = new SpannableString(string);
-		s.setSpan(new TextAppearanceSpan(mContext, appearance), 0, s.length() - 1, 0);
-		return s;		
-	}
-	
-	private int getAppearanceResId(String resIdFieldName, int defaultResId)
-	{
-		Class<?> cls = android.R.style.class;
-		try
-		{
-			Field f = cls.getField(resIdFieldName);
-			return f.getInt(null);
-		}
-		catch(IllegalAccessException e)
-		{
-			// eat exception
-		}
-		catch(SecurityException e)
-		{
-			// eat exception
-		}
-		catch(NoSuchFieldException e)
-		{
-			Log.w(TAG, "getAppearance: no such field in android.R.style: " + resIdFieldName);
-		}
-		
-		return defaultResId;
-	}
-	
-	private void cancelNotifications() {
-		mNotificationMgr.cancel(R.id.notification);
+		mNotification.update();
 	}
 	
 	private void scheduleBeginAlarm(Calendar time, int doseTime) {

@@ -152,7 +152,7 @@
 	<string name="_title_active">Active</string>
 	<string name="_title_ignore_dose">Mark as ignored</string>
 	
-	<string name="_msg_insufficient_supplies">The current supplies are not sufficient for this dose.</string>
+	<string name="_msg_insufficient_supplies">Insufficient supplies (%3$s) of %1$s for a dose of %2$s.</string>
 	
     <string name="dialog_set_number">Set</string>
     <string name="dialog_cancel">Cancel</string>
@@ -162,5 +162,7 @@
     
     <string name="_msg_click_to_edit">(click to edit)</string>
     <string name="_msg_empty_list_text">Click MENU and select "%1$s" to add a drug.</string>
+    
+    <string name="_msg_no_doses_on_this_day">There are no doses to be taken on this date.</string>
 	
 </resources>

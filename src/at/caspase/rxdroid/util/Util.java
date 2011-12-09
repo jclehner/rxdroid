@@ -125,4 +125,14 @@ public final class Util
 	{
 		return millis + "ms (" + new DumbTime(millis, true).toString(true) + ")";
 	}
+	
+	public static boolean equals(Object a, Object b)
+	{
+		if(a == null && b == null)
+			return true;
+		else if(a != null)
+			return a.equals(b);
+		
+		return b.equals(a);	
+	}
 }

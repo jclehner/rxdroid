@@ -22,13 +22,17 @@
 package at.caspase.rxdroid.db;
 
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import android.content.Context;
@@ -36,8 +40,6 @@ import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
-import at.caspase.rxdroid.db.Drug;
-import at.caspase.rxdroid.db.Intake;
 
 import com.j256.ormlite.dao.Dao;
 
@@ -69,8 +71,10 @@ public final class Database
 	
 	private static boolean sIsLoaded = false;
 	
-	private static WeakHashMap<OnDatabaseChangedListener, Void> sOnChangedListeners = 
-		new WeakHashMap<OnDatabaseChangedListener, Void>();
+	private static Thread sUiThread;
+	
+	private static Map<OnChangedListener, Void> sOnChangedListeners = 
+		Collections.synchronizedMap(new WeakHashMap<OnChangedListener, Void>());
 
 	/**
 	 * Initializes the DB.
@@ -104,6 +108,8 @@ public final class Database
 			getCachedIntakes();
 			
 			sIsLoaded = true;
+			
+			sUiThread = Thread.currentThread();
 		}
 	}
 	
@@ -117,7 +123,7 @@ public final class Database
 	 * @see #OnDatabaseChangedListener
 	 * @param listener The listener to register.
 	 */
-	public static synchronized void registerOnChangedListener(OnDatabaseChangedListener listener) 
+	public static synchronized void registerOnChangedListener(OnChangedListener listener) 
 	{
 		sOnChangedListeners.put(listener, null);
 		//Log.d(TAG, "register: Objects in listener registry: " + sOnChangedListeners.size());
@@ -129,10 +135,11 @@ public final class Database
 	 * @see #Database.OnDatabaseChangedListener
 	 * @param listener The listener to remove.
 	 */
-	public static synchronized void unregisterOnChangedListener(OnDatabaseChangedListener listener) 
+	public static synchronized void unregisterOnChangedListener(OnChangedListener listener) 
 	{
-		sOnChangedListeners.remove(listener);
-		//Log.d(TAG, "unregister: Objects in listener registry: " + sOnChangedListeners.size());
+		requireUiThread();
+		Log.d(TAG, "unregister: Objects in listener registry: " + sOnChangedListeners.size());
+		sOnChangedListeners.remove(listener);		
 	}
 
 	/**
@@ -253,7 +260,7 @@ public final class Database
 		for(int doseTime = Drug.TIME_MORNING; doseTime != Drug.TIME_INVALID; ++doseTime)
 		{
 			if(!findIntakes(drug, date, doseTime).isEmpty())
-				openIntakeDoseTimes.remove(doseTime);	
+				openIntakeDoseTimes.remove(openIntakeDoseTimes.indexOf(doseTime));	
 		}
 		
 		Log.d(TAG, "openIntakeDoseTimes=" + Arrays.toString(openIntakeDoseTimes.toArray()));
@@ -264,7 +271,7 @@ public final class Database
 	 * Gets the cached drugs.
 	 * @return a reference to the <em>actual</em> cache. Use {@link #getDrugs()} to get a copy of the cache.
 	 */
-	public static synchronized List<Drug> getCachedDrugs() 
+	private static synchronized List<Drug> getCachedDrugs() 
 	{
 		if(sDrugCache == null)
 		{
@@ -286,7 +293,7 @@ public final class Database
 	 * Gets the cached intakes.
 	 * @return a reference to the <em>actual</em> cache. Use {@link #getIntakes()} to get a copy of the cache.
 	 */
-	public static synchronized List<Intake> getCachedIntakes() 
+	private static synchronized List<Intake> getCachedIntakes() 
 	{
 		if(sIntakeCache == null)
 		{
@@ -306,6 +313,8 @@ public final class Database
 	
 	private static synchronized <T extends Entry, ID> void create(final Dao<T, ID> dao, final T t, int flags)
 	{
+		requireUiThread();
+		
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -336,12 +345,13 @@ public final class Database
 			
 		}
 		
-		for(OnDatabaseChangedListener l : sOnChangedListeners.keySet())
-			l.onEntryCreated(t, flags);
+		dispatchEventToListeners("onEntryCreated", t, flags);
 	}	
 
 	private static synchronized <T extends Entry, ID> void update(final Dao<T, ID> dao, final T t, int flags)
 	{
+		requireUiThread();
+		
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -369,20 +379,26 @@ public final class Database
 			final Drug oldDrug = Entry.findInCollection(drugCache, newDrug.getId());
 			int index = drugCache.indexOf(oldDrug);
 			
-			drugCache.remove(index);
-			drugCache.add(index, newDrug);
+			if(oldDrug == null || index == -1)
+				Log.e(TAG, "oldDrug not found in cache: index=" + index + ", oldDrug=" + oldDrug);
+			else
+			{
+				drugCache.remove(index);
+				drugCache.add(index, newDrug);
+			}
 			
 			newEntry = newDrug;			
 		}
 		else
 			throw new UnsupportedOperationException();
 		
-		for(OnDatabaseChangedListener l : sOnChangedListeners.keySet())
-			l.onEntryUpdated(newEntry, flags);
+		dispatchEventToListeners("onEntryUpdated", newEntry, flags);
 	}
 	
 	private static synchronized <T extends Entry, ID> void delete(final Dao<T, ID> dao, final T t, int flags)
 	{
+		requireUiThread();
+		
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -413,8 +429,7 @@ public final class Database
 			intakeCache.remove((Intake) t);
 		}
 		
-		for(OnDatabaseChangedListener l : sOnChangedListeners.keySet())
-			l.onEntryDeleted(t, flags);	
+		dispatchEventToListeners("onEntryDeleted", t, flags);
 	}
 	
 	private static<T> List<T> queryForAll(Dao<T, Integer> dao)
@@ -430,6 +445,55 @@ public final class Database
 		{
 			throw new RuntimeException(e);
 		}
+	}
+	
+	private static void dispatchEventToListeners(String functionName, Entry entry, int flags)
+	{
+		synchronized(sOnChangedListeners)
+		{
+			Set<OnChangedListener> listeners = sOnChangedListeners.keySet();
+			synchronized(listeners)
+			{
+				for(OnChangedListener listener : listeners)
+				{
+					try
+					{
+						Method m = listener.getClass().getMethod(functionName, Entry.class, Integer.TYPE);
+						m.invoke(listener, entry, flags);
+						continue;
+					}
+					catch (SecurityException e)
+					{
+						// handled below
+					}
+					catch (NoSuchMethodException e)
+					{
+						// handled below
+					}
+					catch (IllegalArgumentException e)
+					{
+						// handled below
+					}
+					catch (IllegalAccessException e)
+					{
+						// handled below
+					}
+					catch (InvocationTargetException e)
+					{
+						// handled below
+					}
+					
+					// this code is only reached if an exception was thrown
+					throw new IllegalArgumentException("Failed to dispatch event to listeners: event=" + functionName);				
+				}			
+			}			
+		}	
+	}
+	
+	private static void requireUiThread()
+	{
+		if(!Thread.currentThread().equals(sUiThread))
+			throw new IllegalStateException("Illegal attempt to modify database from outside the UI thread");
 	}
 
 	private Database() {}
@@ -450,7 +514,7 @@ public final class Database
 	 * @author Joseph Lehner
 	 *
 	 */
-	public interface OnDatabaseChangedListener
+	public interface OnChangedListener
 	{
 		/**
 		 * Pass this to ignore an event.

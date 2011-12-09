@@ -98,23 +98,4 @@ public class PreferencesActivity extends PreferenceActivity
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-	@Override
-	public boolean onPreferenceTreeClick(PreferenceScreen prefScreen, Preference pref)
-	{
-		if(pref.getKey().equals("debug_show_intake_dialog"))
-		{
-			Drug drug = new Drug();
-			drug.setName("Foobar");
-			for(int doseTime : Constants.DOSE_TIMES)
-				drug.setDose(doseTime, new Fraction(1));
-						
-			IntakeDialog d = new IntakeDialog(this, drug, Drug.TIME_MORNING, DateTime.today().getTime());
-			d.show();
-			
-			return true;
-		}
-		
-		return super.onPreferenceTreeClick(prefScreen, pref);		
-	}
 }

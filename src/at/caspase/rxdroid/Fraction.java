@@ -99,6 +99,10 @@ public class Fraction extends Number implements Comparable<Number>
 		return mNumerator % mDenominator == 0;
 	}
 	
+	public boolean isNegative() {
+		return mNumerator < 0;
+	}
+	
 	public boolean isZero() {
 		return isZero(this);
 	}
@@ -221,14 +225,6 @@ public class Fraction extends Number implements Comparable<Number>
 
 		return hasher.getHashCode();
 	}
-
-	
-	/*public int compareTo(Number other)
-	{
-		int cmp = compareTo_(other);
-		Log.d(TAG, "\"" + toString() + "\".compareTo((" + other.getClass().getSimpleName() + ") " + other + ") = " + cmp);
-		return cmp;		
-	}*/
 	
 	@Override
 	public int compareTo(Number other)

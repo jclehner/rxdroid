@@ -68,7 +68,7 @@ import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
 import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.caspase.rxdroid.db.Database;
-import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.db.Database.OnChangedListener;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.CollectionUtils;
@@ -100,6 +100,7 @@ public class DrugListActivity extends Activity implements
 	private LayoutInflater mInflater;
 
 	private ViewSwitcher mViewSwitcher;
+	private TextView mMessageOverlay;
 	private GestureDetector mGestureDetector;	
 	private TextView mTextDate;
 
@@ -120,10 +121,11 @@ public class DrugListActivity extends Activity implements
 		mInflater = LayoutInflater.from(this);
 
 		mViewSwitcher = (ViewSwitcher) findViewById(R.id.drug_list_view_flipper);
+		mMessageOverlay = (TextView) findViewById(android.R.id.empty);
 		mTextDate = (TextView) findViewById(R.id.med_list_footer);
 
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());		
-		mTextDate.setOnLongClickListener(this);
+		
 
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		
@@ -131,6 +133,7 @@ public class DrugListActivity extends Activity implements
 		Database.load(); // must be called before mViewSwitcher.setFactory!
 		
 		mViewSwitcher.setFactory(this);
+		mTextDate.setOnLongClickListener(this);
 		
 		findViewById(R.id.view_switcher_container).setOnTouchListener(this);
 		
@@ -142,7 +145,7 @@ public class DrugListActivity extends Activity implements
 	{
 		super.onResume();
 
-		final Intent intent = getIntent();
+		/*final Intent intent = getIntent();
 		final String action = intent.getAction();
 
 		if(Intent.ACTION_VIEW.equals(action) || Intent.ACTION_MAIN.equals(action))
@@ -159,8 +162,9 @@ public class DrugListActivity extends Activity implements
 				setDate((Calendar) date);
 		}
 		else
-			shiftDate(0);
+			shiftDate(0);*/
 		
+		shiftDate(0);		
 		startNotificationService();
 	}
 
@@ -349,9 +353,9 @@ public class DrugListActivity extends Activity implements
 		final Drug drug = Database.getDrug(v.getDrugId());
 
 		final int doseTime = v.getDoseTime();
-		final Fraction dose = drug.getDose(doseTime);
 		
-		requestIntake(drug, mDate, doseTime, dose, true);
+		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, mDate.getTime());
+		dialog.show();
 	}
 
 	@Override
@@ -365,14 +369,6 @@ public class DrugListActivity extends Activity implements
 	public View makeView() 
 	{
 		ListView lv = new ListView(this);		
-		
-		TextView emptyView = new TextView(this);
-		emptyView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
-		emptyView.setText(getString(R.string._msg_empty_list_text, getString(R.string._title_add)));
-		emptyView.setVisibility(View.GONE);
-				
-		lv.setEmptyView(emptyView);
-		
 		return lv;
 	}
 	
@@ -463,7 +459,7 @@ public class DrugListActivity extends Activity implements
 			mViewSwitcher.setOutAnimation(null);
 		}
 		else
-		{			
+		{
 			mDate.add(Calendar.DAY_OF_MONTH, shiftBy);
 
 			if(shiftBy == 1)
@@ -482,6 +478,19 @@ public class DrugListActivity extends Activity implements
 		
 		updateNextView();
 		mViewSwitcher.showNext();
+		
+		if(Database.getDrugs().isEmpty())
+		{
+			mMessageOverlay.setText(getString(R.string._msg_empty_list_text, getString(R.string._title_add)));
+			mMessageOverlay.setVisibility(View.VISIBLE);
+		}
+		else if(((ListView) mViewSwitcher.getCurrentView()).getAdapter().getCount() == 0)
+		{
+			mMessageOverlay.setText(getString(R.string._msg_no_doses_on_this_day));
+			mMessageOverlay.setVisibility(View.VISIBLE);
+		}
+		else
+			mMessageOverlay.setVisibility(View.GONE);
 								
 		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
 
@@ -527,10 +536,10 @@ public class DrugListActivity extends Activity implements
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
-				Database.create(intake, OnDatabaseChangedListener.FLAG_IGNORE);
+				Database.create(intake, OnChangedListener.FLAG_IGNORE);
 				Database.update(drug);
 
-				Toast.makeText(getApplicationContext(), R.string._toast_intake_noted, Toast.LENGTH_SHORT).show();
+				
 			}
 		};
 		//////////////////

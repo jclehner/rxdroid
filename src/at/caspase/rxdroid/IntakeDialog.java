@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnShowListener;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +15,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import at.caspase.rxdroid.FractionInput.OnChangedListener;
+import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Entry;
+import at.caspase.rxdroid.db.Intake;
 
-public class IntakeDialog extends AlertDialog implements OnClickListener, OnShowListener, OnChangedListener
+public class IntakeDialog extends AlertDialog implements OnClickListener, OnShowListener, OnChangedListener, Database.OnChangedListener
 {
 	private static final String TAG = IntakeDialog.class.getName();
 	
@@ -29,8 +33,11 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	private int mFlags;
 	
 	private TextView mDoseText;
-	private TextView mHint;
+	private TextView mHintText;
 	private FractionInput mDoseEdit;
+	
+	private boolean mIsInInsufficientSupplyMode = false;
+	private boolean mDismissCalledFromSwitchMode = false;
 	
 	public static final int FLAG_ALLOW_DOSE_EDIT = 1;
 	
@@ -48,7 +55,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		View view = lf.inflate(R.layout.intake, null);
 		
 		mDoseText = (TextView) view.findViewById(R.id.dose_text);
-		mHint = (TextView) view.findViewById(R.id.dose_hint);
+		mHintText = (TextView) view.findViewById(R.id.dose_hint);
 		mDoseEdit = (FractionInput) view.findViewById(R.id.dose_edit);
 				
 		mDoseText.setText(mDose.toString());
@@ -57,30 +64,40 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 			@Override
 			public void onClick(View v)
 			{
-				mDoseText.setVisibility(View.GONE);
-				mHint.setVisibility(View.GONE);
-				mDoseEdit.setVisibility(View.VISIBLE);
-				getButton(BUTTON_NEUTRAL).setEnabled(true);
+				setEditable(true);
 			}
 		});
 		
-		//mDoseText.setError(getString(R.string._msg_click_to_edit));
-		
 		mDoseEdit.setValue(mDose);
 		mDoseEdit.setOnChangeListener(this);
-		//mDoseEdit.setVisibility(View.GONE);
 		
 		setTitle(mDrug.getName());
 		
+		setView(view);
+		
+		//setButton(BUTTON_POSITIVE, "", (OnClickListener) null);
+		//setButton(BUTTON_NEUTRAL, "", this);
+		//setButton(BUTTON_NEGATIVE, "", this);
+		
 		setButton(BUTTON_POSITIVE, getString(android.R.string.ok), (OnClickListener) null);
-		setButton(BUTTON_NEUTRAL, "1 ↔ 1¾", this);
-		setButton(BUTTON_NEGATIVE, getString(android.R.string.cancel), this);
+        setButton(BUTTON_NEUTRAL, "1 ↔ 1¾", this);
+        setButton(BUTTON_NEGATIVE, getString(android.R.string.cancel), this);
+
+        setupMessages();
 		
-		setupMessages();
-		
-		setView(view);		
-		
-		setOnShowListener(this);
+		setOnShowListener(this);		
+		Database.registerOnChangedListener(this);
+	}
+	
+	public void setEditable(boolean editable)
+	{
+		int editVisibility = editable ? View.VISIBLE : View.GONE;
+		int textVisibility = editable ? View.GONE : View.VISIBLE;		
+				
+		mDoseText.setVisibility(textVisibility);
+		mHintText.setVisibility(textVisibility);
+		mDoseEdit.setVisibility(editVisibility);
+		getButton(BUTTON_NEUTRAL).setEnabled(editable);		
 	}
 
 	@Override
@@ -88,32 +105,162 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	{		
 		setNonDismissingListener(BUTTON_POSITIVE);
 		setNonDismissingListener(BUTTON_NEUTRAL);		
-		getButton(BUTTON_NEUTRAL).setEnabled(false);
+					
+		setupNormalMode();
 		
 		Log.d(TAG, "onShow: OK");
+	}
+	
+	@Override
+	public void onStop()
+	{
+		Log.d(TAG, "onStop: calledFromSwitchMode=" + mDismissCalledFromSwitchMode);
+		if(!mDismissCalledFromSwitchMode)
+			Database.unregisterOnChangedListener(this);
 	}
 
 	@Override
 	public void onClick(DialogInterface dialog, int which)
-	{
-		Toast.makeText(getContext(), "Clicked " + which, Toast.LENGTH_SHORT).show();
+	{		
+		if(!mIsInInsufficientSupplyMode)
+			handleOnClickInNormalMode(which);
+		else
+			handleOnClickInInsufficientSupplyMode(which);
+	}
 		
+	@Override
+	public void onChanged(FractionInput widget, Fraction oldValue)
+	{
+		Log.d(TAG, "onChanged: " + oldValue + " -> " + widget.getValue());
+		
+		mDose = widget.getValue();
+		mDoseText.setText(mDose.toString());		
+	}
+	
+	@Override
+	public void onEntryUpdated(Entry entry, int flags)
+	{
+		Log.d(TAG, "onEntryUpdated: entry=" + entry);
+		
+		if(entry instanceof Drug && entry.getId() == mDrug.getId())
+		{
+			mDrug = (Drug) entry;
+			
+			if(mIsInInsufficientSupplyMode)
+			{				
+				if(mDrug.getCurrentSupply().compareTo(mDose) != -1)
+				{
+					switchMode(false);
+					return;
+				}
+			}
+			
+			updateCurrentMode();
+		}
+	}
+	
+	@Override
+	public void onEntryCreated(Entry entry, int flags) {}
+	
+	@Override
+	public void onEntryDeleted(Entry entry, int flags) {}
+	
+	private void handleOnClickInNormalMode(int which)
+	{		
 		if(which == BUTTON_NEUTRAL)
 			mDoseEdit.setMixedNumberMode(!mDoseEdit.isInMixedNumberMode());
 		else if(which == BUTTON_POSITIVE)
 		{
-			if(mDoseEdit.getValue().isZero())
-			{
-				removeAllCustomViews();		
-				setMessage("YARRRR, ZERO!");
-			}			
-		}	
+			if(mDrug.getCurrentSupply().compareTo(mDose) == -1)
+				switchMode(false);
+			else
+				addIntakeAndDismiss();
+		}
 	}
 	
-	@Override
-	public void onChanged(FractionInput widget, Fraction oldValue)
+	private void handleOnClickInInsufficientSupplyMode(int which)
 	{
-		Log.d(TAG, "onChanged: " + oldValue + " -> " + widget.getValue());		
+		if(which == BUTTON_POSITIVE)
+		{
+			Context context = getContext();
+			
+			Intent intent = new Intent(context, DrugEditActivity.class);
+			intent.setAction(Intent.ACTION_EDIT);
+			intent.putExtra(DrugEditActivity.EXTRA_DRUG, mDrug);
+			intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
+			
+			context.startActivity(intent);						
+		}
+		else if(which == BUTTON_NEGATIVE)
+			addIntakeAndDismiss();
+	}
+	
+	private void addIntakeAndDismiss()
+	{
+		Intake intake = new Intake(mDrug, mDate, mDoseTime, mDose);
+		Database.create(intake);
+		
+		Fraction newSupply = mDrug.getCurrentSupply().minus(mDose);
+		mDrug.setCurrentSupply(newSupply.isNegative() ? new Fraction() : newSupply);
+		Database.update(mDrug);
+		
+		dismiss();
+		
+		Toast.makeText(getContext(), R.string._toast_intake_noted, Toast.LENGTH_SHORT).show();
+	}
+	
+	private void switchMode(boolean dismissBeforeUpdate)
+	{
+		mIsInInsufficientSupplyMode = !mIsInInsufficientSupplyMode;
+		
+		if(dismissBeforeUpdate)
+		{
+			// dismissing the dialog and then showing it again makes for a 
+			// smoother user experience
+			mDismissCalledFromSwitchMode = true;
+			dismiss();		
+			mDismissCalledFromSwitchMode = false;
+		}
+		
+		updateCurrentMode();
+		
+		if(dismissBeforeUpdate)
+			show();
+	}
+	
+	private void updateCurrentMode()
+	{
+		if(mIsInInsufficientSupplyMode)
+		{		
+			setCustomViewVisibility(View.GONE);
+			
+			Context context = getContext();
+			setMessage(context.getString(R.string._msg_insufficient_supplies, 
+					mDrug.getName(), mDose, mDrug.getCurrentSupply()));
+			getButton(BUTTON_POSITIVE).setText(context.getString(R.string._btn_edit_drug));
+			getButton(BUTTON_NEUTRAL).setVisibility(View.GONE);
+			getButton(BUTTON_NEGATIVE).setText(context.getString(R.string._btn_ignore));			
+		}
+		else
+		{
+			setupNormalMode();
+		}
+	}
+	
+	private void setupNormalMode()
+	{
+		setCustomViewVisibility(View.VISIBLE);
+		mDoseEdit.setVisibility(View.INVISIBLE);
+				
+		getButton(BUTTON_POSITIVE).setText(getString(android.R.string.ok));
+		getButton(BUTTON_NEGATIVE).setText(getString(android.R.string.cancel));	
+		
+		Button b = getButton(BUTTON_NEUTRAL);
+		b.setText("1 ↔ 1¾");
+		b.setVisibility(View.VISIBLE);
+		b.setEnabled(false);
+		
+		setupMessages();
 	}
 	
 	private void setNonDismissingListener(int button)
@@ -139,15 +286,11 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		return getContext().getString(resId);
 	}
 	
-	private void removeAllCustomViews()
+	private void setCustomViewVisibility(int visibility)
 	{
-		// setView() has no effect once the dialog is shown, so
-		// just hide the custom views
-		
-		View views[] = { mDoseEdit, mDoseText, mHint };
-		
+		View views[] = { mDoseEdit, mDoseText, mHintText };
 		for(View v : views)
-			v.setVisibility(View.GONE);		
+			v.setVisibility(visibility);		
 	}
 	
 	private class NonDismissingListener implements View.OnClickListener

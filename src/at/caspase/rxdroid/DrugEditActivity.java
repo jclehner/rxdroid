@@ -47,7 +47,8 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.inputmethod.InputMethodManager;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -298,7 +299,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		Util.populateListPreferenceEntryValues(mFreqPreference);
-		Util.populateListPreferenceEntryValues(mDrugForm);
+		Util.populateListPreferenceEntryValues(mDrugForm);		
 	}
 
 	@Override

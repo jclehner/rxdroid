@@ -66,7 +66,15 @@ public final class GlobalContext
 		}
 				
 		return sContext;
-	}	
+	}
+	
+	public static String getString(int resId) {
+		return sContext.getString(resId);
+	}
+	
+	public static String getString(int resId, Object... formatArgs) {
+		return sContext.getString(resId, formatArgs);
+	}
 	
 	private GlobalContext() {}
 }

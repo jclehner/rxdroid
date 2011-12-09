@@ -30,12 +30,12 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Database;
-import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.db.Database.OnChangedListener;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.Constants;
 
-public class NotificationService extends Service implements OnDatabaseChangedListener, OnSharedPreferenceChangeListener
+public class NotificationService extends Service implements OnChangedListener, OnSharedPreferenceChangeListener
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = NotificationService.class.getName();

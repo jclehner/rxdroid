@@ -36,7 +36,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import at.caspase.rxdroid.db.Database;
-import at.caspase.rxdroid.db.Database.OnDatabaseChangedListener;
+import at.caspase.rxdroid.db.Database.OnChangedListener;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
@@ -49,7 +49,7 @@ import at.caspase.rxdroid.util.DateTime;
  * 
  * @author Joseph Lehner
  */
-public class DoseView extends FrameLayout implements OnDatabaseChangedListener
+public class DoseView extends FrameLayout implements OnChangedListener
 {	
 	@SuppressWarnings("unused")
 	private static final String TAG = DoseView.class.getName();
@@ -135,11 +135,11 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	public void setDrug(final Drug drug)
 	{
-		setInfo(null, drug);
+		setInfo(mDate, drug);
 	}
 
 	public void setDate(Calendar date) {
-		setInfo(date, null);
+		setInfo(date, mDrug);
 	}
 
 	public Calendar getDate() {
@@ -168,6 +168,8 @@ public class DoseView extends FrameLayout implements OnDatabaseChangedListener
 
 	public void setInfo(Calendar date, Drug drug)
 	{
+		Log.d(TAG, "setInfo: date=" + (date != null ? DateTime.toSqlDate(date) : "null") + ", drug=" + drug);
+		
 		final boolean doUpdateView;
 		
 		if(date != null)

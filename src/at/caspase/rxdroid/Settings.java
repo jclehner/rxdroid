@@ -39,6 +39,7 @@ public class Settings
 	private static final String TAG = Settings.class.getName();
 
 	private static final String KEY_LAST_MSG_HASH = "last_msg_hash";
+	private static final String KEY_LAST_MSG_COUNT = "last_msg_count";
 	
 	private static final String KEY_PREFIXES[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 	private static final int DOSE_TIMES[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
@@ -301,6 +302,20 @@ public class Settings
 	{
 		Editor editor = sSharedPrefs.edit();
 		editor.putInt(KEY_LAST_MSG_HASH, messageHash);
+		editor.commit();
+	}
+	
+	public int getLastNotificationCount() {
+		return sSharedPrefs.getInt(KEY_LAST_MSG_COUNT, 0);
+	}
+	
+	public void setLastNotificationCount(int notificationCount)
+	{
+		if(notificationCount < 0 || notificationCount > 3)
+			throw new IllegalArgumentException();
+		
+		Editor editor = sSharedPrefs.edit();
+		editor.putInt(KEY_LAST_MSG_COUNT, notificationCount);
 		editor.commit();
 	}
 	

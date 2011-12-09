@@ -1,6 +1,5 @@
 #!/bin/bash
 
-ORMLITE_DATA="http://ormlite.com/releases/4.27/ormlite-core-4.27.jar"
 ORMLITE_FETCHURL="http://ormlite.com/releases"
 PACKAGES="ormlite-core ormlite-android"
 
