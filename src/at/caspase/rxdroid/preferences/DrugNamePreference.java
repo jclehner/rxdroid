@@ -22,13 +22,17 @@
 package at.caspase.rxdroid.preferences;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Database;
@@ -90,6 +94,22 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
+	@Override
+	protected void showDialog(Bundle state)
+	{
+		super.showDialog(null);
+		
+		Dialog dialog = getDialog();
+		if(dialog != null)
+		{
+			// this is required on devices with small screens that would otherwise squash
+			// the 
+			Window window = dialog.getWindow();
+	        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
+	                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+	    }
+	}
+	
 	@Override
 	protected void onPrepareDialogBuilder(AlertDialog.Builder builder)
 	{

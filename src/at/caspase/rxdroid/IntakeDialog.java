@@ -75,10 +75,6 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		
 		setView(view);
 		
-		//setButton(BUTTON_POSITIVE, "", (OnClickListener) null);
-		//setButton(BUTTON_NEUTRAL, "", this);
-		//setButton(BUTTON_NEGATIVE, "", this);
-		
 		setButton(BUTTON_POSITIVE, getString(android.R.string.ok), (OnClickListener) null);
         setButton(BUTTON_NEUTRAL, "1 ↔ 1¾", this);
         setButton(BUTTON_NEGATIVE, getString(android.R.string.cancel), this);
@@ -134,6 +130,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		Log.d(TAG, "onChanged: " + oldValue + " -> " + widget.getValue());
 		
 		mDose = widget.getValue();
+		getButton(BUTTON_POSITIVE).setEnabled(!mDose.isZero());
 		mDoseText.setText(mDose.toString());		
 	}
 	
@@ -249,8 +246,9 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	
 	private void setupNormalMode()
 	{
-		setCustomViewVisibility(View.VISIBLE);
-		mDoseEdit.setVisibility(View.INVISIBLE);
+		boolean editable = mDose.isZero();
+		
+		setEditable(editable);
 				
 		getButton(BUTTON_POSITIVE).setText(getString(android.R.string.ok));
 		getButton(BUTTON_NEGATIVE).setText(getString(android.R.string.cancel));	
@@ -258,7 +256,10 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		Button b = getButton(BUTTON_NEUTRAL);
 		b.setText("1 ↔ 1¾");
 		b.setVisibility(View.VISIBLE);
-		b.setEnabled(false);
+		b.setEnabled(editable);
+		
+		b = getButton(BUTTON_POSITIVE);
+		b.setEnabled(!mDose.isZero());
 		
 		setupMessages();
 	}

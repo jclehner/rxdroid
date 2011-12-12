@@ -2,6 +2,7 @@ package at.caspase.rxdroid;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
@@ -21,7 +22,9 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	public interface OnChangedListener
 	{
 		public void onChanged(FractionInput widget, Fraction oldValue);
-	}	
+	}
+	
+	private static final String TAG = FractionInput.class.getName();
 	
 	private static final int MAX = 99999;
 	
@@ -109,7 +112,7 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 		
 		if(picker.getId() == R.id.integer)
 			mInteger = newVal;
-		if(picker.getId() == R.id.numerator)
+		else if(picker.getId() == R.id.numerator)
 			mNumerator = newVal;
 		else if(picker.getId() == R.id.denominator)
 		{
