@@ -87,8 +87,8 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	
 	public void setEditable(boolean editable)
 	{
-		int editVisibility = editable ? View.VISIBLE : View.GONE;
-		int textVisibility = editable ? View.GONE : View.VISIBLE;		
+		int editVisibility = editable ? View.VISIBLE : View.INVISIBLE;
+		int textVisibility = editable ? View.INVISIBLE : View.VISIBLE;		
 				
 		mDoseText.setVisibility(textVisibility);
 		mHintText.setVisibility(textVisibility);
@@ -165,7 +165,16 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	private void handleOnClickInNormalMode(int which)
 	{		
 		if(which == BUTTON_NEUTRAL)
-			mDoseEdit.setMixedNumberMode(!mDoseEdit.isInMixedNumberMode());
+		{
+			int nextFractionMode = mDoseEdit.getFractionInputMode();
+			
+			do
+			{
+				if(++nextFractionMode == FractionInput.MODE_INVALID)
+					nextFractionMode = FractionInput.MODE_INTEGER;
+				
+			} while(!mDoseEdit.setFractionInputMode(nextFractionMode));
+		}			
 		else if(which == BUTTON_POSITIVE)
 		{
 			if(mDrug.getCurrentSupply().compareTo(mDose) == -1)
@@ -246,9 +255,9 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	
 	private void setupNormalMode()
 	{
-		boolean editable = mDose.isZero();
+		boolean doseIsZero = mDose.isZero();
 		
-		setEditable(editable);
+		setEditable(doseIsZero);
 				
 		getButton(BUTTON_POSITIVE).setText(getString(android.R.string.ok));
 		getButton(BUTTON_NEGATIVE).setText(getString(android.R.string.cancel));	
@@ -256,10 +265,10 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		Button b = getButton(BUTTON_NEUTRAL);
 		b.setText("1 ↔ 1¾");
 		b.setVisibility(View.VISIBLE);
-		b.setEnabled(editable);
+		b.setEnabled(doseIsZero);
 		
 		b = getButton(BUTTON_POSITIVE);
-		b.setEnabled(!mDose.isZero());
+		b.setEnabled(!doseIsZero);
 		
 		setupMessages();
 	}

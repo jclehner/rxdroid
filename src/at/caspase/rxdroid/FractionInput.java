@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.quietlycoding.android.picker.NumberPicker;
 
@@ -25,18 +26,23 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	}
 	
 	private static final String TAG = FractionInput.class.getName();
-	
 	private static final int MAX = 99999;
+	
+	public static final int MODE_INTEGER = 1;
+	public static final int MODE_MIXED = 2;
+	public static final int MODE_FRACTION = 3;
+	public static final int MODE_INVALID = 4;
 	
 	private NumberPicker mIntegerPicker;
 	private NumberPicker mNumeratorPicker;
 	private NumberPicker mDenominatorPicker;
+	private TextView mFractionBar;
 	
 	private int mInteger = 0;
 	private int mNumerator = 0;
 	private int mDenominator = 1;
 	
-	private boolean mUseMixedNumberMode = false;
+	private int mFractionInputMode = MODE_FRACTION;
 	
 	private OnChangedListener mListener;
 	
@@ -50,6 +56,7 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 		mIntegerPicker = (NumberPicker) findViewById(R.id.integer);
 		mNumeratorPicker = (NumberPicker) findViewById(R.id.numerator);
 		mDenominatorPicker = (NumberPicker) findViewById(R.id.denominator);
+		mFractionBar = (TextView) findViewById(R.id.fraction_bar);
 		
 		mIntegerPicker.setOnChangeListener(this);
 		mNumeratorPicker.setOnChangeListener(this);
@@ -72,9 +79,10 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	
 	public void setValue(Fraction value)
 	{
-		int data[] = value.getFractionData(mUseMixedNumberMode);
+		// for MODE_INTEGER and MODE_MIXED get the value as a mixed number
+		int data[] = value.getFractionData(mFractionInputMode != MODE_FRACTION);
 		
-		mInteger = mUseMixedNumberMode ? data[0] : 0;
+		mInteger = (mFractionInputMode == MODE_FRACTION) ? 0 : data[0];
 		mNumerator = data[1];
 		mDenominator = data[2];
 		
@@ -85,16 +93,33 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 		return new Fraction(mInteger, mNumerator, mDenominator);
 	}
 	
-	public void setMixedNumberMode(boolean useMixedNumberMode)
-	{
-		mUseMixedNumberMode = useMixedNumberMode;
-		// ugly, but this updates the fraction's members
+	/**
+	 * Sets the widget's input mode.
+	 * <p>
+	 * Valid input modes are MODE_INTEGER, MODE_FRACTION and MODE_MIXED. The mode set
+	 * determines which number picker widgets are visible. Note that a call to
+	 * <code>setMode(MODE_INTEGER)</code> is ignored if the widget's underlying value
+	 * cannot be converted to an integer.
+	 * 
+	 * @param mode either MODE_INTEGER, MODE_FRACTION or MODE_MIXED
+	 * @return <code>false</code> if mode is MODE_INTEGER but the underlying value is
+	 * 		not an integer. For other arguments, this function always returns <code>true</code>.
+	 */
+	public boolean setFractionInputMode(int mode)
+	{		
+		if(mode == MODE_INTEGER)
+		{
+			if(!getValue().isInteger())
+				return false;
+		}
+		
+		mFractionInputMode = mode;
 		setValue(getValue());
-		updateView();		
+		return true;
 	}
 	
-	public boolean isInMixedNumberMode() {
-		return mUseMixedNumberMode;
+	public int getFractionInputMode() {
+		return mFractionInputMode;
 	}
 	
 	public OnChangedListener getOnChangeListener() {
@@ -130,9 +155,17 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	
 	private void updateView()
 	{
-		mIntegerPicker.setVisibility(mUseMixedNumberMode ? VISIBLE : GONE);
-		mIntegerPicker.setCurrent(mInteger);
+		Log.d(TAG, "updateView: mFractionInputMode=" + mFractionInputMode);
 		
+		// hide in fraction mode
+		mIntegerPicker.setVisibility(mFractionInputMode == MODE_FRACTION ? GONE : VISIBLE);
+		// hide in integer mode
+		mNumeratorPicker.setVisibility(mFractionInputMode == MODE_INTEGER ? GONE: VISIBLE);
+		mDenominatorPicker.setVisibility(mFractionInputMode == MODE_INTEGER ? GONE: VISIBLE);
+		mFractionBar.setVisibility(mFractionInputMode == MODE_INTEGER ? GONE: VISIBLE);
+		
+		
+		mIntegerPicker.setCurrent(mInteger);
 		mNumeratorPicker.setCurrent(mNumerator);
 		mDenominatorPicker.setCurrent(mDenominator);
 	}
