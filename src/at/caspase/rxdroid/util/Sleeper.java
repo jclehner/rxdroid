@@ -27,18 +27,18 @@ import at.caspase.rxdroid.debug.SleepState;
 public class Sleeper
 {
 	private static final String TAG = Sleeper.class.getName();
-	
+
 	private long mEnd;
 	private boolean mIsSnoozing = false;
-	
+
 	public Sleeper(long millis)
 	{
 		if(millis <= 0)
 			throw new IllegalArgumentException();
-		
+
 		mEnd = System.currentTimeMillis() + millis;
 	}
-	
+
 	public synchronized void snooze(long millis) throws InterruptedException
 	{
 		try
@@ -51,26 +51,26 @@ public class Sleeper
 			mIsSnoozing = false;
 		}
 	}
-	
+
 	public synchronized void wake()
 	{
 		if(mIsSnoozing)
 			notify();
 	}
-	
+
 	public void sleepPart(long millis) throws InterruptedException
 	{
 		if(millis < 0)
 			throw new IllegalArgumentException();
-		
+
 		sleep(getSleepTime(millis));
 	}
-	
+
 	public void sleepRemaining() throws InterruptedException
 	{
 		sleep(mEnd - System.currentTimeMillis());
 	}
-	
+
 	public static void sleep(long time) throws InterruptedException
 	{
 		if(time > 0)
@@ -87,11 +87,11 @@ public class Sleeper
 			}
 		}
 	}
-	
+
 	private long getSleepTime(long millis)
 	{
 		final long now = System.currentTimeMillis();
-		
+
 		if(now < mEnd)
 		{
 			if((now + millis) < mEnd)
@@ -99,7 +99,7 @@ public class Sleeper
 			else
 				return mEnd - now;
 		}
-		
+
 		return 0;
-	}		
+	}
 }

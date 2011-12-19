@@ -36,14 +36,14 @@ public final class Constants
 	public static int getDoseViewId(int doseTime) {
 		return DOSE_VIEW_IDS[doseTime];
 	}
-	
+
 	public static final int[] DOSE_VIEW_IDS = {
 		R.id.morning,
 		R.id.noon,
 		R.id.evening,
 		R.id.night
 	};
-		
+
 	public static final int[] WEEK_DAYS = {
 			Calendar.MONDAY,
 			Calendar.TUESDAY,
@@ -53,12 +53,12 @@ public final class Constants
 			Calendar.SATURDAY,
 			Calendar.SUNDAY
 	};
-	
+
 	public static final Integer[] DOSE_TIMES = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 
 	public static final String[] LONG_WEEK_DAY_NAMES;
 	public static final String[] SHORT_WEEK_DAY_NAMES;
-	
+
 	static
 	{
 		LONG_WEEK_DAY_NAMES = new String[WEEK_DAYS.length];

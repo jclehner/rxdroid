@@ -49,12 +49,12 @@ public class PreferencesActivity extends PreferenceActivity
 
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
 		addPreferencesFromResource(R.xml.preferences);
-		
+
 		final Preference versionPref = findPreference("version");
 		if(versionPref != null)
 			versionPref.setSummary(Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION);
-		
-		Util.populateListPreferenceEntryValues(findPreference("snooze_type"));		
+
+		Util.populateListPreferenceEntryValues(findPreference("snooze_type"));
 	}
 
 	@Override
@@ -78,11 +78,11 @@ public class PreferencesActivity extends PreferenceActivity
 				builder.setNegativeButton(android.R.string.cancel, null);
 				/////////////////////
 				builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-					
+
 					@Override
 					public void onClick(DialogInterface dialog, int which)
 					{
-						mSharedPreferences.edit().clear().commit();						
+						mSharedPreferences.edit().clear().commit();
 					}
 				});
 				/////////////////////

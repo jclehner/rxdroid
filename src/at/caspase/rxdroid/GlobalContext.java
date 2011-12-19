@@ -25,13 +25,13 @@ import android.content.Context;
 
 /**
  * Provides a globally available context.
- * 
+ *
  * @author Joseph Lehner
  */
 public final class GlobalContext
 {
 	private static Context sContext;
-	
+
 	/**
 	 * Set the globally available context.
 	 *
@@ -42,19 +42,19 @@ public final class GlobalContext
 		if(sContext == null)
 			sContext = context.getApplicationContext();
 	}
-	
+
 	/**
 	 * Calls {@link #get(boolean)} with <code>allowNullContext=false</code>.
 	 */
 	public static synchronized Context get() {
 		return get(false);
 	}
-	
+
 	/**
 	 * Gets the stored context.
-	 * 
+	 *
 	 * @param allowNullContext If set to <code>true</code>, the function will <em>not</em> throw
-	 * 	an exception if the currently stored context is <code>null</code> 
+	 *     an exception if the currently stored context is <code>null</code>
 	 * @return a reference to the stored context
 	 */
 	public static synchronized Context get(boolean allowNullContext)
@@ -64,17 +64,17 @@ public final class GlobalContext
 			if(!allowNullContext)
 				throw new IllegalStateException("Context is null");
 		}
-				
+
 		return sContext;
 	}
-	
+
 	public static String getString(int resId) {
 		return sContext.getString(resId);
 	}
-	
+
 	public static String getString(int resId, Object... formatArgs) {
 		return sContext.getString(resId, formatArgs);
 	}
-	
+
 	private GlobalContext() {}
 }

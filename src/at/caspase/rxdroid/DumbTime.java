@@ -76,8 +76,8 @@ public class DumbTime implements Comparable<DumbTime>
 
 	private static final int S_MILLIS = 1000;
 	private static final int M_MILLIS = 60 * S_MILLIS;
-	private static final int H_MILLIS = 60 * M_MILLIS;	
-	
+	private static final int H_MILLIS = 60 * M_MILLIS;
+
 	/**
 	 * Creates an instance using an offset from midnight.
 	 *
@@ -86,22 +86,22 @@ public class DumbTime implements Comparable<DumbTime>
 	 * @param allowMoreThan24Hours See above.
 	 */
 	public DumbTime(long offset, boolean allowMoreThan24Hours)
-	{		
+	{
 		if(offset >= Constants.MILLIS_PER_DAY && !allowMoreThan24Hours)
 			throw new IllegalArgumentException(offset + " is out of range");
-		
+
 		mHours = (int) (offset / H_MILLIS);
 		offset -= mHours * H_MILLIS;
-				
+
 		mMinutes = (int) (offset / M_MILLIS);
 		offset -= mMinutes * M_MILLIS;
-				
+
 		mSeconds = (int) (offset / S_MILLIS);
 		offset -= mSeconds * S_MILLIS;
-				
+
 		mMillis = (int) offset;
 	}
-	
+
 	public int getHours() {
 		return mHours;
 	}
@@ -141,7 +141,7 @@ public class DumbTime implements Comparable<DumbTime>
 
 		mSeconds = seconds;
 	}
-	
+
 	public boolean before(DumbTime time) {
 		return getTime() < time.getTime();
 	}
@@ -149,7 +149,7 @@ public class DumbTime implements Comparable<DumbTime>
 	public boolean after(DumbTime time) {
 		return getTime() > time.getTime();
 	}
-	
+
 	@Override
 	public int compareTo(DumbTime other)
 	{
@@ -163,7 +163,7 @@ public class DumbTime implements Comparable<DumbTime>
 	{
 		if(o == null || !(o instanceof DumbTime))
 			return false;
-		
+
 		return getTime() == ((DumbTime) o).getTime();
 	}
 
@@ -214,7 +214,7 @@ public class DumbTime implements Comparable<DumbTime>
 
 		throw new IllegalArgumentException("timeString=" + timeString);
 	}
-	
+
 	public static DumbTime fromCalendar(Calendar cal) {
 		return new DumbTime(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
 	}

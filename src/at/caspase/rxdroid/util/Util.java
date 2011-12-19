@@ -47,7 +47,7 @@ public final class Util
 
 		throw new IllegalArgumentException();
 	}
-	
+
 	public static int getDoseTimeDrawableFromDoseTime(int doseTime)
 	{
 		return getDoseTimeDrawableFromDoseViewId(Constants.getDoseViewId(doseTime));
@@ -68,7 +68,7 @@ public final class Util
 		}
 
 		throw new IllegalArgumentException();
-	}	
+	}
 
 	/**
 	 * Obtains a string attribute from an AttributeSet.
@@ -94,20 +94,20 @@ public final class Util
 
 		return value == null ? defaultValue : value;
 	}
-	
+
 	public static<T> int toInteger(T t)
 	{
 		if(t == null)
 			throw new NullPointerException();
-		
+
 		final String str = t.toString();
-		
+
 		if(str.length() == 0)
 			return 0;
-		
-		return Integer.parseInt(str, 10);	
+
+		return Integer.parseInt(str, 10);
 	}
-	
+
 
 	public static void populateListPreferenceEntryValues(Preference preference)
 	{
@@ -120,19 +120,19 @@ public final class Util
 
 		pref.setEntryValues(values);
 	}
-	
+
 	public static String millis(long millis)
 	{
 		return millis + "ms (" + new DumbTime(millis, true).toString(true) + ")";
 	}
-	
+
 	public static boolean equals(Object a, Object b)
 	{
 		if(a == null && b == null)
 			return true;
 		else if(a != null)
 			return a.equals(b);
-		
-		return b.equals(a);	
+
+		return b.equals(a);
 	}
 }

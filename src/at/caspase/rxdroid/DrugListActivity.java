@@ -77,7 +77,7 @@ public class DrugListActivity extends Activity implements
 	public static final int MENU_ADD = 0;
 	public static final int MENU_PREFERENCES = 1;
 	public static final int MENU_TOGGLE_FILTERING = 2;
-	
+
 	public static final int CMENU_TOGGLE_INTAKE = 0;
 	//public static final int CMENU_CHANGE_DOSE = 1;
 	public static final int CMENU_EDIT_DRUG = 2;
@@ -93,15 +93,15 @@ public class DrugListActivity extends Activity implements
 
 	private ViewSwitcher mViewSwitcher;
 	private TextView mMessageOverlay;
-	private GestureDetector mGestureDetector;	
+	private GestureDetector mGestureDetector;
 	private TextView mTextDate;
 
 	private Calendar mDate;
-	
+
 	private boolean mShowingAll = false;
 
 	private SharedPreferences mSharedPreferences;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -116,19 +116,19 @@ public class DrugListActivity extends Activity implements
 		mMessageOverlay = (TextView) findViewById(android.R.id.empty);
 		mTextDate = (TextView) findViewById(R.id.med_list_footer);
 
-		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());		
-		
+		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
 
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-		
+
 		GlobalContext.set(getApplicationContext());
 		Database.load(); // must be called before mViewSwitcher.setFactory!
-		
+
 		mViewSwitcher.setFactory(this);
 		mTextDate.setOnLongClickListener(this);
-		
+
 		findViewById(R.id.view_switcher_container).setOnTouchListener(this);
-		
+
 		mGestureDetector = new GestureDetector(this, this);
 	}
 
@@ -147,7 +147,7 @@ public class DrugListActivity extends Activity implements
 			{
 				if(date != null)
 					Log.e(TAG, "onResume: EXTRA_DAY set, but wrong type");
-				
+
 				shiftDate(0);
 			}
 			else
@@ -155,8 +155,8 @@ public class DrugListActivity extends Activity implements
 		}
 		else
 			shiftDate(0);*/
-		
-		shiftDate(0);		
+
+		shiftDate(0);
 		startNotificationService();
 	}
 
@@ -173,7 +173,7 @@ public class DrugListActivity extends Activity implements
 		menu.add(0, MENU_TOGGLE_FILTERING, 0, R.string._title_toggle_filtering).setIcon(android.R.drawable.ic_menu_view);
 		menu.add(0, MENU_ADD, 0, R.string._title_add).setIcon(android.R.drawable.ic_menu_add);
 		menu.add(0, MENU_PREFERENCES, 0, R.string._title_preferences).setIcon(android.R.drawable.ic_menu_preferences);
-		
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -199,80 +199,80 @@ public class DrugListActivity extends Activity implements
 			case MENU_TOGGLE_FILTERING:
 			{
 				mShowingAll = !mShowingAll;
-				
+
 				final ListView currentView = (ListView) mViewSwitcher.getCurrentView();
 				final DrugAdapter adapter = (DrugAdapter) currentView.getAdapter();
-				
+
 				if(mShowingAll)
 					adapter.setFilter(null);
 				else
 					adapter.setFilter(new DrugFilter());
-									
+
 				return true;
 			}
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
 	{
 		final DoseView doseView = (DoseView) v;
 		final Drug drug = Database.getDrug(doseView.getDrugId());
 		final int doseTime = doseView.getDoseTime();
-		
+
 		//menu.setHeaderIcon(android.R.drawable.ic_menu_agenda);
 		menu.setHeaderTitle(drug.getName());
-		
+
 		final boolean wasDoseTaken = doseView.wasDoseTaken();
 		final int toggleIntakeMessageId;
-		
+
 		if(wasDoseTaken)
 			toggleIntakeMessageId = R.string._title_mark_not_taken;
 		else
 			toggleIntakeMessageId = R.string._title_mark_taken;
-		
+
 		//////////////////////////////////////////////////
 		menu.add(0, CMENU_TOGGLE_INTAKE, 0, toggleIntakeMessageId).setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			
+
 			@Override
 			public boolean onMenuItemClick(MenuItem item)
 			{
 				if(!wasDoseTaken)
-					doseView.performClick();					
+					doseView.performClick();
 				else
 				{
 					Fraction dose = new Fraction();
-					
+
 					for(Intake intake : Database.findIntakes(drug, mDate, doseTime))
 					{
 						dose.add(intake.getDose());
 						Database.delete(intake);
 					}
-					
+
 					Log.d(TAG, "onMenuItemClick: adding " + dose + " to current supply of " + drug.getName());
 					drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
 					Database.update(drug);
 				}
-				
-				return true;				
+
+				return true;
 			}
-		});	
+		});
 		/////////////////////////////////////////////////
-				
+
 		//menu.add(0, CMENU_CHANGE_DOSE, 0, R.string._title_change_dose);
-		
+
 		final Intent editIntent = new Intent(this, DrugEditActivity.class);
 		editIntent.setAction(Intent.ACTION_EDIT);
 		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
 		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
 		//menu.add(0, CMENU_SHOW_SUPPLY_STATUS, 0, "Show supply status");
-		
+
 		if(!wasDoseTaken)
-		{		
+		{
 			menu.add(0, CMENU_IGNORE_DOSE, 0, R.string._title_ignore_dose)
 					.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-						
+
 						@Override
 						public boolean onMenuItemClick(MenuItem item)
 						{
@@ -309,11 +309,11 @@ public class DrugListActivity extends Activity implements
 	public void onDrugNameClick(View view)
 	{
 		Intent intent = new Intent(Intent.ACTION_EDIT);
-		intent.setClass(this, DrugEditActivity.class);		
-		
+		intent.setClass(this, DrugEditActivity.class);
+
 		Drug drug = Database.getDrug((Integer) view.getTag(TAG_ID));
 		intent.putExtra(DrugEditActivity.EXTRA_DRUG, (Serializable) drug);
-		
+
 		startActivityForResult(intent, 0);
 	}
 
@@ -325,7 +325,7 @@ public class DrugListActivity extends Activity implements
 			final int year = mDate.get(Calendar.YEAR);
 			final int month = mDate.get(Calendar.MONTH);
 			final int day = mDate.get(Calendar.DAY_OF_MONTH);
-			
+
 			DatePickerDialog dialog = new DatePickerDialog(this, this, year, month, day);
 			dialog.show();
 			return true;
@@ -345,83 +345,83 @@ public class DrugListActivity extends Activity implements
 		final Drug drug = Database.getDrug(v.getDrugId());
 
 		final int doseTime = v.getDoseTime();
-		
+
 		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, mDate.getTime());
 		dialog.show();
 	}
 
 	@Override
-	public void onSharedPreferenceChanged(SharedPreferences preferences, String key) 
+	public void onSharedPreferenceChanged(SharedPreferences preferences, String key)
 	{
 		// causes the ListView to be refreshed
 		setDate(mDate);
 	}
 
 	@Override
-	public View makeView() 
+	public View makeView()
 	{
-		ListView lv = new ListView(this);		
+		ListView lv = new ListView(this);
 		return lv;
 	}
-	
-	/////////////	
-	
+
+	/////////////
+
 	@Override
 	public boolean onDown(MotionEvent e) {
 		return false;
 	}
-	
+
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
-	{		
+	{
 		final float begX = e1 != null ? e1.getX() : 0.0f;
 		final float endX = e2 != null ? e2.getX() : 0.0f;
 		final float diffX = Math.abs(begX - endX);
-		
+
 		Log.d(TAG, "onFling: diffX=" + diffX + ", velocityX=" + velocityX);
-		
+
 		// TODO determine whether these are suitable values for this purpose
 		if(diffX > 50 && Math.abs(velocityX) > 800)
 		{
 			shiftDate(begX < endX ? -1 : 1);
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public void onLongPress(MotionEvent e) {}
-	
+
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
 		return false;
 	}
-	
+
 	@Override
 	public void onShowPress(MotionEvent e) {}
-	
+
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		return false;
 	}
-	
+
 	/////////////
-	
+
 	@Override
-	public boolean onTouch(View v, MotionEvent event) 
-	{		
+	public boolean onTouch(View v, MotionEvent event)
+	{
 		super.onTouchEvent(event);
 		return mGestureDetector.onTouchEvent(event);
 	}
-	
+
 	/////////////
 
 	private void startNotificationService()
 	{
 		Intent serviceIntent = new Intent();
 		serviceIntent.setClass(this, NotificationService.class);
-		
+
 		startService(serviceIntent);
 	}
 
@@ -467,10 +467,10 @@ public class DrugListActivity extends Activity implements
 			else
 				throw new IllegalArgumentException();
 		}
-		
+
 		updateNextView();
 		mViewSwitcher.showNext();
-		
+
 		if(Database.getDrugs().isEmpty())
 		{
 			mMessageOverlay.setText(getString(R.string._msg_empty_list_text, getString(R.string._title_add)));
@@ -483,25 +483,25 @@ public class DrugListActivity extends Activity implements
 		}
 		else
 			mMessageOverlay.setVisibility(View.GONE);
-								
+
 		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
 
 		if(mDate.equals(DateTime.today()))
 			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
 
 		mTextDate.setText(dateString);
-		//setTitle(getString(R.string.app_name) + " - " + dateString.toString()); 
-		
+		//setTitle(getString(R.string.app_name) + " - " + dateString.toString());
+
 		// update the intent so our Activity is restarted with the last opened date
 		setIntent(getIntent().putExtra(EXTRA_DAY, (Serializable) mDate));
 
 		setProgressBarIndeterminateVisibility(false);
 	}
-	
+
 	private void updateNextView()
 	{
 		final ListView nextView = (ListView) mViewSwitcher.getNextView();
-		
+
 		final DrugAdapter adapter = new DrugAdapter(this, R.layout.dose_view, Database.getDrugs(), mDate);
 		adapter.setFilter(mShowingAll ? null : new DrugFilter());
 		nextView.setAdapter(adapter);
@@ -509,21 +509,21 @@ public class DrugListActivity extends Activity implements
 	}
 
 	private class DrugAdapter extends ArrayAdapter<Drug>
-	{		
+	{
 		private ArrayList<Drug> mAllItems;
 		private ArrayList<Drug> mItems;
 		private Calendar mAdapterDate;
-		
-		public DrugAdapter(Context context, int viewResId, List<Drug> items, Calendar date) 
+
+		public DrugAdapter(Context context, int viewResId, List<Drug> items, Calendar date)
 		{
 			super(context, viewResId, items);
-			
+
 			mAllItems = new ArrayList<Drug>(items);
 			mAdapterDate = (Calendar) date.clone();
 		}
-		
+
 		public void setFilter(CollectionUtils.Filter<Drug> filter)
-		{			
+		{
 			if(filter != null)
 				mItems = (ArrayList<Drug>) CollectionUtils.filter(mAllItems, filter);
 			else
@@ -531,20 +531,20 @@ public class DrugListActivity extends Activity implements
 				//mItems = (ArrayList<Drug>) CollectionUtils.copy(mAllItems);
 				mItems = mAllItems;
 			}
-			
+
 			notifyDataSetChanged();
 		}
-		
+
 		@Override
 		public Drug getItem(int position) {
 			return mItems.get(position);
 		}
-		
+
 		@Override
 		public int getPosition(Drug drug) {
 			return mItems.indexOf(drug);
 		}
-		
+
 		@Override
 		public int getCount() {
 			return mItems.size();
@@ -557,62 +557,62 @@ public class DrugListActivity extends Activity implements
 			// laggish animations if there are more than 3 or 4 drugs (i.e. 12-16 DoseViews)
 			//
 			// All measurements were done using an HTC Desire running Cyanogenmod 7!
-			
+
 			final DoseViewHolder holder;
 
 			if(v == null)
 			{
 				v = mInflater.inflate(R.layout.drug_view2, null);
-				
+
 				holder = new DoseViewHolder();
-				
+
 				holder.name = (TextView) v.findViewById(R.id.drug_name);
 				holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
-				
+
 				for(int i = 0; i != holder.doseViews.length; ++i)
 				{
 					final int doseViewId = Constants.DOSE_VIEW_IDS[i];
 					holder.doseViews[i] = (DoseView) v.findViewById(doseViewId);
 					registerForContextMenu(holder.doseViews[i]);
 				}
-				
+
 				v.setTag(holder);
 			}
 			else
 				holder = (DoseViewHolder) v.getTag();
-			
+
 			final Drug drug = getItem(position);
-			
+
 			holder.name.setText(drug.getName());
 			holder.name.setTag(TAG_ID, drug.getId());
-			holder.icon.setImageResource(drug.getFormResourceId());			
-						
+			holder.icon.setImageResource(drug.getFormResourceId());
+
 			// This part often takes more than 90% of the time spent in this function,
 			// being rougly 0.025s when hasInfo returns false, and 0.008s when it
 			// returns true.
 			//
 			// Assuming that, in the worst case, all calls to hasInfo return false, this
-			// means that this part alone will, in total, take more than 100ms to complete 
+			// means that this part alone will, in total, take more than 100ms to complete
 			// for 4 drugs.
-			
+
 			for(DoseView doseView : holder.doseViews)
 			{
 				if(!doseView.hasInfo(mAdapterDate, drug))
 					doseView.setInfo(mAdapterDate, drug);
 			}
-			
+
 			return v;
-		}		
+		}
 	}
 
 	private class DrugFilter implements CollectionUtils.Filter<Drug>
-	{		
+	{
 		@Override
 		public boolean matches(Drug drug)
-		{		
+		{
 			final boolean showDoseless = mSharedPreferences.getBoolean("show_doseless", true);
 			final boolean showInactive = mSharedPreferences.getBoolean("show_inactive", true);
-			
+
 			if(!showDoseless && mDate != null)
 			{
 				if(!drug.hasDoseOnDate(mDate))
@@ -620,15 +620,15 @@ public class DrugListActivity extends Activity implements
 			}
 			else if(!showInactive && !drug.isActive())
 				return false;
-			
+
 			return true;
 		}
 	}
-	
+
 	private static class DoseViewHolder
 	{
 		TextView name;
 		ImageView icon;
-		DoseView[] doseViews = new DoseView[4];			
+		DoseView[] doseViews = new DoseView[4];
 	}
 }

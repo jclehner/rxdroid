@@ -35,18 +35,18 @@ import at.caspase.rxdroid.db.Entry;
 public class OldDrug extends Entry
 {
 	private static final long serialVersionUID = -2569745648137404894L;
-	
+
 	@Override
 	public Entry convert()
 	{
-		Drug drug = new Drug(name, form, active, refillSize, currentSupply, 
-				new Fraction[] { doseMorning, doseNoon, doseEvening, doseNight }, 
+		Drug drug = new Drug(name, form, active, refillSize, currentSupply,
+				new Fraction[] { doseMorning, doseNoon, doseEvening, doseNight },
 				frequency, frequencyArg, frequencyOrigin);
 		drug.setId(getId());
-		
+
 		return drug;
 	}
-	
+
 	@DatabaseField(unique = true)
 	private String name;
 
@@ -78,13 +78,13 @@ public class OldDrug extends Entry
 	// TODO change column name
 	@DatabaseField(canBeNull = true)
 	private int frequency = 0;
-	
+
 	@DatabaseField(canBeNull = true)
 	private long frequencyArg = 0;
-	
+
 	@DatabaseField(canBeNull = true)
 	private Date frequencyOrigin;
-	
+
 	@DatabaseField(canBeNull = true)
 	private String comment;
 

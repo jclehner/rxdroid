@@ -45,7 +45,7 @@ import com.j256.ormlite.table.DatabaseTable;
 public class Intake extends Entry
 {
 	private static final long serialVersionUID = -9158847314588407608L;
-	
+
 	@DatabaseField(foreign = true)
 	private Drug drug;
 
@@ -57,7 +57,7 @@ public class Intake extends Entry
 
 	@DatabaseField
 	private int doseTime;
-	
+
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
 	private Fraction dose;
 
@@ -71,7 +71,7 @@ public class Intake extends Entry
 		this.doseTime = doseTime;
 		this.dose = dose;
 	}
-	
+
 	/**
 	 * Constructs an empty intake.
 	 * <p>
@@ -81,15 +81,15 @@ public class Intake extends Entry
 	public Intake(Drug drug, Date date, int doseTime) {
 		this(drug, date, doseTime, new Fraction());
 	}
-	
+
 	public int getDrugId() {
 		return drug.getId();
 	}
-	
+
 	public Drug getDrug() {
-		return Database.getDrug(getDrugId());			
+		return Database.getDrug(getDrugId());
 	}
-	
+
 	public Fraction getDose() {
 		return dose;
 	}
@@ -105,7 +105,7 @@ public class Intake extends Entry
 	public int getDoseTime() {
 		return doseTime;
 	}
-	
+
 	public boolean isEmptyIntake() {
 		return dose == null;
 	}
@@ -142,7 +142,7 @@ public class Intake extends Entry
 
 		if(this.getDrugId() != other.getDrugId())
 			return false;
-		
+
 		if(!this.dose.equals(other.dose))
 			return false;
 

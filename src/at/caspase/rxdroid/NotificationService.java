@@ -38,11 +38,11 @@ import at.caspase.rxdroid.util.Constants;
 public class NotificationService extends Service implements OnChangedListener, OnSharedPreferenceChangeListener
 {
 	private static final String TAG = NotificationService.class.getName();
-		
+
 	private SharedPreferences mSharedPrefs;
-	
+
 	private static boolean sIsStarted = false;
-	
+
 	@Override
 	public void onEntryCreated(Entry entry, int flags)
 	{
@@ -50,17 +50,17 @@ public class NotificationService extends Service implements OnChangedListener, O
 		{
 			Handler handler = new Handler();
 			handler.postDelayed(new Runnable() {
-				
+
 				@Override
 				public void run()
 				{
-					NotificationReceiver.sendBroadcast(getApplicationContext(), true);				
+					NotificationReceiver.sendBroadcast(getApplicationContext(), true);
 				}
 			}, Constants.NOTIFICATION_INITIAL_DELAY);
-			
+
 		}
-		else	
-			NotificationReceiver.sendBroadcast(this, false);		
+		else
+			NotificationReceiver.sendBroadcast(this, false);
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class NotificationService extends Service implements OnChangedListener, O
 		// TODO filter
 		NotificationReceiver.sendBroadcast(this, true);
 	}
-	
+
 	@Override
 	public void onCreate()
 	{
@@ -91,7 +91,7 @@ public class NotificationService extends Service implements OnChangedListener, O
 		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 		mSharedPrefs.registerOnSharedPreferenceChangeListener(this);
 	}
-	
+
 	@Override
 	public void onDestroy()
 	{
@@ -107,7 +107,7 @@ public class NotificationService extends Service implements OnChangedListener, O
 	public IBinder onBind(Intent arg0) {
 		return null;
 	}
-	
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{

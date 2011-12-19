@@ -40,11 +40,11 @@ public class FakeSettings extends Settings
 	@SuppressWarnings("unused")
 	private static final String TAG = FakeSettings.class.getName();
 	private static int counter = 0;
-	
+
 	public FakeSettings() {
 		Log.d(TAG, "Creating instance");
 	}
-	
+
 	@Override
 	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
 		return 10 * 1000;
@@ -54,7 +54,7 @@ public class FakeSettings extends Settings
 	public long getMillisUntilDoseTimeEnd(Calendar time, int doseTime) {
 		return 10 * 1000;
 	}
-	
+
 	@Override
 	public long getMillisUntilDoseTimeEndRaw(Calendar time, int doseTime) {
 		return getMillisUntilDoseTimeEnd(time, doseTime);
@@ -70,7 +70,7 @@ public class FakeSettings extends Settings
 	{
 		final int doseTime = counter % (Drug.TIME_NIGHT + 1);
 		++counter;
-		
+
 		return doseTime;
 	}
 

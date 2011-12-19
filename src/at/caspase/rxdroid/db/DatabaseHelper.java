@@ -43,10 +43,10 @@ import com.j256.ormlite.table.TableUtils;
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 {
 	private static final String TAG = DatabaseHelper.class.getName();
-	
+
 	public static final int DB_VERSION = 46;
 	private static final String DB_NAME = "db.sqlite";
-	
+
 	private Dao<Drug, Integer> mDrugDao = null;
 	private Dao<Intake, Integer> mIntakeDao = null;
 
@@ -73,26 +73,26 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	public void onUpgrade(SQLiteDatabase db, ConnectionSource cs, int oldVersion, int newVersion)
 	{
 		Log.d(TAG, "onUpgrade: " + oldVersion + " -> " + newVersion);
-		
+
 		try
 		{
 			if(newVersion == DB_VERSION)
 			{
 				final String packageName = Database.class.getPackage().getName();
 				final String classNames[] = { "Drug", "Intake" };
-				
+
 				int updatedDataCount = 0;
-				
+
 				for(String className : classNames)
 				{
 					final String oldDataClassName = packageName + ".v" + oldVersion + ".Old" + className;
 					final String newDataClassName = packageName + "." + className;
-					
+
 					Log.d(TAG, "  Mapping " + oldDataClassName + " to " + newDataClassName);
-					
+
 					final Class<?> oldDataClass;
 					final Class<?> newDataClass = Class.forName(newDataClassName);
-										
+
 					try
 					{
 						oldDataClass = Class.forName(oldDataClassName);
@@ -102,23 +102,23 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 					{
 						Log.d(TAG, "  Not upgrading " + className);
 						continue;
-					}					
-					
+					}
+
 					@SuppressWarnings("rawtypes")
 					final Dao newDao = getDao(newDataClass);
 					final List<?> oldData = getDao(oldDataClass).queryForAll();
-					
+
 					TableUtils.dropTable(cs, oldDataClass, true);
 					TableUtils.createTable(cs, newDataClass);
-					
+
 					for(Object data : oldData)
 					{
 						final Method convertMethod = oldDataClass.getMethod("convert");
-						
+
 						Entry entry = (Entry) convertMethod.invoke(data);
 						newDao.create(entry);
 					}
-					
+
 					if(updatedDataCount == 0)
 						resetDatabase(db, cs);
 				}
@@ -129,7 +129,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 				throw new RuntimeException("Refusing to downgrade database from " + oldVersion + " to " + newVersion);
 		}
 		catch(Exception e)
-		{			
+		{
 			throw new RuntimeException("Error while attempting database upgrade", e);
 		}
 	}
@@ -173,11 +173,11 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		mDrugDao = null;
 		mIntakeDao = null;
 	}
-	
+
 	private void resetDatabase(SQLiteDatabase db, ConnectionSource cs)
 	{
 		Log.d(TAG, "Resetting DB");
-		
+
 		try
 		{
 			TableUtils.dropTable(cs, Drug.class, true);
@@ -187,7 +187,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		{
 			Log.e(TAG, "resetDatabase", e);
 		}
-		
+
 		onCreate(db, cs);
 	}
 }

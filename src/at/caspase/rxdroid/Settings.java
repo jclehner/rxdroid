@@ -40,22 +40,22 @@ public class Settings
 
 	private static final String KEY_LAST_MSG_HASH = "last_msg_hash";
 	private static final String KEY_LAST_MSG_COUNT = "last_msg_count";
-	
+
 	private static final String KEY_PREFIXES[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 	private static final int DOSE_TIMES[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 
 	private static SharedPreferences sSharedPrefs = null;
 	private static Context sApplicationContext;
-	
+
 	private static Settings sInstance;
 
 	public synchronized static Settings instance()
 	{
 		if(sApplicationContext == null)
 			sApplicationContext = GlobalContext.get();
-		
+
 		sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sApplicationContext);
-		
+
 		if(sInstance == null)
 		{
 			if(sSharedPrefs.getBoolean("debug_fake_dosetimes", false))
@@ -68,7 +68,7 @@ public class Settings
 				sInstance = new Settings();
 				Log.d(TAG, "Using Settings");
 			}
-			
+
 			sInstance.setLastNotificationMessageHash(0);
 		}
 
@@ -88,51 +88,51 @@ public class Settings
 
 		return defaults;
 	}
-	
+
 	public Calendar getDoseTimeBegin(Calendar date, int doseTime) {
 		return getDoseTimeBeginOrEnd(date, doseTime, true);
 	}
-	
+
 	public Calendar getDoseTimeEnd(Calendar date, int doseTime) {
 		return getDoseTimeBeginOrEnd(date, doseTime, false);
 	}
-	
+
 	private Calendar getDoseTimeBeginOrEnd(Calendar date, int doseTime, boolean getDoseTimeBegin)
 	{
 		final DumbTime time;
-		
+
 		if(getDoseTimeBegin)
-			time = getTimePreferenceBegin(doseTime);			
+			time = getTimePreferenceBegin(doseTime);
 		else
 			time = getTimePreferenceEnd(doseTime);
-		
+
 		date.set(Calendar.HOUR, time.getHours());
 		date.set(Calendar.MINUTE, time.getMinutes());
 		date.set(Calendar.SECOND, 0);
 		date.set(Calendar.MILLISECOND, 0);
-				
+
 		if(doseTime == Drug.TIME_NIGHT && !getDoseTimeBegin)
 		{
 			DumbTime end = getTimePreferenceEnd(doseTime);
 			if(end.before(time))
-				date.add(Calendar.DAY_OF_MONTH, 1);			
+				date.add(Calendar.DAY_OF_MONTH, 1);
 		}
-		
-		return date;		
+
+		return date;
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_GET_MILLIS_UNTIL_BEGIN);
 	}
-	
+
 	public long getMillisUntilDoseTimeEnd(Calendar time, int doseTime) {
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, 0);
 	}
-	
+
 	/**
 	 * Gets the time until the end of that dose time in respect to
 	 * the given time.
@@ -145,7 +145,7 @@ public class Settings
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_DONT_CORRECT_TIME);
 	}
 
-	public long getSnoozeTime() 
+	public long getSnoozeTime()
 	{
 		final long snoozeTime = getTimePreference("time_snooze").getTime();
 		Log.d(TAG, "snoozeTime=" + snoozeTime);
@@ -159,30 +159,30 @@ public class Settings
 	public long getDoseTimeEndOffset(int doseTime) {
 		return getTimePreference(KEY_PREFIXES[doseTime] + "_end").getTime();
 	}
-	
+
 	public long getTrueDoseTimeEndOffset(int doseTime)
 	{
 		final long doseTimeBeginOffset = getDoseTimeBeginOffset(doseTime);
 		long doseTimeEndOffset = getDoseTimeEndOffset(doseTime);
-		
+
 		if(doseTimeEndOffset < doseTimeBeginOffset)
 			doseTimeEndOffset += Constants.MILLIS_PER_DAY;
-		
-		return doseTimeEndOffset;		
+
+		return doseTimeEndOffset;
 	}
-	
+
 	public boolean hasWrappingDoseTimeNight() {
 		return getDoseTimeEndOffset(Drug.TIME_NIGHT) != getTrueDoseTimeEndOffset(Drug.TIME_NIGHT);
 	}
-	
+
 	public DumbTime getTimePreferenceBegin(int doseTime) {
 		return getTimePreference(doseTime, "_begin");
 	}
-	
+
 	public DumbTime getTimePreferenceEnd(int doseTime) {
 		return getTimePreference(doseTime, "_end");
 	}
-	
+
 	public DumbTime getTimePreference(String key)
 	{
 		if(key == null)
@@ -197,26 +197,26 @@ public class Settings
 
 		return DumbTime.valueOf(value);
 	}
-	
+
 	private DumbTime getTimePreference(int doseTime, String suffix) {
 		return getTimePreference(KEY_PREFIXES[doseTime] + suffix);
 	}
-	
+
 	public Calendar getActiveDate(Calendar time)
 	{
 		final Calendar date = DateTime.getDatePart(time);
 		final int activeDoseTime = getActiveDoseTime(time);
-		
+
 		if(activeDoseTime == Drug.TIME_NIGHT && hasWrappingDoseTimeNight())
 		{
 			final DumbTime end = new DumbTime(getDoseTimeEndOffset(Drug.TIME_NIGHT));
 			if(DateTime.isWithinRange(time, new DumbTime(0), end))
 				date.add(Calendar.DAY_OF_MONTH, -1);
 		}
-		
+
 		return date;
 	}
-	
+
 	public Calendar getActiveDate() {
 		return getActiveDate(DateTime.now());
 	}
@@ -224,7 +224,7 @@ public class Settings
 	public int getActiveOrNextDoseTime() {
 		return getActiveDoseTime(DateTime.now());
 	}
-	
+
 	public int getActiveOrNextDoseTime(Calendar time)
 	{
 		int ret = getActiveDoseTime(time);
@@ -243,7 +243,7 @@ public class Settings
 
 		return -1;
 	}
-	
+
 	public int getActiveDoseTime() {
 		return getActiveDoseTime(DateTime.now());
 	}
@@ -251,29 +251,29 @@ public class Settings
 	public int getNextDoseTime(Calendar time) {
 		return getNextDoseTime(time, false);
 	}
-	
+
 	public int getNextDoseTime(Calendar time, boolean useNextDayOffsets)
 	{
 		int retDoseTime = -1;
 		long smallestDiff = 0;
-		
+
 		//Log.d(TAG, "getNextDoseTime: time=" + time);
-		
+
 		for(int doseTime : DOSE_TIMES)
 		{
 			long diff = getMillisUntilDoseTimeBegin(time, doseTime);
 			if(useNextDayOffsets)
 				diff += Constants.MILLIS_PER_DAY;
-			
+
 			//Log.d(TAG, "  diff " + diff + " for doseTime=" + doseTime);
-			
+
 			if(diff > 0 && (smallestDiff == 0 || diff < smallestDiff))
 			{
 				smallestDiff = diff;
 				retDoseTime = doseTime;
 			}
 		}
-		
+
 		if(retDoseTime == -1)
 		{
 			if(!useNextDayOffsets)
@@ -281,65 +281,65 @@ public class Settings
 				//Log.d(TAG, "  retrying with offsets from next day");
 				return getNextDoseTime(time, true);
 			}
-			
+
 			throw new RuntimeException("retDoseTime == -1");
-		}		
-		
+		}
+
 		//Log.d(TAG, "  retDoseTime=" + retDoseTime);
-		return retDoseTime;	
-	}	
+		return retDoseTime;
+	}
 
 	public int getNextDoseTime() {
 		return getNextDoseTime(DateTime.now());
 	}
 
-	
+
 	public int getLastNotificationMessageHash() {
 		return sSharedPrefs.getInt(KEY_LAST_MSG_HASH, 0);
 	}
-	
-	public void setLastNotificationMessageHash(int messageHash) 
+
+	public void setLastNotificationMessageHash(int messageHash)
 	{
 		Editor editor = sSharedPrefs.edit();
 		editor.putInt(KEY_LAST_MSG_HASH, messageHash);
 		editor.commit();
 	}
-	
+
 	public int getLastNotificationCount() {
 		return sSharedPrefs.getInt(KEY_LAST_MSG_COUNT, 0);
 	}
-	
+
 	public void setLastNotificationCount(int notificationCount)
 	{
 		if(notificationCount < 0 || notificationCount > 3)
 			throw new IllegalArgumentException();
-		
+
 		Editor editor = sSharedPrefs.edit();
 		editor.putInt(KEY_LAST_MSG_COUNT, notificationCount);
 		editor.commit();
 	}
-	
+
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;
 	private static final int FLAG_DONT_CORRECT_TIME = 2;
 
 	private long getMillisUntilDoseTimeBeginOrEnd(Calendar time, int doseTime, int flags)
 	{
-		final long doseTimeOffsetMillis = (flags & FLAG_GET_MILLIS_UNTIL_BEGIN) != 0 ? 
+		final long doseTimeOffsetMillis = (flags & FLAG_GET_MILLIS_UNTIL_BEGIN) != 0 ?
 				getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
-		
-		final DumbTime doseTimeOffset = new DumbTime(doseTimeOffsetMillis);		
+
+		final DumbTime doseTimeOffset = new DumbTime(doseTimeOffsetMillis);
 		final Calendar target = DateTime.getDatePart(time);
-		
+
 		// simply adding the millisecond offset is tempting, but leads to errors
 		// when the DST begins/ends in this interval
-				
+
 		target.set(Calendar.HOUR_OF_DAY, doseTimeOffset.getHours());
 		target.set(Calendar.MINUTE, doseTimeOffset.getMinutes());
 		target.set(Calendar.SECOND, doseTimeOffset.getSeconds());
-			
+
 		if(target.getTimeInMillis() < time.getTimeInMillis() && (flags & FLAG_DONT_CORRECT_TIME) == 0)
 			target.add(Calendar.DAY_OF_MONTH, 1);
-								
+
 		return target.getTimeInMillis() - time.getTimeInMillis();
 	}
 }

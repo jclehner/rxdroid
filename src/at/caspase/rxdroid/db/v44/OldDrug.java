@@ -41,7 +41,7 @@ public class OldDrug extends Entry
 	public Drug convert()
 	{
 		final int newFrequency;
-		
+
 		if(frequency > FREQ_DAILY && frequency < FREQ_EVERY_N_DAYS)
 			newFrequency = FREQ_DAILY;
 		else
@@ -51,23 +51,23 @@ public class OldDrug extends Entry
 				case FREQ_EVERY_N_DAYS:
 					newFrequency = Drug.REPEAT_EVERY_N_DAYS;
 					break;
-					
+
 				case FREQ_WEEKDAYS:
 					newFrequency = Drug.REPEAT_WEEKDAYS;
 					break;
-					
+
 				default:
 					newFrequency = frequency;
-			}			
+			}
 		}
-		
-		Drug drug = new Drug(name, form, active, refillSize, currentSupply, getSchedule(), 
+
+		Drug drug = new Drug(name, form, active, refillSize, currentSupply, getSchedule(),
 				newFrequency, frequencyArg, frequencyOrigin);
 		drug.setId(getId());
-		
-		return drug;		
+
+		return drug;
 	}
-	
+
 	@SuppressWarnings("unused")
 	private static final String TAG = OldDrug.class.getName();
 	private static final long serialVersionUID = -2569745648137404894L;
@@ -88,14 +88,14 @@ public class OldDrug extends Entry
 	// this gap is the reason for the DB version change
 	public static final int FREQ_EVERY_N_DAYS = 3;
 	public static final int FREQ_WEEKDAYS = 4;
-	
+
 	public static final int FREQARG_DAY_MON = 1;
 	public static final int FREQARG_DAY_TUE = 1 << 1;
 	public static final int FREQARG_DAY_WED = 1 << 2;
 	public static final int FREQARG_DAY_THU = 1 << 3;
 	public static final int FREQARG_DAY_FRI = 1 << 4;
 	public static final int FREQARG_DAY_SAT = 1 << 5;
-	public static final int FREQARG_DAY_SUN = 1 << 6;		
+	public static final int FREQARG_DAY_SUN = 1 << 6;
 
 	@DatabaseField(unique = true)
 	public String name;
@@ -144,16 +144,16 @@ public class OldDrug extends Entry
 	 */
 	@DatabaseField(canBeNull = true)
 	public long frequencyArg = 0;
-	
+
 	@DatabaseField
 	public java.util.Date frequencyOrigin;
-	
+
 	@DatabaseField(canBeNull = true)
 	public String comment;
 
 	public OldDrug() {}
-	
-	public OldDrug(String name, int form, boolean active, int refillSize, Fraction currentSupply, Fraction[] schedule, 
+
+	public OldDrug(String name, int form, boolean active, int refillSize, Fraction currentSupply, Fraction[] schedule,
 			int frequency, long frequencyArg, Date frequencyOrigin)
 	{
 		this.name = name;
@@ -185,11 +185,11 @@ public class OldDrug extends Entry
 	public Fraction getCurrentSupply() {
 		return currentSupply;
 	}
-	
+
 	public Fraction[] getSchedule() {
 		return new Fraction[] { doseMorning, doseNoon, doseEvening, doseNight };
 	}
-	
+
 	public void setForm(int form)
 	{
 		if(form > FORM_OTHER)
@@ -201,8 +201,8 @@ public class OldDrug extends Entry
 	{
 		if(frequency > FREQ_WEEKDAYS)
 			throw new IllegalArgumentException();
-		
-		else	
+
+		else
 			this.frequency = frequency;
 	}
 

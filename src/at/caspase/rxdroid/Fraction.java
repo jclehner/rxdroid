@@ -35,8 +35,8 @@ import at.caspase.rxdroid.util.Hasher;
 public class Fraction extends Number implements Comparable<Number>
 {
 	private static final long serialVersionUID = 2050536341303052796L;
-	
-	@SuppressWarnings("unused") 
+
+	@SuppressWarnings("unused")
 	private static final String TAG = Fraction.class.getName();
 	private static final Pattern REGEX = Pattern.compile("^\\s*(?:(-?\\d+)\\s+)?\\s*(?:(-?\\d+)\\s*/\\s*(\\d+)\\s*)\\s*$");
 
@@ -53,7 +53,7 @@ public class Fraction extends Number implements Comparable<Number>
 	/**
 	 * Default constructor.
 	 * <p>
-	 * Constructs a fraction with a value of zero. 
+	 * Constructs a fraction with a value of zero.
 	 */
 	public Fraction() {}
 
@@ -93,22 +93,22 @@ public class Fraction extends Number implements Comparable<Number>
 	public Fraction(int integer, int numerator, int denominator) {
 		init(integer, numerator, denominator);
 	}
-	
+
 	/**
 	 * Returns <code>true</code> if <code>numerator / denominator</code> yields an integer.
 	 */
 	public boolean isInteger() {
 		return mNumerator % mDenominator == 0;
 	}
-	
+
 	public boolean isNegative() {
 		return mNumerator < 0;
 	}
-	
+
 	public boolean isZero() {
 		return isZero(this);
 	}
-	
+
 	/**
 	 * Adds another fraction to this object.
 	 * @return a reference to this object.
@@ -116,7 +116,7 @@ public class Fraction extends Number implements Comparable<Number>
 	public Fraction add(final Fraction other)
 	{
 		requireNotZeroConstant();
-		
+
 		int numerator, denominator;
 
 		//Log.d(TAG, "plus: this=" + this + ", other=" + other);
@@ -136,13 +136,13 @@ public class Fraction extends Number implements Comparable<Number>
 			numerator = this.mNumerator + other.mNumerator;
 			denominator = this.mDenominator;
 		}
-		
+
 		// this reduces the resulting fraction
 		init(0, numerator, denominator);
-		
+
 		return this;
 	}
-	
+
 	/**
 	 * Adds an integer to this object.
 	 * @return a reference to this object.
@@ -150,16 +150,16 @@ public class Fraction extends Number implements Comparable<Number>
 	public Fraction add(int n)
 	{
 		requireNotZeroConstant();
-		
+
 		//init(0, mNumerator + n * mDenominator, mDenominator);
 		mNumerator += n * mDenominator;
 		return this;
 	}
-	
+
 	public Fraction subtract(final Fraction other) {
 		return add(other.negate());
 	}
-	
+
 	public Fraction subtract(int n) {
 		return add(-n);
 	}
@@ -170,7 +170,7 @@ public class Fraction extends Number implements Comparable<Number>
 		return result.add(other);
 	}
 
-	public Fraction plus(int n) 
+	public Fraction plus(int n)
 	{
 		Fraction result = new Fraction(this);
 		return result.add(n);
@@ -214,7 +214,7 @@ public class Fraction extends Number implements Comparable<Number>
 	{
 		if(!(o instanceof Number))
 			return false;
-		
+
 		return compareTo((Number) o) == 0;
 	}
 
@@ -228,27 +228,27 @@ public class Fraction extends Number implements Comparable<Number>
 
 		return hasher.getHashCode();
 	}
-	
+
 	@Override
 	public int compareTo(Number other)
 	{
 		if(this == other)
 			return 0;
-		
+
 		if(other instanceof Fraction)
 		{
 			Fraction otherFraction = (Fraction) other;
-			
+
 			int a = this.mNumerator * otherFraction.mDenominator;
 			int b = otherFraction.mNumerator * this.mDenominator;
-			
+
 			if(a == b)
 				return 0;
-			
-			return (a < b) ? -1 : 1;	
-		}		
+
+			return (a < b) ? -1 : 1;
+		}
 		else
-			return Double.compare(this.doubleValue(), other.doubleValue());	
+			return Double.compare(this.doubleValue(), other.doubleValue());
 	}
 
 	/**
@@ -301,7 +301,7 @@ public class Fraction extends Number implements Comparable<Number>
 	public long longValue() {
 		return Math.round(doubleValue());
 	}
-	
+
 	public static boolean isZero(Fraction f) {
 		return f.mNumerator == 0;
 	}
@@ -384,7 +384,7 @@ public class Fraction extends Number implements Comparable<Number>
 		mNumerator = mNumerator / divisor;
 		mDenominator = denominator / divisor;
 	}
-	
+
 	private void requireNotZeroConstant()
 	{
 		if(this == ZERO)
@@ -398,9 +398,9 @@ public class Fraction extends Number implements Comparable<Number>
 	{
 		int product = n1 * n2;
 
-		do 
+		do
 		{
-			if(n1 < n2) 
+			if(n1 < n2)
 			{
 				int tmp = n1;
 				n1 = n2;

@@ -33,19 +33,19 @@ import at.caspase.rxdroid.GlobalContext;
 
 /**
  * Date/time utilities.
- * 
+ *
  * @author Joseph Lehner
  */
 public final class DateTime
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = DateTime.class.getName();
-		
+
 	/**
 	 * Returns the current date.
-	 * 
+	 *
 	 * @return a <code>Calendar</code> set to the current date, its time
-	 * 	set to 00:00:00
+	 *     set to 00:00:00
 	 */
 	public static Calendar today() {
 		return getDatePart(DateTime.now());
@@ -53,13 +53,13 @@ public final class DateTime
 
 	/**
 	 * Returns the current time.
-	 * 
+	 *
 	 * @return the result of <code>Gregorian.getInstance()</code>
 	 */
 	public static Calendar now() {
 		return GregorianCalendar.getInstance();
 	}
-	
+
 	/**
 	 * Sets a <code>Calendar's</code> time to 00:00:00.000.
 	 */
@@ -67,16 +67,16 @@ public final class DateTime
 	{
 		final Calendar date = (Calendar) time.clone();
 		final int calFields[] = { Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND };
-		
+
 		for(int calField: calFields)
 			date.set(calField, 0);
-		
-		return date;		
+
+		return date;
 	}
-	
+
 	/**
 	 * Returns a <code>Calendar</code> with the specified date.
-	 * 
+	 *
 	 * @param year The year
 	 * @param month The month (January is 0, December is 11!)
 	 * @param day The date
@@ -88,23 +88,23 @@ public final class DateTime
 		date.set(Calendar.MINUTE, 0);
 		date.set(Calendar.SECOND, 0);
 		date.set(Calendar.MILLISECOND, 0);
-		
+
 		date.set(Calendar.YEAR, year);
 		date.set(Calendar.MONTH, month);
 		date.set(Calendar.DAY_OF_MONTH, day);
-				
+
 		return date;
 	}
-	
+
 	public static java.sql.Date toSqlDate(Calendar cal)
 	{
 		final int year = cal.get(Calendar.YEAR);
 		final int month = cal.get(Calendar.MONTH);
-		final int day = cal.get(Calendar.DAY_OF_MONTH);		
-		
-		return new java.sql.Date(year - 1900, month, day);	
+		final int day = cal.get(Calendar.DAY_OF_MONTH);
+
+		return new java.sql.Date(year - 1900, month, day);
 	}
-	
+
 	public static Time toSqlTime(Calendar cal)
 	{
 		final Time time = new java.sql.Time(cal.getTimeInMillis());
@@ -115,11 +115,11 @@ public final class DateTime
 	{
 		if(calendar == null)
 			return "null";
-		
+
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
 		return sdf.format(calendar.getTime());
 	}
-	
+
 	public static String toNativeDate(Date date) {
 		return DateFormat.getDateFormat(GlobalContext.get()).format(date);
 	}
@@ -130,10 +130,10 @@ public final class DateTime
 		final int minute = date.get(Calendar.MINUTE);
 		final int second = date.get(Calendar.SECOND);
 		final int millis = date.get(Calendar.MILLISECOND);
-		
-		return millis + 1000 * (hour * 3600 + minute * 60 + second);		
+
+		return millis + 1000 * (hour * 3600 + minute * 60 + second);
 	}
-	
+
 	public static long getOffsetFromMidnight(Date date)
 	{
 		Calendar theDate = GregorianCalendar.getInstance();
@@ -147,14 +147,14 @@ public final class DateTime
 		//Log.d(TAG, "isWithinRange(" + toString(time) + ", " + begin + ", " + end + ") = " + ret);
 		return ret;
 	}
-	
+
 	public static boolean isWithinRange_(Calendar time, DumbTime begin, DumbTime end)
 	{
 		final DumbTime theTime = DumbTime.fromCalendar(time);
-						
+
 		if(end.before(begin))
 			return theTime.before(end) || theTime.compareTo(begin) != -1;
-				
+
 		return theTime.compareTo(begin) != -1 && theTime.before(end);
 	}
 }

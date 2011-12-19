@@ -98,18 +98,18 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	protected void showDialog(Bundle state)
 	{
 		super.showDialog(null);
-		
+
 		Dialog dialog = getDialog();
 		if(dialog != null)
 		{
 			// this is required on devices with small screens that would otherwise squash
-			// the 
+			// the
 			Window window = dialog.getWindow();
-	        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
-	                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-	    }
+			window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
+					WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+		}
 	}
-	
+
 	@Override
 	protected void onPrepareDialogBuilder(AlertDialog.Builder builder)
 	{
@@ -162,13 +162,13 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	}
 
 	private boolean isUniqueDrugName(String name)
-	{		
+	{
 		for(Drug drug : Database.getDrugs())
 		{
 			if(name.equals(drug.getName()))
 				return false;
 		}
-		
+
 		return true;
 	}
 }

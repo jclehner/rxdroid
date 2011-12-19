@@ -92,9 +92,9 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	public CharSequence getSummary() {
 		return mTime == null ? null : mTime.toString();
 	}
-	
+
 	@Override
-	public void onAttachedToActivity() 
+	public void onAttachedToActivity()
 	{
 		// if we did this in the constructor, getPersistedString would not
 		// return the actual value

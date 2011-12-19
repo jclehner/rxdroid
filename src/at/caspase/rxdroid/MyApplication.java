@@ -26,11 +26,11 @@ import android.app.Application;
 public class MyApplication extends Application
 {
 	public static final boolean DEVELOPER_MODE = true;
-	
+
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
-		GlobalContext.set(getApplicationContext());   
+		GlobalContext.set(getApplicationContext());
 	}
 }

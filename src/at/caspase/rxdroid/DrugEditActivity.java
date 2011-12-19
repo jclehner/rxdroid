@@ -70,7 +70,7 @@ import at.caspase.rxdroid.util.Util;
  *
  */
 
-public class DrugEditActivity extends PreferenceActivity implements OnPreferenceChangeListener, 
+public class DrugEditActivity extends PreferenceActivity implements OnPreferenceChangeListener,
 		OnPreferenceClickListener, OnDateSetListener
 {
 	public static final String EXTRA_DRUG = "drug";
@@ -121,11 +121,11 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			builder.setMessage(R.string._msg_err_empty_drug_name);
 			builder.setNegativeButton(android.R.string.cancel, null);
 			builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					finish();					
+					finish();
 				}
 			});
 			builder.show();
@@ -179,7 +179,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	public boolean onPreferenceChange(Preference preference, Object newValue)
 	{
 		String key = preference.getKey();
-		
+
 		if("drug_name".equals(key))
 		{
 			Log.d(TAG, "onPreferenceChange: drugName=" + newValue);
@@ -188,7 +188,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		else if("morning".equals(key) || "noon".equals(key) || "evening".equals(key) || "night".equals(key))
 			mDrug.setDose(DosePreference.getDoseTimeFromKey(key), (Fraction) newValue);
 		else if("repeat".equals(key))
-		{			
+		{
 			final int repeat = toInt(newValue);
 
 			if(repeat != Drug.REPEAT_DAILY)
@@ -198,10 +198,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					case Drug.REPEAT_EVERY_N_DAYS:
 						handleEveryNDaysRepeat();
 						break;
-						
+
 					case Drug.REPEAT_WEEKDAYS:
 						handleWeekdayRepeat();
-						break;		
+						break;
 
 					default:
 						throw new IllegalStateException("Invalid repeat value");
@@ -212,7 +212,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				mDrug.setRepeat(Drug.REPEAT_DAILY);
 				updatePreferences();
 			}
-			
+
 			// the user might cancel a dialog in one of the handle<foobar>Repeat()
 			// functions. by returning false here, we ensure that setValueIndex() is
 			// only called if the repeat was actually changed
@@ -263,11 +263,11 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		return false;
 	}
-	
+
 	@Override
 	public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
 	{
-		
+
 	}
 
 	@Override
@@ -289,7 +289,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		mCurrentSupply = (FractionPreference) findPreference("current_supply");
 		mRefillSize = (EditTextPreference) findPreference("refill_size");
 		mIsActive = (CheckBoxPreference) findPreference("is_active");
-		
+
 		// mark all preferences as non-persisting!
 		for(String key : PREF_KEYS)
 		{
@@ -299,7 +299,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		Util.populateListPreferenceEntryValues(mFreqPreference);
-		Util.populateListPreferenceEntryValues(mDrugForm);		
+		Util.populateListPreferenceEntryValues(mDrugForm);
 	}
 
 	@Override
@@ -342,7 +342,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	private void initPreferences()
 	{
 		mDrugName.setInitialName(mDrug.getName());
-		
+
 		for(DosePreference dosePref : mDosePrefs)
 			dosePref.setDrug(mDrug);
 
@@ -357,7 +357,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	private void updatePreferences()
 	{
 		Log.d(TAG, "updatePreferences: mDrug=" + mDrug);
-		
+
 		mDrugName.setName(mDrug.getName());
 
 		// intake repeat
@@ -370,16 +370,16 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			case Drug.REPEAT_DAILY:
 				summary = getString(R.string._msg_freq_daily);
 				break;
-				
+
 			case Drug.REPEAT_EVERY_N_DAYS:
 				int distance = (int) mDrug.getRepeatArg();
 				// FIXME change to next occurence
-				String origin = DateTime.toNativeDate(mDrug.getRepeatOrigin());			
+				String origin = DateTime.toNativeDate(mDrug.getRepeatOrigin());
 				summary = getString(R.string._msg_freq_every_n_days, distance, origin);
 				break;
-				
+
 			case Drug.REPEAT_WEEKDAYS:
-				long repeatArg = mDrug.getRepeatArg();				
+				long repeatArg = mDrug.getRepeatArg();
 				summary = getWeekdayRepeatSummary(repeatArg);
 				break;
 
@@ -407,16 +407,16 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		{
 			mCurrentSupply.setSummary(currentSupply.toString());
 			mCurrentSupply.setValue(currentSupply);
-			
+
 			final int currentSupplyDays = mDrug.getCurrentSupplyDays();
 			if(currentSupplyDays > 0)
 			{
-				final Calendar end = DateTime.today();				
+				final Calendar end = DateTime.today();
 				end.add(Calendar.DAY_OF_MONTH, currentSupplyDays);
-				
-				mCurrentSupply.setSummary(getString(R.string._msg_supply, 
-						currentSupply.toString(), DateTime.toNativeDate(end.getTime())));			
-			}		
+
+				mCurrentSupply.setSummary(getString(R.string._msg_supply,
+						currentSupply.toString(), DateTime.toNativeDate(end.getTime())));
+			}
 		}
 
 		// refill size
@@ -427,22 +427,22 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mRefillSize.setText("0");
 		}
 		else
-		{		
+		{
 			final String refillSizeStr = Integer.toString(mDrug.getRefillSize());
 			mRefillSize.setSummary(refillSizeStr);
 			mRefillSize.setText(refillSizeStr);
 		}
-			
+
 
 		// active?
 		mIsActive.setChecked(mDrug.isActive());
 	}
-	
+
 	private void handleEveryNDaysRepeat()
 	{
 		final Date repeatOrigin;
 		final long repeatArg;
-		
+
 		if(mDrug.getRepeat() != Drug.REPEAT_EVERY_N_DAYS)
 		{
 			repeatOrigin = DateTime.today().getTime();
@@ -452,123 +452,123 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		{
 			repeatOrigin = mDrug.getRepeatOrigin();
 			repeatArg = mDrug.getRepeatArg();
-		}		
-		
+		}
+
 		final EditText editText = new EditText(this);
 		editText.setText(Long.toString(repeatArg));
 		editText.setEms(20);
 		editText.setMaxLines(1);
 		editText.setInputType(InputType.TYPE_CLASS_NUMBER);
 		editText.setSelectAllOnFocus(true);
-		
+
 		final OnDateSetListener onDateSetListener = new OnDateSetListener() {
-			
+
 			@Override
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-			{	
+			{
 				mDrug.setRepeat(Drug.REPEAT_EVERY_N_DAYS);
 				mDrug.setRepeatOrigin(DateTime.date(year, monthOfYear, dayOfMonth).getTime());
 				mDrug.setRepeatArg(Long.valueOf(editText.getText().toString()));
 				updatePreferences();
 			}
 		};
-		
+
 		final Context context = this;
-		
+
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string._title_every_n_days);
-		builder.setMessage(R.string._msg_every_n_days_distance);		
+		builder.setMessage(R.string._msg_every_n_days_distance);
 		builder.setView(editText);
 		builder.setCancelable(true);
 		builder.setNegativeButton(android.R.string.cancel, null);
 		builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-			
+
 			@Override
 			public void onClick(DialogInterface dialog, int which)
-			{				
+			{
 				int year = 1900 + repeatOrigin.getYear();
 				int month = repeatOrigin.getMonth();
 				int day = repeatOrigin.getDate();
-				
-				DatePickerDialog datePickerDialog = 
+
+				DatePickerDialog datePickerDialog =
 						new DatePickerDialog(context, onDateSetListener, year, month, day);
-				
+
 				datePickerDialog.setCancelable(false);
 				datePickerDialog.setMessage(getString(R.string._msg_repetition_origin));
 				datePickerDialog.show();
 			}
 		});
-		
+
 		final AlertDialog dialog = builder.create();
-		
+
 		editText.addTextChangedListener(new TextWatcher() {
-			
+
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
-						
+
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-						
+
 			@Override
 			public void afterTextChanged(Editable s)
 			{
 				final long value;
-				
+
 				if(s.length() == 0)
 					value = 0;
 				else
 					value = Long.valueOf(s.toString());
-				
+
 				final boolean enabled = value >= 2;
-				dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(enabled);	
-				
+				dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(enabled);
+
 				if(!enabled)
-					editText.setError(getString(R.string._msg_drug_repeat_ge_2));	
+					editText.setError(getString(R.string._msg_drug_repeat_ge_2));
 				else
-					editText.setError(null);			
+					editText.setError(null);
 			}
 		});
-		
+
 		dialog.show();
 		editText.performClick();
 	}
-	
+
 	private void handleWeekdayRepeat()
-	{	
+	{
 		// if this changes the drug's repeat, all repeat options are reset. if the
 		// drug's repeat already was FREQ_WEEKDAYS, this call will not change anything
 		mDrug.setRepeat(Drug.REPEAT_WEEKDAYS);
-		
+
 		long repeatArg = mDrug.getRepeatArg();
 		final boolean[] checkedItems = SimpleBitSet.toBooleanArray(repeatArg, Constants.LONG_WEEK_DAY_NAMES.length);
-				
+
 		if(repeatArg == 0)
 		{
 			// check the current weekday if none are selected
 			final int weekday = DateTime.now().get(Calendar.DAY_OF_WEEK);
-			final int index = CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);				
+			final int index = CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);
 			checkedItems[index] = true;
 			repeatArg |= 1 << index;
 		}
-				
+
 		final SimpleBitSet bitSet = new SimpleBitSet(repeatArg);
-		
+
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Weekydays");
 		builder.setMultiChoiceItems(Constants.LONG_WEEK_DAY_NAMES, checkedItems, new OnMultiChoiceClickListener() {
-			
+
 			@Override
 			public void onClick(DialogInterface dialog, int which, boolean isChecked)
 			{
 				bitSet.set(which, isChecked);
-				
+
 				final Button positiveButton = ((AlertDialog) dialog).getButton(Dialog.BUTTON_POSITIVE);
 				positiveButton.setEnabled(bitSet.longValue() != 0);
 			}
 		});
 		builder.setNegativeButton(android.R.string.cancel, null);
 		builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-			
+
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
@@ -576,28 +576,28 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				updatePreferences();
 			}
 		});
-		
+
 		builder.show();
 	}
-	
+
 	private String getWeekdayRepeatSummary(long repeatArgs)
 	{
 		final LinkedList<String> weekdays = new LinkedList<String>();
-		
+
 		for(int i = 0; i != 7; ++i)
 		{
 			if((repeatArgs & (1 << i)) != 0)
 				weekdays.add(Constants.SHORT_WEEK_DAY_NAMES[i]);
 		}
-		
+
 		if(weekdays.isEmpty())
 			return getString(R.string._summary_intake_never);
-		
+
 		StringBuilder sb = new StringBuilder(weekdays.get(0));
-		
+
 		for(int i = 1; i != weekdays.size(); ++i)
 			sb.append(", " + weekdays.get(i));
-		
+
 		return sb.toString();
 	}
 

@@ -38,13 +38,13 @@ public class OldDrug extends Entry
 	@Override
 	public Drug convert()
 	{
-		Drug drug = new Drug(name, form, active, refillSize, currentSupply, getSchedule(), 
+		Drug drug = new Drug(name, form, active, refillSize, currentSupply, getSchedule(),
 				frequency, frequencyArg, new java.util.Date(0));
 		drug.setId(getId());
-		
-		return drug;		
+
+		return drug;
 	}
-	
+
 	private static final long serialVersionUID = -2569745648137404894L;
 
 	public static final int FORM_TABLET = 0;
@@ -141,7 +141,7 @@ public class OldDrug extends Entry
 	public Fraction getCurrentSupply() {
 		return currentSupply;
 	}
-	
+
 	public Fraction[] getSchedule() {
 		return new Fraction[] { doseMorning, doseNoon, doseEvening, doseNight };
 	}

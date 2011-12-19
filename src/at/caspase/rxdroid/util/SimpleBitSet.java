@@ -22,13 +22,13 @@
 package at.caspase.rxdroid.util;
 
 public class SimpleBitSet
-{	
+{
 	private long mValue;
-	
+
 	public SimpleBitSet(long value) {
 		mValue = value;
 	}
-	
+
 	public void set(int n, boolean value)
 	{
 		if(value)
@@ -36,23 +36,23 @@ public class SimpleBitSet
 		else
 			mValue ^= (1 << n);
 	}
-	
+
 	public boolean get(int n) {
 		return (mValue & (1 << n)) != 0;
 	}
-	
+
 	public int bitCount() {
 		return Long.bitCount(mValue);
 	}
-	
+
 	public long longValue() {
 		return mValue;
 	}
-	
+
 	public boolean[] toBooleanArray() {
 		return toBooleanArray(64);
 	}
-	
+
 	public boolean[] toBooleanArray(int size) {
 		return toBooleanArray(mValue, size);
 	}
@@ -60,10 +60,10 @@ public class SimpleBitSet
 	public static boolean[] toBooleanArray(long value, int size)
 	{
 		boolean[] ret = new boolean[size];
-				
+
 		for(int i = 0; i != size; ++i)
 			ret[i] = ((value & (1 << i)) != 0);
-					
+
 		return ret;
 	}
 }

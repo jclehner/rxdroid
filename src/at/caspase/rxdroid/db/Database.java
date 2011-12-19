@@ -49,7 +49,7 @@ import com.j256.ormlite.dao.Dao;
  * Even though DB access is handled by ORMLite, it should not be neccessary to deal with the library
  * directly outside this class. For this to work, {@link #load(Context)} has to be called before using any
  * other function. If using {@link #load()}, you must ensure that the {@link #GlobalContext} has been
- * initialized. 
+ * initialized.
  * </p>
  * <p>
  * Note that all ORMLite related classes will have members prefixed without the
@@ -64,55 +64,55 @@ public final class Database
 
 	private static List<Drug> sDrugCache;
 	private static List<Intake> sIntakeCache;
-	
+
 	private static DatabaseHelper mHelper;
 	private static Dao<Drug, Integer> mDrugDao;
 	private static Dao<Intake, Integer> mIntakeDao;
-	
+
 	private static boolean sIsLoaded = false;
-	
+
 	private static Thread sUiThread;
-	
-	private static Map<OnChangedListener, Void> sOnChangedListeners = 
+
+	private static Map<OnChangedListener, Void> sOnChangedListeners =
 		Collections.synchronizedMap(new WeakHashMap<OnChangedListener, Void>());
 
 	/**
 	 * Initializes the DB.
 	 * <p>
 	 * This function uses the Context provided by GlobalContext
-	 * 
+	 *
 	 * @throws IllegalArgumentException if GlobalContext was not initialized.
 	 */
 	public static synchronized void load() {
 		load(GlobalContext.get());
 	}
-	
+
 	/**
 	 * Initializes the DB.
-	 * 
+	 *
 	 * @param context an android Context for creating the ORMLite database helper.
 	 */
 	public static synchronized void load(Context context)
 	{
 		if(context == null)
 			throw new IllegalArgumentException("Argument 'context' must not be null. Did you call GlobalContext.set() ?");
-		
+
 		if(!sIsLoaded)
 		{
 			mHelper = new DatabaseHelper(context);
-			
+
 			mDrugDao = mHelper.getDrugDao();
 			mIntakeDao = mHelper.getIntakeDao();
-			
+
 			getCachedDrugs();
 			getCachedIntakes();
-			
+
 			sIsLoaded = true;
-			
+
 			sUiThread = Thread.currentThread();
 		}
 	}
-	
+
 	/**
 	 * Add a listener to the registry.
 	 *
@@ -123,7 +123,7 @@ public final class Database
 	 * @see #OnDatabaseChangedListener
 	 * @param listener The listener to register.
 	 */
-	public static synchronized void registerOnChangedListener(OnChangedListener listener) 
+	public static synchronized void registerOnChangedListener(OnChangedListener listener)
 	{
 		sOnChangedListeners.put(listener, null);
 		//Log.d(TAG, "register: Objects in listener registry: " + sOnChangedListeners.size());
@@ -135,11 +135,11 @@ public final class Database
 	 * @see #Database.OnDatabaseChangedListener
 	 * @param listener The listener to remove.
 	 */
-	public static synchronized void unregisterOnChangedListener(OnChangedListener listener) 
+	public static synchronized void unregisterOnChangedListener(OnChangedListener listener)
 	{
 		requireUiThread();
 		Log.d(TAG, "unregister: Objects in listener registry: " + sOnChangedListeners.size());
-		sOnChangedListeners.remove(listener);		
+		sOnChangedListeners.remove(listener);
 	}
 
 	/**
@@ -152,17 +152,17 @@ public final class Database
 		else if(t instanceof Intake)
 			create(mIntakeDao, (Intake) t, flags);
 	}
-	
+
 	/**
 	 * Creates a new database entry and notifies listeners.
 	 */
 	public static <T extends Entry, ID> void create(final T t) {
 		create(t, 0);
 	}
-	
+
 	/**
 	 * Updates a database entry and notifies listeners.
-	 */	
+	 */
 	public static <T extends Entry, ID> void update(final T t, int flags)
 	{
 		if(t instanceof Drug)
@@ -170,17 +170,17 @@ public final class Database
 		else if(t instanceof Intake)
 			update(mIntakeDao, (Intake) t, flags);
 	}
-	
+
 	/**
 	 * Updates a database entry and notifies listeners.
-	 */	
+	 */
 	public static <T extends Entry, ID> void update(final T t) {
 		update(t, 0);
 	}
-	
+
 	/**
 	 * Deletes a database entry and notifies listeners.
-	 */	
+	 */
 	public static <T extends Entry, ID> void delete(final T t, int flags)
 	{
 		if(t instanceof Drug)
@@ -188,17 +188,17 @@ public final class Database
 		else if(t instanceof Intake)
 			delete(mIntakeDao, (Intake) t, flags);
 	}
-	
+
 	/**
 	 * Deletes a database entry and notifies listeners.
-	 */	
+	 */
 	public static <T extends Entry, ID> void delete(final T t) {
 		delete(t, 0);
 	}
 
 	/**
 	 * Returns the drug with the specified id (unchecked).
-	 * 
+	 *
 	 * @param drugId the id to search for.
 	 * @return The drug or <code>null</code> if it doesn't exist.
 	 */
@@ -209,24 +209,24 @@ public final class Database
 			if(drug.getId() == drugId)
 				return drug;
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Returns the drug with the specified id (checked).
-	 * 
+	 *
 	 * @param drugId the id to search for.
 	 * @throws NoSuchElementException if there is no drug with the specified id.
 	 */
 	public static Drug getDrug(int drugId)
 	{
 		Drug drug = findDrug(drugId);
-		if(drug == null)		
+		if(drug == null)
 			throw new NoSuchElementException("No drug with id=" + drugId);
 		return drug;
 	}
-	
+
 	/**
 	 * Find all intakes meeting the specified criteria.
 	 * <p>
@@ -236,8 +236,8 @@ public final class Database
 	 */
 	public static synchronized List<Intake> findIntakes(Drug drug, Calendar date, Integer doseTime)
 	{
-		final List<Intake> intakes = new LinkedList<Intake>();		
-		
+		final List<Intake> intakes = new LinkedList<Intake>();
+
 		for(Intake intake : getCachedIntakes())
 		{
 			if(intake.getDrugId() != drug.getId())
@@ -245,33 +245,33 @@ public final class Database
 			if(date != null && !intake.getDate().equals(DateTime.toSqlDate(date)))
 				continue;
 			if(doseTime != null && intake.getDoseTime() != doseTime)
-				continue;			
-			
+				continue;
+
 			intakes.add(intake);
 		}
-		
-		return intakes;	
+
+		return intakes;
 	}
-	
+
 	public static synchronized List<Integer> getOpenIntakeDoseTimes(Drug drug, Calendar date)
 	{
 		final LinkedList<Integer> openIntakeDoseTimes = new LinkedList<Integer>(Arrays.asList(Constants.DOSE_TIMES));
-		
+
 		for(int doseTime = Drug.TIME_MORNING; doseTime != Drug.TIME_INVALID; ++doseTime)
 		{
 			if(!findIntakes(drug, date, doseTime).isEmpty())
-				openIntakeDoseTimes.remove(openIntakeDoseTimes.indexOf(doseTime));	
+				openIntakeDoseTimes.remove(openIntakeDoseTimes.indexOf(doseTime));
 		}
-		
+
 		Log.d(TAG, "openIntakeDoseTimes=" + Arrays.toString(openIntakeDoseTimes.toArray()));
-		return openIntakeDoseTimes;		
+		return openIntakeDoseTimes;
 	}
-	
+
 	/**
 	 * Gets the cached drugs.
 	 * @return a reference to the <em>actual</em> cache. Use {@link #getDrugs()} to get a copy of the cache.
 	 */
-	private static synchronized List<Drug> getCachedDrugs() 
+	private static synchronized List<Drug> getCachedDrugs()
 	{
 		if(sDrugCache == null)
 		{
@@ -280,7 +280,7 @@ public final class Database
 		}
 		return sDrugCache;
 	}
-	
+
 	/**
 	 * Gets a copy of the cached drugs.
 	 * @return a copy of the current cache.
@@ -288,12 +288,12 @@ public final class Database
 	public static List<Drug> getDrugs() {
 		return new LinkedList<Drug>(getCachedDrugs());
 	}
-	
+
 	/**
 	 * Gets the cached intakes.
 	 * @return a reference to the <em>actual</em> cache. Use {@link #getIntakes()} to get a copy of the cache.
 	 */
-	private static synchronized List<Intake> getCachedIntakes() 
+	private static synchronized List<Intake> getCachedIntakes()
 	{
 		if(sIntakeCache == null)
 		{
@@ -301,7 +301,7 @@ public final class Database
 			Log.d(TAG, "Cached " + sIntakeCache.size() + " drugs");
 		}
 		return sIntakeCache;
-	}	
+	}
 
 	/**
 	 * Gets a copy of the cached intakes.
@@ -309,12 +309,12 @@ public final class Database
 	 */
 	public static List<Intake> getIntakes() {
 		return new LinkedList<Intake>(getCachedIntakes());
-	}	
-	
+	}
+
 	private static synchronized <T extends Entry, ID> void create(final Dao<T, ID> dao, final T t, int flags)
 	{
 		requireUiThread();
-		
+
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -332,9 +332,9 @@ public final class Database
 		});
 
 		th.start();
-		
+
 		if(t instanceof Drug)
-		{		
+		{
 			final List<Drug> drugCache = getCachedDrugs();
 			drugCache.add((Drug) t);
 		}
@@ -342,16 +342,16 @@ public final class Database
 		{
 			final List<Intake> intakeCache = getCachedIntakes();
 			intakeCache.add((Intake) t);
-			
+
 		}
-		
+
 		dispatchEventToListeners("onEntryCreated", t, flags);
-	}	
+	}
 
 	private static synchronized <T extends Entry, ID> void update(final Dao<T, ID> dao, final T t, int flags)
 	{
 		requireUiThread();
-		
+
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -371,14 +371,14 @@ public final class Database
 		th.start();
 
 		Entry newEntry;
-		
+
 		if(t instanceof Drug)
 		{
 			final List<Drug> drugCache = getCachedDrugs();
-			final Drug newDrug = (Drug) t;			
+			final Drug newDrug = (Drug) t;
 			final Drug oldDrug = Entry.findInCollection(drugCache, newDrug.getId());
 			int index = drugCache.indexOf(oldDrug);
-			
+
 			if(oldDrug == null || index == -1)
 				Log.e(TAG, "oldDrug not found in cache: index=" + index + ", oldDrug=" + oldDrug);
 			else
@@ -386,19 +386,19 @@ public final class Database
 				drugCache.remove(index);
 				drugCache.add(index, newDrug);
 			}
-			
-			newEntry = newDrug;			
+
+			newEntry = newDrug;
 		}
 		else
 			throw new UnsupportedOperationException();
-		
+
 		dispatchEventToListeners("onEntryUpdated", newEntry, flags);
 	}
-	
+
 	private static synchronized <T extends Entry, ID> void delete(final Dao<T, ID> dao, final T t, int flags)
 	{
 		requireUiThread();
-		
+
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -418,25 +418,25 @@ public final class Database
 		th.start();
 
 		if(t instanceof Drug)
-		{		
+		{
 			final List<Drug> drugCache = getCachedDrugs();
-			drugCache.remove((Drug) t);				
+			drugCache.remove((Drug) t);
 			// FIXME remove intakes
 		}
 		else if(t instanceof Intake)
-		{			
+		{
 			final List<Intake> intakeCache = getCachedIntakes();
 			intakeCache.remove((Intake) t);
 		}
-		
+
 		dispatchEventToListeners("onEntryDeleted", t, flags);
 	}
-	
+
 	private static<T> List<T> queryForAll(Dao<T, Integer> dao)
 	{
 		if(dao == null)
 			throw new IllegalStateException("dao == null. Did you call Database.load() ?");
-		
+
 		try
 		{
 			return dao.queryForAll();
@@ -446,7 +446,7 @@ public final class Database
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private static void dispatchEventToListeners(String functionName, Entry entry, int flags)
 	{
 		synchronized(sOnChangedListeners)
@@ -482,14 +482,14 @@ public final class Database
 					{
 						// handled below
 					}
-					
+
 					// this code is only reached if an exception was thrown
-					throw new IllegalArgumentException("Failed to dispatch event to listeners: event=" + functionName);				
-				}			
-			}			
-		}	
+					throw new IllegalArgumentException("Failed to dispatch event to listeners: event=" + functionName);
+				}
+			}
+		}
 	}
-	
+
 	private static void requireUiThread()
 	{
 		if(!Thread.currentThread().equals(sUiThread))
@@ -502,15 +502,15 @@ public final class Database
 	 * Notifies objects of database changes.
 	 * <p>
 	 * Objects implementing this interface and registering themselves using
-	 * {@link #Database.registerOnChangedListener()} will be notified of 
+	 * {@link #Database.registerOnChangedListener()} will be notified of
 	 * any changes to the database, as long as the modifications are performed
 	 * using the static functions in {@link #Database}.
-	 * 
+	 *
 	 * @see Database#create
 	 * @see Database#update
 	 * @see Database#delete
 	 * @see Database#dropDatabase
-	 * 
+	 *
 	 * @author Joseph Lehner
 	 *
 	 */
@@ -523,32 +523,32 @@ public final class Database
 		 * is ORed into the <code>flags</code> argument of the callbacks.
 		 */
 		public static final int FLAG_IGNORE = 1;
-		
+
 		/**
 		 * Called after an entry has been added to the database.
-		 * 
+		 *
 		 * @param entry the entry that has been created.
 		 * @param flags for private implementation details.
 		 */
 		public void onEntryCreated(Entry entry, int flags);
-		
+
 		/**
 		 * Called after a database entry has been updated.
-		 * 
+		 *
 		 * @param entry the new version of the entry.
 		 * @param flags for private implementation details.
 		 */
 		public void onEntryUpdated(Entry entry, int flags);
-		
+
 		/**
 		 * Called after a database entry has been deleted.
-		 * 
+		 *
 		 * @param entry the entry that was just deleted.
 		 * @param flags for private implementation details.
 		 */
 		public void onEntryDeleted(Entry entry, int flags);
 	}
-	
+
 	public interface Filter<T extends Entry>
 	{
 		boolean matches(T t);

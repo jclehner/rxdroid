@@ -66,7 +66,7 @@ public abstract class Entry implements Serializable
 	public final void setId(int id) {
 		this.id = id;
 	}
-	
+
 	/**
 	 * Converts this Entry to an instance usable by the current database version.
 	 */

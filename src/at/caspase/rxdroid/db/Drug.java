@@ -93,14 +93,14 @@ public class Drug extends Entry
 	public static final int REPEAT_WEEKDAYS = 2;
 	// TODO valid arguments: 6, 8, 12, with automapping to doseTimes
 	public static final int REPEAT_EVERY_N_HOURS = 3;
-	
+
 	public static final int REPEATARG_DAY_MON = 1;
 	public static final int REPEATARG_DAY_TUE = 1 << 1;
 	public static final int REPEATARG_DAY_WED = 1 << 2;
 	public static final int REPEATARG_DAY_THU = 1 << 3;
 	public static final int REPEATARG_DAY_FRI = 1 << 4;
 	public static final int REPEATARG_DAY_SAT = 1 << 5;
-	public static final int REPEATARG_DAY_SUN = 1 << 6;		
+	public static final int REPEATARG_DAY_SUN = 1 << 6;
 
 	@DatabaseField(unique = true)
 	private String name;
@@ -150,10 +150,10 @@ public class Drug extends Entry
 	 */
 	@DatabaseField(canBeNull = true)
 	private long repeatArg = 0;
-	
+
 	@DatabaseField(canBeNull = true)
 	private Date repeatOrigin;
-	
+
 	@DatabaseField(canBeNull = true)
 	private String comment;
 
@@ -161,15 +161,15 @@ public class Drug extends Entry
 	 * Default constructor, required by ORMLite.
 	 */
 	public Drug() {}
-	
+
 	/**
 	 * Constructor for setting all fields.
 	 * <p>
 	 * This constructor should only be used by <code>OldDrug.convert()</code> as no
-	 * sanity checks are performed, possibly allowing the construction of an 
+	 * sanity checks are performed, possibly allowing the construction of an
 	 * invalid object.
 	 */
-	public Drug(String name, int form, boolean active, int refillSize, Fraction currentSupply, Fraction[] schedule, 
+	public Drug(String name, int form, boolean active, int refillSize, Fraction currentSupply, Fraction[] schedule,
 			int repeat, long repeatArg, Date repeatOrigin)
 	{
 		this.name = name;
@@ -190,12 +190,12 @@ public class Drug extends Entry
 	public boolean hasDoseOnDate(Calendar cal) {
 		return hasDoseOnDate(cal.getTime());
 	}
-	
+
 	public boolean hasDoseOnDate(Date date)
 	{
 		if(repeat == REPEAT_DAILY)
 			return true;
-		
+
 		if(repeat == REPEAT_EVERY_N_DAYS)
 		{
 			final long diffDays = Math.abs(repeatOrigin.getTime() - date.getTime()) / Constants.MILLIS_PER_DAY;
@@ -204,10 +204,10 @@ public class Drug extends Entry
 		else if(repeat == REPEAT_WEEKDAYS)
 		{
 			Calendar cal = Calendar.getInstance();
-			cal.setTime(date);			
+			cal.setTime(date);
 			return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
 		}
-		
+
 		throw new RuntimeException("Repeat type " + repeat + " not yet implemented");
 	}
 
@@ -246,7 +246,7 @@ public class Drug extends Entry
 	public long getRepeatArg() {
 		return repeatArg;
 	}
-	
+
 	public Date getRepeatOrigin() {
 		return repeatOrigin;
 	}
@@ -262,45 +262,45 @@ public class Drug extends Entry
 	public Fraction getCurrentSupply() {
 		return currentSupply;
 	}
-	
-	public int getCurrentSupplyDays() 
+
+	public int getCurrentSupplyDays()
 	{
 		final Calendar today = DateTime.today();
-		
+
 		double dailyDose = 0.0;
 		for(Fraction dose : getSchedule())
 			dailyDose += dose.doubleValue();
-				
+
 		if(dailyDose == 0.0)
 			return 0;
-		
+
 		// determine how many intakes are open today and subtract the dose's sum
 		// from the current supply
-		
+
 		double doseRemainingToday = 0.0;
 		final List<Integer> openIntakeDoseTimes = Database.getOpenIntakeDoseTimes(this, today);
 		for(Integer doseTime : openIntakeDoseTimes)
-			doseRemainingToday += getDose(doseTime).doubleValue();				
-		
+			doseRemainingToday += getDose(doseTime).doubleValue();
+
 		final double supply = this.currentSupply.doubleValue() - doseRemainingToday;
 		final double correctionFactor = getSupplyCorrectionFactor();
-		
+
 		return (int) Math.floor((supply / dailyDose) * correctionFactor);
 	}
-	
+
 	public double getSupplyCorrectionFactor()
 	{
 		switch(repeat)
-		{				
+		{
 			case REPEAT_EVERY_N_DAYS:
 				return repeatArg / 1.0;
-				
+
 			case REPEAT_WEEKDAYS:
 				return 7.0 / Long.bitCount(repeatArg);
-				
+
 			default:
 				return 1.0;
-		}			
+		}
 	}
 
 	public Fraction[] getSchedule() {
@@ -310,30 +310,30 @@ public class Drug extends Entry
 	public Fraction getDose(int doseTime) {
 		return getSchedule()[doseTime];
 	}
-	
+
 	public Fraction getDose(int doseTime, Date date)
 	{
 		if(!hasDoseOnDate(date))
 			return new Fraction(0);
-		return getSchedule()[doseTime];		
+		return getSchedule()[doseTime];
 	}
-	
+
 	@Deprecated
 	public Fraction getDose(int doseTime, Calendar calendar) {
 		return getDose(doseTime, calendar.getTime());
 	}
-	
+
 	public Fraction getDailyDose()
 	{
 		final Fraction dailyDose = new Fraction();
-		
+
 		for(Fraction dose : getSchedule())
 			dailyDose.add(dose);
-		
+
 		Log.d(TAG, "dailyDose: " + dailyDose);
 		Log.d(TAG, "Fraction.ZERO: " + Fraction.ZERO);
-				
-		return dailyDose;		
+
+		return dailyDose;
 	}
 
 	public String getComment() {
@@ -355,13 +355,13 @@ public class Drug extends Entry
 	{
 		if(repeat > REPEAT_WEEKDAYS)
 			throw new IllegalArgumentException();
-		
+
 		if(repeat == this.repeat)
 			return;
-		
+
 		Log.d(TAG, "setRepeat(" + repeat + ") on " + toString());
-		
-		// the preference was changed, so reset all repeat-related settings		
+
+		// the preference was changed, so reset all repeat-related settings
 		this.repeat = repeat;
 		this.repeatArg = 0;
 		this.repeatOrigin = DateTime.today().getTime();
@@ -369,50 +369,50 @@ public class Drug extends Entry
 
 	/**
 	 * Sets the repeat argument.
-	 * 
+	 *
 	 * @param repeatArg the exact interpretation of this value depends on currently set repeat.
 	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's repeat.
 	 * @throws UnsupportedOperationException if this instance's repeat does not allow repeat arguments.
 	 */
-	public void setRepeatArg(long repeatArg) 
+	public void setRepeatArg(long repeatArg)
 	{
 		if(repeat == REPEAT_EVERY_N_DAYS)
 		{
 			if(repeatArg <= 1)
-				throw new IllegalArgumentException();			
+				throw new IllegalArgumentException();
 		}
 		else if(repeat == REPEAT_WEEKDAYS)
 		{
 			// binary(01111111) = hex(0x7f) (all weekdays)
 			if(repeatArg <= 0 || repeatArg > 0x7f)
-				throw new IllegalArgumentException();		
+				throw new IllegalArgumentException();
 		}
 		else if(repeat == REPEAT_EVERY_N_HOURS)
 		{
 			if(repeatArg != 6 && repeatArg != 8 && repeatArg != 12)
-				throw new IllegalArgumentException();			
+				throw new IllegalArgumentException();
 		}
 		else
-			throw new UnsupportedOperationException();	
-		
+			throw new UnsupportedOperationException();
+
 		this.repeatArg = repeatArg;
 	}
-	
+
 	/**
 	 * Sets the repeat origin.
 	 * @param repeatOrigin
 	 * @throws UnsupportedOperationException if this instance's repeat does not allow a repeat origin.
 	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's repeat.
 	 */
-	public void setRepeatOrigin(Date repeatOrigin) 
+	public void setRepeatOrigin(Date repeatOrigin)
 	{
 		if(repeat != REPEAT_EVERY_N_DAYS && repeat != REPEAT_EVERY_N_HOURS)
 			throw new UnsupportedOperationException();
-		
+
 		if(repeat == REPEAT_EVERY_N_DAYS && DateTime.getOffsetFromMidnight(repeatOrigin) != 0)
 			throw new IllegalArgumentException();
-		
-		this.repeatOrigin = repeatOrigin;	
+
+		this.repeatOrigin = repeatOrigin;
 	}
 
 	public void setActive(boolean active) {
@@ -533,19 +533,19 @@ public class Drug extends Entry
 
 		return members;
 	}
-	
+
 	private boolean hasDoseOnWeekday(int calWeekday)
 	{
 		if(repeat != REPEAT_WEEKDAYS)
 			throw new IllegalStateException("repeat != FREQ_WEEKDAYS");
-		
+
 		// first, translate Calendar's weekday representation to our
 		// own.
-		
+
 		int weekday = CollectionUtils.indexOf(calWeekday, Constants.WEEK_DAYS);
 		if(weekday == -1)
 			throw new IllegalArgumentException("Argument " + calWeekday + " does not map to a valid weekday");
-		
-		return (repeatArg & (1 << weekday)) != 0;		
+
+		return (repeatArg & (1 << weekday)) != 0;
 	}
 }
