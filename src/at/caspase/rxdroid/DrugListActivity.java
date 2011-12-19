@@ -156,6 +156,8 @@ public class DrugListActivity extends Activity implements
 		else
 			shiftDate(0);*/
 
+		Log.d(TAG, "onResume");
+		
 		shiftDate(0);
 		startNotificationService();
 	}

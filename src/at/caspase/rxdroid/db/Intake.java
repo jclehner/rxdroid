@@ -107,7 +107,7 @@ public class Intake extends Entry
 	}
 
 	public boolean isEmptyIntake() {
-		return dose == null;
+		return dose == null || dose.isZero();
 	}
 
 	@Override

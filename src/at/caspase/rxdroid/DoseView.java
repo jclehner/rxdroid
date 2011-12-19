@@ -168,8 +168,6 @@ public class DoseView extends FrameLayout implements OnChangedListener
 
 	public void setInfo(Calendar date, Drug drug)
 	{
-		Log.d(TAG, "setInfo: date=" + (date != null ? DateTime.toSqlDate(date) : "null") + ", drug=" + drug);
-
 		final boolean doUpdateView;
 
 		if(date != null)
@@ -244,14 +242,13 @@ public class DoseView extends FrameLayout implements OnChangedListener
 
 			if(isApplicableIntake(intake))
 			{
-				if(intake.isEmptyIntake() && mCumulativeDose.isZero())
-				{
+				if(intake.isEmptyIntake() /*&& mCumulativeDose.isZero()*/)
 					markAsIgnored();
-					return;
+				else
+				{				
+					mCumulativeDose.add(intake.getDose());
+					markAsTaken();
 				}
-
-				mCumulativeDose.add(intake.getDose());
-				markAsTaken();
 			}
 		}
 	}
@@ -301,7 +298,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			return false;
 		else if(intake.getDoseTime() != mDoseTime)
 			return false;
-		else if(!intake.getDate().equals(mDate))
+		else if(intake.getDate().getTime() != mDate.getTimeInMillis())
 			return false;
 
 		return true;
