@@ -1,34 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-	android:orientation="horizontal"
-	android:gravity="center"
->    
-	<com.quietlycoding.android.picker.NumberPicker android:id="@+id/integer" 
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:visibility="gone"
-	/>
-    
-	<com.quietlycoding.android.picker.NumberPicker android:id="@+id/numerator" 
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-	/>
-	
-	<TextView android:id="@+id/fraction_bar"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"		
-		android:layout_gravity="center_vertical"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center"
+	    
+		android:orientation="horizontal"
+		android:gravity="center"
+	>	
+		<com.quietlycoding.android.picker.NumberPicker android:id="@+id/integer" 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:visibility="gone"
+		/>
+	    
+		<com.quietlycoding.android.picker.NumberPicker android:id="@+id/numerator" 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+		/>
 		
-		android:textAppearance="?android:attr/textAppearanceLarge"
-		android:textStyle="bold"
-		android:text="/"
-	/>
-	
-	<com.quietlycoding.android.picker.NumberPicker android:id="@+id/denominator" 
+		<TextView android:id="@+id/fraction_bar"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"		
+			android:layout_gravity="center_vertical"
+			
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:textStyle="bold"
+			android:text="/"
+		/>
+		
+		<com.quietlycoding.android.picker.NumberPicker android:id="@+id/denominator" 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+		/>   
+	    
+	</LinearLayout>
+
+	<Button android:id="@+id/mode_switcher"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-	/>   
-    
-</LinearLayout>
+		android:layout_gravity="right|bottom"
+		
+		android:minEms="3"
+		android:textSize="20sp"
+		android:text="1¾"
+	/>
+	
+</FrameLayout>

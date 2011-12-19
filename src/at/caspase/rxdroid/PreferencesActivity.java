@@ -28,13 +28,9 @@ import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceScreen;
 import android.view.Menu;
 import android.view.MenuItem;
 import at.caspase.rxdroid.db.DatabaseHelper;
-import at.caspase.rxdroid.db.Drug;
-import at.caspase.rxdroid.util.Constants;
-import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
 public class PreferencesActivity extends PreferenceActivity

@@ -28,8 +28,8 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.util.AttributeSet;
 import android.util.Log;
 import at.caspase.rxdroid.Fraction;
-import at.caspase.rxdroid.FractionInputDialog;
-import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
+import at.caspase.rxdroid.FractionInputDialog2;
+import at.caspase.rxdroid.FractionInputDialog2.OnFractionSetListener;
 
 /**
  * A preference for storing fractions.
@@ -58,7 +58,7 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 		super(context, attrs, defStyle);
 
 		mValue = Fraction.decode(getPersistedString("0"));
-		setOnPreferenceClickListener(this);
+		setOnPreferenceClickListener(this);		
 	}
 
 	public void setValue(Fraction value) {
@@ -97,9 +97,10 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 	@Override
 	public boolean onPreferenceClick(Preference preference)
 	{
-		FractionInputDialog dialog = new FractionInputDialog(getContext(), mValue, this);
+		FractionInputDialog2 dialog = new FractionInputDialog2(getContext(), mValue, this);
 		dialog.setTitle(mDialogTitle);
-		dialog.setLongClickSummand(mLongClickSummand);
+		dialog.setOnFractionSetListener(this);
+		//dialog.setLongClickSummand(mLongClickSummand);
 		
 		if(mDialogIcon != -1)
 			dialog.setIcon(mDialogIcon);
@@ -109,14 +110,14 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 	}
 
 	@Override
-	public void onFractionSet(FractionInputDialog dialog, Fraction value)
+	public void onFractionSet(FractionInputDialog2 dialog, Fraction value)
 	{
 		boolean canPersist = callChangeListener(value);
 
 		if(canPersist && shouldPersist())
 			persistString(value.toString());
 
-		mValue = dialog.getValue();
+		mValue = value;
 		setSummary(mValue.toString());
 		notifyChanged();
 	}

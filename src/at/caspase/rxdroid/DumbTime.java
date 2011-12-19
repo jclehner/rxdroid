@@ -45,6 +45,7 @@ import at.caspase.rxdroid.util.Hasher;
  */
 public class DumbTime implements Comparable<DumbTime>
 {
+	@SuppressWarnings("unused")
 	private static final String TAG = DumbTime.class.getName();
 	private static final String[] FORMATS = { "HH:mm:ss", "HH:mm" };
 

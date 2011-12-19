@@ -27,13 +27,9 @@ import java.util.Calendar;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -63,18 +59,14 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
-import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.caspase.rxdroid.db.Database;
-import at.caspase.rxdroid.db.Database.OnChangedListener;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
-import at.caspase.rxdroid.util.Util;
 
 public class DrugListActivity extends Activity implements
 	OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener,
@@ -247,7 +239,7 @@ public class DrugListActivity extends Activity implements
 			public boolean onMenuItemClick(MenuItem item)
 			{
 				if(!wasDoseTaken)
-					requestIntake(drug, mDate, doseTime, doseView.getDose(), true);
+					doseView.performClick();					
 				else
 				{
 					Fraction dose = new Fraction();
@@ -514,118 +506,6 @@ public class DrugListActivity extends Activity implements
 		adapter.setFilter(mShowingAll ? null : new DrugFilter());
 		nextView.setAdapter(adapter);
 		nextView.setOnTouchListener(this);
-	}
-		
-	@SuppressWarnings("unused")
-	private void requestIntake(final Drug drug, Calendar date, int doseTime, Fraction dose, boolean askOnNormalIntake)
-	{
-		if(dose.equals(Fraction.ZERO))
-		{
-			requestUnscheduledIntake(drug, date, doseTime);
-			return;
-		}
-		
-		final Intake intake = new Intake(drug, DateTime.toSqlDate(mDate), doseTime, dose);
-		final Fraction newSupply = drug.getCurrentSupply().minus(dose);
-		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(drug.getName() + ": " + dose);
-		
-		//////////////////
-		final OnClickListener defaultOnClickListener = new OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which)
-			{
-				Database.create(intake, OnChangedListener.FLAG_IGNORE);
-				Database.update(drug);
-
-				
-			}
-		};
-		//////////////////
-		
-		if(newSupply.compareTo(0) == -1 && drug.getRefillSize() != 0)
-		{
-			drug.setCurrentSupply(Fraction.ZERO);
-			
-			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setMessage(R.string._msg_insufficient_supplies);
-			builder.setPositiveButton(R.string._btn_ignore, defaultOnClickListener);
-			//////////////////
-			builder.setNeutralButton(R.string._btn_edit_drug, new OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					Intent intent = new Intent(Intent.ACTION_EDIT);
-                    intent.setClass(getApplicationContext(), DrugEditActivity.class);
-                    intent.putExtra(DrugEditActivity.EXTRA_DRUG, (Serializable) drug);
-                    intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
-
-                    startActivityForResult(intent, 0);		
-				}
-			});
-			//////////////////
-		}
-		else
-		{
-			if(newSupply.compareTo(0) == -1)
-				drug.setCurrentSupply(Fraction.ZERO);
-			else
-				drug.setCurrentSupply(newSupply);
-			
-			builder.setIcon(Util.getDoseTimeDrawableFromDoseTime(doseTime));
-			
-			final boolean hasIntakes = !Database.findIntakes(drug, date, doseTime).isEmpty();
-			if(!hasIntakes)
-			{
-				if(askOnNormalIntake)
-				{				
-					//builder.setMessage("Take the above mentioned dose now and press OK.");
-					builder.setMessage(R.string._msg_intake_normal);
-	                builder.setPositiveButton(android.R.string.ok, defaultOnClickListener);
-	                builder.setNegativeButton(android.R.string.cancel, null);
-				}
-				else
-				{
-					// we pretend the user clicked the "OK" button
-					defaultOnClickListener.onClick(null, Dialog.BUTTON_POSITIVE);
-					return;
-				}
-			}
-			else
-			{
-				//builder.setMessage("You have already taken this dose. Do you want to take it regardless?");
-				builder.setMessage(R.string._msg_intake_already_taken);
-                builder.setPositiveButton(android.R.string.yes, defaultOnClickListener);
-                builder.setNegativeButton(android.R.string.no, null);
-			}			
-		}
-		
-		builder.show();
-	}	
-	
-	private void requestUnscheduledIntake(final Drug drug, final Calendar date, final int doseTime)
-	{
-		final FractionInputDialog dialog = new FractionInputDialog(this, Fraction.ZERO, null);
-		dialog.setKeypadEnabled(false);
-		dialog.setTitle(drug.getName());
-		//dialog.setIcon(Util.getDoseTimeDrawableFromDoseTime(doseTime));
-		dialog.setIcon(android.R.drawable.ic_dialog_info);
-		dialog.setMessage(getString(R.string._msg_intake_unscheduled));
-		//dialog.setMessage("No dose is scheduled at this time - choose one now.");
-		//////////////////	
-		dialog.setOnFractionSetListener(new OnFractionSetListener() {
-			
-			@Override
-			public void onFractionSet(FractionInputDialog dialog, Fraction value)
-			{
-				Log.d(TAG, "requestUnscheduledIntake$onFractionSet");
-				requestIntake(drug, date, doseTime, value, false);				
-			}
-		});
-		//////////////////
-		dialog.show();
 	}
 
 	private class DrugAdapter extends ArrayAdapter<Drug>

@@ -69,6 +69,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		});
 		
 		mDoseEdit.setValue(mDose);
+		mDoseEdit.setFractionInputMode(mDose.isInteger() ? FractionInput.MODE_INTEGER : FractionInput.MODE_FRACTION);
 		mDoseEdit.setOnChangeListener(this);
 		
 		setTitle(mDrug.getName());
@@ -76,7 +77,6 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		setView(view);
 		
 		setButton(BUTTON_POSITIVE, getString(android.R.string.ok), (OnClickListener) null);
-        setButton(BUTTON_NEUTRAL, "1 ↔ 1¾", this);
         setButton(BUTTON_NEGATIVE, getString(android.R.string.cancel), this);
 
         setupMessages();
@@ -93,7 +93,6 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		mDoseText.setVisibility(textVisibility);
 		mHintText.setVisibility(textVisibility);
 		mDoseEdit.setVisibility(editVisibility);
-		getButton(BUTTON_NEUTRAL).setEnabled(editable);		
 	}
 
 	@Override
@@ -164,18 +163,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	
 	private void handleOnClickInNormalMode(int which)
 	{		
-		if(which == BUTTON_NEUTRAL)
-		{
-			int nextFractionMode = mDoseEdit.getFractionInputMode();
-			
-			do
-			{
-				if(++nextFractionMode == FractionInput.MODE_INVALID)
-					nextFractionMode = FractionInput.MODE_INTEGER;
-				
-			} while(!mDoseEdit.setFractionInputMode(nextFractionMode));
-		}			
-		else if(which == BUTTON_POSITIVE)
+		if(which == BUTTON_POSITIVE)
 		{
 			if(mDrug.getCurrentSupply().compareTo(mDose) == -1)
 				switchMode(false);
@@ -244,7 +232,6 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 			setMessage(context.getString(R.string._msg_insufficient_supplies, 
 					mDrug.getName(), mDose, mDrug.getCurrentSupply()));
 			getButton(BUTTON_POSITIVE).setText(context.getString(R.string._btn_edit_drug));
-			getButton(BUTTON_NEUTRAL).setVisibility(View.GONE);
 			getButton(BUTTON_NEGATIVE).setText(context.getString(R.string._btn_ignore));			
 		}
 		else
@@ -262,12 +249,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		getButton(BUTTON_POSITIVE).setText(getString(android.R.string.ok));
 		getButton(BUTTON_NEGATIVE).setText(getString(android.R.string.cancel));	
 		
-		Button b = getButton(BUTTON_NEUTRAL);
-		b.setText("1 ↔ 1¾");
-		b.setVisibility(View.VISIBLE);
-		b.setEnabled(doseIsZero);
-		
-		b = getButton(BUTTON_POSITIVE);
+		Button b = getButton(BUTTON_POSITIVE);
 		b.setEnabled(!doseIsZero);
 		
 		setupMessages();

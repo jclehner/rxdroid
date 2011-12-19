@@ -37,7 +37,6 @@ import at.caspase.rxdroid.util.Constants;
 
 public class NotificationService extends Service implements OnChangedListener, OnSharedPreferenceChangeListener
 {
-	@SuppressWarnings("unused")
 	private static final String TAG = NotificationService.class.getName();
 		
 	private SharedPreferences mSharedPrefs;
