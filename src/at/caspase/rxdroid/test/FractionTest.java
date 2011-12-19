@@ -150,6 +150,51 @@ public class FractionTest extends AndroidTestCase
 		for(int i = 0; i != expected.length; ++i)
 			assertEqualsAsString(expected[i], Fraction.decode(FRACTIONS[i]).negate());
 	}
+	
+	public void testCompare()
+	{
+		final String[][] allFractions = {
+				// expected cmp == -1
+				{
+					"12/8",
+					"45/18",
+					"6/8",
+					"3/2",
+					"-14/2"				
+				},
+				// expected cmp == 0
+				{
+					"10/8",
+					"23/9",
+					"14/16",
+					"30/10",
+					"-5",
+					"-21/4",
+					"-5/4",
+					"8/7"
+				},
+				// expected cmp == +1
+				{
+					"2",
+					"47/18",
+					"13/16",
+					"-1 1/4",
+				}
+		};
+		
+		for(int i = 0; i != 3; ++i)
+		{
+			String[] fractions = allFractions[i];
+			for(int k = 0; k != fractions.length; ++k)
+			{
+				Fraction f1 = Fraction.decode(FRACTIONS[i]);
+				Fraction f2 = Fraction.decode(fractions[i]);
+				
+				int expected = i - 1;
+				assertCompare(expected, f1, f2);				
+			}			
+		}
+	}
 
 	//public void testToString() {
 	//    //fail("Not yet implemented");
@@ -157,6 +202,17 @@ public class FractionTest extends AndroidTestCase
 
 	private static <T> void assertEqualsAsString(T a, T b) {
 		assertEquals(a.toString(), b.toString());
+	}
+	
+	private void assertCompare(int expected, Fraction a, Fraction b)
+	{
+		if(expected < -1 || expected > 1)
+			throw new IllegalArgumentException();
+		
+		final int result = a.compareTo(b);
+		
+		if(result != expected)
+			fail("\"" + a + "\".compareTo(\"" + b + "\") == " + result + ", expected " + expected);
 	}
 
 }

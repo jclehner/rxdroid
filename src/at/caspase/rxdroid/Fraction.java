@@ -51,7 +51,9 @@ public class Fraction extends Number implements Comparable<Number>
 	public static final Fraction ZERO = new Fraction(0);
 
 	/**
-	 * Construct a fraction of the value zero.
+	 * Default constructor.
+	 * <p>
+	 * Constructs a fraction with a value of zero. 
 	 */
 	public Fraction() {}
 
@@ -63,10 +65,10 @@ public class Fraction extends Number implements Comparable<Number>
 	}
 
 	/**
-	 * Construct a fraction from a whole number.
+	 * Construct a fraction from an integer.
 	 */
-	public Fraction(int wholeNum) {
-		mNumerator = wholeNum;
+	public Fraction(int integer) {
+		this(integer, 1);
 	}
 
 	/**
@@ -78,18 +80,18 @@ public class Fraction extends Number implements Comparable<Number>
 	 * @throws IllegalArgumentException if {@code denominator <= 0}
 	 */
 	public Fraction(int numerator, int denominator) {
-		construct(0, numerator, denominator);
+		init(0, numerator, denominator);
 	}
 
 	/**
 	 * Construct a fraction from a mixed number format.
 	 *
-	 * When initializing negative fractions, only specify the wholeNum parameter as negative.
+	 * When initializing negative fractions, only specify the <code>integer</code> parameter as negative.
 	 *
 	 * @throws IllegalArgumentException if {@code denominator <= 0} or {@code wholeNum != 0 && numerator < 0}
 	 */
-	public Fraction(int wholeNum, int numerator, int denominator) {
-		construct(wholeNum, numerator, denominator);
+	public Fraction(int integer, int numerator, int denominator) {
+		init(integer, numerator, denominator);
 	}
 	
 	/**
@@ -135,8 +137,8 @@ public class Fraction extends Number implements Comparable<Number>
 			denominator = this.mDenominator;
 		}
 		
-		this.mDenominator = denominator;
-		this.mNumerator = numerator;
+		// this reduces the resulting fraction
+		init(0, numerator, denominator);
 		
 		return this;
 	}
@@ -149,6 +151,7 @@ public class Fraction extends Number implements Comparable<Number>
 	{
 		requireNotZeroConstant();
 		
+		//init(0, mNumerator + n * mDenominator, mDenominator);
 		mNumerator += n * mDenominator;
 		return this;
 	}
@@ -232,12 +235,20 @@ public class Fraction extends Number implements Comparable<Number>
 		if(this == other)
 			return 0;
 		
-		// TODO ugly, change to equalizing to the same denominator and
-		// then comparing the nominators!
-		if(this.doubleValue() == other.doubleValue())
-			return 0;
-
-		return this.doubleValue() < other.doubleValue() ? -1 : 1;
+		if(other instanceof Fraction)
+		{
+			Fraction otherFraction = (Fraction) other;
+			
+			int a = this.mNumerator * otherFraction.mDenominator;
+			int b = otherFraction.mNumerator * this.mDenominator;
+			
+			if(a == b)
+				return 0;
+			
+			return (a < b) ? -1 : 1;	
+		}		
+		else
+			return Double.compare(this.doubleValue(), other.doubleValue());	
 	}
 
 	/**
@@ -350,20 +361,20 @@ public class Fraction extends Number implements Comparable<Number>
 		sDisplayMixedNumbers = displayMixedNumbers;
 	}
 
-	private void construct(int wholeNum, int numerator, int denominator)
+	private void init(int integer, int numerator, int denominator)
 	{
 		if(denominator <= 0)
 			throw new IllegalArgumentException("Denominator must be greater than zero");
 
-		if(wholeNum != 0 && numerator < 0)
+		if(integer != 0 && numerator < 0)
 			throw new IllegalArgumentException("Nominator must not be negative if wholeNum is non-zero");
 
 		// set mNumerator, even though we divide it by the GCD later, so as to pass the
 		// original argument to this function to findGCD
-		if(wholeNum >= 0)
-			mNumerator = wholeNum * denominator + numerator;
+		if(integer >= 0)
+			mNumerator = integer * denominator + numerator;
 		else
-			mNumerator = wholeNum * denominator - numerator;
+			mNumerator = integer * denominator - numerator;
 
 		// the sign, if present, has been moved to the numerator by now
 		denominator = Math.abs(denominator);
