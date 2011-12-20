@@ -7,27 +7,36 @@
     android:layout_height="match_parent"
 >
  
-    <TextView android:id="@+id/dose_text"
+	<LinearLayout 
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_gravity="center|top"
-		android:gravity="center"
-		
-		android:textAppearance="?android:attr/textAppearanceLarge"
-		android:textSize="50sp"
-		android:textStyle="bold"
-		android:text="0"
-	/>
+   		android:layout_height="match_parent"
+		android:orientation="vertical"	
+		android:gravity="center"	
+	>
+	
+	    <TextView android:id="@+id/dose_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center|top"
+			android:gravity="center"
+			
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:textSize="50sp"
+			android:textStyle="bold"
+			android:text="0"
+		/>
+	    
+	    <TextView android:id="@+id/dose_hint"
+	        android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center|bottom"
+			
+			android:gravity="center"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:text="@string/_msg_click_to_edit"
+		/>
     
-    <TextView android:id="@+id/dose_hint"
-        android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_gravity="center|bottom"
-		
-		android:gravity="center"
-		android:textAppearance="?android:attr/textAppearanceSmall"
-		android:text="@string/_msg_click_to_edit"
-	/>
+    </LinearLayout>
     
     <at.caspase.rxdroid.FractionInput android:id="@+id/dose_edit"
 		android:layout_width="match_parent"
