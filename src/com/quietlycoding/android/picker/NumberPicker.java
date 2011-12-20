@@ -19,9 +19,11 @@ package com.quietlycoding.android.picker;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Handler;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.method.NumberKeyListener;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -44,14 +46,14 @@ import at.caspase.rxdroid.R;
  * @author Google
  */
 public class NumberPicker extends LinearLayout implements OnClickListener,
-		OnFocusChangeListener, OnLongClickListener {
+		OnFocusChangeListener, OnLongClickListener, TextWatcher {
 
 	private static final String TAG = "NumberPicker";
 	private static final int DEFAULT_MAX = 200;
 	private static final int DEFAULT_MIN = 0;
 	private static final int DEFAULT_VALUE = 0;
 	private static final boolean DEFAULT_WRAP = true;
-
+	
 	public interface OnChangedListener {
 		void onChanged(NumberPicker picker, int oldVal, int newVal);
 	}
@@ -107,6 +109,8 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 
 	private boolean mIncrement;
 	private boolean mDecrement;
+	
+	private boolean mTextChangedByTextWatcher = false;
 
 	public NumberPicker(Context context) {
 		this(context, null);
@@ -138,6 +142,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 		mText.setOnFocusChangeListener(this);
 		mText.setFilters(new InputFilter[] {inputFilter});
 		mText.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+		mText.addTextChangedListener(this);
 
 		if (!isEnabled()) {
 			setEnabled(false);
@@ -447,5 +452,25 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 	 */
 	public int getCurrent() {
 		return mCurrent;
+	}
+	
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		// this is necessary to prevent an infinite loop
+		if (!mTextChangedByTextWatcher) {		
+			mTextChangedByTextWatcher = true;
+			validateInput(mText);
+			mTextChangedByTextWatcher = false;
+		}
+	}	
+
+	@Override
+	public void afterTextChanged(Editable arg0) {
+		// unused		
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+		// unused		
 	}
 }

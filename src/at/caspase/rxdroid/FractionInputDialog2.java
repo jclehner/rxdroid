@@ -80,5 +80,6 @@ public class FractionInputDialog2 extends AlertDialog implements OnClickListener
 	public void onChanged(FractionInput widget, Fraction oldValue)
 	{
 		mValue = widget.getValue();
+		Log.d(TAG, "onChanged: value=" + mValue);
 	}
 }

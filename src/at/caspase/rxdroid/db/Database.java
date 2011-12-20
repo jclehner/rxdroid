@@ -62,6 +62,8 @@ public final class Database
 {
 	private static final String TAG = Database.class.getName();
 	
+	public static final int FLAG_DONT_NOTIFY_LISTENERS = 1;
+	
 	private static List<Drug> sDrugCache;
 	private static List<Intake> sIntakeCache;
 
@@ -70,8 +72,6 @@ public final class Database
 	private static Dao<Intake, Integer> mIntakeDao;
 
 	private static boolean sIsLoaded = false;
-
-	private static Thread sUiThread;
 
 	private static Map<OnChangedListener, Void> sOnChangedListeners =
 		Collections.synchronizedMap(new WeakHashMap<OnChangedListener, Void>());
@@ -109,8 +109,6 @@ public final class Database
 			getCachedIntakes();
 
 			sIsLoaded = true;
-
-			sUiThread = Thread.currentThread();
 		}
 	}
 	
@@ -146,9 +144,8 @@ public final class Database
 	 */
 	public static synchronized void unregisterOnChangedListener(OnChangedListener listener)
 	{
-		requireUiThread();
-		Log.d(TAG, "unregister: Objects in listener registry: " + sOnChangedListeners.size());
 		sOnChangedListeners.remove(listener);
+		//Log.d(TAG, "unregister: Objects in listener registry: " + sOnChangedListeners.size());
 	}
 
 	/**
@@ -322,8 +319,6 @@ public final class Database
 
 	private static synchronized <T extends Entry, ID> void create(final Dao<T, ID> dao, final T t, int flags)
 	{
-		requireUiThread();
-
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -359,8 +354,9 @@ public final class Database
 
 	private static synchronized <T extends Entry, ID> void update(final Dao<T, ID> dao, final T t, int flags)
 	{
-		requireUiThread();
-
+		if(!(t instanceof Drug))
+			throw new UnsupportedOperationException();
+		
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -379,35 +375,24 @@ public final class Database
 
 		th.start();
 
-		Entry newEntry;
+		final List<Drug> drugCache = getCachedDrugs();
+		final Drug newDrug = (Drug) t;
+		final Drug oldDrug = Entry.findInCollection(drugCache, newDrug.getId());
+		int index = drugCache.indexOf(oldDrug);
 
-		if(t instanceof Drug)
-		{
-			final List<Drug> drugCache = getCachedDrugs();
-			final Drug newDrug = (Drug) t;
-			final Drug oldDrug = Entry.findInCollection(drugCache, newDrug.getId());
-			int index = drugCache.indexOf(oldDrug);
-
-			if(oldDrug == null || index == -1)
-				Log.e(TAG, "oldDrug not found in cache: index=" + index + ", oldDrug=" + oldDrug);
-			else
-			{
-				drugCache.remove(index);
-				drugCache.add(index, newDrug);
-			}
-
-			newEntry = newDrug;
-		}
+		if(oldDrug == null || index == -1)
+			Log.e(TAG, "oldDrug not found in cache: index=" + index + ", oldDrug=" + oldDrug);
 		else
-			throw new UnsupportedOperationException();
+		{
+			drugCache.remove(index);
+			drugCache.add(index, newDrug);
+		}
 
-		dispatchEventToListeners("onEntryUpdated", newEntry, flags);
+		dispatchEventToListeners("onEntryUpdated", newDrug, flags);
 	}
 
 	private static synchronized <T extends Entry, ID> void delete(final Dao<T, ID> dao, final T t, int flags)
 	{
-		requireUiThread();
-
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -428,9 +413,20 @@ public final class Database
 
 		if(t instanceof Drug)
 		{
+			final Drug drug = (Drug) t;
+			final List<Intake> intakeCache = getCachedIntakes();
 			final List<Drug> drugCache = getCachedDrugs();
-			drugCache.remove((Drug) t);
-			// FIXME remove intakes
+			drugCache.remove(drug);
+			
+			// we need to work with a copy of the intake cache to 
+			// prevent ConcurrentModificationExceptions
+			for(Object o : intakeCache.toArray())
+			{
+				Intake intake = (Intake) o;
+				
+				if(intake.getDrugId() == drug.getId())
+					delete((Intake) o, FLAG_DONT_NOTIFY_LISTENERS);			
+			}
 		}
 		else if(t instanceof Intake)
 		{
@@ -458,6 +454,9 @@ public final class Database
 
 	private static void dispatchEventToListeners(String functionName, Entry entry, int flags)
 	{
+		if((flags & FLAG_DONT_NOTIFY_LISTENERS) != 0)
+			return;
+		
 		synchronized(sOnChangedListeners)
 		{
 			Set<OnChangedListener> listeners = sOnChangedListeners.keySet();
@@ -493,16 +492,10 @@ public final class Database
 					}
 
 					// this code is only reached if an exception was thrown
-					throw new IllegalArgumentException("Failed to dispatch event to listeners: event=" + functionName);
+					throw new RuntimeException("Failed to dispatch event to listeners: event=" + functionName);
 				}
 			}
 		}
-	}
-
-	private static void requireUiThread()
-	{
-		if(!Thread.currentThread().equals(sUiThread))
-			throw new IllegalStateException("Illegal attempt to modify database from outside the UI thread");
 	}
 
 	private Database() {}

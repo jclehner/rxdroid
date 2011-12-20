@@ -223,7 +223,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_OUTSIDE:
-				setBackgroundResource(R.drawable.doseview_background);
+				setBackgroundResource(R.drawable.doseview_background);								
 				break;
 		}
 

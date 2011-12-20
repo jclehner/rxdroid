@@ -114,6 +114,8 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 	{
 		boolean canPersist = callChangeListener(value);
 
+		Log.d(TAG, "onFractionSet: value=" + value);
+		
 		if(canPersist && shouldPersist())
 			persistString(value.toString());
 
