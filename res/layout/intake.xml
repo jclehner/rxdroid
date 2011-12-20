@@ -16,6 +16,7 @@
 		android:textAppearance="?android:attr/textAppearanceLarge"
 		android:textSize="50sp"
 		android:textStyle="bold"
+		android:text="0"
 	/>
     
     <TextView android:id="@+id/dose_hint"

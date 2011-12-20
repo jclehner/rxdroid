@@ -38,7 +38,9 @@
 	 		android:layout_height="wrap_content"
 	 		android:layout_gravity="left"
 	 		android:onClick="onNavigationClick"
-	 		android:src="@drawable/arrow_left"
+	 		android:src="@drawable/arrow_left"	 		
+	 		
+	 		android:visibility="gone"
 	 	/>	 	
 		 
 		 <TextView android:id="@+id/med_list_footer"
@@ -62,6 +64,8 @@
 	 		android:layout_gravity="right"
 	 		android:onClick="onNavigationClick"
 	 		android:src="@drawable/arrow_right"
+	 		
+	 		android:visibility="gone"
 	 	/>
 	
 	</LinearLayout>

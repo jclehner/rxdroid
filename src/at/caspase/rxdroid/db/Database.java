@@ -61,7 +61,7 @@ import com.j256.ormlite.dao.Dao;
 public final class Database
 {
 	private static final String TAG = Database.class.getName();
-
+	
 	private static List<Drug> sDrugCache;
 	private static List<Intake> sIntakeCache;
 
@@ -95,7 +95,7 @@ public final class Database
 	public static synchronized void load(Context context)
 	{
 		if(context == null)
-			throw new IllegalArgumentException("Argument 'context' must not be null. Did you call GlobalContext.set() ?");
+			throw new NullPointerException("Argument 'context' must not be null. Did you call GlobalContext.set() ?");
 
 		if(!sIsLoaded)
 		{
@@ -104,6 +104,7 @@ public final class Database
 			mDrugDao = mHelper.getDrugDao();
 			mIntakeDao = mHelper.getIntakeDao();
 
+			// actually load the drugs from the database
 			getCachedDrugs();
 			getCachedIntakes();
 
@@ -111,6 +112,14 @@ public final class Database
 
 			sUiThread = Thread.currentThread();
 		}
+	}
+	
+	public static DatabaseHelper getHelper()
+	{
+		if(!sIsLoaded)
+			throw new RuntimeException("Database is not yet initialized");
+		
+		return mHelper;
 	}
 
 	/**

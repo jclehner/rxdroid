@@ -164,5 +164,17 @@
     <string name="_msg_empty_list_text">Click MENU and select "%1$s" to add a drug.</string>
     
     <string name="_msg_no_doses_on_this_day">There are no doses to be taken on this date.</string>
+    
+    <string name="_title_database_error">Database Error</string>
+	<string name="_msg_db_error_general">General database error.</string>
+	<string name="_msg_db_error_upgrade">Error while upgrading database.</string>
+	<string name="_msg_db_error_downgrade">The currently installed database cannot be read, as it was created 
+		by a newer version of this application.</string>
+	<string name="_msg_db_error_footer">You may choose to reset the database to a state that is usable by the
+		application. A backup of the old database will be automatically created.</string>
+	<string name="_btn_backup_and_reset">Backup &amp; Reset</string>
+	
+	<string name="_msg_db_loading">Loading database, please stand by.</string>
+	
 	
 </resources>
