@@ -122,7 +122,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			throw new IllegalArgumentException();
 
 		final int drawableIds[] = { R.drawable.ic_morning, R.drawable.ic_noon, R.drawable.ic_evening, R.drawable.ic_night };
-		final String[] hints = { "Morning", "Noon", "Evening", "Night" };
+		final int[] hints = { R.string._Morning, R.string._Noon, R.string._Evening, R.string._Night };
 
 		mDoseText.setHint(hints[doseTime]);
 		mDoseTimeIcon.setImageResource(drawableIds[doseTime]);

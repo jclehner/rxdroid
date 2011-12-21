@@ -169,7 +169,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		{
 			Database.create(mDrug, 0);
 			setResult(RESULT_OK);
-			Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), getString(R.string._toast_saved), Toast.LENGTH_SHORT).show();
 		}
 
 		finish();
@@ -181,10 +181,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		String key = preference.getKey();
 
 		if("drug_name".equals(key))
-		{
-			Log.d(TAG, "onPreferenceChange: drugName=" + newValue);
 			mDrug.setName((String) newValue);
-		}
 		else if("morning".equals(key) || "noon".equals(key) || "evening".equals(key) || "night".equals(key))
 			mDrug.setDose(DosePreference.getDoseTimeFromKey(key), (Fraction) newValue);
 		else if("repeat".equals(key))
@@ -554,7 +551,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		final SimpleBitSet bitSet = new SimpleBitSet(repeatArg);
 
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Weekydays");
+		builder.setTitle(R.string._title_weekdays);
 		builder.setMultiChoiceItems(Constants.LONG_WEEK_DAY_NAMES, checkedItems, new OnMultiChoiceClickListener() {
 
 			@Override

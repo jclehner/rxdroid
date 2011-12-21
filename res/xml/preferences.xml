@@ -172,7 +172,8 @@
 		</PreferenceCategory>
 	</PreferenceScreen>
 	
-	<!--  no need to localize debugging options -->
+	<!-- 
+	
 	<PreferenceScreen android:key="prefscreen_debug"
 		android:title="Debugging options">
 		
@@ -193,6 +194,8 @@
 		/>	
 	
 	</PreferenceScreen>
+	
+	 -->
 	
 	<Preference android:key="version"
 		android:title="@string/_title_version"
