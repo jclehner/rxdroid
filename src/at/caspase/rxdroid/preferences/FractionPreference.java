@@ -98,7 +98,7 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 	public boolean onPreferenceClick(Preference preference)
 	{
 		FractionInputDialog2 dialog = new FractionInputDialog2(getContext(), mValue, this);
-		dialog.setTitle(mDialogTitle);
+		dialog.setTitle(mDialogTitle != null ? mDialogTitle : getTitle());
 		dialog.setOnFractionSetListener(this);
 		//dialog.setLongClickSummand(mLongClickSummand);
 
