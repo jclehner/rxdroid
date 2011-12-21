@@ -23,23 +23,28 @@ package at.caspase.rxdroid;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.util.Util;
 
-public class PreferencesActivity extends PreferenceActivity
+public class PreferencesActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = PreferencesActivity.class.getName();
 
 	private static final int MENU_RESTORE_DEFAULTS = 0;
 
+	private static final String PREF_LOW_SUPPLY_THRESHOLD = "num_min_supply_days";
+	
 	SharedPreferences mSharedPreferences;
 
 	@Override
@@ -48,13 +53,16 @@ public class PreferencesActivity extends PreferenceActivity
 		super.onCreate(savedInstanceState);
 
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
+		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		addPreferencesFromResource(R.xml.preferences);
 
 		final Preference versionPref = findPreference("version");
 		if(versionPref != null)
 			versionPref.setSummary(Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION);
-
+		
 		Util.populateListPreferenceEntryValues(findPreference("snooze_type"));
+
+		updateLowSupplyThresholdPreferenceSummary();
 	}
 
 	@Override
@@ -93,5 +101,19 @@ public class PreferencesActivity extends PreferenceActivity
 				// ignore
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
+	{
+		if(PREF_LOW_SUPPLY_THRESHOLD.equals(key))
+			updateLowSupplyThresholdPreferenceSummary();
+	}
+	
+	private void updateLowSupplyThresholdPreferenceSummary()
+	{
+		String value = mSharedPreferences.getString(PREF_LOW_SUPPLY_THRESHOLD, "10");
+		Preference p = findPreference(PREF_LOW_SUPPLY_THRESHOLD);
+		p.setSummary(getString(R.string._summary_min_supply_days, value));
 	}
 }
