@@ -58,11 +58,13 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 
 		final Preference versionPref = findPreference("version");
 		if(versionPref != null)
-			versionPref.setSummary(Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION);
+		{
+			String summary = Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION;			
+			versionPref.setSummary(summary);
+		}
 		
-		Util.populateListPreferenceEntryValues(findPreference("snooze_type"));
-
 		updateLowSupplyThresholdPreferenceSummary();
+		Util.populateListPreferenceEntryValues(findPreference("snooze_type"));		
 	}
 
 	@Override
@@ -112,8 +114,11 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	
 	private void updateLowSupplyThresholdPreferenceSummary()
 	{
-		String value = mSharedPreferences.getString(PREF_LOW_SUPPLY_THRESHOLD, "10");
 		Preference p = findPreference(PREF_LOW_SUPPLY_THRESHOLD);
-		p.setSummary(getString(R.string._summary_min_supply_days, value));
+		if(p != null)
+		{
+			String value = mSharedPreferences.getString(PREF_LOW_SUPPLY_THRESHOLD, "10");
+			p.setSummary(getString(R.string._summary_min_supply_days, value));
+		}
 	}
 }
