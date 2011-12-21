@@ -47,7 +47,7 @@
 		
 		android:minEms="3"
 		android:textSize="20sp"
-		android:text="1¾"
+		android:text="¾"
 	/>
 	
 </FrameLayout>

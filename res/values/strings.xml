@@ -175,6 +175,7 @@
 	<string name="_btn_backup_and_reset">Backup &amp; Reset</string>
 	
 	<string name="_msg_db_loading">Loading database, please stand by.</string>
-	
+	<string name="_msg_footer_insufficient_supplies">This dose is larger than this drug\'s supply (%1$s). To ignore this,
+		simply press the %2$s button again. To edit the drug\'s supply, click this text.</string>
 	
 </resources>

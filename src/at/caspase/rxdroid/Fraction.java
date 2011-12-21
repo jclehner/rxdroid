@@ -362,7 +362,7 @@ public class Fraction extends Number implements Comparable<Number>
 	}
 
 	private void init(int integer, int numerator, int denominator)
-	{
+	{		
 		if(denominator <= 0)
 			throw new IllegalArgumentException("Denominator must be greater than zero");
 

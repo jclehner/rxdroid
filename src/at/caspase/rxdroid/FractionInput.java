@@ -22,6 +22,7 @@
 package at.caspase.rxdroid;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -29,6 +30,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -147,10 +149,10 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 		{
 			mFractionInputMode = mode;
 
-			String modeSelectorText = (mode == MODE_INTEGER) ? "¾" : "1¾";
+			//String modeSelectorText = (mode == MODE_INTEGER) ? "¾" : "1¾";
 			int modeSelectorVisibility = (mode == MODE_INTEGER) ? VISIBLE : GONE;
 
-			mModeSwitcher.setText(modeSelectorText);
+			//mModeSwitcher.setText(modeSelectorText);
 			mModeSwitcher.setVisibility(modeSelectorVisibility);
 
 			setValue(getValue());

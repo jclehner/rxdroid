@@ -29,20 +29,37 @@
 	    <TextView android:id="@+id/dose_hint"
 	        android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_gravity="center|bottom"
-			
+						
 			android:gravity="center"
 			android:textAppearance="?android:attr/textAppearanceSmall"
 			android:text="@string/_msg_click_to_edit"
 		/>
-    
+	    	    
     </LinearLayout>
     
-    <at.caspase.rxdroid.FractionInput android:id="@+id/dose_edit"
+	<LinearLayout 
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:visibility="invisible"
-	/>     
+   		android:layout_height="match_parent"
+		android:orientation="vertical"	
+		android:gravity="center"	
+	>
+	
+	    <at.caspase.rxdroid.FractionInput android:id="@+id/dose_edit"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:visibility="invisible"
+		/>
+	    
+	    <TextView android:id="@+id/footer"
+	    	android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			
+			android:gravity="center"
+			android:visibility="gone"
+			android:text="@string/_msg_footer_insufficient_supplies"
+		/>
+	    
+	</LinearLayout>
     
 </FrameLayout>
 	 

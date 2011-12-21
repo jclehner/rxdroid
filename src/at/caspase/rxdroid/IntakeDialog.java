@@ -29,10 +29,18 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
+import android.os.Environment;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.View.MeasureSpec;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 import at.caspase.rxdroid.FractionInput.OnChangedListener;
@@ -56,9 +64,8 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	private TextView mDoseText;
 	private TextView mHintText;
 	private FractionInput mDoseEdit;
-
-	private boolean mIsInInsufficientSupplyMode = false;
-	private boolean mDismissCalledFromSwitchMode = false;
+	
+	private PopupWindow mPopup;
 
 	public static final int FLAG_ALLOW_DOSE_EDIT = 1;
 
@@ -94,14 +101,14 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		mDoseEdit.setOnChangeListener(this);
 
 		setTitle(mDrug.getName());
-
 		setView(view);
 
 		setButton(BUTTON_POSITIVE, getString(android.R.string.ok), (OnClickListener) null);
 		setButton(BUTTON_NEGATIVE, getString(android.R.string.cancel), this);
 
 		setupMessages();
-
+		setupPopupWindow(context, lf);
+		
 		setOnShowListener(this);
 		Database.registerOnChangedListener(this);
 	}
@@ -122,33 +129,34 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		setNonDismissingListener(BUTTON_POSITIVE);
 		setNonDismissingListener(BUTTON_NEUTRAL);
 
-		setupNormalMode();
-
-		Log.d(TAG, "onShow: OK");
+		setupViews();
 	}
 
 	@Override
 	public void onStop()
 	{
-		Log.d(TAG, "onStop: calledFromSwitchMode=" + mDismissCalledFromSwitchMode);
-		if(!mDismissCalledFromSwitchMode)
-			Database.unregisterOnChangedListener(this);
+		mPopup.dismiss();
+		Database.unregisterOnChangedListener(this);
 	}
 
 	@Override
 	public void onClick(DialogInterface dialog, int which)
 	{
-		if(!mIsInInsufficientSupplyMode)
-			handleOnClickInNormalMode(which);
-		else
-			handleOnClickInInsufficientSupplyMode(which);
+		if(which == BUTTON_POSITIVE)
+		{		
+			if(hasInsufficientSupplies())
+			{
+				mPopup.dismiss();						
+				mPopup.showAtLocation(mDoseEdit, Gravity.CENTER, 0, 0);				
+			}
+			else
+				addIntakeAndDismiss();
+		}
 	}
 
 	@Override
 	public void onChanged(FractionInput widget, Fraction oldValue)
 	{
-		Log.d(TAG, "onChanged: " + oldValue + " -> " + widget.getValue());
-
 		mDose = widget.getValue();
 		getButton(BUTTON_POSITIVE).setEnabled(!mDose.isZero());
 		mDoseText.setText(mDose.toString());
@@ -157,22 +165,12 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	@Override
 	public void onEntryUpdated(Entry entry, int flags)
 	{
-		Log.d(TAG, "onEntryUpdated: entry=" + entry);
-
 		if(entry instanceof Drug && entry.getId() == mDrug.getId())
 		{
 			mDrug = (Drug) entry;
 
-			if(mIsInInsufficientSupplyMode)
-			{
-				if(mDrug.getCurrentSupply().compareTo(mDose) != -1)
-				{
-					switchMode(false);
-					return;
-				}
-			}
-
-			updateCurrentMode();
+			if(!hasInsufficientSupplies())
+				mPopup.dismiss();
 		}
 	}
 
@@ -181,33 +179,59 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 
 	@Override
 	public void onEntryDeleted(Entry entry, int flags) {}
-
-	private void handleOnClickInNormalMode(int which)
+	
+	@Override
+	public void onBackPressed()
 	{
-		if(which == BUTTON_POSITIVE)
-		{
-			if(mDrug.getCurrentSupply().compareTo(mDose) == -1)
-				switchMode(false);
-			else
-				addIntakeAndDismiss();
-		}
+		if(!mPopup.isShowing())
+			super.onBackPressed();
+		else
+			mPopup.dismiss();		
 	}
-
-	private void handleOnClickInInsufficientSupplyMode(int which)
+	
+	private boolean hasInsufficientSupplies()
 	{
-		if(which == BUTTON_POSITIVE)
-		{
-			Context context = getContext();
+		Fraction supplies = mDrug.getCurrentSupply();
+		return supplies.compareTo(mDose) == -1;
+	}
+	
+	private void setupPopupWindow(final Context context, LayoutInflater lf)
+	{
+		View view = lf.inflate(R.layout.intake_popup, null, false);
+		String ok = context.getString(android.R.string.ok);
+		String text = context.getString(R.string._msg_footer_insufficient_supplies, mDrug.getCurrentSupply(), ok);
+		
+		TextView tv = (TextView) view.findViewById(R.id.text);
+		tv.setText(text);
+		tv.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v)
+			{
+				Intent intent = new Intent(context, DrugEditActivity.class);
+				intent.setAction(Intent.ACTION_EDIT);
+				intent.putExtra(DrugEditActivity.EXTRA_DRUG, mDrug);
+				intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
 
-			Intent intent = new Intent(context, DrugEditActivity.class);
-			intent.setAction(Intent.ACTION_EDIT);
-			intent.putExtra(DrugEditActivity.EXTRA_DRUG, mDrug);
-			intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
-
-			context.startActivity(intent);
-		}
-		else if(which == BUTTON_NEGATIVE)
-			addIntakeAndDismiss();
+				context.startActivity(intent);			
+			}
+		});
+		
+		WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay(); 
+		
+		int width  = display.getWidth()  * 8 / 10;
+		int height = display.getHeight() * 1 / 3;
+		
+		mPopup = new PopupWindow(
+				view,
+				width, 
+				height, 
+				false
+		);
+		
+		mPopup.setOutsideTouchable(true);
+		mPopup.setTouchable(true);
 	}
 
 	private void addIntakeAndDismiss()
@@ -224,44 +248,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		Toast.makeText(getContext(), R.string._toast_intake_noted, Toast.LENGTH_SHORT).show();
 	}
 
-	private void switchMode(boolean dismissBeforeUpdate)
-	{
-		mIsInInsufficientSupplyMode = !mIsInInsufficientSupplyMode;
-
-		if(dismissBeforeUpdate)
-		{
-			// dismissing the dialog and then showing it again makes for a
-			// smoother user experience
-			mDismissCalledFromSwitchMode = true;
-			dismiss();
-			mDismissCalledFromSwitchMode = false;
-		}
-
-		updateCurrentMode();
-
-		if(dismissBeforeUpdate)
-			show();
-	}
-
-	private void updateCurrentMode()
-	{
-		if(mIsInInsufficientSupplyMode)
-		{
-			setCustomViewVisibility(View.GONE);
-
-			Context context = getContext();
-			setMessage(context.getString(R.string._msg_insufficient_supplies,
-					mDrug.getName(), mDose, mDrug.getCurrentSupply()));
-			getButton(BUTTON_POSITIVE).setText(context.getString(R.string._btn_edit_drug));
-			getButton(BUTTON_NEGATIVE).setText(context.getString(R.string._btn_ignore));
-		}
-		else
-		{
-			setupNormalMode();
-		}
-	}
-
-	private void setupNormalMode()
+	private void setupViews()
 	{
 		boolean doseIsZero = mDose.isZero();
 
@@ -297,13 +284,6 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 
 	private String getString(int resId) {
 		return getContext().getString(resId);
-	}
-
-	private void setCustomViewVisibility(int visibility)
-	{
-		View views[] = { mDoseEdit, mDoseText, mHintText };
-		for(View v : views)
-			v.setVisibility(visibility);
 	}
 
 	private class NonDismissingListener implements View.OnClickListener
