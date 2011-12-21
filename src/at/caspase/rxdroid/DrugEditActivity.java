@@ -116,7 +116,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		if(drugName == null || drugName.length() == 0)
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string._title_error);
+			builder.setTitle(R.string._title_warning);
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setMessage(R.string._msg_err_empty_drug_name);
 			builder.setNegativeButton(android.R.string.cancel, null);

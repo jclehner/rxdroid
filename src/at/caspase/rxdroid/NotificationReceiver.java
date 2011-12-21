@@ -32,6 +32,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Database;
@@ -43,23 +45,24 @@ public class NotificationReceiver extends BroadcastReceiver
 {
 	private static final String TAG = NotificationReceiver.class.getName();
 
-	private static final String EXTRA_BE_QUIET = "be_quiet";
+	static final String EXTRA_BE_QUIET = "be_quiet";
+	static final String EXTRA_SNOOZE = "snooze";
+	
+	private static final int SNOOZE_DISABLED = 0;
+	private static final int SNOOZE_REPEAT = 1;
+	private static final int SNOOZE_MANUAL = 2;
 
 	private Context mContext;
 
 	private AlarmManager mAlarmMgr;
 	private Settings mSettings;
 	private SharedPreferences mSharedPrefs;
-	private NotificationManager mNotificationMgr;
+	
+	private int mSnoozeType;
+	
+	private Thread mThread;
 
 	private MyNotification mNotification = new MyNotification();
-
-	static public void sendBroadcast(Context context, boolean beQuiet)
-	{
-		Intent intent = new Intent(context, NotificationReceiver.class);
-		intent.putExtra(EXTRA_BE_QUIET, beQuiet);
-		context.sendBroadcast(intent);
-	}
 
 	@Override
 	public void onReceive(Context context, Intent intent)
@@ -73,10 +76,14 @@ public class NotificationReceiver extends BroadcastReceiver
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mSettings = Settings.instance();
 		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-		mNotificationMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
+		mSnoozeType = mSettings.getListPreferenceValueIndex("snooze_type", SNOOZE_DISABLED);
+		
 		final boolean beQuiet = intent != null && intent.getBooleanExtra(EXTRA_BE_QUIET, false);
-
+		final boolean isSnoozeRequest = intent != null && intent.getBooleanExtra(EXTRA_SNOOZE, false);
+		
+		if(mThread != null)
+			mThread.interrupt();
+		
 		rescheduleAlarms();
 		updateCurrentNotifications(beQuiet);
 	}
@@ -115,10 +122,10 @@ public class NotificationReceiver extends BroadcastReceiver
 			ignorePendingIntakes = false;
 
 		Calendar date = mSettings.getActiveDate(now);
-		updateNotifications(date, doseTime, ignorePendingIntakes, beQuiet);
+		updateNotifications(date, doseTime, ignorePendingIntakes, mSnoozeType == SNOOZE_REPEAT);
 	}
 
-	private void updateNotifications(Calendar date, int doseTime, boolean ignorePendingIntakes, boolean beQuiet)
+	private void updateNotifications(Calendar date, int doseTime, boolean ignorePendingIntakes, boolean forceUpdate)
 	{
 		int pendingIntakes = ignorePendingIntakes ? 0 : countOpenIntakes(date, doseTime);
 		int forgottenIntakes = countForgottenIntakes(date, doseTime);
@@ -128,7 +135,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		mNotification.setForgottenCount(forgottenIntakes);
 		mNotification.setLowSupplyMessage(lowSupplyMessage);
 
-		mNotification.update();
+		mNotification.update(forceUpdate);
 	}
 
 	private void scheduleBeginAlarm(Calendar time, int doseTime) {
@@ -142,15 +149,20 @@ public class NotificationReceiver extends BroadcastReceiver
 	private void scheduleNextBeginOrEndAlarm(Calendar time, int doseTime, boolean scheduleEnd)
 	{
 		final long offset;
-
+		
 		if(scheduleEnd)
-			offset = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);
+		{
+			if(mSnoozeType != SNOOZE_REPEAT)
+				offset = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);
+			else
+				offset = mSettings.getSnoozeTime();
+		}			
 		else
 			offset = mSettings.getMillisUntilDoseTimeBegin(time, doseTime);
-
+		
 		time.add(Calendar.MILLISECOND, (int) offset);
 
-		Log.d(TAG, "Scheduling " + (scheduleEnd ? "end" : "begin") + " of doseTime " + doseTime + " for " + DateTime.toString(time));
+		Log.d(TAG, "Scheduling " + (scheduleEnd ? (mSnoozeType != SNOOZE_REPEAT ? "end" : "next alarm") : "begin") + " of doseTime " + doseTime + " for " + DateTime.toString(time));
 		Log.d(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
 
 		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation());

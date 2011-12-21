@@ -38,8 +38,8 @@ public class Settings
 {
 	private static final String TAG = Settings.class.getName();
 
-	private static final String KEY_LAST_MSG_HASH = "last_msg_hash";
-	private static final String KEY_LAST_MSG_COUNT = "last_msg_count";
+	private static final String KEY_LAST_MSG_HASH = "_last_msg_hash";
+	private static final String KEY_LAST_MSG_COUNT = "_last_msg_count";
 
 	private static final String KEY_PREFIXES[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 	private static final int DOSE_TIMES[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
@@ -120,11 +120,7 @@ public class Settings
 
 		return date;
 	}
-
-
-
-
-
+	
 	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_GET_MILLIS_UNTIL_BEGIN);
 	}
@@ -147,9 +143,10 @@ public class Settings
 
 	public long getSnoozeTime()
 	{
-		final long snoozeTime = getTimePreference("time_snooze").getTime();
-		Log.d(TAG, "snoozeTime=" + snoozeTime);
-		return snoozeTime;
+		if(!sSharedPrefs.getBoolean("debug_snooze_time_short", false))
+			return getTimePreference("time_snooze").getTime();
+		
+		return 10000;
 	}
 
 	private long getDoseTimeBeginOffset(int doseTime) {
@@ -317,6 +314,12 @@ public class Settings
 		Editor editor = sSharedPrefs.edit();
 		editor.putInt(KEY_LAST_MSG_COUNT, notificationCount);
 		editor.commit();
+	}
+	
+	public int getListPreferenceValueIndex(String key, int defValue)
+	{
+		String valueStr = sSharedPrefs.getString(key, null);
+		return valueStr != null ? Integer.parseInt(valueStr, 10) : defValue;
 	}
 
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;

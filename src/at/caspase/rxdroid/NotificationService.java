@@ -22,6 +22,7 @@
 package at.caspase.rxdroid;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -54,32 +55,36 @@ public class NotificationService extends Service implements OnChangedListener, O
 				@Override
 				public void run()
 				{
-					NotificationReceiver.sendBroadcast(getApplicationContext(), true);
+					sendBroadcast(getApplicationContext(), true);
 				}
 			}, Constants.NOTIFICATION_INITIAL_DELAY);
 
 		}
 		else
-			NotificationReceiver.sendBroadcast(this, false);
+			sendBroadcast(this, false);
 	}
 
 	@Override
 	public void onEntryUpdated(Entry entry, int flags)
 	{
-		NotificationReceiver.sendBroadcast(this, false);
+		sendBroadcast(this, false);
 	}
 
 	@Override
 	public void onEntryDeleted(Entry entry, int flags)
 	{
-		NotificationReceiver.sendBroadcast(this, false);
+		sendBroadcast(this, false);
 	}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
 	{
-		// TODO filter
-		NotificationReceiver.sendBroadcast(this, true);
+		// TODO filter more
+		if(key == null || key.startsWith("_"))
+			return;		
+		
+		Log.d(TAG, "onSharedPreferenceChanged: key=" + key);
+		sendBroadcast(this, true);
 	}
 
 	@Override
@@ -113,9 +118,17 @@ public class NotificationService extends Service implements OnChangedListener, O
 	{
 		if(!sIsStarted)
 		{
-			NotificationReceiver.sendBroadcast(this, true);
+			Log.d(TAG, "onStartCommand");
+			sendBroadcast(this, true);
 			sIsStarted = true;
 		}
 		return START_STICKY;
+	}
+	
+	private static void sendBroadcast(Context context, boolean beQuiet)
+	{
+		Intent intent = new Intent(context, NotificationReceiver.class);
+		intent.putExtra(NotificationReceiver.EXTRA_BE_QUIET, beQuiet);
+		context.sendBroadcast(intent);
 	}
 }

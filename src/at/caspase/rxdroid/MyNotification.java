@@ -70,8 +70,12 @@ public class MyNotification
 	public void setLowSupplyMessage(String lowSupplyMessage) {
 		mLowSupplyMessage = lowSupplyMessage;
 	}
+	
+	public void update() {
+		update(true);
+	}
 
-	public void update()
+	public void update(boolean forceUpdate)
 	{
 		NotificationManager notificationMgr =
 				(NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -131,17 +135,17 @@ public class MyNotification
 				mNotification.number = notificationItems;
 
 			Settings settings = Settings.instance();
-
 			int messageHash = message.hashCode();
-			if(settings.getLastNotificationMessageHash() != messageHash)
+			
+			if(forceUpdate || settings.getLastNotificationMessageHash() != messageHash)
 			{
 				settings.setLastNotificationMessageHash(messageHash);
 				mNotification.flags ^= Notification.FLAG_ONLY_ALERT_ONCE;
 			}
-
-			if(notificationItems < settings.getLastNotificationCount())
+			
+			if(!forceUpdate && notificationItems < settings.getLastNotificationCount())
 				mNotification.defaults ^= Notification.DEFAULT_ALL;
-
+	
 			notificationMgr.notify(R.id.notification, mNotification);
 			settings.setLastNotificationCount(notificationItems);
 		}

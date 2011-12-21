@@ -172,30 +172,24 @@
 		</PreferenceCategory>
 	</PreferenceScreen>
 	
-	<!-- 
+	
 	
 	<PreferenceScreen android:key="prefscreen_debug"
 		android:title="Debugging options">
-		
-		<Preference android:key="debug_show_intake_dialog"
-			android:title="Show intake dialog"
-		/>
-		
-		<CheckBoxPreference android:key="debug_enabled"
-			android:title="Enable debugging mode"
+				
+		<CheckBoxPreference android:key="debug_logv"
+			android:title="Debug loglevel"
+			android:summary="Enables more verbose logging for debugging purposes"	
 			android:defaultValue="false" 
 		/>
-			
-		<CheckBoxPreference android:key="debug_fake_dosetimes"
-			android:title="Fake doseTimes"
-			android:summary="Switch doseTimes every minute"
-			android:defaultValue="false"
-			android:dependency="debug_enabled" 
-		/>	
+		
+		<CheckBoxPreference android:key="debug_snooze_time_short"
+			android:title="Short snooze time"
+			android:summary="Set snooze time to 10 seconds"			
+			android:defaultValue="false" 
+		/>
 	
 	</PreferenceScreen>
-	
-	 -->
 	
 	<Preference android:key="version"
 		android:title="@string/_title_version"

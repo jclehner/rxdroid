@@ -44,7 +44,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	private static final int MENU_RESTORE_DEFAULTS = 0;
 
 	private static final String PREF_LOW_SUPPLY_THRESHOLD = "num_min_supply_days";
-	
+		
 	SharedPreferences mSharedPreferences;
 
 	@Override
