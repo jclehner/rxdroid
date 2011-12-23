@@ -45,6 +45,8 @@ public class NotificationReceiver extends BroadcastReceiver
 {
 	private static final String TAG = NotificationReceiver.class.getName();
 
+	private static final boolean LOGV = true;
+	
 	static final String EXTRA_BE_QUIET = "be_quiet";
 	static final String EXTRA_SNOOZE = "snooze";
 	
@@ -67,8 +69,6 @@ public class NotificationReceiver extends BroadcastReceiver
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
-		Log.d(TAG, "onReceive(" + context + ", " + intent + ")");
-
 		GlobalContext.set(context.getApplicationContext());
 		Database.load();
 
