@@ -103,6 +103,8 @@ public class FractionPreference extends DialogPreference implements FractionInpu
 	@Override
 	public void onFractionSet(FractionInputDialog2 dialog, Fraction value)
 	{
+		mValue = value;
+		
 		boolean canPersist = callChangeListener(mValue);
 		if(canPersist && shouldPersist())
 			persistString(mValue.toString());
@@ -123,6 +125,7 @@ public class FractionPreference extends DialogPreference implements FractionInpu
 		
 		mDialog.setTitle(getDialogTitle());
 		mDialog.setIcon(android.R.drawable.ic_dialog_dialer);
+		mDialog.setOnFractionSetListener(this);
 		mDialog.setOnDismissListener(new OnDismissListener() {
 			
 			@Override
