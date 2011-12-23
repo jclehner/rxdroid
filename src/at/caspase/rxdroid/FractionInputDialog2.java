@@ -46,9 +46,8 @@ public class FractionInputDialog2 extends AlertDialog implements OnClickListener
 
 		mInput = new FractionInput(context, null);
 		mInput.setOnChangeListener(this);
-		mInput.setValue(value);
-
-		mValue = value;
+		
+		setValue(value);
 
 		setButton(BUTTON_POSITIVE, context.getString(android.R.string.ok), this);
 		setButton(BUTTON_NEGATIVE, context.getString(android.R.string.cancel),
@@ -56,6 +55,16 @@ public class FractionInputDialog2 extends AlertDialog implements OnClickListener
 
 		setView(mInput);
 		setIcon(android.R.drawable.ic_dialog_dialer);
+	}
+	
+	public void setValue(Fraction value)
+	{
+		mInput.setValue(value);
+		mValue = value;
+	}
+	
+	public Fraction getValue() {
+		return new Fraction(mValue);
 	}
 
 	public void setOnFractionSetListener(OnFractionSetListener listener) {
@@ -78,7 +87,7 @@ public class FractionInputDialog2 extends AlertDialog implements OnClickListener
 	}
 
 	@Override
-	public void onChanged(FractionInput widget, Fraction oldValue)
+	public void onFractionChanged(FractionInput widget, Fraction oldValue)
 	{
 		mValue = widget.getValue();
 		Log.d(TAG, "onChanged: value=" + mValue);

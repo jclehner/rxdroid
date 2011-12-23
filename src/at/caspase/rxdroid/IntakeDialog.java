@@ -155,7 +155,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	}
 
 	@Override
-	public void onChanged(FractionInput widget, Fraction oldValue)
+	public void onFractionChanged(FractionInput widget, Fraction oldValue)
 	{
 		mDose = widget.getValue();
 		getButton(BUTTON_POSITIVE).setEnabled(!mDose.isZero());

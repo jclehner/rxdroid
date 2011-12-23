@@ -6,5 +6,6 @@
 	<item type="id" name="notification"/>
 	<item type="id" name="notification_intake_pending"/>
 	<item type="id" name="notification_intake_forgotten"/>
-	<item type="id" name="notification_low_supplies"/>
+	<item type="id" name="notification_low_supplies"/>	
+	<item type="id" name="fraction_pref_input"/>
 </resources>

@@ -28,6 +28,7 @@ import android.view.View.OnClickListener;
 import at.caspase.rxdroid.DoseView;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.util.CollectionUtils;
 
 public class DosePreference extends FractionPreference implements OnClickListener
 {
@@ -43,9 +44,7 @@ public class DosePreference extends FractionPreference implements OnClickListene
 		super(context, attrs);
 
 		mDoseTime = getDoseTimeFromKey(getKey());
-
-		//final int[] doseTimeIcons = { R.drawable.ic_morning, R.drawable.ic_noon, R.drawable.ic_evening, R.drawable.ic_night };
-		//setDialogIcon(doseTimeIcons[mDoseTime]);
+		
 		setDialogIcon(android.R.drawable.ic_dialog_dialer);
 		setDialogTitle(getTitle());
 
@@ -65,24 +64,14 @@ public class DosePreference extends FractionPreference implements OnClickListene
 
 	@Override
 	public void onClick(View v) {
-		onPreferenceClick(this);
+		onClick();
 	}
 
 	public static int getDoseTimeFromKey(String key)
 	{
 		final String[] keys = { "morning", "noon", "evening", "night" };
-		//mDoseTime = Arrays.binarySearch(keys, 0, keys.length, getKey());
-
-		int doseTime = -1;
-
-		for(int i = 0; i != keys.length; ++i)
-		{
-			if(keys[i].equals(key))
-			{
-				doseTime = i;
-				break;
-			}
-		}
+		
+		int doseTime = CollectionUtils.indexOf(key, keys);
 
 		if(doseTime == -1)
 			throw new IllegalStateException("Illegal key '" + key + "' for DosePreference. Valid keys: morning, noon, evening, night");

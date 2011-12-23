@@ -48,7 +48,7 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 {
 	public interface OnChangedListener
 	{
-		public void onChanged(FractionInput widget, Fraction oldValue);
+		public void onFractionChanged(FractionInput widget, Fraction oldValue);
 	}
 
 	private static final String TAG = FractionInput.class.getName();
@@ -193,7 +193,7 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 			return;
 
 		if(mListener != null)
-			mListener.onChanged(this, oldValue);
+			mListener.onFractionChanged(this, oldValue);
 
 		/*if(mFractionInputMode != MODE_INTEGER)
 		{

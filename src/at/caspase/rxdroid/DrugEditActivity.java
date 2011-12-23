@@ -343,8 +343,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		for(DosePreference dosePref : mDosePrefs)
 			dosePref.setDrug(mDrug);
 
-		mCurrentSupply.setLongClickSummand(new Fraction(mDrug.getRefillSize()));
-
 		updatePreferences();
 	}
 
@@ -429,6 +427,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mRefillSize.setSummary(refillSizeStr);
 			mRefillSize.setText(refillSizeStr);
 		}
+		
+		mCurrentSupply.setLongClickSummand(new Fraction(mDrug.getRefillSize()));
 
 
 		// active?

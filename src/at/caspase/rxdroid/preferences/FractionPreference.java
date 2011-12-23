@@ -21,15 +21,21 @@
 
 package at.caspase.rxdroid.preferences;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.res.TypedArray;
-import android.preference.Preference;
-import android.preference.Preference.OnPreferenceClickListener;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.util.Log;
 import at.caspase.rxdroid.Fraction;
+import at.caspase.rxdroid.FractionInput;
 import at.caspase.rxdroid.FractionInputDialog2;
-import at.caspase.rxdroid.FractionInputDialog2.OnFractionSetListener;
+import at.caspase.rxdroid.R;
 
 /**
  * A preference for storing fractions.
@@ -37,18 +43,16 @@ import at.caspase.rxdroid.FractionInputDialog2.OnFractionSetListener;
  * @author Joseph Lehner
  *
  */
-public class FractionPreference extends Preference implements OnPreferenceClickListener, OnFractionSetListener
+public class FractionPreference extends DialogPreference implements FractionInputDialog2.OnFractionSetListener
 {
 	private static final String TAG = FractionPreference.class.getName();
 
 	private Fraction mValue;
 	private Fraction mLongClickSummand;
-
-	private CharSequence mSummary;
-
-	private CharSequence mDialogTitle;
-	private int mDialogIcon = -1;
-
+	private boolean mIsShowingDialog = false;
+	
+	FractionInputDialog2 mDialog;
+	
 	public FractionPreference(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
@@ -58,70 +62,82 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 		super(context, attrs, defStyle);
 
 		mValue = Fraction.decode(getPersistedString("0"));
-		setOnPreferenceClickListener(this);
 	}
 
-	public void setValue(Fraction value) {
+	public void setValue(Fraction value) 
+	{
 		mValue = value;
+		
+		if(super.getSummary() == null)
+			setSummary(value.toString());
 	}
 
 	public Fraction getValue() {
 		return mValue;
 	}
 
-	public void setDialogTitle(CharSequence title) {
-		mDialogTitle = title;
-	}
-
-	public void setDialogIcon(int resId) {
-		mDialogIcon = resId;
-	}
-
 	public void setLongClickSummand(Fraction value) {
 		mLongClickSummand = value;
 	}
-
-	@Override
-	public void setSummary(CharSequence summary) {
-		mSummary = summary;
-	}
-
+	
 	@Override
 	public CharSequence getSummary()
 	{
-		if(mSummary == null)
+		CharSequence summary = super.getSummary();
+		if(summary == null)
 			return mValue.toString();
-		return mSummary;
+		
+		return summary;
 	}
-
+	
 	@Override
-	public boolean onPreferenceClick(Preference preference)
+	public void onClick(DialogInterface dialog, int which)
 	{
-		FractionInputDialog2 dialog = new FractionInputDialog2(getContext(), mValue, this);
-		dialog.setTitle(mDialogTitle != null ? mDialogTitle : getTitle());
-		dialog.setOnFractionSetListener(this);
-		//dialog.setLongClickSummand(mLongClickSummand);
-
-		if(mDialogIcon != -1)
-			dialog.setIcon(mDialogIcon);
-
-		dialog.show();
-		return true;
+		if(which == DialogInterface.BUTTON_NEUTRAL)
+		{
+			FractionInputDialog2 myDialog = (FractionInputDialog2) dialog;
+			onFractionSet(myDialog, myDialog.getValue().add(mLongClickSummand));
+		}
 	}
-
+	
 	@Override
 	public void onFractionSet(FractionInputDialog2 dialog, Fraction value)
 	{
-		boolean canPersist = callChangeListener(value);
-
-		Log.d(TAG, "onFractionSet: value=" + value);
-		
+		boolean canPersist = callChangeListener(mValue);
 		if(canPersist && shouldPersist())
-			persistString(value.toString());
-
-		mValue = value;
-		setSummary(mValue.toString());
-		notifyChanged();
+			persistString(mValue.toString());
+		
+		notifyChanged();		
+	}
+	
+	@Override
+	protected void showDialog(Bundle state)
+	{
+		mIsShowingDialog = true;
+		
+		mDialog = new FractionInputDialog2(getContext(), mValue, this);
+		
+		String middleButtonText = getMiddleButtonText();
+		if(middleButtonText != null)		
+			mDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getMiddleButtonText(), this);
+		
+		mDialog.setTitle(getDialogTitle());
+		mDialog.setIcon(android.R.drawable.ic_dialog_dialer);
+		mDialog.setOnDismissListener(new OnDismissListener() {
+			
+			@Override
+			public void onDismiss(DialogInterface dialog)
+			{
+				mIsShowingDialog = false;
+			}
+		});
+		
+		mDialog.show();
+	}
+	
+	@Override
+	protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
+		// do nothing
 	}
 
 	@Override
@@ -130,5 +146,85 @@ public class FractionPreference extends Preference implements OnPreferenceClickL
 		String value = a.getString(index);
 		Log.d(TAG, "onGetDefaultValue: value=" + value);
 		return value != null ? value : "0";
+	}
+	
+	@Override
+	protected Parcelable onSaveInstanceState()
+	{		
+		Parcelable superState = super.onSaveInstanceState();
+		
+		SavedState myState = new SavedState(superState);
+		myState.longClickSummand = mLongClickSummand;
+		myState.value = mDialog != null ? mDialog.getValue() : mValue;
+		myState.isShowingDialog = mIsShowingDialog ? 1 : 0;
+		
+		return myState;
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Parcelable state)
+	{		
+		if(!(state instanceof SavedState))
+			super.onRestoreInstanceState(state);
+		else
+		{
+			SavedState myState = (SavedState) state;			
+			super.onRestoreInstanceState(myState.getSuperState());
+			
+			setLongClickSummand(myState.longClickSummand);
+			setValue(myState.value);
+			if(myState.isShowingDialog == 1)
+				showDialog(null);
+		}	
+	}
+	
+	private String getMiddleButtonText()
+	{
+		if(mLongClickSummand != null && !mLongClickSummand.isZero())		
+			return mLongClickSummand.isNegative() ? "" : "+" + mLongClickSummand;
+				
+		return null;
+	}
+	
+	private static class SavedState extends BaseSavedState
+	{
+		Fraction value;
+		Fraction longClickSummand;
+		int isShowingDialog;
+		
+		public SavedState(Parcel parcel) 
+		{
+			super(parcel);
+			value = (Fraction) parcel.readSerializable();
+			longClickSummand = (Fraction) parcel.readSerializable();
+			isShowingDialog = parcel.readInt();
+		}
+		
+		@Override
+		public void writeToParcel(Parcel dest, int flags) 
+		{
+			super.writeToParcel(dest, flags);
+			dest.writeSerializable(value);
+			dest.writeSerializable(longClickSummand);
+			dest.writeInt(isShowingDialog);
+		}
+
+		public SavedState(Parcelable superState) {
+			super(superState);
+		}
+
+		@SuppressWarnings("unused")
+		public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+            
+			public SavedState createFromParcel(Parcel in) 
+            {
+                return new SavedState(in);
+            }
+
+            public SavedState[] newArray(int size) 
+            {
+                return new SavedState[size];
+            }
+        };
 	}
 }
