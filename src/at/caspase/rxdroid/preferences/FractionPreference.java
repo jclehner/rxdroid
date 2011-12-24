@@ -159,10 +159,8 @@ public class FractionPreference extends DialogPreference implements
 	@Override
 	protected Parcelable onSaveInstanceState()
 	{
-		//mDialogBundle = mDialog.onSaveInstanceState();
-		
 		Parcelable superState = super.onSaveInstanceState();		
-		return StateSaver.saveState(this, superState);
+		return StateSaver.saveState(this, superState, null);
 	}
 	
 	@Override
