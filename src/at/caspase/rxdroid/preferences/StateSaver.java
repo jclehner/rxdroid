@@ -34,8 +34,7 @@ public final class StateSaver
 	 * @author Joseph Lehner
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
-	public @interface SaveState {};
-	
+	public @interface SaveState {};	
 	
 	/**
 	 * Creates a Parcelable with the given Preference's state.
@@ -48,7 +47,7 @@ public final class StateSaver
 	 * @param extras Any additional data, can be <code>null</code>.
 	 * @return
 	 */
-	public static Parcelable saveState(Preference pref, Parcelable superState, Bundle extras)
+	public static Parcelable createInstanceState(Preference pref, Parcelable superState, Bundle extras)
 	{
 		final SavedState myState = new SavedState(superState);
 		
@@ -94,7 +93,7 @@ public final class StateSaver
 		return null;
 	}
 	
-	public static void restoreState(Preference pref, Parcelable state)
+	public static void restoreInstanceState(Preference pref, Parcelable state)
 	{
 		if(LOGV) Log.d(TAG, "restoreState: key=" + pref.getKey());
 		
@@ -160,13 +159,15 @@ public final class StateSaver
 			super(parcel);
 			
 			values = (HashMap<String, Object>) parcel.readSerializable();
+			extras = parcel.readBundle();
 		}
 		
 		@Override
 		public void writeToParcel(Parcel dest, int flags) 
 		{
 			super.writeToParcel(dest, flags);
-			dest.writeSerializable(values);			
+			dest.writeSerializable(values);
+			dest.writeBundle(extras);
 		}
 
 		public SavedState(Parcelable superState) {

@@ -160,14 +160,14 @@ public class FractionPreference extends DialogPreference implements
 	protected Parcelable onSaveInstanceState()
 	{
 		Parcelable superState = super.onSaveInstanceState();		
-		return StateSaver.saveState(this, superState, null);
+		return StateSaver.createInstanceState(this, superState, null);
 	}
 	
 	@Override
 	protected void onRestoreInstanceState(Parcelable state)
 	{
 		super.onRestoreInstanceState(StateSaver.getSuperState(state));		
-		StateSaver.restoreState(this, state);
+		StateSaver.restoreInstanceState(this, state);
 		
 		if(mIsShowingDialog)
 			showDialog(null);
