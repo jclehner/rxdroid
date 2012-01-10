@@ -22,8 +22,7 @@
 package at.caspase.rxdroid;
 
 import android.content.Context;
-import android.graphics.LinearGradient;
-import android.graphics.drawable.Drawable;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -31,9 +30,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import at.caspase.androidutils.StateSaver;
+import at.caspase.androidutils.StateSaver.SaveState;
 
 import com.quietlycoding.android.picker.NumberPicker;
 
@@ -68,11 +68,16 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	private TextView mFractionBar;
 	private Button mModeSwitcher;
 
+	@SaveState
 	private int mInteger = 0;
+	@SaveState
 	private int mNumerator = 0;
+	@SaveState
 	private int mDenominator = 1;
-
+	
+	@SaveState
 	private int mFractionInputMode = MODE_INVALID;
+	@SaveState
 	private boolean mIsAutoInputModeEnabled = false;
 
 	private OnChangedListener mListener;
@@ -123,13 +128,17 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 				mode = MODE_MIXED;
 			else
 				mode = MODE_FRACTION;
-				
+			
+			if(LOGV) Log.v(TAG, "setValue: mode " + mFractionInputMode + " -> " + mode + " (auto)");
+			
 			if(mode != mFractionInputMode)
 			{
-				if(LOGV) Log.v(TAG, "mFractionInputMode: " + mFractionInputMode + " -> " + mode + " (auto)");
+				if(LOGV) Log.v(TAG, "setValue: mode " + mFractionInputMode + " -> " + mode + " (auto)");
 				mFractionInputMode = mode;		
 			}
 		}
+		else
+			if(LOGV) Log.v(TAG, "setValue: mode=" + mFractionInputMode);
 		
 		// for MODE_INTEGER and MODE_MIXED get the value as a mixed number
 		int data[] = value.getFractionData(mFractionInputMode != MODE_FRACTION);
@@ -197,8 +206,11 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	 * 
 	 * @param enabled
 	 */
-	public void setAutoInputModeEnabled(boolean enabled) {
+	public void setAutoInputModeEnabled(boolean enabled) 
+	{
 		mIsAutoInputModeEnabled = enabled;
+		if(enabled)
+			setValue(getValue());
 	}
 	
 	public boolean isAutoInputModeEnabled(boolean enabled) {
@@ -245,6 +257,23 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 				setFractionInputMode(MODE_FRACTION);
 		}
 	}
+	
+	@Override
+	protected Parcelable onSaveInstanceState()
+	{		
+		Parcelable superState = super.onSaveInstanceState();
+		return StateSaver.createInstanceState(this, superState, null);		
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Parcelable state)
+	{
+		Parcelable superState = StateSaver.getSuperState(state);
+		super.onRestoreInstanceState(superState);
+		StateSaver.restoreInstanceState(this, state);
+		
+		updateView();		
+	}	
 
 	private void updateView()
 	{

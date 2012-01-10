@@ -464,7 +464,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
 			{
 				mDrug.setRepeat(Drug.REPEAT_EVERY_N_DAYS);
-				mDrug.setRepeatOrigin(DateTime.date(year, monthOfYear, dayOfMonth).getTime());
+				mDrug.setRepeatOrigin(DateTime.date(year, monthOfYear, dayOfMonth));
 				mDrug.setRepeatArg(Long.valueOf(editText.getText().toString()));
 				updatePreferences();
 			}

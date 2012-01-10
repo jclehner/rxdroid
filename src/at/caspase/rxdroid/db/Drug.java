@@ -265,7 +265,7 @@ public class Drug extends Entry
 
 	public int getCurrentSupplyDays()
 	{
-		final Calendar today = DateTime.today();
+		final Date today = DateTime.today().getTime();
 
 		double dailyDose = 0.0;
 		for(Fraction dose : getSchedule())

@@ -134,7 +134,7 @@ public class PreferencesTest extends AndroidTestCase
 		//      java.util.Calendar's October is 9 (January is 0)
 		//                                     |
 		//                                     v
-		Calendar date = DateTime.date(2011, 10 - 1, 30); // DST ends on this day in CEST
+		Calendar date = DateTime.calendar(2011, 10 - 1, 30); // DST ends on this day in CEST
 		date.setTimeZone(tzCet);
 
 		testTimeOffsets(date, testCases);
@@ -215,7 +215,7 @@ public class PreferencesTest extends AndroidTestCase
 			final Calendar expected = (Calendar) today.clone();
 			expected.add(Calendar.DAY_OF_MONTH, testCases[i][2]);
 
-			assertEquals(expected, Settings.instance().getActiveDate(time));
+			assertEquals(expected.getTime(), Settings.instance().getActiveDate(time));
 		}
 
 	}

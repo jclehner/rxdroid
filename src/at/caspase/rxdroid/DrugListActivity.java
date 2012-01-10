@@ -24,6 +24,8 @@ package at.caspase.rxdroid;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.Activity;
@@ -96,7 +98,7 @@ public class DrugListActivity extends Activity implements
 	private GestureDetector mGestureDetector;
 	private TextView mTextDate;
 
-	private Calendar mDate;
+	private Date mDate;
 
 	private boolean mShowingAll = false;
 
@@ -246,7 +248,7 @@ public class DrugListActivity extends Activity implements
 				{
 					Fraction dose = new Fraction();
 
-					for(Intake intake : Database.findIntakes(drug, mDate, doseTime))
+					for(Intake intake : Intake.find(drug, mDate, doseTime))
 					{
 						dose.add(intake.getDose());
 						Database.delete(intake);
@@ -278,7 +280,7 @@ public class DrugListActivity extends Activity implements
 						@Override
 						public boolean onMenuItemClick(MenuItem item)
 						{
-							Database.create(new Intake(drug, mDate.getTime(), doseTime));
+							Database.create(new Intake(drug, mDate, doseTime));
 							return true;
 						}
 					}
@@ -324,9 +326,12 @@ public class DrugListActivity extends Activity implements
 	{
 		if(view.getId() == R.id.med_list_footer)
 		{
-			final int year = mDate.get(Calendar.YEAR);
-			final int month = mDate.get(Calendar.MONTH);
-			final int day = mDate.get(Calendar.DAY_OF_MONTH);
+			Calendar cal = GregorianCalendar.getInstance();
+			cal.setTime(mDate);
+			
+			final int year = cal.get(Calendar.YEAR);
+			final int month = cal.get(Calendar.MONTH);
+			final int day = cal.get(Calendar.DAY_OF_MONTH);
 
 			DatePickerDialog dialog = new DatePickerDialog(this, this, year, month, day);
 			dialog.show();
@@ -348,7 +353,7 @@ public class DrugListActivity extends Activity implements
 
 		final int doseTime = v.getDoseTime();
 
-		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, mDate.getTime());
+		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, mDate);
 		dialog.show();
 	}
 
@@ -427,7 +432,7 @@ public class DrugListActivity extends Activity implements
 		startService(serviceIntent);
 	}
 
-	private void setDate(Calendar newDate) {
+	private void setDate(Date newDate) {
 		setOrShiftDate(0, newDate);
 	}
 
@@ -438,7 +443,7 @@ public class DrugListActivity extends Activity implements
 	// shift to previous (-1) or next(1) date. passing 0
 	// will reset to specified date, or current date
 	// if newDate is -1
-	private void setOrShiftDate(int shiftBy, Calendar newDate)
+	private void setOrShiftDate(int shiftBy, Date newDate)
 	{
 		setProgressBarIndeterminateVisibility(true);
 
@@ -454,7 +459,7 @@ public class DrugListActivity extends Activity implements
 		}
 		else
 		{
-			mDate.add(Calendar.DAY_OF_MONTH, shiftBy);
+			mDate = DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy);
 
 			if(shiftBy == 1)
 			{
@@ -514,14 +519,14 @@ public class DrugListActivity extends Activity implements
 	{
 		private ArrayList<Drug> mAllItems;
 		private ArrayList<Drug> mItems;
-		private Calendar mAdapterDate;
+		private Date mAdapterDate;
 
-		public DrugAdapter(Context context, int viewResId, List<Drug> items, Calendar date)
+		public DrugAdapter(Context context, int viewResId, List<Drug> items, Date date)
 		{
 			super(context, viewResId, items);
 
 			mAllItems = new ArrayList<Drug>(items);
-			mAdapterDate = (Calendar) date.clone();
+			mAdapterDate = date;
 		}
 
 		public void setFilter(CollectionUtils.Filter<Drug> filter)
@@ -620,7 +625,7 @@ public class DrugListActivity extends Activity implements
 			if(!showDoseless && mDate != null)
 			{
 				if(!drug.hasDoseOnDate(mDate))
-					result = !Database.findIntakes(drug, mDate, null).isEmpty();
+					result = !Intake.find(drug, mDate, null).isEmpty();
 			}
 			
 			if(!showInactive && !drug.isActive())

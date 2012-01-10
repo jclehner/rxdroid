@@ -81,19 +81,23 @@ public final class DateTime
 	 * @param month The month (January is 0, December is 11!)
 	 * @param day The date
 	 */
-	public static Calendar date(int year, int month, int day)
+	public static Date date(int year, int month, int day) {
+		return calendar(year, month, day).getTime();
+	}
+	
+	public static Calendar calendar(int year, int month, int day)
 	{
-		final Calendar date = new GregorianCalendar();
-		date.set(Calendar.HOUR_OF_DAY, 0);
-		date.set(Calendar.MINUTE, 0);
-		date.set(Calendar.SECOND, 0);
-		date.set(Calendar.MILLISECOND, 0);
+		Calendar cal = new GregorianCalendar();
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
 
-		date.set(Calendar.YEAR, year);
-		date.set(Calendar.MONTH, month);
-		date.set(Calendar.DAY_OF_MONTH, day);
-
-		return date;
+		cal.set(Calendar.YEAR, year);
+		cal.set(Calendar.MONTH, month);
+		cal.set(Calendar.DAY_OF_MONTH, day);
+		
+		return cal;
 	}
 
 	public static java.sql.Date toSqlDate(Calendar cal)
@@ -156,5 +160,13 @@ public final class DateTime
 			return theTime.before(end) || theTime.compareTo(begin) != -1;
 
 		return theTime.compareTo(begin) != -1 && theTime.before(end);
+	}
+	
+	public static Date add(Date date, int field, int value)
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(field, value);
+		return cal.getTime();	
 	}
 }

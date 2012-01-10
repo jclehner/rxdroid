@@ -22,6 +22,7 @@
 package at.caspase.rxdroid;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import android.app.Notification;
 import android.content.Context;
@@ -199,22 +200,22 @@ public class Settings
 		return getTimePreference(KEY_PREFIXES[doseTime] + suffix);
 	}
 
-	public Calendar getActiveDate(Calendar time)
+	public Date getActiveDate(Calendar time)
 	{
-		final Calendar date = DateTime.getDatePart(time);
+		final Calendar cal = DateTime.getDatePart(time);
 		final int activeDoseTime = getActiveDoseTime(time);
 
 		if(activeDoseTime == Drug.TIME_NIGHT && hasWrappingDoseTimeNight())
 		{
 			final DumbTime end = new DumbTime(getDoseTimeEndOffset(Drug.TIME_NIGHT));
 			if(DateTime.isWithinRange(time, new DumbTime(0), end))
-				date.add(Calendar.DAY_OF_MONTH, -1);
+				cal.add(Calendar.DAY_OF_MONTH, -1);
 		}
 
-		return date;
+		return cal.getTime();
 	}
 
-	public Calendar getActiveDate() {
+	public Date getActiveDate() {
 		return getActiveDate(DateTime.now());
 	}
 

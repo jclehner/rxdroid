@@ -28,6 +28,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,6 @@ import android.content.Context;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.util.Constants;
-import at.caspase.rxdroid.util.DateTime;
 
 import com.j256.ormlite.dao.Dao;
 
@@ -233,39 +233,13 @@ public final class Database
 		return drug;
 	}
 
-	/**
-	 * Find all intakes meeting the specified criteria.
-	 * <p>
-	 * @param drug The drug to search for (based on its database ID).
-	 * @param date The Intake's date. Can be <code>null</code>.
-	 * @param doseTime The Intake's doseTime. Can be <code>null</code>.
-	 */
-	public static synchronized List<Intake> findIntakes(Drug drug, Calendar date, Integer doseTime)
-	{
-		final List<Intake> intakes = new LinkedList<Intake>();
-
-		for(Intake intake : getCachedIntakes())
-		{
-			if(intake.getDrugId() != drug.getId())
-				continue;
-			if(date != null && !intake.getDate().equals(DateTime.toSqlDate(date)))
-				continue;
-			if(doseTime != null && intake.getDoseTime() != doseTime)
-				continue;
-
-			intakes.add(intake);
-		}
-
-		return intakes;
-	}
-
-	public static synchronized List<Integer> getOpenIntakeDoseTimes(Drug drug, Calendar date)
+	public static synchronized List<Integer> getOpenIntakeDoseTimes(Drug drug, Date date)
 	{
 		final LinkedList<Integer> openIntakeDoseTimes = new LinkedList<Integer>(Arrays.asList(Constants.DOSE_TIMES));
 
 		for(int doseTime = Drug.TIME_MORNING; doseTime != Drug.TIME_INVALID; ++doseTime)
 		{
-			if(!findIntakes(drug, date, doseTime).isEmpty())
+			if(!Intake.find(drug, date, doseTime).isEmpty())
 				openIntakeDoseTimes.remove(openIntakeDoseTimes.indexOf(doseTime));
 		}
 
@@ -299,7 +273,7 @@ public final class Database
 	 * Gets the cached intakes.
 	 * @return a reference to the <em>actual</em> cache. Use {@link #getIntakes()} to get a copy of the cache.
 	 */
-	private static synchronized List<Intake> getCachedIntakes()
+	static synchronized List<Intake> getCachedIntakes()
 	{
 		if(sIntakeCache == null)
 		{

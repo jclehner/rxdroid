@@ -47,6 +47,8 @@ public class NotificationService extends Service implements OnChangedListener, O
 	@Override
 	public void onEntryCreated(Entry entry, int flags)
 	{
+		Log.d(TAG, "onEntryCreated: entry=(" + entry.getClass().getSimpleName() + ") " + entry);		
+		
 		if(entry instanceof Intake)
 		{
 			Handler handler = new Handler();

@@ -23,21 +23,20 @@ package at.caspase.rxdroid;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import android.app.AlarmManager;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
@@ -121,11 +120,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		else
 			ignorePendingIntakes = false;
 
-		Calendar date = mSettings.getActiveDate(now);
+		Date date = mSettings.getActiveDate(now);
 		updateNotifications(date, doseTime, ignorePendingIntakes, mSnoozeType == SNOOZE_REPEAT);
 	}
 
-	private void updateNotifications(Calendar date, int doseTime, boolean ignorePendingIntakes, boolean forceUpdate)
+	private void updateNotifications(Date date, int doseTime, boolean ignorePendingIntakes, boolean forceUpdate)
 	{
 		int pendingIntakes = ignorePendingIntakes ? 0 : countOpenIntakes(date, doseTime);
 		int forgottenIntakes = countForgottenIntakes(date, doseTime);
@@ -182,7 +181,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		return PendingIntent.getBroadcast(mContext, 0, intent, 0);
 	}
 
-	private static int countOpenIntakes(Calendar date, int doseTime)
+	private static int countOpenIntakes(Date date, int doseTime)
 	{
 		int count = 0;
 
@@ -193,7 +192,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(!drug.isActive() || dose.equals(0) || !drug.hasDoseOnDate(date))
 				continue;
 
-			if(Database.findIntakes(drug, date, doseTime).isEmpty())
+			if(Intake.find(drug, date, doseTime).isEmpty())
 				++count;
 		}
 
@@ -201,7 +200,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	}
 
-	private static int countForgottenIntakes(Calendar date, int activeOrNextDoseTime)
+	private static int countForgottenIntakes(Date date, int activeOrNextDoseTime)
 	{
 		int count = 0;
 
@@ -211,7 +210,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		return count;
 	}
 
-	private String getLowSupplyMessage(Calendar date, int activeDoseTime)
+	private String getLowSupplyMessage(Date date, int activeDoseTime)
 	{
 		final List<Drug> drugsWithLowSupply = new ArrayList<Drug>();
 		final int minDays = Integer.parseInt(mSharedPrefs.getString("num_min_supply_days", "7"), 10);

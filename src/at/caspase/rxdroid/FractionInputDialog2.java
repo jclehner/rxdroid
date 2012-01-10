@@ -46,6 +46,7 @@ public class FractionInputDialog2 extends AlertDialog implements OnClickListener
 
 		mInput = new FractionInput(context, null);
 		mInput.setOnChangeListener(this);
+		mListener = listener;
 		
 		setValue(value);
 
@@ -65,6 +66,14 @@ public class FractionInputDialog2 extends AlertDialog implements OnClickListener
 	
 	public Fraction getValue() {
 		return new Fraction(mValue);
+	}
+	
+	public void setFractionInputMode(int mode) {
+		mInput.setFractionInputMode(mode);
+	}
+	
+	public void setAutoInputModeEnabled(boolean enabled) {
+		mInput.setAutoInputModeEnabled(enabled);
 	}
 
 	public void setOnFractionSetListener(OnFractionSetListener listener) {

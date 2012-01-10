@@ -22,6 +22,7 @@
 package at.caspase.rxdroid;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
@@ -65,7 +66,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 
 	private Drug mDrug;
 	private int mDoseTime = -1;
-	private Calendar mDate;
+	private Date mDate;
 
 	// this value is updated by a call to countIntakes()
 	private Fraction mCumulativeDose = new Fraction();
@@ -138,11 +139,11 @@ public class DoseView extends FrameLayout implements OnChangedListener
 		setInfo(mDate, drug);
 	}
 
-	public void setDate(Calendar date) {
+	public void setDate(Date date) {
 		setInfo(date, mDrug);
 	}
 
-	public Calendar getDate() {
+	public Date getDate() {
 		return mDate;
 	}
 
@@ -166,7 +167,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 		mDoseText.addTextChangedListener(watcher);
 	}
 
-	public void setInfo(Calendar date, Drug drug)
+	public void setInfo(Date date, Drug drug)
 	{
 		final boolean doUpdateView;
 
@@ -194,7 +195,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			updateView();
 	}
 
-	public boolean hasInfo(Calendar date, Drug drug)
+	public boolean hasInfo(Date date, Drug drug)
 	{
 		if(mDate == null || !mDate.equals(date))
 			return false;
@@ -298,7 +299,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			return false;
 		else if(intake.getDoseTime() != mDoseTime)
 			return false;
-		else if(intake.getDate().getTime() != mDate.getTimeInMillis())
+		else if(!intake.getDate().equals(mDate))
 			return false;
 
 		return true;
@@ -407,7 +408,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 		if(mDate == null || mDrug == null)
 			throw new IllegalStateException("Cannot obtain intake data from DoseView with unset date and/or drug");
 
-		List<Intake> intakes = Database.findIntakes(mDrug, mDate, mDoseTime);
+		List<Intake> intakes = Intake.find(mDrug, mDate, mDoseTime);
 
 		mCumulativeDose = new Fraction();
 

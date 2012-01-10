@@ -22,19 +22,20 @@
 package at.caspase.rxdroid.preferences;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.preference.DialogPreference;
-import android.preference.PreferenceManager.OnActivityDestroyListener;
 import android.util.AttributeSet;
 import android.util.Log;
+import at.caspase.androidutils.MyDialogPreference;
+import at.caspase.androidutils.StateSaver;
+import at.caspase.androidutils.StateSaver.SaveState;
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.FractionInputDialog2;
-import at.caspase.rxdroid.preferences.StateSaver.SaveState;
+import at.caspase.rxdroid.FractionInputDialog2.OnFractionSetListener;
 
 /**
  * A preference for storing fractions.
@@ -42,17 +43,15 @@ import at.caspase.rxdroid.preferences.StateSaver.SaveState;
  * @author Joseph Lehner
  *
  */
-public class FractionPreference extends DialogPreference implements 
-		FractionInputDialog2.OnFractionSetListener, OnActivityDestroyListener, OnDismissListener
+public class FractionPreference extends MyDialogPreference implements OnFractionSetListener
 {
-	private static final String TAG = FractionPreference.class.getName();
-
-	@SaveState
+	private static final String TAG = FractionPreference.class.getName();	
+	
+	private static final String KEY_VALUE = "value";
+	
 	Fraction mValue;
 	@SaveState
 	Fraction mLongClickSummand;
-	@SaveState
-	boolean mIsShowingDialog = false;
 		
 	//FractionInputDialog2 mDialog;
 	
@@ -62,8 +61,7 @@ public class FractionPreference extends DialogPreference implements
 
 	public FractionPreference(Context context, AttributeSet attrs, int defStyle)
 	{
-		super(context, attrs, defStyle);
-
+		super(context, attrs, defStyle);		
 		mValue = Fraction.decode(getPersistedString("0"));
 	}
 
@@ -116,31 +114,13 @@ public class FractionPreference extends DialogPreference implements
 	}
 	
 	@Override
-	protected void showDialog(Bundle state)
+	protected Dialog onGetCustomDialog()
 	{
-		mIsShowingDialog = true;
-		
-		// XXX
-		FractionInputDialog2 mDialog = new FractionInputDialog2(getContext(), mValue, this);
-		
-		String middleButtonText = getMiddleButtonText();
-		if(middleButtonText != null)		
-			mDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getMiddleButtonText(), this);
-		
-		mDialog.setTitle(getDialogTitle());
-		mDialog.setIcon(android.R.drawable.ic_dialog_dialer);
-		mDialog.setOnFractionSetListener(this);
-		mDialog.setOnDismissListener(this);
-		/*mDialog.setOnDismissListener(new OnDismissListener() {
-			
-			@Override
-			public void onDismiss(DialogInterface dialog)
-			{
-				mIsShowingDialog = false;
-			}
-		});*/
-		
-		mDialog.show();
+		FractionInputDialog2 dialog = new FractionInputDialog2(getContext(), mValue, this);
+		dialog.setTitle(getDialogTitle());
+		dialog.setIcon(android.R.drawable.ic_dialog_dialer);
+		dialog.setAutoInputModeEnabled(true);
+		return dialog;
 	}
 	
 	@Override
@@ -159,25 +139,33 @@ public class FractionPreference extends DialogPreference implements
 	@Override
 	protected Parcelable onSaveInstanceState()
 	{
-		Parcelable superState = super.onSaveInstanceState();		
-		return StateSaver.createInstanceState(this, superState, null);
+		Bundle extras = new Bundle();
+		FractionInputDialog2 dialog = (FractionInputDialog2) getDialog();
+		final Fraction value;
+		
+		if(dialog != null)
+			value = dialog.getValue();		
+		else
+			value = mValue;
+		
+		extras.putSerializable(KEY_VALUE, value);		
+		Parcelable superState = super.onSaveInstanceState();			
+		return StateSaver.createInstanceState(this, superState, extras);
 	}
 	
 	@Override
 	protected void onRestoreInstanceState(Parcelable state)
 	{
-		super.onRestoreInstanceState(StateSaver.getSuperState(state));		
 		StateSaver.restoreInstanceState(this, state);
 		
-		if(mIsShowingDialog)
-			showDialog(null);
-	}
-	
-	private String getMiddleButtonText()
-	{
-		if(mLongClickSummand != null && !mLongClickSummand.isZero())		
-			return mLongClickSummand.isNegative() ? "" : "+" + mLongClickSummand;
-				
-		return null;
+		Bundle extras = StateSaver.getExtras(state);
+		if(extras != null)
+		{
+			mValue = (Fraction) extras.getSerializable(KEY_VALUE);
+			if(mValue == null)
+				mValue = new Fraction();
+		}
+		
+		super.onRestoreInstanceState(StateSaver.getSuperState(state));		
 	}
 }

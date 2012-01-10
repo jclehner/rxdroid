@@ -22,9 +22,13 @@
 package at.caspase.rxdroid.db;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import at.caspase.rxdroid.Fraction;
+import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
 
 import com.j256.ormlite.field.DataType;
@@ -152,5 +156,31 @@ public class Intake extends Entry
 	@Override
 	public String toString() {
 		return drug + ": date=" + date + ", doseTime=" + doseTime + ", dose=" + dose;
+	}
+
+	/**
+	 * Find all intakes meeting the specified criteria.
+	 * <p>
+	 * @param drug The drug to search for (based on its database ID).
+	 * @param date The Intake's date. Can be <code>null</code>.
+	 * @param doseTime The Intake's doseTime. Can be <code>null</code>.
+	 */
+	public static synchronized List<Intake> find(Drug drug, Date date, Integer doseTime)
+	{
+		final List<Intake> intakes = new LinkedList<Intake>();
+	
+		for(Intake intake : Database.getCachedIntakes())
+		{
+			if(intake.getDrugId() != drug.getId())
+				continue;
+			if(date != null && !intake.getDate().equals(date))
+				continue;
+			if(doseTime != null && intake.getDoseTime() != doseTime)
+				continue;
+	
+			intakes.add(intake);
+		}
+	
+		return intakes;
 	}
 }
