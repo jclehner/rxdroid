@@ -22,6 +22,7 @@
 package at.caspase.rxdroid;
 
 import android.content.Context;
+import android.graphics.LinearGradient;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -53,6 +54,8 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 
 	private static final String TAG = FractionInput.class.getName();
 	private static final int MAX = 99999;
+	
+	private static final boolean LOGV = true;
 
 	public static final int MODE_INTEGER = 1;
 	public static final int MODE_MIXED = 2;
@@ -70,6 +73,7 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	private int mDenominator = 1;
 
 	private int mFractionInputMode = MODE_INVALID;
+	private boolean mIsAutoInputModeEnabled = false;
 
 	private OnChangedListener mListener;
 
@@ -109,6 +113,24 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 
 	public void setValue(Fraction value)
 	{
+		if(mIsAutoInputModeEnabled)
+		{
+			final int mode;
+			
+			if(value.isInteger())
+				mode = MODE_INTEGER;
+			else if(Double.compare(value.doubleValue(), 1.0) == 1)
+				mode = MODE_MIXED;
+			else
+				mode = MODE_FRACTION;
+				
+			if(mode != mFractionInputMode)
+			{
+				if(LOGV) Log.v(TAG, "mFractionInputMode: " + mFractionInputMode + " -> " + mode + " (auto)");
+				mFractionInputMode = mode;		
+			}
+		}
+		
 		// for MODE_INTEGER and MODE_MIXED get the value as a mixed number
 		int data[] = value.getFractionData(mFractionInputMode != MODE_FRACTION);
 
@@ -130,6 +152,9 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	 * determines which number picker widgets are visible. Note that a call to
 	 * <code>setMode(MODE_INTEGER)</code> is ignored if the widget's underlying value
 	 * cannot be converted to an integer.
+	 * <p>
+	 * Note that automatic fraction intput mode guessing (see {@link #setAutoInputModeEnabled(boolean)})
+	 * will be disabled, if a call to this function succeeds (i.e. returns <code>true</code>).
 	 *
 	 * @param mode either MODE_INTEGER, MODE_FRACTION or MODE_MIXED
 	 * @return <code>false</code> if mode is MODE_INTEGER but the underlying value is
@@ -145,16 +170,12 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 		else if(mode == MODE_INVALID)
 			throw new IllegalArgumentException();
 
+		// an explicit request for a specific mode overrides the automatic setting
+		setAutoInputModeEnabled(false);
+		
 		if(mode != mFractionInputMode)
 		{
 			mFractionInputMode = mode;
-
-			//String modeSelectorText = (mode == MODE_INTEGER) ? "¾" : "1¾";
-			int modeSelectorVisibility = (mode == MODE_INTEGER) ? VISIBLE : GONE;
-
-			//mModeSwitcher.setText(modeSelectorText);
-			mModeSwitcher.setVisibility(modeSelectorVisibility);
-
 			setValue(getValue());
 		}
 
@@ -163,6 +184,25 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 
 	public int getFractionInputMode() {
 		return mFractionInputMode;
+	}
+	
+	/**
+	 * Enables automatic input mode setting.
+	 * <p>
+	 * If enabled, {@link #setValue(Fraction)} will try to guess the most
+	 * appropriate input mode for that value. 
+	 * <p>
+	 * Note that later calls to {@link #setFractionInputMode(int)} will override
+	 * this setting.  
+	 * 
+	 * @param enabled
+	 */
+	public void setAutoInputModeEnabled(boolean enabled) {
+		mIsAutoInputModeEnabled = enabled;
+	}
+	
+	public boolean isAutoInputModeEnabled(boolean enabled) {
+		return mIsAutoInputModeEnabled;
 	}
 
 	public OnChangedListener getOnChangeListener() {
@@ -194,14 +234,6 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 
 		if(mListener != null)
 			mListener.onFractionChanged(this, oldValue);
-
-		/*if(mFractionInputMode != MODE_INTEGER)
-		{
-			if(Math.abs(getValue().doubleValue()) < 1)
-				setFractionInputMode(MODE_FRACTION);
-			else
-				setFractionInputMode(MODE_MIXED);
-		}*/
 	}
 
 	@Override
@@ -224,6 +256,8 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 		mNumeratorPicker.setVisibility(mFractionInputMode == MODE_INTEGER ? GONE: VISIBLE);
 		mDenominatorPicker.setVisibility(mFractionInputMode == MODE_INTEGER ? GONE: VISIBLE);
 		mFractionBar.setVisibility(mFractionInputMode == MODE_INTEGER ? GONE: VISIBLE);
+		// show in integer mode
+		mModeSwitcher.setVisibility(mFractionInputMode == MODE_INTEGER ? VISIBLE : GONE);
 
 		mIntegerPicker.setCurrent(mInteger);
 		mNumeratorPicker.setCurrent(mNumerator);

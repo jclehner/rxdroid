@@ -615,15 +615,18 @@ public class DrugListActivity extends Activity implements
 			final boolean showDoseless = mSharedPreferences.getBoolean("show_doseless", true);
 			final boolean showInactive = mSharedPreferences.getBoolean("show_inactive", true);
 
+			boolean result = true;
+			
 			if(!showDoseless && mDate != null)
 			{
 				if(!drug.hasDoseOnDate(mDate))
-					return !Database.findIntakes(drug, mDate, null).isEmpty();
+					result = !Database.findIntakes(drug, mDate, null).isEmpty();
 			}
-			else if(!showInactive && !drug.isActive())
-				return false;
+			
+			if(!showInactive && !drug.isActive())
+				result = false;
 
-			return true;
+			return result;
 		}
 	}
 

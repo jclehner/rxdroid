@@ -4,9 +4,10 @@
 	android:layout_height="wrap_content"
     
 	android:orientation="vertical"
-	android:padding="20dip"
+	android:padding="30dip"
 	android:gravity="center"
 	android:background="@android:drawable/alert_dark_frame"
+	
 >
 
     <TextView android:id="@+id/text"

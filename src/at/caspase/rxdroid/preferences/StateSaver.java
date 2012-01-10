@@ -3,6 +3,7 @@ package at.caspase.rxdroid.preferences;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import android.os.Bundle;
@@ -13,7 +14,7 @@ import android.preference.Preference.BaseSavedState;
 import android.util.Log;
 
 /**
- * A helper class for saving Preference states.
+ * A helper class for saving Object states.
  * <p>
  * This class vastly reduces the amount of boilerplate code
  * required for saving/restoring states.
@@ -37,31 +38,31 @@ public final class StateSaver
 	public @interface SaveState {};	
 	
 	/**
-	 * Creates a Parcelable with the given Preference's state.
+	 * Creates a Parcelable with the given object's state.
 	 * <p>
 	 * This function automagically saves all members annotated using
-	 * SaveState and combines their values with the Preference
+	 * SaveState and combines their values with the state of the object's
+	 * superclass.
 	 * 
-	 * @param pref The preference to save.
+	 * @param o The object from which to create an instance state.
 	 * @param superState The state of pref's superclass.
 	 * @param extras Any additional data, can be <code>null</code>.
 	 * @return
 	 */
-	public static Parcelable createInstanceState(Preference pref, Parcelable superState, Bundle extras)
+	public static Parcelable createInstanceState(Object o, Parcelable superState, Bundle extras)
 	{
 		final SavedState myState = new SavedState(superState);
-		
-		if(LOGV) Log.d(TAG, "saveState: key=" + pref.getKey());
-		
-		forEachAnnotatedMember(pref, new Callback() {
+		myState.extras = extras;
+				
+		forEachAnnotatedMember(o, new Callback() {
 			
 			@Override
-			public void invoke(Preference pref, Field f)
+			public void invoke(Object o, Field f)
 			{
 				try
 				{
-					myState.values.put(f.getName(), f.get(pref));
-					if(LOGV) Log.d(TAG, "  " + f.getName() + " <- " + f.get(pref));
+					myState.values.put(f.getName(), f.get(o));
+					if(LOGV) Log.d(TAG, "  " + f.getName() + " <- " + f.get(o));
 				}
 				catch (IllegalArgumentException e)
 				{
@@ -93,26 +94,22 @@ public final class StateSaver
 		return null;
 	}
 	
-	public static void restoreInstanceState(Preference pref, Parcelable state)
+	public static void restoreInstanceState(Object o, Parcelable state)
 	{
-		if(LOGV) Log.d(TAG, "restoreState: key=" + pref.getKey());
-		
 		if(state instanceof SavedState)
 		{
 			final SavedState myState = (SavedState) state;
 			
-			forEachAnnotatedMember(pref, new Callback() {
+			forEachAnnotatedMember(o, new Callback() {
 				
 				@Override
-				public void invoke(Preference pref, Field f)
+				public void invoke(Object o, Field f)
 				{
 					Object value = myState.values.get(f.getName());
-					if(value == null)
-						Log.w(TAG, "restoreState: " + f.getName() + " is null");
-					
+										
 					try
 					{
-						f.set(pref, value);
+						f.set(o, value);
 						if(LOGV) Log.d(TAG, "  " + f.getName() + " := " + value);
 					}
 					catch (IllegalArgumentException e)
@@ -128,24 +125,26 @@ public final class StateSaver
 		}		
 	}
 	
-	private static void forEachAnnotatedMember(Preference pref, Callback callback)
+	private static void forEachAnnotatedMember(Object o, Callback callback)
 	{
-		Class<?> cls = pref.getClass();
-		Class<?> mySuper = cls.getSuperclass();
+		Class<?> cls = o.getClass();
+		if(!cls.isAnnotationPresent(SaveState.class))
+			return;
 		
-		if(pref.getClass().equals(mySuper))
-			forEachAnnotatedMember((Preference) mySuper.cast(pref), callback);
+		Class<?> mySuper = cls.getSuperclass();
+		if(mySuper != null)
+			forEachAnnotatedMember(mySuper.cast(o), callback);
 						
 		for(Field f : cls.getDeclaredFields())
 		{
 			if(f.isAnnotationPresent(SaveState.class))
-				callback.invoke(pref, f);
+				callback.invoke(o, f);
 		}	
 	}
 	
 	private interface Callback
 	{
-		void invoke(Preference pref, Field f);
+		void invoke(Object o, Field f);
 	}
 	
 	private static class SavedState extends BaseSavedState

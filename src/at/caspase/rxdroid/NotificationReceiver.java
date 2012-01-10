@@ -219,7 +219,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		for(Drug drug : Database.getDrugs())
 		{
 			// refill size of zero means ignore supply values
-			if (drug.getRefillSize() == 0)
+			if(!drug.isActive() || drug.getRefillSize() == 0)
 				continue;
 
 			double dailyDose = 0;
