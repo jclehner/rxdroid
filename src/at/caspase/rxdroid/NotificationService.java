@@ -106,7 +106,7 @@ public class NotificationService extends Service implements OnChangedListener, O
 		super.onDestroy();
 		Database.unregisterOnChangedListener(this);
 		mSharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
-		Settings.instance().setLastNotificationMessageHash(0);
+		//Settings.instance().setLastNotificationMessageHash(0);
 		sIsStarted = false;
 	}
 

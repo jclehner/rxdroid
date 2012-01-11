@@ -38,7 +38,8 @@ import at.caspase.rxdroid.util.DateTime;
 public class Settings
 {
 	private static final String TAG = Settings.class.getName();
-
+	private static final boolean LOGV = true;
+	
 	private static final String KEY_LAST_MSG_HASH = "_last_msg_hash";
 	private static final String KEY_LAST_MSG_COUNT = "_last_msg_count";
 
@@ -321,6 +322,12 @@ public class Settings
 	{
 		String valueStr = sSharedPrefs.getString(key, null);
 		return valueStr != null ? Integer.parseInt(valueStr, 10) : defValue;
+	}	
+	@Override
+	protected void finalize()
+	{
+		if(LOGV) Log.v(TAG, "finalize called");
+		setLastNotificationMessageHash(0);
 	}
 
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;

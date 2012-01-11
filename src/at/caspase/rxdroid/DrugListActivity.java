@@ -248,7 +248,7 @@ public class DrugListActivity extends Activity implements
 				{
 					Fraction dose = new Fraction();
 
-					for(Intake intake : Intake.find(drug, mDate, doseTime))
+					for(Intake intake : Intake.findAll(drug, mDate, doseTime))
 					{
 						dose.add(intake.getDose());
 						Database.delete(intake);
@@ -493,7 +493,7 @@ public class DrugListActivity extends Activity implements
 
 		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
 
-		if(mDate.equals(DateTime.today()))
+		if(mDate.equals(DateTime.todayDate()))
 			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
 
 		mTextDate.setText(dateString);
@@ -614,23 +614,26 @@ public class DrugListActivity extends Activity implements
 
 	private class DrugFilter implements CollectionUtils.Filter<Drug>
 	{
+		final boolean mShowDoseless = mSharedPreferences.getBoolean("show_doseless", true);
+		final boolean mShowInactive = mSharedPreferences.getBoolean("show_inactive", true);
+		
 		@Override
 		public boolean matches(Drug drug)
 		{
-			final boolean showDoseless = mSharedPreferences.getBoolean("show_doseless", true);
-			final boolean showInactive = mSharedPreferences.getBoolean("show_inactive", true);
-
 			boolean result = true;
 			
-			if(!showDoseless && mDate != null)
+			if(!mShowDoseless && mDate != null)
 			{
 				if(!drug.hasDoseOnDate(mDate))
-					result = !Intake.find(drug, mDate, null).isEmpty();
+					result = false;
 			}
 			
-			if(!showInactive && !drug.isActive())
+			if(!mShowInactive && !drug.isActive())
 				result = false;
 
+			if(!result && !Intake.findAll(drug, mDate, null).isEmpty())
+				result = true;
+			
 			return result;
 		}
 	}

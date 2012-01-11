@@ -239,7 +239,7 @@ public final class Database
 
 		for(int doseTime = Drug.TIME_MORNING; doseTime != Drug.TIME_INVALID; ++doseTime)
 		{
-			if(!Intake.find(drug, date, doseTime).isEmpty())
+			if(!Intake.findAll(drug, date, doseTime).isEmpty())
 				openIntakeDoseTimes.remove(openIntakeDoseTimes.indexOf(doseTime));
 		}
 

@@ -53,18 +53,28 @@ public final class DateTime
 	 *
 	 * @return a <code>Calendar</code> set to the current date, its time
 	 *     set to 00:00:00
+	 * @deprecated Use {@link #todayDate()}
 	 */
 	public static Calendar today() {
 		return getDatePart(DateTime.now());
+	}
+	
+	public static Date todayDate() {
+		return today().getTime();
 	}
 
 	/**
 	 * Returns the current time.
 	 *
 	 * @return the result of <code>Gregorian.getInstance()</code>
+	 * @deprecated Use {@link #nowDate()}
 	 */
 	public static Calendar now() {
 		return GregorianCalendar.getInstance();
+	}
+	
+	public static Date nowDate() {
+		return now().getTime();
 	}
 
 	/**

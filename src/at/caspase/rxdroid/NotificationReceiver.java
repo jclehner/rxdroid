@@ -192,7 +192,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(!drug.isActive() || dose.equals(0) || !drug.hasDoseOnDate(date))
 				continue;
 
-			if(Intake.find(drug, date, doseTime).isEmpty())
+			if(Intake.findAll(drug, date, doseTime).isEmpty())
 				++count;
 		}
 

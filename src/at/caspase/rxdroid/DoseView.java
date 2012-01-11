@@ -408,7 +408,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 		if(mDate == null || mDrug == null)
 			throw new IllegalStateException("Cannot obtain intake data from DoseView with unset date and/or drug");
 
-		List<Intake> intakes = Intake.find(mDrug, mDate, mDoseTime);
+		List<Intake> intakes = Intake.findAll(mDrug, mDate, mDoseTime);
 
 		mCumulativeDose = new Fraction();
 

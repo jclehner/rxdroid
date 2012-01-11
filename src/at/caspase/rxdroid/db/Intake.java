@@ -123,6 +123,7 @@ public class Intake extends Entry
 		hasher.hash(date);
 		hasher.hash(timestamp);
 		hasher.hash(doseTime);
+		hasher.hash(dose);
 
 		return hasher.getHashCode();
 	}
@@ -144,8 +145,8 @@ public class Intake extends Entry
 		if(!this.date.equals(other.date))
 			return false;
 
-		if(this.getDrugId() != other.getDrugId())
-			return false;
+		/*if(this.getDrugId() != other.getDrugId())
+			return false;*/
 
 		if(!this.dose.equals(other.dose))
 			return false;
@@ -165,7 +166,7 @@ public class Intake extends Entry
 	 * @param date The Intake's date. Can be <code>null</code>.
 	 * @param doseTime The Intake's doseTime. Can be <code>null</code>.
 	 */
-	public static synchronized List<Intake> find(Drug drug, Date date, Integer doseTime)
+	public static synchronized List<Intake> findAll(Drug drug, Date date, Integer doseTime)
 	{
 		final List<Intake> intakes = new LinkedList<Intake>();
 	
