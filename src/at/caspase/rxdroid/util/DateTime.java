@@ -41,6 +41,13 @@ public final class DateTime
 	@SuppressWarnings("unused")
 	private static final String TAG = DateTime.class.getName();
 
+	public static Calendar calendarFromDate(Date date)
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal;		
+	}	
+	
 	/**
 	 * Returns the current date.
 	 *
