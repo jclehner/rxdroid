@@ -322,14 +322,8 @@ public class Settings
 	{
 		String valueStr = sSharedPrefs.getString(key, null);
 		return valueStr != null ? Integer.parseInt(valueStr, 10) : defValue;
-	}	
-	@Override
-	protected void finalize()
-	{
-		if(LOGV) Log.v(TAG, "finalize called");
-		setLastNotificationMessageHash(0);
 	}
-
+	
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;
 	private static final int FLAG_DONT_CORRECT_TIME = 2;
 

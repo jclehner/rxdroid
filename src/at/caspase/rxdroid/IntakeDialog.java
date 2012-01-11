@@ -49,7 +49,8 @@ import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 
-public class IntakeDialog extends AlertDialog implements OnClickListener, OnShowListener, OnChangedListener, Database.OnChangedListener
+public class IntakeDialog extends AlertDialog implements OnClickListener, OnShowListener, 
+		OnChangedListener, Database.OnChangedListener
 {
 	private static final String TAG = IntakeDialog.class.getName();
 
@@ -82,12 +83,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		LayoutInflater lf = LayoutInflater.from(context);
 		View view = lf.inflate(R.layout.intake, null);
 
-		mDoseText = (TextView) view.findViewById(R.id.dose_text);
-		mHintText = (TextView) view.findViewById(R.id.dose_hint);
-		mDoseEdit = (FractionInput) view.findViewById(R.id.dose_edit);
-
-		mDoseText.setText(mDose.toString());
-		mDoseText.setOnClickListener(new View.OnClickListener() {
+		view.findViewById(R.id.dose_container).setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v)
@@ -95,7 +91,13 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 				setEditable(true);
 			}
 		});
-
+		
+		mDoseText = (TextView) view.findViewById(R.id.dose_text);
+		mHintText = (TextView) view.findViewById(R.id.dose_hint);
+		mDoseEdit = (FractionInput) view.findViewById(R.id.dose_edit);
+		
+		mDoseText.setText(mDose.toString());
+		
 		mDoseEdit.setValue(mDose);
 		mDoseEdit.setFractionInputMode(mDose.isInteger() ? FractionInput.MODE_INTEGER : FractionInput.MODE_FRACTION);
 		mDoseEdit.setOnChangeListener(this);

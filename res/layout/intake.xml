@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
 >
  
-	<LinearLayout 
+	<LinearLayout android:id="@+id/dose_container" 
 		android:layout_width="match_parent"
    		android:layout_height="match_parent"
 		android:orientation="vertical"	
