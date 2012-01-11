@@ -30,8 +30,8 @@
     <string name="_msg_doses_fp">Doses: %1$d forgotten, %2$d pending.</string>
     <string name="_msg_doses_f">Doses: %1$d forgotten.</string>
     <string name="_msg_doses_p">Doses: %1$d pending.</string>
-    <string name="_msg_low_supply_single">Low supplies for %1$s.</string>
-    <string name="_msg_low_supply_multiple">Low supplies for %1$s and %2$d other(s).</string>
+    <string name="_msg_low_supply_single">Low supplies: %1$s.</string>
+    <string name="_msg_low_supply_multiple">Low supplies: %1$s and %2$d other(s).</string>
     
 	<string name="_msg_constraints_ab">Pick a time between %1$s and %2$s.</string>
 	<string name="_msg_constraints_a">Pick a time after %1$s.</string>

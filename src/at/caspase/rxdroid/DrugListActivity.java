@@ -74,8 +74,9 @@ public class DrugListActivity extends Activity implements
 	OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener,
 	ViewFactory, OnGestureListener, OnTouchListener
 {
-	public static final String TAG = DrugListActivity.class.getName();
-
+	private static final String TAG = DrugListActivity.class.getName();
+	private static final boolean LOGV = true;
+	
 	public static final int MENU_ADD = 0;
 	public static final int MENU_PREFERENCES = 1;
 	public static final int MENU_TOGGLE_FILTERING = 2;
@@ -87,7 +88,7 @@ public class DrugListActivity extends Activity implements
 	public static final int CMENU_IGNORE_DOSE = 4;
 
 	public static final String EXTRA_DAY = "day";
-	public static final String EXTRA_STARTED_BY_NOTIFICATION = "started_from_notification";
+	public static final String EXTRA_STARTED_FROM_NOTIFICATION = "started_from_notification";
 
 	private static final int TAG_ID = R.id.tag_drug_id;
 
@@ -139,26 +140,17 @@ public class DrugListActivity extends Activity implements
 	{
 		super.onResume();
 
-		/*final Intent intent = getIntent();
-		final String action = intent.getAction();
-
-		if(Intent.ACTION_VIEW.equals(action) || Intent.ACTION_MAIN.equals(action))
+		Intent intent = getIntent();
+		if(intent != null)
 		{
-			Serializable date = intent.getSerializableExtra(EXTRA_DAY);
-			if(!(date instanceof Calendar))
-			{
-				if(date != null)
-					Log.e(TAG, "onResume: EXTRA_DAY set, but wrong type");
-
-				shiftDate(0);
-			}
-			else
-				setDate((Calendar) date);
+			final boolean wasStartedFromNotification = 
+					intent.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION, false);
+			
+			if(wasStartedFromNotification)
+				intent.removeExtra(EXTRA_STARTED_FROM_NOTIFICATION);
+			
+			if(LOGV) Log.d(TAG, "onResume: EXTRA_STARTED_FROM_NOTIFICATION=" + wasStartedFromNotification);
 		}
-		else
-			shiftDate(0);*/
-
-		Log.d(TAG, "onResume");
 		
 		shiftDate(0);
 		startNotificationService();
@@ -418,8 +410,9 @@ public class DrugListActivity extends Activity implements
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		super.onTouchEvent(event);
-		return mGestureDetector.onTouchEvent(event);
+		if(mGestureDetector.onTouchEvent(event))
+			return true;
+		return super.onTouchEvent(event);
 	}
 
 	/////////////

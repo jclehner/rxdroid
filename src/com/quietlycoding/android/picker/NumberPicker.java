@@ -457,7 +457,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 		// this is necessary to prevent an infinite loop
-		if (!mTextChangedByTextWatcher) {		
+		if (!mTextChangedByTextWatcher && mText.getText().length() != 0) {		
 			mTextChangedByTextWatcher = true;
 			validateInput(mText);
 			mTextChangedByTextWatcher = false;

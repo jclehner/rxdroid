@@ -55,8 +55,11 @@ public class MyNotification
 
 		final Intent intent = new Intent(mContext, DrugListActivity.class);
 		intent.setAction(Intent.ACTION_VIEW);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		mNotification.contentIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.putExtra(DrugListActivity.EXTRA_STARTED_FROM_NOTIFICATION, true);
+		
+		int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+		mNotification.contentIntent = PendingIntent.getActivity(mContext, 0, intent, flags);
 	}
 
 	public void setPendingCount(int pendingCount) {
