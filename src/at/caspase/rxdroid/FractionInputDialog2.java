@@ -51,8 +51,7 @@ public class FractionInputDialog2 extends AlertDialog implements OnClickListener
 		setValue(value);
 
 		setButton(BUTTON_POSITIVE, context.getString(android.R.string.ok), this);
-		setButton(BUTTON_NEGATIVE, context.getString(android.R.string.cancel),
-				(OnClickListener) null);
+		setButton(BUTTON_NEGATIVE, context.getString(android.R.string.cancel), (OnClickListener) null);
 
 		setView(mInput);
 		setIcon(android.R.drawable.ic_dialog_dialer);

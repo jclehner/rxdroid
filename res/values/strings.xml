@@ -182,5 +182,6 @@
 		
 	<string name="_title_weekdays">Weekdays</string>
 	
-	
+	<string name="_msg_snoozing">Snoozing. Click to cancel.</string>
+	<string name="_toast_snoozing">Snoozing</string>
 </resources>

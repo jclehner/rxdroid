@@ -42,7 +42,7 @@ public class NotificationService extends Service implements OnChangedListener, O
 
 	private SharedPreferences mSharedPrefs;
 
-	private static boolean sIsStarted = false;
+	private static boolean sIsStarted = false;	
 
 	@Override
 	public void onEntryCreated(Entry entry, int flags)
@@ -57,25 +57,25 @@ public class NotificationService extends Service implements OnChangedListener, O
 				@Override
 				public void run()
 				{
-					sendBroadcast(getApplicationContext(), true);
+					updateNotification(getApplicationContext(), true);
 				}
 			}, Constants.NOTIFICATION_INITIAL_DELAY);
 
 		}
 		else
-			sendBroadcast(this, false);
+			updateNotification(this, false);
 	}
 
 	@Override
 	public void onEntryUpdated(Entry entry, int flags)
 	{
-		sendBroadcast(this, false);
+		updateNotification(this, false);
 	}
 
 	@Override
 	public void onEntryDeleted(Entry entry, int flags)
 	{
-		sendBroadcast(this, false);
+		updateNotification(this, false);
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class NotificationService extends Service implements OnChangedListener, O
 			return;		
 		
 		Log.d(TAG, "onSharedPreferenceChanged: key=" + key);
-		sendBroadcast(this, true);
+		updateNotification(this, true);
 	}
 
 	@Override
@@ -121,16 +121,25 @@ public class NotificationService extends Service implements OnChangedListener, O
 		if(!sIsStarted)
 		{
 			Log.d(TAG, "onStartCommand");
-			sendBroadcast(this, true);
+			updateNotification(this, true);
 			sIsStarted = true;
 		}
 		return START_STICKY;
 	}
 	
-	private static void sendBroadcast(Context context, boolean beQuiet)
+	public static void snooze(Context context) {		
+		sendBroadcast(context, false, true);
+	}
+	
+	private static void updateNotification(Context context, boolean beQuiet) {
+		sendBroadcast(context, beQuiet, false);
+	}
+	
+	private static void sendBroadcast(Context context, boolean beQuiet, boolean snooze)
 	{
 		Intent intent = new Intent(context, NotificationReceiver.class);
-		intent.putExtra(NotificationReceiver.EXTRA_BE_QUIET, beQuiet);
+		//intent.putExtra(NotificationReceiver.EXTRA_SILENT, beQuiet);
+		intent.putExtra(NotificationReceiver.EXTRA_SNOOZE, snooze);
 		context.sendBroadcast(intent);
 	}
 }

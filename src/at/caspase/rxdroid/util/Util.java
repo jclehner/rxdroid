@@ -21,16 +21,23 @@
 
 package at.caspase.rxdroid.util;
 
+import java.lang.reflect.Field;
+
+import android.R.style;
 import android.content.Context;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.util.AttributeSet;
+import android.util.Log;
 import at.caspase.rxdroid.DumbTime;
+import at.caspase.rxdroid.MyNotification;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Drug;
 
 public final class Util
 {
+	private static final String TAG = Util.class.getName();
+	
 	public static int getDoseTimeDrawableFromDoseViewId(int doseViewId)
 	{
 		switch(doseViewId)
@@ -134,5 +141,41 @@ public final class Util
 			return a.equals(b);
 
 		return b.equals(a);
+	}
+
+	/**
+	 * Gets a named id from <code>android.R.style</code>.
+	 * <p>
+	 * With the help of this function, you can use style resources only
+	 * available in later versions of android than the one you're developing
+	 * for.
+	 * 
+	 * @param resIdFieldName The name of the resource id (e.g. "textAppearanceLarge"). 
+	 * @param defaultResId The resource id to return if the requested resource does not exist.
+	 * @return The resource id of the requested name, or the supplied default value.
+	 */
+	
+	public static int getStyleResId(String resIdFieldName, int defaultResId)
+	{
+		try
+		{
+			Field f = android.R.style.class.getField(resIdFieldName);
+			return f.getInt(null);
+		}
+		catch(IllegalAccessException e)
+		{
+			// eat exception
+		}
+		catch(SecurityException e)
+		{
+			// eat exception
+		}
+		catch(NoSuchFieldException e)
+		{
+			// eat exception
+		}
+	
+		Log.w(TAG, "getAppearance: inaccessible field in android.R.style: " + resIdFieldName);
+		return defaultResId;
 	}
 }

@@ -161,13 +161,19 @@
 			android:title="@string/_title_pref_notification_methods">
 		
 			<CheckBoxPreference android:key="use_led"
-				android:title="@string/_title_pref_use_led" />
+				android:title="@string/_title_pref_use_led"
+				android:defaultValue="true" 
+			/>
 				
 			<CheckBoxPreference android:key="use_sound"
-				android:title="@string/_title_pref_use_sound" />
+				android:title="@string/_title_pref_use_sound"
+				android:defaultValue="true" 
+			/>
 				
 			<CheckBoxPreference android:key="use_vibrator"
-				android:title="@string/_title_pref_use_vibrator" />
+				android:title="@string/_title_pref_use_vibrator"
+				android:defaultValue="true" 
+			/>
 		
 		</PreferenceCategory>
 	</PreferenceScreen>

@@ -21,45 +21,42 @@
 
 package at.caspase.rxdroid;
 
-import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.List;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.SpannableString;
 import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 import android.widget.RemoteViews;
 import at.caspase.rxdroid.util.Constants;
+import at.caspase.rxdroid.util.Util;
 
 public class MyNotification
 {
 	private static final String TAG = MyNotification.class.getName();
+	private static final boolean LOGV = true;
 
+	public static final int FLAG_SILENT = 1;
+	
 	private Notification mNotification;
+	private Context mContext;
 
 	private int mPendingCount;
 	private int mForgottenCount;
 	private String mLowSupplyMessage;
+	
+	private boolean mIsSnoozing = false;
 
-	private Context mContext = GlobalContext.get();
-
-	public MyNotification()
+	public MyNotification(Context context)
 	{
-		String tickerText = mContext.getString(R.string._msg_new_notification);
+		String tickerText = context.getString(R.string._msg_new_notification);
 		mNotification = new Notification(R.drawable.ic_stat_pill, tickerText, 0);
-
-		final Intent intent = new Intent(mContext, DrugListActivity.class);
-		intent.setAction(Intent.ACTION_VIEW);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.putExtra(DrugListActivity.EXTRA_STARTED_FROM_NOTIFICATION, true);
-		
-		int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-		mNotification.contentIntent = PendingIntent.getActivity(mContext, 0, intent, flags);
+		mContext = context;
 	}
 
 	public void setPendingCount(int pendingCount) {
@@ -74,33 +71,46 @@ public class MyNotification
 		mLowSupplyMessage = lowSupplyMessage;
 	}
 	
+	@Deprecated
 	public void update() {
-		update(true);
+		update(true, 0);
 	}
 
-	public void update(boolean forceUpdate)
+	public void update(boolean forceUpdate, int flags)
 	{
+		if(LOGV) Log.d(TAG, "update(" + forceUpdate + ", " + flags + ")");
+		
 		NotificationManager notificationMgr =
 				(NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		if((mPendingCount + mForgottenCount) == 0 && mLowSupplyMessage == null)
+		if(mIsSnoozing && forceUpdate)
+			mIsSnoozing = false;
+		
+		boolean haveNoDoses = !mIsSnoozing && (mPendingCount + mForgottenCount) == 0;
+				
+		if(haveNoDoses && mLowSupplyMessage == null)
 			notificationMgr.cancel(R.id.notification);
 		else
 		{
 			String doseMessage = null;
 			int notificationItems = 1;
 
-			if(mPendingCount != 0 && mForgottenCount != 0)
-			{
-				doseMessage = mContext.getString(R.string._msg_doses_fp, mForgottenCount, mPendingCount);
-				notificationItems = 2;
+			if(!mIsSnoozing)
+			{			
+				if(mPendingCount != 0 && mForgottenCount != 0)
+				{
+					doseMessage = mContext.getString(R.string._msg_doses_fp, mForgottenCount, mPendingCount);
+					notificationItems = 2;
+				}
+				else if(mPendingCount != 0)
+					doseMessage = mContext.getString(R.string._msg_doses_p, mPendingCount);
+				else if(mForgottenCount != 0)
+					doseMessage = mContext.getString(R.string._msg_doses_f, mForgottenCount);
+				else
+					notificationItems = 0;
 			}
-			else if(mPendingCount != 0)
-				doseMessage = mContext.getString(R.string._msg_doses_p, mPendingCount);
-			else if(mForgottenCount != 0)
-				doseMessage = mContext.getString(R.string._msg_doses_f, mForgottenCount);
 			else
-				notificationItems = 0;
+				doseMessage = mContext.getString(R.string._msg_snoozing);
 
 			final String bullet;
 
@@ -138,6 +148,8 @@ public class MyNotification
 				mNotification.number = notificationItems;
 
 			Settings settings = Settings.instance();
+			settings.setLastNotificationCount(notificationItems);
+			
 			int messageHash = message.hashCode();
 			
 			if(forceUpdate || settings.getLastNotificationMessageHash() != messageHash)
@@ -146,17 +158,63 @@ public class MyNotification
 				mNotification.flags ^= Notification.FLAG_ONLY_ALERT_ONCE;
 			}
 			
-			if(!forceUpdate && notificationItems < settings.getLastNotificationCount())
-				mNotification.defaults ^= Notification.DEFAULT_ALL;
+			applyDefaultsFromSettings();
+			setupNotificationContentIntent();
+			
+			boolean silent = (flags & FLAG_SILENT) != 0;
+			
+			if(silent || (!forceUpdate && notificationItems < settings.getLastNotificationCount()))
+				mNotification.defaults ^= Notification.DEFAULT_ALL;			
 	
-			notificationMgr.notify(R.id.notification, mNotification);
-			settings.setLastNotificationCount(notificationItems);
+			notificationMgr.notify(R.id.notification, mNotification);		
 		}
+	}
+	
+	public void setSnoozeMessageEnabled(boolean enabled) {
+		mIsSnoozing = enabled;
+	}
+	
+	public boolean isSnoozing() {
+		return mIsSnoozing;
+	}
+	
+	private void setupNotificationContentIntent()
+	{		
+		if(!mIsSnoozing)
+		{		
+			final Intent intent = new Intent(mContext, DrugListActivity.class);
+			intent.setAction(Intent.ACTION_VIEW);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.putExtra(DrugListActivity.EXTRA_STARTED_FROM_NOTIFICATION, true);			
+			int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+			mNotification.contentIntent = PendingIntent.getActivity(mContext, 0, intent, flags);	
+		}
+		else
+		{
+			final Intent intent = new Intent(mContext, NotificationReceiver.class);
+			intent.putExtra(NotificationReceiver.EXTRA_CANCEL_SNOOZE, true);			
+			int flags = PendingIntent.FLAG_CANCEL_CURRENT;			
+			mNotification.contentIntent = PendingIntent.getBroadcast(mContext, 0, intent, flags);			
+		}			
+	}
+	
+	private void applyDefaultsFromSettings()
+	{
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
+		
+		if(!sp.getBoolean("use_led", true))
+			mNotification.defaults ^= Notification.DEFAULT_LIGHTS;
+		
+		if(!sp.getBoolean("use_sound", true))
+			mNotification.defaults ^= Notification.DEFAULT_SOUND;
+		
+		if(!sp.getBoolean("use_vibrator", true))
+			mNotification.defaults ^= Notification.DEFAULT_VIBRATE;	
 	}
 
 	private CharSequence createTitleSpannable(String title)
 	{
-		int appearance = getAppearanceResId("TextAppearance_StatusBar_EventContent_Title",
+		int appearance = Util.getStyleResId("TextAppearance_StatusBar_EventContent_Title",
 				android.R.style.TextAppearance_Medium_Inverse);
 
 		return createSpannableWithAppearance(title, appearance);
@@ -164,7 +222,7 @@ public class MyNotification
 
 	private CharSequence createContentSpannable(String content)
 	{
-		int appearance = getAppearanceResId("TextAppearance_StatusBar_EventContent",
+		int appearance = Util.getStyleResId("TextAppearance_StatusBar_EventContent",
 				android.R.style.TextAppearance_Small_Inverse);
 
 		return createSpannableWithAppearance(content, appearance);
@@ -175,31 +233,5 @@ public class MyNotification
 		SpannableString s = new SpannableString(string);
 		s.setSpan(new TextAppearanceSpan(mContext, appearance), 0, s.length() - 1, 0);
 		return s;
-	}
-
-	private int getAppearanceResId(String resIdFieldName, int defaultResId)
-	{
-		Class<?> cls = android.R.style.class;
-		try
-		{
-			Field f = cls.getField(resIdFieldName);
-			return f.getInt(null);
-		}
-		catch(IllegalAccessException e)
-		{
-			// eat exception
-		}
-		catch(SecurityException e)
-		{
-			// eat exception
-		}
-		catch(NoSuchFieldException e)
-		{
-			// eat exception
-		}
-
-		Log.w(TAG, "getAppearance: inaccessible field in android.R.style: " + resIdFieldName);
-
-		return defaultResId;
 	}
 }

@@ -318,7 +318,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 		else
 			actualDose = null;
 
-		if(actualDose != null && !Fraction.isZero(actualDose))
+		if(actualDose != null && !actualDose.isZero())
 		{
 			SpannableStringBuilder sb = new SpannableStringBuilder(actualDose.toString());
 

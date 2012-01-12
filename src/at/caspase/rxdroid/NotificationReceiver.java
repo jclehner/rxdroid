@@ -45,25 +45,27 @@ public class NotificationReceiver extends BroadcastReceiver
 	private static final String TAG = NotificationReceiver.class.getName();
 
 	private static final boolean LOGV = true;
-	
-	static final String EXTRA_BE_QUIET = "be_quiet";
+
+	//static final String EXTRA_SILENT = "be_quiet";
 	static final String EXTRA_SNOOZE = "snooze";
-	
-	private static final int SNOOZE_DISABLED = 0;
-	private static final int SNOOZE_REPEAT = 1;
-	private static final int SNOOZE_MANUAL = 2;
+	static final String EXTRA_CANCEL_SNOOZE = "cancel_snooze";
+
+	static final int SNOOZE_DISABLED = 0;
+	static final int SNOOZE_REPEAT = 1;
+	static final int SNOOZE_MANUAL = 2;
 
 	private Context mContext;
 
 	private AlarmManager mAlarmMgr;
 	private Settings mSettings;
 	private SharedPreferences mSharedPrefs;
-	
-	private int mSnoozeType;
-	
-	private Thread mThread;
 
-	private MyNotification mNotification = new MyNotification();
+	private int mSnoozeType;
+
+	private MyNotification mNotification;
+
+	private boolean mIsManualSnoozeRequest = false;
+	private boolean mIsSnoozeCancelRequest = false;
 
 	@Override
 	public void onReceive(Context context, Intent intent)
@@ -76,15 +78,20 @@ public class NotificationReceiver extends BroadcastReceiver
 		mSettings = Settings.instance();
 		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 		mSnoozeType = mSettings.getListPreferenceValueIndex("snooze_type", SNOOZE_DISABLED);
+		mNotification = new MyNotification(context);
+
+		if(intent != null)
+		{
+			mIsManualSnoozeRequest = intent.getBooleanExtra(EXTRA_SNOOZE, false);
+			mIsSnoozeCancelRequest = intent.getBooleanExtra(EXTRA_CANCEL_SNOOZE, false);
+			if(LOGV) Log.d(TAG, "onReceive: snoozeRequest=" + mIsManualSnoozeRequest + ", snoozeCancel=" + mIsSnoozeCancelRequest);
+		}
 		
-		final boolean beQuiet = intent != null && intent.getBooleanExtra(EXTRA_BE_QUIET, false);
-		final boolean isSnoozeRequest = intent != null && intent.getBooleanExtra(EXTRA_SNOOZE, false);
-		
-		if(mThread != null)
-			mThread.interrupt();
-		
+		if(mIsManualSnoozeRequest && mSnoozeType != SNOOZE_MANUAL)
+			return;
+
 		rescheduleAlarms();
-		updateCurrentNotifications(beQuiet);
+		updateCurrentNotifications();
 	}
 
 	private void rescheduleAlarms()
@@ -107,7 +114,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			scheduleBeginAlarm(now, nextDoseTime);
 	}
 
-	private void updateCurrentNotifications(boolean beQuiet)
+	private void updateCurrentNotifications()
 	{
 		Calendar now = DateTime.now();
 		final boolean ignorePendingIntakes;
@@ -121,10 +128,10 @@ public class NotificationReceiver extends BroadcastReceiver
 			ignorePendingIntakes = false;
 
 		Date date = mSettings.getActiveDate(now);
-		updateNotifications(date, doseTime, ignorePendingIntakes, mSnoozeType == SNOOZE_REPEAT);
+		updateNotifications(date, doseTime, ignorePendingIntakes);
 	}
 
-	private void updateNotifications(Date date, int doseTime, boolean ignorePendingIntakes, boolean forceUpdate)
+	private void updateNotifications(Date date, int doseTime, boolean ignorePendingIntakes)
 	{
 		int pendingIntakes = ignorePendingIntakes ? 0 : countOpenIntakes(date, doseTime);
 		int forgottenIntakes = countForgottenIntakes(date, doseTime);
@@ -133,8 +140,15 @@ public class NotificationReceiver extends BroadcastReceiver
 		mNotification.setPendingCount(pendingIntakes);
 		mNotification.setForgottenCount(forgottenIntakes);
 		mNotification.setLowSupplyMessage(lowSupplyMessage);
-
-		mNotification.update(forceUpdate);
+		mNotification.setSnoozeMessageEnabled(mIsManualSnoozeRequest);
+		
+		if(!mIsManualSnoozeRequest)
+		{
+			boolean forceUpdate = !mIsSnoozeCancelRequest && mSnoozeType == SNOOZE_REPEAT;
+			mNotification.update(forceUpdate, mIsSnoozeCancelRequest ? MyNotification.FLAG_SILENT : 0);
+		}
+		else
+			mNotification.update(false, MyNotification.FLAG_SILENT);
 	}
 
 	private void scheduleBeginAlarm(Calendar time, int doseTime) {
@@ -148,20 +162,20 @@ public class NotificationReceiver extends BroadcastReceiver
 	private void scheduleNextBeginOrEndAlarm(Calendar time, int doseTime, boolean scheduleEnd)
 	{
 		final long offset;
-		
+
 		if(scheduleEnd)
 		{
-			if(mSnoozeType != SNOOZE_REPEAT)
-				offset = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);
-			else
+			if(mSnoozeType == SNOOZE_REPEAT || mIsManualSnoozeRequest)
 				offset = mSettings.getSnoozeTime();
-		}			
+			else
+				offset = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);
+		}
 		else
 			offset = mSettings.getMillisUntilDoseTimeBegin(time, doseTime);
-		
+
 		time.add(Calendar.MILLISECOND, (int) offset);
 
-		Log.d(TAG, "Scheduling " + (scheduleEnd ? (mSnoozeType != SNOOZE_REPEAT ? "end" : "next alarm") : "begin") + " of doseTime " + doseTime + " for " + DateTime.toString(time));
+		Log.d(TAG, "Scheduling " + (scheduleEnd ? mSnoozeType != SNOOZE_REPEAT ? "end" : "next alarm" : "begin") + " of doseTime " + doseTime + " for " + DateTime.toString(time));
 		Log.d(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
 
 		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation());
@@ -176,8 +190,6 @@ public class NotificationReceiver extends BroadcastReceiver
 	private PendingIntent createOperation()
 	{
 		Intent intent = new Intent(mContext, NotificationReceiver.class);
-		intent.putExtra(EXTRA_BE_QUIET, true);
-
 		return PendingIntent.getBroadcast(mContext, 0, intent, 0);
 	}
 
@@ -189,7 +201,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		{
 			final Fraction dose = drug.getDose(doseTime);
 
-			if(!drug.isActive() || dose.equals(0) || !drug.hasDoseOnDate(date))
+			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date))
 				continue;
 
 			if(Intake.findAll(drug, date, doseTime).isEmpty())
@@ -232,7 +244,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			if(dailyDose != 0)
 			{
-				if(Double.compare(drug.getCurrentSupplyDays(), (double) minDays) == -1)
+				if(Double.compare(drug.getCurrentSupplyDays(), minDays) == -1)
 					drugsWithLowSupply.add(drug);
 			}
 		}

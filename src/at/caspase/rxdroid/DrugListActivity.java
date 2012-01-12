@@ -61,6 +61,7 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
 import at.caspase.rxdroid.db.Database;
@@ -140,19 +141,31 @@ public class DrugListActivity extends Activity implements
 	{
 		super.onResume();
 
+		final boolean wasStartedFromNotification;
+		
 		Intent intent = getIntent();
 		if(intent != null)
 		{
-			final boolean wasStartedFromNotification = 
+			wasStartedFromNotification = 
 					intent.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION, false);
-			
-			if(wasStartedFromNotification)
-				intent.removeExtra(EXTRA_STARTED_FROM_NOTIFICATION);
 			
 			if(LOGV) Log.d(TAG, "onResume: EXTRA_STARTED_FROM_NOTIFICATION=" + wasStartedFromNotification);
 		}
+		else
+			wasStartedFromNotification = false;
 		
 		shiftDate(0);
+		
+		if(wasStartedFromNotification)
+		{
+			int snoozeType = Settings.instance().getListPreferenceValueIndex("snooze_type", -1);
+			if(snoozeType == NotificationReceiver.SNOOZE_MANUAL)
+			{			
+				NotificationService.snooze(this);
+				Toast.makeText(this, R.string._toast_snoozing, Toast.LENGTH_SHORT).show();
+			}
+		}	
+		
 		startNotificationService();
 	}
 
