@@ -74,7 +74,7 @@ public final class CollectionUtils
 
 		try
 		{
-			return (Collection<E>) collection.getClass().newInstance();
+			return collection.getClass().newInstance();
 		}
 		catch(Exception e)
 		{

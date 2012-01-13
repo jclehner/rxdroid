@@ -129,7 +129,7 @@ public class Fraction extends Number implements Comparable<Number>
 			int multOther = lcm / other.mDenominator;
 
 			denominator = lcm;
-			numerator = (this.mNumerator * multThis) + (other.mNumerator * multOther);
+			numerator = this.mNumerator * multThis + other.mNumerator * multOther;
 		}
 		else
 		{
@@ -245,7 +245,7 @@ public class Fraction extends Number implements Comparable<Number>
 			if(a == b)
 				return 0;
 
-			return (a < b) ? -1 : 1;
+			return a < b ? -1 : 1;
 		}
 		else
 			return Double.compare(this.doubleValue(), other.doubleValue());
@@ -362,7 +362,7 @@ public class Fraction extends Number implements Comparable<Number>
 	}
 
 	private void init(int integer, int numerator, int denominator)
-	{		
+	{
 		if(denominator <= 0)
 			throw new IllegalArgumentException("Denominator must be greater than zero");
 

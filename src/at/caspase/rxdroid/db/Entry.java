@@ -39,9 +39,9 @@ public abstract class Entry implements Serializable
 {
 	private static final long serialVersionUID = 8300191193261799857L;
 
-	public static final String COLUMN_ID = "id";
+	//public static final String COLUMN_ID = "id";
 
-	@DatabaseField(columnName = COLUMN_ID, generatedId = true)
+	@DatabaseField(/*columnName = COLUMN_ID,*/ generatedId = true)
 	protected int id;
 
 	@Override

@@ -77,7 +77,7 @@ public class DrugListActivity extends Activity implements
 {
 	private static final String TAG = DrugListActivity.class.getName();
 	private static final boolean LOGV = true;
-	
+
 	public static final int MENU_ADD = 0;
 	public static final int MENU_PREFERENCES = 1;
 	public static final int MENU_TOGGLE_FILTERING = 2;
@@ -142,30 +142,30 @@ public class DrugListActivity extends Activity implements
 		super.onResume();
 
 		final boolean wasStartedFromNotification;
-		
+
 		Intent intent = getIntent();
 		if(intent != null)
 		{
-			wasStartedFromNotification = 
+			wasStartedFromNotification =
 					intent.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION, false);
-			
+
 			if(LOGV) Log.d(TAG, "onResume: EXTRA_STARTED_FROM_NOTIFICATION=" + wasStartedFromNotification);
 		}
 		else
 			wasStartedFromNotification = false;
-		
+
 		shiftDate(0);
-		
+
 		if(wasStartedFromNotification)
 		{
 			int snoozeType = Settings.instance().getListPreferenceValueIndex("snooze_type", -1);
 			if(snoozeType == NotificationReceiver.SNOOZE_MANUAL)
-			{			
+			{
 				NotificationService.snooze(this);
 				Toast.makeText(this, R.string._toast_snoozing, Toast.LENGTH_SHORT).show();
 			}
-		}	
-		
+		}
+
 		startNotificationService();
 	}
 
@@ -227,7 +227,7 @@ public class DrugListActivity extends Activity implements
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
 	{
 		final DoseView doseView = (DoseView) v;
-		final Drug drug = Database.getDrug(doseView.getDrugId());
+		final Drug drug = Drug.getDrug(doseView.getDrugId());
 		final int doseTime = doseView.getDoseTime();
 
 		//menu.setHeaderIcon(android.R.drawable.ic_menu_agenda);
@@ -320,8 +320,8 @@ public class DrugListActivity extends Activity implements
 		Intent intent = new Intent(Intent.ACTION_EDIT);
 		intent.setClass(this, DrugEditActivity.class);
 
-		Drug drug = Database.getDrug((Integer) view.getTag(TAG_ID));
-		intent.putExtra(DrugEditActivity.EXTRA_DRUG, (Serializable) drug);
+		Drug drug = Drug.getDrug((Integer) view.getTag(TAG_ID));
+		intent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
 
 		startActivityForResult(intent, 0);
 	}
@@ -331,9 +331,9 @@ public class DrugListActivity extends Activity implements
 	{
 		if(view.getId() == R.id.med_list_footer)
 		{
-			Calendar cal = GregorianCalendar.getInstance();
+			Calendar cal = Calendar.getInstance();
 			cal.setTime(mDate);
-			
+
 			final int year = cal.get(Calendar.YEAR);
 			final int month = cal.get(Calendar.MONTH);
 			final int day = cal.get(Calendar.DAY_OF_MONTH);
@@ -354,7 +354,7 @@ public class DrugListActivity extends Activity implements
 	public void onDoseClick(final View view)
 	{
 		final DoseView v = (DoseView) view;
-		final Drug drug = Database.getDrug(v.getDrugId());
+		final Drug drug = Drug.getDrug(v.getDrugId());
 
 		final int doseTime = v.getDoseTime();
 
@@ -484,7 +484,7 @@ public class DrugListActivity extends Activity implements
 		updateNextView();
 		mViewSwitcher.showNext();
 
-		if(Database.getDrugs().isEmpty())
+		if(Database.getAll(Drug.class).isEmpty())
 		{
 			mMessageOverlay.setText(getString(R.string._msg_empty_list_text, getString(R.string._title_add)));
 			mMessageOverlay.setVisibility(View.VISIBLE);
@@ -506,7 +506,7 @@ public class DrugListActivity extends Activity implements
 		//setTitle(getString(R.string.app_name) + " - " + dateString.toString());
 
 		// update the intent so our Activity is restarted with the last opened date
-		setIntent(getIntent().putExtra(EXTRA_DAY, (Serializable) mDate));
+		setIntent(getIntent().putExtra(EXTRA_DAY, mDate));
 
 		setProgressBarIndeterminateVisibility(false);
 	}
@@ -515,7 +515,7 @@ public class DrugListActivity extends Activity implements
 	{
 		final ListView nextView = (ListView) mViewSwitcher.getNextView();
 
-		final DrugAdapter adapter = new DrugAdapter(this, R.layout.dose_view, Database.getDrugs(), mDate);
+		final DrugAdapter adapter = new DrugAdapter(this, R.layout.dose_view, Database.getAll(Drug.class), mDate);
 		adapter.setFilter(mShowingAll ? null : new DrugFilter());
 		nextView.setAdapter(adapter);
 		nextView.setOnTouchListener(this);
@@ -622,24 +622,24 @@ public class DrugListActivity extends Activity implements
 	{
 		final boolean mShowDoseless = mSharedPreferences.getBoolean("show_doseless", true);
 		final boolean mShowInactive = mSharedPreferences.getBoolean("show_inactive", true);
-		
+
 		@Override
 		public boolean matches(Drug drug)
 		{
 			boolean result = true;
-			
+
 			if(!mShowDoseless && mDate != null)
 			{
 				if(!drug.hasDoseOnDate(mDate))
 					result = false;
 			}
-			
+
 			if(!mShowInactive && !drug.isActive())
 				result = false;
 
 			if(!result && !Intake.findAll(drug, mDate, null).isEmpty())
 				result = true;
-			
+
 			return result;
 		}
 	}

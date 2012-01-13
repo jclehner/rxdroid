@@ -33,3 +33,5 @@ for P in $PACKAGES; do
 	sed -i -e "s/$P-$oldversion/$base/" .classpath
 done
 
+svn ci -m "ORMLite upgrade: $oldversion -> $1"
+

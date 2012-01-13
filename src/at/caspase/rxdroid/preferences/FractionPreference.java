@@ -45,30 +45,30 @@ import at.caspase.rxdroid.FractionInputDialog2.OnFractionSetListener;
  */
 public class FractionPreference extends MyDialogPreference implements OnFractionSetListener
 {
-	private static final String TAG = FractionPreference.class.getName();	
-	
+	private static final String TAG = FractionPreference.class.getName();
+
 	private static final String KEY_VALUE = "value";
-	
+
 	Fraction mValue;
 	@SaveState
 	Fraction mLongClickSummand;
-		
+
 	//FractionInputDialog2 mDialog;
-	
+
 	public FractionPreference(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
 	public FractionPreference(Context context, AttributeSet attrs, int defStyle)
 	{
-		super(context, attrs, defStyle);		
+		super(context, attrs, defStyle);
 		mValue = Fraction.decode(getPersistedString("0"));
 	}
 
-	public void setValue(Fraction value) 
+	public void setValue(Fraction value)
 	{
 		mValue = value;
-		
+
 		if(super.getSummary() == null)
 			setSummary(value.toString());
 	}
@@ -80,17 +80,17 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 	public void setLongClickSummand(Fraction value) {
 		mLongClickSummand = value;
 	}
-	
+
 	@Override
 	public CharSequence getSummary()
 	{
 		CharSequence summary = super.getSummary();
 		if(summary == null)
 			return mValue.toString();
-		
+
 		return summary;
 	}
-	
+
 	@Override
 	public void onClick(DialogInterface dialog, int which)
 	{
@@ -100,19 +100,19 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 			onFractionSet(myDialog, myDialog.getValue().add(mLongClickSummand));
 		}
 	}
-	
+
 	@Override
 	public void onFractionSet(FractionInputDialog2 dialog, Fraction value)
 	{
 		mValue = value;
-		
+
 		boolean canPersist = callChangeListener(mValue);
 		if(canPersist && shouldPersist())
 			persistString(mValue.toString());
-		
+
 		notifyChanged();
 	}
-	
+
 	@Override
 	protected Dialog onGetCustomDialog()
 	{
@@ -122,7 +122,7 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 		dialog.setAutoInputModeEnabled(true);
 		return dialog;
 	}
-	
+
 	@Override
 	protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
 		// do nothing
@@ -135,29 +135,29 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 		Log.d(TAG, "onGetDefaultValue: value=" + value);
 		return value != null ? value : "0";
 	}
-	
+
 	@Override
 	protected Parcelable onSaveInstanceState()
 	{
 		Bundle extras = new Bundle();
 		FractionInputDialog2 dialog = (FractionInputDialog2) getDialog();
 		final Fraction value;
-		
+
 		if(dialog != null)
-			value = dialog.getValue();		
+			value = dialog.getValue();
 		else
 			value = mValue;
-		
-		extras.putSerializable(KEY_VALUE, value);		
-		Parcelable superState = super.onSaveInstanceState();			
+
+		extras.putSerializable(KEY_VALUE, value);
+		Parcelable superState = super.onSaveInstanceState();
 		return StateSaver.createInstanceState(this, superState, extras);
 	}
-	
+
 	@Override
 	protected void onRestoreInstanceState(Parcelable state)
 	{
 		StateSaver.restoreInstanceState(this, state);
-		
+
 		Bundle extras = StateSaver.getExtras(state);
 		if(extras != null)
 		{
@@ -165,7 +165,7 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 			if(mValue == null)
 				mValue = new Fraction();
 		}
-		
-		super.onRestoreInstanceState(StateSaver.getSuperState(state));		
+
+		super.onRestoreInstanceState(StateSaver.getSuperState(state));
 	}
 }

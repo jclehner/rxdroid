@@ -94,7 +94,7 @@ public class Sleeper
 
 		if(now < mEnd)
 		{
-			if((now + millis) < mEnd)
+			if(now + millis < mEnd)
 				return millis;
 			else
 				return mEnd - now;

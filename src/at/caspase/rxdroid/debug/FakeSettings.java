@@ -76,6 +76,6 @@ public class FakeSettings extends Settings
 
 	@Override
 	public int getNextDoseTime(Calendar time) {
-		return (counter % (Drug.TIME_NIGHT + 1));
+		return counter % (Drug.TIME_NIGHT + 1);
 	}
 }

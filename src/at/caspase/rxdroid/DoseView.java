@@ -30,7 +30,6 @@ import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
@@ -224,7 +223,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_OUTSIDE:
-				setBackgroundResource(R.drawable.doseview_background);								
+				setBackgroundResource(R.drawable.doseview_background);
 				break;
 		}
 
@@ -246,7 +245,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 				if(intake.isEmptyIntake() /*&& mCumulativeDose.isZero()*/)
 					markAsIgnored();
 				else
-				{				
+				{
 					mCumulativeDose.add(intake.getDose());
 					markAsTaken();
 				}

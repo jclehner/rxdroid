@@ -42,13 +42,13 @@ public class NotificationService extends Service implements OnChangedListener, O
 
 	private SharedPreferences mSharedPrefs;
 
-	private static boolean sIsStarted = false;	
+	private static boolean sIsStarted = false;
 
 	@Override
 	public void onEntryCreated(Entry entry, int flags)
 	{
-		Log.d(TAG, "onEntryCreated: entry=(" + entry.getClass().getSimpleName() + ") " + entry);		
-		
+		Log.d(TAG, "onEntryCreated: entry=(" + entry.getClass().getSimpleName() + ") " + entry);
+
 		if(entry instanceof Intake)
 		{
 			Handler handler = new Handler();
@@ -83,8 +83,8 @@ public class NotificationService extends Service implements OnChangedListener, O
 	{
 		// TODO filter more
 		if(key == null || key.startsWith("_"))
-			return;		
-		
+			return;
+
 		Log.d(TAG, "onSharedPreferenceChanged: key=" + key);
 		updateNotification(this, true);
 	}
@@ -126,15 +126,15 @@ public class NotificationService extends Service implements OnChangedListener, O
 		}
 		return START_STICKY;
 	}
-	
-	public static void snooze(Context context) {		
+
+	public static void snooze(Context context) {
 		sendBroadcast(context, false, true);
 	}
-	
+
 	private static void updateNotification(Context context, boolean beQuiet) {
 		sendBroadcast(context, beQuiet, false);
 	}
-	
+
 	private static void sendBroadcast(Context context, boolean beQuiet, boolean snooze)
 	{
 		Intent intent = new Intent(context, NotificationReceiver.class);

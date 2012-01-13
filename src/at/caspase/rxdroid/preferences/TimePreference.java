@@ -42,7 +42,7 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	private static final String TAG = TimePreference.class.getName();
 
 	private static final int WRAP_AFTER = 1;
-	private static final int WRAP_BEFORE = (1 << 1);
+	private static final int WRAP_BEFORE = 1 << 1;
 
 	private String mDefaultValue;
 	private DumbTime mTime;

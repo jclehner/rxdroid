@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import android.util.Log;
 import at.caspase.rxdroid.Fraction;
@@ -265,27 +266,42 @@ public class Drug extends Entry
 
 	public int getCurrentSupplyDays()
 	{
-		final Date today = DateTime.today().getTime();
-
-		double dailyDose = 0.0;
-		for(Fraction dose : getSchedule())
-			dailyDose += dose.doubleValue();
-
-		if(dailyDose == 0.0)
+		final Fraction dailyDose = getDailyDose();
+		if(dailyDose.isZero())
 			return 0;
 
-		// determine how many intakes are open today and subtract the dose's sum
-		// from the current supply
+		final Date today = DateTime.todayDate();
 
+		// determine the sum of the doses still to be taken today and
+		// subtract that from the current supply to get the true
+		// number of days remaining
 		double doseRemainingToday = 0.0;
-		final List<Integer> openIntakeDoseTimes = Database.getOpenIntakeDoseTimes(this, today);
-		for(Integer doseTime : openIntakeDoseTimes)
-			doseRemainingToday += getDose(doseTime).doubleValue();
+
+		for(int doseTime : Constants.DOSE_TIMES)
+		{
+			Fraction cumulativeDose = new Fraction();
+
+			final List<Intake> intakes = Intake.findAll(this, today, doseTime);
+			for(Intake intake : intakes)
+				cumulativeDose.add(intake.getDose());
+
+			if(cumulativeDose.isZero())
+			{
+				final Fraction dose = getDose(doseTime, today);
+				doseRemainingToday += dose.doubleValue();
+			}
+
+			//
+			//Fraction expectedDose = getDose(doseTime, today);
+			//if(cumulativeDose.compareTo(expectedDose) < 0)
+			//	doseRemainingToday += expectedDose.minus(cumulativeDose).doubleValue();
+			//
+		}
 
 		final double supply = this.currentSupply.doubleValue() - doseRemainingToday;
 		final double correctionFactor = getSupplyCorrectionFactor();
 
-		return (int) Math.floor((supply / dailyDose) * correctionFactor);
+		return (int) Math.floor(supply / dailyDose.doubleValue() * correctionFactor);
 	}
 
 	public double getSupplyCorrectionFactor()
@@ -318,20 +334,12 @@ public class Drug extends Entry
 		return getSchedule()[doseTime];
 	}
 
-	@Deprecated
-	public Fraction getDose(int doseTime, Calendar calendar) {
-		return getDose(doseTime, calendar.getTime());
-	}
-
 	public Fraction getDailyDose()
 	{
 		final Fraction dailyDose = new Fraction();
 
 		for(Fraction dose : getSchedule())
 			dailyDose.add(dose);
-
-		Log.d(TAG, "dailyDose: " + dailyDose);
-		Log.d(TAG, "Fraction.ZERO: " + Fraction.ZERO);
 
 		return dailyDose;
 	}
@@ -364,15 +372,15 @@ public class Drug extends Entry
 		// the preference was changed, so reset all repeat-related settings
 		this.repeat = repeat;
 		this.repeatArg = 0;
-		this.repeatOrigin = DateTime.today().getTime();
+		this.repeatOrigin = DateTime.todayDate();
 	}
 
 	/**
-	 * Sets the repeat argument.
+	 * Sets the repeat mode.
 	 *
-	 * @param repeatArg the exact interpretation of this value depends on currently set repeat.
-	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's repeat.
-	 * @throws UnsupportedOperationException if this instance's repeat does not allow repeat arguments.
+	 * @param repeatArg the exact interpretation of this value depends on the repeat mode currently set.
+	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's repeat mode.
+	 * @throws UnsupportedOperationException if this instance's repeat mode does not expect any arguments.
 	 */
 	public void setRepeatArg(long repeatArg)
 	{
@@ -401,8 +409,8 @@ public class Drug extends Entry
 	/**
 	 * Sets the repeat origin.
 	 * @param repeatOrigin
-	 * @throws UnsupportedOperationException if this instance's repeat does not allow a repeat origin.
-	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's repeat.
+	 * @throws UnsupportedOperationException if this instance's repeat mode does not allow a repeat origin to be set.
+	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's repeat mode.
 	 */
 	public void setRepeatOrigin(Date repeatOrigin)
 	{
@@ -506,6 +514,23 @@ public class Drug extends Entry
 	}
 
 	/**
+	 * Returns the drug with the specified id (unchecked).
+	 *
+	 * @param drugId the id to search for.
+	 * @return The drug or <code>null</code> if it doesn't exist.
+	 */
+	public static Drug find(int drugId)
+	{
+		for(Drug drug : Database.getCached(Drug.class))
+		{
+			if(drug.getId() == drugId)
+				return drug;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get all relevant members for comparison/hashing.
 	 *
 	 * When comparing for equality or hashing, we ignore a drug's unique ID, as it may be left
@@ -546,6 +571,20 @@ public class Drug extends Entry
 		if(weekday == -1)
 			throw new IllegalArgumentException("Argument " + calWeekday + " does not map to a valid weekday");
 
-		return (repeatArg & (1 << weekday)) != 0;
+		return (repeatArg & 1 << weekday) != 0;
+	}
+
+	/**
+	 * Returns the drug with the specified id (checked).
+	 *
+	 * @param drugId the id to search for.
+	 * @throws NoSuchElementException if there is no drug with the specified id.
+	 */
+	public static Drug getDrug(int drugId)
+	{
+		Drug drug = find(drugId);
+		if(drug == null)
+			throw new NoSuchElementException("No drug with id=" + drugId);
+		return drug;
 	}
 }

@@ -163,7 +163,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 
 	private boolean isUniqueDrugName(String name)
 	{
-		for(Drug drug : Database.getDrugs())
+		for(Drug drug : Database.getAll(Drug.class))
 		{
 			if(name.equals(drug.getName()))
 				return false;

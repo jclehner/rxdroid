@@ -45,9 +45,9 @@ public final class DateTime
 	{
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
-		return cal;		
-	}	
-	
+		return cal;
+	}
+
 	/**
 	 * Returns the current date.
 	 *
@@ -55,10 +55,11 @@ public final class DateTime
 	 *     set to 00:00:00
 	 * @deprecated Use {@link #todayDate()}
 	 */
+	@Deprecated
 	public static Calendar today() {
 		return getDatePart(DateTime.now());
 	}
-	
+
 	public static Date todayDate() {
 		return today().getTime();
 	}
@@ -69,10 +70,11 @@ public final class DateTime
 	 * @return the result of <code>Gregorian.getInstance()</code>
 	 * @deprecated Use {@link #nowDate()}
 	 */
+	@Deprecated
 	public static Calendar now() {
-		return GregorianCalendar.getInstance();
+		return Calendar.getInstance();
 	}
-	
+
 	public static Date nowDate() {
 		return now().getTime();
 	}
@@ -101,7 +103,7 @@ public final class DateTime
 	public static Date date(int year, int month, int day) {
 		return calendar(year, month, day).getTime();
 	}
-	
+
 	public static Calendar calendar(int year, int month, int day)
 	{
 		Calendar cal = new GregorianCalendar();
@@ -113,7 +115,7 @@ public final class DateTime
 		cal.set(Calendar.YEAR, year);
 		cal.set(Calendar.MONTH, month);
 		cal.set(Calendar.DAY_OF_MONTH, day);
-		
+
 		return cal;
 	}
 
@@ -157,7 +159,7 @@ public final class DateTime
 
 	public static long getOffsetFromMidnight(Date date)
 	{
-		Calendar theDate = GregorianCalendar.getInstance();
+		Calendar theDate = Calendar.getInstance();
 		theDate.setTime(date);
 		return getOffsetFromMidnight(theDate);
 	}
@@ -178,12 +180,12 @@ public final class DateTime
 
 		return theTime.compareTo(begin) != -1 && theTime.before(end);
 	}
-	
+
 	public static Date add(Date date, int field, int value)
 	{
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		cal.add(field, value);
-		return cal.getTime();	
+		return cal.getTime();
 	}
 }

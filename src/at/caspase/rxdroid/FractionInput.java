@@ -54,7 +54,7 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 
 	private static final String TAG = FractionInput.class.getName();
 	private static final int MAX = 99999;
-	
+
 	private static final boolean LOGV = true;
 
 	public static final int MODE_INTEGER = 1;
@@ -74,7 +74,7 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	private int mNumerator = 0;
 	@SaveState
 	private int mDenominator = 1;
-	
+
 	@SaveState
 	private int mFractionInputMode = MODE_INVALID;
 	@SaveState
@@ -121,29 +121,29 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 		if(mIsAutoInputModeEnabled)
 		{
 			final int mode;
-			
+
 			if(value.isInteger())
 				mode = MODE_INTEGER;
 			else if(Double.compare(value.doubleValue(), 1.0) == 1)
 				mode = MODE_MIXED;
 			else
 				mode = MODE_FRACTION;
-			
+
 			if(LOGV) Log.v(TAG, "setValue: mode " + mFractionInputMode + " -> " + mode + " (auto)");
-			
+
 			if(mode != mFractionInputMode)
 			{
 				if(LOGV) Log.v(TAG, "setValue: mode " + mFractionInputMode + " -> " + mode + " (auto)");
-				mFractionInputMode = mode;		
+				mFractionInputMode = mode;
 			}
 		}
 		else
 			if(LOGV) Log.v(TAG, "setValue: mode=" + mFractionInputMode);
-		
+
 		// for MODE_INTEGER and MODE_MIXED get the value as a mixed number
 		int data[] = value.getFractionData(mFractionInputMode != MODE_FRACTION);
 
-		mInteger = (mFractionInputMode == MODE_FRACTION) ? 0 : data[0];
+		mInteger = mFractionInputMode == MODE_FRACTION ? 0 : data[0];
 		mNumerator = data[1];
 		mDenominator = data[2];
 
@@ -181,7 +181,7 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 
 		// an explicit request for a specific mode overrides the automatic setting
 		setAutoInputModeEnabled(false);
-		
+
 		if(mode != mFractionInputMode)
 		{
 			mFractionInputMode = mode;
@@ -194,25 +194,25 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	public int getFractionInputMode() {
 		return mFractionInputMode;
 	}
-	
+
 	/**
 	 * Enables automatic input mode setting.
 	 * <p>
 	 * If enabled, {@link #setValue(Fraction)} will try to guess the most
-	 * appropriate input mode for that value. 
+	 * appropriate input mode for that value.
 	 * <p>
 	 * Note that later calls to {@link #setFractionInputMode(int)} will override
-	 * this setting.  
-	 * 
+	 * this setting.
+	 *
 	 * @param enabled
 	 */
-	public void setAutoInputModeEnabled(boolean enabled) 
+	public void setAutoInputModeEnabled(boolean enabled)
 	{
 		mIsAutoInputModeEnabled = enabled;
 		if(enabled)
 			setValue(getValue());
 	}
-	
+
 	public boolean isAutoInputModeEnabled(boolean enabled) {
 		return mIsAutoInputModeEnabled;
 	}
@@ -257,23 +257,23 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 				setFractionInputMode(MODE_FRACTION);
 		}
 	}
-	
+
 	@Override
 	protected Parcelable onSaveInstanceState()
-	{		
+	{
 		Parcelable superState = super.onSaveInstanceState();
-		return StateSaver.createInstanceState(this, superState, null);		
+		return StateSaver.createInstanceState(this, superState, null);
 	}
-	
+
 	@Override
 	protected void onRestoreInstanceState(Parcelable state)
 	{
 		Parcelable superState = StateSaver.getSuperState(state);
 		super.onRestoreInstanceState(superState);
 		StateSaver.restoreInstanceState(this, state);
-		
-		updateView();		
-	}	
+
+		updateView();
+	}
 
 	private void updateView()
 	{

@@ -35,8 +35,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.util.Log;
-import at.caspase.rxdroid.GlobalContext;
-
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
@@ -54,45 +52,45 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 	public static class DbError extends RuntimeException
 	{
-		public static final int GENERAL = 0;
-		public static final int UPGRADE = 1;
-		public static final int DOWNGRADE = 2;
-		public static final int BACKUP = 3;
-		
+		public static final int E_GENERAL = 0;
+		public static final int E_UPGRADE = 1;
+		public static final int E_DOWNGRADE = 2;
+		public static final int E_BACKUP = 3;
+
 		public DbError(int type, String string, Throwable e)
 		{
 			super(string, e);
 			mType = type;
 		}
-		
+
 		public DbError(String string, Throwable e) {
-			this(GENERAL, string, e);
+			this(E_GENERAL, string, e);
 		}
-		
-		public DbError(int type, Throwable e) 
+
+		public DbError(int type, Throwable e)
 		{
 			super(e);
 			mType = type;
 		}
-		
-		public DbError(int type, String string) 
+
+		public DbError(int type, String string)
 		{
 			super(string);
 			mType = type;
 		}
-		
+
 		public DbError(String string) {
-			this(GENERAL, string);
+			this(E_GENERAL, string);
 		}
-		
+
 		public DbError(int type) {
 			this(type, getTypeAsString(type));
 		}
-		
+
 		public int getType() {
 			return mType;
 		}
-		
+
 		private static String getTypeAsString(int type)
 		{
 			final String[] names = {
@@ -101,18 +99,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 				"DOWNGRADE",
 				"BACKUP"
 			};
-			
+
 			if(type < names.length)
 				return names[type];
-			
-			return "<Invalid error code>";
+
+			return "UNKNOWN";
 		}
-		
+
 		private final int mType;
 
-		private static final long serialVersionUID = 4326067582393937172L;		
+		private static final long serialVersionUID = 4326067582393937172L;
 	}
-	
+
 	public static final int DB_VERSION = 46;
 	private static final String DB_NAME = "db.sqlite";
 
@@ -120,10 +118,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	private Dao<Intake, Integer> mIntakeDao = null;
 
 	private final Context mContext;
-	
-	public DatabaseHelper(Context context) 
+
+	DatabaseHelper(Context context)
 	{
-		super(context, DB_NAME, null, DB_VERSION);		
+		super(context, DB_NAME, null, DB_VERSION);
 		mContext = context;
 	}
 
@@ -199,12 +197,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			else if(oldVersion < newVersion)
 				reset(false);
 			else
-				throw new DbError(DbError.DOWNGRADE);
+				throw new DbError(DbError.E_DOWNGRADE);
 		}
 		catch(Exception e)
 		{
-			throw new DbError(DbError.UPGRADE, e);
-		}		
+			throw new DbError(DbError.E_UPGRADE, e);
+		}
 	}
 
 	public synchronized Dao<Drug, Integer> getDrugDao()
@@ -242,14 +240,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		mDrugDao = null;
 		mIntakeDao = null;
 	}
-	
+
 	public void reset(boolean doBackup)
 	{
 		if(doBackup)
 			backup();
-		
+
 		ConnectionSource cs = getConnectionSource();
-		
+
 		try
 		{
 			TableUtils.dropTable(cs, Drug.class, true);
@@ -257,41 +255,41 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 		catch(SQLException e)
 		{
-			throw new DbError(DbError.GENERAL, e);
+			throw new DbError(DbError.E_GENERAL, e);
 		}
 
 		onCreate(getWritableDatabase(), cs);
 	}
-	
+
 	private void backup()
 	{
 		String packageName = mContext.getApplicationInfo().packageName;
-		
+
 		File dbDir = new File(Environment.getDataDirectory(), packageName + "/databases");
-		File currentDb = new File(dbDir, DB_NAME);    
+		File currentDb = new File(dbDir, DB_NAME);
 	    File backupDb = new File(dbDir, "backup-" + System.currentTimeMillis() / 1000 + ".sqlite");
-	    
+
 	    if(!dbDir.exists() || !currentDb.exists() || !dbDir.canWrite() || !backupDb.canWrite())
-	    	throw new DbError(DbError.BACKUP);    
-	   
+	    	throw new DbError(DbError.E_BACKUP);
+
 		try
 		{
 			FileChannel src = new FileInputStream(currentDb).getChannel();
 			FileChannel dst = new FileOutputStream(backupDb).getChannel();
-			    
+
 			dst.transferFrom(src, 0, src.size());
-			    
+
 			src.close();
-			dst.close();	
+			dst.close();
 		}
 		catch (FileNotFoundException e)
 		{
-			throw new DbError(DbError.BACKUP, e);
+			throw new DbError(DbError.E_BACKUP, e);
 		}
 		catch (IOException e)
 		{
-			throw new DbError(DbError.BACKUP, e);
-		}	   
+			throw new DbError(DbError.E_BACKUP, e);
+		}
 	}
 }
 

@@ -18,7 +18,6 @@ package com.quietlycoding.android.picker;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -53,7 +52,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 	private static final int DEFAULT_MIN = 0;
 	private static final int DEFAULT_VALUE = 0;
 	private static final boolean DEFAULT_WRAP = true;
-	
+
 	public interface OnChangedListener {
 		void onChanged(NumberPicker picker, int oldVal, int newVal);
 	}
@@ -73,6 +72,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 				final StringBuilder mBuilder = new StringBuilder();
 				final java.util.Formatter mFmt = new java.util.Formatter(mBuilder);
 				final Object[] mArgs = new Object[1];
+				@Override
 				public String toString(int value) {
 					mArgs[0] = value;
 					mBuilder.delete(0, mBuilder.length());
@@ -83,6 +83,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 
 	private final Handler mHandler;
 	private final Runnable mRunnable = new Runnable() {
+		@Override
 		public void run() {
 			if (mIncrement) {
 				changeCurrent(mCurrent + 1);
@@ -109,7 +110,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 
 	private boolean mIncrement;
 	private boolean mDecrement;
-	
+
 	private boolean mTextChangedByTextWatcher = false;
 
 	public NumberPicker(Context context) {
@@ -232,6 +233,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 		mSpeed = speed;
 	}
 
+	@Override
 	public void onClick(View v) {
 		validateInput(mText);
 		if (!mText.hasFocus()) mText.requestFocus();
@@ -245,7 +247,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 	}
 
 	private String formatNumber(int value) {
-		return (mFormatter != null)
+		return mFormatter != null
 				? mFormatter.toString(value)
 				: String.valueOf(value);
 	}
@@ -286,7 +288,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 
 	private void validateCurrentView(CharSequence str) {
 		int val = getSelectedPos(str.toString());
-		if ((val >= mStart) && (val <= mEnd)) {
+		if (val >= mStart && val <= mEnd) {
 			if (mCurrent != val) {
 				mPrevious = mCurrent;
 				mCurrent = val;
@@ -296,6 +298,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 		updateView();
 	}
 
+	@Override
 	public void onFocusChange(View v, boolean hasFocus) {
 
 		/* When focus is lost check that the text field
@@ -323,6 +326,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 	 * We start the long click here but rely on the {@link NumberPickerButton}
 	 * to inform us when the long click has ended.
 	 */
+	@Override
 	public boolean onLongClick(View v) {
 
 		/* The text view may still have focus so clear it's focus which will
@@ -357,6 +361,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 	private NumberPickerButton mDecrementButton;
 
 	private class NumberPickerInputFilter implements InputFilter {
+		@Override
 		public CharSequence filter(CharSequence source, int start, int end,
 				Spanned dest, int dstart, int dend) {
 			if (mDisplayedValues == null) {
@@ -381,6 +386,7 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 
 		// XXX This doesn't allow for range limits when controlled by a
 		// soft input method!
+		@Override
 		public int getInputType() {
 			return InputType.TYPE_CLASS_NUMBER;
 		}
@@ -453,24 +459,24 @@ public class NumberPicker extends LinearLayout implements OnClickListener,
 	public int getCurrent() {
 		return mCurrent;
 	}
-	
+
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 		// this is necessary to prevent an infinite loop
-		if (!mTextChangedByTextWatcher && mText.getText().length() != 0) {		
+		if (!mTextChangedByTextWatcher && mText.getText().length() != 0) {
 			mTextChangedByTextWatcher = true;
 			validateInput(mText);
 			mTextChangedByTextWatcher = false;
 		}
-	}	
+	}
 
 	@Override
 	public void afterTextChanged(Editable arg0) {
-		// unused		
+		// unused
 	}
 
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-		// unused		
+		// unused
 	}
 }

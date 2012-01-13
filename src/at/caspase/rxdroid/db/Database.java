@@ -25,10 +25,8 @@ package at.caspase.rxdroid.db;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +37,6 @@ import java.util.WeakHashMap;
 import android.content.Context;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
-import at.caspase.rxdroid.util.Constants;
 
 import com.j256.ormlite.dao.Dao;
 
@@ -61,16 +58,13 @@ import com.j256.ormlite.dao.Dao;
 public final class Database
 {
 	private static final String TAG = Database.class.getName();
-	
+
 	public static final int FLAG_DONT_NOTIFY_LISTENERS = 1;
-	
-	private static List<Drug> sDrugCache;
-	private static List<Intake> sIntakeCache;
 
-	private static DatabaseHelper mHelper;
-	private static Dao<Drug, Integer> mDrugDao;
-	private static Dao<Intake, Integer> mIntakeDao;
+	private static final HashMap<Class<?>, List<? extends Entry>> sCache =
+			new HashMap<Class<?>, List<? extends Entry>>();
 
+	private static DatabaseHelper sHelper;
 	private static boolean sIsLoaded = false;
 
 	private static Map<OnChangedListener, Void> sOnChangedListeners =
@@ -99,25 +93,22 @@ public final class Database
 
 		if(!sIsLoaded)
 		{
-			mHelper = new DatabaseHelper(context);
+			sHelper = new DatabaseHelper(context);
 
-			mDrugDao = mHelper.getDrugDao();
-			mIntakeDao = mHelper.getIntakeDao();
-
-			// actually load the drugs from the database
-			getCachedDrugs();
-			getCachedIntakes();
+			// precache entries
+			getCached(Drug.class);
+			getCached(Intake.class);
 
 			sIsLoaded = true;
 		}
 	}
-	
+
 	public static DatabaseHelper getHelper()
 	{
 		if(!sIsLoaded)
 			throw new RuntimeException("Database is not yet initialized");
-		
-		return mHelper;
+
+		return sHelper;
 	}
 
 	/**
@@ -151,274 +142,174 @@ public final class Database
 	/**
 	 * Creates a new database entry and notifies listeners.
 	 */
-	public static <T extends Entry, ID> void create(final T t, int flags)
-	{
-		if(t instanceof Drug)
-			create(mDrugDao, (Drug) t, flags);
-		else if(t instanceof Intake)
-			create(mIntakeDao, (Intake) t, flags);
+	public static <E extends Entry> void create(E entry, int flags) {
+		runDbOperation("create", entry, flags);
 	}
 
 	/**
 	 * Creates a new database entry and notifies listeners.
 	 */
-	public static <T extends Entry, ID> void create(final T t) {
-		create(t, 0);
+	public static <E extends Entry> void create(E entry) {
+		create(entry, 0);
 	}
 
 	/**
-	 * Updates a database entry and notifies listeners.
+	 * Updates an existing database entry and notifies listeners.
 	 */
-	public static <T extends Entry, ID> void update(final T t, int flags)
+	public static <E extends Entry> void update(E entry, int flags) {
+		runDbOperation("update", entry, flags);
+	}
+
+	/**
+	 * Updates an existing database entry and notifies listeners.
+	 */
+	public static <E extends Entry> void update(E entry) {
+		update(entry, 0);
+	}
+
+	/**
+	 * Deletes an existing database entry and notifies listeners.
+	 */
+	public static <E extends Entry> void delete(E entry, int flags) {
+		runDbOperation("delete", entry, flags);
+	}
+
+	/**
+	 * Deletes an existing database entry and notifies listeners.
+	 */
+	public static <E extends Entry> void delete(E entry) {
+		delete(entry, 0);
+	}
+
+	public static <T extends Entry> List<T> getAll(Class<T> clazz) {
+		return new LinkedList<T>(getCached(clazz));
+	}
+
+	static synchronized <T extends Entry> List<T> getCached(Class<T> clazz)
 	{
-		if(t instanceof Drug)
-			update(mDrugDao, (Drug) t, flags);
-		else if(t instanceof Intake)
-			update(mIntakeDao, (Intake) t, flags);
-	}
-
-	/**
-	 * Updates a database entry and notifies listeners.
-	 */
-	public static <T extends Entry, ID> void update(final T t) {
-		update(t, 0);
-	}
-
-	/**
-	 * Deletes a database entry and notifies listeners.
-	 */
-	public static <T extends Entry, ID> void delete(final T t, int flags)
-	{
-		if(t instanceof Drug)
-			delete(mDrugDao, (Drug) t, flags);
-		else if(t instanceof Intake)
-			delete(mIntakeDao, (Intake) t, flags);
-	}
-
-	/**
-	 * Deletes a database entry and notifies listeners.
-	 */
-	public static <T extends Entry, ID> void delete(final T t) {
-		delete(t, 0);
-	}
-
-	/**
-	 * Returns the drug with the specified id (unchecked).
-	 *
-	 * @param drugId the id to search for.
-	 * @return The drug or <code>null</code> if it doesn't exist.
-	 */
-	public static Drug findDrug(int drugId)
-	{
-		for(Drug drug : getCachedDrugs())
+		if(!sCache.containsKey(clazz))
 		{
-			if(drug.getId() == drugId)
-				return drug;
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the drug with the specified id (checked).
-	 *
-	 * @param drugId the id to search for.
-	 * @throws NoSuchElementException if there is no drug with the specified id.
-	 */
-	public static Drug getDrug(int drugId)
-	{
-		Drug drug = findDrug(drugId);
-		if(drug == null)
-			throw new NoSuchElementException("No drug with id=" + drugId);
-		return drug;
-	}
-
-	public static synchronized List<Integer> getOpenIntakeDoseTimes(Drug drug, Date date)
-	{
-		final LinkedList<Integer> openIntakeDoseTimes = new LinkedList<Integer>(Arrays.asList(Constants.DOSE_TIMES));
-
-		for(int doseTime = Drug.TIME_MORNING; doseTime != Drug.TIME_INVALID; ++doseTime)
-		{
-			if(!Intake.findAll(drug, date, doseTime).isEmpty())
-				openIntakeDoseTimes.remove(openIntakeDoseTimes.indexOf(doseTime));
-		}
-
-		Log.d(TAG, "openIntakeDoseTimes=" + Arrays.toString(openIntakeDoseTimes.toArray()));
-		return openIntakeDoseTimes;
-	}
-
-	/**
-	 * Gets the cached drugs.
-	 * @return a reference to the <em>actual</em> cache. Use {@link #getDrugs()} to get a copy of the cache.
-	 */
-	private static synchronized List<Drug> getCachedDrugs()
-	{
-		if(sDrugCache == null)
-		{
-			sDrugCache = Collections.synchronizedList(queryForAll(mDrugDao));
-			Log.d(TAG, "Cached " + sDrugCache.size() + " drugs");
-		}
-		return sDrugCache;
-	}
-
-	/**
-	 * Gets a copy of the cached drugs.
-	 * @return a copy of the current cache.
-	 */
-	public static List<Drug> getDrugs() {
-		return new LinkedList<Drug>(getCachedDrugs());
-	}
-
-	/**
-	 * Gets the cached intakes.
-	 * @return a reference to the <em>actual</em> cache. Use {@link #getIntakes()} to get a copy of the cache.
-	 */
-	static synchronized List<Intake> getCachedIntakes()
-	{
-		if(sIntakeCache == null)
-		{
-			sIntakeCache = Collections.synchronizedList(queryForAll(mIntakeDao));
-			Log.d(TAG, "Cached " + sIntakeCache.size() + " intakes");
-		}
-		return sIntakeCache;
-	}
-
-	/**
-	 * Gets a copy of the cached intakes.
-	 * @return a copy of the current cache.
-	 */
-	public static List<Intake> getIntakes() {
-		return new LinkedList<Intake>(getCachedIntakes());
-	}
-
-	private static synchronized <T extends Entry, ID> void create(final Dao<T, ID> dao, final T t, int flags)
-	{
-		Thread th = new Thread(new Runnable() {
-
-			@Override
-			public void run()
+			if(!sIsLoaded)
 			{
-				try
-				{
-					dao.create(t);
-				}
-				catch (SQLException e)
-				{
-					throw new RuntimeException(e);
-				}
+				final List<T> entries = queryForAll(clazz);
+				sCache.put(clazz, entries);
+				Log.i(TAG, "Cached " + entries.size() + " entries of type " + clazz.getSimpleName());
 			}
-		});
-
-		th.start();
-
-		if(t instanceof Drug)
-		{
-			final List<Drug> drugCache = getCachedDrugs();
-			drugCache.add((Drug) t);
-		}
-		else if(t instanceof Intake)
-		{
-			final List<Intake> intakeCache = getCachedIntakes();
-			intakeCache.add((Intake) t);
-
+			else
+				throw new NoSuchElementException(clazz.getSimpleName());
 		}
 
-		dispatchEventToListeners("onEntryCreated", t, flags);
+		@SuppressWarnings("unchecked")
+		List<T> cached = (List<T>) sCache.get(clazz);
+		return cached;
 	}
 
-	private static synchronized <T extends Entry, ID> void update(final Dao<T, ID> dao, final T t, int flags)
+
+	private static synchronized <T> Dao<T, Integer> getDaoChecked(Class<T> clazz)
 	{
-		if(!(t instanceof Drug))
-			throw new UnsupportedOperationException();
-		
-		Thread th = new Thread(new Runnable() {
-
-			@Override
-			public void run()
-			{
-				try
-				{
-					dao.update(t);
-				}
-				catch (SQLException e)
-				{
-					throw new RuntimeException(e);
-				}
-			}
-		});
-
-		th.start();
-
-		final List<Drug> drugCache = getCachedDrugs();
-		final Drug newDrug = (Drug) t;
-		final Drug oldDrug = Entry.findInCollection(drugCache, newDrug.getId());
-		int index = drugCache.indexOf(oldDrug);
-
-		if(oldDrug == null || index == -1)
-			Log.e(TAG, "oldDrug not found in cache: index=" + index + ", oldDrug=" + oldDrug);
-		else
-		{
-			drugCache.remove(index);
-			drugCache.add(index, newDrug);
-		}
-
-		dispatchEventToListeners("onEntryUpdated", newDrug, flags);
-	}
-
-	private static synchronized <T extends Entry, ID> void delete(final Dao<T, ID> dao, final T t, int flags)
-	{
-		Thread th = new Thread(new Runnable() {
-
-			@Override
-			public void run()
-			{
-				try
-				{
-					dao.delete(t);
-				}
-				catch (SQLException e)
-				{
-					throw new RuntimeException(e);
-				}
-			}
-		});
-
-		th.start();
-
-		if(t instanceof Drug)
-		{
-			final Drug drug = (Drug) t;
-			final List<Intake> intakeCache = getCachedIntakes();
-			final List<Drug> drugCache = getCachedDrugs();
-			drugCache.remove(drug);
-			
-			// we need to work with a copy of the intake cache to 
-			// prevent ConcurrentModificationExceptions
-			for(Object o : intakeCache.toArray())
-			{
-				Intake intake = (Intake) o;
-				
-				if(intake.getDrugId() == drug.getId())
-					delete((Intake) o, FLAG_DONT_NOTIFY_LISTENERS);			
-			}
-		}
-		else if(t instanceof Intake)
-		{
-			final List<Intake> intakeCache = getCachedIntakes();
-			intakeCache.remove((Intake) t);
-		}
-
-		dispatchEventToListeners("onEntryDeleted", t, flags);
-	}
-
-	private static<T> List<T> queryForAll(Dao<T, Integer> dao)
-	{
-		if(dao == null)
-			throw new IllegalStateException("dao == null. Did you call Database.load() ?");
-
 		try
 		{
-			return dao.queryForAll();
+			return sHelper.getDao(clazz);
+		}
+		catch(SQLException e)
+		{
+			throw new RuntimeException("Error getting DAO for " + clazz.getSimpleName());
+		}
+	}
+
+	private static <E extends Entry> void runDbOperation(String methodName, E entry, int flags)
+	{
+		@SuppressWarnings("unchecked")
+		final Class<E> clazz = (Class<E>) entry.getClass();
+		final List<E> cached = getCached(clazz);
+
+		if("create".equals(methodName))
+			cached.add(entry);
+		else if("delete".equals(methodName))
+		{
+			cached.remove(entry);
+
+			//Entry toRemove = Entry.findInCollection(cached, entry.getId());
+			//cached.remove(toRemove);
+		}
+		else if("update".equals(methodName))
+		{
+			final Entry oldEntry = Entry.findInCollection(cached, entry.getId());
+			int index = cached.indexOf(oldEntry);
+
+			cached.remove(index);
+			cached.add(index, entry);
+		}
+		else
+			throw new IllegalArgumentException("methodName=" + methodName);
+
+		final Dao<E, Integer> dao = getDaoChecked(clazz);
+		runDaoMethodInThread(dao, methodName, entry);
+
+		if((flags & FLAG_DONT_NOTIFY_LISTENERS) == 0)
+		{
+			final char first = Character.toUpperCase(methodName.charAt(0));
+			final String eventName = "onEntry" + first + methodName.substring(1) + "d";
+			dispatchEventToListeners(eventName, entry, 0);
+		}
+
+		// TODO process entry-type specific hooks
+	}
+
+	private static <E extends Entry, ID> void runDaoMethodInThread(final Dao<E, ID> dao, final String methodName, final E entry)
+	//private static void runDaoMethodInThread(final Dao<Entry, Integer> dao, final String methodName, final Entry entry)
+	{
+		final Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run()
+			{
+				Exception ex;
+
+				try
+				{
+					final Method m = dao.getClass().getMethod(methodName, Object.class);
+					m.invoke(dao, entry);
+					return;
+				}
+				catch(IllegalArgumentException e)
+				{
+					ex = e;
+					// handled at end of function
+				}
+				catch(IllegalAccessException e)
+				{
+					ex = e;
+					// handled at end of function
+				}
+				catch(InvocationTargetException e)
+				{
+					ex = e;
+					// handled at end of function
+				}
+				catch(SecurityException e)
+				{
+					ex = e;
+					// handled at end of function
+				}
+				catch(NoSuchMethodException e)
+				{
+					ex = e;
+					// handled at end of function
+				}
+
+				throw new RuntimeException("Failed to run DAO method " + methodName, ex);
+			}
+		});
+
+		th.start();
+	}
+
+	static<T> List<T> queryForAll(Class<T> clazz)
+	{
+		try
+		{
+			return getDaoChecked(clazz).queryForAll();
 		}
 		catch(SQLException e)
 		{
@@ -430,7 +321,7 @@ public final class Database
 	{
 		if((flags & FLAG_DONT_NOTIFY_LISTENERS) != 0)
 			return;
-		
+
 		synchronized(sOnChangedListeners)
 		{
 			Set<OnChangedListener> listeners = sOnChangedListeners.keySet();

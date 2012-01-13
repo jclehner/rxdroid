@@ -26,8 +26,6 @@ import java.util.Date;
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entry;
-import at.caspase.rxdroid.util.CollectionUtils;
-import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
 
 import com.j256.ormlite.field.DataType;

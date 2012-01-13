@@ -32,13 +32,13 @@ public class SimpleBitSet
 	public void set(int n, boolean value)
 	{
 		if(value)
-			mValue |= (1 << n);
+			mValue |= 1 << n;
 		else
-			mValue ^= (1 << n);
+			mValue ^= 1 << n;
 	}
 
 	public boolean get(int n) {
-		return (mValue & (1 << n)) != 0;
+		return (mValue & 1 << n) != 0;
 	}
 
 	public int bitCount() {
@@ -62,7 +62,7 @@ public class SimpleBitSet
 		boolean[] ret = new boolean[size];
 
 		for(int i = 0; i != size; ++i)
-			ret[i] = ((value & (1 << i)) != 0);
+			ret[i] = (value & 1 << i) != 0;
 
 		return ret;
 	}

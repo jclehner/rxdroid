@@ -44,7 +44,7 @@ public class DosePreference extends FractionPreference implements OnClickListene
 		super(context, attrs);
 
 		mDoseTime = getDoseTimeFromKey(getKey());
-		
+
 		setDialogIcon(android.R.drawable.ic_dialog_dialer);
 		setDialogTitle(getTitle());
 
@@ -70,7 +70,7 @@ public class DosePreference extends FractionPreference implements OnClickListene
 	public static int getDoseTimeFromKey(String key)
 	{
 		final String[] keys = { "morning", "noon", "evening", "night" };
-		
+
 		int doseTime = CollectionUtils.indexOf(key, keys);
 
 		if(doseTime == -1)

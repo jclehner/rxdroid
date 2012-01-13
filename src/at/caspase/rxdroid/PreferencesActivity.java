@@ -28,11 +28,10 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
+
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.util.Util;
 
@@ -44,7 +43,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	private static final int MENU_RESTORE_DEFAULTS = 0;
 
 	private static final String PREF_LOW_SUPPLY_THRESHOLD = "num_min_supply_days";
-		
+
 	SharedPreferences mSharedPreferences;
 
 	@Override
@@ -59,12 +58,12 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		final Preference versionPref = findPreference("version");
 		if(versionPref != null)
 		{
-			String summary = Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION;			
+			String summary = Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION;
 			versionPref.setSummary(summary);
 		}
-		
+
 		updateLowSupplyThresholdPreferenceSummary();
-		Util.populateListPreferenceEntryValues(findPreference("snooze_type"));		
+		Util.populateListPreferenceEntryValues(findPreference("snooze_type"));
 	}
 
 	@Override
@@ -104,14 +103,14 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
 	{
 		if(PREF_LOW_SUPPLY_THRESHOLD.equals(key))
 			updateLowSupplyThresholdPreferenceSummary();
 	}
-	
+
 	private void updateLowSupplyThresholdPreferenceSummary()
 	{
 		Preference p = findPreference(PREF_LOW_SUPPLY_THRESHOLD);

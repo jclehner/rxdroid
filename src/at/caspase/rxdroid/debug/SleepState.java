@@ -24,7 +24,6 @@ package at.caspase.rxdroid.debug;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import android.util.Log;
 import at.caspase.rxdroid.DumbTime;
 
 public enum SleepState
@@ -54,7 +53,7 @@ public enum SleepState
 
 	public Calendar getBegin()
 	{
-		final Calendar begin = GregorianCalendar.getInstance();
+		final Calendar begin = Calendar.getInstance();
 		begin.setTimeInMillis(mTime);
 
 		return begin;
@@ -72,7 +71,7 @@ public enum SleepState
 	{
 		if(isSleeping())
 		{
-			long remaining = (mTime + mMillis) - System.currentTimeMillis();
+			long remaining = mTime + mMillis - System.currentTimeMillis();
 			return remaining >= 0 ? remaining : 0;
 		}
 

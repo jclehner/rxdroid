@@ -47,8 +47,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -147,7 +145,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					@Override
 					public void onClick(DialogInterface dialog, int which)
 					{
-						if(which == AlertDialog.BUTTON_POSITIVE)
+						if(which == DialogInterface.BUTTON_POSITIVE)
 						{
 							Database.update(mDrug);
 							setResult(RESULT_OK);
@@ -427,7 +425,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mRefillSize.setSummary(refillSizeStr);
 			mRefillSize.setText(refillSizeStr);
 		}
-		
+
 		mCurrentSupply.setLongClickSummand(new Fraction(mDrug.getRefillSize()));
 
 
@@ -442,7 +440,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		if(mDrug.getRepeat() != Drug.REPEAT_EVERY_N_DAYS)
 		{
-			repeatOrigin = DateTime.today().getTime();
+			repeatOrigin = DateTime.todayDate();
 			repeatArg = 2;
 		}
 		else
@@ -517,7 +515,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					value = Long.valueOf(s.toString());
 
 				final boolean enabled = value >= 2;
-				dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(enabled);
+				dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(enabled);
 
 				if(!enabled)
 					editText.setError(getString(R.string._msg_drug_repeat_ge_2));
@@ -559,7 +557,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			{
 				bitSet.set(which, isChecked);
 
-				final Button positiveButton = ((AlertDialog) dialog).getButton(Dialog.BUTTON_POSITIVE);
+				final Button positiveButton = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
 				positiveButton.setEnabled(bitSet.longValue() != 0);
 			}
 		});
@@ -583,7 +581,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		for(int i = 0; i != 7; ++i)
 		{
-			if((repeatArgs & (1 << i)) != 0)
+			if((repeatArgs & 1 << i) != 0)
 				weekdays.add(Constants.SHORT_WEEK_DAY_NAMES[i]);
 		}
 

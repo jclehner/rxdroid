@@ -55,17 +55,16 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final int SNOOZE_MANUAL = 2;
 
 	private Context mContext;
-
 	private AlarmManager mAlarmMgr;
 	private Settings mSettings;
-	private SharedPreferences mSharedPrefs;
+	private MyNotification mNotification;
+	private List<Drug> mAllDrugs;
 
 	private int mSnoozeType;
-
-	private MyNotification mNotification;
-
 	private boolean mIsManualSnoozeRequest = false;
 	private boolean mIsSnoozeCancelRequest = false;
+
+
 
 	@Override
 	public void onReceive(Context context, Intent intent)
@@ -76,9 +75,10 @@ public class NotificationReceiver extends BroadcastReceiver
 		mContext = context;
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mSettings = Settings.instance();
-		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-		mSnoozeType = mSettings.getListPreferenceValueIndex("snooze_type", SNOOZE_DISABLED);
 		mNotification = new MyNotification(context);
+		mAllDrugs = Database.getAll(Drug.class);
+
+		mSnoozeType = mSettings.getListPreferenceValueIndex("snooze_type", SNOOZE_DISABLED);
 
 		if(intent != null)
 		{
@@ -86,7 +86,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			mIsSnoozeCancelRequest = intent.getBooleanExtra(EXTRA_CANCEL_SNOOZE, false);
 			if(LOGV) Log.d(TAG, "onReceive: snoozeRequest=" + mIsManualSnoozeRequest + ", snoozeCancel=" + mIsSnoozeCancelRequest);
 		}
-		
+
 		if(mIsManualSnoozeRequest && mSnoozeType != SNOOZE_MANUAL)
 			return;
 
@@ -141,7 +141,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		mNotification.setForgottenCount(forgottenIntakes);
 		mNotification.setLowSupplyMessage(lowSupplyMessage);
 		mNotification.setSnoozeMessageEnabled(mIsManualSnoozeRequest);
-		
+
 		if(!mIsManualSnoozeRequest)
 		{
 			boolean forceUpdate = !mIsSnoozeCancelRequest && mSnoozeType == SNOOZE_REPEAT;
@@ -193,11 +193,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		return PendingIntent.getBroadcast(mContext, 0, intent, 0);
 	}
 
-	private static int countOpenIntakes(Date date, int doseTime)
+	private int countOpenIntakes(Date date, int doseTime)
 	{
 		int count = 0;
 
-		for(Drug drug : Database.getDrugs())
+		for(Drug drug : mAllDrugs)
 		{
 			final Fraction dose = drug.getDose(doseTime);
 
@@ -212,7 +212,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	}
 
-	private static int countForgottenIntakes(Date date, int activeOrNextDoseTime)
+	private int countForgottenIntakes(Date date, int activeOrNextDoseTime)
 	{
 		int count = 0;
 
@@ -225,9 +225,10 @@ public class NotificationReceiver extends BroadcastReceiver
 	private String getLowSupplyMessage(Date date, int activeDoseTime)
 	{
 		final List<Drug> drugsWithLowSupply = new ArrayList<Drug>();
-		final int minDays = Integer.parseInt(mSharedPrefs.getString("num_min_supply_days", "7"), 10);
+		final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
+		final int minDays = Integer.parseInt(sp.getString("num_min_supply_days", "7"), 10);
 
-		for(Drug drug : Database.getDrugs())
+		for(Drug drug : mAllDrugs)
 		{
 			// refill size of zero means ignore supply values
 			if(!drug.isActive() || drug.getRefillSize() == 0)

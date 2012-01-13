@@ -39,7 +39,7 @@ public class Settings
 {
 	private static final String TAG = Settings.class.getName();
 	private static final boolean LOGV = true;
-	
+
 	private static final String KEY_LAST_MSG_HASH = "_last_msg_hash";
 	private static final String KEY_LAST_MSG_COUNT = "_last_msg_count";
 
@@ -122,7 +122,7 @@ public class Settings
 
 		return date;
 	}
-	
+
 	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_GET_MILLIS_UNTIL_BEGIN);
 	}
@@ -147,7 +147,7 @@ public class Settings
 	{
 		if(!sSharedPrefs.getBoolean("debug_snooze_time_short", false))
 			return getTimePreference("time_snooze").getTime();
-		
+
 		return 10000;
 	}
 
@@ -317,13 +317,13 @@ public class Settings
 		editor.putInt(KEY_LAST_MSG_COUNT, notificationCount);
 		editor.commit();
 	}
-	
+
 	public int getListPreferenceValueIndex(String key, int defValue)
 	{
 		String valueStr = sSharedPrefs.getString(key, null);
 		return valueStr != null ? Integer.parseInt(valueStr, 10) : defValue;
 	}
-	
+
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;
 	private static final int FLAG_DONT_CORRECT_TIME = 2;
 

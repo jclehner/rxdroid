@@ -22,13 +22,11 @@
 package at.caspase.rxdroid.db;
 
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import at.caspase.rxdroid.Fraction;
-import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Hasher;
 
 import com.j256.ormlite.field.DataType;
@@ -91,7 +89,7 @@ public class Intake extends Entry
 	}
 
 	public Drug getDrug() {
-		return Database.getDrug(getDrugId());
+		return Drug.getDrug(getDrugId());
 	}
 
 	public Fraction getDose() {
@@ -169,8 +167,8 @@ public class Intake extends Entry
 	public static synchronized List<Intake> findAll(Drug drug, Date date, Integer doseTime)
 	{
 		final List<Intake> intakes = new LinkedList<Intake>();
-	
-		for(Intake intake : Database.getCachedIntakes())
+
+		for(Intake intake : Database.getCached(Intake.class))
 		{
 			if(intake.getDrugId() != drug.getId())
 				continue;
@@ -178,10 +176,10 @@ public class Intake extends Entry
 				continue;
 			if(doseTime != null && intake.getDoseTime() != doseTime)
 				continue;
-	
+
 			intakes.add(intake);
 		}
-	
+
 		return intakes;
 	}
 }

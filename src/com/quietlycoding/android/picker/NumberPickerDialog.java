@@ -48,6 +48,7 @@ public class NumberPickerDialog extends AlertDialog implements OnClickListener {
 		mListener = listener;
 	}
 
+	@Override
 	public void onClick(DialogInterface dialog, int which) {
 		if (mListener != null) {
 			mListener.onNumberSet(mNumberPicker.getCurrent());
