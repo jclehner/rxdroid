@@ -157,6 +157,9 @@ public class Drug extends Entry
 	@DatabaseField(canBeNull = true)
 	private Date repeatOrigin;
 
+	@DatabaseField
+	private int sortRank = 0;
+
 	@DatabaseField(canBeNull = true)
 	private String comment;
 
@@ -173,7 +176,7 @@ public class Drug extends Entry
 	 * invalid object.
 	 */
 	public Drug(String name, int form, boolean active, int refillSize, Fraction currentSupply, Fraction[] schedule,
-			int repeat, long repeatArg, Date repeatOrigin)
+			int repeat, long repeatArg, Date repeatOrigin, int sortRank)
 	{
 		this.name = name;
 		this.form = form;
@@ -187,6 +190,7 @@ public class Drug extends Entry
 		this.repeat = repeat;
 		this.repeatArg = repeatArg;
 		this.repeatOrigin = repeatOrigin;
+		this.sortRank = sortRank;
 	}
 
 	@Deprecated
@@ -470,6 +474,14 @@ public class Drug extends Entry
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public int getSortRank() {
+		return sortRank;
+	}
+
+	public void setSortRank(int sortRank) {
+		this.sortRank = sortRank;
 	}
 
 	@Override

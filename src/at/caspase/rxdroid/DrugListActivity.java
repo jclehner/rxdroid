@@ -21,11 +21,9 @@
 
 package at.caspase.rxdroid;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.Activity;
@@ -70,6 +68,7 @@ import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Timer;
 
 public class DrugListActivity extends Activity implements
 	OnLongClickListener, OnDateSetListener, OnSharedPreferenceChangeListener,
@@ -571,11 +570,19 @@ public class DrugListActivity extends Activity implements
 			//
 			// All measurements were done using an HTC Desire running Cyanogenmod 7!
 
+			Timer t = null;
+			if(LOGV && position == 0)
+			{
+				Log.v(TAG, "getView: position=0");
+				t = new Timer();
+			}
+
 			final DoseViewHolder holder;
 
 			if(v == null)
 			{
 				v = mInflater.inflate(R.layout.drug_view2, null);
+				if(LOGV && position == 0) Log.v(TAG, "  0: " + t);
 
 				holder = new DoseViewHolder();
 
@@ -590,15 +597,23 @@ public class DrugListActivity extends Activity implements
 				}
 
 				v.setTag(holder);
+
 			}
 			else
 				holder = (DoseViewHolder) v.getTag();
 
 			final Drug drug = getItem(position);
+			String drugName = drug.getName();
 
-			holder.name.setText(drug.getName());
+			// shouldn't normally happen, unless there's a DB problem
+			if(drugName == null || drugName.length() == 0)
+				drugName = "<???>";
+
+			holder.name.setText(drugName);
 			holder.name.setTag(TAG_ID, drug.getId());
 			holder.icon.setImageResource(drug.getFormResourceId());
+
+			if(LOGV && position == 0) Log.v(TAG, "  1: " + t);
 
 			// This part often takes more than 90% of the time spent in this function,
 			// being rougly 0.025s when hasInfo returns false, and 0.008s when it
@@ -613,6 +628,8 @@ public class DrugListActivity extends Activity implements
 				if(!doseView.hasInfo(mAdapterDate, drug))
 					doseView.setInfo(mAdapterDate, drug);
 			}
+
+			if(LOGV && position == 0) Log.v(TAG, "  2: " + t);
 
 			return v;
 		}

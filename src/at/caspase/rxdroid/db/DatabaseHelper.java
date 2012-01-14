@@ -111,7 +111,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		private static final long serialVersionUID = 4326067582393937172L;
 	}
 
-	public static final int DB_VERSION = 46;
+	public static final int DB_VERSION = 48;
 	private static final String DB_NAME = "db.sqlite";
 
 	private final Context mContext;
@@ -146,6 +146,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		{
 			if(newVersion == DB_VERSION)
 			{
+				backup();
+
 				final String packageName = Database.class.getPackage().getName();
 				final String classNames[] = { "Drug", "Intake" };
 

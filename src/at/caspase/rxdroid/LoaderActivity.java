@@ -27,12 +27,14 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
-
+import android.util.Log;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper.DbError;
 
 public class LoaderActivity extends Activity implements OnClickListener
 {
+	private static final String TAG = LoaderActivity.class.getName();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -70,6 +72,8 @@ public class LoaderActivity extends Activity implements OnClickListener
 		}
 		catch(DbError e)
 		{
+			Log.w(TAG, e);
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(R.string._title_database_error);
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
