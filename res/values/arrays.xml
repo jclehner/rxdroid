@@ -13,6 +13,7 @@
     	<item>@string/_title_daily</item>
     	<item>@string/_title_every_n_days</item>
     	<item>@string/_title_pick_days</item>
+    	<item>@string/_title_on_demand</item>
     </string-array>
    
 	<string-array name="snooze_types">

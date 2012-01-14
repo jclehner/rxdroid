@@ -65,7 +65,7 @@ public class LoaderActivity extends Activity implements OnClickListener
 
 		try
 		{
-			Database.load();
+			Database.init();
 			return true;
 		}
 		catch(DbError e)

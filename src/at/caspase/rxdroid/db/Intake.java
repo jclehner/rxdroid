@@ -34,15 +34,27 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
- * Represents a dose intake by the user.
+ * Represents a dose intake event.
+ * <p>
+ * An intake event is created whenever the user takes a dose. Each
+ * entry will contain the following information:
+ * <ul>
+ * <li>A reference to the Drug that was taken</li>
+ * <li>The date at which the intake <em>should</em> have happened<sup>*</sup></li>
+ * <li>The exact time at which the dose was <em>actually</em> taken</li>
+ * <li>The dose-time (see Drug docs)</li>
+ * <li>The actual dose that was taken, as it might differ from the Drug's intake schedule</li>
+ * </ul>
  *
- * Each database entry will consist of an id of the drug that was taken, a timestamp
- * representing the time the user marked the dose as 'taken' in the app, the dose-time, the <em>scheduled</em>
- * date (note that this may differ from the date represented by the timestamp. Assume for
- * example that the user takes a drug scheduled for the night at 1 minute past midnight.),
+ * <sup>*</sup>) Consider a dose that should be taken at night. If the user takes that dose
+ * after midnight, the {@link #date} field will contain the date <em>before</em> midnight,
+ * while the {@link #timestamp} will be set to the actual time.
+ *
+ * @see Drug
  *
  * @author Joseph Lehner
  */
+
 @DatabaseTable(tableName = "intake")
 public class Intake extends Entry
 {

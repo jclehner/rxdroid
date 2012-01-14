@@ -41,18 +41,18 @@ import com.j256.ormlite.table.DatabaseTable;
 
 /**
  * Class for handling the drug database.
- *
+ * <p>
  * The word "dose" in the context of this documentation refers to
  * the smallest available dose of that drug without having to
  * manually reduce its amount (i.e. no pill-splitting). For example,
  * a package of Aspirin containing 30 tablets contains 30 doses; of
  * course, the intake schedule may also contain doses in fractions.
- *
+ * <p>
  * Another term you'll come across in the docs and the code is the
  * concept of a 'dose-time'. A dose-time is a user-definable subdivision
  * of the day, having one of the following predefined names: morning,
  * noon, evening, night.
- *
+ * <p>
  * Any drug in the database will have the following attributes:
  * <ul>
  *  <li>A unique name</li>
@@ -92,8 +92,10 @@ public class Drug extends Entry
 	public static final int REPEAT_DAILY = 0;
 	public static final int REPEAT_EVERY_N_DAYS = 1;
 	public static final int REPEAT_WEEKDAYS = 2;
+	public static final int REPEAT_ON_DEMAND = 3;
+
 	// TODO valid arguments: 6, 8, 12, with automapping to doseTimes
-	public static final int REPEAT_EVERY_N_HOURS = 3;
+	public static final int REPEAT_EVERY_N_HOURS = -1;
 
 	public static final int REPEATARG_DAY_MON = 1;
 	public static final int REPEATARG_DAY_TUE = 1 << 1;
@@ -194,22 +196,23 @@ public class Drug extends Entry
 
 	public boolean hasDoseOnDate(Date date)
 	{
-		if(repeat == REPEAT_DAILY)
-			return true;
-
-		if(repeat == REPEAT_EVERY_N_DAYS)
+		switch(repeat)
 		{
-			final long diffDays = Math.abs(repeatOrigin.getTime() - date.getTime()) / Constants.MILLIS_PER_DAY;
-			return diffDays % repeatArg == 0;
-		}
-		else if(repeat == REPEAT_WEEKDAYS)
-		{
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(date);
-			return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
-		}
+			case REPEAT_DAILY:
+			case REPEAT_ON_DEMAND:
+				return true;
 
-		throw new RuntimeException("Repeat type " + repeat + " not yet implemented");
+			case REPEAT_EVERY_N_DAYS:
+				final long diffDays = Math.abs(repeatOrigin.getTime() - date.getTime()) / Constants.MILLIS_PER_DAY;
+				return diffDays % repeatArg == 0;
+
+			case REPEAT_WEEKDAYS:
+				final Calendar cal = DateTime.calendarFromDate(date);
+				return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
+
+			default:
+				throw new RuntimeException("Unknown repeat mode");
+		}
 	}
 
 	public String getName() {
@@ -334,7 +337,7 @@ public class Drug extends Entry
 		return getSchedule()[doseTime];
 	}
 
-	public Fraction getDailyDose()
+	private Fraction getDailyDose()
 	{
 		final Fraction dailyDose = new Fraction();
 
@@ -361,7 +364,7 @@ public class Drug extends Entry
 
 	public void setRepeat(int repeat)
 	{
-		if(repeat > REPEAT_WEEKDAYS)
+		if(repeat > REPEAT_ON_DEMAND)
 			throw new IllegalArgumentException();
 
 		if(repeat == this.repeat)

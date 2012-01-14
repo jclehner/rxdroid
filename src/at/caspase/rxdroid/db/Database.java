@@ -44,8 +44,8 @@ import com.j256.ormlite.dao.Dao;
  * All DB access goes here.
  * <p>
  * Even though DB access is handled by ORMLite, it should not be neccessary to deal with the library
- * directly outside this class. For this to work, {@link #load(Context)} has to be called before using any
- * other function. If using {@link #load()}, you must ensure that the {@link #GlobalContext} has been
+ * directly outside this class. For this to work, {@link #init(Context)} has to be called before using any
+ * other function. If using {@link #init()}, you must ensure that the {@link #GlobalContext} has been
  * initialized.
  * </p>
  * <p>
@@ -77,8 +77,8 @@ public final class Database
 	 *
 	 * @throws IllegalArgumentException if GlobalContext was not initialized.
 	 */
-	public static synchronized void load() {
-		load(GlobalContext.get());
+	public static void init() {
+		init(GlobalContext.get());
 	}
 
 	/**
@@ -86,7 +86,7 @@ public final class Database
 	 *
 	 * @param context an android Context for creating the ORMLite database helper.
 	 */
-	public static synchronized void load(Context context)
+	public static synchronized void init(Context context)
 	{
 		if(context == null)
 			throw new NullPointerException("Argument 'context' must not be null. Did you call GlobalContext.set() ?");

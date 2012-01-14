@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -186,7 +185,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		{
 			final int repeat = toInt(newValue);
 
-			if(repeat != Drug.REPEAT_DAILY)
+			if(repeat != Drug.REPEAT_DAILY && repeat != Drug.REPEAT_ON_DEMAND)
 			{
 				switch(repeat)
 				{
@@ -204,7 +203,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			}
 			else
 			{
-				mDrug.setRepeat(Drug.REPEAT_DAILY);
+				mDrug.setRepeat(repeat);
 				updatePreferences();
 			}
 
@@ -376,6 +375,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				summary = getWeekdayRepeatSummary(repeatArg);
 				break;
 
+			case Drug.REPEAT_ON_DEMAND:
+				summary = getString(R.string._title_on_demand);
+				break;
+
 			default:
 				throw new IllegalStateException("Invalid repeat value " + repeat);
 		}
@@ -390,10 +393,16 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		mDrugForm.setValueIndex(form);
 
 		// current supply
+		// refill size
+		final int refillSize = mDrug.getRefillSize();
 		final Fraction currentSupply = mDrug.getCurrentSupply();
 		if(currentSupply.compareTo(0) == 0)
 		{
-			mCurrentSupply.setSummary(R.string._summary_not_available);
+			if(refillSize != 0)
+				mCurrentSupply.setSummary(R.string._summary_not_available);
+			else
+				mCurrentSupply.setSummary("0");
+
 			mCurrentSupply.setValue(Fraction.ZERO);
 		}
 		else
@@ -401,19 +410,20 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mCurrentSupply.setSummary(currentSupply.toString());
 			mCurrentSupply.setValue(currentSupply);
 
-			final int currentSupplyDays = mDrug.getCurrentSupplyDays();
-			if(currentSupplyDays > 0)
+			if(mDrug.getRepeat() != Drug.REPEAT_ON_DEMAND)
 			{
-				final Calendar end = DateTime.today();
-				end.add(Calendar.DAY_OF_MONTH, currentSupplyDays);
+				final int currentSupplyDays = mDrug.getCurrentSupplyDays();
+				if(currentSupplyDays > 0)
+				{
+					final Calendar end = DateTime.today();
+					end.add(Calendar.DAY_OF_MONTH, currentSupplyDays);
 
-				mCurrentSupply.setSummary(getString(R.string._msg_supply,
-						currentSupply.toString(), DateTime.toNativeDate(end.getTime())));
+					mCurrentSupply.setSummary(getString(R.string._msg_supply,
+							currentSupply.toString(), DateTime.toNativeDate(end.getTime())));
+				}
 			}
 		}
 
-		// refill size
-		final int refillSize = mDrug.getRefillSize();
 		if(refillSize == 0)
 		{
 			mRefillSize.setSummary(R.string._summary_not_available);
@@ -427,7 +437,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		mCurrentSupply.setLongClickSummand(new Fraction(mDrug.getRefillSize()));
-
 
 		// active?
 		mIsActive.setChecked(mDrug.isActive());

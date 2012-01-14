@@ -114,9 +114,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	public static final int DB_VERSION = 46;
 	private static final String DB_NAME = "db.sqlite";
 
-	private Dao<Drug, Integer> mDrugDao = null;
-	private Dao<Intake, Integer> mIntakeDao = null;
-
 	private final Context mContext;
 
 	DatabaseHelper(Context context)
@@ -203,42 +200,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		{
 			throw new DbError(DbError.E_UPGRADE, e);
 		}
-	}
-
-	public synchronized Dao<Drug, Integer> getDrugDao()
-	{
-		try
-		{
-			if(mDrugDao == null)
-				mDrugDao = getDao(Drug.class);
-		}
-		catch(SQLException e)
-		{
-			throw new DbError("Error getting DAO", e);
-		}
-		return mDrugDao;
-	}
-
-	public synchronized Dao<Intake, Integer> getIntakeDao()
-	{
-		try
-		{
-			if(mIntakeDao == null)
-				mIntakeDao = getDao(Intake.class);
-		}
-		catch(SQLException e)
-		{
-			throw new DbError("Error getting DAO", e);
-		}
-		return mIntakeDao;
-	}
-
-	@Override
-	public void close()
-	{
-		super.close();
-		mDrugDao = null;
-		mIntakeDao = null;
 	}
 
 	public void reset(boolean doBackup)

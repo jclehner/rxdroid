@@ -372,7 +372,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 
 		mStatus = STATUS_INDETERMINATE;
 
-		if(mHasDoseOnDate)
+		if(mHasDoseOnDate && mDrug.getRepeat() != Drug.REPEAT_ON_DEMAND)
 		{
 			if(mDrug.getDose(mDoseTime).compareTo(0) != 0)
 			{

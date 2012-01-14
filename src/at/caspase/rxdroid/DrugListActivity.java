@@ -126,7 +126,7 @@ public class DrugListActivity extends Activity implements
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
 		GlobalContext.set(getApplicationContext());
-		Database.load(); // must be called before mViewSwitcher.setFactory!
+		Database.init(); // must be called before mViewSwitcher.setFactory!
 
 		mViewSwitcher.setFactory(this);
 		mTextDate.setOnLongClickListener(this);

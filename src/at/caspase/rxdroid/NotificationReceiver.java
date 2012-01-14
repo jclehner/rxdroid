@@ -64,13 +64,11 @@ public class NotificationReceiver extends BroadcastReceiver
 	private boolean mIsManualSnoozeRequest = false;
 	private boolean mIsSnoozeCancelRequest = false;
 
-
-
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
 		GlobalContext.set(context.getApplicationContext());
-		Database.load();
+		Database.init();
 
 		mContext = context;
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
