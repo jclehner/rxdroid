@@ -97,11 +97,11 @@ public class Intake extends Entry
 	}
 
 	public int getDrugId() {
-		return drug.getId();
+		return drug.id;
 	}
 
 	public Drug getDrug() {
-		return Drug.getDrug(getDrugId());
+		return Drug.find(drug.id);
 	}
 
 	public Fraction getDose() {

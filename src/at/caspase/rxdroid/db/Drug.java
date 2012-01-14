@@ -42,7 +42,7 @@ import com.j256.ormlite.table.DatabaseTable;
 /**
  * Class for handling the drug database.
  * <p>
- * The word "dose" in the context of this documentation refers to
+ * The word "dose" in the context of this text (and this text ONLY) refers to
  * the smallest available dose of that drug without having to
  * manually reduce its amount (i.e. no pill-splitting). For example,
  * a package of Aspirin containing 30 tablets contains 30 doses; of
@@ -534,6 +534,20 @@ public class Drug extends Entry
 	}
 
 	/**
+	 * Returns the drug with the specified id (checked).
+	 *
+	 * @param drugId the id to search for.
+	 * @throws NoSuchElementException if there is no drug with the specified id.
+	 */
+	public static Drug get(int drugId)
+	{
+		Drug drug = find(drugId);
+		if(drug == null)
+			throw new NoSuchElementException("No drug with id=" + drugId);
+		return drug;
+	}
+
+	/**
 	 * Get all relevant members for comparison/hashing.
 	 *
 	 * When comparing for equality or hashing, we ignore a drug's unique ID, as it may be left
@@ -577,17 +591,19 @@ public class Drug extends Entry
 		return (repeatArg & 1 << weekday) != 0;
 	}
 
-	/**
-	 * Returns the drug with the specified id (checked).
-	 *
-	 * @param drugId the id to search for.
-	 * @throws NoSuchElementException if there is no drug with the specified id.
-	 */
-	public static Drug getDrug(int drugId)
-	{
-		Drug drug = find(drugId);
-		if(drug == null)
-			throw new NoSuchElementException("No drug with id=" + drugId);
-		return drug;
-	}
+	static final Runnable HOOK_DELETE = new Runnable() {
+
+		@Override
+		public void run()
+		{
+			for(Intake intake : Database.getAll(Intake.class))
+			{
+				if(intake.getDrug() == null)
+				{
+					Log.d(TAG, "Deleting intake for drug id " + intake.getDrugId());
+					Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
+				}
+			}
+		}
+	};
 }

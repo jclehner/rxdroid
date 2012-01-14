@@ -227,7 +227,7 @@ public class DrugListActivity extends Activity implements
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
 	{
 		final DoseView doseView = (DoseView) v;
-		final Drug drug = Drug.getDrug(doseView.getDrugId());
+		final Drug drug = Drug.get(doseView.getDrugId());
 		final int doseTime = doseView.getDoseTime();
 
 		//menu.setHeaderIcon(android.R.drawable.ic_menu_agenda);
@@ -320,7 +320,7 @@ public class DrugListActivity extends Activity implements
 		Intent intent = new Intent(Intent.ACTION_EDIT);
 		intent.setClass(this, DrugEditActivity.class);
 
-		Drug drug = Drug.getDrug((Integer) view.getTag(TAG_ID));
+		Drug drug = Drug.get((Integer) view.getTag(TAG_ID));
 		intent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
 
 		startActivityForResult(intent, 0);
@@ -354,7 +354,7 @@ public class DrugListActivity extends Activity implements
 	public void onDoseClick(final View view)
 	{
 		final DoseView v = (DoseView) view;
-		final Drug drug = Drug.getDrug(v.getDrugId());
+		final Drug drug = Drug.get(v.getDrugId());
 
 		final int doseTime = v.getDoseTime();
 

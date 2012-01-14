@@ -22,6 +22,7 @@
 package at.caspase.rxdroid.db;
 
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -37,6 +39,7 @@ import java.util.WeakHashMap;
 import android.content.Context;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
+import at.caspase.rxdroid.util.Reflect;
 
 import com.j256.ormlite.dao.Dao;
 
@@ -58,6 +61,7 @@ import com.j256.ormlite.dao.Dao;
 public final class Database
 {
 	private static final String TAG = Database.class.getName();
+	private static final boolean LOGV = true;
 
 	public static final int FLAG_DONT_NOTIFY_LISTENERS = 1;
 
@@ -124,7 +128,7 @@ public final class Database
 	public static synchronized void registerOnChangedListener(OnChangedListener listener)
 	{
 		sOnChangedListeners.put(listener, null);
-		//Log.d(TAG, "register: Objects in listener registry: " + sOnChangedListeners.size());
+		//if(LOGV) Log.v(TAG, "register: Objects in registry: " + sOnChangedListeners.size());
 	}
 
 	/**
@@ -136,14 +140,14 @@ public final class Database
 	public static synchronized void unregisterOnChangedListener(OnChangedListener listener)
 	{
 		sOnChangedListeners.remove(listener);
-		//Log.d(TAG, "unregister: Objects in listener registry: " + sOnChangedListeners.size());
+		if(LOGV) Log.v(TAG, "unregister: Objects in registry: " + sOnChangedListeners.size());
 	}
 
 	/**
 	 * Creates a new database entry and notifies listeners.
 	 */
 	public static <E extends Entry> void create(E entry, int flags) {
-		runDbOperation("create", entry, flags);
+		performDbOperation("create", entry, flags);
 	}
 
 	/**
@@ -157,7 +161,7 @@ public final class Database
 	 * Updates an existing database entry and notifies listeners.
 	 */
 	public static <E extends Entry> void update(E entry, int flags) {
-		runDbOperation("update", entry, flags);
+		performDbOperation("update", entry, flags);
 	}
 
 	/**
@@ -171,7 +175,7 @@ public final class Database
 	 * Deletes an existing database entry and notifies listeners.
 	 */
 	public static <E extends Entry> void delete(E entry, int flags) {
-		runDbOperation("delete", entry, flags);
+		performDbOperation("delete", entry, flags);
 	}
 
 	/**
@@ -193,7 +197,7 @@ public final class Database
 			{
 				final List<T> entries = queryForAll(clazz);
 				sCache.put(clazz, entries);
-				Log.i(TAG, "Cached " + entries.size() + " entries of type " + clazz.getSimpleName());
+				if(LOGV) Log.v(TAG, "Cached " + entries.size() + " entries of type " + clazz.getSimpleName());
 			}
 			else
 				throw new NoSuchElementException(clazz.getSimpleName());
@@ -217,7 +221,7 @@ public final class Database
 		}
 	}
 
-	private static <E extends Entry> void runDbOperation(String methodName, E entry, int flags)
+	private static <E extends Entry> void performDbOperation(String methodName, E entry, int flags)
 	{
 		@SuppressWarnings("unchecked")
 		final Class<E> clazz = (Class<E>) entry.getClass();
@@ -226,12 +230,7 @@ public final class Database
 		if("create".equals(methodName))
 			cached.add(entry);
 		else if("delete".equals(methodName))
-		{
 			cached.remove(entry);
-
-			//Entry toRemove = Entry.findInCollection(cached, entry.getId());
-			//cached.remove(toRemove);
-		}
 		else if("update".equals(methodName))
 		{
 			final Entry oldEntry = Entry.findInCollection(cached, entry.getId());
@@ -246,18 +245,43 @@ public final class Database
 		final Dao<E, Integer> dao = getDaoChecked(clazz);
 		runDaoMethodInThread(dao, methodName, entry);
 
+		final String hookName = "HOOK_" + methodName.toUpperCase(Locale.US);
+		final Field hookField = Reflect.getDeclaredField(clazz, hookName);
+		if(hookField != null)
+		{
+			Runnable hook = null;
+
+			try
+			{
+				hook = (Runnable) hookField.get(null);
+			}
+			catch(IllegalArgumentException e)
+			{
+				if(LOGV) Log.d(TAG, hookName, e);
+			}
+			catch(IllegalAccessException e)
+			{
+				if(LOGV) Log.d(TAG, hookName, e);
+			}
+
+			if(hook != null)
+			{
+				// don't run this in a thread as we want a clean state when events are
+				// dispatched to listeners
+				hook.run();
+				if(LOGV) Log.v(TAG, "Ran hook " + hookField.getName());
+			}
+		}
+
 		if((flags & FLAG_DONT_NOTIFY_LISTENERS) == 0)
 		{
 			final char first = Character.toUpperCase(methodName.charAt(0));
 			final String eventName = "onEntry" + first + methodName.substring(1) + "d";
 			dispatchEventToListeners(eventName, entry, 0);
 		}
-
-		// TODO process entry-type specific hooks
 	}
 
 	private static <E extends Entry, ID> void runDaoMethodInThread(final Dao<E, ID> dao, final String methodName, final E entry)
-	//private static void runDaoMethodInThread(final Dao<Entry, Integer> dao, final String methodName, final Entry entry)
 	{
 		final Thread th = new Thread(new Runnable() {
 
@@ -327,6 +351,8 @@ public final class Database
 			Set<OnChangedListener> listeners = sOnChangedListeners.keySet();
 			synchronized(listeners)
 			{
+				long startTime = System.currentTimeMillis();
+
 				for(OnChangedListener listener : listeners)
 				{
 					try
@@ -358,6 +384,12 @@ public final class Database
 
 					// this code is only reached if an exception was thrown
 					throw new RuntimeException("Failed to dispatch event to listeners: event=" + functionName);
+				}
+
+				if(LOGV)
+				{
+					long diff = System.currentTimeMillis() - startTime;
+					Log.v(TAG, "Dispatched event " + functionName + " to " + listeners.size() + " listeners in " + diff + "ms");
 				}
 			}
 		}

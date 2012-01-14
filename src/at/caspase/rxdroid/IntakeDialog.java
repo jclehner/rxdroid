@@ -29,16 +29,11 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
-import android.os.Environment;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.View.MeasureSpec;
-import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -49,7 +44,7 @@ import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 
-public class IntakeDialog extends AlertDialog implements OnClickListener, OnShowListener, 
+public class IntakeDialog extends AlertDialog implements OnClickListener, OnShowListener,
 		OnChangedListener, Database.OnChangedListener
 {
 	private static final String TAG = IntakeDialog.class.getName();
@@ -65,7 +60,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	private TextView mDoseText;
 	private TextView mHintText;
 	private FractionInput mDoseEdit;
-	
+
 	private PopupWindow mPopup;
 
 	public static final int FLAG_ALLOW_DOSE_EDIT = 1;
@@ -91,13 +86,13 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 				setEditable(true);
 			}
 		});
-		
+
 		mDoseText = (TextView) view.findViewById(R.id.dose_text);
 		mHintText = (TextView) view.findViewById(R.id.dose_hint);
 		mDoseEdit = (FractionInput) view.findViewById(R.id.dose_edit);
-		
+
 		mDoseText.setText(mDose.toString());
-		
+
 		mDoseEdit.setValue(mDose);
 		mDoseEdit.setFractionInputMode(mDose.isInteger() ? FractionInput.MODE_INTEGER : FractionInput.MODE_FRACTION);
 		mDoseEdit.setOnChangeListener(this);
@@ -110,7 +105,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 
 		setupMessages();
 		setupPopupWindow(context, lf);
-		
+
 		setOnShowListener(this);
 		Database.registerOnChangedListener(this);
 	}
@@ -145,11 +140,11 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	public void onClick(DialogInterface dialog, int which)
 	{
 		if(which == BUTTON_POSITIVE)
-		{		
-			if(hasInsufficientSupplies())
+		{
+			if(hasInsufficientSupplies() && !mPopup.isShowing())
 			{
-				mPopup.dismiss();						
-				mPopup.showAtLocation(mDoseEdit, Gravity.CENTER, 0, 0);				
+				//mPopup.dismiss();
+				mPopup.showAtLocation(mDoseEdit, Gravity.CENTER, 0, 0);
 			}
 			else
 				addIntakeAndDismiss();
@@ -181,32 +176,35 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 
 	@Override
 	public void onEntryDeleted(Entry entry, int flags) {}
-	
+
 	@Override
 	public void onBackPressed()
 	{
 		if(!mPopup.isShowing())
 			super.onBackPressed();
 		else
-			mPopup.dismiss();		
+			mPopup.dismiss();
 	}
-	
+
 	private boolean hasInsufficientSupplies()
 	{
+		if(mDrug.getRefillSize() == 0)
+			return false;
+
 		Fraction supplies = mDrug.getCurrentSupply();
 		return supplies.compareTo(mDose) == -1;
 	}
-	
+
 	private void setupPopupWindow(final Context context, LayoutInflater lf)
 	{
 		View view = lf.inflate(R.layout.intake_popup, null, false);
 		String ok = context.getString(android.R.string.ok);
 		String text = context.getString(R.string._msg_footer_insufficient_supplies, mDrug.getCurrentSupply(), ok);
-		
+
 		TextView tv = (TextView) view.findViewById(R.id.text);
 		tv.setText(text);
 		tv.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v)
 			{
@@ -215,23 +213,23 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 				intent.putExtra(DrugEditActivity.EXTRA_DRUG, mDrug);
 				intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
 
-				context.startActivity(intent);			
+				context.startActivity(intent);
 			}
 		});
-		
+
 		WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-		Display display = wm.getDefaultDisplay(); 
-		
+		Display display = wm.getDefaultDisplay();
+
 		int width  = display.getWidth()  * 8 / 10;
 		int height = display.getHeight() * 1 / 3;
-		
+
 		mPopup = new PopupWindow(
 				view,
-				width, 
-				height, 
+				width,
+				height,
 				false
 		);
-		
+
 		mPopup.setOutsideTouchable(true);
 		mPopup.setTouchable(true);
 	}

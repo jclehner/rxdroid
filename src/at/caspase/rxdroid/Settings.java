@@ -31,7 +31,6 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Drug;
-import at.caspase.rxdroid.debug.FakeSettings;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
@@ -60,16 +59,8 @@ public class Settings
 
 		if(sInstance == null)
 		{
-			if(sSharedPrefs.getBoolean("debug_fake_dosetimes", false))
-			{
-				sInstance = new FakeSettings();
-				Log.d(TAG, "Using FakeSettings");
-			}
-			else
-			{
-				sInstance = new Settings();
-				Log.d(TAG, "Using Settings");
-			}
+			sInstance = new Settings();
+			Log.d(TAG, "Using Settings");
 
 			sInstance.setLastNotificationMessageHash(0);
 		}

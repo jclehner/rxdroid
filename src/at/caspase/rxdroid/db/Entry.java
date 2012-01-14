@@ -28,9 +28,17 @@ import com.j256.ormlite.field.DatabaseField;
 
 /**
  * Base class for all database entries.
- *
+ * <p>
  * The main purpose of this class is to provide alleviate child classes from
- * declaring an ID field and to provide an unimplemented equals() method.
+ * declaring an ID field and to force descendants to declare {@link #equals(Object)} and
+ * {@link #hashCode()}.
+ * <p>
+ * Also note that you may define hooks for descendant classes that are called when
+ * the database is modified. A hook has the name HOOK_&lt;db action name&gt; (see
+ * Drug docs for valid action names). The following is a sample hook implementation:
+ *
+ *
+ * @see
  *
  * @author Joseph Lehner
  *
