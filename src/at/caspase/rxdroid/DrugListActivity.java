@@ -23,9 +23,9 @@ package at.caspase.rxdroid;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -514,7 +514,10 @@ public class DrugListActivity extends Activity implements
 	{
 		final ListView nextView = (ListView) mViewSwitcher.getNextView();
 
-		final DrugAdapter adapter = new DrugAdapter(this, R.layout.dose_view, Database.getAll(Drug.class), mDate);
+		final List<Drug> drugs = Database.getAll(Drug.class);
+		Collections.sort(drugs);
+
+		final DrugAdapter adapter = new DrugAdapter(this, R.layout.dose_view, drugs, mDate);
 		adapter.setFilter(mShowingAll ? null : new DrugFilter());
 		nextView.setAdapter(adapter);
 		nextView.setOnTouchListener(this);

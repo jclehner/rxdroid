@@ -24,14 +24,15 @@ package at.caspase.rxdroid;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.util.Util;
 
@@ -55,12 +56,30 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		addPreferencesFromResource(R.xml.preferences);
 
-		final Preference versionPref = findPreference("version");
-		if(versionPref != null)
+		Preference p = findPreference("version");
+		if(p != null)
 		{
 			String summary = Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION;
-			versionPref.setSummary(summary);
+			p.setSummary(summary);
 		}
+
+		p = findPreference("debug_sorter");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					Intent intent = new Intent(PreferencesActivity.this, DrugSortActivity.class);
+					startActivity(intent);
+					return true;
+				}
+			});
+
+
+		}
+
 
 		updateLowSupplyThresholdPreferenceSummary();
 		Util.populateListPreferenceEntryValues(findPreference("snooze_type"));

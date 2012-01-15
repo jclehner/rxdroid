@@ -182,6 +182,10 @@
 	
 	<PreferenceScreen android:key="prefscreen_debug"
 		android:title="Debugging options">
+		
+		<Preference android:key="debug_sorter"
+			android:title="Launch DrugSortActivity"
+		/>			
 				
 		<CheckBoxPreference android:key="debug_logv"
 			android:title="Debug loglevel"

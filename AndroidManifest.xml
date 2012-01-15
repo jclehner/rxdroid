@@ -23,6 +23,8 @@
 			
 		</activity>
 		
+		<activity android:name=".DrugSortActivity" />
+		
 		<activity android:name=".DrugListActivity"		    
 		    android:screenOrientation="nosensor"
 		    android:windowSoftInputMode="adjustPan"

@@ -115,6 +115,7 @@ public class LoaderActivity extends Activity implements OnClickListener
 		finish();
 
 		Intent intent = new Intent(this, DrugListActivity.class);
+		//Intent intent = new Intent(this, DrugSortActivity.class); // XXX
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		startActivity(intent);
 	}

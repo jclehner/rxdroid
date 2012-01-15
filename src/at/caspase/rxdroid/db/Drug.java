@@ -71,7 +71,7 @@ import com.j256.ormlite.table.DatabaseTable;
  *
  */
 @DatabaseTable(tableName = "drugs")
-public class Drug extends Entry
+public class Drug extends Entry implements Comparable<Drug>
 {
 	private static final String TAG = Drug.class.getName();
 	private static final long serialVersionUID = -2569745648137404894L;
@@ -162,6 +162,8 @@ public class Drug extends Entry
 
 	@DatabaseField(canBeNull = true)
 	private String comment;
+
+	private Fraction[] mSchedule;
 
 	/**
 	 * Default constructor, required by ORMLite.
@@ -326,19 +328,36 @@ public class Drug extends Entry
 		}
 	}
 
-	public Fraction[] getSchedule() {
-		return new Fraction[] { doseMorning, doseNoon, doseEvening, doseNight };
+	public synchronized Fraction[] getSchedule()
+	{
+		if(mSchedule == null)
+			mSchedule = new Fraction[] { doseMorning, doseNoon, doseEvening, doseNight };
+
+		return mSchedule;
 	}
 
-	public Fraction getDose(int doseTime) {
-		return getSchedule()[doseTime];
+	public Fraction getDose(int doseTime)
+	{
+		switch(doseTime)
+		{
+			case TIME_MORNING:
+				return doseMorning;
+			case TIME_NOON:
+				return doseNoon;
+			case TIME_EVENING:
+				return doseEvening;
+			case TIME_NIGHT:
+				return doseNight;
+			default:
+				throw new IllegalArgumentException();
+		}
 	}
 
 	public Fraction getDose(int doseTime, Date date)
 	{
 		if(!hasDoseOnDate(date))
 			return new Fraction(0);
-		return getSchedule()[doseTime];
+		return getDose(doseTime);
 	}
 
 	private Fraction getDailyDose()
@@ -451,7 +470,7 @@ public class Drug extends Entry
 		this.currentSupply = currentSupply;
 	}
 
-	public void setDose(int doseTime, Fraction value)
+	public synchronized void setDose(int doseTime, Fraction value)
 	{
 		switch(doseTime)
 		{
@@ -470,6 +489,9 @@ public class Drug extends Entry
 			default:
 				throw new IllegalArgumentException();
 		}
+
+		if(mSchedule != null)
+			mSchedule[doseTime] = value;
 	}
 
 	public void setComment(String comment) {
@@ -526,6 +548,26 @@ public class Drug extends Entry
 	@Override
 	public String toString() {
 		return id + ":\"" + name + "\"=" + Arrays.toString(getSchedule());
+	}
+
+	@Override
+	public int compareTo(Drug other)
+	{
+		int thisRank = sortRank;
+		int otherRank = other.sortRank;
+
+		if(thisRank == otherRank)
+		{
+			thisRank = id;
+			otherRank = other.id;
+		}
+
+		if(thisRank < otherRank)
+			return -1;
+		else if(thisRank > otherRank)
+			return 1;
+
+		return 0;
 	}
 
 	/**
