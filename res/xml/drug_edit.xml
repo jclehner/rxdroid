@@ -4,8 +4,8 @@
 	<at.caspase.rxdroid.preferences.DrugNamePreference android:key="drug_name"
 		android:hint="Drug name"
 		android:inputType="textCapWords"
-	/>
-	
+	/>	
+		
 	<Preference android:key="delete"
 		android:title="@string/_title_delete"
 	/>

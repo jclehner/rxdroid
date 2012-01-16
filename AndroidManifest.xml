@@ -8,7 +8,6 @@
 
 	<application android:icon="@drawable/ic_launcher"
 		android:debuggable="true" android:label="RxDroid" 
-		android:theme="@android:style/Theme.Black" 
 		android:name=".MyApplication"
 	>
 	
@@ -27,7 +26,6 @@
 		
 		<activity android:name=".DrugListActivity"		    
 		    android:screenOrientation="nosensor"
-		    android:windowSoftInputMode="adjustPan"
 		/>
 
 		<activity android:name=".DrugEditActivity"
@@ -73,5 +71,5 @@
 
 	<instrumentation android:targetPackage="at.caspase.rxdroid" android:label="RxDroid Tests" android:name="android.test.InstrumentationTestRunner"/>
 	
-	<uses-sdk android:minSdkVersion="8" />
+	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="15" />
 </manifest> 

@@ -53,7 +53,7 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	private String[] mConstraintKeys = new String[2];
 
 	public TimePreference(Context context, AttributeSet attrs) {
-		this(context, attrs, 0);
+		this(context, attrs, android.R.attr.preferenceStyle);
 	}
 
 	public TimePreference(Context context, AttributeSet attrs, int defStyle)

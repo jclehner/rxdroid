@@ -45,7 +45,6 @@
     <string name="_msg_freq_daily">Daily</string>
 	<string name="_msg_freq_weekly">Every %1$s</string>
 
-	<string name="_msg_delete_drug">Are you sure that you want to delete this drug?</string>
 	<string name="_toast_deleted">Deleted</string>
 	  
     <!--  Dialogs: Errors -->    
@@ -185,4 +184,7 @@
 	<string name="_msg_snoozing">Snoozing. Click to cancel.</string>
 	<string name="_toast_snoozing">Snoozing</string>
 	<string name="_title_on_demand">On demand</string>
+	
+	<string name="_title_delete_drug">Really delete %1$s?</string>
+	<string name="_msg_delete_drug">This cannot be undone!</string>
 </resources>

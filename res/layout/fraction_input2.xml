@@ -12,13 +12,13 @@
 		android:orientation="horizontal"
 		android:gravity="center"
 	>	
-		<com.quietlycoding.android.picker.NumberPicker android:id="@+id/integer" 
+		<at.caspase.rxdroid.NumberPickerWrapper android:id="@+id/integer" 
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:visibility="gone"
 		/>
 	    
-		<com.quietlycoding.android.picker.NumberPicker android:id="@+id/numerator" 
+		<at.caspase.rxdroid.NumberPickerWrapper android:id="@+id/numerator" 
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 		/>
@@ -33,7 +33,7 @@
 			android:text="/"
 		/>
 		
-		<com.quietlycoding.android.picker.NumberPicker android:id="@+id/denominator" 
+		<at.caspase.rxdroid.NumberPickerWrapper android:id="@+id/denominator" 
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 		/>   

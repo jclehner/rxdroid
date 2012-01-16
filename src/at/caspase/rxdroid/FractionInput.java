@@ -34,8 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import at.caspase.androidutils.StateSaver;
 import at.caspase.androidutils.StateSaver.SaveState;
-
-import com.quietlycoding.android.picker.NumberPicker;
+import at.caspase.rxdroid.NumberPickerWrapper.OnValueChangeListener;
 
 /**
  * A widget for fraction input.
@@ -45,7 +44,7 @@ import com.quietlycoding.android.picker.NumberPicker;
  *
  * @author Joseph Lehner
  */
-public class FractionInput extends LinearLayout implements NumberPicker.OnChangedListener, OnClickListener
+public class FractionInput extends LinearLayout implements OnClickListener
 {
 	public interface OnChangedListener
 	{
@@ -53,7 +52,6 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	}
 
 	private static final String TAG = FractionInput.class.getName();
-	private static final int MAX = 99999;
 
 	private static final boolean LOGV = true;
 
@@ -62,9 +60,9 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	public static final int MODE_FRACTION = 3;
 	public static final int MODE_INVALID = 4;
 
-	private NumberPicker mIntegerPicker;
-	private NumberPicker mNumeratorPicker;
-	private NumberPicker mDenominatorPicker;
+	private NumberPickerWrapper mIntegerPicker;
+	private NumberPickerWrapper mNumeratorPicker;
+	private NumberPickerWrapper mDenominatorPicker;
 	private TextView mFractionBar;
 	private Button mModeSwitcher;
 
@@ -89,23 +87,21 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 		LayoutInflater lf = LayoutInflater.from(context);
 		lf.inflate(R.layout.fraction_input2, this, true);
 
-		mIntegerPicker = (NumberPicker) findViewById(R.id.integer);
-		mNumeratorPicker = (NumberPicker) findViewById(R.id.numerator);
-		mDenominatorPicker = (NumberPicker) findViewById(R.id.denominator);
+		mIntegerPicker = (NumberPickerWrapper) findViewById(R.id.integer);
+		mNumeratorPicker = (NumberPickerWrapper) findViewById(R.id.numerator);
+		mDenominatorPicker = (NumberPickerWrapper) findViewById(R.id.denominator);
 		mFractionBar = (TextView) findViewById(R.id.fraction_bar);
 		mModeSwitcher = (Button) findViewById(R.id.mode_switcher);
 
-		mIntegerPicker.setOnChangeListener(this);
-		mIntegerPicker.setRange(0, MAX);
-		mIntegerPicker.setWrap(false);
+		mIntegerPicker.setOnValueChangeListener(mPickerListener);
+		mIntegerPicker.setWrapSelectorWheel(false);
 
-		mNumeratorPicker.setOnChangeListener(this);
-		mNumeratorPicker.setRange(0, MAX);
-		mNumeratorPicker.setWrap(false);
+		mNumeratorPicker.setOnValueChangeListener(mPickerListener);
+		mNumeratorPicker.setWrapSelectorWheel(false);
 
-		mDenominatorPicker.setOnChangeListener(this);
-		mDenominatorPicker.setRange(1, MAX);
-		mDenominatorPicker.setWrap(false);
+		mDenominatorPicker.setOnValueChangeListener(mPickerListener);
+		mDenominatorPicker.setMinValue(1); // must be called before setWrapSelectorWheel!
+		mDenominatorPicker.setWrapSelectorWheel(false);
 
 		mModeSwitcher.setOnClickListener(this);
 
@@ -226,29 +222,6 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 	}
 
 	@Override
-	public void onChanged(NumberPicker picker, int oldVal, int newVal)
-	{
-		Fraction oldValue = getValue();
-
-		if(picker.getId() == R.id.integer)
-			mInteger = newVal;
-		else if(picker.getId() == R.id.numerator)
-			mNumerator = newVal;
-		else if(picker.getId() == R.id.denominator)
-		{
-			if(newVal > 0)
-				mDenominator = newVal;
-			else // this shouldn't happen
-				mDenominator = 1;
-		}
-		else
-			return;
-
-		if(mListener != null)
-			mListener.onFractionChanged(this, oldValue);
-	}
-
-	@Override
 	public void onClick(View v)
 	{
 		if(v.getId() == R.id.mode_switcher)
@@ -288,8 +261,34 @@ public class FractionInput extends LinearLayout implements NumberPicker.OnChange
 		// show in integer mode
 		mModeSwitcher.setVisibility(mFractionInputMode == MODE_INTEGER ? VISIBLE : GONE);
 
-		mIntegerPicker.setCurrent(mInteger);
-		mNumeratorPicker.setCurrent(mNumerator);
-		mDenominatorPicker.setCurrent(mDenominator);
+		mIntegerPicker.setValue(mInteger);
+		mNumeratorPicker.setValue(mNumerator);
+		mDenominatorPicker.setValue(mDenominator);
 	}
+
+	private OnValueChangeListener mPickerListener = new OnValueChangeListener() {
+
+		@Override
+		public void onValueChange(NumberPickerWrapper picker, int oldVal, int newVal)
+		{
+			Fraction oldValue = getValue();
+
+			if(picker.getId() == R.id.integer)
+				mInteger = newVal;
+			else if(picker.getId() == R.id.numerator)
+				mNumerator = newVal;
+			else if(picker.getId() == R.id.denominator)
+			{
+				if(newVal > 0)
+					mDenominator = newVal;
+				else // this shouldn't happen
+					mDenominator = 1;
+			}
+			else
+				return;
+
+			if(mListener != null)
+				mListener.onFractionChanged(FractionInput.this, oldValue);
+		}
+	};
 }

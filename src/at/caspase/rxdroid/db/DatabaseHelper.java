@@ -218,7 +218,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 		catch(SQLException e)
 		{
-			throw new DbError(DbError.E_GENERAL, e);
+			Log.e(TAG, "reset", e);
+			//throw new DbError(DbError.E_GENERAL, e);
 		}
 
 		onCreate(getWritableDatabase(), cs);

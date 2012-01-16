@@ -30,7 +30,7 @@ import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.util.CollectionUtils;
 
-public class DosePreference extends FractionPreference implements OnClickListener
+public class DosePreference extends FractionPreference
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = DosePreference.class.getName();
@@ -39,9 +39,13 @@ public class DosePreference extends FractionPreference implements OnClickListene
 	private Drug mDrug;
 	private DoseView mDoseView;
 
-	public DosePreference(Context context, AttributeSet attrs)
+	public DosePreference(Context context, AttributeSet attrs) {
+		this(context, attrs, android.R.attr.preferenceStyle);
+	}
+
+	public DosePreference(Context context, AttributeSet attrs, int defStyle)
 	{
-		super(context, attrs);
+		super(context, attrs, defStyle);
 
 		mDoseTime = getDoseTimeFromKey(getKey());
 
@@ -60,11 +64,6 @@ public class DosePreference extends FractionPreference implements OnClickListene
 	@Override
 	public CharSequence getSummary() {
 		return null;
-	}
-
-	@Override
-	public void onClick(View v) {
-		onClick();
 	}
 
 	public static int getDoseTimeFromKey(String key)
@@ -92,7 +91,16 @@ public class DosePreference extends FractionPreference implements OnClickListene
 
 			mDoseView.setDoseTime(mDoseTime);
 			mDoseView.setDrug(mDrug);
-			mDoseView.setOnClickListener(this);
+			mDoseView.setOnClickListener(mViewClickListener);
 		}
 	}
+
+	private OnClickListener mViewClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v)
+		{
+			DosePreference.this.onClick();
+		}
+	};
 }

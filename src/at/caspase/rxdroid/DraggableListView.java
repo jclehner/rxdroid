@@ -160,11 +160,8 @@ public class DraggableListView extends ListView
 
 		mLastDragIdx = pointToIndex(1, y);
 
-
-
-
-
-
+		if(bottom + halfHeight > getBottom())
+			scrollTo(1, bottom);
 
 		/*if(aboveIdx == -1 && belowIdx != 0)
 			return;
@@ -273,6 +270,9 @@ public class DraggableListView extends ListView
 
 		Log.d(TAG, "DnD:" + mDragOriginIdx + " -> " + mLastDragIdx);
 
+		if(mDragOriginIdx == -1)
+			return;
+
 		if(mDropListener != null)
 			mDropListener.onDrop(mDragOriginIdx, mLastDragIdx);
 
@@ -281,6 +281,7 @@ public class DraggableListView extends ListView
 		{
 			@SuppressWarnings("rawtypes")
 			ArrayAdapter aAdapter = (ArrayAdapter) getAdapter();
+
 			Object o = aAdapter.getItem(mDragOriginIdx);
 			aAdapter.remove(o);
 			aAdapter.insert(o, mLastDragIdx);

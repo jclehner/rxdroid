@@ -46,9 +46,13 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	private EditText mInput;
 	private String mInitialName = null;
 
-	public DrugNamePreference(Context context, AttributeSet attrs)
+	public DrugNamePreference(Context context, AttributeSet attrs) {
+		this(context, attrs, android.R.attr.editTextPreferenceStyle);
+	}
+
+	public DrugNamePreference(Context context, AttributeSet attrs, int defStyle)
 	{
-		super(context, attrs);
+		super(context, attrs, defStyle);
 
 		mInput = getEditText();
 		mInput.addTextChangedListener(this);
@@ -97,23 +101,17 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	@Override
 	protected void showDialog(Bundle state)
 	{
-		super.showDialog(null);
+		super.showDialog(state);
 
 		Dialog dialog = getDialog();
 		if(dialog != null)
 		{
 			// this is required on devices with small screens that would otherwise squash
-			// the
+			// the EditText displayed in the dialog
 			Window window = dialog.getWindow();
 			window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
 					WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 		}
-	}
-
-	@Override
-	protected void onPrepareDialogBuilder(AlertDialog.Builder builder)
-	{
-		super.onPrepareDialogBuilder(builder);
 	}
 
 	@Override

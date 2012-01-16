@@ -4,6 +4,11 @@
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
+	
+	android:focusable="false"
+	android:focusableInTouchMode="false"
+	
+	android:nextFocusLeft="@+id/drug_name"
 >
 	<!-- first line: icon + name -->
 	
@@ -18,7 +23,7 @@
 		android:src="@drawable/med_pill"
 	/>
   
-  	<TextView android:id="@+id/drug_name"
+  	<TextView android:id="@id/drug_name"
   		android:layout_width="fill_parent"
   		android:layout_height="wrap_content"
   		  		
@@ -35,24 +40,28 @@
   		android:onClick="onDrugNameClick"
   		
   		android:textColor="@color/text_fg_color"
+  		
+  		android:nextFocusDown="@+id/morning"
   		  		
   		style="@style/android:TextAppearance.Large"	
 	/>
 	
 	<!-- second line: dose views android:layout_alignBottom="@id/drug_icon" -->
   	
-  	<at.caspase.rxdroid.DoseView android:id="@+id/morning"
+  	<at.caspase.rxdroid.DoseView android:id="@id/morning"
   		android:layout_height="wrap_content"
   		android:layout_width="wrap_content"
   		
   		android:layout_toRightOf="@id/drug_icon"
   		android:layout_below="@id/drug_name"
   		
+  		android:nextFocusLeft="@+id/noon"
+  		
   		android:focusable="true"
   		android:onClick="onDoseClick"
   	/>
   	
-  	<at.caspase.rxdroid.DoseView android:id="@+id/noon"
+  	<at.caspase.rxdroid.DoseView android:id="@id/noon"
   		android:layout_height="wrap_content"
   		android:layout_width="wrap_content"
   		

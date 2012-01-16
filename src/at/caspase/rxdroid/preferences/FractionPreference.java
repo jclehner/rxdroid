@@ -56,7 +56,7 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 	//FractionInputDialog2 mDialog;
 
 	public FractionPreference(Context context, AttributeSet attrs) {
-		this(context, attrs, 0);
+		this(context, attrs, android.R.attr.dialogPreferenceStyle);
 	}
 
 	public FractionPreference(Context context, AttributeSet attrs, int defStyle)

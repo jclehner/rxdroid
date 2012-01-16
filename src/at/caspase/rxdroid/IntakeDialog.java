@@ -97,7 +97,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		mDoseEdit.setFractionInputMode(mDose.isInteger() ? FractionInput.MODE_INTEGER : FractionInput.MODE_FRACTION);
 		mDoseEdit.setOnChangeListener(this);
 
-		setTitle(mDrug.getName());
+		//setTitle(mDrug.getName());
 		setView(view);
 
 		setButton(BUTTON_POSITIVE, getString(android.R.string.ok), (OnClickListener) null);

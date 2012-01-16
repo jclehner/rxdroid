@@ -199,7 +199,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		{
 			final Fraction dose = drug.getDose(doseTime);
 
-			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date))
+			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date) || drug.getRepeat() == Drug.REPEAT_ON_DEMAND)
 				continue;
 
 			if(Intake.findAll(drug, date, doseTime).isEmpty())

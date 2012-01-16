@@ -210,14 +210,14 @@ public class DoseView extends FrameLayout implements OnChangedListener
 	}
 
 	@Override
-	public boolean onTouchEvent(final MotionEvent event)
+	public boolean onTouchEvent(MotionEvent event)
 	{
 		int action = event.getAction() & MotionEvent.ACTION_MASK;
 
 		switch(action)
 		{
 			case MotionEvent.ACTION_DOWN:
-				setBackgroundResource(R.drawable.doseview_background_focus);
+				setBackgroundResource(R.drawable.doseview_background_selected);
 				break;
 
 			case MotionEvent.ACTION_UP:

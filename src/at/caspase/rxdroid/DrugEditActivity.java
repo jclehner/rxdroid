@@ -113,7 +113,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		if(drugName == null || drugName.length() == 0)
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string._title_warning);
+			//builder.setTitle(R.string._title_warning);
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setMessage(R.string._msg_err_empty_drug_name);
 			builder.setNegativeButton(android.R.string.cancel, null);
@@ -235,7 +235,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setTitle(mDrug.getName());
+			builder.setTitle(getString(R.string._title_delete_drug, mDrug.getName()));
 			builder.setMessage(R.string._msg_delete_drug);
 
 			builder.setPositiveButton(android.R.string.yes, new OnClickListener() {
@@ -351,6 +351,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		Log.d(TAG, "updatePreferences: mDrug=" + mDrug);
 
 		mDrugName.setName(mDrug.getName());
+		//mDrugName.setText(mDrug.getName());
 
 		// intake repeat
 
