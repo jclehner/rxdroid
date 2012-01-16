@@ -181,7 +181,9 @@
 	
 	
 	<PreferenceScreen android:key="prefscreen_debug"
-		android:title="Debugging options">
+		android:title="Debugging options"
+		android:icon="@android:drawable/ic_menu_preferences"	
+	>
 		
 		<Preference android:key="debug_sorter"
 			android:title="Launch DrugSortActivity"

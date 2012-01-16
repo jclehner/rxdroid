@@ -161,7 +161,7 @@
 	<string name="menu_preferences_label">Preferences</string>
     <string name="menu_dialog_label">Dialog Picker</string>
     
-    <string name="_msg_click_to_edit">(click to edit)</string>
+    <string name="_msg_touch_to_edit">(touch to edit)</string>
     <string name="_msg_empty_list_text">Click MENU and select "%1$s" to add a drug.</string>
     
     <string name="_msg_no_doses_on_this_day">There are no doses to be taken on this date.</string>

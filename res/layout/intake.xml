@@ -32,7 +32,7 @@
 						
 			android:gravity="center"
 			android:textAppearance="?android:attr/textAppearanceSmall"
-			android:text="@string/_msg_click_to_edit"
+			android:text="@string/_msg_touch_to_edit"
 		/>
 	    	    
     </LinearLayout>
