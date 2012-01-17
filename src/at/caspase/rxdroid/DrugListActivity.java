@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -35,7 +36,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.SpannableString;
 import android.text.format.DateFormat;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -526,16 +529,17 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		else
 			mMessageOverlay.setVisibility(View.GONE);
 
-		//final SpannableString dateString = new SpannableString(DateFormat
-		//		.getDateFormat(this).format(mDate.getTime()));
+		//final String dateString = DateFormat.getDateFormat(this).format(mDate);
+				//setTitle(getString(R.string.app_name) + " - " + dateString);
 
-		final String dateString = DateFormat.getDateFormat(this).format(mDate);
-		setTitle(getString(R.string.app_name) + " - " + dateString);
+		final SpannableString dateString = new SpannableString(DateFormat
+				.getDateFormat(this).format(mDate.getTime()));
 
-		//if (mDate.equals(DateTime.todayDate()))
-		//	dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
+		if(mDate.equals(DateTime.todayDate()))
+			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
 
-		//mTextDate.setText(dateString);
+		mTextDate.setText(dateString);
+
 		// setTitle(getString(R.string.app_name) + " - " +
 		// dateString.toString());
 
