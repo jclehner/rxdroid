@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<style name="TextLarge" parent="@android:style/TextAppearance.Large">
+	<style name="TextLarge" parent="@android:style/TextAppearance.Holo.Large">
 		<item name="android:textColor">@color/color_text</item>
 	</style>	
 </resources>

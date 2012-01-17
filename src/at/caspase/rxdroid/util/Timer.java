@@ -40,7 +40,7 @@ public class Timer
 	}
 
 	public double elapsedSeconds() {
-		return (double) elapsed() / 1000;
+		return elapsed() / 1000.0;
 	}
 
 	@Override

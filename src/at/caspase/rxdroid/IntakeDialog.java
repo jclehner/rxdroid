@@ -198,8 +198,9 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	private void setupPopupWindow(final Context context, LayoutInflater lf)
 	{
 		View view = lf.inflate(R.layout.intake_popup, null, false);
-		String ok = context.getString(android.R.string.ok);
-		String text = context.getString(R.string._msg_footer_insufficient_supplies, mDrug.getCurrentSupply(), ok);
+		String okStr = context.getString(android.R.string.ok);
+		String text = context.getString(R.string._msg_footer_insufficient_supplies,
+				mDrug.getCurrentSupply(), okStr, mDrug.getName());
 
 		TextView tv = (TextView) view.findViewById(R.id.text);
 		tv.setText(text);

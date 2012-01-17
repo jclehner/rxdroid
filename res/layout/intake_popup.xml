@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         
-        style="@android:style/TextAppearance.Theme.Dialog"
+        style="@style/Theme.Dialog"
     />
     
 </LinearLayout>

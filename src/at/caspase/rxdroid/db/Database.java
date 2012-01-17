@@ -37,8 +37,10 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
+import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.caspase.rxdroid.util.Reflect;
 
 import com.j256.ormlite.dao.Dao;
@@ -97,13 +99,20 @@ public final class Database
 
 		if(!sIsLoaded)
 		{
-			sHelper = new DatabaseHelper(context);
+			try
+			{
+				sHelper = new DatabaseHelper(context);
 
-			// precache entries
-			getCached(Drug.class);
-			getCached(Intake.class);
+				// precache entries
+				getCached(Drug.class);
+				getCached(Intake.class);
 
-			sIsLoaded = true;
+				sIsLoaded = true;
+			}
+			catch(SQLiteCantOpenDatabaseException e)
+			{
+				throw new DatabaseError(DatabaseError.E_GENERAL, e);
+			}
 		}
 	}
 
@@ -257,11 +266,15 @@ public final class Database
 			}
 			catch(IllegalArgumentException e)
 			{
-				if(LOGV) Log.d(TAG, hookName, e);
+				Log.w(TAG, hookName, e);
 			}
 			catch(IllegalAccessException e)
 			{
-				if(LOGV) Log.d(TAG, hookName, e);
+				Log.w(TAG, hookName, e);
+			}
+			catch(ClassCastException e)
+			{
+				Log.w(TAG, hookName, e);
 			}
 
 			if(hook != null)
@@ -329,7 +342,7 @@ public final class Database
 		th.start();
 	}
 
-	static<T> List<T> queryForAll(Class<T> clazz)
+	private static<T> List<T> queryForAll(Class<T> clazz)
 	{
 		try
 		{
@@ -351,7 +364,8 @@ public final class Database
 			Set<OnChangedListener> listeners = sOnChangedListeners.keySet();
 			synchronized(listeners)
 			{
-				long startTime = System.currentTimeMillis();
+				long startTime;
+				if(LOGV) startTime = System.currentTimeMillis();
 
 				for(OnChangedListener listener : listeners)
 				{
@@ -395,8 +409,6 @@ public final class Database
 		}
 	}
 
-	private Database() {}
-
 	/**
 	 * Notifies objects of database changes.
 	 * <p>
@@ -405,10 +417,9 @@ public final class Database
 	 * any changes to the database, as long as the modifications are performed
 	 * using the static functions in {@link #Database}.
 	 *
-	 * @see Database#create
-	 * @see Database#update
-	 * @see Database#delete
-	 * @see Database#dropDatabase
+	 * @see Database#create(Entry)
+	 * @see Database#update(Entry)
+	 * @see Database#delete(Entry)
 	 *
 	 * @author Joseph Lehner
 	 *
@@ -452,4 +463,6 @@ public final class Database
 	{
 		boolean matches(T t);
 	}
+
+	private Database() {}
 }

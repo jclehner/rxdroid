@@ -24,6 +24,7 @@ package at.caspase.rxdroid;
 import java.util.StringTokenizer;
 
 import android.content.Context;
+import android.os.Build;
 
 /**
  * Provides information about the current version.
@@ -35,8 +36,9 @@ public final class Version
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = Version.class.getName();
+	private static final boolean LOGV = true;
 
-	public static final boolean LOGV = true;
+	static final boolean SDK_IS_PRE_HONEYCOMB = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
 
 	/**
 	 * Short format. Example: <code>1.2.3</code>

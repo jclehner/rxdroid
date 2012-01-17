@@ -114,7 +114,7 @@ public class MyNotification
 
 			final String bullet;
 
-			if(doseMessage == null || mLowSupplyMessage == null)
+			if(!Version.SDK_IS_PRE_HONEYCOMB || (doseMessage == null || mLowSupplyMessage == null))
 				bullet = "";
 			else
 				bullet = Constants.NOTIFICATION_BULLET;
@@ -124,7 +124,7 @@ public class MyNotification
 			if(doseMessage != null)
 				sb.append(bullet + doseMessage);
 
-			if(mLowSupplyMessage != null)
+			if(Version.SDK_IS_PRE_HONEYCOMB && mLowSupplyMessage != null)
 			{
 				if(doseMessage != null)
 					sb.append("\n");
@@ -133,24 +133,33 @@ public class MyNotification
 				++notificationItems;
 			}
 
-			final String message = sb.toString();
+			final String contentText = sb.toString();
+			final String contentTitle = mContext.getString(R.string._title_notifications);
 
-			final RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.notification);
-			views.setCharSequence(R.id.stat_title, "setText",
-					createTitleSpannable(mContext.getString(R.string._title_notifications)));
-			views.setCharSequence(R.id.stat_text, "setText", createContentSpannable(message));
-			views.setTextViewText(R.id.stat_time, "");
+			if(Version.SDK_IS_PRE_HONEYCOMB)
+			{
+				final RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.notification);
+				views.setCharSequence(R.id.stat_title, "setText",
+						createTitleSpannable(contentTitle));
+				views.setCharSequence(R.id.stat_text, "setText", createContentSpannable(contentText));
+				views.setTextViewText(R.id.stat_time, "");
+				mNotification.contentView = views;
+			}
+			else
+			{
+				mNotification.setLatestEventInfo(mContext, contentTitle, contentText, null);
+			}
 
 			mNotification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONLY_ALERT_ONCE;
 			mNotification.defaults |= Notification.DEFAULT_ALL;
-			mNotification.contentView = views;
+
 			if(notificationItems > 1)
 				mNotification.number = notificationItems;
 
 			Settings settings = Settings.instance();
 			settings.setLastNotificationCount(notificationItems);
 
-			int messageHash = message.hashCode();
+			int messageHash = contentText.hashCode();
 
 			if(forceUpdate || settings.getLastNotificationMessageHash() != messageHash)
 			{
@@ -239,7 +248,7 @@ public class MyNotification
 	private SpannableString createSpannableWithAppearance(String string, int appearance)
 	{
 		SpannableString s = new SpannableString(string);
-		s.setSpan(new TextAppearanceSpan(mContext, appearance), 0, s.length() - 1, 0);
+		s.setSpan(new TextAppearanceSpan(mContext, appearance), 0, s.length(), 0);
 		return s;
 	}
 }

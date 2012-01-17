@@ -35,9 +35,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.SpannableString;
 import android.text.format.DateFormat;
-import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -498,17 +496,13 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 			if (shiftBy == 1)
 			{
-				mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this,
-						R.anim.slide_in_right));
-				mViewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(
-						this, R.anim.slide_out_left));
+				mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_in_right));
+				mViewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_out_left));
 			}
 			else if (shiftBy == -1)
 			{
-				mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this,
-						android.R.anim.slide_in_left));
-				mViewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(
-						this, android.R.anim.slide_out_right));
+				mViewSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left));
+				mViewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right));
 			}
 			else
 				throw new IllegalArgumentException();
@@ -523,8 +517,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 					getString(R.string._title_add)));
 			mMessageOverlay.setVisibility(View.VISIBLE);
 		}
-		else if (((ListView) mViewSwitcher.getCurrentView()).getAdapter()
-				.getCount() == 0)
+		else if(((ListView) mViewSwitcher.getCurrentView()).getAdapter().getCount() == 0)
 		{
 			mMessageOverlay
 					.setText(getString(R.string._msg_no_doses_on_this_day));
@@ -533,13 +526,16 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		else
 			mMessageOverlay.setVisibility(View.GONE);
 
-		final SpannableString dateString = new SpannableString(DateFormat
-				.getDateFormat(this).format(mDate.getTime()));
+		//final SpannableString dateString = new SpannableString(DateFormat
+		//		.getDateFormat(this).format(mDate.getTime()));
 
-		if (mDate.equals(DateTime.todayDate()))
-			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
+		final String dateString = DateFormat.getDateFormat(this).format(mDate);
+		setTitle(getString(R.string.app_name) + " - " + dateString);
 
-		mTextDate.setText(dateString);
+		//if (mDate.equals(DateTime.todayDate()))
+		//	dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
+
+		//mTextDate.setText(dateString);
 		// setTitle(getString(R.string.app_name) + " - " +
 		// dateString.toString());
 
@@ -566,16 +562,23 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	private class DrugAdapter extends ArrayAdapter<Drug>
 	{
+		//private static final String TAG = DrugAdapter.class.getName();
+
 		private ArrayList<Drug> mAllItems;
 		private ArrayList<Drug> mItems;
 		private Date mAdapterDate;
 
-		public DrugAdapter(Context context, int viewResId, List<Drug> items,
-				Date date) {
+		private Timer mTimer = null;
+
+		public DrugAdapter(Context context, int viewResId, List<Drug> items, Date date)
+		{
 			super(context, viewResId, items);
 
 			mAllItems = new ArrayList<Drug>(items);
 			mAdapterDate = date;
+
+			if(LOGV)
+				mTimer = new Timer();
 		}
 
 		public void setFilter(CollectionUtils.Filter<Drug> filter)
@@ -593,20 +596,17 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 
 		@Override
-		public Drug getItem(int position)
-		{
+		public Drug getItem(int position) {
 			return mItems.get(position);
 		}
 
 		@Override
-		public int getPosition(Drug drug)
-		{
+		public int getPosition(Drug drug) {
 			return mItems.indexOf(drug);
 		}
 
 		@Override
-		public int getCount()
-		{
+		public int getCount() {
 			return mItems.size();
 		}
 
@@ -621,20 +621,14 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			// All measurements were done using an HTC Desire running
 			// Cyanogenmod 7!
 
-			Timer t = null;
-			if (LOGV && position == 0)
-			{
-				Log.v(TAG, "getView: position=0");
-				t = new Timer();
-			}
+			if(LOGV && position == 0)
+				mTimer.reset();
 
 			final DoseViewHolder holder;
 
 			if(v == null)
 			{
 				v = mInflater.inflate(R.layout.drug_view2, null);
-				if (LOGV && position == 0)
-					Log.v(TAG, "  0: " + t);
 
 				holder = new DoseViewHolder();
 
@@ -664,9 +658,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			holder.name.setTag(TAG_ID, drug.getId());
 			holder.icon.setImageResource(drug.getFormResourceId());
 
-			if(LOGV && position == 0)
-				Log.v(TAG, "  1: " + t);
-
 			// This part often takes more than 90% of the time spent in this
 			// function,
 			// being rougly 0.025s when hasInfo returns false, and 0.008s when
@@ -685,8 +676,15 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 					doseView.setInfo(mAdapterDate, drug);
 			}
 
-			if(LOGV && position == 0)
-				Log.v(TAG, "  2: " + t);
+			if(LOGV && position == getCount() - 1)
+			{
+				final double elapsed = mTimer.elapsedSeconds();
+				final int viewCount = getCount() * 4;
+				final double timePerView = elapsed / viewCount;
+
+				Log.v(TAG + "$DrugAdapter", viewCount + " views created in " +
+							elapsed + "s (" + timePerView + "s per view)");
+			}
 
 			return v;
 		}

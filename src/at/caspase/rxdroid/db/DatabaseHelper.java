@@ -21,19 +21,13 @@
 
 package at.caspase.rxdroid.db;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
 import android.util.Log;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
@@ -49,41 +43,42 @@ import com.j256.ormlite.table.TableUtils;
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 {
 	private static final String TAG = DatabaseHelper.class.getName();
+	private static final boolean LOGV = true;
 
-	public static class DbError extends RuntimeException
+	public static class DatabaseError extends RuntimeException
 	{
 		public static final int E_GENERAL = 0;
 		public static final int E_UPGRADE = 1;
 		public static final int E_DOWNGRADE = 2;
 		public static final int E_BACKUP = 3;
 
-		public DbError(int type, String string, Throwable e)
+		public DatabaseError(int type, String string, Throwable e)
 		{
 			super(string, e);
 			mType = type;
 		}
 
-		public DbError(String string, Throwable e) {
+		public DatabaseError(String string, Throwable e) {
 			this(E_GENERAL, string, e);
 		}
 
-		public DbError(int type, Throwable e)
+		public DatabaseError(int type, Throwable e)
 		{
 			super(e);
 			mType = type;
 		}
 
-		public DbError(int type, String string)
+		public DatabaseError(int type, String string)
 		{
 			super(string);
 			mType = type;
 		}
 
-		public DbError(String string) {
+		public DatabaseError(String string) {
 			this(E_GENERAL, string);
 		}
 
-		public DbError(int type) {
+		public DatabaseError(int type) {
 			this(type, getTypeAsString(type));
 		}
 
@@ -112,7 +107,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	}
 
 	public static final int DB_VERSION = 48;
-	private static final String DB_NAME = "db.sqlite";
+	public static final String DB_NAME = "db.sqlite";
 
 	private final Context mContext;
 
@@ -132,83 +127,38 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 		catch(SQLException e)
 		{
-			throw new DbError("Failed to create tables", e);
+			throw new DatabaseError("Failed to create tables", e);
 		}
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void onUpgrade(SQLiteDatabase db, ConnectionSource cs, int oldVersion, int newVersion)
 	{
-		Log.d(TAG, "onUpgrade: " + oldVersion + " -> " + newVersion);
+		if(oldVersion == newVersion)
+			return;
 
-		try
+		final boolean isUpgrade = newVersion > oldVersion;
+
+		if(isUpgrade)
 		{
-			if(newVersion == DB_VERSION)
-			{
-				backup();
-
-				final String packageName = Database.class.getPackage().getName();
-				final String classNames[] = { "Drug", "Intake" };
-
-				int updatedDataCount = 0;
-
-				for(String className : classNames)
-				{
-					final String oldDataClassName = packageName + ".v" + oldVersion + ".Old" + className;
-					final String newDataClassName = packageName + "." + className;
-
-					Log.d(TAG, "  Mapping " + oldDataClassName + " to " + newDataClassName);
-
-					final Class<?> oldDataClass;
-					final Class<?> newDataClass = Class.forName(newDataClassName);
-
-					try
-					{
-						oldDataClass = Class.forName(oldDataClassName);
-						++updatedDataCount;
-					}
-					catch(Exception e)
-					{
-						Log.d(TAG, "  Not upgrading " + className);
-						continue;
-					}
-
-					@SuppressWarnings("rawtypes")
-					final Dao newDao = getDao(newDataClass);
-					final List<?> oldData = getDao(oldDataClass).queryForAll();
-
-					TableUtils.dropTable(cs, oldDataClass, true);
-					TableUtils.createTable(cs, newDataClass);
-
-					for(Object data : oldData)
-					{
-						final Method convertMethod = oldDataClass.getMethod("convert");
-
-						Entry entry = (Entry) convertMethod.invoke(data);
-						newDao.create(entry);
-					}
-
-					//if(updatedDataCount == 0)
-					//	resetDatabase(db, cs);
-				}
-			}
-			else if(oldVersion < newVersion)
-				reset(false);
-			else
-				throw new DbError(DbError.E_DOWNGRADE);
+			if(upgrade(cs, oldVersion, newVersion))
+				return; // everything ok
 		}
-		catch(Exception e)
-		{
-			throw new DbError(DbError.E_UPGRADE, e);
-		}
+
+		db.setVersion(oldVersion);
+		throw new DatabaseError(isUpgrade ? DatabaseError.E_UPGRADE : DatabaseError.E_DOWNGRADE);
 	}
 
-	public void reset(boolean doBackup)
+	@Override
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion)
 	{
-		if(doBackup)
-			backup();
+		// onDowngrade was not available in pre-Honeycomb versions, so we still need to handle the
+		// downgrade in onUpgrade!
+		onUpgrade(db, getConnectionSource(), oldVersion, newVersion);
+	}
 
+	public void reset()
+	{
 		ConnectionSource cs = getConnectionSource();
 
 		try
@@ -225,6 +175,91 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		onCreate(getWritableDatabase(), cs);
 	}
 
+	@SuppressWarnings("unchecked")
+	private boolean upgrade(ConnectionSource cs, int oldVersion, int newVersion)
+	{
+		if(oldVersion >= newVersion)
+			return true;
+
+		Log.i(TAG, "Upgrading database: " + oldVersion + " -> " + newVersion);
+
+		final String packageName = Database.class.getPackage().getName();
+		final String classNames[] = { "Drug", "Intake" };
+
+		int updatedDataCount = 0;
+
+		Exception ex;
+
+		try
+		{
+			for(String className : classNames)
+			{
+				final String oldDataClassName = packageName + ".v" + oldVersion + ".Old" + className;
+				final String newDataClassName = packageName + "." + className;
+
+				final Class<?> oldDataClass;
+				final Class<?> newDataClass = Class.forName(newDataClassName);
+
+				try
+				{
+					oldDataClass = Class.forName(oldDataClassName);
+					++updatedDataCount;
+				}
+				catch(ClassNotFoundException e)
+				{
+					if(LOGV) Log.v(TAG, "  Not upgrading " + className);
+					continue;
+				}
+
+				@SuppressWarnings("rawtypes")
+				final Dao newDao = getDao(newDataClass);
+				final List<?> oldData = getDao(oldDataClass).queryForAll();
+
+				TableUtils.dropTable(cs, oldDataClass, true);
+				TableUtils.createTable(cs, newDataClass);
+
+				for(Object data : oldData)
+				{
+					final Method convertMethod = oldDataClass.getMethod("convert");
+
+					Entry entry = (Entry) convertMethod.invoke(data);
+					newDao.create(entry);
+				}
+			}
+
+			return true;
+		}
+		catch(SQLException e)
+		{
+			ex = e;
+		}
+		catch(IllegalArgumentException e)
+		{
+			ex = e;
+		}
+		catch(IllegalAccessException e)
+		{
+			ex = e;
+		}
+		catch(InvocationTargetException e)
+		{
+			ex = e;
+		}
+		catch(NoSuchMethodException e)
+		{
+			ex = e;
+		}
+		catch(ClassNotFoundException e)
+		{
+			ex = e;
+		}
+
+		Log.e(TAG, "onUpgrade", ex);
+
+		return false;
+	}
+
+	/*
 	private void backup()
 	{
 		String packageName = mContext.getApplicationInfo().packageName;
@@ -255,5 +290,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			throw new DbError(DbError.E_BACKUP, e);
 		}
 	}
+	*/
 }
 

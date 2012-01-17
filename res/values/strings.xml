@@ -166,18 +166,18 @@
     
     <string name="_msg_no_doses_on_this_day">There are no doses to be taken on this date.</string>
     
-    <string name="_title_database_error">Database Error</string>
-	<string name="_msg_db_error_general">General database error.</string>
-	<string name="_msg_db_error_upgrade">Error while upgrading database.</string>
-	<string name="_msg_db_error_downgrade">The currently installed database cannot be read, as it was created 
-		by a newer version of this application.</string>
-	<string name="_msg_db_error_footer">You may choose to reset the database to a state that is usable by the
-		application. A backup of the old database will be automatically created.</string>
-	<string name="_btn_backup_and_reset">Backup &amp; Reset</string>
+    <string name="_msg_db_error_general">An unknown database error has occurred.</string>
+	<string name="_msg_db_error_upgrade">An error has occurred while upgrading the database.</string>
+	<string name="_msg_db_error_downgrade">The local data was created by a newer version of this
+		app and cannot be read.</string>
+	
+	<string name="_msg_db_error_footer">If you reset the database, all your data will be lost!</string>	
+	
+	<string name="_btn_reset">Reset</string>
 	
 	<string name="_msg_db_loading">Loading database, please stand by.</string>
-	<string name="_msg_footer_insufficient_supplies">This dose is larger than this drug\'s supply (%1$s). To ignore this,
-		simply press the %2$s button again. To edit the drug\'s supply, click this text.</string>
+	<string name="_msg_footer_insufficient_supplies">Insufficient supplies for this dose. 
+		Press %2$s to ignore, or touch this text to edit %3$s.</string>
 		
 	<string name="_title_weekdays">Weekdays</string>
 	
@@ -187,4 +187,10 @@
 	
 	<string name="_title_delete_drug">Really delete %1$s?</string>
 	<string name="_msg_delete_drug">This cannot be undone!</string>
+	
+	<string name="_toast_db_reset_success">Successfully reset database.</string>
+	<string name="_toast_db_reset_failure">Database reset failed. Please reinstall.</string>
+	
+	<string name="_btn_exit">Exit</string>
+	
 </resources>

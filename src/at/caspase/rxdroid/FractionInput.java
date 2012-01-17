@@ -39,9 +39,6 @@ import at.caspase.rxdroid.NumberPickerWrapper.OnValueChangeListener;
 /**
  * A widget for fraction input.
  *
- * This implementation basically uses the private NumberPicker implementation
- * available in the pre-Honeycomb sources.
- *
  * @author Joseph Lehner
  */
 public class FractionInput extends LinearLayout implements OnClickListener
