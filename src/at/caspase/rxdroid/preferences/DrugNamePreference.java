@@ -87,7 +87,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	public void afterTextChanged(Editable s)
 	{
 		if(!s.toString().equals(mInitialName) && !isUniqueDrugName(s.toString()))
-			mInput.setError("Another drug with that name already exists!");
+			mInput.setError(getContext().getString(R.string._msg_err_non_unique_drug_name));
 		else
 			mInput.setError(null);
 	}

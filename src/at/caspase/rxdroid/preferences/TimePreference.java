@@ -45,7 +45,7 @@ public class TimePreference extends Preference implements OnTimeSetListener, OnP
 	private static final int WRAP_BEFORE = 1 << 1;
 
 	private String mDefaultValue;
-	private DumbTime mTime;
+	DumbTime mTime;
 
 	private int mWrapFlags;
 

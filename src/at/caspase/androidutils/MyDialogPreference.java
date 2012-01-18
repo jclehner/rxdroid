@@ -66,7 +66,7 @@ public class MyDialogPreference extends DialogPreference implements OnDismissLis
 	}
 
 	public MyDialogPreference(Context context, AttributeSet attrs) {
-		super(context, attrs);
+		super(context, attrs, android.R.attr.dialogPreferenceStyle);
 	}
 
 	public void setNeutralButtonText(CharSequence text) {
@@ -115,6 +115,15 @@ public class MyDialogPreference extends DialogPreference implements OnDismissLis
 		return null;
 	}
 
+	/**
+	 * Called before the dialog is actually shown.
+	 *
+	 * @param dialog
+	 */
+	protected void onShowDialog(Dialog dialog) {
+		// stub
+	}
+
 	@Override
 	protected void showDialog(Bundle state)
 	{
@@ -150,6 +159,8 @@ public class MyDialogPreference extends DialogPreference implements OnDismissLis
 			Window window = mDialog.getWindow();
 			window.setSoftInputMode(mSoftInputMode);
 		}
+
+		onShowDialog(mDialog);
 
 		mDialog.setOnDismissListener(this);
 		mDialog.show();

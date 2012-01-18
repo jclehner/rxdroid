@@ -137,7 +137,6 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		mNotification.setPendingCount(pendingIntakes);
 		mNotification.setForgottenCount(forgottenIntakes);
-		mNotification.setLowSupplyMessage(lowSupplyMessage);
 		mNotification.setSnoozeMessageEnabled(mIsManualSnoozeRequest);
 
 		if(!mIsManualSnoozeRequest)
@@ -163,7 +162,12 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		if(scheduleEnd)
 		{
-			if(mSnoozeType == SNOOZE_REPEAT || mIsManualSnoozeRequest)
+			// If there are no pending intakes, we don't need to fire an alarm every time the
+			// snooze timeout is reached. There still might be some 'low supply' notifications,
+			// but we only want those to occur at the beginning of each dose time.
+			final boolean hasIntakeNotifications = mNotification.hasIntakeNotifications();
+
+			if((mSnoozeType == SNOOZE_REPEAT || mIsManualSnoozeRequest) && hasIntakeNotifications)
 				offset = mSettings.getSnoozeTime();
 			else
 				offset = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);

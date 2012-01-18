@@ -124,13 +124,16 @@ public class MyNotification
 			if(doseMessage != null)
 				sb.append(bullet + doseMessage);
 
-			if(Version.SDK_IS_PRE_HONEYCOMB && mLowSupplyMessage != null)
+			if(mLowSupplyMessage != null)
 			{
-				if(doseMessage != null)
-					sb.append("\n");
+				if(!Version.SDK_IS_PRE_HONEYCOMB || doseMessage == null)
+				{
+					if(doseMessage != null)
+						sb.append("\n");
 
-				sb.append(bullet + mLowSupplyMessage);
-				++notificationItems;
+					sb.append(bullet + mLowSupplyMessage);
+					++notificationItems;
+				}
 			}
 
 			final String contentText = sb.toString();
@@ -193,6 +196,10 @@ public class MyNotification
 
 	public boolean isSnoozing() {
 		return mIsSnoozing;
+	}
+
+	public boolean hasIntakeNotifications() {
+		return mForgottenCount + mPendingCount != 0;
 	}
 
 	private void setupNotificationContentIntent()
