@@ -151,6 +151,7 @@ public class MyNotification
 			else
 			{
 				mNotification.setLatestEventInfo(mContext, contentTitle, contentText, null);
+				//mNotification.contentView = null;
 			}
 
 			mNotification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONLY_ALERT_ONCE;

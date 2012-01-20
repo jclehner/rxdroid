@@ -106,8 +106,7 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 	{
 		mValue = value;
 
-		boolean canPersist = callChangeListener(mValue);
-		if(canPersist && shouldPersist())
+		if(callChangeListener(mValue))
 			persistString(mValue.toString());
 
 		notifyChanged();
@@ -118,7 +117,7 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 	{
 		FractionInputDialog2 dialog = new FractionInputDialog2(getContext(), mValue, this);
 		dialog.setTitle(getDialogTitle());
-		dialog.setIcon(android.R.drawable.ic_dialog_dialer);
+		dialog.setIcon(getDialogIcon());
 		dialog.setAutoInputModeEnabled(true);
 		return dialog;
 	}

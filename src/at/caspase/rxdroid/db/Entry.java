@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011, 2012 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  * This file is part of RxDroid.
  *
@@ -22,7 +22,11 @@
 package at.caspase.rxdroid.db;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Collection;
+
+import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
+import at.caspase.rxdroid.util.Reflect;
 
 import com.j256.ormlite.field.DatabaseField;
 
@@ -45,12 +49,13 @@ import com.j256.ormlite.field.DatabaseField;
  */
 public abstract class Entry implements Serializable
 {
+	private static final String TAG = Entry.class.getName();
 	private static final long serialVersionUID = 8300191193261799857L;
 
 	//public static final String COLUMN_ID = "id";
 
 	@DatabaseField(/*columnName = COLUMN_ID,*/ generatedId = true)
-	protected int id;
+	protected int id = -1;
 
 	@Override
 	public abstract boolean equals(Object other);
@@ -91,6 +96,37 @@ public abstract class Entry implements Serializable
 		}
 
 		return null;
+	}
+
+	protected static void copy(Entry dest, Entry src)
+	{
+		Class<?> clsD = dest.getClass();
+		Class<?> clsS = src.getClass();
+
+		for(Field fS : clsS.getDeclaredFields())
+		{
+			if(fS.isAnnotationPresent(DatabaseField.class))
+			{
+				Field fD = Reflect.getDeclaredField(clsD, fS.getName());
+				if(fD != null)
+				{
+					try
+					{
+						fD.setAccessible(true);
+						fS.setAccessible(true);
+						fD.set(dest, fS.get(src));
+					}
+					catch(IllegalArgumentException e)
+					{
+						throw new DatabaseError(DatabaseError.E_GENERAL, e);
+					}
+					catch(IllegalAccessException e)
+					{
+						throw new DatabaseError(DatabaseError.E_GENERAL, e);
+					}
+				}
+			}
+		}
 	}
 }
 

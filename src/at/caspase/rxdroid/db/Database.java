@@ -37,7 +37,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteCantOpenDatabaseException;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
@@ -109,7 +109,7 @@ public final class Database
 
 				sIsLoaded = true;
 			}
-			catch(SQLiteCantOpenDatabaseException e)
+			catch(SQLiteException e)
 			{
 				throw new DatabaseError(DatabaseError.E_GENERAL, e);
 			}

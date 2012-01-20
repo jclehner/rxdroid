@@ -30,7 +30,6 @@ import com.j256.ormlite.table.DatabaseTable;
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entry;
-import at.caspase.rxdroid.db.UpgradeUtils;
 
 @DatabaseTable(tableName="drugs")
 @SuppressWarnings({ "unused", "serial" })
@@ -63,7 +62,6 @@ public class OldDrug extends Entry
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
 	private Fraction doseNight;
 
-	// TODO change column name
 	@DatabaseField(canBeNull = true)
 	private int repeat;
 
@@ -80,8 +78,9 @@ public class OldDrug extends Entry
 	public Drug convert()
 	{
 		Drug drug = new Drug();
-		UpgradeUtils.copyDrug(drug, this);
+		copy(drug, this);
 		drug.setSortRank(0);
+		assert drug.getId() != -1;
 		return drug;
 	}
 

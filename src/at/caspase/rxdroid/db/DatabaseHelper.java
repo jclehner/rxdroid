@@ -149,13 +149,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		throw new DatabaseError(isUpgrade ? DatabaseError.E_UPGRADE : DatabaseError.E_DOWNGRADE);
 	}
 
-	@Override
+	/*@Override
 	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion)
 	{
 		// onDowngrade was not available in pre-Honeycomb versions, so we still need to handle the
 		// downgrade in onUpgrade!
 		onUpgrade(db, getConnectionSource(), oldVersion, newVersion);
-	}
+	}*/
 
 	public void reset()
 	{

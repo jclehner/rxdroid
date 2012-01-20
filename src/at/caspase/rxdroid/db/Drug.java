@@ -170,31 +170,6 @@ public class Drug extends Entry implements Comparable<Drug>
 	 */
 	public Drug() {}
 
-	/**
-	 * Constructor for setting all fields.
-	 * <p>
-	 * This constructor should only be used by <code>OldDrug.convert()</code> as no
-	 * sanity checks are performed, possibly allowing the construction of an
-	 * invalid object.
-	 */
-	public Drug(String name, int form, boolean active, int refillSize, Fraction currentSupply, Fraction[] schedule,
-			int repeat, long repeatArg, Date repeatOrigin, int sortRank)
-	{
-		this.name = name;
-		this.form = form;
-		this.active = active;
-		this.refillSize = refillSize;
-		this.currentSupply = currentSupply;
-		this.doseMorning = schedule[0];
-		this.doseNoon = schedule[1];
-		this.doseEvening = schedule[2];
-		this.doseNight = schedule[3];
-		this.repeat = repeat;
-		this.repeatArg = repeatArg;
-		this.repeatOrigin = repeatOrigin;
-		this.sortRank = sortRank;
-	}
-
 	@Deprecated
 	public boolean hasDoseOnDate(Calendar cal) {
 		return hasDoseOnDate(cal.getTime());

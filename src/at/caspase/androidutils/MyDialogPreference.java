@@ -25,6 +25,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -46,10 +47,10 @@ import at.caspase.androidutils.StateSaver.SaveState;
  * @author Joseph Lehner
  *
  */
-public class MyDialogPreference extends DialogPreference implements OnDismissListener
+public abstract class MyDialogPreference extends DialogPreference implements OnDismissListener
 {
 	private static final String TAG = MyDialogPreference.class.getName();
-
+	@SuppressWarnings("unused")
 	private static final boolean LOGV = true;
 
 	@SaveState
@@ -105,9 +106,21 @@ public class MyDialogPreference extends DialogPreference implements OnDismissLis
 	 * will never be called. Also note that an OnDismissListener
 	 * set on the returned dialog will be overridden in {@link #showDialog(Bundle)}!
 	 * <p>
+	 * Using this function requires care, as the following functions will <em>never</em>
+	 * be called:
+	 * <ul>
+	 * <li>{@link #onPrepareDialogBuilder(android.app.AlertDialog.Builder)}</li>
+	 * <li>{@link #onCreateDialogView()}</li>
+	 * <li>{@link #onDialogClosed(boolean)}<sup>*</sup></li>
+	 * </ul>
+	 *
 	 * Also note that dialog properties returned by functions such as
 	 * {@link #getDialogTitle()} will <em>not</em> be automatically
 	 * applied if using a custom dialog.
+	 * <p>
+	 * <sup>*)</sup> This function <em>might</em> be called, if you've used the
+	 * {@link OnClickListener} returned by {@link #getDialogOnClickListener()}
+	 * for your buttons.
 	 *
 	 * @return the custom dialog, or <code>null</code> by default.
 	 */
@@ -117,6 +130,12 @@ public class MyDialogPreference extends DialogPreference implements OnDismissLis
 
 	/**
 	 * Called before the dialog is actually shown.
+	 * <p>
+	 * This function may be used to set extra options on dialogs
+	 * not created via {@link #onGetCustomDialog()}.
+	 *
+	 * Note that you cannot use {@link Dialog#setOnDismissListener(OnDismissListener)}, as
+	 * this listener is used internally by this class and will be overridden.
 	 *
 	 * @param dialog
 	 */
@@ -124,8 +143,21 @@ public class MyDialogPreference extends DialogPreference implements OnDismissLis
 		// stub
 	}
 
+	/**
+	 * Returns the default OnClickListener supplied to the dialog.
+	 * <p>
+	 * This function is only relevant when using {@link #onGetCustomDialog()}. You can
+	 * use this default listener for your dialog's buttons, which will ensure that
+	 * {@link #onDialogClosed(boolean)} will be called.
+	 *
+	 * @see #onGetCustomDialog()
+	 */
+	protected final OnClickListener getDialogOnClickListener() {
+		return mListener;
+	}
+
 	@Override
-	protected void showDialog(Bundle state)
+	protected final void showDialog(Bundle state)
 	{
 		if(state != null)
 			Log.w(TAG, "showDialog: ignoring non-null state");
@@ -136,9 +168,9 @@ public class MyDialogPreference extends DialogPreference implements OnDismissLis
 			AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
 					.setTitle(getTitle())
 					.setIcon(getDialogIcon())
-					.setPositiveButton(getPositiveButtonText(), this)
-					.setNeutralButton(getNeutralButtonText(), this)
-					.setNegativeButton(getNegativeButtonText(), this)
+					.setPositiveButton(getPositiveButtonText(), mListener)
+					.setNeutralButton(getNeutralButtonText(), mListener)
+					.setNegativeButton(getNegativeButtonText(), mListener)
 			;
 
 			View contentView = onCreateDialogView();
@@ -200,4 +232,13 @@ public class MyDialogPreference extends DialogPreference implements OnDismissLis
 				showDialog(null);
 		}
 	}
+
+	private final OnClickListener mListener = new OnClickListener() {
+
+		@Override
+		public void onClick(DialogInterface dialog, int which)
+		{
+			onDialogClosed(which == Dialog.BUTTON_POSITIVE);
+		}
+	};
 }

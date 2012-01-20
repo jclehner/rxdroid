@@ -111,7 +111,6 @@ public class LoaderActivity extends Activity implements OnClickListener
 
 			sb.append(getString(R.string._msg_db_error_footer));
 
-
 			builder.setMessage(sb.toString());
 			builder.setNegativeButton(R.string._btn_exit, this);
 			builder.setPositiveButton(R.string._btn_reset, this);

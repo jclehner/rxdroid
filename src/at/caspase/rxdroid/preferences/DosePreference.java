@@ -29,6 +29,7 @@ import at.caspase.rxdroid.DoseView;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.util.CollectionUtils;
+import at.caspase.rxdroid.util.Util;
 
 public class DosePreference extends FractionPreference
 {
@@ -49,7 +50,7 @@ public class DosePreference extends FractionPreference
 
 		mDoseTime = getDoseTimeFromKey(getKey());
 
-		setDialogIcon(android.R.drawable.ic_dialog_dialer);
+		setDialogIcon(Util.getDoseTimeDrawableFromDoseTime(mDoseTime));
 		setDialogTitle(getTitle());
 
 		setWidgetLayoutResource(R.layout.dose_preference);
@@ -73,7 +74,7 @@ public class DosePreference extends FractionPreference
 		int doseTime = CollectionUtils.indexOf(key, keys);
 
 		if(doseTime == -1)
-			throw new IllegalStateException("Illegal key '" + key + "' for DosePreference. Valid keys: morning, noon, evening, night");
+			throw new IllegalStateException("Illegal key '" + key + "' for DosePreference. Valid keys: " + keys);
 
 		return doseTime;
 	}

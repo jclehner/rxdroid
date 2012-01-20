@@ -61,17 +61,17 @@ public final class StateSaver
 	 * SaveState and combines their values with the state of the object's
 	 * superclass.
 	 *
-	 * @param o The object from which to create an instance state.
+	 * @param object The object from which to create an instance state.
 	 * @param superState The state of pref's superclass.
 	 * @param extras Any additional data, can be <code>null</code>.
 	 * @return
 	 */
-	public static Parcelable createInstanceState(Object o, Parcelable superState, Bundle extras)
+	public static Parcelable createInstanceState(Object object, Parcelable superState, Bundle extras)
 	{
 		final SavedState myState = new SavedState(superState);
 		myState.extras = extras;
 
-		forEachAnnotatedMember(o, new Callback() {
+		forEachAnnotatedMember(object, new Callback() {
 
 			@Override
 			public void invoke(Object o, Field f, String mapKey)
@@ -110,14 +110,14 @@ public final class StateSaver
 		return null;
 	}
 
-	public static void restoreInstanceState(Object o, Parcelable state)
+	public static void restoreInstanceState(Object object, Parcelable state)
 	{
 		if(!(state instanceof SavedState))
 			return;
 
 		final SavedState myState = (SavedState) state;
 
-		forEachAnnotatedMember(o, new Callback() {
+		forEachAnnotatedMember(object, new Callback() {
 
 			@Override
 			public void invoke(Object o, Field f, String mapKey)
