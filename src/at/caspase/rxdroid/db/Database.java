@@ -63,7 +63,7 @@ import com.j256.ormlite.dao.Dao;
 public final class Database
 {
 	private static final String TAG = Database.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	public static final int FLAG_DONT_NOTIFY_LISTENERS = 1;
 
