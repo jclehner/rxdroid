@@ -61,6 +61,7 @@ import android.widget.Toast;
 import at.caspase.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
@@ -117,9 +118,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		mMessageOverlay = (TextView) findViewById(android.R.id.empty);
 		mTextDate = (TextView) findViewById(R.id.text_date);
 
-		mSharedPreferences = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
-
+		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
 		GlobalContext.set(getApplicationContext());
@@ -146,6 +145,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			mDate = DateTime.todayDate();
 
 		setDate(mDate, true);
+
+		Database.registerOnChangedListener(mDatabaseListener);
 	}
 
 	@Override
@@ -181,6 +182,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		super.onDestroy();
 		mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+		Database.unregisterOnChangedListener(mDatabaseListener);
 	}
 
 	@Override
@@ -199,7 +201,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		switch (item.getItemId())
+		switch(item.getItemId())
 		{
 			case MENU_ADD:
 			{
@@ -255,32 +257,28 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			toggleIntakeMessageId = R.string._title_mark_taken;
 
 		// ////////////////////////////////////////////////
-		menu.add(0, CMENU_TOGGLE_INTAKE, 0, toggleIntakeMessageId)
-				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-					@Override
-					public boolean onMenuItemClick(MenuItem item)
+		menu.add(0, CMENU_TOGGLE_INTAKE, 0, toggleIntakeMessageId).setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item)
+				{
+					if(!wasDoseTaken)
+						doseView.performClick();
+					else
 					{
-						if(!wasDoseTaken)
-							doseView.performClick();
-						else
+						Fraction dose = new Fraction();
+						for(Intake intake : Intake.findAll(drug, mDate, doseTime))
 						{
-							Fraction dose = new Fraction();
-
-							for(Intake intake : Intake.findAll(drug, mDate, doseTime))
-							{
-								dose.add(intake.getDose());
-								Database.delete(intake);
-							}
-
-							Log.d(TAG, "onMenuItemClick: adding " + dose + " to current supply of " + drug.getName());
-							drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
-							Database.update(drug);
+							dose.add(intake.getDose());
+							Database.delete(intake);
 						}
 
-						return true;
+						drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
+						Database.update(drug);
 					}
-				});
+
+					return true;
+				}
+		});
 		// ///////////////////////////////////////////////
 
 		// menu.add(0, CMENU_CHANGE_DOSE, 0, R.string._title_change_dose);
@@ -349,14 +347,14 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		final int doseTime = v.getDoseTime();
 
-		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, mDate);
+		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, v.getDate());
 		dialog.show();
 	}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences preferences, String key)
 	{
-		updateListAdapter(getCurrentListView(), mDate, null);
+		setDate(mDate, true);
 	}
 
 	@Override
@@ -399,6 +397,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	private void setDate(Date date, boolean initPager)
 	{
 		mDate = date;
+		getIntent().putExtra(EXTRA_DATE, mDate);
 
 		if(initPager)
 		{
@@ -600,7 +599,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		DoseView[] doseViews = new DoseView[4];
 	}
 
-	private OnPageChangeListener mPageListener = new OnPageChangeListener() {
+	private final OnPageChangeListener mPageListener = new OnPageChangeListener() {
 
 		@Override
 		public void onPageSelected(int page)
@@ -627,6 +626,26 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 				setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy), false);
 			}
 
+		}
+	};
+
+	private final Database.OnChangedListener mDatabaseListener = new Database.OnChangedListener() {
+
+		@Override
+		public void onEntryUpdated(Entry entry, int flags) {}
+
+		@Override
+		public void onEntryDeleted(Entry entry, int flags)
+		{
+			if(entry instanceof Drug)
+				setDate(mDate, true);
+		}
+
+		@Override
+		public void onEntryCreated(Entry entry, int flags)
+		{
+			if(entry instanceof Drug)
+				setDate(mDate, true);
 		}
 	};
 }

@@ -195,7 +195,7 @@ public final class StateSaver
 		void invoke(Object o, Field f, String mapKey);
 	}
 
-	private static class SavedState extends BaseSavedState
+	public static class SavedState extends BaseSavedState
 	{
 		HashMap<String, Object> values = new HashMap<String, Object>();
 		Bundle extras;
@@ -221,7 +221,6 @@ public final class StateSaver
 			super(superState);
 		}
 
-		@SuppressWarnings("unused")
 		public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
 
 			@Override

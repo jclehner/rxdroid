@@ -137,6 +137,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		mNotification.setPendingCount(pendingIntakes);
 		mNotification.setForgottenCount(forgottenIntakes);
+		mNotification.setLowSupplyMessage(lowSupplyMessage);
 		mNotification.setSnoozeMessageEnabled(mIsManualSnoozeRequest);
 
 		if(!mIsManualSnoozeRequest)
