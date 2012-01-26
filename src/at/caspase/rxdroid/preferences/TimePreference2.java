@@ -31,9 +31,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TimePicker;
-import android.widget.Toast;
 import android.widget.TimePicker.OnTimeChangedListener;
+import android.widget.Toast;
 import at.caspase.androidutils.MyDialogPreference;
+import at.caspase.androidutils.StateSaver.SaveState;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.util.Util;
@@ -61,6 +62,7 @@ public class TimePreference2 extends MyDialogPreference
 	private String mDefaultValue;
 	private DumbTime mTime;
 
+	@SaveState
 	private DumbTime mDialogTime;
 
 	private Button mSetButton;
@@ -147,6 +149,9 @@ public class TimePreference2 extends MyDialogPreference
 		}
 		else
 			mTime = DumbTime.valueOf(persisted);
+
+		if(mDialogTime == null)
+			mDialogTime = mTime;
 	}
 
 	@Override
@@ -155,8 +160,8 @@ public class TimePreference2 extends MyDialogPreference
 		final Context context = getContext();
 		final TimePicker timePicker = new TimePicker(context);
 		timePicker.setIs24HourView(DateFormat.is24HourFormat(context));
-		timePicker.setCurrentHour(mTime.getHours());
-		timePicker.setCurrentMinute(mTime.getMinutes());
+		timePicker.setCurrentHour(mDialogTime.getHours());
+		timePicker.setCurrentMinute(mDialogTime.getMinutes());
 		timePicker.setOnTimeChangedListener(mListener);
 
 		builder.setView(timePicker);
@@ -172,6 +177,8 @@ public class TimePreference2 extends MyDialogPreference
 			public void onShow(DialogInterface dialog)
 			{
 				mSetButton = ((AlertDialog) dialog).getButton(Dialog.BUTTON_POSITIVE);
+				if(!isTimeWithinConstraints(mDialogTime))
+					mSetButton.setEnabled(false);
 			}
 		});
 	}
@@ -198,6 +205,22 @@ public class TimePreference2 extends MyDialogPreference
 			}
 		}
 	}
+
+	/*@Override
+	protected Parcelable onSaveInstanceState()
+	{
+		Parcelable superState = super.onSaveInstanceState();
+		return StateSaver.createInstanceState(this, superState, null);
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Parcelable state)
+	{
+		super.onRestoreInstanceState(StateSaver.getSuperState(state));
+		StateSaver.restoreInstanceState(this, state);
+
+
+	}*/
 
 	private boolean isTimeWithinConstraints(DumbTime time)
 	{

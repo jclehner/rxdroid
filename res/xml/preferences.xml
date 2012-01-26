@@ -138,7 +138,7 @@
 		android:icon="@drawable/android:ic_menu_info_details"
 	>
 		
-		<at.caspase.rxdroid.preferences.TimePreference android:key="time_snooze"
+		<at.caspase.rxdroid.preferences.TimePreference2 android:key="time_snooze"
 			android:title="@string/_Snooze_time"
 			android:defaultValue="@string/pref_default_time_snooze"
 		/>		

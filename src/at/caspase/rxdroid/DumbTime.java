@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -43,8 +44,10 @@ import at.caspase.rxdroid.util.Hasher;
  * @author Joseph Lehner
  *
  */
-public class DumbTime implements Comparable<DumbTime>
+public class DumbTime implements Serializable, Comparable<DumbTime>
 {
+	private static final long serialVersionUID = -6977398555336283902L;
+
 	@SuppressWarnings("unused")
 	private static final String TAG = DumbTime.class.getName();
 	private static final String[] FORMATS = { "HH:mm:ss", "HH:mm" };

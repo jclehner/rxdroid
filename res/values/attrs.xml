@@ -8,7 +8,7 @@
     	<attr name="icon" format="reference" />
     </declare-styleable>
     
-    <declare-styleable name="TimePreference">
+    <declare-styleable name="TimePreference2">
     	<attr name="before" format="string" />
     	<attr name="after" format="string" />
     	<attr name="allowBeforeWrap" format="boolean" />
