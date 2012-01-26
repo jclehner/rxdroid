@@ -90,6 +90,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	private static final int TAG_ID = R.id.tag_drug_id;
 
 	private LayoutInflater mInflater;
+	private SharedPreferences mSharedPreferences;
 
 	private ViewPager mPager;
 	private TextView mMessageOverlay;
@@ -100,9 +101,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	private boolean mShowingAll = false;
 
 	private int mSwipeDirection = 0;
-	private int mLastPage = -1;
 
-	private SharedPreferences mSharedPreferences;
+	private boolean mIsShowing = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -144,8 +144,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		if(mDate == null)
 			mDate = DateTime.todayDate();
 
-		setDate(mDate, true);
-
 		Database.registerOnChangedListener(mDatabaseListener);
 	}
 
@@ -154,6 +152,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		super.onResume();
 
+		mIsShowing = true;
+
 		final boolean wasStartedFromNotification;
 
 		Intent intent = getIntent();
@@ -161,8 +161,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			wasStartedFromNotification = intent.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION, false);
 		else
 			wasStartedFromNotification = false;
-
-		mPager.setCurrentItem(InfiniteViewPagerAdapter.CENTER, false);
 
 		if(wasStartedFromNotification)
 		{
@@ -175,6 +173,16 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 
 		startNotificationService();
+
+		setDate(mDate, true);
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		mIsShowing = false;
+		mPager.removeAllViews();
 	}
 
 	@Override
@@ -344,10 +352,14 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		final DoseView v = (DoseView) view;
 		final Drug drug = Drug.get(v.getDrugId());
-
 		final int doseTime = v.getDoseTime();
+		final Date date = v.getDate();
 
-		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, v.getDate());
+		if(!date.equals(mDate))
+			Log.w(TAG, "Activity date " + mDate + " differs from DoseView date " + date);
+
+
+		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, date);
 		dialog.show();
 	}
 
@@ -396,13 +408,18 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	private void setDate(Date date, boolean initPager)
 	{
+		if(!mIsShowing)
+		{
+			if(LOGV) Log.v(TAG, "setDate: activity is not showing; ignoring");
+			return;
+		}
+
 		mDate = date;
 		getIntent().putExtra(EXTRA_DATE, mDate);
 
 		if(initPager)
 		{
 			mSwipeDirection = 0;
-			mLastPage = -1;
 
 			mPager.removeAllViews();
 			mPager.setAdapter(new InfiniteViewPagerAdapter(this));
@@ -446,10 +463,10 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	private void updateDateString(int shiftBy)
 	{
-		final Date date = DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy);
-		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(date.getTime()));
+		//final Date date = DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy);
+		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
 
-		if(date.equals(DateTime.todayDate()))
+		if(mDate.equals(DateTime.todayDate()))
 			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
 
 		mTextDate.setText(dateString);
@@ -601,14 +618,14 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	private final OnPageChangeListener mPageListener = new OnPageChangeListener() {
 
+		int mPage;
+		int mLastPage = -1;
+
 		@Override
 		public void onPageSelected(int page)
 		{
-			mSwipeDirection = mLastPage != - 1 ? page - mLastPage : 0;
-			mLastPage = page;
-
-			if(mSwipeDirection != 0)
-				updateDateString(mSwipeDirection < 0 ? -1 : 1);
+			mPage = page;
+			Log.d(TAG, "onPageSelected: mPage=" + mPage);
 		}
 
 		@Override
@@ -617,13 +634,19 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public void onPageScrollStateChanged(int state)
 		{
-			if(state != ViewPager.SCROLL_STATE_IDLE)
-				return;
-
-			if(mSwipeDirection != 0)
+			if(state == ViewPager.SCROLL_STATE_IDLE)
 			{
-				final int shiftBy = mSwipeDirection < 0 ? -1 : 1;
-				setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy), false);
+				Log.d(TAG, "onPageScrollStateChanged: mPage=" + mPage + ", mLastPage=" + mLastPage);
+
+				mSwipeDirection = mPage != -1 ? mPage - mLastPage : 0;
+				mLastPage = mPage;
+
+				if(mSwipeDirection != 0)
+				{
+					final int shiftBy = mSwipeDirection < 0 ? -1 : 1;
+					setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy), false);
+					updateDateString(mSwipeDirection < 0 ? -1 : 1);
+				}
 			}
 
 		}

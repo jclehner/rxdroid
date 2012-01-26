@@ -27,7 +27,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -63,7 +65,7 @@ import com.j256.ormlite.dao.Dao;
 public final class Database
 {
 	private static final String TAG = Database.class.getName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = true;
 
 	public static final int FLAG_DONT_NOTIFY_LISTENERS = 1;
 
@@ -74,7 +76,7 @@ public final class Database
 	private static boolean sIsLoaded = false;
 
 	private static Map<OnChangedListener, Void> sOnChangedListeners =
-		Collections.synchronizedMap(new WeakHashMap<OnChangedListener, Void>());
+			new WeakHashMap<OnChangedListener, Void>();
 
 	/**
 	 * Initializes the DB.
@@ -354,57 +356,60 @@ public final class Database
 		}
 	}
 
-	private static void dispatchEventToListeners(String functionName, Entry entry, int flags)
+	private static synchronized void dispatchEventToListeners(String functionName, Entry entry, int flags)
 	{
 		if((flags & FLAG_DONT_NOTIFY_LISTENERS) != 0)
 			return;
 
-		synchronized(sOnChangedListeners)
+		final Set<OnChangedListener> listeners =
+				Collections.synchronizedSet(sOnChangedListeners.keySet());
+
+		synchronized(listeners)
 		{
-			Set<OnChangedListener> listeners = sOnChangedListeners.keySet();
-			synchronized(listeners)
+			Iterator<OnChangedListener> i = listeners.iterator();
+
+			while(i.hasNext())
 			{
-				long startTime;
-				if(LOGV) startTime = System.currentTimeMillis();
+				Exception ex;
+				OnChangedListener l = null;
 
-				for(OnChangedListener listener : listeners)
+				try
 				{
-					try
-					{
-						Method m = listener.getClass().getMethod(functionName, Entry.class, Integer.TYPE);
-						m.invoke(listener, entry, flags);
-						continue;
-					}
-					catch (SecurityException e)
-					{
-						// handled below
-					}
-					catch (NoSuchMethodException e)
-					{
-						// handled below
-					}
-					catch (IllegalArgumentException e)
-					{
-						// handled below
-					}
-					catch (IllegalAccessException e)
-					{
-						// handled below
-					}
-					catch (InvocationTargetException e)
-					{
-						// handled below
-					}
+					l = i.next();
+					Method m = l.getClass().getMethod(functionName, Entry.class, Integer.TYPE);
+					m.invoke(l, entry, flags);
 
-					// this code is only reached if an exception was thrown
-					throw new RuntimeException("Failed to dispatch event to listeners: event=" + functionName);
+					if(LOGV) Log.v(TAG, "dispatchEventToListeners: success for " + l);
+
+					continue;
+				}
+				catch(SecurityException e)
+				{
+					ex = e;
+				}
+				catch(NoSuchMethodException e)
+				{
+					ex = e;
+				}
+				catch(IllegalArgumentException e)
+				{
+					ex = e;
+				}
+				catch(IllegalAccessException e)
+				{
+					ex = e;
+				}
+				catch(InvocationTargetException e)
+				{
+					ex = e;
+				}
+				catch(ConcurrentModificationException e)
+				{
+					ex = e;
 				}
 
-				if(LOGV)
-				{
-					long diff = System.currentTimeMillis() - startTime;
-					Log.v(TAG, "Dispatched event " + functionName + " to " + listeners.size() + " listeners in " + diff + "ms");
-				}
+				Log.e(TAG, "Failed to dispatch event " + functionName + " to listener " + l, ex);
+				break;
 			}
 		}
 	}
