@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -46,9 +47,9 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private static final boolean LOGV = true;
 
-	//static final String EXTRA_SILENT = "be_quiet";
-	static final String EXTRA_SNOOZE = "snooze";
-	static final String EXTRA_CANCEL_SNOOZE = "cancel_snooze";
+	static final String EXTRA_SILENT = TAG + ".be_silent";
+	static final String EXTRA_SNOOZE = TAG + ".snooze";
+	static final String EXTRA_CANCEL_SNOOZE = TAG + ".cancel_snooze";
 
 	static final int SNOOZE_DISABLED = 0;
 	static final int SNOOZE_REPEAT = 1;
@@ -57,12 +58,12 @@ public class NotificationReceiver extends BroadcastReceiver
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
 	private Settings mSettings;
-	private MyNotification mNotification;
 	private List<Drug> mAllDrugs;
 
 	private int mSnoozeType;
 	private boolean mIsManualSnoozeRequest = false;
 	private boolean mIsSnoozeCancelRequest = false;
+	private boolean mDoPostSilent = false;
 
 	@Override
 	public void onReceive(Context context, Intent intent)
@@ -73,7 +74,6 @@ public class NotificationReceiver extends BroadcastReceiver
 		mContext = context;
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mSettings = Settings.instance();
-		mNotification = new MyNotification(context);
 		mAllDrugs = Database.getAll(Drug.class);
 
 		mSnoozeType = mSettings.getListPreferenceValueIndex("snooze_type", SNOOZE_DISABLED);
@@ -82,6 +82,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		{
 			mIsManualSnoozeRequest = intent.getBooleanExtra(EXTRA_SNOOZE, false);
 			mIsSnoozeCancelRequest = intent.getBooleanExtra(EXTRA_CANCEL_SNOOZE, false);
+			mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
 			if(LOGV) Log.d(TAG, "onReceive: snoozeRequest=" + mIsManualSnoozeRequest + ", snoozeCancel=" + mIsSnoozeCancelRequest);
 		}
 
@@ -131,22 +132,37 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void updateNotifications(Date date, int doseTime, boolean ignorePendingIntakes)
 	{
-		int pendingIntakes = ignorePendingIntakes ? 0 : countOpenIntakes(date, doseTime);
-		int forgottenIntakes = countForgottenIntakes(date, doseTime);
-		String lowSupplyMessage = getLowSupplyMessage(date, doseTime);
-
-		mNotification.setPendingCount(pendingIntakes);
-		mNotification.setForgottenCount(forgottenIntakes);
-		mNotification.setLowSupplyMessage(lowSupplyMessage);
-		mNotification.setSnoozeMessageEnabled(mIsManualSnoozeRequest);
+		MyNotification.Builder builder = new MyNotification.Builder(mContext);
 
 		if(!mIsManualSnoozeRequest)
 		{
-			boolean forceUpdate = !mIsSnoozeCancelRequest && mSnoozeType == SNOOZE_REPEAT;
-			mNotification.update(forceUpdate, mIsSnoozeCancelRequest ? MyNotification.FLAG_SILENT : 0);
+			final String message2 = getLowSupplyMessage(date, doseTime);
+			int pendingCount = ignorePendingIntakes ? 0 : countOpenIntakes(date, doseTime);
+			int forgottenCount = countForgottenIntakes(date, doseTime);
+
+			if((pendingCount + forgottenCount) == 0 && message2 == null)
+			{
+				builder.cancel();
+				return;
+			}
+
+			if(pendingCount != 0 && forgottenCount != 0)
+				builder.setMessage1(R.string._msg_doses_fp, forgottenCount, pendingCount);
+			else if(pendingCount != 0)
+				builder.setMessage1(R.string._msg_doses_p, pendingCount);
+			else if(forgottenCount != 0)
+				builder.setMessage1(R.string._msg_doses_f, forgottenCount);
+
+			builder.setMessage2(message2);
+			builder.setForceUpdate(!mIsSnoozeCancelRequest && mSnoozeType == SNOOZE_REPEAT);
+
+			if(!mIsSnoozeCancelRequest)
+				builder.setDefaults(Notification.DEFAULT_ALL);
 		}
 		else
-			mNotification.update(false, MyNotification.FLAG_SILENT);
+			builder.setMessage1(R.string._msg_snoozing);
+
+		builder.post();
 	}
 
 	private void scheduleBeginAlarm(Calendar time, int doseTime) {
@@ -159,6 +175,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void scheduleNextBeginOrEndAlarm(Calendar time, int doseTime, boolean scheduleEnd)
 	{
+		boolean isSnoozeIntent = false;
 		final long offset;
 
 		if(scheduleEnd)
@@ -166,10 +183,13 @@ public class NotificationReceiver extends BroadcastReceiver
 			// If there are no pending intakes, we don't need to fire an alarm every time the
 			// snooze timeout is reached. There still might be some 'low supply' notifications,
 			// but we only want those to occur at the beginning of each dose time.
-			final boolean hasIntakeNotifications = mNotification.hasIntakeNotifications();
+			//final boolean hasIntakeNotifications = mNotification.hasIntakeNotifications();
 
-			if((mSnoozeType == SNOOZE_REPEAT || mIsManualSnoozeRequest) && hasIntakeNotifications)
+			if((mSnoozeType == SNOOZE_REPEAT || mIsManualSnoozeRequest) /*&& hasIntakeNotifications*/)
+			{
 				offset = mSettings.getSnoozeTime();
+				isSnoozeIntent = true;
+			}
 			else
 				offset = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);
 		}
@@ -181,16 +201,16 @@ public class NotificationReceiver extends BroadcastReceiver
 		Log.d(TAG, "Scheduling " + (scheduleEnd ? mSnoozeType != SNOOZE_REPEAT ? "end" : "next alarm" : "begin") + " of doseTime " + doseTime + " for " + DateTime.toString(time));
 		Log.d(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
 
-		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation());
+		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation(isSnoozeIntent));
 	}
 
 	private void cancelAllAlarms()
 	{
 		Log.d(TAG, "Cancelling all alarms...");
-		mAlarmMgr.cancel(createOperation());
+		mAlarmMgr.cancel(createOperation(false));
 	}
 
-	private PendingIntent createOperation()
+	private PendingIntent createOperation(boolean isSnoozeIntent)
 	{
 		Intent intent = new Intent(mContext, NotificationReceiver.class);
 		return PendingIntent.getBroadcast(mContext, 0, intent, 0);

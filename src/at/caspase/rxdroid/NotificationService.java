@@ -135,10 +135,10 @@ public class NotificationService extends Service implements OnChangedListener, O
 		sendBroadcast(context, beQuiet, false);
 	}
 
-	private static void sendBroadcast(Context context, boolean beQuiet, boolean snooze)
+	private static void sendBroadcast(Context context, boolean silent, boolean snooze)
 	{
 		Intent intent = new Intent(context, NotificationReceiver.class);
-		//intent.putExtra(NotificationReceiver.EXTRA_SILENT, beQuiet);
+		intent.putExtra(NotificationReceiver.EXTRA_SILENT, silent);
 		intent.putExtra(NotificationReceiver.EXTRA_SNOOZE, snooze);
 		context.sendBroadcast(intent);
 	}

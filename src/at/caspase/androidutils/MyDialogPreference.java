@@ -35,6 +35,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import at.caspase.androidutils.StateSaver.SaveState;
+import at.caspase.androidutils.StateSaver.SavedState;
 
 
 /**
@@ -216,7 +217,9 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 		Bundle extras = new Bundle();
 		extras.putBoolean(KEY_IS_DIALOG_SHOWING, isShowing);
 
-		return StateSaver.createInstanceState(this, superState, extras);
+		StateSaver.SavedState state = (SavedState) StateSaver.createInstanceState(this, superState, extras);
+		Log.d(TAG, "onSaveInstanceState: extras=" + StateSaver.getExtras(state).keySet());
+		return state;
 	}
 
 	@Override
@@ -231,6 +234,8 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 			if(extras.getBoolean(KEY_IS_DIALOG_SHOWING, false))
 				showDialog(null);
 		}
+
+		Log.d(TAG, "onRestoreInstanceState: extras=" + extras);
 	}
 
 	private final OnClickListener mListener = new OnClickListener() {

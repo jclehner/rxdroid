@@ -242,7 +242,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 
 		Fraction newSupply = mDrug.getCurrentSupply().minus(mDose);
 		mDrug.setCurrentSupply(newSupply.isNegative() ? new Fraction() : newSupply);
-		Database.update(mDrug);
+		Database.update(mDrug, Database.FLAG_DONT_NOTIFY_LISTENERS);
 
 		dismiss();
 

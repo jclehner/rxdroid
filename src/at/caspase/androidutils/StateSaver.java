@@ -44,7 +44,7 @@ import android.util.Log;
 public final class StateSaver
 {
 	private static final String TAG = StateSaver.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	/**
 	 * Marks object members whose value should be saved/restored.
@@ -68,7 +68,27 @@ public final class StateSaver
 	 */
 	public static Parcelable createInstanceState(Object object, Parcelable superState, Bundle extras)
 	{
-		final SavedState myState = new SavedState(superState);
+		final SavedState myState;
+
+		/*if(superState instanceof SavedState)
+		{
+			// we can assume that, by calling object.super.onSaveInstanceState, this function was already
+			// called, so there's no need to iterate over all annotated members again
+
+			myState = (SavedState) superState;
+			if(!myState.wasCreateInstanceStateCalled)
+				throw new IllegalStateException("createInstanceState was not called on super state");
+
+			if(myState.extras != null && extras != null)
+				myState.extras.putAll(extras);
+			else
+				myState.extras = extras;
+
+			return myState;
+		}
+		else*/
+			myState = new SavedState(superState);
+
 		myState.extras = extras;
 
 		forEachAnnotatedMember(object, new Callback() {
@@ -90,6 +110,8 @@ public final class StateSaver
 				}
 			}
 		});
+
+		myState.wasCreateInstanceStateCalled = true;
 
 		return myState;
 	}
@@ -197,8 +219,9 @@ public final class StateSaver
 
 	public static class SavedState extends BaseSavedState
 	{
-		HashMap<String, Object> values = new HashMap<String, Object>();
-		Bundle extras;
+		private HashMap<String, Object> values = new HashMap<String, Object>();
+		private Bundle extras;
+		private boolean wasCreateInstanceStateCalled = false;
 
 		@SuppressWarnings("unchecked")
 		public SavedState(Parcel parcel)

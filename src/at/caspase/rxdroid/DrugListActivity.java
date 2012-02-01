@@ -182,6 +182,10 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		super.onPause();
 		mIsShowing = false;
+		// TODO this is an ugly hack, required for now to prevent
+		// FCs that occurs when adding/updating/deleting a drug
+		// in DrugEditActivity (due to DoseView's event handlers
+		// being called)
 		mPager.removeAllViews();
 	}
 
