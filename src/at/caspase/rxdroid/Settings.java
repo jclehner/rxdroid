@@ -134,10 +134,10 @@ public class Settings
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_DONT_CORRECT_TIME);
 	}
 
-	public long getSnoozeTime()
+	public long getAlarmTimeout()
 	{
 		if(!sSharedPrefs.getBoolean("debug_snooze_time_short", false))
-			return getTimePreference("time_snooze").getTime();
+			return getTimePreference("alarm_timeout").getTime();
 
 		return 10000;
 	}
@@ -182,7 +182,10 @@ public class Settings
 		if(value == null)
 		{
 			int resId = sApplicationContext.getResources().getIdentifier("at.caspase.rxdroid:string/pref_default_" + key, null, null);
-			value = sApplicationContext.getString(resId);
+			if(resId != 0)
+				value = sApplicationContext.getString(resId);
+			else
+				value = "00:30";
 		}
 
 		return DumbTime.valueOf(value);

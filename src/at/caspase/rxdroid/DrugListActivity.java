@@ -57,7 +57,6 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import at.caspase.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
@@ -164,12 +163,12 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		if(wasStartedFromNotification)
 		{
-			int snoozeType = Settings.instance().getListPreferenceValueIndex("snooze_type", -1);
-			if(snoozeType == NotificationReceiver.SNOOZE_MANUAL)
-			{
-				NotificationService.snooze(this);
-				Toast.makeText(this, R.string._toast_snoozing, Toast.LENGTH_SHORT).show();
-			}
+			//int snoozeType = Settings.instance().getListPreferenceValueIndex("snooze_type", -1);
+			//if(snoozeType == NotificationReceiver.ALARM_MODE_SNOOZE)
+			//{
+			//	NotificationService.snooze(this);
+			//	Toast.makeText(this, R.string._toast_snoozing, Toast.LENGTH_SHORT).show();
+			//}
 		}
 
 		startNotificationService();
@@ -430,7 +429,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			mPager.setCurrentItem(InfiniteViewPagerAdapter.CENTER, false);
 		}
 
-		updateDateString(0);
+		updateDateString();
 	}
 
 	private void updateListAdapter(ListView listView, Date date, List<Drug> drugs)
@@ -465,7 +464,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		return (ListView) mPager.getChildAt(mPager.getCurrentItem());
 	}
 
-	private void updateDateString(int shiftBy)
+	private void updateDateString()
 	{
 		//final Date date = DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy);
 		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
@@ -649,8 +648,9 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 				{
 					final int shiftBy = mSwipeDirection < 0 ? -1 : 1;
 					setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy), false);
-					updateDateString(mSwipeDirection < 0 ? -1 : 1);
 				}
+
+				updateDateString();
 			}
 
 		}

@@ -33,6 +33,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Database;
@@ -47,27 +48,67 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private static final boolean LOGV = true;
 
-	static final String EXTRA_SILENT = TAG + ".be_silent";
+	static final String EXTRA_SILENT = TAG + ".silent";
 	static final String EXTRA_SNOOZE = TAG + ".snooze";
 	static final String EXTRA_CANCEL_SNOOZE = TAG + ".cancel_snooze";
+	static final String EXTRA_SNOOZE_STATE = TAG + ".snooze_state";
 
-	static final int SNOOZE_DISABLED = 0;
-	static final int SNOOZE_REPEAT = 1;
-	static final int SNOOZE_MANUAL = 2;
+	private static final String EXTRA_IS_DELETE_INTENT = TAG + ".is_delete_intent";
+
+	static final int ALARM_MODE_NORMAL = 0;
+	static final int ALARM_MODE_REPEAT = 1;
+	static final int ALARM_MODE_SNOOZE = 2;
+
+	/**
+	 * The first notification was posted.
+	 * <p>
+	 * OnClick behavior:
+	 * <ol>
+	 * <li>Launch DrugListActivity</li>
+	 * <li>Delete current notification</li>
+	 * <li>(Display Toast info)</li>
+	 * <li>Post new notification with snoozing info</li>
+	 * </ol>
+	 */
+	private static final int SNOOZE_STATE_0 = 0;
+
+	/**
+	 * Currently displaying "snoozing" text.
+	 * <p>
+	 * OnClick behavior:
+	 * <ol>
+	 * <li>Delete notification</li>
+	 * <li>Replace with current notification, but w/o snooze behaviour</li>
+	 * </ol>
+	 */
+	private static final int SNOOZE_STATE_1 = 1;
+
+	/**
+	 * Snoozing was cancelled. Behave as if snoozing was disabled.
+	 */
+	private static final int SNOOZE_STATE_2 = 2;
+
 
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
 	private Settings mSettings;
 	private List<Drug> mAllDrugs;
 
-	private int mSnoozeType;
+	private int mAlarmRepeatMode;
+
 	private boolean mIsManualSnoozeRequest = false;
 	private boolean mIsSnoozeCancelRequest = false;
+	private boolean mIsDeleteIntent = false;
 	private boolean mDoPostSilent = false;
+
+	private int mSnoozeState = -1;
 
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
+		if(intent == null)
+			return;
+
 		GlobalContext.set(context.getApplicationContext());
 		Database.init();
 
@@ -76,18 +117,24 @@ public class NotificationReceiver extends BroadcastReceiver
 		mSettings = Settings.instance();
 		mAllDrugs = Database.getAll(Drug.class);
 
-		mSnoozeType = mSettings.getListPreferenceValueIndex("snooze_type", SNOOZE_DISABLED);
+		mAlarmRepeatMode = mSettings.getListPreferenceValueIndex("alarm_mode", ALARM_MODE_NORMAL);
 
-		if(intent != null)
+		mIsManualSnoozeRequest = intent.getBooleanExtra(EXTRA_SNOOZE, false);
+		mIsSnoozeCancelRequest = intent.getBooleanExtra(EXTRA_CANCEL_SNOOZE, false);
+		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
+		mIsDeleteIntent = intent.getBooleanExtra(EXTRA_IS_DELETE_INTENT, false);
+		mSnoozeState = intent.getIntExtra(EXTRA_SNOOZE_STATE, -1);
+
+		if(LOGV)
 		{
-			mIsManualSnoozeRequest = intent.getBooleanExtra(EXTRA_SNOOZE, false);
-			mIsSnoozeCancelRequest = intent.getBooleanExtra(EXTRA_CANCEL_SNOOZE, false);
-			mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
-			if(LOGV) Log.d(TAG, "onReceive: snoozeRequest=" + mIsManualSnoozeRequest + ", snoozeCancel=" + mIsSnoozeCancelRequest);
+			Log.d(TAG,
+					"onReceive\n" +
+					"  is delete intent       : " + mIsDeleteIntent + "\n" +
+					"  manual snooze request  : " + mIsManualSnoozeRequest + "\n" +
+					"  snooze cancel request  : " + mIsSnoozeCancelRequest + "\n" +
+					"  post silent notifcation: " + mDoPostSilent + "\n" +
+					"  current snooze state   : " + mSnoozeState + "\n");
 		}
-
-		if(mIsManualSnoozeRequest && mSnoozeType != SNOOZE_MANUAL)
-			return;
 
 		rescheduleAlarms();
 		updateCurrentNotifications();
@@ -134,33 +181,63 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		MyNotification.Builder builder = new MyNotification.Builder(mContext);
 
-		if(!mIsManualSnoozeRequest)
+		if(mAlarmRepeatMode == ALARM_MODE_SNOOZE && mSnoozeState != SNOOZE_STATE_2)
 		{
-			final String message2 = getLowSupplyMessage(date, doseTime);
-			int pendingCount = ignorePendingIntakes ? 0 : countOpenIntakes(date, doseTime);
-			int forgottenCount = countForgottenIntakes(date, doseTime);
+			final int nextSnoozeState;
 
-			if((pendingCount + forgottenCount) == 0 && message2 == null)
+			// if this was *not* a deleteIntent, the snooze timeout has passed, so we display
+			// the notification again, resetting the snooze state.
+
+			if(mIsDeleteIntent)
+				nextSnoozeState = mSnoozeState + 1;
+			else
+				nextSnoozeState = -1;
+
+			final Intent intent = new Intent(mContext, NotificationReceiver.class);
+			intent.putExtra(EXTRA_SNOOZE_STATE, nextSnoozeState);
+			intent.putExtra(EXTRA_IS_DELETE_INTENT, true);
+
+			final PendingIntent deleteIntent =
+					PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+			builder.setDeleteIntent(deleteIntent);
+			builder.addFlags(Notification.FLAG_AUTO_CANCEL);
+
+			if(LOGV) Log.v(TAG, "updateNotifications: snooze state was " + mSnoozeState);
+
+			if(mSnoozeState == SNOOZE_STATE_0)
 			{
-				builder.cancel();
+				builder.setMessage1(R.string._msg_snoozing);
+				builder.setContentIntent(createDrugListIntent(date));
+				builder.post();
 				return;
 			}
 
-			if(pendingCount != 0 && forgottenCount != 0)
-				builder.setMessage1(R.string._msg_doses_fp, forgottenCount, pendingCount);
-			else if(pendingCount != 0)
-				builder.setMessage1(R.string._msg_doses_p, pendingCount);
-			else if(forgottenCount != 0)
-				builder.setMessage1(R.string._msg_doses_f, forgottenCount);
-
-			builder.setMessage2(message2);
-			builder.setForceUpdate(!mIsSnoozeCancelRequest && mSnoozeType == SNOOZE_REPEAT);
-
-			if(!mIsSnoozeCancelRequest)
-				builder.setDefaults(Notification.DEFAULT_ALL);
+			if(LOGV) Log.v(TAG, "  posting normal notification");
 		}
-		else
-			builder.setMessage1(R.string._msg_snoozing);
+
+		final String message2 = getLowSupplyMessage(date, doseTime);
+		int pendingCount = ignorePendingIntakes ? 0 : countOpenIntakes(date, doseTime);
+		int forgottenCount = countForgottenIntakes(date, doseTime);
+
+		if((pendingCount + forgottenCount) == 0 && message2 == null)
+		{
+			builder.cancel();
+			return;
+		}
+
+		if(pendingCount != 0 && forgottenCount != 0)
+			builder.setMessage1(R.string._msg_doses_fp, forgottenCount, pendingCount);
+		else if(pendingCount != 0)
+			builder.setMessage1(R.string._msg_doses_p, pendingCount);
+		else if(forgottenCount != 0)
+			builder.setMessage1(R.string._msg_doses_f, forgottenCount);
+
+		builder.setMessage2(message2);
+		builder.setForceUpdate(mAlarmRepeatMode == ALARM_MODE_REPEAT);
+		builder.setContentIntent(createDrugListIntent(date));
+
+		if(!mDoPostSilent)
+			builder.setDefaults(Notification.DEFAULT_ALL);
 
 		builder.post();
 	}
@@ -175,45 +252,81 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void scheduleNextBeginOrEndAlarm(Calendar time, int doseTime, boolean scheduleEnd)
 	{
+		final Bundle extras = new Bundle();
 		boolean isSnoozeIntent = false;
 		final long offset;
 
 		if(scheduleEnd)
 		{
-			// If there are no pending intakes, we don't need to fire an alarm every time the
-			// snooze timeout is reached. There still might be some 'low supply' notifications,
-			// but we only want those to occur at the beginning of each dose time.
-			//final boolean hasIntakeNotifications = mNotification.hasIntakeNotifications();
+			final long offsetEnd = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);
+			final long snoozeTime = mSettings.getAlarmTimeout();
 
-			if((mSnoozeType == SNOOZE_REPEAT || mIsManualSnoozeRequest) /*&& hasIntakeNotifications*/)
+			if(LOGV)
 			{
-				offset = mSettings.getSnoozeTime();
-				isSnoozeIntent = true;
+				Log.v(TAG, "scheduleNextBeginOrEndAlarm\n" +
+					"  offsetEnd=" + offsetEnd + "\n" +
+					"  snoozeTime=" + snoozeTime + "\n" +
+					"  min: " + Math.min(offsetEnd, snoozeTime) + "\n");
 			}
-			else
-				offset = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);
+
+			switch(mAlarmRepeatMode)
+			{
+				case ALARM_MODE_REPEAT:
+					offset = Math.min(offsetEnd, snoozeTime);
+					break;
+
+				case ALARM_MODE_SNOOZE:
+					if(mIsDeleteIntent)
+					{
+						offset = Math.min((mSnoozeState == SNOOZE_STATE_0 ? snoozeTime : offsetEnd), offsetEnd);
+						break;
+					}
+					// else fall through!
+
+				default:
+					offset = offsetEnd;
+			}
 		}
 		else
 			offset = mSettings.getMillisUntilDoseTimeBegin(time, doseTime);
 
 		time.add(Calendar.MILLISECOND, (int) offset);
 
-		Log.d(TAG, "Scheduling " + (scheduleEnd ? mSnoozeType != SNOOZE_REPEAT ? "end" : "next alarm" : "begin") + " of doseTime " + doseTime + " for " + DateTime.toString(time));
-		Log.d(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
+		if(LOGV)
+		{
+			Log.d(TAG, "Scheduling " + (scheduleEnd ? mAlarmRepeatMode != ALARM_MODE_REPEAT ? "end" : "next alarm" : "begin") +
+					" of doseTime " + doseTime + " for " + DateTime.toString(time));
+			Log.d(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
+		}
 
-		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation(isSnoozeIntent));
+		//extras.putBoolean(EXTRA_SNOOZE, isSnoozeIntent);
+
+		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation(extras));
 	}
 
 	private void cancelAllAlarms()
 	{
 		Log.d(TAG, "Cancelling all alarms...");
-		mAlarmMgr.cancel(createOperation(false));
+		mAlarmMgr.cancel(createOperation(null));
 	}
 
-	private PendingIntent createOperation(boolean isSnoozeIntent)
+	private PendingIntent createOperation(Bundle extras)
 	{
 		Intent intent = new Intent(mContext, NotificationReceiver.class);
+		if(extras != null)
+			intent.putExtras(extras);
+
 		return PendingIntent.getBroadcast(mContext, 0, intent, 0);
+	}
+
+	private PendingIntent createDrugListIntent(Date date)
+	{
+		Intent intent = new Intent(mContext, DrugListActivity.class);
+		intent.putExtra(DrugListActivity.EXTRA_STARTED_FROM_NOTIFICATION, true);
+		intent.putExtra(DrugListActivity.EXTRA_DATE, date);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+		return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	}
 
 	private int countOpenIntakes(Date date, int doseTime)

@@ -14,7 +14,7 @@
     <string name="pref_default_time_evening_end">21:00</string>
     <string name="pref_default_time_night_begin">22:00</string>
     <string name="pref_default_time_night_end">23:30</string>
-    <string name="pref_default_time_snooze">00:10</string>
+    <string name="pref_default_alarm_timeout">00:30</string>
         
     <!-- Begin of translatable strings -->
     
@@ -75,9 +75,7 @@
     
     <string name="_title_pref_use_led">LED</string>
     <string name="_title_pref_use_sound">Sound</string>
-    <string name="_title_pref_use_vibrator">Vibration</string>    
-    
- 	<string name="_Snooze_time">Snooze time</string>
+    <string name="_title_pref_use_vibrator">Vibration</string>
     
     <string name="_title_prefscreen_display">Display</string>
     <string name="_summary_prefscreen_display">Choose which drugs to display</string>
@@ -121,7 +119,6 @@
 	<string name="_title_version">Version</string>
 	
 	<string name="_summary_not_available">N/A</string>
-	<string name="_preftitle_snooze_type">Snooze type</string>
 	
 	<string name="_title_tablet">Tablet</string>
 	<string name="_title_injection">Injection</string>
@@ -192,5 +189,11 @@
 	<string name="_toast_db_reset_failure">Database reset failed. Please reinstall.</string>
 	
 	<string name="_btn_exit">Exit</string>
+	
+	<string name="_title_alarm_mode">Alarm mode</string>
+	<string name="_summary_alarm_mode_normal">Alarms will not be repeated.</string>
+	<string name="_summary_alarm_mode_repeat">Repeat alarm every %1$d minute(s).</string>
+	
+	<string name="_title_alarm_timeout">Alarm timeout</string>
 	
 </resources>

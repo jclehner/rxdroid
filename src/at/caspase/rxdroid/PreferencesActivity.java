@@ -28,7 +28,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
@@ -76,13 +78,30 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 					return true;
 				}
 			});
+		}
 
+		p = findPreference("alarm_mode");
+		if(p != null)
+		{
+			p.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue)
+				{
+					String value = newValue.toString();
+					int index = ((ListPreference) preference).findIndexOfValue(value);
+
+					Preference alarmTimeout = findPreference("alarm_timeout");
+					alarmTimeout.setEnabled(index > 0);
+
+					return true;
+				}
+			});
 		}
 
 
 		updateLowSupplyThresholdPreferenceSummary();
-		Util.populateListPreferenceEntryValues(findPreference("snooze_type"));
+		Util.populateListPreferenceEntryValues(findPreference("alarm_mode"));
 	}
 
 	@Override

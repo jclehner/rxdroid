@@ -17,7 +17,7 @@
 		<PreferenceCategory android:key="cat_time_morning"
 			android:title="@string/_Morning">
 			
-			<at.caspase.rxdroid.preferences.TimePreference2 android:key="time_morning_begin"
+			<at.caspase.rxdroid.preferences.TimePreference android:key="time_morning_begin"
 				android:title="@string/_Begin"
 				android:dialogIcon="@drawable/ic_morning"
 				android:defaultValue="@string/pref_default_time_morning_begin"
@@ -26,7 +26,7 @@
 				rxdroid:allowAfterWrap="true"
 			/>
 				
-			<at.caspase.rxdroid.preferences.TimePreference2 android:key="time_morning_end"
+			<at.caspase.rxdroid.preferences.TimePreference android:key="time_morning_end"
 				android:title="@string/_End"
 				android:defaultValue="@string/pref_default_time_morning_end"
 				rxdroid:after="time_morning_begin"
@@ -37,13 +37,13 @@
 		<PreferenceCategory android:key="cat_time_noon"
 			android:title="@string/_Noon">
 			
-			<at.caspase.rxdroid.preferences.TimePreference2 android:key="time_noon_begin"
+			<at.caspase.rxdroid.preferences.TimePreference android:key="time_noon_begin"
 				android:title="@string/_Begin"
 				android:defaultValue="@string/pref_default_time_noon_begin"
 				rxdroid:after="time_morning_end"
 				rxdroid:before="time_noon_end" />
 			
-			<at.caspase.rxdroid.preferences.TimePreference2 android:key="time_noon_end"
+			<at.caspase.rxdroid.preferences.TimePreference android:key="time_noon_end"
 				android:title="@string/_End"
 				android:defaultValue="@string/pref_default_time_noon_end"
 				rxdroid:after="time_noon_begin"
@@ -54,14 +54,14 @@
 		<PreferenceCategory android:key="cat_time_evening"
 			android:title="@string/_Evening"
 		>
-			<at.caspase.rxdroid.preferences.TimePreference2 android:key="time_evening_begin"
+			<at.caspase.rxdroid.preferences.TimePreference android:key="time_evening_begin"
 				android:title="@string/_Begin"
 				android:defaultValue="@string/pref_default_time_evening_begin"
 				rxdroid:after="time_noon_end"
 				rxdroid:before="time_evening_end"
 			/>
 			
-			<at.caspase.rxdroid.preferences.TimePreference2 android:key="time_evening_end"
+			<at.caspase.rxdroid.preferences.TimePreference android:key="time_evening_end"
 				android:title="@string/_End"
 				android:defaultValue="@string/pref_default_time_evening_end"
 				rxdroid:after="time_evening_begin"
@@ -73,7 +73,7 @@
 		<PreferenceCategory android:key="cat_time_night"
 			android:title="@string/_Night"
 		>
-			<at.caspase.rxdroid.preferences.TimePreference2 android:key="time_night_begin"
+			<at.caspase.rxdroid.preferences.TimePreference android:key="time_night_begin"
 				android:title="@string/_Begin"
 				android:defaultValue="@string/pref_default_time_night_begin"
 				rxdroid:after="time_evening_end"
@@ -81,7 +81,7 @@
 				rxdroid:allowBeforeWrap="true"
 			/>
 			
-			<at.caspase.rxdroid.preferences.TimePreference2 android:key="time_night_end"
+			<at.caspase.rxdroid.preferences.TimePreference android:key="time_night_end"
 				android:title="@string/_End"
 				android:defaultValue="@string/pref_default_time_night_end"
 				rxdroid:after="time_night_begin"
@@ -136,18 +136,18 @@
 		android:title="@string/_title_prefscreen_notifications"
 		android:summary="@string/_summary_prefscreen_notifications"
 		android:icon="@drawable/android:ic_menu_info_details"
-	>
-		
-		<at.caspase.rxdroid.preferences.TimePreference2 android:key="time_snooze"
-			android:title="@string/_Snooze_time"
-			android:defaultValue="@string/pref_default_time_snooze"
+	>		
+		<ListPreference android:key="alarm_mode"
+			android:title="@string/_title_alarm_mode"
+			android:entries="@array/alarm_modes"
+			android:defaultValue="0"
 		/>		
 		
-		<ListPreference android:key="snooze_type"
-			android:title="@string/_preftitle_snooze_type"
-			android:entries="@array/snooze_types"
-			android:defaultValue="0"
-		/>
+		<at.caspase.rxdroid.preferences.TimePreference android:key="alarm_timeout"
+			android:title="@string/_title_alarm_timeout"
+			android:defaultValue="@string/pref_default_alarm_timeout"
+			android:enabled="false"
+		/>	
 		
 		<EditTextPreference android:key="num_min_supply_days"
 			android:title="@string/_title_min_supply_days"

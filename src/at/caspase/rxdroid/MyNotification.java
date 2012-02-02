@@ -47,6 +47,8 @@ public class MyNotification
 	private boolean mShowTime = false;
 	private boolean mIsPersistent = false;
 
+	private int mFlags = 0;
+
 	private PendingIntent mContentIntent;
 	private PendingIntent mDeleteIntent;
 
@@ -138,6 +140,12 @@ public class MyNotification
 			return this;
 		}
 
+		public Builder addFlags(int flags)
+		{
+			mNotification.mFlags |= flags;
+			return this;
+		}
+
 		public Builder setContentIntent(PendingIntent contentIntent)
 		{
 			mNotification.mContentIntent = contentIntent;
@@ -185,6 +193,8 @@ public class MyNotification
 			notification.when = System.currentTimeMillis();
 
 		//notification.flags |= Notification.FLAG_SHOW_LIGHTS;
+
+		notification.flags = mFlags;
 
 		if(mIsPersistent)
 			notification.flags |= Notification.FLAG_ONGOING_EVENT;
