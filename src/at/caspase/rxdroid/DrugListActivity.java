@@ -404,6 +404,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	private void setDate(Date date, boolean initPager)
 	{
+		if(LOGV) Log.v(TAG, "setDate: date=" + date + ", initPager=" + initPager);
+
 		if(!mIsShowing)
 		{
 			if(LOGV) Log.v(TAG, "setDate: activity is not showing; ignoring");
@@ -614,14 +616,16 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	private final OnPageChangeListener mPageListener = new OnPageChangeListener() {
 
-		int mPage;
-		int mLastPage = -1;
+		int mPage = InfiniteViewPagerAdapter.CENTER;
+		int mLastPage = InfiniteViewPagerAdapter.CENTER;
 
 		@Override
 		public void onPageSelected(int page)
 		{
 			mPage = page;
-			Log.d(TAG, "onPageSelected: mPage=" + mPage);
+
+			if(page == InfiniteViewPagerAdapter.CENTER)
+				mLastPage = InfiniteViewPagerAdapter.CENTER;
 		}
 
 		@Override
@@ -632,18 +636,15 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		{
 			if(state == ViewPager.SCROLL_STATE_IDLE)
 			{
-				Log.d(TAG, "onPageScrollStateChanged: mPage=" + mPage + ", mLastPage=" + mLastPage);
+				mSwipeDirection = mLastPage != -1 ? mPage - mLastPage : 0;
 
-				mSwipeDirection = mPage != -1 ? mPage - mLastPage : 0;
+				if(LOGV) Log.v(TAG, "onPageScrollStateChanged: mPage=" + mPage +
+						", mLastPage=" + mLastPage + ", mSwipeDirection=" + mSwipeDirection);
+
+				final int shiftBy = mSwipeDirection < 0 ? -1 : 1;
+				setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy), false);
+
 				mLastPage = mPage;
-
-				if(mSwipeDirection != 0)
-				{
-					final int shiftBy = mSwipeDirection < 0 ? -1 : 1;
-					setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy), false);
-				}
-
-				updateDateString();
 			}
 
 		}
