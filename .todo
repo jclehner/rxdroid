@@ -1,0 +1,348 @@
+<?xml version="1.0"?>
+<todo version="0.1.20">
+    <note priority="veryhigh" time="1316557487" done="1317224604">
+        Check functionality of Dose.TIME_NIGHT spanning two days
+        <comment>
+            Fixed.
+        </comment>
+        <note priority="veryhigh" time="1316557578" done="0">
+            Case 1: active dose time should be Drug.TIME_NIGHT, restart the thread AFTER midnight
+        </note>
+        <note priority="veryhigh" time="1316557629" done="0">
+            Case 2: let dose time end, start before midnight, set end to after midnight, see what happens
+        </note>
+    </note>
+    <note priority="veryhigh" time="1316988193" done="1317228615">
+        Fix getActiveDoseTime
+        <comment>
+            Fixed
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1317224596" done="1318343545">
+        Add dose information to Intake objects
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1317228605" done="1317304971">
+        Resolve the ConcurrentModificationException when deleting a drug
+        <comment>
+            Hopefully...
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1318718171" done="1318784107">
+        Set time to 00:28 with Drug.TIME_NIGHT spanning to 00:30 the next day and observe notification fuckup - FIX!
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1321224140" done="1324306295">
+        Create FractionInputDialog and make IntakeDialog use it
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1321224167" done="1322946883">
+        Consider changeing IntakeActivity to a Dialog, due to styling difficulties
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1322946871" done="1323731193">
+        display instructions if main ListView is empty
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1323299993" done="1324429131">
+        MAKE IntakeDialog A FUCKING ACTIVITY USING THE TIP FROM http://stackoverflow.com/questions/3045406/tunning-up-activity-with-dialog-theme !
+        <comment>
+            fixed using different method
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1324431449" done="1326404985">
+        Reimplement snoozing
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1324493850" done="1326234011">
+        Refactoring: Calendar -&gt; Date
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1326751556" done="1327071960">
+        Fix LoaderActivity
+        <comment>
+            hopefully fixed it
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1327420017" done="1327939245">
+        Investigate date not changing but drug list sliding in DrugListActivity
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1327420049" done="1328201745">
+        Fix notification defaults
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="high" time="1316529642" done="1318944915">
+        Implement DoseView long click behaviour: remove intake, mark as taken, change dose, edit drug
+        <comment>
+            fixed, removed some options
+        </comment>
+    </note>
+    <note priority="high" time="1317213065" done="1321196875">
+        add fake-intake class for ignoring drug doses
+        <comment>
+            abandoned, using Intakes with dose.equals(Fraction.ZERO) now
+        </comment>
+    </note>
+    <note priority="high" time="1317581013" done="1318779479">
+        Actually work with a drug's refill size
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="high" time="1320707720" done="1320962675">
+        Rename: frequency -&gt; repeat (in app &amp; code)
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="high" time="1320707869" done="1321196908">
+        add special icon for non-standard dose intake (maybe yellow tick?), e.g. scheduled dose was 2, but the user took 1 or 2 1/2
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="high" time="1320708051" done="1323776693">
+        add long-click option for non-standard dose intake
+        <comment>
+            not applicable anymore
+        </comment>
+    </note>
+    <note priority="high" time="1322944697" done="1323892421">
+        Allow integer input mode for FractionINput
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="high" time="1323892487" done="1324306318">
+        Maybe put fraction input mode toggler into FractionInput (maybe displayed by default, allowing a switch from MODE_INTEGER to MODE_FRACTION)
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="high" time="1326234311" done="1326463373">
+        Move entry-type specific operations from Database to Drug/Intake
+        <comment>
+            used different approach
+        </comment>
+    </note>
+    <note priority="high" time="1326411820" done="1327420025">
+        Use a ViewPager for DrugListActivity
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="high" time="1326454840" done="1326536740">
+        Add 'on demand' repeat mode
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="medium" time="1316529552" done="1318956457">
+        Speed up DrugAdapter#getView()
+        <comment>
+            not that big of a problem anymore, due to caching
+        </comment>
+    </note>
+    <note priority="medium" time="1316614618" done="1326411836">
+        Fix the GestureOverlayView hack
+        <comment>
+            will use ViewPager
+        </comment>
+    </note>
+    <note priority="medium" time="1317314869" done="1318711300">
+        Fix low supply messages for drugs with frequency != FREQ_DAILY
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="medium" time="1317314886" done="1318589057">
+        In drug frequencies, hange "every other day" to "every N days"
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="medium" time="1317314965" done="1318589059">
+        Allow picking certain week days for drug frequencies, e.g. Mon, Fri, Sat
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="medium" time="1317514845" done="1323776725">
+        Consider removing the option to click on "0"-doses, maybe adding a dedicated button instead, allowing unscheduled intakes.
+        <comment>
+            not applicable anymore
+        </comment>
+    </note>
+    <note priority="medium" time="1317581035" done="1323731237">
+        Remove the spacer between the TextView and the EditTexts in FractionInputDialog
+        <comment>
+            deprecated
+        </comment>
+    </note>
+    <note priority="medium" time="1317581250" done="1323731253">
+        Consider moving the whole requestIntake stuff from DrugListActivity to a separate activity with a dialog theme
+        <comment>
+            deprecated
+        </comment>
+    </note>
+    <note priority="medium" time="1318543262" done="1318711302">
+        Put Database.Entry, .Drug and .Intake into separate files, in a new at.caspase.rxdroid.db package. In that package, also add subpackages, like .v43 for class definitions from version 43
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="medium" time="1318716079" done="1324430672">
+        Add the current "low supply threshold" setting's value to the summary
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="medium" time="1318945060" done="1319583835">
+        Implement three snoozing options: don't snooze, snooze on click, autosnooze
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="medium" time="1320793646" done="1324429884">
+        Make DatabaseHelper display dialogs for errors/upgrade/downgrade
+        <comment>
+            implemented in LoaderActivity
+        </comment>
+    </note>
+    <note priority="medium" time="1321197019" done="1324381785">
+        make first Activity to be loaded a special Activity, in which the DB is intialized and errors regarding the DB can be displayed
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="medium" time="1324297188" done="1324382348">
+        Make DoseView immediately display the yellow tick when igoring a dose
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="medium" time="1324306309" done="1324430700">
+        Unify IntakeDialog and FractionInputDialog?
+        <comment>
+            obsolete
+        </comment>
+    </note>
+    <note priority="medium" time="1324308984" done="1324308994">
+        32
+    </note>
+    <note priority="low" time="1316529505" done="1316548042">
+        Ask the user for confirmation before resetting all preferences to their defaults
+    </note>
+    <note priority="low" time="1316529611" done="1318444927">
+        Don't use fixed yyyy-mm-dd date format
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="low" time="1316614544" done="1316988254">
+        Make Database.update(), .create() and .delete() functions with DAO argument private
+    </note>
+    <note priority="low" time="1316614792" done="1324430718">
+        Allow moving the app to SD, but display a warning as the BOOT_COMPLETED intent will not be delivered
+        <comment>
+            duplicate entry
+        </comment>
+    </note>
+    <note priority="low" time="1317306209" done="1318783849">
+        Implement the "show doseless/inactive" settings
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="high" time="1320707778">
+        Notify the user of a forgotten dose for a drug with repeat != daily, by inflating a ViewStub above the date view, leading to a separate activity
+    </note>
+    <note priority="high" time="1324308938">
+        Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?
+    </note>
+    <note priority="high" time="1324602189">
+        Allow the user to customize the display order in DrugListActivity
+    </note>
+    <note priority="medium" time="1316529704" done="1328202331">
+        Ask the user for a dose when clicking a dose that already has an intake.
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="medium" time="1318540605">
+        Somehow, implement an "Every N hours" frequency option
+    </note>
+    <note priority="medium" time="1318943892">
+        Consider modelling DrugNamePreference's layout after the layout found in the old DrugEditActivty layout
+    </note>
+    <note priority="medium" time="1320707746">
+        only update notifications when really neccessary
+    </note>
+    <note priority="medium" time="1320778180">
+        Better tablet support; use Fragments!
+    </note>
+    <note priority="medium" time="1320793813">
+        distribute DoseViews equidistantly across the screen
+    </note>
+    <note priority="medium" time="1324592387">
+        Reimplement the mess that is DrugEditActivity (should it really be a PreferenceActivity?)
+    </note>
+    <note priority="medium" time="1326455007">
+        Allow intakes to be updated!
+    </note>
+    <note priority="low" time="1316547776">
+        Don't show the FractionInputDialog displayed when clicking on an empty dose with an intial value of zero, but use the lowest dose currently in the input schedule.
+    </note>
+    <note priority="low" time="1317226248">
+        For Version, don't get the revision from strings.xml, as this requires faking a change in the file to update the revision tag.
+    </note>
+    <note priority="low" time="1317226470">
+        Externalize all strings
+    </note>
+    <note priority="low" time="1317226740">
+        Allow moving the app to SD, but display a big fat warning (OK button should only be active after 5 seconds). Also the dialog should be displayed every time until the user checks a checkbox in the dialog.
+    </note>
+    <note priority="low" time="1320793916">
+        use or remove the comment field in Drug
+    </note>
+    <note priority="low" time="1326536117">
+        Allow per-weekday doseTime definitions
+    </note>
+    <note priority="low" time="1326753387">
+        Move icon selection in DrugEditActivity to DrugNamePreference itself!
+    </note>
+    <note priority="verylow" time="1316529783">
+        Add icons for all drug forms. Also change the current injection and liquid icons.
+    </note>
+    <note priority="verylow" time="1316548531">
+        Draw smaller doseTime icons for displaying as Dialog icons
+    </note>
+    <note priority="verylow" time="1316548559">
+        Handle landscape view
+    </note>
+    <note priority="verylow" time="1316548662">
+        Consider keeping intake entries only for a certain number of days, before removing them from the DB. The user should be able to choose this history size, within reasonable bounds.
+    </note>
+    <note priority="verylow" time="1316614566">
+        Make it possible to navigate DrugListActivity using the trackball
+    </note>
+</todo>

@@ -54,6 +54,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	private Date mDate;
 
 	private Fraction mDose;
+	private final int mIntakeCount;
 
 	private int mFlags;
 
@@ -73,7 +74,12 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		mDoseTime = doseTime;
 		mDate = date;
 
-		mDose = drug.getDose(doseTime, date);
+		mIntakeCount = Intake.findAll(drug, date, doseTime).size();
+
+		if(mIntakeCount == 0)
+			mDose = drug.getDose(doseTime, date);
+		else
+			mDose = new Fraction();
 
 		LayoutInflater lf = LayoutInflater.from(context);
 		View view = lf.inflate(R.layout.intake, null);
@@ -94,6 +100,8 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		mDoseText.setText(mDose.toString());
 
 		mDoseEdit.setValue(mDose);
+
+
 		mDoseEdit.setFractionInputMode(mDose.isInteger() ? FractionInput.MODE_INTEGER : FractionInput.MODE_FRACTION);
 		mDoseEdit.setOnChangeListener(this);
 
