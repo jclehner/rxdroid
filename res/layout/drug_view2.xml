@@ -20,7 +20,8 @@
 		android:layout_alignParentTop="true"
 							
 		android:scaleType="fitCenter"
-		android:src="@drawable/med_pill"
+		android:padding="1dp"
+		android:src="@drawable/ic_drug_pill"
 	/>
   
   	<TextView android:id="@id/drug_name"

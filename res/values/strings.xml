@@ -194,6 +194,9 @@
 	
 	<string name="_title_alarm_timeout">Alarm timeout</string>
 	
+	
+	<string name="_msg_forgotten_intakes">Forgotten intakes since %1$s:</string>
+	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.

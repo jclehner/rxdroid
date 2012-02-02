@@ -76,7 +76,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	private static final String TAG = Drug.class.getName();
 	private static final long serialVersionUID = -2569745648137404894L;
 
-	public static final int FORM_TABLET = 0;
+	public static final int FORM_PILL = 0;
 	public static final int FORM_INJECTION = 1;
 	public static final int FORM_SPRAY = 2;
 	public static final int FORM_DROP = 3;
@@ -209,16 +209,19 @@ public class Drug extends Entry implements Comparable<Drug>
 		switch(form)
 		{
 			case FORM_INJECTION:
-				return R.drawable.med_syringe;
+				return R.drawable.ic_drug_syringe;
 
 			case FORM_DROP:
-				return R.drawable.med_drink;
+				return R.drawable.ic_drug_drink;
 
-			case FORM_TABLET:
+			case FORM_GEL:
+				return R.drawable.ic_drug_tube;
+
+			case FORM_PILL:
 				// fall through
 
 			default:
-				return R.drawable.med_pill;
+				return R.drawable.ic_drug_pill;
 
 			// FIXME
 		}
