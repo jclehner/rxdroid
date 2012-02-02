@@ -162,6 +162,12 @@
             not that big of a problem anymore, due to caching
         </comment>
     </note>
+    <note priority="medium" time="1316529704" done="1328202331">
+        Ask the user for a dose when clicking a dose that already has an intake.
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1316614618" done="1326411836">
         Fix the GestureOverlayView hack
         <comment>
@@ -273,20 +279,20 @@
             fixed
         </comment>
     </note>
+    <note priority="verylow" time="1316548531" done="1328202433">
+        Draw smaller doseTime icons for displaying as Dialog icons
+        <comment>
+            fixed long ago
+        </comment>
+    </note>
     <note priority="high" time="1320707778">
-        Notify the user of a forgotten dose for a drug with repeat != daily, by inflating a ViewStub above the date view, leading to a separate activity
+        For drug specific notifications, display an icon (either change the drug icon's color or use something like android.R.drawable.ic_dialog_alert). Clicking the icon opens a Dialog.
     </note>
     <note priority="high" time="1324308938">
         Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?
     </note>
     <note priority="high" time="1324602189">
         Allow the user to customize the display order in DrugListActivity
-    </note>
-    <note priority="medium" time="1316529704" done="1328202331">
-        Ask the user for a dose when clicking a dose that already has an intake.
-        <comment>
-            done
-        </comment>
     </note>
     <note priority="medium" time="1318540605">
         Somehow, implement an "Every N hours" frequency option
@@ -332,9 +338,6 @@
     </note>
     <note priority="verylow" time="1316529783">
         Add icons for all drug forms. Also change the current injection and liquid icons.
-    </note>
-    <note priority="verylow" time="1316548531">
-        Draw smaller doseTime icons for displaying as Dialog icons
     </note>
     <note priority="verylow" time="1316548559">
         Handle landscape view

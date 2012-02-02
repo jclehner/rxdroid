@@ -199,12 +199,16 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		menu.add(0, MENU_TOGGLE_FILTERING, 0, R.string._title_toggle_filtering)
-				.setIcon(android.R.drawable.ic_menu_view);
-		menu.add(0, MENU_ADD, 0, R.string._title_add).setIcon(
-				android.R.drawable.ic_menu_add);
-		menu.add(0, MENU_PREFERENCES, 0, R.string._title_preferences).setIcon(
-				android.R.drawable.ic_menu_preferences);
+		menu.add(0, MENU_ADD, 0, R.string._title_add).setIcon(android.R.drawable.ic_menu_add);
+		menu.add(0, MENU_PREFERENCES, 0, R.string._title_preferences).setIcon(android.R.drawable.ic_menu_preferences);
+		menu.add(0, MENU_TOGGLE_FILTERING, 0, R.string._title_toggle_filtering).setIcon(android.R.drawable.ic_menu_view);
+
+		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		{
+			menu.getItem(MENU_ADD).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			menu.getItem(MENU_PREFERENCES).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			menu.getItem(MENU_TOGGLE_FILTERING).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+		}
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -231,19 +235,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			case MENU_TOGGLE_FILTERING:
 			{
 				mShowingAll = !mShowingAll;
-
-				final ListView currentView = getCurrentListView();
-				if(currentView != null)
-				{
-					final DrugAdapter adapter = (DrugAdapter) currentView.getAdapter();
-
-					if(mShowingAll)
-						adapter.setFilter(null);
-					else
-						adapter.setFilter(new DrugFilter(mDate));
-
-					return true;
-				}
+				setDate(mDate, true);
+				return true;
 			}
 		}
 		return super.onOptionsItemSelected(item);
