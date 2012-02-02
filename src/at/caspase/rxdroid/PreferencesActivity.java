@@ -36,6 +36,7 @@ import android.preference.PreferenceActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import at.caspase.rxdroid.db.DatabaseHelper;
+import at.caspase.rxdroid.preferences.TimePreference;
 import at.caspase.rxdroid.util.Util;
 
 public class PreferencesActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener
@@ -88,15 +89,12 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue)
 				{
-					String value = newValue.toString();
-					int index = ((ListPreference) preference).findIndexOfValue(value);
-
-					Preference alarmTimeout = findPreference("alarm_timeout");
-					alarmTimeout.setEnabled(index > 0);
-
+					updateAlarmModePreferenceSummary(preference, newValue.toString());
 					return true;
 				}
 			});
+
+			updateAlarmModePreferenceSummary(p, null);
 		}
 
 
@@ -156,6 +154,43 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		{
 			String value = mSharedPreferences.getString(PREF_LOW_SUPPLY_THRESHOLD, "10");
 			p.setSummary(getString(R.string._summary_min_supply_days, value));
+		}
+	}
+
+	private void updateAlarmModePreferenceSummary(Preference p, String value)
+	{
+		if(value == null)
+		{
+			if((value = ((ListPreference) p).getValue()) == null)
+				return;
+		}
+
+		int index = ((ListPreference) p).findIndexOfValue(value);
+
+		Preference alarmTimeout = findPreference("alarm_timeout");
+		alarmTimeout.setEnabled(index > 0);
+
+		switch(index)
+		{
+			case 1:
+				final DumbTime timeout = ((TimePreference) alarmTimeout).getValue();
+				final int minutes;
+
+				if(timeout != null)
+					minutes = 60 * timeout.getHours() + timeout.getMinutes();
+				else
+					minutes = 0;
+
+				p.setSummary(getString(R.string._summary_alarm_mode_repeat, minutes));
+				break;
+
+			case 0:
+				// fall through
+
+			default:
+				p.setSummary(R.string._summary_alarm_mode_normal);
+				break;
+
 		}
 	}
 }

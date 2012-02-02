@@ -106,6 +106,10 @@ public class TimePreference extends MyDialogPreference
 			setDialogIcon(android.R.drawable.ic_menu_recent_history);
 	}
 
+	public DumbTime getValue() {
+		return mTime;
+	}
+
 	@Override
 	public CharSequence getSummary() {
 		return mTime != null ? mTime.toString() : mDefaultValue;

@@ -318,6 +318,22 @@ public class Settings
 		return valueStr != null ? Integer.parseInt(valueStr, 10) : defValue;
 	}
 
+	public int getNotificationDefaultsXorMask()
+	{
+		int mask = -1;
+
+		if(!sSharedPrefs.getBoolean("use_led", true))
+			mask |= Notification.DEFAULT_LIGHTS;
+
+		if(!sSharedPrefs.getBoolean("use_sound", true))
+			mask |= Notification.DEFAULT_SOUND;
+
+		if(!sSharedPrefs.getBoolean("use_vibrator", true))
+			mask |= Notification.DEFAULT_VIBRATE;
+
+		return mask;
+	}
+
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;
 	private static final int FLAG_DONT_CORRECT_TIME = 2;
 

@@ -140,7 +140,7 @@
 	<string name="_title_every_n_days">Every N days</string>
 	<string name="_title_pick_days">Pick days</string>
 	
-	<string name="_title_dont_snooze">Don\'t snooze</string>
+	<string name="_title_dont_snooze">Alarm once</string>
 	<string name="_title_repeat_alarm">Repeat alarm</string>
 	<string name="_title_snooze">Snooze</string>
 	

@@ -217,6 +217,10 @@ public class MyNotification
 			Settings.instance().setLastNotificationMessageHash(thisHash);
 		}
 
+		int defaultsXorMask = Settings.instance().getNotificationDefaultsXorMask();
+		if(defaultsXorMask != -1)
+			notification.defaults ^= defaultsXorMask;
+
 		NotificationManager notificationMgr = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationMgr.notify(R.id.notification, notification);
 	}

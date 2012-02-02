@@ -139,6 +139,7 @@
 	>		
 		<ListPreference android:key="alarm_mode"
 			android:title="@string/_title_alarm_mode"
+			android:summary="@string/_summary_alarm_mode_normal"
 			android:entries="@array/alarm_modes"
 			android:defaultValue="0"
 		/>		
