@@ -39,9 +39,9 @@ import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.util.Util;
 
-public class TimePreference2 extends MyDialogPreference
+public class TimePreference extends MyDialogPreference
 {
-	private static final String TAG = TimePreference2.class.getName();
+	private static final String TAG = TimePreference.class.getName();
 	private static final boolean LOGV = false;
 
 	private static final int WRAP_AFTER = 1;
@@ -67,7 +67,7 @@ public class TimePreference2 extends MyDialogPreference
 
 	private Button mSetButton;
 
-	public TimePreference2(Context context, AttributeSet attrs)
+	public TimePreference(Context context, AttributeSet attrs)
 	{
 		// we don't want the DialgPreference layout in pre honeycomb here
 		super(context, attrs, android.R.attr.preferenceStyle);
@@ -254,7 +254,7 @@ public class TimePreference2 extends MyDialogPreference
 		final String key = mConstraintKeys[index];
 		if(key != null)
 		{
-			final TimePreference2 constraintPref = (TimePreference2) findPreferenceInHierarchy(key);
+			final TimePreference constraintPref = (TimePreference) findPreferenceInHierarchy(key);
 			if(constraintPref == null)
 				throw new IllegalArgumentException("No such TimePreference: " + key);
 

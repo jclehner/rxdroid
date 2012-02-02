@@ -34,8 +34,8 @@ import at.caspase.androidutils.MyDialogPreference;
 import at.caspase.androidutils.StateSaver;
 import at.caspase.androidutils.StateSaver.SaveState;
 import at.caspase.rxdroid.Fraction;
-import at.caspase.rxdroid.FractionInputDialog2;
-import at.caspase.rxdroid.FractionInputDialog2.OnFractionSetListener;
+import at.caspase.rxdroid.FractionInputDialog;
+import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
 
 /**
  * A preference for storing fractions.
@@ -96,13 +96,13 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 	{
 		if(which == DialogInterface.BUTTON_NEUTRAL)
 		{
-			FractionInputDialog2 myDialog = (FractionInputDialog2) dialog;
+			FractionInputDialog myDialog = (FractionInputDialog) dialog;
 			onFractionSet(myDialog, myDialog.getValue().add(mLongClickSummand));
 		}
 	}
 
 	@Override
-	public void onFractionSet(FractionInputDialog2 dialog, Fraction value)
+	public void onFractionSet(FractionInputDialog dialog, Fraction value)
 	{
 		mValue = value;
 
@@ -115,7 +115,7 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 	@Override
 	protected Dialog onGetCustomDialog()
 	{
-		FractionInputDialog2 dialog = new FractionInputDialog2(getContext(), mValue, this);
+		FractionInputDialog dialog = new FractionInputDialog(getContext(), mValue, this);
 		dialog.setTitle(getDialogTitle());
 		dialog.setIcon(getDialogIcon());
 		dialog.setAutoInputModeEnabled(true);
@@ -139,7 +139,7 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 	protected Parcelable onSaveInstanceState()
 	{
 		Bundle extras = new Bundle();
-		FractionInputDialog2 dialog = (FractionInputDialog2) getDialog();
+		FractionInputDialog dialog = (FractionInputDialog) getDialog();
 		final Fraction value;
 
 		if(dialog != null)

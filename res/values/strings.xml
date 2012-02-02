@@ -16,7 +16,16 @@
     <string name="pref_default_time_night_end">23:30</string>
     <string name="pref_default_alarm_timeout">00:30</string>
         
-    <!-- Begin of translatable strings -->
+    <!-- 
+    Translatable strings start here. The naming scheme is as follows:
+    
+    _title_<foobar>		Titles for Dialogs, Preferences, Activities, etc. (w/o trailing dot)
+    _summary_<foobar>	Preference summaries (w/ trailing dot)
+    _toast_<foobar>		Message for Toast notifications (w/ trailing dot)
+    _btn_<foobar>		Button label. Should be as short as possible. (w/o trailing dot)
+    _msg_<foobar>		Everything that does not fit into the categories above (w/ trailing dot)   
+    
+    -->
     
     <string name="_Morning">Morning</string>
     <string name="_Noon">Noon</string>
@@ -151,13 +160,7 @@
 	<string name="_title_ignore_dose">Mark as ignored</string>
 	
 	<string name="_msg_insufficient_supplies">Insufficient supplies (%3$s) of %1$s for a dose of %2$s.</string>
-	
-    <string name="dialog_set_number">Set</string>
-    <string name="dialog_cancel">Cancel</string>
-    <string name="dialog_picker_title">Choose a number</string>
-	<string name="menu_preferences_label">Preferences</string>
-    <string name="menu_dialog_label">Dialog Picker</string>
-    
+	    
     <string name="_msg_touch_to_edit">(touch to edit)</string>
     <string name="_msg_empty_list_text">Click MENU and select "%1$s" to add a drug.</string>
     
@@ -195,5 +198,17 @@
 	<string name="_summary_alarm_mode_repeat">Repeat alarm every %1$d minute(s).</string>
 	
 	<string name="_title_alarm_timeout">Alarm timeout</string>
+	
+	<!-- 
+    An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
+    and thus use a different naming scheme.
+    
+    Keep at the end of strings.xml!  
+     -->
+    <string name="dialog_set_number">Set</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_picker_title">Choose a number</string>
+	<string name="menu_preferences_label">Preferences</string>
+    <string name="menu_dialog_label">Dialog Picker</string>
 	
 </resources>

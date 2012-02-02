@@ -27,20 +27,20 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.util.Log;
 
-public class FractionInputDialog2 extends AlertDialog implements OnClickListener, FractionInput.OnChangedListener
+public class FractionInputDialog extends AlertDialog implements OnClickListener, FractionInput.OnChangedListener
 {
-	private static final String TAG = FractionInputDialog2.class.getName();
+	private static final String TAG = FractionInputDialog.class.getName();
 
 	public interface OnFractionSetListener
 	{
-		void onFractionSet(FractionInputDialog2 dialog, Fraction value);
+		void onFractionSet(FractionInputDialog dialog, Fraction value);
 	}
 
 	private FractionInput mInput;
 	private Fraction mValue;
 	private OnFractionSetListener mListener;
 
-	public FractionInputDialog2(Context context, Fraction value, OnFractionSetListener listener)
+	public FractionInputDialog(Context context, Fraction value, OnFractionSetListener listener)
 	{
 		super(context);
 
