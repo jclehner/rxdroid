@@ -399,7 +399,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		final Fraction currentSupply = mDrug.getCurrentSupply();
 		if(currentSupply.compareTo(0) == 0)
 		{
-			if(refillSize != 0)
+			if(refillSize == 0)
 				mCurrentSupply.setSummary(R.string._summary_not_available);
 			else
 				mCurrentSupply.setSummary("0");
