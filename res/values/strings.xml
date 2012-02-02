@@ -64,10 +64,7 @@
 	<string name="_msg_err_non_unique_drug_name">This name is already taken.</string>
     
     <!--  Dialogs: Warnings -->
-	<string name="_title_warning">Warning</string>       
-    <string name="_msg_warning_svc_not_running">The notification service was not running. 
-			It might have crashed, or was stopped through other means (e.g. task killers). 
-			Be aware that you may have missed doses!</string>
+	<string name="_title_warning">Warning</string> 
     
     <string name="_title_preferences">Preferences</string>
         
@@ -90,12 +87,10 @@
     <string name="_summary_prefscreen_display">Choose which drugs to display</string>
     
     <string name="_title_pref_show_days_without_intakes">Show doseless</string>
-	<string name="_summary_pref_show_days_without_intakes_on">All drugs will be displayed</string>
-	<string name="_summary_pref_show_days_without_intakes_off">Drugs having no doses on the currently displayed day will be hidden</string>
+	<string name="_summary_pref_show_days_without_intakes">Show drugs having no doses on the currently displayed day.</string>
 	
 	<string name="_title_pref_show_inactive">Show inactive</string>
-	<string name="_summary_pref_show_inactive_off">Drugs marked as inactive will be hidden</string>
-	<string name="_summary_pref_show_inactive_on">@string/_summary_pref_show_days_without_intakes_on</string>
+	<string name="_summary_pref_show_inactive_off">Show drugs marked as inactive</string>
 	
 	<string name="_title_pref_restore_defaults">Restore defaults</string>
 	<string name="_summary_pref_restore_defaults">Resets all preferences to default values</string>
@@ -147,7 +142,7 @@
 	<string name="_msg_supply">%1$s - lasts until %2$s</string>
 	<string name="_title_save_chanes">Save changes</string>
 	<string name="_msg_save_drug_changes">Do you want to save changes made to this drug?</string>
-	<string name="_msg_every_n_days_distance">How many days between each repetition?</string>
+	<string name="_msg_every_n_days_distance">Days between each repetition.</string>
 	<string name="_msg_repetition_origin">Pick a starting date.</string>
 	
 	<string name="_title_intake_schedule">Intake schedule</string>
@@ -205,8 +200,8 @@
     
     Keep at the end of strings.xml!  
      -->
-    <string name="dialog_set_number">Set</string>
-    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_set_number">@string/_btn_set</string>
+    <string name="dialog_cancel">@android:string/cancel</string>
     <string name="dialog_picker_title">Choose a number</string>
 	<string name="menu_preferences_label">Preferences</string>
     <string name="menu_dialog_label">Dialog Picker</string>

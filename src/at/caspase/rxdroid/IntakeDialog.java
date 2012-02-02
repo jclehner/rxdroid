@@ -102,7 +102,8 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		mDoseEdit.setValue(mDose);
 
 
-		mDoseEdit.setFractionInputMode(mDose.isInteger() ? FractionInput.MODE_INTEGER : FractionInput.MODE_FRACTION);
+		mDoseEdit.setAutoInputModeEnabled(true);
+		//mDoseEdit.setFractionInputMode(mDose.isInteger() ? FractionInput.MODE_INTEGER : FractionInput.MODE_FRACTION);
 		mDoseEdit.setOnChangeListener(this);
 
 		//setTitle(mDrug.getName());
@@ -230,7 +231,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		Display display = wm.getDefaultDisplay();
 
 		int width  = display.getWidth()  * 8 / 10;
-		int height = display.getHeight() * 1 / 3;
+		int height = display.getHeight() * 2 / 5;
 
 		mPopup = new PopupWindow(
 				view,

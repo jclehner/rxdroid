@@ -106,16 +106,14 @@
 		<CheckBoxPreference
 			android:key="show_inactive"
 			android:title="@string/_title_pref_show_inactive"
-			android:summaryOn="@string/_summary_pref_show_inactive_on"
-			android:summaryOff="@string/_summary_pref_show_inactive_off"
+			android:summary="@string/_summary_pref_show_inactive"
 			android:defaultValue="true"
 		/>
 		
 		<CheckBoxPreference
 			android:key="show_doseless"
 			android:title="@string/_title_pref_show_days_without_intakes"
-			android:summaryOn="@string/_summary_pref_show_days_without_intakes_on"
-			android:summaryOff="@string/_summary_pref_show_days_without_intakes_off"
+			android:summary="@string/_summary_pref_show_days_without_intakes"
 			android:defaultValue="true"
 		/>
 		

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        
+    <!-- 
+    Translatable strings start here. The naming scheme is as follows:
+    
+    _title_<foobar>		Titles for Dialogs, Preferences, Activities, etc. (w/o trailing dot)
+    _summary_<foobar>	Preference summaries (w/ trailing dot)
+    _toast_<foobar>		Message for Toast notifications (w/ trailing dot)
+    _btn_<foobar>		Button label. Should be as short as possible. (w/o trailing dot)
+    _msg_<foobar>		Everything that does not fit into the categories above (w/ trailing dot)   
+    
+    -->
+    
+    <string name="_Morning">Morgen</string>
+    <string name="_Noon">Mittag</string>
+    <string name="_Evening">Abend</string>
+    <string name="_Night">Nacht</string>
+    <string name="_Begin">Anfang</string>
+    <string name="_End">Ende</string>
+    
+    <string name="_msg_new_notification">Neue Benachrichtigung</string>
+    <string name="_title_notifications">RxDroid</string>
+    <string name="_msg_doses_fp">Einnahmen: %1$d vergessen, %2$d ausstehend.</string>
+    <string name="_msg_doses_f">Einnahmen: %1$d vergessen.</string>
+    <string name="_msg_doses_p">Einnahmen: %1$d ausstehend.</string>
+    <string name="_msg_low_supply_single">Niedriger Vorrat: %1$s.</string>
+    <string name="_msg_low_supply_multiple">Niedrige Vorräte: %1$s und %2$d andere(s).</string>
+    
+	<string name="_msg_constraints_ab">Wähle eine Zeit zwischen %1$s und %2$s.</string>
+	<string name="_msg_constraints_a">Wähle eine Zeit nach %1$s.</string>
+	<string name="_msg_constraints_b">Wähle eine Zeit vor %2$s.</string>
+	
+	<string name="_btn_set">Auswählen</string>
+    
+    <string name="_title_drug_name">Medikamentenname</string>
+    <string name="_title_delete">Löschen</string>
+    
+    <string name="_msg_freq_daily">Täglich</string>
+	<string name="_msg_freq_weekly">Jeden %1$s</string>
+
+	<string name="_toast_deleted">Gelöscht</string>
+	  
+    <!--  Dialogs: Errors -->    
+    <string name="_title_error">Fehler</string>    
+	
+	<string name="_msg_timepreference_constraint_failed">Zeit liegt nicht im angegebenen Zeitraum.</string>
+	<string name="_msg_err_empty_drug_name">Dieses Medikament hat keinen Namen und wird verworfen.</string>
+	<string name="_msg_err_non_unique_drug_name">Dieser Name ist bereits Vergeben.</string>
+    
+    <!--  Dialogs: Warnings -->
+	<string name="_title_warning">Warnung</string>   
+    
+    <string name="_title_preferences">Einstellungen</string>
+        
+    <string name="_title_prefscreen_times">Zeiten</string>
+    <string name="_summary_prefscreen_times">Zeiträume von Morgen, Mittag, etc.</string>
+    
+    <string name="_title_prefscreen_notifications">Benachrichtigungen</string>
+    <string name="_summary_prefscreen_notifications">Benachrichtigungsmethoden, etc.</string>
+    
+    <string name="_title_pref_notification_methods">Benachrichtigungsmethoden</string>
+    
+    <string name="_title_min_supply_days">Niedrige Vorräte</string>
+    <string name="_summary_min_supply_days">Eine Benachrichtigung anzeigen, wenn die Vorräte eines Medikaments für weniger als %1$s
+    	Tag(e) ausreicht</string>
+    
+    <string name="_title_pref_use_led">LED</string>
+    <string name="_title_pref_use_sound">Ton</string>
+    <string name="_title_pref_use_vibrator">Vibration</string>
+    
+    <string name="_title_prefscreen_display">Anzeige</string>
+    <string name="_summary_prefscreen_display">Filteroptionen, etc.</string>
+    
+    <string name="_title_pref_show_days_without_intakes">Ohne Einnahme</string>
+	<string name="_summary_pref_show_days_without_intakes">Medikamente ohne Einnahmen am ausgewählten Tag anzeigen.</string>
+	
+	<string name="_title_pref_show_inactive">Zeige inaktive</string>
+	<string name="_summary_pref_show_inactive">Medikamente anzeigen, die als inaktiv gekennzeichnet sind.</string>
+	
+	<string name="_title_pref_restore_defaults">Einstellungen Zurücksetzen</string>
+	<string name="_summary_pref_restore_defaults">Resets all preferences to default values</string>
+	
+	<string name="_title_prefscreen_display_info">Information</string>
+	<string name="_summary_prefscreen_display_info">Dies Einstellungen können über MENÜ -&gt; Alle anzeigen 
+		aufgehoben werden.</string>		
+	
+	<string name="_btn_discard">Verwerfen</string>
+	<string name="_btn_save">Speichern</string>
+	<string name="_toast_intake_noted">Notiert.</string>
+	<string name="_toast_saved">Gespeichert.</string>
+	
+	<string name="_title_add">Hinzufügen</string>
+	<string name="_title_toggle_filtering">Alle anzeigen / filtern</string>
+	
+
+	<string name="_msg_intake_already_taken">You have already taken this dose. Do you want to continue?</string>
+	<string name="_msg_intake_normal">Nimm diese Dosis und klicke auf OK.</string>
+	<string name="_msg_intake_unscheduled">Wähle eine Dosis und klicke auf OK.</string>
+	<string name="_title_change_dose">Dosis bearbeiten</string>
+	<string name="_title_edit_drug">Medikament bearbeiten</string>
+	<string name="_title_mark_not_taken">Als nicht eingenommen markieren</string>
+	<string name="_title_mark_taken">Als eingenommen markieren</string>
+	
+	<string name="_msg_freq_every_n_days">Alle %1$s Tage, beginnend am %2$s</string>
+	
+	<string name="_summary_intake_never">Nie</string>
+	<string name="_msg_drug_repeat_ge_2">Wert muss größer oder gleich 2 sein.</string>
+	<string name="_title_version">Version</string>
+	
+	<string name="_summary_not_available">Nicht verfügbar</string>
+	
+	<string name="_title_tablet">Tablette</string>
+	<string name="_title_injection">Injektion</string>
+	<string name="_title_spray">Spray</string>
+	<string name="_title_drop">Tropfen</string>
+	<string name="_title_gel">Gel</string>
+	<string name="_title_other">Andere</string>
+	
+	<string name="_title_daily">Täglich</string>
+	<string name="_title_every_n_days">Alle N Tage</string>
+	<string name="_title_pick_days">Wochentage auswählen</string>
+	
+	<string name="_title_dont_snooze">Einmalige Alarme</string>
+	<string name="_title_repeat_alarm">Alarme wiederholen</string>
+	<string name="_title_snooze">Schlummerfunktion</string>
+	
+	<string name="_msg_supply">%1$s - hält bis %2$s</string>
+	<string name="_title_save_chanes">Änderungen speichern</string>
+	<string name="_msg_save_drug_changes">Änderungen an diesem Medikament speichern?</string>
+	<string name="_msg_every_n_days_distance">Tage zwischen jeder Einnahme.</string>
+	<string name="_msg_repetition_origin">Wähle ein Anfangsdatum.</string>
+	
+	<string name="_title_intake_schedule">Einnahmeplan</string>
+	<string name="_title_repeat">Wiederholung</string>
+	<string name="_title_misc">Diverses</string>
+	<string name="_title_icon">Icon</string>
+	<string name="_title_current_supply">Vorrat</string>
+	<string name="_title_refill_size">Packungsgröße</string>
+	<string name="_title_active">Aktiv</string>
+	<string name="_title_ignore_dose">Als ignoriert markieren</string>
+		    
+    <string name="_msg_touch_to_edit">(zum Bearbeiten berühren)</string>
+    <string name="_msg_empty_list_text">Drücke auf MENÜ und wähle "%1$s" um ein Medikament hinzuzufügen.</string>
+    
+    <string name="_msg_no_doses_on_this_day">An diesem Tag sind keine Einnahmen vorhanden.</string>
+    
+    <string name="_msg_db_error_general">Ein unbekannter Datenbankfehler ist aufgetreten.</string>
+	<string name="_msg_db_error_upgrade">Ein Fehler beim Datenbankupgrade ist aufgetreten.</string>
+	<string name="_msg_db_error_downgrade">Die lokalen Daten wurden von einer neueren Version dieser
+		App erstellt.</string>
+	
+	<string name="_msg_db_error_footer">Ein Zurücksetzen der Datenbank hat den Verlust aller Daten dieser App zur Folge.</string>	
+	
+	<string name="_btn_reset">Zurücksetzen</string>
+	
+	<string name="_msg_db_loading">Lade Datenbank, bitte warten.</string>
+	<string name="_msg_footer_insufficient_supplies">Ungenügender Vorrat für diese Dosis. Klicke %2$s um
+		dies zu ignorieren, oder berühre diesen Text um %3$s zu bearbeiten.</string>
+		
+	<string name="_title_weekdays">Wochentage</string>
+	
+	<string name="_msg_snoozing">Schlummere. Klicke zum Abbrechen.</string>
+	<string name="_toast_snoozing">Schlummere.</string>
+	<string name="_title_on_demand">Bei Bedarf</string>
+	
+	<string name="_title_delete_drug">%1$s wirklich löschen?</string>
+	<string name="_msg_delete_drug">Dies kann nicht rückgängig gemacht werden!</string>
+	
+	<string name="_toast_db_reset_success">Zurücksetzen der Datenbank erfolgreich.</string>
+	<string name="_toast_db_reset_failure">Zurücksetzen der Datenbank fehlgeschlagen. Bitte neu installieren.</string>
+	
+	<string name="_btn_exit">Verlassen</string>
+	
+	<string name="_title_alarm_mode">Wiederholung</string>
+	<string name="_summary_alarm_mode_normal">Benachrichtigungen werden nicht wiederholt.</string>
+	<string name="_summary_alarm_mode_repeat">Benachrichtigungen werden alle %1$d Minute(n) wiederholt.</string>
+	
+	<string name="_title_alarm_timeout">Intervall</string>
+	
+	<!-- 
+    An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
+    and thus use a different naming scheme.
+    
+    Keep at the end of strings.xml!  
+     -->
+    <string name="dialog_set_number">@string/_btn_set</string>
+    <string name="dialog_cancel">@android:string/cancel</string>
+    <string name="dialog_picker_title">Wähle eine Zahl</string>
+	
+</resources>

@@ -194,4 +194,8 @@ public class Intake extends Entry
 
 		return intakes;
 	}
+
+	public static int countAll(Drug drug, Date date, Integer doseTime) {
+		return findAll(drug, date, doseTime).size();
+	}
 }

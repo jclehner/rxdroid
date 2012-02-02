@@ -58,6 +58,7 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 		mInput.addTextChangedListener(this);
 
 		setSummary(null);
+		setWidgetLayoutResource(0);
 	}
 
 	public void setInitialName(String name)
