@@ -12,10 +12,10 @@
     
     -->
     
-    <string name="_Morning">Morgen</string>
-    <string name="_Noon">Mittag</string>
-    <string name="_Evening">Abend</string>
-    <string name="_Night">Nacht</string>
+    <string name="_Morning">Morgens</string>
+    <string name="_Noon">Mittags</string>
+    <string name="_Evening">Abends</string>
+    <string name="_Night">Nachts</string>
     <string name="_Begin">Anfang</string>
     <string name="_End">Ende</string>
     

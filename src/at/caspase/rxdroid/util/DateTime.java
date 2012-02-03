@@ -184,6 +184,7 @@ public final class DateTime
 	public static Date add(Date date, int field, int value)
 	{
 		Calendar cal = calendarFromDate(date);
+		cal.add(field, value);
 		return cal.getTime();
 	}
 

@@ -100,6 +100,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	private boolean mShowingAll = false;
 
 	private int mSwipeDirection = 0;
+	private int mLastPage = -1;
 
 	private boolean mIsShowing = false;
 
@@ -418,6 +419,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		if(initPager)
 		{
 			mSwipeDirection = 0;
+			mLastPage = -1;
 
 			mPager.removeAllViews();
 			mPager.setAdapter(new InfiniteViewPagerAdapter(this));
@@ -633,14 +635,13 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	private final OnPageChangeListener mPageListener = new OnPageChangeListener() {
 
 		int mPage = InfiniteViewPagerAdapter.CENTER;
-		int mLastPage = InfiniteViewPagerAdapter.CENTER;
 
 		@Override
 		public void onPageSelected(int page)
 		{
 			mPage = page;
 
-			if(page == InfiniteViewPagerAdapter.CENTER)
+			if(mLastPage == -1)
 				mLastPage = InfiniteViewPagerAdapter.CENTER;
 		}
 
@@ -658,6 +659,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 						", mLastPage=" + mLastPage + ", mSwipeDirection=" + mSwipeDirection);
 
 				final int shiftBy = mSwipeDirection < 0 ? -1 : 1;
+
 				setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy), false);
 
 				mLastPage = mPage;
