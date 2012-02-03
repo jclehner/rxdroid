@@ -183,9 +183,13 @@ public final class DateTime
 
 	public static Date add(Date date, int field, int value)
 	{
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(date);
-		cal.add(field, value);
+		Calendar cal = calendarFromDate(date);
 		return cal.getTime();
+	}
+
+	public static int get(Date date, int field)
+	{
+		Calendar cal = calendarFromDate(date);
+		return cal.get(field);
 	}
 }

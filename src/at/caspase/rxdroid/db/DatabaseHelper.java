@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid.db;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -106,7 +107,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		private static final long serialVersionUID = 4326067582393937172L;
 	}
 
-	public static final int DB_VERSION = 48;
+	public static final int DB_VERSION = 50;
 	public static final String DB_NAME = "db.sqlite";
 
 	private final Context mContext;
@@ -122,8 +123,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	{
 		try
 		{
-			TableUtils.createTable(cs, Drug.class);
-			TableUtils.createTable(cs, Intake.class);
+			for(Class<?> clazz : Database.CLASSES)
+				TableUtils.createTable(cs, clazz);
 		}
 		catch(SQLException e)
 		{
@@ -181,10 +182,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		if(oldVersion >= newVersion)
 			return true;
 
-		Log.i(TAG, "Upgrading database: " + oldVersion + " -> " + newVersion);
+		Log.i(TAG, "upgrade: v" + oldVersion + " -> v" + newVersion);
 
 		final String packageName = Database.class.getPackage().getName();
-		final String classNames[] = { "Drug", "Intake" };
+		final String oldPackageName = packageName + ".v" + oldVersion;
 
 		int updatedDataCount = 0;
 
@@ -192,13 +193,38 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 		try
 		{
-			for(String className : classNames)
+			try
 			{
-				final String oldDataClassName = packageName + ".v" + oldVersion + ".Old" + className;
+				final Class<?> hook = Class.forName(oldPackageName + ".Hook");
+				Log.i(TAG, "  Found hook in " + oldPackageName);
+
+				final Constructor<?> ctor = hook.getConstructor(cs.getClass());
+				Runnable r = (Runnable) ctor.newInstance(cs);
+				r.run();
+			}
+			catch(ClassNotFoundException e)
+			{
+				// ignore
+			}
+			catch(InstantiationException e)
+			{
+				Log.w(TAG, e);
+			}
+			catch(NoSuchMethodException e)
+			{
+				Log.w(TAG, e);
+			}
+
+			for(Class<?> clazz : Database.CLASSES)
+			{
+				final String className = clazz.getSimpleName();
+				final String oldDataClassName = oldPackageName + ".Old" + className;
 				final String newDataClassName = packageName + "." + className;
 
 				final Class<?> oldDataClass;
 				final Class<?> newDataClass = Class.forName(newDataClassName);
+
+				TableUtils.createTableIfNotExists(cs, newDataClass);
 
 				try
 				{
@@ -207,9 +233,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 				}
 				catch(ClassNotFoundException e)
 				{
-					if(LOGV) Log.v(TAG, "  Not upgrading " + className);
 					continue;
 				}
+
+				Log.i(TAG, "  Found " + oldDataClassName);
 
 				@SuppressWarnings("rawtypes")
 				final Dao newDao = getDao(newDataClass);
@@ -254,7 +281,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			ex = e;
 		}
 
-		Log.e(TAG, "onUpgrade", ex);
+		Log.e(TAG, "upgrade", ex);
 
 		return false;
 	}

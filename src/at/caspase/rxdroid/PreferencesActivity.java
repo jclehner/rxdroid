@@ -35,6 +35,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.preferences.TimePreference;
 import at.caspase.rxdroid.util.Util;
@@ -95,6 +96,21 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 			});
 
 			updateAlarmModePreferenceSummary(p, null);
+		}
+
+		p = findPreference("debug_generate_db_source");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					Database.generateJavaSourceForDbUpgrade();
+					return true;
+				}
+			});
+
 		}
 
 

@@ -176,4 +176,14 @@ public final class Util
 		Log.w(TAG, "getAppearance: inaccessible field in android.R.style: " + resIdFieldName);
 		return defaultResId;
 	}
+
+	/**
+	 * Returns an array index for the given weekday.
+	 *
+	 * @param weekday a weekday as found in Calendar's DAY_OF_WEEK field.
+	 * @return <code>0</code> for Monday, <code>1</code> for Tuesday, etc.
+	 */
+	public static int calWeekdayToIndex(int weekday) {
+		return CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);
+	}
 }

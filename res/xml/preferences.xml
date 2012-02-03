@@ -184,6 +184,10 @@
 		android:title="Debugging options"
 		android:icon="@android:drawable/ic_menu_preferences"	
 	>
+		<Preference android:key="debug_generate_db_source"
+			android:title="Generate source"
+			android:summary="Create java sources for DB upgrades"
+		/>
 		
 		<Preference android:key="debug_sorter"
 			android:title="Launch DrugSortActivity"

@@ -231,7 +231,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		Display display = wm.getDefaultDisplay();
 
 		int width  = display.getWidth()  * 8 / 10;
-		int height = display.getHeight() * 2 / 5;
+		int height = display.getHeight() * 1 / 3;
 
 		mPopup = new PopupWindow(
 				view,

@@ -21,7 +21,10 @@
 
 package at.caspase.rxdroid.util;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import android.util.Log;
 
@@ -89,6 +92,41 @@ public final class Reflect
 		}
 
 		return defValue;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName)
+	{
+		if(annotation == null)
+			return null;
+
+		Exception ex;
+
+		try
+		{
+			final Method m = annotation.getClass().getMethod(parameterName);
+			return (T) m.invoke(annotation);
+		}
+		catch(NoSuchMethodException e)
+		{
+			ex = e;
+		}
+		catch(IllegalArgumentException e)
+		{
+			ex = e;
+		}
+		catch(IllegalAccessException e)
+		{
+			ex = e;
+		}
+		catch(InvocationTargetException e)
+		{
+			ex = e;
+		}
+
+		Log.w(TAG, "getAnnotationParamter: failed to obtain parameter " + parameterName, ex);
+
+		return null;
 	}
 
 	private static String fieldName(Field f)

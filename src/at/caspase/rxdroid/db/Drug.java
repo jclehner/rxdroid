@@ -87,6 +87,20 @@ public class Drug extends Entry implements Comparable<Drug>
 	public static final int TIME_NOON = 1;
 	public static final int TIME_EVENING = 2;
 	public static final int TIME_NIGHT = 3;
+	/**
+	 * All dose-times &lt;= this value are considered invalid.
+	 * <p>
+	 * You can also use this value in a <code>for</code> loop, which
+	 * will guarantee that the value of <code>doseTime</code> will always
+	 * be a valid dose-time. Example:
+	 * <pre>
+	 * {@code
+	 * for(int doseTime = TIME_MORNING; doseTime != TIME_INVALD; ++doseTime) {
+	 * 	 // do something
+	 * }
+	 * }
+	 * </pre>
+	 */
 	public static final int TIME_INVALID = 4;
 
 	public static final int REPEAT_DAILY = 0;
@@ -159,6 +173,9 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	@DatabaseField
 	private int sortRank = 0;
+
+	@DatabaseField(foreign = true, canBeNull = true)
+	private Schedule schedule;
 
 	@DatabaseField(canBeNull = true)
 	private String comment;
@@ -306,7 +323,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		}
 	}
 
-	public synchronized Fraction[] getSchedule()
+	public Fraction[] getSimpleSchedule()
 	{
 		if(mSchedule == null)
 			mSchedule = new Fraction[] { doseMorning, doseNoon, doseEvening, doseNight };
@@ -342,7 +359,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	{
 		final Fraction dailyDose = new Fraction();
 
-		for(Fraction dose : getSchedule())
+		for(Fraction dose : getSimpleSchedule())
 			dailyDose.add(dose);
 
 		return dailyDose;
@@ -484,6 +501,15 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.sortRank = sortRank;
 	}
 
+	public Schedule getSchedule() {
+		return schedule;
+	}
+
+	public void setSchedule(Schedule schedule) {
+		this.schedule = schedule;
+	}
+
+
 	@Override
 	public boolean equals(Object o)
 	{
@@ -525,7 +551,7 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	@Override
 	public String toString() {
-		return id + ":\"" + name + "\"=" + Arrays.toString(getSchedule());
+		return id + ":\"" + name + "\"=" + Arrays.toString(getSimpleSchedule());
 	}
 
 	@Override

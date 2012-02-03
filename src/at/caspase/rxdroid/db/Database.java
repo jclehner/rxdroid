@@ -22,12 +22,17 @@
 package at.caspase.rxdroid.db;
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -39,13 +44,15 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteException;
+import android.os.Environment;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.caspase.rxdroid.util.Reflect;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 /**
  * All DB access goes here.
@@ -66,6 +73,12 @@ public final class Database
 {
 	private static final String TAG = Database.class.getName();
 	private static final boolean LOGV = false;
+
+	static final Class<?>[] CLASSES = {
+		Drug.class,
+		Intake.class,
+		Schedule.class
+	};
 
 	public static final int FLAG_DONT_NOTIFY_LISTENERS = 1;
 
@@ -94,6 +107,7 @@ public final class Database
 	 *
 	 * @param context an android Context for creating the ORMLite database helper.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static synchronized void init(Context context)
 	{
 		if(context == null)
@@ -101,20 +115,13 @@ public final class Database
 
 		if(!sIsLoaded)
 		{
-			try
-			{
-				sHelper = new DatabaseHelper(context);
+			sHelper = new DatabaseHelper(context);
 
-				// precache entries
-				getCached(Drug.class);
-				getCached(Intake.class);
+			// precache entries
+			for(Class clazz : CLASSES)
+				getCached(clazz);
 
-				sIsLoaded = true;
-			}
-			catch(SQLiteException e)
-			{
-				throw new DatabaseError(DatabaseError.E_GENERAL, e);
-			}
+			sIsLoaded = true;
 		}
 	}
 
@@ -219,6 +226,106 @@ public final class Database
 		return cached;
 	}
 
+	public static void generateJavaSourceForDbUpgrade()
+	{
+		final File dir = new File(Environment.getExternalStorageDirectory(), "RxDroid");
+
+		Log.i(TAG, "generateJavaSourceForDbUpgrade: dir=" + dir);
+
+		for(Class<?> clazz : CLASSES)
+		{
+			final File file = new File(dir, "Old" + clazz.getSimpleName() + ".java");
+
+			try
+			{
+				if(!clazz.isAnnotationPresent(DatabaseTable.class))
+					continue;
+
+				String tableName = Reflect.getAnnotationParameter(clazz.getAnnotation(DatabaseTable.class), "tableName");
+
+				FileWriter fs = new FileWriter(file);
+				fs.write(
+						"package " + Database.class.getPackage().getName() + ".v" + DatabaseHelper.DB_VERSION + ";\n" +
+						"\n" +
+						"@SuppressWarnings({\"serial\", \"unused\"})\n" +
+						"@DatabaseTable(tableName=\"" + tableName + "\")\n" +
+						"public class Old" + clazz.getSimpleName() + " extends Entry\n" +
+						"{\n" +
+						"\tpublic Old" + clazz.getSimpleName() + "() {}\n\n"
+				);
+
+				for(Field f : clazz.getDeclaredFields())
+				{
+					final Class<?> type = f.getType();
+
+					if(f.isAnnotationPresent(DatabaseField.class))
+					{
+						boolean isSerializable = false;
+
+						if(type == Integer.TYPE)
+							;
+						else if(type == Long.TYPE)
+							;
+						else if(type == Boolean.TYPE)
+							;
+						else if(type == Date.class)
+							;
+						else if(type == String.class)
+							;
+						else
+							isSerializable = true;
+
+						fs.write("\t@DatabaseField");
+
+						if(isSerializable)
+							fs.write("(dataType=DataType.SERIALIZABLE) // TODO verify");
+
+						fs.write("\n");
+
+						fs.write("\tprivate " + type.getSimpleName() + " " + f.getName() + ";\n\n");
+					}
+				}
+
+				fs.write(
+						// convert()
+
+						"\t@Override\n" +
+						"\tpublic Entry convert()\n" +
+						"\t{\n" +
+						"\t\t// FIXME stub\n" +
+						"\t\treturn null;\n" +
+						"\t}\n\n" +
+
+						// equals()
+
+						"\t@Override\n" +
+						"\tpublic boolean equals(Object other) {\n" +
+						"\t\tthrow new UnsupportedOperationException();\n" +
+						"\t}\n\n" +
+
+						// hashCode()
+
+						"\t@Override\n" +
+						"\tpublic int hashCode() {\n" +
+						"\t\tthrow new UnsupportedOperationException();\n" +
+						"\t}\n"
+				);
+
+				fs.write("}\n");
+				fs.close();
+			}
+			catch(FileNotFoundException e)
+			{
+				Log.w(TAG, "generateJavaSourceForDbUpgrade", e);
+				break;
+			}
+			catch(IOException e)
+			{
+				Log.w(TAG, "generateJavaSourceForDbUpgrade", e);
+				break;
+			}
+		}
+	}
 
 	private static synchronized <T> Dao<T, Integer> getDaoChecked(Class<T> clazz)
 	{
@@ -352,7 +459,7 @@ public final class Database
 		}
 		catch(SQLException e)
 		{
-			throw new RuntimeException(e);
+			throw new DatabaseError(DatabaseError.E_GENERAL, e);
 		}
 	}
 
