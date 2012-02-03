@@ -455,10 +455,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		startService(serviceIntent);
 	}
 
-	private ListView getCurrentListView() {
-		return (ListView) mPager.getChildAt(mPager.getCurrentItem());
-	}
-
 	private void updateDateString()
 	{
 		//final Date date = DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy);
@@ -468,6 +464,31 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
 
 		mTextDate.setText(dateString);
+	}
+
+	private static String getDrugName(Drug drug)
+	{
+		final String name = drug.getName();
+		// this should never happen unless there's a DB problem
+		if(name == null || name.length() == 0)
+			return "<???>";
+
+		// TODO do name scrambling here, if desired by the user
+
+		return name;
+
+		/*if(name.length() < 4)
+			return name;
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(name.charAt(0));
+
+		String reversed = new StringBuilder(name.substring(1, name.length() - 1)).reverse().toString();
+		sb.append(reversed);
+
+		sb.append(name.charAt(name.length() - 1));
+
+		return sb.toString();*/
 	}
 
 	private class DrugAdapter extends ArrayAdapter<Drug>
@@ -546,13 +567,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 				holder = (DoseViewHolder) v.getTag();
 
 			final Drug drug = getItem(position);
-			String drugName = drug.getName();
 
-			// shouldn't normally happen, unless there's a DB problem
-			if(drugName == null || drugName.length() == 0)
-				drugName = "<???>";
-
-			holder.name.setText(drugName);
+			holder.name.setText(getDrugName(drug));
 			holder.name.setTag(TAG_ID, drug.getId());
 			holder.icon.setImageResource(drug.getFormResourceId());
 

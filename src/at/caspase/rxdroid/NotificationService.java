@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -34,7 +33,6 @@ import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Database.OnChangedListener;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
-import at.caspase.rxdroid.util.Constants;
 
 public class NotificationService extends Service implements OnChangedListener, OnSharedPreferenceChangeListener
 {
@@ -47,11 +45,9 @@ public class NotificationService extends Service implements OnChangedListener, O
 	@Override
 	public void onEntryCreated(Entry entry, int flags)
 	{
-		Log.d(TAG, "onEntryCreated: entry=(" + entry.getClass().getSimpleName() + ") " + entry);
-
 		if(entry instanceof Intake)
 		{
-			Handler handler = new Handler();
+			/*Handler handler = new Handler();
 			handler.postDelayed(new Runnable() {
 
 				@Override
@@ -59,7 +55,8 @@ public class NotificationService extends Service implements OnChangedListener, O
 				{
 					updateNotification(getApplicationContext(), true);
 				}
-			}, Constants.NOTIFICATION_INITIAL_DELAY);
+			}, Constants.NOTIFICATION_INITIAL_DELAY);*/
+			updateNotification(this, true);
 
 		}
 		else
@@ -85,14 +82,12 @@ public class NotificationService extends Service implements OnChangedListener, O
 		if(key == null || key.startsWith("_"))
 			return;
 
-		Log.d(TAG, "onSharedPreferenceChanged: key=" + key);
 		updateNotification(this, true);
 	}
 
 	@Override
 	public void onCreate()
 	{
-		Log.d(TAG, "onCreate");
 		super.onCreate();
 		Database.registerOnChangedListener(this);
 		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -102,7 +97,6 @@ public class NotificationService extends Service implements OnChangedListener, O
 	@Override
 	public void onDestroy()
 	{
-		Log.d(TAG, "onDestroy");
 		super.onDestroy();
 		Database.unregisterOnChangedListener(this);
 		mSharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
