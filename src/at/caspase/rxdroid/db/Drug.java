@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011, 2012 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  * This file is part of RxDroid.
  *
