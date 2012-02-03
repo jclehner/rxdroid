@@ -44,7 +44,7 @@ import android.util.Log;
 public final class StateSaver
 {
 	private static final String TAG = StateSaver.class.getName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = true;
 
 	/**
 	 * Marks object members whose value should be saved/restored.
@@ -68,50 +68,33 @@ public final class StateSaver
 	 */
 	public static Parcelable createInstanceState(Object object, Parcelable superState, Bundle extras)
 	{
-		final SavedState myState;
-
-		/*if(superState instanceof SavedState)
-		{
-			// we can assume that, by calling object.super.onSaveInstanceState, this function was already
-			// called, so there's no need to iterate over all annotated members again
-
-			myState = (SavedState) superState;
-			if(!myState.wasCreateInstanceStateCalled)
-				throw new IllegalStateException("createInstanceState was not called on super state");
-
-			if(myState.extras != null && extras != null)
-				myState.extras.putAll(extras);
-			else
-				myState.extras = extras;
-
-			return myState;
-		}
-		else*/
-			myState = new SavedState(superState);
-
+		final SavedState myState = new SavedState(superState);
 		myState.extras = extras;
 
-		forEachAnnotatedMember(object, new Callback() {
+		if(!myState.wasCreateInstanceStateCalled)
+		{
+			forEachAnnotatedMember(object, new Callback() {
 
-			@Override
-			public void invoke(Object o, Field f, String mapKey)
-			{
-				try
+				@Override
+				public void invoke(Object o, Field f, String mapKey)
 				{
-					myState.values.put(mapKey, f.get(o));
+					try
+					{
+						myState.values.put(mapKey, f.get(o));
+					}
+					catch (IllegalArgumentException e)
+					{
+						Log.w(TAG, e);
+					}
+					catch (IllegalAccessException e)
+					{
+						Log.w(TAG, e);
+					}
 				}
-				catch (IllegalArgumentException e)
-				{
-					Log.w(TAG, e);
-				}
-				catch (IllegalAccessException e)
-				{
-					Log.w(TAG, e);
-				}
-			}
-		});
+			});
 
-		myState.wasCreateInstanceStateCalled = true;
+			myState.wasCreateInstanceStateCalled = true;
+		}
 
 		return myState;
 	}
@@ -144,6 +127,12 @@ public final class StateSaver
 			@Override
 			public void invoke(Object o, Field f, String mapKey)
 			{
+				if(!myState.values.containsKey(mapKey))
+				{
+					Log.w(TAG, "restoreInstanceState: key does not exist: " + mapKey);
+				}
+
+
 				Object value = myState.values.get(mapKey);
 
 				try
@@ -183,7 +172,7 @@ public final class StateSaver
 			if(f.isAnnotationPresent(SaveState.class))
 			{
 				String mapKey = f.getName() + "@" + clazz.getName();
-				if(LOGV) Log.v(TAG, "  " + f.getName());
+				if(LOGV) Log.v(TAG, "  " + f.getName() + " (" + mapKey + ")");
 
 				try
 				{
