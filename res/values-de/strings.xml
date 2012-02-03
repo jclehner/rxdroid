@@ -37,7 +37,6 @@
     <string name="_title_delete">Löschen</string>
     
     <string name="_msg_freq_daily">Täglich</string>
-	<string name="_msg_freq_weekly">Jeden %1$s</string>
 
 	<string name="_toast_deleted">Gelöscht</string>
 	  
@@ -79,8 +78,7 @@
 	<string name="_summary_pref_show_inactive">Medikamente anzeigen, die als inaktiv gekennzeichnet sind.</string>
 	
 	<string name="_title_pref_restore_defaults">Einstellungen Zurücksetzen</string>
-	<string name="_summary_pref_restore_defaults">Resets all preferences to default values</string>
-	
+		
 	<string name="_title_prefscreen_display_info">Information</string>
 	<string name="_summary_prefscreen_display_info">Dies Einstellungen können über MENÜ -&gt; Alle anzeigen 
 		aufgehoben werden.</string>		
@@ -93,8 +91,6 @@
 	<string name="_title_add">Hinzufügen</string>
 	<string name="_title_toggle_filtering">Alle anzeigen / filtern</string>
 	
-
-	<string name="_msg_intake_already_taken">You have already taken this dose. Do you want to continue?</string>
 	<string name="_msg_intake_normal">Dosis einnehmen und auf OK klicken.</string>
 	<string name="_msg_intake_unscheduled">Dosis wählen und auf OK klicken.</string>
 	<string name="_title_change_dose">Dosis bearbeiten</string>

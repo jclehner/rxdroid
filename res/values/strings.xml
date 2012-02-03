@@ -52,7 +52,6 @@
     <string name="_title_delete">Delete</string>
     
     <string name="_msg_freq_daily">Daily</string>
-	<string name="_msg_freq_weekly">Every %1$s</string>
 
 	<string name="_toast_deleted">Deleted</string>
 	  
@@ -90,7 +89,6 @@
 	<string name="_summary_pref_show_days_without_intakes">Show drugs having no doses on the currently displayed day.</string>
 	
 	<string name="_title_pref_show_inactive">Show inactive</string>
-	<string name="_summary_pref_show_inactive_off">Show drugs marked as inactive</string>
 	
 	<string name="_title_pref_restore_defaults">Restore defaults</string>
 	<string name="_summary_pref_restore_defaults">Resets all preferences to default values</string>
@@ -106,8 +104,6 @@
 	<string name="_title_add">Add</string>
 	<string name="_title_toggle_filtering">Show all / Apply filter</string>
 	
-	<string name="_btn_edit_drug">Edit drug</string>
-	<string name="_btn_ignore">Ignore</string>
 	<string name="_msg_intake_already_taken">You have already taken this dose. Do you want to continue?</string>
 	<string name="_msg_intake_normal">Take this dose and press OK.</string>
 	<string name="_msg_intake_unscheduled">Enter a dose and press OK.</string>
@@ -154,8 +150,6 @@
 	<string name="_title_active">Active</string>
 	<string name="_title_ignore_dose">Mark as ignored</string>
 	
-	<string name="_msg_insufficient_supplies">Insufficient supplies (%3$s) of %1$s for a dose of %2$s.</string>
-	    
     <string name="_msg_touch_to_edit">(touch to edit)</string>
     <string name="_msg_empty_list_text">Click MENU and select "%1$s" to add a drug.</string>
     
@@ -194,9 +188,6 @@
 	
 	<string name="_title_alarm_timeout">Alarm timeout</string>
 	
-	
-	<string name="_msg_forgotten_intakes">Forgotten intakes since %1$s:</string>
-	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.
@@ -206,7 +197,5 @@
     <string name="dialog_set_number">@string/_btn_set</string>
     <string name="dialog_cancel">@android:string/cancel</string>
     <string name="dialog_picker_title">Choose a number</string>
-	<string name="menu_preferences_label">Preferences</string>
-    <string name="menu_dialog_label">Dialog Picker</string>
-	
+		
 </resources>
