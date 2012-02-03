@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 	
-	<!-- prevents automatic focus acquisition -->
-	<LinearLayout
-		android:layout_width="0px"
-		android:layout_height="0px"		
-    	
-    	android:focusable="true"
-    	android:focusableInTouchMode="true"    	 
-    />	
+	<include layout="@layout/focus_grabber" />
 		
 	<android.widget.NumberPicker android:id="@+id/picker" 
 			android:layout_width="wrap_content"

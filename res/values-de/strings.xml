@@ -95,8 +95,8 @@
 	
 
 	<string name="_msg_intake_already_taken">You have already taken this dose. Do you want to continue?</string>
-	<string name="_msg_intake_normal">Nimm diese Dosis und klicke auf OK.</string>
-	<string name="_msg_intake_unscheduled">Wähle eine Dosis und klicke auf OK.</string>
+	<string name="_msg_intake_normal">Dosis einnehmen und auf OK klicken.</string>
+	<string name="_msg_intake_unscheduled">Dosis wählen und auf OK klicken.</string>
 	<string name="_title_change_dose">Dosis bearbeiten</string>
 	<string name="_title_edit_drug">Medikament bearbeiten</string>
 	<string name="_title_mark_not_taken">Als nicht eingenommen markieren</string>

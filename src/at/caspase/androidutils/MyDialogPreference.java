@@ -218,7 +218,6 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 		extras.putBoolean(KEY_IS_DIALOG_SHOWING, isShowing);
 
 		StateSaver.SavedState state = (SavedState) StateSaver.createInstanceState(this, superState, extras);
-		Log.d(TAG, "onSaveInstanceState: extras=" + StateSaver.getExtras(state).keySet());
 		return state;
 	}
 
@@ -234,8 +233,6 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 			if(extras.getBoolean(KEY_IS_DIALOG_SHOWING, false))
 				showDialog(null);
 		}
-
-		Log.d(TAG, "onRestoreInstanceState: extras=" + extras);
 	}
 
 	private final OnClickListener mListener = new OnClickListener() {
