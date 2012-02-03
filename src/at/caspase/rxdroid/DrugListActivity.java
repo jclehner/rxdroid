@@ -44,6 +44,7 @@ import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,6 +53,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -92,7 +94,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	private SharedPreferences mSharedPreferences;
 
 	private ViewPager mPager;
-	private TextView mMessageOverlay;
 	private TextView mTextDate;
 
 	private Date mDate;
@@ -115,7 +116,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		mInflater = LayoutInflater.from(this);
 
 		mPager = (ViewPager) findViewById(R.id.drug_list_pager);
-		mMessageOverlay = (TextView) findViewById(android.R.id.empty);
 		mTextDate = (TextView) findViewById(R.id.text_date);
 
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -369,10 +369,19 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public View makeView(int offset)
 	{
-		final ListView lv = new ListView(this);
+		final TextView textView = new TextView(this);
+		textView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		textView.setGravity(Gravity.CENTER);
 
 		final List<Drug> drugs = Database.getAll(Drug.class);
+		if(drugs.isEmpty())
+		{
+			textView.setText(getString(R.string._msg_empty_list_text, getString(R.string._title_add)));
+			return textView;
+		}
+
 		Collections.sort(drugs);
+		final ListView listView = new ListView(this);
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(mDate);
@@ -385,22 +394,15 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		else
 			cal.add(Calendar.DAY_OF_MONTH, mSwipeDirection < 0 ? -1 : 1);
 
-		updateListAdapter(lv, cal.getTime(), drugs);
+		updateListAdapter(listView, cal.getTime(), drugs);
 
-		if(drugs.isEmpty())
+		if(listView.getAdapter().getCount() == 0)
 		{
-			mMessageOverlay.setText(getString(R.string._msg_empty_list_text, getString(R.string._title_add)));
-			mMessageOverlay.setVisibility(View.VISIBLE);
+			textView.setText(getString(R.string._msg_no_doses_on_this_day));
+			return textView;
 		}
-		else if(lv.getAdapter().getCount() == 0)
-		{
-			mMessageOverlay.setText(getString(R.string._msg_no_doses_on_this_day));
-			mMessageOverlay.setVisibility(View.VISIBLE);
-		}
-		else
-			mMessageOverlay.setVisibility(View.GONE);
 
-		return lv;
+		return listView;
 	}
 
 	private void setDate(Date date, boolean initPager)

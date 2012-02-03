@@ -143,7 +143,7 @@
     <string name="_msg_touch_to_edit">(zum Bearbeiten berühren)</string>
     <string name="_msg_empty_list_text">Drücke auf MENÜ und wähle "%1$s" um ein Medikament hinzuzufügen.</string>
     
-    <string name="_msg_no_doses_on_this_day">An diesem Tag sind keine Einnahmen vorhanden.</string>
+    <string name="_msg_no_doses_on_this_day">Keine Einnahmen für diesen Tag vorgesehen.</string>
     
     <string name="_msg_db_error_general">Ein unbekannter Datenbankfehler ist aufgetreten.</string>
 	<string name="_msg_db_error_upgrade">Ein Fehler beim Datenbankupgrade ist aufgetreten.</string>

@@ -4,21 +4,11 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:layout_gravity="center"	
->
-
-	
+>	
 		<android.support.v4.view.ViewPager android:id="@+id/drug_list_pager"
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
 			android:layout_weight="1"
-		/>	
-	
-		<TextView android:id="@id/android:empty"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			
-			android:gravity="center"
-			android:visibility="gone"
 		/>
 		 
 		 <TextView android:id="@+id/text_date"
