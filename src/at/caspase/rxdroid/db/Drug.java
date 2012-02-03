@@ -107,6 +107,8 @@ public class Drug extends Entry implements Comparable<Drug>
 	public static final int REPEAT_EVERY_N_DAYS = 1;
 	public static final int REPEAT_WEEKDAYS = 2;
 	public static final int REPEAT_ON_DEMAND = 3;
+	public static final int REPEAT_CUSTOM = 4;
+	public static final int REPEAT_INVALID = 5;
 
 	// TODO valid arguments: 6, 8, 12, with automapping to doseTimes
 	public static final int REPEAT_EVERY_N_HOURS = -1;
@@ -180,7 +182,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField(canBeNull = true)
 	private String comment;
 
-	private Fraction[] mSchedule;
+	private Fraction[] mSimpleSchedule;
 
 	/**
 	 * Default constructor, required by ORMLite.
@@ -201,12 +203,18 @@ public class Drug extends Entry implements Comparable<Drug>
 				return true;
 
 			case REPEAT_EVERY_N_DAYS:
-				final long diffDays = Math.abs(repeatOrigin.getTime() - date.getTime()) / Constants.MILLIS_PER_DAY;
+				if(date.before(repeatOrigin))
+					return false;
+
+				final long diffDays = (repeatOrigin.getTime() - date.getTime()) / Constants.MILLIS_PER_DAY;
 				return diffDays % repeatArg == 0;
 
 			case REPEAT_WEEKDAYS:
 				final Calendar cal = DateTime.calendarFromDate(date);
 				return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
+
+			case REPEAT_CUSTOM:
+				return schedule.hasDoseOnDate(date);
 
 			default:
 				throw new RuntimeException("Unknown repeat mode");
@@ -325,14 +333,17 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public Fraction[] getSimpleSchedule()
 	{
-		if(mSchedule == null)
-			mSchedule = new Fraction[] { doseMorning, doseNoon, doseEvening, doseNight };
+		if(mSimpleSchedule == null)
+			mSimpleSchedule = new Fraction[] { doseMorning, doseNoon, doseEvening, doseNight };
 
-		return mSchedule;
+		return mSimpleSchedule;
 	}
 
 	public Fraction getDose(int doseTime)
 	{
+		if(repeat == REPEAT_CUSTOM)
+			throw new UnsupportedOperationException("This function cannot be used in conjunction with a custom schedule");
+
 		switch(doseTime)
 		{
 			case TIME_MORNING:
@@ -350,9 +361,14 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public Fraction getDose(int doseTime, Date date)
 	{
-		if(!hasDoseOnDate(date))
-			return new Fraction(0);
-		return getDose(doseTime);
+		if(repeat != REPEAT_CUSTOM)
+		{
+			if(!hasDoseOnDate(date))
+				return new Fraction(0);
+			return getDose(doseTime);
+		}
+
+		return schedule.getDose(date, doseTime);
 	}
 
 	private Fraction getDailyDose()
@@ -382,7 +398,7 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public void setRepeat(int repeat)
 	{
-		if(repeat > REPEAT_ON_DEMAND)
+		if(repeat >= REPEAT_INVALID)
 			throw new IllegalArgumentException();
 
 		if(repeat == this.repeat)
@@ -485,8 +501,8 @@ public class Drug extends Entry implements Comparable<Drug>
 				throw new IllegalArgumentException();
 		}
 
-		if(mSchedule != null)
-			mSchedule[doseTime] = value;
+		if(mSimpleSchedule != null)
+			mSimpleSchedule[doseTime] = value;
 	}
 
 	public void setComment(String comment) {
