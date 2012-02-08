@@ -21,7 +21,10 @@
 
 package at.caspase.rxdroid.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Utility functions for dealing with java <code>Collections</code>.
@@ -46,7 +49,7 @@ public final class CollectionUtils
 		boolean matches(E e);
 	}
 
-	public static<E> Collection<E> filter(final Collection<E> collection, Filter<E> filter)
+	public static <E> Collection<E> filter(final Collection<E> collection, Filter<E> filter)
 	{
 		final Collection<E> filtered = create(collection);
 
@@ -59,7 +62,7 @@ public final class CollectionUtils
 		return filtered;
 	}
 
-	public static<E> Collection<E> copy(final Collection<E> collection)
+	public static <E> Collection<E> copy(final Collection<E> collection)
 	{
 		final Collection<E> cloned = create(collection);
 		cloned.addAll(collection);
@@ -67,10 +70,10 @@ public final class CollectionUtils
 	}
 
 	@SuppressWarnings("unchecked")
-	public static<E> Collection<E> create(final Collection<E> collection)
+	public static <E> Collection<E> create(final Collection<E> collection)
 	{
 		if(collection == null)
-			throw new IllegalArgumentException("Supplied argument was null");
+			throw new NullPointerException();
 
 		try
 		{
@@ -82,7 +85,7 @@ public final class CollectionUtils
 		}
 	}
 
-	public static<T> int indexOf(T e, T[] array)
+	public static <T> int indexOf(T e, T[] array)
 	{
 		for(int i = 0; i != array.length; ++i)
 		{
@@ -102,6 +105,122 @@ public final class CollectionUtils
 		}
 
 		return -1;
+	}
+
+	public static char[] toCharArray(Object[] array)
+	{
+		final int s = array.length;
+		final char[] ret = new char[s];
+		for(int i = 0; i != s; ++i)
+			ret[i] = (Character) array[i];
+		return ret;
+	}
+
+	public static boolean getNextPermutation(StringBuilder sb)
+	{
+		List<Character> list = asList(sb.toString().toCharArray());
+		boolean ret = getNextPermutation(list);
+
+		Object[] array = list.toArray();
+		sb.delete(0, sb.length());
+		sb.append(toCharArray(array));
+
+		return ret;
+	}
+
+	/**
+	 * Get the next permutation.
+	 * <p>
+	 * This function's implementation is based on the implementation found in
+	 * the GNU ISO C++ library's implementation of <code>std::next_permutation()</code>.
+	 *
+	 */
+	public static <E extends Comparable<E>> boolean getNextPermutation(List<E> list)
+	{
+		final int first = 0;
+		final int last = list.size();
+
+		if(first == last)
+			return false;
+
+		int i = first;
+		++i;
+
+		if(i == last)
+			return false;
+
+		i = last;
+		--i;
+
+		for(;;)
+		{
+			int ii = i;
+			--i;
+
+			if(list.get(i).compareTo(list.get(ii)) < 0)
+			{
+				int j = last;
+				while(!(list.get(i).compareTo(list.get(--j)) < 0))
+					; // empty body
+
+				swap(list, i, j);
+				reverse(list, ii, last);
+
+				return true;
+			}
+			if(i == first)
+			{
+				Collections.reverse(list);
+				return false;
+			}
+		}
+	}
+
+	public static List<Integer> asList(int[] array)
+	{
+		List<Integer> list = new ArrayList<Integer>(array.length);
+
+		for(int i = 0; i != array.length; ++i)
+			list.add(array[i]);
+
+		return list;
+	}
+
+	public static List<Character> asList(char[] array)
+	{
+		List<Character> list = new ArrayList<Character>(array.length);
+
+		for(int i = 0; i != array.length; ++i)
+			list.add(array[i]);
+
+		return list;
+	}
+
+	public static <E> void swap(List<E> list, int i, int j)
+	{
+		E tmp = list.get(i);
+		list.set(i, list.get(j));
+		list.set(j, tmp);
+	}
+
+	public static <E> void reverse(List<E> list, final int begin, final int end)
+	{
+		if(end <= begin)
+			throw new IllegalArgumentException("end <= begin");
+
+		if(end - begin == 1)
+			return;
+
+		List<E> reversed = new ArrayList<E>(end - begin);
+
+		for(int i = begin; i != end; ++i)
+		{
+			final int j = begin + (end - i - 1);
+			reversed.add(list.get(j));
+		}
+
+		for(int i = 0; i != reversed.size(); ++i)
+			list.set(begin + i, reversed.get(i));
 	}
 
 	private CollectionUtils() {}

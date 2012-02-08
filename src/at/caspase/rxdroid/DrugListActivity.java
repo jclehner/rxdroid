@@ -59,6 +59,7 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import at.caspase.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
@@ -253,6 +254,15 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		// menu.setHeaderIcon(android.R.drawable.ic_menu_agenda);
 		menu.setHeaderTitle(drug.getName());
 
+		// ////////////////////////////////////////////////
+
+		final Intent editIntent = new Intent(this, DrugEditActivity.class);
+		editIntent.setAction(Intent.ACTION_EDIT);
+		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
+		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
+
+		// ////////////////////////////////////////////////
+
 		final boolean wasDoseTaken = doseView.wasDoseTaken();
 		final int toggleIntakeMessageId;
 
@@ -261,7 +271,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		else
 			toggleIntakeMessageId = R.string._title_mark_taken;
 
-		// ////////////////////////////////////////////////
 		menu.add(0, CMENU_TOGGLE_INTAKE, 0, toggleIntakeMessageId).setOnMenuItemClickListener(new OnMenuItemClickListener() {
 				@Override
 				public boolean onMenuItemClick(MenuItem item)
@@ -288,10 +297,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		// menu.add(0, CMENU_CHANGE_DOSE, 0, R.string._title_change_dose);
 
-		final Intent editIntent = new Intent(this, DrugEditActivity.class);
-		editIntent.setAction(Intent.ACTION_EDIT);
-		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
-		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
+
 		// menu.add(0, CMENU_SHOW_SUPPLY_STATUS, 0, "Show supply status");
 
 		if(!wasDoseTaken)
@@ -480,19 +486,58 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		// TODO do name scrambling here, if desired by the user
 
 		return name;
+	}
 
-		/*if(name.length() < 4)
-			return name;
+	/**
+	 * Checks whether for missing drug intakes before a given date.
+	 *
+	 * @param drug
+	 * @return
+	 */
 
-		StringBuilder sb = new StringBuilder();
-		sb.append(name.charAt(0));
+	private static boolean hasMissingIntakesBeforeDate(Drug drug, Date date)
+	{
+		if(LOGV) Log.v(TAG, "hasMissingIntakesBeforeDate: drug=" + drug);
 
-		String reversed = new StringBuilder(name.substring(1, name.length() - 1)).reverse().toString();
-		sb.append(reversed);
+		int repeatMode = drug.getRepeatMode();
 
-		sb.append(name.charAt(name.length() - 1));
+		if(repeatMode == Drug.REPEAT_EVERY_N_DAYS)
+		{
+			long days = drug.getRepeatArg();
 
-		return sb.toString();*/
+			Date origin = drug.getRepeatOrigin();
+			if(date.before(origin))
+				return false;
+
+			long elapsed = date.getTime() - origin.getTime();
+
+			int offset = (int) -(elapsed % days);
+			if(offset == 0)
+				offset = (int) -days;
+
+			Date lastIntakeDate = DateTime.add(date, Calendar.DAY_OF_MONTH, offset);
+			if(LOGV) Log.v(TAG, "  calculacted lastIntakeDate=" + lastIntakeDate);
+
+			return Intake.hasAll(drug, lastIntakeDate);
+		}
+		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
+		{
+			for(int i = 0; i != 7; ++i)
+			{
+				Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, 7 - i);
+				if(LOGV) Log.v(TAG, "  " + checkDate);
+				if(drug.hasDoseOnDate(checkDate))
+				{
+					if(!Intake.hasAll(drug, checkDate))
+					{
+						if(LOGV) Log.v(TAG, "    found missing intakes");
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private class DrugAdapter extends ArrayAdapter<Drug>
@@ -502,6 +547,10 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		private ArrayList<Drug> mAllItems;
 		private ArrayList<Drug> mItems;
 		private Date mAdapterDate;
+
+		// hide DrugListActivity.mDate
+		@SuppressWarnings("unused")
+		private Date mDate;
 
 		private Timer mTimer = null;
 
@@ -557,6 +606,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 				holder.name = (TextView) v.findViewById(R.id.drug_name);
 				holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
+				holder.notification = (ImageView) v.findViewById(R.id.drug_notification_icon);
+				holder.notification.setOnClickListener(mDrugNotificationIconListener);
 
 				for(int i = 0; i != holder.doseViews.length; ++i)
 				{
@@ -575,6 +626,15 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			holder.name.setText(getDrugName(drug));
 			holder.name.setTag(TAG_ID, drug.getId());
 			holder.icon.setImageResource(drug.getFormResourceId());
+
+			final int visibility;
+
+			if(DateTime.todayDate().equals(mAdapterDate) && hasMissingIntakesBeforeDate(drug, mAdapterDate))
+				visibility = View.VISIBLE;
+			else
+				visibility = View.GONE;
+
+			holder.notification.setVisibility(visibility);
 
 			for(DoseView doseView : holder.doseViews)
 			{
@@ -623,6 +683,9 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			if(!result && !Intake.findAll(drug, mFilterDate, null).isEmpty())
 				result = true;
 
+			if(!result && DateTime.isToday(mFilterDate) && hasMissingIntakesBeforeDate(drug, mFilterDate))
+				result = true;
+
 			return result;
 		}
 	}
@@ -632,7 +695,18 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		TextView name;
 		ImageView icon;
 		DoseView[] doseViews = new DoseView[4];
+		ImageView notification;
 	}
+
+	private final OnClickListener mDrugNotificationIconListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v)
+		{
+			Log.d(TAG, "onClick");
+			Toast.makeText(getApplicationContext(), R.string._toast_drug_notification_icon, Toast.LENGTH_LONG).show();
+		}
+	};
 
 	private final OnPageChangeListener mPageListener = new OnPageChangeListener() {
 

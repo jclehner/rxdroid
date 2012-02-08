@@ -355,7 +355,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		// intake repeat
 
-		final int repeat = mDrug.getRepeat();
+		final int repeat = mDrug.getRepeatMode();
 		final String summary;
 
 		switch(repeat)
@@ -411,7 +411,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mCurrentSupply.setSummary(currentSupply.toString());
 			mCurrentSupply.setValue(currentSupply);
 
-			if(mDrug.getRepeat() != Drug.REPEAT_ON_DEMAND)
+			if(mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
 			{
 				final int currentSupplyDays = mDrug.getCurrentSupplyDays();
 				if(currentSupplyDays > 0)
@@ -448,7 +448,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		final Date repeatOrigin;
 		final long repeatArg;
 
-		if(mDrug.getRepeat() != Drug.REPEAT_EVERY_N_DAYS)
+		if(mDrug.getRepeatMode() != Drug.REPEAT_EVERY_N_DAYS)
 		{
 			repeatOrigin = DateTime.todayDate();
 			repeatArg = 2;

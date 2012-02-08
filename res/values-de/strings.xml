@@ -174,6 +174,8 @@
 	
 	<string name="_title_alarm_timeout">Intervall</string>
 	
+	<string name="_toast_drug_notification_icon">Die letzte Dosis dieses Medikaments wurde nicht eingenommen.</string>   
+	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.

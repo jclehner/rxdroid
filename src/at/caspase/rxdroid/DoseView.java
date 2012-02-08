@@ -242,13 +242,14 @@ public class DoseView extends FrameLayout implements OnChangedListener
 
 			if(isApplicableIntake(intake))
 			{
-				if(intake.isEmptyIntake() /*&& mCumulativeDose.isZero()*/)
+				/*if(intake.isEmptyIntake() && mCumulativeDose.isZero())
 					markAsIgnored();
 				else
 				{
 					mCumulativeDose.add(intake.getDose());
 					markAsTaken();
-				}
+				}*/
+				updateView();
 			}
 		}
 	}
@@ -372,7 +373,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 
 		mStatus = STATUS_INDETERMINATE;
 
-		if(mHasDoseOnDate && mDrug.getRepeat() != Drug.REPEAT_ON_DEMAND)
+		if(mHasDoseOnDate && mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
 		{
 			if(!mDrug.getDose(mDoseTime, mDate).isZero())
 			{

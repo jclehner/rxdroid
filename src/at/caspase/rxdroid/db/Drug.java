@@ -149,7 +149,6 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
 	private Fraction doseNight = new Fraction();
 
-	// TODO change column name
 	@DatabaseField(canBeNull = true)
 	private int repeat = REPEAT_DAILY;
 
@@ -252,7 +251,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		}
 	}
 
-	public int getRepeat() {
+	public int getRepeatMode() {
 		return repeat;
 	}
 

@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import at.caspase.rxdroid.Fraction;
+import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
 
 import com.j256.ormlite.field.DataType;
@@ -197,5 +198,24 @@ public class Intake extends Entry
 
 	public static int countAll(Drug drug, Date date, Integer doseTime) {
 		return findAll(drug, date, doseTime).size();
+	}
+
+	public static boolean hasAll(Drug drug, Date date)
+	{
+		if(!drug.hasDoseOnDate(date))
+			return true;
+
+		//List<Intake> intakes = findAll(drug, date, null);
+		for(int doseTime : Constants.DOSE_TIMES)
+		{
+			Fraction dose = drug.getDose(doseTime, date);
+			if(!dose.isZero())
+			{
+				if(countAll(drug, date, doseTime) == 0)
+					return false;
+			}
+		}
+
+		return true;
 	}
 }

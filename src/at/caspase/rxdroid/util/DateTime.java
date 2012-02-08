@@ -166,19 +166,16 @@ public final class DateTime
 
 	public static boolean isWithinRange(Calendar time, DumbTime begin, DumbTime end)
 	{
-		boolean ret = isWithinRange_(time, begin, end);
-		//Log.d(TAG, "isWithinRange(" + toString(time) + ", " + begin + ", " + end + ") = " + ret);
-		return ret;
-	}
-
-	public static boolean isWithinRange_(Calendar time, DumbTime begin, DumbTime end)
-	{
 		final DumbTime theTime = DumbTime.fromCalendar(time);
 
 		if(end.before(begin))
 			return theTime.before(end) || theTime.compareTo(begin) != -1;
 
 		return theTime.compareTo(begin) != -1 && theTime.before(end);
+	}
+
+	public static boolean isToday(Date date) {
+		return todayDate().equals(date);
 	}
 
 	public static Date add(Date date, int field, int value)

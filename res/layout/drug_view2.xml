@@ -25,7 +25,7 @@
 	/>
   
   	<TextView android:id="@id/drug_name"
-  		android:layout_width="fill_parent"
+  		android:layout_width="wrap_content"
   		android:layout_height="wrap_content"
   		  		
   		android:layout_toRightOf="@id/drug_icon"
@@ -91,6 +91,21 @@
   		
   		android:focusable="true"
   		android:onClick="onDoseClick"
-  	/>  
+  	/>
+  	
+  	<ImageView android:id="@+id/drug_notification_icon" 
+  		android:layout_width="50dp"
+  		android:layout_height="30dp"
+  		
+  		android:layout_alignParentRight="true"
+  		android:layout_alignBottom="@id/drug_name"
+  		
+  		android:padding="3dp"
+  		android:scaleType="fitCenter"  		
+  		android:src="@android:drawable/ic_dialog_alert"
+  		android:clickable="true"
+  		
+  		android:visibility="visible"
+  	/>
     
 </RelativeLayout>
