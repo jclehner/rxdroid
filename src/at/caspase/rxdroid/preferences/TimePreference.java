@@ -54,12 +54,12 @@ public class TimePreference extends MyDialogPreference
 	private static final int IDX_AFTER = 0;
 	private static final int IDX_BEFORE = 1;
 
-	private DumbTime[] mConstraintTimes = new DumbTime[2];
-	private String[] mConstraintKeys = new String[2];
+	private final DumbTime[] mConstraintTimes = new DumbTime[2];
+	private final String[] mConstraintKeys = new String[2];
 
 	private int mWrapFlags;
 
-	private String mDefaultValue;
+	private final String mDefaultValue;
 	private DumbTime mTime;
 
 	@SaveState
@@ -106,10 +106,6 @@ public class TimePreference extends MyDialogPreference
 			setDialogIcon(android.R.drawable.ic_menu_recent_history);
 	}
 
-	public DumbTime getValue() {
-		return mTime;
-	}
-
 	@Override
 	public CharSequence getSummary() {
 		return mTime != null ? mTime.toString() : mDefaultValue;
@@ -138,6 +134,16 @@ public class TimePreference extends MyDialogPreference
 			return null;
 
 		return getContext().getString(msgId, after, before);
+	}
+
+	@Override
+	public DumbTime getValue() {
+		return mTime;
+	}
+
+	@Override
+	public void setValue(Object value) {
+		mTime = (DumbTime) value;
 	}
 
 	@Override

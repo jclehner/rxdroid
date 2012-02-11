@@ -190,7 +190,7 @@
 		/>
 		
 		<Preference android:key="debug_sorter"
-			android:title="Launch DrugSortActivity"
+			android:title="Launch Activity for testing"
 		/>			
 				
 		<CheckBoxPreference android:key="debug_logv"

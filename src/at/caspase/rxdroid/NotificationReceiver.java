@@ -150,7 +150,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		Log.d(TAG, "Scheduling next alarms...");
 
-		final Calendar now = DateTime.now();
+		final Calendar now = DateTime.nowCalendar();
 		int activeDoseTime = mSettings.getActiveDoseTime(now);
 		int nextDoseTime = mSettings.getNextDoseTime(now);
 
@@ -162,7 +162,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void updateCurrentNotifications()
 	{
-		Calendar now = DateTime.now();
+		Calendar now = DateTime.nowCalendar();
 		final boolean ignorePendingIntakes;
 		int doseTime = mSettings.getActiveDoseTime(now);
 		if(doseTime == -1)

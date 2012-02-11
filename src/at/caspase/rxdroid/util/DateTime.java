@@ -56,12 +56,12 @@ public final class DateTime
 	 * @deprecated Use {@link #todayDate()}
 	 */
 	@Deprecated
-	public static Calendar today() {
-		return getDatePart(DateTime.now());
+	public static Calendar todayCalendar() {
+		return getDatePart(DateTime.nowCalendar());
 	}
 
 	public static Date todayDate() {
-		return today().getTime();
+		return todayCalendar().getTime();
 	}
 
 	/**
@@ -71,12 +71,12 @@ public final class DateTime
 	 * @deprecated Use {@link #nowDate()}
 	 */
 	@Deprecated
-	public static Calendar now() {
+	public static Calendar nowCalendar() {
 		return Calendar.getInstance();
 	}
 
 	public static Date nowDate() {
-		return now().getTime();
+		return nowCalendar().getTime();
 	}
 
 	/**

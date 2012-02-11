@@ -32,6 +32,7 @@ public class InfiniteViewPagerAdapter extends PagerAdapter
 	private static final int ITEM_COUNT = 2 * PAGES_PER_SIDE + 1;
 
 	public static final int CENTER = PAGES_PER_SIDE + 1;
+	public static final int MAX = ITEM_COUNT - 1;
 
 	private ViewFactory mFactory;
 

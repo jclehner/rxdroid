@@ -78,7 +78,7 @@ public class PreferencesTest extends AndroidTestCase
 			final int doseTime     = testCases[i][2];
 			final int nextDoseTime = testCases[i][3];
 
-			final Calendar date = DateTime.today();
+			final Calendar date = DateTime.todayCalendar();
 			final Calendar time = (Calendar) date.clone();
 
 			time.set(Calendar.HOUR_OF_DAY, hours);
@@ -110,7 +110,7 @@ public class PreferencesTest extends AndroidTestCase
 				{ 24 + 01, 30, 16200000, -1 } // (06:00 - 01:30) = 270min in millis
 		};
 
-		testTimeOffsets(DateTime.today(), testCases);
+		testTimeOffsets(DateTime.todayCalendar(), testCases);
 	}
 
 	public void testTimeOffsetsWithDst()
@@ -204,7 +204,7 @@ public class PreferencesTest extends AndroidTestCase
 			{ 48 + 06, 30, 2 }
 		};
 
-		final Calendar today = DateTime.today();
+		final Calendar today = DateTime.todayCalendar();
 
 		for(int i = 0; i != testCases.length; ++i)
 		{

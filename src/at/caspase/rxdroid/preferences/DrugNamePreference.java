@@ -43,8 +43,12 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	@SuppressWarnings("unused")
 	private static final String TAG = DrugNamePreference.class.getName();
 
-	private EditText mInput;
+	private final EditText mInput;
 	private String mInitialName = null;
+
+	public DrugNamePreference(Context context) {
+		this(context, null);
+	}
 
 	public DrugNamePreference(Context context, AttributeSet attrs) {
 		this(context, attrs, android.R.attr.editTextPreferenceStyle);

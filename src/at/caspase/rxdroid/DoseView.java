@@ -249,6 +249,8 @@ public class DoseView extends FrameLayout implements OnChangedListener
 					mCumulativeDose.add(intake.getDose());
 					markAsTaken();
 				}*/
+				
+				mCumulativeDose.add(intake.getDose());				
 				updateView();
 			}
 		}
@@ -377,10 +379,10 @@ public class DoseView extends FrameLayout implements OnChangedListener
 		{
 			if(!mDrug.getDose(mDoseTime, mDate).isZero())
 			{
-				final Calendar end = DateTime.calendarFromDate(mDate);
-				end.add(Calendar.MILLISECOND, (int) Settings.instance().getTrueDoseTimeEndOffset(mDoseTime));
-
-				if(DateTime.now().compareTo(end) != -1)
+				int offset = (int) Settings.instance().getTrueDoseTimeEndOffset(mDoseTime);
+				Date end = DateTime.add(mDate, Calendar.MILLISECOND, offset);
+				
+				if(DateTime.nowDate().after(end))
 					mStatus = STATUS_FORGOTTEN;
 			}
 		}

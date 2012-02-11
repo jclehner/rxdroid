@@ -416,11 +416,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				final int currentSupplyDays = mDrug.getCurrentSupplyDays();
 				if(currentSupplyDays > 0)
 				{
-					final Calendar end = DateTime.today();
-					end.add(Calendar.DAY_OF_MONTH, currentSupplyDays);
-
+					Date end = DateTime.add(DateTime.todayDate(), Calendar.DAY_OF_MONTH, currentSupplyDays);
+					
 					mCurrentSupply.setSummary(getString(R.string._msg_supply,
-							currentSupply.toString(), DateTime.toNativeDate(end.getTime())));
+							currentSupply.toString(), DateTime.toNativeDate(end)));
 				}
 			}
 		}
@@ -550,7 +549,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		if(repeatArg == 0)
 		{
 			// check the current weekday if none are selected
-			final int weekday = DateTime.now().get(Calendar.DAY_OF_WEEK);
+			final int weekday = DateTime.nowCalendar().get(Calendar.DAY_OF_WEEK);
 			final int index = CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);
 			checkedItems[index] = true;
 			repeatArg |= 1 << index;

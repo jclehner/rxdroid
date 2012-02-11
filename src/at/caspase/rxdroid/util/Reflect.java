@@ -22,6 +22,7 @@
 package at.caspase.rxdroid.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -98,7 +99,7 @@ public final class Reflect
 	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName)
 	{
 		if(annotation == null)
-			return null;
+			throw new NullPointerException("annotation");
 
 		Exception ex;
 
@@ -124,9 +125,80 @@ public final class Reflect
 			ex = e;
 		}
 
-		Log.w(TAG, "getAnnotationParamter: failed to obtain parameter " + parameterName, ex);
+		throw new RuntimeException("Failed to obtain paramter " + parameterName, ex);
+	}
 
-		return null;
+	/**
+	 * Makes a <code>Field</code> accessible.
+	 *
+	 * @param field
+	 * @return Whether the field's accessible status was changed.
+	 */
+	public static boolean makeAccessible(Field field)
+	{
+		if(!field.isAccessible())
+		{
+			field.setAccessible(true);
+			return true;
+		}
+
+		return false;
+	}
+
+	public static <T> T newInstance(Class<T> clazz) {
+		return newInstance(clazz, new Class<?>[0]);
+	}
+
+	public static <T> T newInstance(Class<T> clazz, Object... args) {
+		return newInstance(clazz, getTypes(args), args);
+	}
+
+	//@SuppressWarnings("unchecked")
+	public static <T> T newInstance(Class<T> clazz, Class<?>[] argTypes, Object... args)
+	{
+		if(argTypes.length != args.length)
+			throw new IllegalArgumentException("argTypes.length != args.length");
+
+		Log.d(TAG, "newInstance: clazz=" + clazz + ", args=" + args);
+
+		Exception ex;
+
+		try
+		{
+			Constructor<T> ctor = clazz.getConstructor(argTypes);
+			return ctor.newInstance(args);
+		}
+		catch (NoSuchMethodException e)
+		{
+			ex = e;
+		}
+		catch (IllegalArgumentException e)
+		{
+			ex = e;
+		}
+		catch (InstantiationException e)
+		{
+			ex = e;
+		}
+		catch (IllegalAccessException e)
+		{
+			ex = e;
+		}
+		catch (InvocationTargetException e)
+		{
+			ex = e;
+		}
+
+		throw new RuntimeException(ex);
+	}
+
+	private static Class<?>[] getTypes(Object[] args)
+	{
+		Class<?>[] types = new Class<?>[args.length];
+		for(int i = 0; i != args.length; ++i)
+			types[i] = args[i].getClass();
+
+		return types;
 	}
 
 	private static String fieldName(Field f)

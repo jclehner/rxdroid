@@ -211,11 +211,11 @@ public class Settings
 	}
 
 	public Date getActiveDate() {
-		return getActiveDate(DateTime.now());
+		return getActiveDate(DateTime.nowCalendar());
 	}
 
 	public int getActiveOrNextDoseTime() {
-		return getActiveDoseTime(DateTime.now());
+		return getActiveDoseTime(DateTime.nowCalendar());
 	}
 
 	public int getActiveOrNextDoseTime(Calendar time)
@@ -238,7 +238,7 @@ public class Settings
 	}
 
 	public int getActiveDoseTime() {
-		return getActiveDoseTime(DateTime.now());
+		return getActiveDoseTime(DateTime.nowCalendar());
 	}
 
 	public int getNextDoseTime(Calendar time) {
@@ -283,7 +283,7 @@ public class Settings
 	}
 
 	public int getNextDoseTime() {
-		return getNextDoseTime(DateTime.now());
+		return getNextDoseTime(DateTime.nowCalendar());
 	}
 
 
@@ -320,7 +320,7 @@ public class Settings
 
 	public int getNotificationDefaultsXorMask()
 	{
-		int mask = -1;
+		int mask = 0;
 
 		if(!sSharedPrefs.getBoolean("use_led", true))
 			mask |= Notification.DEFAULT_LIGHTS;

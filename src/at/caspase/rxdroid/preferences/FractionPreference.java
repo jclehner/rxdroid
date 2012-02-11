@@ -65,18 +65,6 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 		mValue = Fraction.decode(getPersistedString("0"));
 	}
 
-	public void setValue(Fraction value)
-	{
-		mValue = value;
-
-		if(super.getSummary() == null)
-			setSummary(value.toString());
-	}
-
-	public Fraction getValue() {
-		return mValue;
-	}
-
 	public void setLongClickSummand(Fraction value) {
 		mLongClickSummand = value;
 	}
@@ -110,6 +98,20 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 			persistString(mValue.toString());
 
 		notifyChanged();
+	}
+
+	@Override
+	public void setValue(Object value)
+	{
+		mValue = (Fraction) value;
+
+		if(super.getSummary() == null)
+			setSummary(mValue.toString());
+	}
+
+	@Override
+	public Fraction getValue() {
+		return mValue;
 	}
 
 	@Override

@@ -33,11 +33,13 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.preferences.TimePreference;
+import at.caspase.rxdroid.test.ObjectToPreferenceTestActivity;
 import at.caspase.rxdroid.util.Util;
 
 public class PreferencesActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener
@@ -75,7 +77,8 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 				@Override
 				public boolean onPreferenceClick(Preference preference)
 				{
-					Intent intent = new Intent(PreferencesActivity.this, DrugSortActivity.class);
+					//Intent intent = new Intent(PreferencesActivity.this, DrugSortActivity.class);
+					Intent intent = new Intent(PreferencesActivity.this, ObjectToPreferenceTestActivity.class);
 					startActivity(intent);
 					return true;
 				}
@@ -111,6 +114,21 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 				}
 			});
 
+		}
+
+		p = findPreference("time_morning_begin");
+		if(p != null)
+		{
+			p.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue)
+				{
+					Log.d(TAG, "onPreferenceChange: preference=" + preference +
+							", type=" + newValue.getClass() + ", value=" + newValue);
+					return true;
+				}
+			});
 		}
 
 

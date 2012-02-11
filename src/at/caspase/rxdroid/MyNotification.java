@@ -31,7 +31,7 @@ public class MyNotification
 	private static final String TAG = MyNotification.class.getName();
 	private static final boolean LOGV = false;
 
-	private Context mContext;
+	private final Context mContext;
 
 	private String mTickerText;
 	private String mTitle;
@@ -54,8 +54,8 @@ public class MyNotification
 
 	public static class Builder
 	{
-		private MyNotification mNotification;
-		private Context mContext;
+		private final MyNotification mNotification;
+		private final Context mContext;
 
 		public Builder(Context context)
 		{
@@ -205,7 +205,7 @@ public class MyNotification
 		notification.tickerText = mTickerText;
 		notification.icon = mIconResId;
 
-		final String message =  mMessage1 != null ? mMessage1 : mMessage2;
+		final String message = getMessage();
 		notification.setLatestEventInfo(mContext, mTitle, message, mContentIntent);
 
 		int lastHash = Settings.instance().getLastNotificationMessageHash();
@@ -218,11 +218,17 @@ public class MyNotification
 		}
 
 		int defaultsXorMask = Settings.instance().getNotificationDefaultsXorMask();
-		if(defaultsXorMask != -1)
-			notification.defaults ^= defaultsXorMask;
+		notification.defaults ^= defaultsXorMask;
+
+		if((notification.defaults & Notification.DEFAULT_LIGHTS) != 0)
+			notification.flags |= Notification.FLAG_SHOW_LIGHTS;
 
 		NotificationManager notificationMgr = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationMgr.notify(R.id.notification, notification);
+	}
+
+	public String getMessage() {
+		return mMessage1 != null ? mMessage1 : mMessage2;
 	}
 
 	public String getMessage1() {

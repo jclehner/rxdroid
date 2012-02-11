@@ -56,8 +56,6 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 
 	@SaveState
 	private CharSequence mNeutralButtonText;
-	@SaveState
-	private int mSoftInputMode = 0;
 
 	private Dialog mDialog;
 
@@ -97,6 +95,10 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 		return mDialog != null;
 	}
 
+	public abstract void setValue(Object value);
+
+	public abstract Object getValue();
+
 	/**
 	 * Returns a custom dialog, if present.
 	 * <p>
@@ -127,6 +129,10 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 	 */
 	protected Dialog onGetCustomDialog() {
 		return null;
+	}
+
+	protected int getSoftInputMode() {
+		return 0;
 	}
 
 	/**
@@ -187,10 +193,12 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 			mDialog = builder.create();
 		}
 
-		if(mSoftInputMode != 0)
+
+		int softInputMode = getSoftInputMode();
+		if(softInputMode != 0)
 		{
 			Window window = mDialog.getWindow();
-			window.setSoftInputMode(mSoftInputMode);
+			window.setSoftInputMode(softInputMode);
 		}
 
 		onShowDialog(mDialog);
