@@ -87,6 +87,13 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 	}
 
 	@Override
+	public void onClick(DialogInterface dialog, int which)
+	{
+		//super.onClick();
+		onDialogClosed(which == Dialog.BUTTON_POSITIVE);
+	}
+
+	@Override
 	public void onDismiss(DialogInterface dialog) {
 		mDialog = null;
 	}
@@ -150,7 +157,7 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 		// stub
 	}
 
-	/**
+	/*
 	 * Returns the default OnClickListener supplied to the dialog.
 	 * <p>
 	 * This function is only relevant when using {@link #onGetCustomDialog()}. You can
@@ -159,9 +166,9 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 	 *
 	 * @see #onGetCustomDialog()
 	 */
-	protected final OnClickListener getDialogOnClickListener() {
-		return mListener;
-	}
+	//protected final OnClickListener getDialogOnClickListener() {
+	//	return mListener;
+	//}
 
 	@Override
 	protected final void showDialog(Bundle state)
@@ -175,9 +182,9 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 			AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
 					.setTitle(getTitle())
 					.setIcon(getDialogIcon())
-					.setPositiveButton(getPositiveButtonText(), mListener)
-					.setNeutralButton(getNeutralButtonText(), mListener)
-					.setNegativeButton(getNegativeButtonText(), mListener)
+					.setPositiveButton(getPositiveButtonText(), this)
+					.setNeutralButton(getNeutralButtonText(), this)
+					.setNegativeButton(getNegativeButtonText(), this)
 			;
 
 			View contentView = onCreateDialogView();
@@ -213,6 +220,9 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 	}
 
 	@Override
+	protected abstract void onDialogClosed(boolean positiveResult);
+
+	@Override
 	protected Parcelable onSaveInstanceState()
 	{
 		// This might be a hack, but it's the only way I've found to work
@@ -243,12 +253,12 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 		}
 	}
 
-	private final OnClickListener mListener = new OnClickListener() {
+	/*private final OnClickListener mListener = new OnClickListener() {
 
 		@Override
 		public void onClick(DialogInterface dialog, int which)
 		{
 			onDialogClosed(which == Dialog.BUTTON_POSITIVE);
 		}
-	};
+	};*/
 }

@@ -40,6 +40,10 @@ public class DosePreference extends FractionPreference
 	private Drug mDrug;
 	private DoseView mDoseView;
 
+	public DosePreference(Context context) {
+		this(context, null);
+	}
+
 	public DosePreference(Context context, AttributeSet attrs) {
 		this(context, attrs, android.R.attr.preferenceStyle);
 	}
@@ -48,23 +52,55 @@ public class DosePreference extends FractionPreference
 	{
 		super(context, attrs, defStyle);
 
-		mDoseTime = getDoseTimeFromKey(getKey());
-
-		setDialogIcon(Util.getDoseTimeDrawableFromDoseTime(mDoseTime));
 		setDialogTitle(getTitle());
-
 		setWidgetLayoutResource(R.layout.dose_preference);
 	}
 
+	/**
+	 * Set the drug to be used by this preference.
+	 *
+	 * @param drug
+	 */
 	public void setDrug(Drug drug)
 	{
 		mDrug = drug;
+		mDoseTime = getDoseTimeFromKey(getKey());
 		setValue(mDrug.getDose(mDoseTime));
+	}
+
+	@Override
+	public void setValue(Object object)
+	{
+		super.setValue(object);
+		// FIXME
+		mDoseTime = getDoseTimeFromKey(getKey());
 	}
 
 	@Override
 	public CharSequence getSummary() {
 		return null;
+	}
+
+	@Override
+	protected void onBindView(View view)
+	{
+		super.onBindView(view);
+
+		if(view != null)
+		{
+
+			setDialogIcon(Util.getDoseTimeDrawableFromDoseTime(mDoseTime));
+
+			mDoseView = (DoseView) view.findViewById(R.id.dose_view);
+			if(mDoseView == null)
+				return;
+
+			mDoseView.setDoseTime(mDoseTime);
+			//mDoseView.setDrug(mDrug);
+			//mDoseView.setDoseFromDrugAndDate(date, drug)
+			mDoseView.setDose(getValue());
+			mDoseView.setOnClickListener(mViewClickListener);
+		}
 	}
 
 	public static int getDoseTimeFromKey(String key)
@@ -77,23 +113,6 @@ public class DosePreference extends FractionPreference
 			throw new IllegalStateException("Illegal key '" + key + "' for DosePreference. Valid keys: " + keys);
 
 		return doseTime;
-	}
-
-	@Override
-	protected void onBindView(View view)
-	{
-		super.onBindView(view);
-
-		if(view != null)
-		{
-			mDoseView = (DoseView) view.findViewById(R.id.dose_view);
-			if(mDoseView == null)
-				return;
-
-			mDoseView.setDoseTime(mDoseTime);
-			mDoseView.setDrug(mDrug);
-			mDoseView.setOnClickListener(mViewClickListener);
-		}
 	}
 
 	private OnClickListener mViewClickListener = new OnClickListener() {

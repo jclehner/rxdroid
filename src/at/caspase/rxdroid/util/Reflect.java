@@ -69,6 +69,26 @@ public final class Reflect
 		return null;
 	}
 
+	public static Object getFieldValue(Field field, Object object)
+	{
+		try
+		{
+			boolean wasMadeAccessible = makeAccessible(field);
+			Object value = field.get(object);
+			if(wasMadeAccessible)
+				field.setAccessible(false);
+			return value;
+		}
+		catch(IllegalArgumentException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch(IllegalAccessException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static Object getFieldValue(Field field, Object o, Object defValue)
 	{
 		Exception ex;
@@ -93,39 +113,6 @@ public final class Reflect
 		}
 
 		return defValue;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName)
-	{
-		if(annotation == null)
-			throw new NullPointerException("annotation");
-
-		Exception ex;
-
-		try
-		{
-			final Method m = annotation.getClass().getMethod(parameterName);
-			return (T) m.invoke(annotation);
-		}
-		catch(NoSuchMethodException e)
-		{
-			ex = e;
-		}
-		catch(IllegalArgumentException e)
-		{
-			ex = e;
-		}
-		catch(IllegalAccessException e)
-		{
-			ex = e;
-		}
-		catch(InvocationTargetException e)
-		{
-			ex = e;
-		}
-
-		throw new RuntimeException("Failed to obtain paramter " + parameterName, ex);
 	}
 
 	/**
@@ -190,6 +177,64 @@ public final class Reflect
 		}
 
 		throw new RuntimeException(ex);
+	}
+
+	/**
+	 * Obtains the value of an <code>Annotation</code>'s parameter.
+	 *
+	 * @param annotation The annotation.
+	 * @param parameterName The name of the <code>Annotation</code> parameter to obtain.
+	 * @throws IllegalArgumentException If the parameter could not be obtained.
+	 * @return The value of the parameter specified, cast to the receiving type.
+	 */
+	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName) {
+		return getAnnotationParameterInternal(annotation, parameterName, false);
+	}
+
+
+	/**
+	 * Same as {@link #getAnnotationParameter(Annotation, String)}, but returns <code>null</code> on error.
+	 *
+	 * @see #getAnnotationParameter(Annotation, String)
+	 */
+	public static <T> T findAnnotationParameter(Annotation annotation, String parameterName) {
+		return getAnnotationParameterInternal(annotation, parameterName, true);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> T getAnnotationParameterInternal(Annotation annotation, String parameterName, boolean returnNullOnError)
+	{
+		if(annotation == null)
+			throw new NullPointerException("annotation");
+
+		Exception ex;
+
+		try
+		{
+			final Method m = annotation.getClass().getMethod(parameterName);
+			return (T) m.invoke(annotation);
+		}
+		catch(NoSuchMethodException e)
+		{
+			ex = e;
+		}
+		catch(IllegalArgumentException e)
+		{
+			ex = e;
+		}
+		catch(IllegalAccessException e)
+		{
+			ex = e;
+		}
+		catch(InvocationTargetException e)
+		{
+			ex = e;
+		}
+
+		if(returnNullOnError)
+			return null;
+
+		throw new IllegalArgumentException("Failed to obtain paramter " + parameterName, ex);
 	}
 
 	private static Class<?>[] getTypes(Object[] args)

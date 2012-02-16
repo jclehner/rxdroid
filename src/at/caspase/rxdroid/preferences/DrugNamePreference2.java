@@ -4,11 +4,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnShowListener;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -38,10 +38,9 @@ public class DrugNamePreference2 extends MyDialogPreference
 	@Override
 	public void setValue(Object value)
 	{
-		if(mName == null || value == null)
-			mOriginalName = (String) value;
-
-		mName = (String) value;
+		mOriginalName = mName = (String) value;
+		setTitle(mName);
+		Log.d("DrugNamePreference2", "Setting title to " + mName);
 	}
 
 	@Override
@@ -50,8 +49,8 @@ public class DrugNamePreference2 extends MyDialogPreference
 	}
 
 	@Override
-	public void onClick(DialogInterface dialog, int which) {
-		mClickListener.onClick(dialog, which);
+	public CharSequence getSummary() {
+		return null;
 	}
 
 	@Override
@@ -66,6 +65,7 @@ public class DrugNamePreference2 extends MyDialogPreference
 	protected View onCreateDialogView()
 	{
 		mEditText = new EditText(getContext());
+		mEditText.setText(mName);
 		mEditText.addTextChangedListener(mWatcher);
 		return mEditText;
 	}
@@ -89,6 +89,22 @@ public class DrugNamePreference2 extends MyDialogPreference
 				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN;
 	}
 
+	@Override
+	protected void onDialogClosed(boolean positiveResult)
+	{
+		if(positiveResult)
+		{
+			String newText = mEditText.getText().toString();
+
+			if(callChangeListener(newText))
+			{
+				setValue(newText);
+				if(shouldPersist())
+					persistString(newText);
+			}
+		}
+	}
+
 	private boolean isUniqueDrugName(String name)
 	{
 		for(Drug drug : Database.getAll(Drug.class))
@@ -99,25 +115,6 @@ public class DrugNamePreference2 extends MyDialogPreference
 
 		return true;
 	}
-
-	private final OnClickListener mClickListener = new OnClickListener() {
-
-		@Override
-		public void onClick(DialogInterface dialog, int which)
-		{
-			if(which == Dialog.BUTTON_POSITIVE)
-			{
-				String newText = mEditText.getText().toString();
-
-				if(callChangeListener(newText))
-				{
-					setValue(newText);
-					if(shouldPersist())
-						persistString(newText);
-				}
-			}
-		}
-	};
 
 	private final TextWatcher mWatcher = new TextWatcher() {
 

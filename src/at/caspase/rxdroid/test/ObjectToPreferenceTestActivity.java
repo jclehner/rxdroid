@@ -3,7 +3,6 @@ package at.caspase.rxdroid.test;
 import java.util.Date;
 
 import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.util.Log;
@@ -11,19 +10,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 import at.caspase.androidutils.otpm.CheckboxPreferenceHelper;
-import at.caspase.androidutils.otpm.DialogPreferenceHelper;
-import at.caspase.androidutils.otpm.EditTextPreferenceHelper;
 import at.caspase.androidutils.otpm.ListPreferenceWithIntHelper;
-import at.caspase.androidutils.otpm.ObjectToPreferenceMapper;
-import at.caspase.androidutils.otpm.ObjectToPreferenceMapper.MapToPreference;
-import at.caspase.androidutils.otpm.ObjectToPreferenceMapper.ObjectWrapper;
+import at.caspase.androidutils.otpm.MyDialogPreferenceHelper;
+import at.caspase.androidutils.otpm.OTPM;
+import at.caspase.androidutils.otpm.OTPM.MapToPreference;
+import at.caspase.androidutils.otpm.OTPM.ObjectWrapper;
+import at.caspase.rxdroid.preferences.DosePreference;
+import at.caspase.rxdroid.preferences.DrugNamePreference2;
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Schedule;
-import at.caspase.rxdroid.preferences.DrugNamePreference;
 
 public class ObjectToPreferenceTestActivity extends PreferenceActivity
 {
@@ -48,8 +47,8 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		(
 			title = "Drug name",
 			order = 1,
-			type = DrugNamePreference.class,
-			helper = EditTextPreferenceHelper.class
+			type = DrugNamePreference2.class,
+			helper = MyDialogPreferenceHelper.class
 		)
 		private String name;
 
@@ -66,7 +65,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		(
 			title = "Active",
 			summary = "Uncheck to deactivate this drug",
-			order = 3,
+			order = 5,
 			type = CheckBoxPreference.class,
 			helper = CheckboxPreferenceHelper.class
 		)
@@ -76,8 +75,24 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 
 		private Fraction currentSupply;
 
+		@MapToPreference
+		(
+			title = "Morning",
+			key = "morning",
+			order = 3,
+			type = DosePreference.class,
+			helper = MyDialogPreferenceHelper.class
+		)
 		private Fraction doseMorning;
 
+		@MapToPreference
+		(
+			title = "Noon",
+			key = "noon",
+			order = 4,
+			type = DosePreference.class,
+			helper = MyDialogPreferenceHelper.class
+		)
 		private Fraction doseNoon;
 
 		private Fraction doseEvening;
@@ -147,8 +162,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		mWrapper.set(drug);
 
 		addPreferencesFromResource(R.xml.empty);
-
-		ObjectToPreferenceMapper.populatePreferenceScreen(getPreferenceScreen(), mWrapper);
+		OTPM.mapToPreferenceScreen(getPreferenceScreen(), mWrapper);
 	}
 
 	@Override

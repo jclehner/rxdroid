@@ -201,6 +201,7 @@ public class TimePreference extends MyDialogPreference
 			if(isTimeWithinConstraints(mDialogTime))
 			{
 				mTime = mDialogTime;
+				setValue(mDialogTime);
 
 				if(callChangeListener(mTime))
 					persistString(mTime.toString());
@@ -237,7 +238,7 @@ public class TimePreference extends MyDialogPreference
 		final DumbTime after = getConstraint(IDX_AFTER);
 		final DumbTime before = getConstraint(IDX_BEFORE);
 
-		Log.d(TAG, "isTimeWithinConstraints: key=" + getKey());
+		Log.d(TAG, "isTimeWithinConstraints: key=" + getKey() + ", time=" + time);
 		Log.d(TAG, "  after=" + after);
 		Log.d(TAG, "  before=" + before);
 

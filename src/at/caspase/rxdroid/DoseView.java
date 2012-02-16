@@ -27,7 +27,6 @@ import java.util.List;
 
 import android.content.Context;
 import android.text.SpannableStringBuilder;
-import android.text.TextWatcher;
 import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -63,9 +62,13 @@ public class DoseView extends FrameLayout implements OnChangedListener
 	private TextView mDoseText;
 	private ImageView mDoseTimeIcon;
 
-	private Drug mDrug;
 	private int mDoseTime = -1;
+
+	private Drug mDrug;
 	private Date mDate;
+	private int mIntakeCount = 0;
+
+	private Fraction mDose;
 
 	// this value is updated by a call to countIntakes()
 	private Fraction mCumulativeDose = new Fraction();
@@ -116,15 +119,30 @@ public class DoseView extends FrameLayout implements OnChangedListener
 		setFocusable(true);
 	}
 
+	public void setDose(Fraction dose)
+	{
+		mDose = dose;
+		updateView();
+	}
+
+	public Fraction getDose()
+	{
+		if(mDose != null)
+			return mDose;
+
+		if(mDrug != null && mDoseTime != -1)
+			return mDrug.getDose(mDoseTime);
+
+		throw new IllegalStateException("Neither dose nor drug and dose time were set");
+	}
+
 	public void setDoseTime(int doseTime)
 	{
 		if(doseTime > Drug.TIME_NIGHT)
 			throw new IllegalArgumentException();
 
 		final int drawableIds[] = { R.drawable.ic_morning, R.drawable.ic_noon, R.drawable.ic_evening, R.drawable.ic_night };
-		final int[] hints = { R.string._Morning, R.string._Noon, R.string._Evening, R.string._Night };
 
-		mDoseText.setHint(hints[doseTime]);
 		mDoseTimeIcon.setImageResource(drawableIds[doseTime]);
 		mDoseTime = doseTime;
 	}
@@ -133,7 +151,24 @@ public class DoseView extends FrameLayout implements OnChangedListener
 		return mDoseTime;
 	}
 
-	public void setDrug(final Drug drug)
+	public Drug getDrug()
+	{
+		if(mDrug == null)
+			throw new IllegalStateException("This DoseView was not intialized with a drug and date");
+		return mDrug;
+	}
+
+	public Date getDate()
+	{
+		if(mDate == null)
+			throw new IllegalStateException("This DoseView was not intialized with a drug and date");
+		return mDate;
+	}
+
+
+
+
+	/*public void setDrug(final Drug drug)
 	{
 		setInfo(mDate, drug);
 	}
@@ -150,48 +185,33 @@ public class DoseView extends FrameLayout implements OnChangedListener
 		return mDrug.getId();
 	}
 
-	public Fraction getDose()
-	{
-		if(mDrug != null && mDoseTime != -1)
-			return mDrug.getDose(mDoseTime);
-		return new Fraction(0);
-		//return Fraction.decode(mDoseText.getText().toString());
-	}
-
 	public TextView getTextView() {
 		return mDoseText;
 	}
 
 	public void addTextChangedListener(TextWatcher watcher) {
 		mDoseText.addTextChangedListener(watcher);
-	}
+	}*/
 
-	public void setInfo(Date date, Drug drug)
+	public void setDoseFromDrugAndDate(Date date, Drug drug)
 	{
-		final boolean doUpdateView;
+		if(date == null || drug == null)
+			throw new NullPointerException();
 
-		if(date != null)
-			mDate = date;
+		mDate = date;
+		mDrug = drug;
 
-		if(drug != null)
-		{
-			mDrug = drug;
-			doUpdateView = true;
-		}
-		else
-			doUpdateView = false;
+		mDose = getDose();
 
-		if(mDate != null && mDrug != null)
-		{
-			mHasDoseOnDate = mDrug.hasDoseOnDate(mDate);
-			updateIntakeStatusIcon();
-		}
-		else
-			mHasDoseOnDate = true;
+		mDose = new Fraction();
 
-		// we have to delay the call to updateView as mHasDoseOnDate has to be set
-		if(doUpdateView)
-			updateView();
+		List<Intake> intakes = Intake.findAll(mDrug, mDate, mDoseTime);
+		for(Intake intake : intakes)
+			mDose.add(intake.getDose());
+
+		mIntakeCount = intakes.size();
+
+		updateView();
 	}
 
 	public boolean hasInfo(Date date, Drug drug)
@@ -235,22 +255,11 @@ public class DoseView extends FrameLayout implements OnChangedListener
 	{
 		if(entry instanceof Intake)
 		{
-			if(mDate == null)
-				return;
-
 			Intake intake = (Intake) entry;
-
 			if(isApplicableIntake(intake))
 			{
-				/*if(intake.isEmptyIntake() && mCumulativeDose.isZero())
-					markAsIgnored();
-				else
-				{
-					mCumulativeDose.add(intake.getDose());
-					markAsTaken();
-				}*/
-				
-				mCumulativeDose.add(intake.getDose());				
+				mDose.add(intake.getDose());
+				++mIntakeCount;
 				updateView();
 			}
 		}
@@ -264,7 +273,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			Drug drug = (Drug) entry;
 
 			if(mDrug == null || drug.getId() == mDrug.getId())
-				setDrug(drug);
+				setDoseFromDrugAndDate(mDate, drug);
 		}
 	}
 
@@ -273,11 +282,13 @@ public class DoseView extends FrameLayout implements OnChangedListener
 	{
 		if(entry instanceof Intake)
 		{
-			if(mDate == null)
-				return;
-
-			if(isApplicableIntake((Intake) entry))
-				updateIntakeStatusIcon();
+			Intake intake = (Intake) entry;
+			if(isApplicableIntake(intake))
+			{
+				mDose.subtract(intake.getDose());
+				--mIntakeCount;
+				updateView();
+			}
 		}
 	}
 
@@ -285,7 +296,9 @@ public class DoseView extends FrameLayout implements OnChangedListener
 	protected void onAttachedToWindow()
 	{
 		super.onAttachedToWindow();
-		Database.registerOnChangedListener(this);
+
+		if(mDrug != null)
+			Database.registerOnChangedListener(this);
 	}
 
 	@Override
@@ -309,54 +322,77 @@ public class DoseView extends FrameLayout implements OnChangedListener
 
 	private void updateView()
 	{
-		if(mDrug == null)
-			return;
+		//if(mDrug == null)
+		//	return;
+		//
+		//final Fraction actualDose;
+		//if(mDate == null || mCumulativeDose == null || mCumulativeDose.isZero())
+		//	actualDose = getDose();
+		//else if(!mCumulativeDose.isZero())
+		//	actualDose = mCumulativeDose;
+		//else
+		//	actualDose = null;
 
-		final Fraction actualDose;
-		if(mDate == null || mCumulativeDose == null || mCumulativeDose.isZero())
-			actualDose = getDose();
-		else if(!mCumulativeDose.isZero())
-			actualDose = mCumulativeDose;
-		else
-			actualDose = null;
-
-		if(actualDose != null && !actualDose.isZero())
+		if(mDrug != null)
 		{
-			SpannableStringBuilder sb = new SpannableStringBuilder(actualDose.toString());
-
-			if(mDate != null)
+			if(mDose.isZero())
 			{
-				final String suffix;
-				switch(actualDose.compareTo(mDrug.getDose(mDoseTime, mDate)))
-				{
-					case -1:
-						suffix = "-";
-						break;
-					case +1:
-						suffix = "+";
-						break;
-					default:
-						suffix = null;
-				}
+				if(mIntakeCount != 0)
+					markAsIgnored();
+			}
+			else
+				markAsTaken();
+		}
+
+		if(mDrug != null)
+		{
+			if(!mDose.isZero())
+			{
+				Fraction scheduledDose = mDrug.getDose(mDoseTime, mDate);
+				int cmp = mDose.compareTo(scheduledDose);
+				String suffix;
+
+				if(cmp < 0)
+					suffix = "-";
+				else if(cmp > 0)
+					suffix = "+";
+				else
+					suffix = null;
+
+				SpannableStringBuilder sb = new SpannableStringBuilder(mDose.toString());
 
 				if(suffix != null)
 				{
 					sb.append(suffix);
 					sb.setSpan(new SuperscriptSpan(), sb.length() - 1, sb.length(), 0);
 				}
-			}
 
-			if(mHasDoseOnDate)
+				if(!mDrug.hasDoseOnDate(mDate))
+				{
+					sb.insert(0, "(");
+					sb.append(")");
+				}
+
 				mDoseText.setText(sb);
+			}
 			else
 			{
-				sb.insert(0, "(");
-				sb.append(")");
-				mDoseText.setText(sb);
+				Fraction dose = mDrug.getDose(mDoseTime, mDate);
+				mDoseText.setText(dose.toString());
+
+				if(!dose.isZero() && mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
+				{
+					int offset = (int) Settings.instance().getTrueDoseTimeEndOffset(mDoseTime);
+					Date end = DateTime.add(mDate, Calendar.MILLISECOND, offset);
+
+					if(DateTime.nowDate().after(end))
+						markAsForgotten();
+				}
 			}
+
 		}
 		else
-			mDoseText.setText("0");
+			mDoseText.setText(mDose.toString());
 	}
 
 	private void updateIntakeStatusIcon()
@@ -381,7 +417,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			{
 				int offset = (int) Settings.instance().getTrueDoseTimeEndOffset(mDoseTime);
 				Date end = DateTime.add(mDate, Calendar.MILLISECOND, offset);
-				
+
 				if(DateTime.nowDate().after(end))
 					mStatus = STATUS_FORGOTTEN;
 			}
@@ -403,6 +439,12 @@ public class DoseView extends FrameLayout implements OnChangedListener
 	{
 		mIntakeStatus.setImageResource(R.drawable.ic_dose_ignored);
 		mStatus = STATUS_TAKEN; // this is intentional!
+	}
+
+	private void markAsForgotten()
+	{
+		mIntakeStatus.setImageResource(R.drawable.ic_dose_forgotten);
+		mStatus = STATUS_FORGOTTEN;
 	}
 
 	private int countIntakes()

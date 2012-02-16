@@ -55,6 +55,10 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 
 	//FractionInputDialog2 mDialog;
 
+	public FractionPreference(Context context) {
+		this(context, null);
+	}
+
 	public FractionPreference(Context context, AttributeSet attrs) {
 		this(context, attrs, android.R.attr.dialogPreferenceStyle);
 	}
@@ -82,6 +86,8 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 	@Override
 	public void onClick(DialogInterface dialog, int which)
 	{
+		super.onClick();
+
 		if(which == DialogInterface.BUTTON_NEUTRAL)
 		{
 			FractionInputDialog myDialog = (FractionInputDialog) dialog;
@@ -168,5 +174,10 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 		}
 
 		super.onRestoreInstanceState(StateSaver.getSuperState(state));
+	}
+
+	@Override
+	protected void onDialogClosed(boolean positiveResult) {
+		// this stuff is handled in onFractionSet
 	}
 }

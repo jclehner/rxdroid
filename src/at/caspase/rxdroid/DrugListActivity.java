@@ -248,7 +248,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
 	{
 		final DoseView doseView = (DoseView) v;
-		final Drug drug = Drug.get(doseView.getDrugId());
+		final Drug drug = doseView.getDrug();
 		final int doseTime = doseView.getDoseTime();
 
 		// menu.setHeaderIcon(android.R.drawable.ic_menu_agenda);
@@ -354,7 +354,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	public void onDoseClick(final View view)
 	{
 		final DoseView v = (DoseView) view;
-		final Drug drug = Drug.get(v.getDrugId());
+		final Drug drug = v.getDrug();
 		final int doseTime = v.getDoseTime();
 		final Date date = v.getDate();
 
@@ -639,7 +639,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			for(DoseView doseView : holder.doseViews)
 			{
 				if(!doseView.hasInfo(mAdapterDate, drug))
-					doseView.setInfo(mAdapterDate, drug);
+					doseView.setDoseFromDrugAndDate(mAdapterDate, drug);
 			}
 
 			if(LOGV && position == getCount() - 1)

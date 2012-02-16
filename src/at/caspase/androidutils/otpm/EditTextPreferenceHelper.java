@@ -14,13 +14,16 @@ public class EditTextPreferenceHelper extends PreferenceHelper<EditTextPreferenc
 	}
 
 	@Override
-	public boolean updatePreference(EditTextPreference preference, Object fieldValue) {
-		setFieldValue((String) fieldValue);
+	public boolean updatePreference(EditTextPreference preference, Object fieldValue)
+	{
+		String newText = (String) fieldValue;
+		preference.setSummary(newText);
+		setFieldValue(newText);
 		return true;
 	}
 
 	@Override
-	public boolean isDisabled() {
+	public boolean isPreferenceDisabled() {
 		return false;
 	}
 }
