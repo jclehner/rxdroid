@@ -31,8 +31,10 @@ public class DrugNamePreference2 extends MyDialogPreference
 		this(context, null);
 	}
 
-	public DrugNamePreference2(Context context, AttributeSet attrs) {
+	public DrugNamePreference2(Context context, AttributeSet attrs)
+	{
 		super(context, attrs);
+		setWidgetLayoutResource(0);
 	}
 
 	@Override
@@ -50,6 +52,11 @@ public class DrugNamePreference2 extends MyDialogPreference
 
 	@Override
 	public CharSequence getSummary() {
+		return null;
+	}
+
+	@Override
+	public CharSequence getDialogTitle() {
 		return null;
 	}
 

@@ -180,7 +180,7 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 		if(mDialog == null)
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
-					.setTitle(getTitle())
+					.setTitle(getDialogTitle())
 					.setIcon(getDialogIcon())
 					.setPositiveButton(getPositiveButtonText(), this)
 					.setNeutralButton(getNeutralButtonText(), this)

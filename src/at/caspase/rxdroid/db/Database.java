@@ -213,9 +213,18 @@ public final class Database
 		{
 			if(!sIsLoaded)
 			{
+				if(LOGV) Log.v(TAG, "getCached: clazz=" + clazz);
+
 				final List<T> entries = queryForAll(clazz);
 				sCache.put(clazz, entries);
-				if(LOGV) Log.v(TAG, "Cached " + entries.size() + " entries of type " + clazz.getSimpleName());
+
+				if(LOGV)
+				{
+					for(T t : entries)
+						Log.v(TAG, "  " + t);
+				}
+
+				Log.i(TAG, "Cached " + entries.size() + " entries of type " + clazz.getSimpleName());
 			}
 			else
 				throw new NoSuchElementException(clazz.getSimpleName());

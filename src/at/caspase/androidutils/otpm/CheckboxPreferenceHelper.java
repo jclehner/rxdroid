@@ -9,6 +9,6 @@ public class CheckboxPreferenceHelper extends
 	public void initPreference(CheckBoxPreference preference, Boolean fieldValue)
 	{
 		preference.setChecked(fieldValue);
-		preference.setSummary(getSummary());
+		//preference.setSummary(getSummary());
 	}
 }

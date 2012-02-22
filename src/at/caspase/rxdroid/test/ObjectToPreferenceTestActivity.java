@@ -4,6 +4,7 @@ import java.util.Date;
 
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -35,6 +36,13 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		}
 	}
 
+	public static class RepeatModePreferenceHelper extends ListPreferenceWithIntHelper
+	{
+		public RepeatModePreferenceHelper() {
+			super(GlobalContext.get(), R.array.drug_repeat);
+		}
+	}
+
 
 	@SuppressWarnings("unused")
 	public static class DrugWrapper extends ObjectWrapper<Drug>
@@ -61,24 +69,17 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		)
 		private int form;
 
-		@MapToPreference
-		(
-			title = "Active",
-			summary = "Uncheck to deactivate this drug",
-			order = 5,
-			type = CheckBoxPreference.class,
-			helper = CheckboxPreferenceHelper.class
-		)
-		private boolean active;
-
 		private int refillSize;
 
 		private Fraction currentSupply;
 
 		@MapToPreference
 		(
-			title = "Morning",
+			//title = "Morning",
+			titleResId = R.string._Morning,
 			key = "morning",
+			//category = "Intake schedule",
+			categoryResId = R.string._title_intake_schedule,
 			order = 3,
 			type = DosePreference.class,
 			helper = MyDialogPreferenceHelper.class
@@ -87,7 +88,8 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 
 		@MapToPreference
 		(
-			title = "Noon",
+			//title = "Noon",
+			titleResId = R.string._Noon,
 			key = "noon",
 			order = 4,
 			type = DosePreference.class,
@@ -95,11 +97,52 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		)
 		private Fraction doseNoon;
 
+		@MapToPreference
+		(
+			//title = "Evening",
+			titleResId = R.string._Evening,
+			key = "evening",
+			order = 5,
+			type = DosePreference.class,
+			helper = MyDialogPreferenceHelper.class
+		)
 		private Fraction doseEvening;
 
+		@MapToPreference
+		(
+			//title = "Night",
+			titleResId = R.string._Night,
+			key = "night",
+			endActiveCategory = true,
+			order = 6,
+			type = DosePreference.class,
+			helper = MyDialogPreferenceHelper.class
+		)
 		private Fraction doseNight;
 
+		@MapToPreference
+		(
+			//title = "Repeat mode",
+			titleResId = R.string._title_repeat,
+			order = 7,
+			type = ListPreference.class,
+			helper = RepeatModePreferenceHelper.class
+		)
 		private int repeat;
+
+		@MapToPreference
+		(
+			//title = "Active",
+			titleResId = R.string._title_active,
+			//summary = "Uncheck to deactivate this drug",
+			//category = "Miscellaneous",
+			categoryResId = R.string._title_misc,
+			//endActiveCategory = true,
+			order = 8,
+			type = CheckBoxPreference.class,
+			helper = CheckboxPreferenceHelper.class
+		)
+		private boolean active;
 
 		private long repeatArg;
 
@@ -110,6 +153,10 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		private Schedule schedule;
 
 		private String comment;
+
+		private Preference mPref;
+
+
 
 		@Override
 		public void set(Drug drug)

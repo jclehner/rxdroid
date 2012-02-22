@@ -6,12 +6,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 import android.content.Context;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import at.caspase.rxdroid.util.Reflect;
 
 /**
@@ -79,17 +84,36 @@ public class OTPM
 		int summaryResId() default 0;
 
 		/**
-		 * Starts a new preference category.
+		 * Starts a new preference category with the given title.
+		 * <p>
+		 * Note that the title also serves as this category's key.
 		 */
-		String categoryTitle() default EMPTY;
+		String category() default EMPTY;
 
 		/**
-		 * Starts a new preference category.
+		 * Starts a new preference category with the given title.
+		 * <p>
+		 * Note that the title also serves as this category's key.
 		 */
 		int categoryResId() default 0;
 
 		/**
+		 * Set a custom key for the preference.
+		 * <p>
+		 * Note that this will default to the preference's title if not specified.
+		 */
+		String categoryKey() default EMPTY;
+
+		/**
 		 * Ends a preference category, if one was active.
+		 * <p>
+		 * Note that this has no effect whatsoever visually, as the last <code>Preference</code> of
+		 * the <code>PreferenceCategory</code> will be indiscernible from the first <code>Preference</code>
+		 * after that<sup>*</sup>. Use of this function is thus only neccessary, when you intend to access all
+		 * children of a certain <code>PreferenceCategory</code>.
+		 * <p>
+		 * <sup>*</sup>) This applies to both the pre-Honeycomb "Dark" theme and the new "Holo" theme, but might be
+		 * different on various custom schemes.
 		 */
 		boolean endActiveCategory() default false;
 
@@ -104,7 +128,16 @@ public class OTPM
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
-	public @interface AddPreference {};
+	public @interface AddPreference
+	{
+		/**
+		 * The order of this preference within the parent {@link PreferenceScreen}.
+		 * <p>
+		 * Note that the preference's may appear in no particular order if you do not
+		 * explicitly set this property.
+		 */
+		int order() default 0;
+	};
 
 	public static abstract class ObjectWrapper<T>
 	{
@@ -134,17 +167,15 @@ public class OTPM
 			throw new NullPointerException("wrapper");
 
 		final Context context = prefScreen.getContext();
-		final Class<?> clazz = wrapper.getClass();
-
 		PreferenceGroup prefCat = null;
 
-		for(Field field : clazz.getDeclaredFields())
-		{
-			if(!field.isAnnotationPresent(MapToPreference.class))
-			{
-				if(field.isAnnotationPresent(AddPreference.class))
-					prefScreen.addPreference((Preference) Reflect.getFieldValue(field, wrapper));
+		prefScreen.setOrderingAsAdded(true);
 
+		for(Field field : getDeclaredAnnotatedFields(wrapper.getClass()))
+		{
+			if(field.isAnnotationPresent(AddPreference.class))
+			{
+				prefScreen.addPreference((Preference) Reflect.getFieldValue(field, wrapper));
 				continue;
 			}
 
@@ -170,8 +201,8 @@ public class OTPM
 				pref.setKey(key);
 
 			// set the title before calling initPreference()
-			pref.setTitle(getPreferenceParameter(context, a, "title"));
-			pref.setSummary(getPreferenceParameter(context, a, "summary"));
+			pref.setTitle(getStringResourceParameter(context, a, "title"));
+			pref.setSummary(getStringResourceParameter(context, a, "summary"));
 
 			prefHlp.initPreference(pref, Reflect.getFieldValue(field, wrapper));
 
@@ -180,13 +211,20 @@ public class OTPM
 				throw new IllegalStateException(prefHlpClazz + " requires you to explicitly set a title");
 
 			pref.setPersistent(false);
-			pref.setOrder((Integer) Reflect.getAnnotationParameter(a, "order"));
 			pref.setOnPreferenceChangeListener(prefHlp.getOnPreferenceChangeListener());
 
-			String categoryTitle = getPreferenceParameter(context, a, "categoryTitle");
+			String categoryTitle = getStringResourceParameter(context, a, "category");
 			if(categoryTitle != null)
 			{
 				prefCat = new PreferenceCategory(context);
+				prefCat.setTitle(categoryTitle);
+
+				String prefCatKey = Reflect.getAnnotationParameter(a, "categoryKey");
+				if(title == null || EMPTY.equals(title))
+					prefCat.setKey(categoryTitle);
+				else
+					prefCat.setKey(prefCatKey);
+
 				prefScreen.addPreference(prefCat);
 			}
 			else if((Boolean) Reflect.getAnnotationParameter(a, "endActiveCategory"))
@@ -199,7 +237,31 @@ public class OTPM
 		}
 	}
 
-	private static String getPreferenceParameter(Context context, Annotation a, String parameterName)
+	private static List<Field> getDeclaredAnnotatedFields(Class<?> clazz)
+	{
+		LinkedList<Field> fields = new LinkedList<Field>();
+
+		for(Field f : clazz.getDeclaredFields())
+		{
+			if(f.isAnnotationPresent(MapToPreference.class) ||
+					f.isAnnotationPresent(AddPreference.class))
+			{
+				fields.add(f);
+			}
+		}
+
+		Collections.sort(fields, FIELD_COMPARATOR);
+		return fields;
+	}
+
+	private static String getStringResourceParameter(Context context, Annotation a, String parameterName)
+	{
+		String ret = getPreferenceParameter_(context, a, parameterName);
+		Log.d(TAG, "getPreferenceParameter: " + parameterName + " => '" + ret + "'");
+		return ret;
+	}
+
+	private static String getPreferenceParameter_(Context context, Annotation a, String parameterName)
 	{
 		String str = Reflect.findAnnotationParameter(a, parameterName);
 		if(str == null || EMPTY.equals(str))
@@ -213,4 +275,36 @@ public class OTPM
 
 		return str;
 	}
+
+	@SuppressWarnings("unchecked")
+	private static Integer getFieldOrder(Field f)
+	{
+		final Class<?>[] types =
+				new Class<?>[] { MapToPreference.class, AddPreference.class };
+
+		for(Class<?> type : types)
+		{
+			Class<? extends Annotation> annotationType = (Class<? extends Annotation>) type;
+
+			if(f.isAnnotationPresent(annotationType))
+			{
+				Annotation a = f.getAnnotation(annotationType);
+				return Reflect.getAnnotationParameter(a, "order");
+			}
+		}
+
+		throw new IllegalArgumentException();
+	}
+
+	private static final Comparator<Field> FIELD_COMPARATOR = new Comparator<Field>() {
+
+		@Override
+		public int compare(Field field1, Field field2)
+		{
+			Integer order1 = getFieldOrder(field1);
+			Integer order2 = getFieldOrder(field2);
+
+			return order1.compareTo(order2);
+		}
+	};
 }

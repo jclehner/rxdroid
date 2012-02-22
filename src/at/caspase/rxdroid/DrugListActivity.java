@@ -524,7 +524,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		{
 			for(int i = 0; i != 7; ++i)
 			{
-				Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, 7 - i);
+				Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -7 + i);
 				if(LOGV) Log.v(TAG, "  " + checkDate);
 				if(drug.hasDoseOnDate(checkDate))
 				{
@@ -703,7 +703,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public void onClick(View v)
 		{
-			Log.d(TAG, "onClick");
 			Toast.makeText(getApplicationContext(), R.string._toast_drug_notification_icon, Toast.LENGTH_LONG).show();
 		}
 	};

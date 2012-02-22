@@ -1,6 +1,5 @@
 package at.caspase.androidutils.otpm;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 import android.preference.Preference;
@@ -133,7 +132,7 @@ public abstract class PreferenceHelper<P extends Preference, T>
 			boolean changedAccess = Reflect.makeAccessible(mField);
 			mField.set(mWrapper, value);
 			if(changedAccess)
-				mField.setAccessible(true);
+				mField.setAccessible(false);
 		}
 		catch(IllegalArgumentException e)
 		{
@@ -150,9 +149,9 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	 *
 	 * @return The preference summary.
 	 */
-	protected final String getSummary()
+	/*protected final String getSummary()
 	{
 		Annotation a = mField.getAnnotation(MapToPreference.class);
 		return Reflect.getAnnotationParameter(a, "summary");
-	}
+	}*/
 }
