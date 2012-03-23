@@ -261,6 +261,12 @@
     <note priority="medium" time="1324308984" done="1324308994">
         32
     </note>
+    <note priority="medium" time="1324592387" done="1332514532">
+        Reimplement the mess that is DrugEditActivity (should it really be a PreferenceActivity?)
+        <comment>
+            will be fixed by OTPM
+        </comment>
+    </note>
     <note priority="low" time="1316529505" done="1316548042">
         Ask the user for confirmation before resetting all preferences to their defaults
     </note>
@@ -268,6 +274,12 @@
         Don't use fixed yyyy-mm-dd date format
         <comment>
             fixed
+        </comment>
+    </note>
+    <note priority="low" time="1316547776" done="1332514553">
+        Don't show the FractionInputDialog displayed when clicking on an empty dose with an intial value of zero, but use the lowest dose currently in the input schedule.
+        <comment>
+            won't implement
         </comment>
     </note>
     <note priority="low" time="1316614544" done="1316988254">
@@ -306,6 +318,9 @@
     <note priority="high" time="1324602189">
         Allow the user to customize the display order in DrugListActivity
     </note>
+    <note priority="high" time="1332514498">
+        Investigate spurious wierdness in DrugListActivity (e.g. marking a drug as not taken leaves the green tick if drug was not scheduled and would be hidden by reloading that date)
+    </note>
     <note priority="medium" time="1318540605">
         Somehow, implement an "Every N hours" frequency option
     </note>
@@ -318,11 +333,11 @@
     <note priority="medium" time="1320778180">
         Better tablet support; use Fragments!
     </note>
-    <note priority="medium" time="1320793813">
+    <note priority="medium" time="1320793813" done="1332514577">
         distribute DoseViews equidistantly across the screen
-    </note>
-    <note priority="medium" time="1324592387">
-        Reimplement the mess that is DrugEditActivity (should it really be a PreferenceActivity?)
+        <comment>
+            won't implement / related to tablet support
+        </comment>
     </note>
     <note priority="medium" time="1326455007">
         Allow intakes to be updated!
@@ -332,9 +347,6 @@
     </note>
     <note priority="medium" time="1328223989">
         Allow scrambling of drug names
-    </note>
-    <note priority="low" time="1316547776">
-        Don't show the FractionInputDialog displayed when clicking on an empty dose with an intial value of zero, but use the lowest dose currently in the input schedule.
     </note>
     <note priority="low" time="1317226248">
         For Version, don't get the revision from strings.xml, as this requires faking a change in the file to update the revision tag.
