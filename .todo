@@ -114,6 +114,12 @@
             fixed
         </comment>
     </note>
+    <note priority="high" time="1320707778" done="1332514213">
+        For drug specific notifications, display an icon (either change the drug icon's color or use something like android.R.drawable.ic_dialog_alert). Clicking the icon opens a Dialog.
+        <comment>
+            superseded by better idea
+        </comment>
+    </note>
     <note priority="high" time="1320707869" done="1321196908">
         add special icon for non-standard dose intake (maybe yellow tick?), e.g. scheduled dose was 2, but the user took 1 or 2 1/2
         <comment>
@@ -285,8 +291,14 @@
             fixed long ago
         </comment>
     </note>
-    <note priority="high" time="1320707778">
-        For drug specific notifications, display an icon (either change the drug icon's color or use something like android.R.drawable.ic_dialog_alert). Clicking the icon opens a Dialog.
+    <note priority="veryhigh" time="1332514149">
+        Fix hasMissingIntakesBeforeDate() - see FIXME in source
+    </note>
+    <note priority="veryhigh" time="1332514208">
+        Clicking the exclamation mark -&gt; either A) zoom to date of last expected intake or B) open dialog
+    </note>
+    <note priority="veryhigh" time="1332514268">
+        Use OTPM framework for DrugEditActivity!
     </note>
     <note priority="high" time="1324308938">
         Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?

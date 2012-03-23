@@ -522,6 +522,11 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
 		{
+			// FIXME: check whether the cumulative doses of all intakes in the last
+			// 7 days match the required cumulative dose. that way, if drug foobar
+			// scheduled to be taken every monday, but it's taken on tuesday, it
+			// will not be listed as having missing intakes (maybe user selectable preference?)
+
 			for(int i = 0; i != 7; ++i)
 			{
 				Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -7 + i);

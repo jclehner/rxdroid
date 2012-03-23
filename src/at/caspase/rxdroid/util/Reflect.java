@@ -146,7 +146,7 @@ public final class Reflect
 		if(argTypes.length != args.length)
 			throw new IllegalArgumentException("argTypes.length != args.length");
 
-		Log.d(TAG, "newInstance: clazz=" + clazz + ", args=" + args);
+		//Log.d(TAG, "newInstance: clazz=" + clazz + ", args=" + args);
 
 		Exception ex;
 
