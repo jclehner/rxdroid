@@ -3,14 +3,14 @@
 	<classpathentry excluding="*/.svn/" kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/ormlite-android-4.33.jar">
+	<classpathentry kind="lib" path="lib/ormlite-android-4.38.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/RxDroid/lib/ormlite-android-4.33-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/RxDroid/lib/ormlite-android-4.38-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/ormlite-core-4.33.jar">
+	<classpathentry kind="lib" path="lib/ormlite-core-4.38.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/RxDroid/lib/ormlite-core-4.33-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/RxDroid/lib/ormlite-core-4.38-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
