@@ -165,34 +165,6 @@ public class DoseView extends FrameLayout implements OnChangedListener
 		return mDate;
 	}
 
-
-
-
-	/*public void setDrug(final Drug drug)
-	{
-		setInfo(mDate, drug);
-	}
-
-	public void setDate(Date date) {
-		setInfo(date, mDrug);
-	}
-
-	public Date getDate() {
-		return mDate;
-	}
-
-	public int getDrugId() {
-		return mDrug.getId();
-	}
-
-	public TextView getTextView() {
-		return mDoseText;
-	}
-
-	public void addTextChangedListener(TextWatcher watcher) {
-		mDoseText.addTextChangedListener(watcher);
-	}*/
-
 	public void setDoseFromDrugAndDate(Date date, Drug drug)
 	{
 		if(date == null || drug == null)

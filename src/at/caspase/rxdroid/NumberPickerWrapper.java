@@ -45,7 +45,7 @@ public class NumberPickerWrapper extends LinearLayout
 	private static final int MIN_DEFAULT = 0;
 	private static final int MAX_DEFAULT = 99999;
 
-	private final com.quietlycoding.android.picker.NumberPicker mNumberPickerOld;
+	private final com.michaelnovakjr.numberpicker.NumberPicker mNumberPickerOld;
 	private final android.widget.NumberPicker mNumberPickerNew;
 
 	// As the old NumberPicker only provides a setRange method,
@@ -83,7 +83,7 @@ public class NumberPickerWrapper extends LinearLayout
 		{
 			mNumberPickerNew = null;
 			mNumberPickerOld =
-					(com.quietlycoding.android.picker.NumberPicker) findViewById(R.id.picker);
+					(com.michaelnovakjr.numberpicker.NumberPicker) findViewById(R.id.picker);
 		}
 		else
 		{
@@ -173,10 +173,10 @@ public class NumberPickerWrapper extends LinearLayout
 			}
 
 			mNumberPickerOld.setOnChangeListener(
-					new com.quietlycoding.android.picker.NumberPicker.OnChangedListener() {
+					new com.michaelnovakjr.numberpicker.NumberPicker.OnChangedListener() {
 
 				@Override
-				public void onChanged(com.quietlycoding.android.picker.NumberPicker picker,
+				public void onChanged(com.michaelnovakjr.numberpicker.NumberPicker picker,
 						int oldVal, int newVal)
 				{
 					mListener.onValueChange(NumberPickerWrapper.this, oldVal, newVal);
