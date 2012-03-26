@@ -47,7 +47,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 	@SuppressWarnings("unused")
 	public static class DrugWrapper extends ObjectWrapper<Drug>
 	{
-		private Drug mDrug;
+		//private Drug mDrug;
 
 		private int id;
 

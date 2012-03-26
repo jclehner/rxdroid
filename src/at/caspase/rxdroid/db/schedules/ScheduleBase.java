@@ -53,6 +53,26 @@ public abstract class ScheduleBase implements Serializable
 	 */
 	public abstract void setDose(Date date, int doseTime, Fraction dose);
 
+	/**
+	 * Returns the beginning of the specified dose time.
+	 * <p>
+	 * @returns <code>null</code> by default, telling RxDroid to use the
+	 * 	values specified in the application-wide settings.
+	 */
+	public Date getDoseTimeBegin(Date date, int doseTime) {
+		return null;
+	}
+
+	/**
+	 * Returns the end of the specified dose time.
+	 * <p>
+	 * @returns <code>null</code> by default, telling RxDroid to use the
+	 * 	values specified in the application-wide settings.
+	 */
+	public Date getDoseTimeEnd(Date date, int doseTime) {
+		return null;
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		throw new UnsupportedOperationException();

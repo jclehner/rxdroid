@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011, 2012 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  * This file is part of RxDroid.
  *
@@ -313,8 +313,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mIsEditing = true;
 			mDrug = (Drug) extra;
 			mDrugHash = mDrug.hashCode();
+
+			setTitle(mDrug.getName());
 		}
-		else if(!Intent.ACTION_INSERT.equals(action))
+		else if(Intent.ACTION_INSERT.equals(action))
+		{
+			setTitle(R.string._title_add_drug);
+		}
+		else
 			throw new IllegalArgumentException("Unhandled action " + action);
 
 		if(mDrug == null)
@@ -417,7 +423,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				if(currentSupplyDays > 0)
 				{
 					Date end = DateTime.add(DateTime.todayDate(), Calendar.DAY_OF_MONTH, currentSupplyDays);
-					
+
 					mCurrentSupply.setSummary(getString(R.string._msg_supply,
 							currentSupply.toString(), DateTime.toNativeDate(end)));
 				}

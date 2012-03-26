@@ -186,17 +186,4 @@ public final class Util
 	public static int calWeekdayToIndex(int weekday) {
 		return CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);
 	}
-
-	public static int factorial(int n)
-	{
-		if(n < 0)
-			throw new IllegalArgumentException("n=" + n);
-
-		int ret = 1;
-
-		for(int i = 2; i <= n; ++i)
-			ret *= i;
-
-		return ret;
-	}
 }

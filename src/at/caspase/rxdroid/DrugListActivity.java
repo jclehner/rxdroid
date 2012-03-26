@@ -522,24 +522,31 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
 		{
-			// FIXME: check whether the cumulative doses of all intakes in the last
-			// 7 days match the required cumulative dose. that way, if drug foobar
-			// scheduled to be taken every monday, but it's taken on tuesday, it
-			// will not be listed as having missing intakes (maybe user selectable preference?)
+			Fraction expectedCumulativeDose = new Fraction();
+			List<Intake> intakes = new ArrayList<Intake>();
 
 			for(int i = 0; i != 7; ++i)
 			{
 				Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -7 + i);
-				if(LOGV) Log.v(TAG, "  " + checkDate);
-				if(drug.hasDoseOnDate(checkDate))
+
+				for(int doseTime : Constants.DOSE_TIMES)
 				{
-					if(!Intake.hasAll(drug, checkDate))
-					{
-						if(LOGV) Log.v(TAG, "    found missing intakes");
-						return true;
-					}
+					expectedCumulativeDose.add(drug.getDose(doseTime, checkDate));
+					intakes.addAll(Intake.findAll(drug, checkDate, doseTime));
 				}
 			}
+
+			Fraction actualCumulativeDose = new Fraction();
+			for(Intake intake : intakes)
+				actualCumulativeDose.add(intake.getDose());
+
+			if(LOGV)
+			{
+				Log.v(TAG, "  expectedCumulativeDose: " + expectedCumulativeDose);
+				Log.v(TAG, "  actualCumulativeDose  : " + actualCumulativeDose);
+			}
+
+			return actualCumulativeDose.compareTo(expectedCumulativeDose) < 0;
 		}
 
 		return false;
@@ -601,6 +608,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			if(LOGV && position == 0)
 				mTimer.reset();
 
+			final Drug drug = getItem(position);
 			final DoseViewHolder holder;
 
 			if(v == null)
@@ -612,6 +620,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 				holder.name = (TextView) v.findViewById(R.id.drug_name);
 				holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
 				holder.notification = (ImageView) v.findViewById(R.id.drug_notification_icon);
+				holder.notification.setTag(drug);
 				holder.notification.setOnClickListener(mDrugNotificationIconListener);
 
 				for(int i = 0; i != holder.doseViews.length; ++i)
@@ -625,8 +634,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			}
 			else
 				holder = (DoseViewHolder) v.getTag();
-
-			final Drug drug = getItem(position);
 
 			holder.name.setText(getDrugName(drug));
 			holder.name.setTag(TAG_ID, drug.getId());
@@ -708,7 +715,18 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public void onClick(View v)
 		{
-			Toast.makeText(getApplicationContext(), R.string._toast_drug_notification_icon, Toast.LENGTH_LONG).show();
+			final Drug drug = (Drug) v.getTag();
+
+			final Calendar cal = DateTime.calendarFromDate(mDate);
+
+			do
+			{
+				cal.add(Calendar.DAY_OF_MONTH, -1);
+			} while(!drug.hasDoseOnDate(cal.getTime()));
+
+			Toast.makeText(getApplicationContext(), R.string._toast_drug_notification_icon, Toast.LENGTH_SHORT).show();
+
+			setDate(cal.getTime(), true);
 		}
 	};
 

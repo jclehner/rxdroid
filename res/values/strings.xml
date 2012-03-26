@@ -189,7 +189,9 @@
 	<string name="_title_alarm_timeout">Alarm timeout</string>
 	
 	<string name="_summary_pref_show_inactive">Show drugs marked as being inactive</string>
-    <string name="_toast_drug_notification_icon">The last dose of this drug was not taken.</string>   
+    <string name="_toast_drug_notification_icon">The last dose of this drug was not taken.</string> 
+    
+    <string name="_title_add_drug">Add drug</string>
 	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
@@ -200,5 +202,7 @@
     <string name="dialog_set_number">@string/_btn_set</string>
     <string name="dialog_cancel">@android:string/cancel</string>
     <string name="dialog_picker_title">Choose a number</string>
+    
+    
 		
 </resources>

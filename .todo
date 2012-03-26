@@ -240,6 +240,12 @@
             implemented in LoaderActivity
         </comment>
     </note>
+    <note priority="medium" time="1320793813" done="1332514577">
+        distribute DoseViews equidistantly across the screen
+        <comment>
+            won't implement / related to tablet support
+        </comment>
+    </note>
     <note priority="medium" time="1321197019" done="1324381785">
         make first Activity to be loaded a special Activity, in which the DB is intialized and errors regarding the DB can be displayed
         <comment>
@@ -303,14 +309,20 @@
             fixed long ago
         </comment>
     </note>
-    <note priority="veryhigh" time="1332514149">
+    <note priority="veryhigh" time="1332514149" done="1332752895">
         Fix hasMissingIntakesBeforeDate() - see FIXME in source
+        <comment>
+            fixed
+        </comment>
     </note>
     <note priority="veryhigh" time="1332514208">
         Clicking the exclamation mark -&gt; either A) zoom to date of last expected intake or B) open dialog
     </note>
     <note priority="veryhigh" time="1332514268">
         Use OTPM framework for DrugEditActivity!
+    </note>
+    <note priority="veryhigh" time="1332514693">
+        consider name change - rxdroid is already taken!
     </note>
     <note priority="high" time="1324308938">
         Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?
@@ -332,12 +344,6 @@
     </note>
     <note priority="medium" time="1320778180">
         Better tablet support; use Fragments!
-    </note>
-    <note priority="medium" time="1320793813" done="1332514577">
-        distribute DoseViews equidistantly across the screen
-        <comment>
-            won't implement / related to tablet support
-        </comment>
     </note>
     <note priority="medium" time="1326455007">
         Allow intakes to be updated!
