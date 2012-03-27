@@ -156,23 +156,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@MapToPreference
 		(
-			title = "Icon",
+			titleResId = R.string._title_icon,
+			categoryResId = R.string._title_misc,
 			order = 8,
 			type = ListPreference.class,
 			helper = FormPreferenceHelper.class
 		)
 		private int form;
-
-		@MapToPreference
-		(
-			titleResId = R.string._title_active,
-			categoryResId = R.string._title_misc,
-			//endActiveCategory = true,
-			order = 9,
-			type = CheckBoxPreference.class,
-			helper = CheckboxPreferenceHelper.class
-		)
-		private boolean active;
 
 		@MapToPreference
 		(
@@ -191,6 +181,16 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			helper = MyDialogPreferenceHelper.class
 		)
 		private Fraction currentSupply;
+
+		@MapToPreference
+		(
+			titleResId = R.string._title_active,
+			//endActiveCategory = true,
+			order = 12,
+			type = CheckBoxPreference.class,
+			helper = CheckboxPreferenceHelper.class
+		)
+		private boolean active;
 
 		private int id;
 
@@ -239,6 +239,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			drug.setActive(active);
 			drug.setComment(comment);
 			drug.setCurrentSupply(currentSupply);
+			drug.setRefillSize(refillSize);
 			drug.setRepeat(repeat);
 
 			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };
