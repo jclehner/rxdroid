@@ -3,12 +3,12 @@
 ORMLITE_FETCHURL="http://ormlite.com/releases"
 PACKAGES="ormlite-core ormlite-android"
 
-if [[ $# -ne 1 ]]; then
+if [[ $# -lt 1 ]]; then
 	echo "usage: upgrade-ormlite [new version]"
 	exit 1
 fi
 
-oldversion=$(ls lib/*.jar | grep -oP '\d+\.\d+' | head -n 1)
+oldversion=`grep -o -m1 -P 'ormlite-android-(\d+\.\d+)' .classpath | awk 'BEGIN { FS="-" }; { print $3 }'`
 
 if [[ "$1" == "$oldversion" ]]; then
 	echo "Already at version $1"
@@ -17,21 +17,23 @@ fi
 
 echo "Old version is $oldversion"
 
-svn rm --force lib/ormlite-*$oldversion*.jar
 
 for P in $PACKAGES; do
 	base="$P-$1"
-	lib="$base.jar"
-	javadoc="$base-javadoc.jar"
+	jar="$base.jar"
+	#javadoc="$base-javadoc.jar"
 
-	wget -nv "$ORMLITE_FETCHURL/$1/$lib" -O lib/$lib || exit 1
-	svn add lib/$lib
+	wget -nv "$ORMLITE_FETCHURL/$1/$jar" -O libs/$jar || exit 1
+	svn add libs/$lib
 
-	wget -nv "$ORMLITE_FETCHURL/$1/$javadoc" -O lib/$javadoc || exit 1
-	svn add lib/$javadoc
+	#wget -nv "$ORMLITE_FETCHURL/$1/$javadoc" -O libs/$javadoc || exit 1
+	#svn add libs/$javadoc
 
 	sed -i -e "s/$P-$oldversion/$base/" .classpath
+
 done
+svn rm --force libs/ormlite-*$oldversion*.jar
 
-svn ci -m "ORMLite upgrade: $oldversion -> $1"
-
+if [[ "$2" != "nocommit" ]]; then
+	svn ci -m "ORMLite upgrade: $oldversion -> $1"
+fi

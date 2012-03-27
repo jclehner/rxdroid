@@ -131,7 +131,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			@Override
 			public void onClick(View v)
 			{
-				setDate(DateTime.todayDate(), true);
+				setDate(DateTime.todayDate(), PAGER_INIT | PAGER_SCROLL);
 			}
 		});
 
@@ -175,7 +175,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		startNotificationService();
 
-		setDate(mDate, true);
+		setDate(mDate, PAGER_INIT);
 	}
 
 	@Override
@@ -237,7 +237,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			case MENU_TOGGLE_FILTERING:
 			{
 				mShowingAll = !mShowingAll;
-				setDate(mDate, true);
+				setDate(mDate, PAGER_INIT);
 				return true;
 			}
 		}
@@ -348,7 +348,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public void onDateSet(DatePicker view, int year, int month, int day)
 	{
-		setDate(DateTime.date(year, month, day), true);
+		setDate(DateTime.date(year, month, day), PAGER_INIT);
 	}
 
 	public void onDoseClick(final View view)
@@ -369,7 +369,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences preferences, String key)
 	{
-		setDate(mDate, true);
+		setDate(mDate, PAGER_INIT);
 	}
 
 	@Override
@@ -411,9 +411,12 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		return listView;
 	}
 
-	private void setDate(Date date, boolean initPager)
+	private static final int PAGER_SCROLL = 1;
+	private static final int PAGER_INIT = 1 << 1;
+
+	private void setDate(Date date, int flags)
 	{
-		if(LOGV) Log.v(TAG, "setDate: date=" + date + ", initPager=" + initPager);
+		if(LOGV) Log.v(TAG, "setDate: date=" + date + ", flags=" + flags);
 
 		if(!mIsShowing)
 		{
@@ -424,14 +427,16 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		mDate = date;
 		getIntent().putExtra(EXTRA_DATE, mDate);
 
-		if(initPager)
+		if((flags & PAGER_INIT) != 0)
 		{
+			final boolean smoothScroll = (flags & PAGER_SCROLL) != 0;
+
 			mSwipeDirection = 0;
 			mLastPage = -1;
 
 			mPager.removeAllViews();
 			mPager.setAdapter(new InfiniteViewPagerAdapter(this));
-			mPager.setCurrentItem(InfiniteViewPagerAdapter.CENTER, false);
+			mPager.setCurrentItem(InfiniteViewPagerAdapter.CENTER, smoothScroll);
 		}
 
 		updateDateString();
@@ -726,7 +731,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 			Toast.makeText(getApplicationContext(), R.string._toast_drug_notification_icon, Toast.LENGTH_SHORT).show();
 
-			setDate(cal.getTime(), true);
+			setDate(cal.getTime(), PAGER_INIT);
 		}
 	};
 
@@ -737,6 +742,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public void onPageSelected(int page)
 		{
+			if(LOGV) Log.v(TAG, "onPageSelected: page=" + page);
+
 			mPage = page;
 
 			if(mLastPage == -1)
@@ -749,6 +756,13 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public void onPageScrollStateChanged(int state)
 		{
+			if(LOGV)
+			{
+				final String[] states = { "IDLE", "DRAGGING", "SETTLING" };
+				Log.v(TAG, "onPageScrollStateChanged: page=" + mPage);
+				Log.v(TAG, "  state=" + states[state]);
+			}
+
 			if(state == ViewPager.SCROLL_STATE_IDLE)
 			{
 				mSwipeDirection = mLastPage != -1 ? mPage - mLastPage : 0;
@@ -756,13 +770,14 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 				if(LOGV) Log.v(TAG, "onPageScrollStateChanged: mPage=" + mPage +
 						", mLastPage=" + mLastPage + ", mSwipeDirection=" + mSwipeDirection);
 
-				final int shiftBy = mSwipeDirection < 0 ? -1 : 1;
-
-				setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy), false);
+				if(mSwipeDirection != 0)
+				{
+					final int shiftBy = mSwipeDirection < 0 ? -1 : 1;
+					setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy), 0);
+				}
 
 				mLastPage = mPage;
 			}
-
 		}
 	};
 
@@ -775,14 +790,14 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		public void onEntryDeleted(Entry entry, int flags)
 		{
 			if(entry instanceof Drug)
-				setDate(mDate, true);
+				setDate(mDate, PAGER_INIT);
 		}
 
 		@Override
 		public void onEntryCreated(Entry entry, int flags)
 		{
 			if(entry instanceof Drug)
-				setDate(mDate, true);
+				setDate(mDate, PAGER_INIT);
 		}
 	};
 }
