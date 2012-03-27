@@ -437,7 +437,10 @@ public class Drug extends Entry implements Comparable<Drug>
 				throw new IllegalArgumentException();
 		}
 		else
-			throw new UnsupportedOperationException();
+		{
+			//throw new UnsupportedOperationException();
+			return;
+		}
 
 		this.repeatArg = repeatArg;
 	}
@@ -451,7 +454,10 @@ public class Drug extends Entry implements Comparable<Drug>
 	public void setRepeatOrigin(Date repeatOrigin)
 	{
 		if(repeat != REPEAT_EVERY_N_DAYS && repeat != REPEAT_EVERY_N_HOURS)
-			throw new UnsupportedOperationException();
+		{
+			//throw new UnsupportedOperationException();
+			return;
+		}
 
 		if(repeat == REPEAT_EVERY_N_DAYS && DateTime.getOffsetFromMidnight(repeatOrigin) != 0)
 			throw new IllegalArgumentException();

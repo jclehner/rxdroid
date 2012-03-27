@@ -146,23 +146,47 @@ public abstract class PreferenceHelper<P extends Preference, T>
 		return false;
 	}
 
-	protected final void setFieldValue(T value)
+	protected final void setFieldValue(T value) {
+		Reflect.setFieldValue(mField, mWrapper, value);
+	}
+
+	protected final void setFieldValue(String fieldName, Object value)
 	{
+		final Class<?> clazz = mField.getClass();
+		final Field field;
+
 		try
 		{
-			boolean changedAccess = Reflect.makeAccessible(mField);
-			mField.set(mWrapper, value);
-			if(changedAccess)
-				mField.setAccessible(false);
+			field = clazz.getField(fieldName);
 		}
-		catch(IllegalArgumentException e)
+		catch(NoSuchFieldException e)
 		{
 			throw new RuntimeException(e);
 		}
-		catch(IllegalAccessException e)
+
+		Reflect.setFieldValue(field, mWrapper, value);
+	}
+
+	protected final Object getFieldValue(String fieldName)
+	{
+		final Class<?> clazz = mField.getClass();
+		final Field field;
+
+		try
+		{
+			field = clazz.getField(fieldName);
+		}
+		catch(NoSuchFieldException e)
 		{
 			throw new RuntimeException(e);
 		}
+
+		return Reflect.getFieldValue(field, mWrapper);
+	}
+
+	@SuppressWarnings("unchecked")
+	protected final T getFieldValue() {
+		return (T) Reflect.getFieldValue(mField, mWrapper);
 	}
 
 	/**

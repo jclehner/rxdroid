@@ -39,7 +39,6 @@ import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.text.Editable;
@@ -50,16 +49,25 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
+import at.caspase.androidutils.otpm.CheckboxPreferenceHelper;
+import at.caspase.androidutils.otpm.ListPreferenceWithIntHelper;
+import at.caspase.androidutils.otpm.MyDialogPreferenceHelper;
+import at.caspase.androidutils.otpm.NumericEditTextPreferenceHelper;
+import at.caspase.androidutils.otpm.OTPM;
+import at.caspase.androidutils.otpm.OTPM.AddPreference;
+import at.caspase.androidutils.otpm.OTPM.MapToPreference;
+import at.caspase.androidutils.otpm.OTPM.ObjectWrapper;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Schedule;
 import at.caspase.rxdroid.preferences.DosePreference;
-import at.caspase.rxdroid.preferences.DrugNamePreference;
+import at.caspase.rxdroid.preferences.DrugNamePreference2;
 import at.caspase.rxdroid.preferences.FractionPreference;
+import at.caspase.rxdroid.test.ObjectToPreferenceTestActivity.FormPreferenceHelper;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.SimpleBitSet;
-import at.caspase.rxdroid.util.Util;
 
 /**
  * Edit a drug's database entry.
@@ -67,37 +75,412 @@ import at.caspase.rxdroid.util.Util;
  *
  */
 
-public class DrugEditActivity extends PreferenceActivity implements OnPreferenceChangeListener,
-		OnPreferenceClickListener, OnDateSetListener
+public class DrugEditActivity extends PreferenceActivity implements OnPreferenceClickListener
 {
 	public static final String EXTRA_DRUG = "drug";
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
 
 	private static final String TAG = DrugEditActivity.class.getName();
+	private static final boolean LOGV = true;
 
-	private static final String[] PREF_KEYS = {
-			"drug_name",
-			"morning",
-			"noon",
-			"evening",
-			"night",
-			"repeat",
-			"drug_form",
-			"current_supply",
-			"refill_size",
-			"is_active"
-	};
+	public static class DrugWrapper extends ObjectWrapper<Drug>
+	{
+		@MapToPreference
+		(
+			titleResId = R.string._title_drug_name,
+			order = 1,
+			type = DrugNamePreference2.class,
+			helper = MyDialogPreferenceHelper.class
+		)
+		private String name;
 
-	private Drug mDrug;
-	private int mDrugHash = 0;
+		@AddPreference(order = 2)
+		private Preference mDeletePreference;
 
-	private DrugNamePreference mDrugName;
-	private DosePreference[] mDosePrefs;
-	private ListPreference mFreqPreference;
-	private ListPreference mDrugForm;
-	private FractionPreference mCurrentSupply;
-	private EditTextPreference mRefillSize;
-	private CheckBoxPreference mIsActive;
+		@MapToPreference
+		(
+			//title = "Morning",
+			titleResId = R.string._Morning,
+			key = "morning",
+			//category = "Intake schedule",
+			categoryResId = R.string._title_intake_schedule,
+			order = 3,
+			type = DosePreference.class,
+			helper = MyDialogPreferenceHelper.class
+		)
+		private Fraction doseMorning;
+
+		@MapToPreference
+		(
+			//title = "Noon",
+			titleResId = R.string._Noon,
+			key = "noon",
+			order = 4,
+			type = DosePreference.class,
+			helper = MyDialogPreferenceHelper.class
+		)
+		private Fraction doseNoon;
+
+		@MapToPreference
+		(
+			//title = "Evening",
+			titleResId = R.string._Evening,
+			key = "evening",
+			order = 5,
+			type = DosePreference.class,
+			helper = MyDialogPreferenceHelper.class
+		)
+		private Fraction doseEvening;
+
+		@MapToPreference
+		(
+			//title = "Night",
+			titleResId = R.string._Night,
+			key = "night",
+			endActiveCategory = true,
+			order = 6,
+			type = DosePreference.class,
+			helper = MyDialogPreferenceHelper.class
+		)
+		private Fraction doseNight;
+
+		@MapToPreference
+		(
+			//title = "Repeat mode",
+			titleResId = R.string._title_repeat,
+			order = 7,
+			type = ListPreference.class,
+			helper = RepeatModePreferenceHelper.class
+		)
+		private int repeat;
+
+		@MapToPreference
+		(
+			title = "Icon",
+			order = 8,
+			type = ListPreference.class,
+			helper = FormPreferenceHelper.class
+		)
+		private int form;
+
+		@MapToPreference
+		(
+			titleResId = R.string._title_active,
+			categoryResId = R.string._title_misc,
+			//endActiveCategory = true,
+			order = 9,
+			type = CheckBoxPreference.class,
+			helper = CheckboxPreferenceHelper.class
+		)
+		private boolean active;
+
+		@MapToPreference
+		(
+			titleResId = R.string._title_refill_size,
+			order = 10,
+			type = EditTextPreference.class,
+			helper = NumericEditTextPreferenceHelper.class
+		)
+		private int refillSize;
+
+		@MapToPreference
+		(
+			titleResId = R.string._title_current_supply,
+			order = 11,
+			type = FractionPreference.class,
+			helper = MyDialogPreferenceHelper.class
+		)
+		private Fraction currentSupply;
+
+		private int id;
+
+		private long repeatArg;
+		private Date repeatOrigin;
+		private int sortRank;
+		private Schedule schedule;
+		private String comment;
+
+		public DrugWrapper(Context context)
+		{
+			mDeletePreference = new Preference(context);
+			mDeletePreference.setKey("delete");
+			mDeletePreference.setTitle(context.getString(R.string._title_delete));
+		}
+
+		@Override
+		public void set(Drug drug)
+		{
+			id = drug.getId();
+			active = drug.isActive();
+			comment = drug.getComment();
+			currentSupply = drug.getCurrentSupply();
+			doseMorning = drug.getDose(Drug.TIME_MORNING);
+			doseNoon = drug.getDose(Drug.TIME_NOON);
+			doseEvening = drug.getDose(Drug.TIME_EVENING);
+			doseNight = drug.getDose(Drug.TIME_NIGHT);
+			refillSize = drug.getRefillSize();
+			repeat = drug.getRepeatMode();
+			repeatArg = drug.getRepeatArg();
+			repeatOrigin = drug.getRepeatOrigin();
+			schedule = drug.getSchedule();
+			sortRank = drug.getSortRank();
+
+			name = drug.getName();
+			form = drug.getForm();
+		}
+
+		@Override
+		public Drug get()
+		{
+			Drug drug = new Drug();
+			drug.setId(id);
+			drug.setName(name);
+			drug.setForm(form);
+			drug.setActive(active);
+			drug.setComment(comment);
+			drug.setCurrentSupply(currentSupply);
+			drug.setRepeat(repeat);
+
+			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };
+
+			for(int i = 0; i != doses.length; ++i)
+				drug.setDose(Constants.DOSE_TIMES[i], doses[i]);
+
+			drug.setRepeatArg(repeatArg);
+			drug.setRepeatOrigin(repeatOrigin);
+
+			return drug;
+		}
+	}
+
+	public static class RepeatModePreferenceHelper extends ListPreferenceWithIntHelper
+	{
+		private ListPreference mPref;
+		private Context mCtx;
+
+		public RepeatModePreferenceHelper() {
+			super(GlobalContext.get(), R.array.drug_repeat);
+		}
+
+		@Override
+		public boolean updatePreference(ListPreference preference, Object newPrefValue)
+		{
+			mPref = preference;
+			mCtx = preference.getContext();
+
+			final int mode = Integer.parseInt((String) newPrefValue, 10);
+			switch(mode)
+			{
+				case Drug.REPEAT_EVERY_N_DAYS:
+					handleEveryNDaysRepeatMode();
+					return false;
+
+				case Drug.REPEAT_WEEKDAYS:
+					handleWeekdaysRepeatMode();
+					return false;
+
+				case Drug.REPEAT_DAILY:
+					mPref.setSummary(R.string._title_daily);
+					break;
+
+				case Drug.REPEAT_ON_DEMAND:
+					mPref.setSummary(R.string._title_on_demand);
+					break;
+
+				default:
+					Toast.makeText(mCtx, "Not implemented", Toast.LENGTH_LONG).show();
+					return false;
+			}
+
+			Log.d(TAG, "calling super.updatePreference");
+
+
+			return super.updatePreference(preference, newPrefValue);
+		}
+
+		private void handleEveryNDaysRepeatMode()
+		{
+			final Date repeatOrigin;
+			final long repeatArg;
+
+			int oldRepeatMode = getFieldValue();
+
+			if(oldRepeatMode != Drug.REPEAT_EVERY_N_DAYS)
+			{
+				repeatOrigin = DateTime.todayDate();
+				repeatArg = 2;
+			}
+			else
+			{
+				repeatOrigin = (Date) getFieldValue("repeatOrigin");
+				repeatArg = (Long) getFieldValue("repeatArg");
+			}
+
+			final EditText editText = new EditText(mCtx);
+			editText.setText(Long.toString(repeatArg));
+			editText.setEms(20);
+			editText.setMaxLines(1);
+			editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+			editText.setSelectAllOnFocus(true);
+
+			final OnDateSetListener onDateSetListener = new OnDateSetListener() {
+
+				@Override
+				public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+				{
+					final Date repeatOrigin = DateTime.date(year, monthOfYear, dayOfMonth);
+					final long repeatArg = Long.valueOf(editText.getText().toString());
+
+					setFieldValue("repeat", Drug.REPEAT_EVERY_N_DAYS);
+					setFieldValue("repeatOrigin", repeatOrigin);
+					setFieldValue("repeatArg", repeatArg);
+
+					// FIXME change to next occurence
+					String summary = mCtx.getString(
+							R.string._msg_freq_every_n_days,
+							repeatArg,
+							DateTime.toNativeDate(repeatOrigin)
+					);
+
+					mPref.setSummary(summary);
+				}
+			};
+
+			final AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
+			builder.setTitle(R.string._title_every_n_days);
+			builder.setMessage(R.string._msg_every_n_days_distance);
+			builder.setView(editText);
+			builder.setCancelable(true);
+			builder.setNegativeButton(android.R.string.cancel, null);
+			builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					int year = 1900 + repeatOrigin.getYear();
+					int month = repeatOrigin.getMonth();
+					int day = repeatOrigin.getDate();
+
+					DatePickerDialog datePickerDialog =
+							new DatePickerDialog(mCtx, onDateSetListener, year, month, day);
+
+					datePickerDialog.setCancelable(false);
+					datePickerDialog.setMessage(mCtx.getString(R.string._msg_repetition_origin));
+					datePickerDialog.show();
+				}
+			});
+
+			final AlertDialog dialog = builder.create();
+
+			editText.addTextChangedListener(new TextWatcher() {
+
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+				@Override
+				public void afterTextChanged(Editable s)
+				{
+					final long value;
+
+					if(s.length() == 0)
+						value = 0;
+					else
+						value = Long.valueOf(s.toString());
+
+					final boolean enabled = value >= 2;
+					dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(enabled);
+
+					if(!enabled)
+						editText.setError(mCtx.getString(R.string._msg_drug_repeat_ge_2));
+					else
+						editText.setError(null);
+				}
+			});
+
+			dialog.show();
+			editText.performClick();
+		}
+
+		private void handleWeekdaysRepeatMode()
+		{
+			if(getFieldValue() != Drug.REPEAT_WEEKDAYS)
+			{
+				setFieldValue("repeatArg", 0);
+				setFieldValue("repeatOrigin", DateTime.todayDate());
+			}
+
+			long repeatArg = (Long) getFieldValue("repeatArg");
+			final boolean[] checkedItems = SimpleBitSet.toBooleanArray(repeatArg, Constants.LONG_WEEK_DAY_NAMES.length);
+
+			if(repeatArg == 0)
+			{
+				// check the current weekday if none is selected
+				final int weekday = DateTime.nowCalendar().get(Calendar.DAY_OF_WEEK);
+				final int index = CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);
+				checkedItems[index] = true;
+				repeatArg |= 1 << index;
+			}
+
+			final SimpleBitSet bitset = new SimpleBitSet(repeatArg);
+
+			final AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
+			builder.setTitle(R.string._title_weekdays);
+			builder.setMultiChoiceItems(Constants.LONG_WEEK_DAY_NAMES, checkedItems, new OnMultiChoiceClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which, boolean isChecked)
+				{
+					bitset.set(which, isChecked);
+
+					final Button positiveButton = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+					positiveButton.setEnabled(bitset.longValue() != 0);
+				}
+			});
+			builder.setNegativeButton(android.R.string.cancel, null);
+			builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					final long repeatArg = bitset.longValue();
+
+					setFieldValue("repeatMode", Drug.REPEAT_WEEKDAYS);
+					setFieldValue("repeatArg", bitset.longValue());
+
+					mPref.setSummary(getWeekdayRepeatSummary(repeatArg));
+				}
+			});
+
+			builder.show();
+		}
+
+		private String getWeekdayRepeatSummary(long repeatArgs)
+		{
+			final LinkedList<String> weekdays = new LinkedList<String>();
+
+			for(int i = 0; i != 7; ++i)
+			{
+				if((repeatArgs & 1 << i) != 0)
+					weekdays.add(Constants.SHORT_WEEK_DAY_NAMES[i]);
+			}
+
+			if(weekdays.isEmpty())
+				return mCtx.getString(R.string._summary_intake_never);
+
+			StringBuilder sb = new StringBuilder(weekdays.get(0));
+
+			for(int i = 1; i != weekdays.size(); ++i)
+				sb.append(", " + weekdays.get(i));
+
+			return sb.toString();
+		}
+	}
+
+	private DrugWrapper mWrapper;
+	private int mDrugHash;
 
 	// if true, we're editing an existing drug; if false, we're adding a new one
 	private boolean mIsEditing;
@@ -108,7 +491,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 
-		String drugName = mDrug.getName();
+		final Drug drug = mWrapper.get();
+		final String drugName = drug.getName();
 
 		if(drugName == null || drugName.length() == 0)
 		{
@@ -132,7 +516,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		if(Intent.ACTION_EDIT.equals(action))
 		{
-			if(mDrugHash != mDrug.hashCode())
+			if(mDrugHash != drug.hashCode())
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string._title_save_chanes);
@@ -146,7 +530,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					{
 						if(which == DialogInterface.BUTTON_POSITIVE)
 						{
-							Database.update(mDrug);
+							Database.update(drug);
 							setResult(RESULT_OK);
 							Toast.makeText(getApplicationContext(), R.string._toast_saved, Toast.LENGTH_SHORT).show();
 						}
@@ -164,68 +548,12 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
 		{
-			Database.create(mDrug, 0);
+			Database.create(drug, 0);
 			setResult(RESULT_OK);
 			Toast.makeText(getApplicationContext(), getString(R.string._toast_saved), Toast.LENGTH_SHORT).show();
 		}
 
 		finish();
-	}
-
-	@Override
-	public boolean onPreferenceChange(Preference preference, Object newValue)
-	{
-		String key = preference.getKey();
-
-		if("drug_name".equals(key))
-			mDrug.setName((String) newValue);
-		else if("morning".equals(key) || "noon".equals(key) || "evening".equals(key) || "night".equals(key))
-			mDrug.setDose(DosePreference.getDoseTimeFromKey(key), (Fraction) newValue);
-		else if("repeat".equals(key))
-		{
-			final int repeat = toInt(newValue);
-
-			if(repeat != Drug.REPEAT_DAILY && repeat != Drug.REPEAT_ON_DEMAND)
-			{
-				switch(repeat)
-				{
-					case Drug.REPEAT_EVERY_N_DAYS:
-						handleEveryNDaysRepeat();
-						break;
-
-					case Drug.REPEAT_WEEKDAYS:
-						handleWeekdayRepeat();
-						break;
-
-					default:
-						throw new IllegalStateException("Invalid repeat value");
-				}
-			}
-			else
-			{
-				mDrug.setRepeat(repeat);
-				updatePreferences();
-			}
-
-			// the user might cancel a dialog in one of the handle<foobar>Repeat()
-			// functions. by returning false here, we ensure that setValueIndex() is
-			// only called if the repeat was actually changed
-			return false;
-		}
-		else if("drug_form".equals(key))
-			mDrug.setForm(toInt(newValue));
-		else if("current_supply".equals(key))
-			mDrug.setCurrentSupply((Fraction) newValue);
-		else if("refill_size".equals(key))
-			mDrug.setRefillSize(toInt(newValue));
-		else if("is_active".equals(key))
-			mDrug.setActive((Boolean) newValue);
-		else
-			Log.d(TAG, "onPreferenceChange: Ignoring " + key);
-
-		updatePreferences();
-
-		return true;
 	}
 
 	@Override
@@ -235,7 +563,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setTitle(getString(R.string._title_delete_drug, mDrug.getName()));
+			builder.setTitle(getString(R.string._title_delete_drug, mWrapper.get().getName()));
 			builder.setMessage(R.string._msg_delete_drug);
 
 			builder.setPositiveButton(android.R.string.yes, new OnClickListener() {
@@ -243,7 +571,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					Database.delete(mDrug);
+					Database.delete(mWrapper.get());
 					Toast.makeText(getApplicationContext(), R.string._toast_deleted, Toast.LENGTH_SHORT).show();
 					finish();
 				}
@@ -259,41 +587,11 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	}
 
 	@Override
-	public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-	{
-
-	}
-
-	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		addPreferencesFromResource(R.xml.drug_edit);
-
-		mDrugName = (DrugNamePreference) findPreference("drug_name");
-		mDosePrefs = new DosePreference[4];
-
-		String[] dosePrefKeys = { "morning", "noon", "evening", "night" };
-		for(int i = 0; i != dosePrefKeys.length; ++i)
-			mDosePrefs[i] = (DosePreference) findPreference(dosePrefKeys[i]);
-
-		mFreqPreference = (ListPreference) findPreference("repeat");
-		mDrugForm = (ListPreference) findPreference("drug_form");
-		mCurrentSupply = (FractionPreference) findPreference("current_supply");
-		mRefillSize = (EditTextPreference) findPreference("refill_size");
-		mIsActive = (CheckBoxPreference) findPreference("is_active");
-
-		// mark all preferences as non-persisting!
-		for(String key : PREF_KEYS)
-		{
-			final Preference pref = findPreference(key);
-			pref.setPersistent(false);
-			pref.setOnPreferenceChangeListener(this);
-		}
-
-		Util.populateListPreferenceEntryValues(mFreqPreference);
-		Util.populateListPreferenceEntryValues(mDrugForm);
+		addPreferencesFromResource(R.xml.empty);
 	}
 
 	@Override
@@ -304,314 +602,46 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		Intent intent = getIntent();
 		String action = intent.getAction();
 
+		Drug drug = null;
+
+		mWrapper = new DrugWrapper(getApplicationContext());
+
 		if(Intent.ACTION_EDIT.equals(action))
 		{
 			Serializable extra = intent.getSerializableExtra(EXTRA_DRUG);
 			if(extra == null)
 				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG");
 
-			mIsEditing = true;
-			mDrug = (Drug) extra;
-			mDrugHash = mDrug.hashCode();
+			drug = (Drug) extra;
 
-			setTitle(mDrug.getName());
+			mWrapper.set(drug);
+			mDrugHash = drug.hashCode();
+			mIsEditing = true;
+
+			setTitle(drug.getName());
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
-		{
 			setTitle(R.string._title_add_drug);
-		}
 		else
 			throw new IllegalArgumentException("Unhandled action " + action);
 
-		if(mDrug == null)
+		if(drug == null)
 		{
 			mIsEditing = false;
-			mDrug = new Drug();
+			mWrapper.set(new Drug());
 		}
+
+		OTPM.mapToPreferenceScreen(getPreferenceScreen(), mWrapper);
 
 		Preference deletePref = findPreference("delete");
-
-		if(mIsEditing)
-			deletePref.setOnPreferenceClickListener(this);
-		else if(deletePref != null)
-			getPreferenceScreen().removePreference(deletePref);
-
-		initPreferences();
-	}
-
-	private void initPreferences()
-	{
-		mDrugName.setInitialName(mDrug.getName());
-
-		for(DosePreference dosePref : mDosePrefs)
-			dosePref.setDrug(mDrug);
-
-		updatePreferences();
-	}
-
-	/**
-	 * Syncs the preference values with the drug's fields.
-	 */
-	private void updatePreferences()
-	{
-		Log.d(TAG, "updatePreferences: mDrug=" + mDrug);
-
-		mDrugName.setName(mDrug.getName());
-		//mDrugName.setText(mDrug.getName());
-
-		// intake repeat
-
-		final int repeat = mDrug.getRepeatMode();
-		final String summary;
-
-		switch(repeat)
+		if(deletePref != null)
 		{
-			case Drug.REPEAT_DAILY:
-				summary = getString(R.string._msg_freq_daily);
-				break;
-
-			case Drug.REPEAT_EVERY_N_DAYS:
-				int distance = (int) mDrug.getRepeatArg();
-				// FIXME change to next occurence
-				String origin = DateTime.toNativeDate(mDrug.getRepeatOrigin());
-				summary = getString(R.string._msg_freq_every_n_days, distance, origin);
-				break;
-
-			case Drug.REPEAT_WEEKDAYS:
-				long repeatArg = mDrug.getRepeatArg();
-				summary = getWeekdayRepeatSummary(repeatArg);
-				break;
-
-			case Drug.REPEAT_ON_DEMAND:
-				summary = getString(R.string._title_on_demand);
-				break;
-
-			default:
-				throw new IllegalStateException("Invalid repeat value " + repeat);
-		}
-
-		mFreqPreference.setSummary(summary);
-		mFreqPreference.setValueIndex(repeat);
-
-		// drug form
-		int form = mDrug.getForm();
-		String[] forms = getResources().getStringArray(R.array.drug_forms);
-		mDrugForm.setSummary(forms[form]);
-		mDrugForm.setValueIndex(form);
-
-		// current supply
-		// refill size
-		final int refillSize = mDrug.getRefillSize();
-		final Fraction currentSupply = mDrug.getCurrentSupply();
-		if(currentSupply.compareTo(0) == 0)
-		{
-			if(refillSize == 0)
-				mCurrentSupply.setSummary(R.string._summary_not_available);
-			else
-				mCurrentSupply.setSummary("0");
-
-			mCurrentSupply.setValue(Fraction.ZERO);
+			if(mIsEditing)
+				deletePref.setOnPreferenceClickListener(this);
+			else if(deletePref != null)
+				getPreferenceScreen().removePreference(deletePref);
 		}
 		else
-		{
-			mCurrentSupply.setSummary(currentSupply.toString());
-			mCurrentSupply.setValue(currentSupply);
-
-			if(mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
-			{
-				final int currentSupplyDays = mDrug.getCurrentSupplyDays();
-				if(currentSupplyDays > 0)
-				{
-					Date end = DateTime.add(DateTime.todayDate(), Calendar.DAY_OF_MONTH, currentSupplyDays);
-
-					mCurrentSupply.setSummary(getString(R.string._msg_supply,
-							currentSupply.toString(), DateTime.toNativeDate(end)));
-				}
-			}
-		}
-
-		if(refillSize == 0)
-		{
-			mRefillSize.setSummary(R.string._summary_not_available);
-			mRefillSize.setText("0");
-		}
-		else
-		{
-			final String refillSizeStr = Integer.toString(mDrug.getRefillSize());
-			mRefillSize.setSummary(refillSizeStr);
-			mRefillSize.setText(refillSizeStr);
-		}
-
-		mCurrentSupply.setLongClickSummand(new Fraction(mDrug.getRefillSize()));
-
-		// active?
-		mIsActive.setChecked(mDrug.isActive());
-	}
-
-	private void handleEveryNDaysRepeat()
-	{
-		final Date repeatOrigin;
-		final long repeatArg;
-
-		if(mDrug.getRepeatMode() != Drug.REPEAT_EVERY_N_DAYS)
-		{
-			repeatOrigin = DateTime.todayDate();
-			repeatArg = 2;
-		}
-		else
-		{
-			repeatOrigin = mDrug.getRepeatOrigin();
-			repeatArg = mDrug.getRepeatArg();
-		}
-
-		final EditText editText = new EditText(this);
-		editText.setText(Long.toString(repeatArg));
-		editText.setEms(20);
-		editText.setMaxLines(1);
-		editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-		editText.setSelectAllOnFocus(true);
-
-		final OnDateSetListener onDateSetListener = new OnDateSetListener() {
-
-			@Override
-			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-			{
-				mDrug.setRepeat(Drug.REPEAT_EVERY_N_DAYS);
-				mDrug.setRepeatOrigin(DateTime.date(year, monthOfYear, dayOfMonth));
-				mDrug.setRepeatArg(Long.valueOf(editText.getText().toString()));
-				updatePreferences();
-			}
-		};
-
-		final Context context = this;
-
-		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string._title_every_n_days);
-		builder.setMessage(R.string._msg_every_n_days_distance);
-		builder.setView(editText);
-		builder.setCancelable(true);
-		builder.setNegativeButton(android.R.string.cancel, null);
-		builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which)
-			{
-				int year = 1900 + repeatOrigin.getYear();
-				int month = repeatOrigin.getMonth();
-				int day = repeatOrigin.getDate();
-
-				DatePickerDialog datePickerDialog =
-						new DatePickerDialog(context, onDateSetListener, year, month, day);
-
-				datePickerDialog.setCancelable(false);
-				datePickerDialog.setMessage(getString(R.string._msg_repetition_origin));
-				datePickerDialog.show();
-			}
-		});
-
-		final AlertDialog dialog = builder.create();
-
-		editText.addTextChangedListener(new TextWatcher() {
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-			@Override
-			public void afterTextChanged(Editable s)
-			{
-				final long value;
-
-				if(s.length() == 0)
-					value = 0;
-				else
-					value = Long.valueOf(s.toString());
-
-				final boolean enabled = value >= 2;
-				dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(enabled);
-
-				if(!enabled)
-					editText.setError(getString(R.string._msg_drug_repeat_ge_2));
-				else
-					editText.setError(null);
-			}
-		});
-
-		dialog.show();
-		editText.performClick();
-	}
-
-	private void handleWeekdayRepeat()
-	{
-		// if this changes the drug's repeat, all repeat options are reset. if the
-		// drug's repeat already was FREQ_WEEKDAYS, this call will not change anything
-		mDrug.setRepeat(Drug.REPEAT_WEEKDAYS);
-
-		long repeatArg = mDrug.getRepeatArg();
-		final boolean[] checkedItems = SimpleBitSet.toBooleanArray(repeatArg, Constants.LONG_WEEK_DAY_NAMES.length);
-
-		if(repeatArg == 0)
-		{
-			// check the current weekday if none are selected
-			final int weekday = DateTime.nowCalendar().get(Calendar.DAY_OF_WEEK);
-			final int index = CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);
-			checkedItems[index] = true;
-			repeatArg |= 1 << index;
-		}
-
-		final SimpleBitSet bitSet = new SimpleBitSet(repeatArg);
-
-		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string._title_weekdays);
-		builder.setMultiChoiceItems(Constants.LONG_WEEK_DAY_NAMES, checkedItems, new OnMultiChoiceClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which, boolean isChecked)
-			{
-				bitSet.set(which, isChecked);
-
-				final Button positiveButton = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
-				positiveButton.setEnabled(bitSet.longValue() != 0);
-			}
-		});
-		builder.setNegativeButton(android.R.string.cancel, null);
-		builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which)
-			{
-				mDrug.setRepeatArg(bitSet.longValue());
-				updatePreferences();
-			}
-		});
-
-		builder.show();
-	}
-
-	private String getWeekdayRepeatSummary(long repeatArgs)
-	{
-		final LinkedList<String> weekdays = new LinkedList<String>();
-
-		for(int i = 0; i != 7; ++i)
-		{
-			if((repeatArgs & 1 << i) != 0)
-				weekdays.add(Constants.SHORT_WEEK_DAY_NAMES[i]);
-		}
-
-		if(weekdays.isEmpty())
-			return getString(R.string._summary_intake_never);
-
-		StringBuilder sb = new StringBuilder(weekdays.get(0));
-
-		for(int i = 1; i != weekdays.size(); ++i)
-			sb.append(", " + weekdays.get(i));
-
-		return sb.toString();
-	}
-
-	private static int toInt(Object string) {
-		return Integer.parseInt((String) string, 10);
+			Log.d(TAG, "No delete preference found");
 	}
 }

@@ -321,8 +321,11 @@
             fixed long ago
         </comment>
     </note>
-    <note priority="veryhigh" time="1332514268">
+    <note priority="veryhigh" time="1332514268" done="1332882204">
         Use OTPM framework for DrugEditActivity!
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="veryhigh" time="1332514693">
         consider name change - rxdroid is already taken!

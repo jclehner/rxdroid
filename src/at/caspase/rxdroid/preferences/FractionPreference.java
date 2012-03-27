@@ -98,7 +98,8 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 	@Override
 	public void onFractionSet(FractionInputDialog dialog, Fraction value)
 	{
-		mValue = value;
+		//mValue = value;
+		setValue(value);
 
 		if(callChangeListener(mValue))
 			persistString(mValue.toString());
@@ -109,9 +110,11 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 	@Override
 	public void setValue(Object value)
 	{
+		Log.d(TAG, "setValue: value=" + value);
+
 		mValue = (Fraction) value;
 
-		if(super.getSummary() == null)
+		//if(super.getSummary() == null)
 			setSummary(mValue.toString());
 	}
 

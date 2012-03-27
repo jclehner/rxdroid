@@ -115,6 +115,24 @@ public final class Reflect
 		return defValue;
 	}
 
+	public static <T> void setFieldValue(Field field, Object o, T value)
+	{
+		try
+		{
+			makeAccessible(field);
+			field.set(o, value);
+			return;
+		}
+		catch(IllegalArgumentException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch(IllegalAccessException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * Makes a <code>Field</code> accessible.
 	 *

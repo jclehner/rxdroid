@@ -67,6 +67,15 @@ public class DrugNamePreference2 extends MyDialogPreference
 	}
 
 	@Override
+	public void setTitle(CharSequence title)
+	{
+		if(title == null || title.equals(""))
+			super.setTitle(getContext().getString(R.string._title_drug_name));
+		else
+			super.setTitle(title);
+	}
+
+	@Override
 	public Object getValue() {
 		return mName;
 	}

@@ -21,6 +21,7 @@
 
 package at.caspase.androidutils.otpm;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -160,8 +161,10 @@ public class OTPM
 		int order() default 0;
 	};
 
-	public static abstract class ObjectWrapper<T>
+	public static abstract class ObjectWrapper<T> implements Serializable
 	{
+		private static final long serialVersionUID = -4236965614902518944L;
+
 		public abstract void set(T value);
 
 		public abstract T get();
@@ -192,6 +195,8 @@ public class OTPM
 
 		prefScreen.setOrderingAsAdded(true);
 
+		if(LOGV) Log.v(TAG, "mapToPreferenceScreen");
+
 		for(Field field : getDeclaredAnnotatedFields(wrapper.getClass()))
 		{
 			if(field.isAnnotationPresent(AddPreference.class))
@@ -199,6 +204,8 @@ public class OTPM
 				prefScreen.addPreference((Preference) Reflect.getFieldValue(field, wrapper));
 				continue;
 			}
+
+			if(LOGV) Log.v(TAG, "  " + field.getName());
 
 			final String fieldName = field.getName();
 			final Annotation a = field.getAnnotation(MapToPreference.class);
@@ -229,7 +236,7 @@ public class OTPM
 
 			final CharSequence title = pref.getTitle();
 			if(title == null || EMPTY.equals(title))
-				throw new IllegalStateException(prefHlpClazz + " requires you to explicitly set a title");
+				throw new IllegalStateException(prefHlpClazz.getSimpleName() + " requires you to explicitly set a title for key=" + pref.getKey());
 
 			pref.setPersistent(false);
 			pref.setOnPreferenceChangeListener(prefHlp.getOnPreferenceChangeListener());
