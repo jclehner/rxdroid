@@ -731,7 +731,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 			Toast.makeText(getApplicationContext(), R.string._toast_drug_notification_icon, Toast.LENGTH_SHORT).show();
 
-			setDate(cal.getTime(), PAGER_INIT);
+			setDate(cal.getTime(), PAGER_INIT | PAGER_SCROLL);
 		}
 	};
 
