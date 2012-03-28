@@ -152,16 +152,16 @@ public abstract class PreferenceHelper<P extends Preference, T>
 
 	protected final void setFieldValue(String fieldName, Object value)
 	{
-		final Class<?> clazz = mField.getClass();
+		final Class<?> clazz = mWrapper.getClass();
 		final Field field;
 
 		try
 		{
-			field = clazz.getField(fieldName);
+			field = clazz.getDeclaredField(fieldName);
 		}
 		catch(NoSuchFieldException e)
 		{
-			throw new RuntimeException(e);
+			throw new RuntimeException("No field " + fieldName + " in type " + clazz.getSimpleName());
 		}
 
 		Reflect.setFieldValue(field, mWrapper, value);
@@ -169,12 +169,12 @@ public abstract class PreferenceHelper<P extends Preference, T>
 
 	protected final Object getFieldValue(String fieldName)
 	{
-		final Class<?> clazz = mField.getClass();
+		final Class<?> clazz = mWrapper.getClass();
 		final Field field;
 
 		try
 		{
-			field = clazz.getField(fieldName);
+			field = clazz.getDeclaredField(fieldName);
 		}
 		catch(NoSuchFieldException e)
 		{

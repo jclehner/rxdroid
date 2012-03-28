@@ -264,11 +264,19 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		@Override
-		public boolean updatePreference(ListPreference preference, Object newPrefValue)
+		public void initPreference(ListPreference preference, Integer fieldValue)
 		{
+			super.initPreference(preference, fieldValue);
+
 			mPref = preference;
 			mCtx = preference.getContext();
 
+			updateSummary();
+		}
+
+		@Override
+		public boolean updatePreference(ListPreference preference, Object newPrefValue)
+		{
 			final int mode = Integer.parseInt((String) newPrefValue, 10);
 			switch(mode)
 			{
@@ -292,9 +300,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					Toast.makeText(mCtx, "Not implemented", Toast.LENGTH_LONG).show();
 					return false;
 			}
-
-			Log.d(TAG, "calling super.updatePreference");
-
 
 			return super.updatePreference(preference, newPrefValue);
 		}
@@ -336,14 +341,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					setFieldValue("repeatOrigin", repeatOrigin);
 					setFieldValue("repeatArg", repeatArg);
 
-					// FIXME change to next occurence
-					String summary = mCtx.getString(
-							R.string._msg_freq_every_n_days,
-							repeatArg,
-							DateTime.toNativeDate(repeatOrigin)
-					);
-
-					mPref.setSummary(summary);
+					updateSummary();
 				}
 			};
 
@@ -446,25 +444,49 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					final long repeatArg = bitset.longValue();
-
-					setFieldValue("repeatMode", Drug.REPEAT_WEEKDAYS);
+					setFieldValue("repeat", Drug.REPEAT_WEEKDAYS);
 					setFieldValue("repeatArg", bitset.longValue());
 
-					mPref.setSummary(getWeekdayRepeatSummary(repeatArg));
+					updateSummary();
 				}
 			});
 
 			builder.show();
 		}
 
-		private String getWeekdayRepeatSummary(long repeatArgs)
+		private void updateSummary()
+		{
+			final int repeatMode = (Integer) getFieldValue("repeat");
+			final long repeatArg = (Long) getFieldValue("repeatArg");
+			final Date repeatOrigin = (Date) getFieldValue("repeatOrigin");
+
+			final String summary;
+
+			if(repeatMode == Drug.REPEAT_EVERY_N_DAYS)
+			{
+				// FIXME change to next occurence
+				summary = mCtx.getString(
+						R.string._msg_freq_every_n_days,
+						repeatArg,
+						DateTime.toNativeDate(repeatOrigin)
+				);
+			}
+			else if(repeatMode == Drug.REPEAT_WEEKDAYS)
+				summary = getWeekdayRepeatSummary(repeatArg);
+			else
+				summary = null;
+
+			if(summary != null)
+				mPref.setSummary(summary);
+		}
+
+		private String getWeekdayRepeatSummary(long repeatArg)
 		{
 			final LinkedList<String> weekdays = new LinkedList<String>();
 
 			for(int i = 0; i != 7; ++i)
 			{
-				if((repeatArgs & 1 << i) != 0)
+				if((repeatArg & (1 << i)) != 0)
 					weekdays.add(Constants.SHORT_WEEK_DAY_NAMES[i]);
 			}
 
@@ -591,7 +613,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
 		addPreferencesFromResource(R.xml.empty);
 	}
 
@@ -632,6 +653,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mWrapper.set(new Drug());
 		}
 
+		getPreferenceScreen().removeAll(); // FIXME this is a hack
 		OTPM.mapToPreferenceScreen(getPreferenceScreen(), mWrapper);
 
 		Preference deletePref = findPreference("delete");
@@ -646,3 +668,48 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			Log.d(TAG, "No delete preference found");
 	}
 }
+
+/*
+final int refillSize = mDrug.getRefillSize();
+                final Fraction currentSupply = mDrug.getCurrentSupply();
+                if(currentSupply.compareTo(0) == 0)
+                {
+                        if(refillSize == 0)
+                                mCurrentSupply.setSummary(R.string._summary_not_available);
+                        else
+                                mCurrentSupply.setSummary("0");
+
+                        mCurrentSupply.setValue(Fraction.ZERO);
+                }
+                else
+                {
+                        mCurrentSupply.setSummary(currentSupply.toString());
+                        mCurrentSupply.setValue(currentSupply);
+
+                        if(mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
+                        {
+                                final int currentSupplyDays = mDrug.getCurrentSupplyDays();
+                                if(currentSupplyDays > 0)
+                                {
+                                        Date end = DateTime.add(DateTime.todayDate(), Calendar.DAY_OF_MONTH, currentSupplyDays);
+
+                                        mCurrentSupply.setSummary(getString(R.string._msg_supply,
+                                                        currentSupply.toString(), DateTime.toNativeDate(end)));
+                                }
+                        }
+                }
+
+                if(refillSize == 0)
+                {
+                        mRefillSize.setSummary(R.string._summary_not_available);
+                        mRefillSize.setText("0");
+                }
+                else
+                {
+                        final String refillSizeStr = Integer.toString(mDrug.getRefillSize());
+                        mRefillSize.setSummary(refillSizeStr);
+                        mRefillSize.setText(refillSizeStr);
+                }
+
+                mCurrentSupply.setLongClickSummand(new Fraction(mDrug.getRefillSize()));
+*/

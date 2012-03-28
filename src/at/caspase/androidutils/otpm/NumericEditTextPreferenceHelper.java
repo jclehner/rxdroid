@@ -1,6 +1,8 @@
 package at.caspase.androidutils.otpm;
 
 import android.preference.EditTextPreference;
+import android.text.InputType;
+import android.widget.EditText;
 
 public class NumericEditTextPreferenceHelper extends PreferenceHelper<EditTextPreference, Integer>
 {
@@ -9,6 +11,11 @@ public class NumericEditTextPreferenceHelper extends PreferenceHelper<EditTextPr
 	{
 		preference.setText(fieldValue.toString());
 		preference.setSummary(fieldValue.toString());
+
+		final EditText editText = preference.getEditText();
+		editText.setMaxLines(1);
+		editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+		editText.setSelectAllOnFocus(true);
 	}
 
 	@Override

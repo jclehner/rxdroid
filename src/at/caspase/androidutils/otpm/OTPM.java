@@ -41,6 +41,15 @@ import android.preference.PreferenceScreen;
 import android.util.Log;
 import at.caspase.rxdroid.util.Reflect;
 
+/*
+ * TODO
+ *
+ * - Add some other mechanism to update summaries (maybe function name as
+ *   a property of @MapToPreference)
+ * - Allow preferences to be loaded from XML files
+ *
+ */
+
 /**
  * Helper functions for creating a preference hierarchy from an arbitrary <code>Object</code>.
  *
@@ -219,14 +228,16 @@ public class OTPM
 			if(prefHlp.isPreferenceDisabled())
 				continue;
 
-			final Preference pref =
-					Reflect.newInstance(prefClazz, new Class<?>[] { Context.class }, context);
-
-			final String key = Reflect.getAnnotationParameter(a, "key");
+			String key = Reflect.getAnnotationParameter(a, "key");
 			if(key == null || EMPTY.equals(key))
-				pref.setKey(fieldName);
-			else
+				key = fieldName;
+
+			Preference pref = prefScreen.findPreference(key);
+			if(pref == null)
+			{
+				pref = Reflect.newInstance(prefClazz, new Class<?>[] { Context.class }, context);
 				pref.setKey(key);
+			}
 
 			// set the title before calling initPreference()
 			pref.setTitle(getStringResourceParameter(context, a, "title"));

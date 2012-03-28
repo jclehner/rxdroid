@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -103,6 +104,8 @@ public class DrugNamePreference2 extends MyDialogPreference
 	{
 		mEditText = new EditText(getContext());
 		mEditText.setText(mName);
+		mEditText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+		//mEditText.setSelectAllOnFocus(true);
 		mEditText.addTextChangedListener(mWatcher);
 		return mEditText;
 	}
