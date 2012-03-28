@@ -6,7 +6,7 @@
 	
 	<include layout="@layout/focus_grabber" />
     	
-	<com.quietlycoding.android.picker.NumberPicker android:id="@+id/picker" 
+	<com.michaelnovakjr.numberpicker.NumberPicker android:id="@+id/picker" 
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
 	/>
