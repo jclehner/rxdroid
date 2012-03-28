@@ -36,8 +36,8 @@
     
     <string name="_msg_new_notification">New notification</string>
     <string name="_title_notifications">RxDroid</string>
-    <string name="_msg_doses_fp">Doses: %1$d forgotten, %2$d pending.</string>
-    <string name="_msg_doses_f">Doses: %1$d forgotten.</string>
+    <string name="_msg_doses_fp">Doses: %1$d missed, %2$d pending.</string>
+    <string name="_msg_doses_f">Doses: %1$d missed.</string>
     <string name="_msg_doses_p">Doses: %1$d pending.</string>
     <string name="_msg_low_supply_single">Low supplies: %1$s.</string>
     <string name="_msg_low_supply_multiple">Low supplies: %1$s and %2$d other(s).</string>
