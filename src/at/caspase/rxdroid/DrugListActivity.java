@@ -506,6 +506,16 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		int repeatMode = drug.getRepeatMode();
 
+		switch(repeatMode)
+		{
+			case Drug.REPEAT_EVERY_N_DAYS:
+			case Drug.REPEAT_WEEKDAYS:
+			{
+				if(drug.hasDoseOnDate(date))
+					return false;
+			}
+		}
+
 		if(repeatMode == Drug.REPEAT_EVERY_N_DAYS)
 		{
 			long days = drug.getRepeatArg();

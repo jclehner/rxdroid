@@ -336,6 +336,9 @@
     <note priority="veryhigh" time="1332882462">
         Fix DrugEditActivity
     </note>
+    <note priority="veryhigh" time="1332930427">
+        Allow disabling of the fraction mode button in FractionInput
+    </note>
     <note priority="high" time="1324308938">
         Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?
     </note>

@@ -31,8 +31,8 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import at.caspase.androidutils.MyDialogPreference;
-import at.caspase.androidutils.StateSaver;
-import at.caspase.androidutils.StateSaver.SaveState;
+import at.caspase.androidutils.InstanceState;
+import at.caspase.androidutils.InstanceState.SaveState;
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.FractionInputDialog;
 import at.caspase.rxdroid.FractionInputDialog.OnFractionSetListener;
@@ -160,15 +160,15 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 
 		extras.putSerializable(KEY_VALUE, value);
 		Parcelable superState = super.onSaveInstanceState();
-		return StateSaver.createInstanceState(this, superState, extras);
+		return InstanceState.create(this, superState, extras);
 	}
 
 	@Override
 	protected void onRestoreInstanceState(Parcelable state)
 	{
-		StateSaver.restoreInstanceState(this, state);
+		InstanceState.restoreTo(this, state);
 
-		Bundle extras = StateSaver.getExtras(state);
+		Bundle extras = InstanceState.getExtras(state);
 		if(extras != null)
 		{
 			mValue = (Fraction) extras.getSerializable(KEY_VALUE);
@@ -176,7 +176,7 @@ public class FractionPreference extends MyDialogPreference implements OnFraction
 				mValue = new Fraction();
 		}
 
-		super.onRestoreInstanceState(StateSaver.getSuperState(state));
+		super.onRestoreInstanceState(InstanceState.getSuperState(state));
 	}
 
 	@Override

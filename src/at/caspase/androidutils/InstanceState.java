@@ -41,9 +41,9 @@ import android.util.Log;
  * required for saving/restoring states.
  */
 
-public final class StateSaver
+public final class InstanceState
 {
-	private static final String TAG = StateSaver.class.getName();
+	private static final String TAG = InstanceState.class.getName();
 	private static final boolean LOGV = true;
 
 	/**
@@ -66,7 +66,7 @@ public final class StateSaver
 	 * @param extras Any additional data, can be <code>null</code>.
 	 * @return
 	 */
-	public static Parcelable createInstanceState(Object object, Parcelable superState, Bundle extras)
+	public static Parcelable create(Object object, Parcelable superState, Bundle extras)
 	{
 		final SavedState myState = new SavedState(superState);
 		myState.extras = extras;
@@ -115,7 +115,7 @@ public final class StateSaver
 		return null;
 	}
 
-	public static void restoreInstanceState(Object object, Parcelable state)
+	public static void restoreTo(Object object, Parcelable state)
 	{
 		if(!(state instanceof SavedState))
 			return;

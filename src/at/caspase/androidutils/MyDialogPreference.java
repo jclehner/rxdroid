@@ -34,8 +34,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import at.caspase.androidutils.StateSaver.SaveState;
-import at.caspase.androidutils.StateSaver.SavedState;
+import at.caspase.androidutils.InstanceState.SaveState;
+import at.caspase.androidutils.InstanceState.SavedState;
 
 
 /**
@@ -235,17 +235,17 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 		Bundle extras = new Bundle();
 		extras.putBoolean(KEY_IS_DIALOG_SHOWING, isShowing);
 
-		StateSaver.SavedState state = (SavedState) StateSaver.createInstanceState(this, superState, extras);
+		InstanceState.SavedState state = (SavedState) InstanceState.create(this, superState, extras);
 		return state;
 	}
 
 	@Override
 	protected void onRestoreInstanceState(Parcelable state)
 	{
-		super.onRestoreInstanceState(StateSaver.getSuperState(state));
-		StateSaver.restoreInstanceState(this, state);
+		super.onRestoreInstanceState(InstanceState.getSuperState(state));
+		InstanceState.restoreTo(this, state);
 
-		Bundle extras = StateSaver.getExtras(state);
+		Bundle extras = InstanceState.getExtras(state);
 		if(extras != null)
 		{
 			if(extras.getBoolean(KEY_IS_DIALOG_SHOWING, false))

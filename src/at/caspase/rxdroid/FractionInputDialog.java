@@ -36,7 +36,7 @@ public class FractionInputDialog extends AlertDialog implements OnClickListener,
 		void onFractionSet(FractionInputDialog dialog, Fraction value);
 	}
 
-	private FractionInput mInput;
+	protected FractionInput mInput;
 	private Fraction mValue;
 	private OnFractionSetListener mListener;
 

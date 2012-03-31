@@ -32,8 +32,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import at.caspase.androidutils.StateSaver;
-import at.caspase.androidutils.StateSaver.SaveState;
+import at.caspase.androidutils.InstanceState;
+import at.caspase.androidutils.InstanceState.SaveState;
 import at.caspase.rxdroid.NumberPickerWrapper.OnValueChangeListener;
 
 /**
@@ -184,6 +184,25 @@ public class FractionInput extends LinearLayout implements OnClickListener
 		return true;
 	}
 
+	public void disableFractionInputMode(boolean disable)
+	{
+		final int visibility;
+
+		if(disable)
+		{
+			setFractionInputMode(MODE_INTEGER);
+			visibility = View.GONE;
+		}
+		else
+			visibility = View.VISIBLE;
+
+		mModeSwitcher.setVisibility(visibility);
+	}
+
+	public boolean isFractionInputModeDisabled() {
+		return mModeSwitcher.getVisibility() == View.GONE && mFractionInputMode == MODE_INTEGER;
+	}
+
 	public int getFractionInputMode() {
 		return mFractionInputMode;
 	}
@@ -232,15 +251,15 @@ public class FractionInput extends LinearLayout implements OnClickListener
 	protected Parcelable onSaveInstanceState()
 	{
 		Parcelable superState = super.onSaveInstanceState();
-		return StateSaver.createInstanceState(this, superState, null);
+		return InstanceState.create(this, superState, null);
 	}
 
 	@Override
 	protected void onRestoreInstanceState(Parcelable state)
 	{
-		Parcelable superState = StateSaver.getSuperState(state);
+		Parcelable superState = InstanceState.getSuperState(state);
 		super.onRestoreInstanceState(superState);
-		StateSaver.restoreInstanceState(this, state);
+		InstanceState.restoreTo(this, state);
 
 		updateView();
 	}

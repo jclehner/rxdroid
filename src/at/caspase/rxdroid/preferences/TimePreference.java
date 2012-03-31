@@ -34,7 +34,7 @@ import android.widget.TimePicker;
 import android.widget.TimePicker.OnTimeChangedListener;
 import android.widget.Toast;
 import at.caspase.androidutils.MyDialogPreference;
-import at.caspase.androidutils.StateSaver.SaveState;
+import at.caspase.androidutils.InstanceState.SaveState;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.util.Util;

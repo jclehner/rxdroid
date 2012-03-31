@@ -25,8 +25,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import at.caspase.androidutils.StateSaver;
-import at.caspase.androidutils.StateSaver.SaveState;
+import at.caspase.androidutils.InstanceState;
+import at.caspase.androidutils.InstanceState.SaveState;
 
 public class StateSaverTest extends AndroidTestCase
 {
@@ -72,14 +72,14 @@ public class StateSaverTest extends AndroidTestCase
 		{
 			Log.v(getClass().getName(), "onSaveInstanceState");
 			Parcelable superState = new Bundle();
-			return StateSaver.createInstanceState(this, superState, null);
+			return InstanceState.create(this, superState, null);
 		}
 
 		@Override
 		public void restoreInstanceState(Parcelable state)
 		{
 			Log.v(getClass().getName(), "restoreInstanceState");
-			StateSaver.restoreInstanceState(this, state);
+			InstanceState.restoreTo(this, state);
 		}
 	}
 
@@ -93,15 +93,15 @@ public class StateSaverTest extends AndroidTestCase
 		{
 			Log.v(getClass().getName(), "onSaveInstanceState");
 			Parcelable superState = super.onSaveInstanceState();
-			return StateSaver.createInstanceState(this, superState, null);
+			return InstanceState.create(this, superState, null);
 		}
 
 		@Override
 		public void restoreInstanceState(Parcelable state)
 		{
-			super.restoreInstanceState(StateSaver.getSuperState(state));
+			super.restoreInstanceState(InstanceState.getSuperState(state));
 			Log.v(getClass().getName(), "restoreInstanceState");
-			StateSaver.restoreInstanceState(this, state);
+			InstanceState.restoreTo(this, state);
 		}
 	}
 

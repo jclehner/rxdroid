@@ -150,13 +150,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		throw new DatabaseError(isUpgrade ? DatabaseError.E_UPGRADE : DatabaseError.E_DOWNGRADE);
 	}
 
-	/*@Override
-	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion)
-	{
-		// onDowngrade was not available in pre-Honeycomb versions, so we still need to handle the
-		// downgrade in onUpgrade!
-		onUpgrade(db, getConnectionSource(), oldVersion, newVersion);
-	}*/
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) { // Do NOT @Override (crashes on API < 11)
+		onUpgrade(db, oldVersion, newVersion);
+	}
 
 	public void reset()
 	{
@@ -164,8 +160,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 		try
 		{
-			TableUtils.dropTable(cs, Drug.class, true);
-			TableUtils.dropTable(cs, Intake.class, true);
+			for(Class<?> clazz : Database.CLASSES)
+				TableUtils.dropTable(cs, clazz, true);
 		}
 		catch(SQLException e)
 		{
@@ -201,6 +197,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 				final Constructor<?> ctor = hook.getConstructor(cs.getClass());
 				Runnable r = (Runnable) ctor.newInstance(cs);
 				r.run();
+
+				++updatedDataCount;
 			}
 			catch(ClassNotFoundException e)
 			{
@@ -224,12 +222,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 				final Class<?> oldDataClass;
 				final Class<?> newDataClass = Class.forName(newDataClassName);
 
-				TableUtils.createTableIfNotExists(cs, newDataClass);
+				//TableUtils.createTableIfNotExists(cs, newDataClass);
+				//++updatedDataCount;
 
 				try
 				{
 					oldDataClass = Class.forName(oldDataClassName);
-					++updatedDataCount;
 				}
 				catch(ClassNotFoundException e)
 				{
@@ -251,10 +249,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 					Entry entry = (Entry) convertMethod.invoke(data);
 					newDao.create(entry);
+
+					++updatedDataCount;
 				}
 			}
 
-			return true;
+			return updatedDataCount != 0;
 		}
 		catch(SQLException e)
 		{

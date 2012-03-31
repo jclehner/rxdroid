@@ -221,7 +221,10 @@ public class MyNotification
 		notification.defaults ^= defaultsXorMask;
 
 		if((notification.defaults & Notification.DEFAULT_LIGHTS) != 0)
+		{
 			notification.flags |= Notification.FLAG_SHOW_LIGHTS;
+			//notification.ledARGB = 0xff0000ff;
+		}
 
 		NotificationManager notificationMgr = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationMgr.notify(R.id.notification, notification);
