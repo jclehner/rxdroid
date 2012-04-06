@@ -58,12 +58,7 @@ public class Settings
 		sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sApplicationContext);
 
 		if(sInstance == null)
-		{
 			sInstance = new Settings();
-			Log.d(TAG, "Using Settings");
-
-			//sInstance.setLastNotificationMessageHash(0);
-		}
 
 		return sInstance;
 	}
@@ -188,7 +183,7 @@ public class Settings
 				value = "00:30";
 		}
 
-		return DumbTime.valueOf(value);
+		return DumbTime.fromString(value);
 	}
 
 	private DumbTime getTimePreference(int doseTime, String suffix) {

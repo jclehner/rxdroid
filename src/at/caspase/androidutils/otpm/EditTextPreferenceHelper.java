@@ -21,7 +21,16 @@
 
 package at.caspase.androidutils.otpm;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnShowListener;
 import android.preference.EditTextPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
+import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 public class EditTextPreferenceHelper extends PreferenceHelper<EditTextPreference, String>
@@ -32,6 +41,13 @@ public class EditTextPreferenceHelper extends PreferenceHelper<EditTextPreferenc
 		pref.setText(value);
 		EditText editText = pref.getEditText();
 		editText.setHint(pref.getTitle());
+
+		Dialog dialog = pref.getDialog();
+		if(dialog != null)
+		{
+			Log.d("FOOOOOBAR", "Houston, we have a Dialog!");
+			dialog.setOnShowListener(mShowListener);
+		}
 	}
 
 	@Override
@@ -47,4 +63,22 @@ public class EditTextPreferenceHelper extends PreferenceHelper<EditTextPreferenc
 	public boolean isPreferenceDisabled() {
 		return false;
 	}
+
+
+
+
+	private final OnShowListener mShowListener = new OnShowListener() {
+
+		@Override
+		public void onShow(DialogInterface dialog)
+		{
+			Window window = ((AlertDialog) dialog).getWindow();
+			if(window != null)
+			{
+				window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED |
+						WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
+			}
+		}
+	};
 }

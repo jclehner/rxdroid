@@ -207,7 +207,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		switch(index)
 		{
 			case 1:
-				final DumbTime timeout = ((TimePreference) alarmTimeout).getValue();
+				final DumbTime timeout = (DumbTime) ((TimePreference) alarmTimeout).getValue();
 				final int minutes;
 
 				if(timeout != null)

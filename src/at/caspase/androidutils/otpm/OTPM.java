@@ -59,7 +59,7 @@ import at.caspase.rxdroid.util.Reflect;
 public class OTPM
 {
 	private static final String TAG = OTPM.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	public static final String EMPTY = "";
 	public static final String CLOSE_GROUP = TAG + "close_group";
@@ -296,7 +296,7 @@ public class OTPM
 	private static String getStringResourceParameter(Context context, Annotation a, String parameterName)
 	{
 		String ret = getPreferenceParameter_(context, a, parameterName);
-		Log.d(TAG, "getPreferenceParameter: " + parameterName + " => '" + ret + "'");
+		if(LOGV) Log.v(TAG, "getPreferenceParameter: " + parameterName + " => '" + ret + "'");
 		return ret;
 	}
 

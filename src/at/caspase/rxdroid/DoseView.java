@@ -58,9 +58,9 @@ public class DoseView extends FrameLayout implements OnChangedListener
 	public static final int STATUS_FORGOTTEN = 2;
 	//public static final int STATUS_IGNORED = 3;
 
-	private ImageView mIntakeStatus;
-	private TextView mDoseText;
-	private ImageView mDoseTimeIcon;
+	private final ImageView mIntakeStatus;
+	private final TextView mDoseText;
+	private final ImageView mDoseTimeIcon;
 
 	private int mDoseTime = -1;
 
@@ -73,7 +73,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 	// this value is updated by a call to countIntakes()
 	private Fraction mCumulativeDose = new Fraction();
 
-	private boolean mHasDoseOnDate = true;
+	private final boolean mHasDoseOnDate = true;
 
 	private int mStatus = STATUS_INDETERMINATE;
 
@@ -363,7 +363,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			}
 
 		}
-		else
+		else if(mDose != null)
 			mDoseText.setText(mDose.toString());
 	}
 

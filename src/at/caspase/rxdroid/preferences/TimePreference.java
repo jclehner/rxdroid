@@ -26,6 +26,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
+import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -39,7 +40,7 @@ import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.util.Util;
 
-public class TimePreference extends MyDialogPreference
+public class TimePreference extends MyDialogPreference<DumbTime>
 {
 	private static final String TAG = TimePreference.class.getName();
 	private static final boolean LOGV = false;
@@ -60,7 +61,7 @@ public class TimePreference extends MyDialogPreference
 	private int mWrapFlags;
 
 	private final String mDefaultValue;
-	private DumbTime mTime;
+	//private DumbTime mTime;
 
 	@SaveState
 	private DumbTime mDialogTime;
@@ -81,7 +82,7 @@ public class TimePreference extends MyDialogPreference
 			String value = attrs.getAttributeValue(NS_PREF, attributeNames[i]);
 			try
 			{
-				mConstraintTimes[i] = DumbTime.valueOf(value);
+				mConstraintTimes[i] = DumbTime.fromString(value);
 			}
 			catch(IllegalArgumentException e)
 			{
@@ -104,11 +105,13 @@ public class TimePreference extends MyDialogPreference
 			setDialogTitle(getTitle());
 		if(getDialogIcon() == null)
 			setDialogIcon(android.R.drawable.ic_menu_recent_history);
+
+		mDialogTime = getValue();
 	}
 
 	@Override
 	public CharSequence getSummary() {
-		return mTime != null ? mTime.toString() : mDefaultValue;
+		return getValue() != null ? getValue().toString() : mDefaultValue;
 	}
 
 	@Override
@@ -137,36 +140,24 @@ public class TimePreference extends MyDialogPreference
 	}
 
 	@Override
-	public DumbTime getValue() {
-		return mTime;
-	}
-
-	@Override
-	public void setValue(Object value) {
-		mTime = (DumbTime) value;
-	}
-
-	@Override
-	protected void onAttachedToActivity()
+	protected void onAttachedToHierarchy(PreferenceManager preferenceManager)
 	{
-		String persisted = getPersistedString(null);
-		if(persisted == null)
-		{
-			if(shouldPersist())
-				persistString(mDefaultValue);
-			mTime = DumbTime.valueOf(mDefaultValue);
-			Log.d(TAG, "onAttachedToActivity: setting defaults for key=" + getKey());
-		}
-		else
-			mTime = DumbTime.valueOf(persisted);
+		super.onAttachedToHierarchy(preferenceManager);
 
 		if(mDialogTime == null)
-			mDialogTime = mTime;
+		{
+			if(getValue() == null)
+				setValue(DumbTime.fromString(mDefaultValue));
+
+			mDialogTime = getValue();
+		}
 	}
 
 	@Override
 	protected void onPrepareDialogBuilder(AlertDialog.Builder builder)
 	{
+		mDialogTime = getDialogValue();
+
 		final Context context = getContext();
 		final TimePicker timePicker = new TimePicker(context);
 		timePicker.setIs24HourView(DateFormat.is24HourFormat(context));
@@ -200,13 +191,8 @@ public class TimePreference extends MyDialogPreference
 		{
 			if(isTimeWithinConstraints(mDialogTime))
 			{
-				mTime = mDialogTime;
-				setValue(mDialogTime);
-
-				if(callChangeListener(mTime))
-					persistString(mTime.toString());
-
-				notifyChanged();
+				//mTime = mDialogTime;
+				changeValue(mDialogTime);
 			}
 			else
 			{
@@ -217,21 +203,26 @@ public class TimePreference extends MyDialogPreference
 		}
 	}
 
-	/*@Override
-	protected Parcelable onSaveInstanceState()
-	{
-		Parcelable superState = super.onSaveInstanceState();
-		return StateSaver.createInstanceState(this, superState, null);
+
+
+	@Override
+	protected String toPersistedString(DumbTime value) {
+		return value.toString(true);
 	}
 
 	@Override
-	protected void onRestoreInstanceState(Parcelable state)
+	protected DumbTime fromPersistedString(String string) {
+		return DumbTime.fromString(string);
+	}
+
+	@Override
+	protected DumbTime getDialogValue()
 	{
-		super.onRestoreInstanceState(StateSaver.getSuperState(state));
-		StateSaver.restoreInstanceState(this, state);
+		if(mDialogTime == null)
+			mDialogTime = getValue();
 
-
-	}*/
+		return mDialogTime;
+	}
 
 	private boolean isTimeWithinConstraints(DumbTime time)
 	{
@@ -269,7 +260,7 @@ public class TimePreference extends MyDialogPreference
 			if(constraintPref == null)
 				throw new IllegalArgumentException("No such TimePreference: " + key);
 
-			return constraintPref.mTime;
+			return constraintPref.getValue();
 		}
 
 		return null;

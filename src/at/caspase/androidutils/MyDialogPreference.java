@@ -21,6 +21,8 @@
 
 package at.caspase.androidutils;
 
+import com.j256.ormlite.stmt.query.SetValue;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -33,6 +35,7 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnAttachStateChangeListener;
 import android.view.Window;
 import at.caspase.androidutils.InstanceState.SaveState;
 import at.caspase.androidutils.InstanceState.SavedState;
@@ -48,15 +51,20 @@ import at.caspase.androidutils.InstanceState.SavedState;
  * @author Joseph Lehner
  *
  */
-public abstract class MyDialogPreference extends DialogPreference implements OnDismissListener
+public abstract class MyDialogPreference<T> extends DialogPreference
 {
 	private static final String TAG = MyDialogPreference.class.getName();
-	@SuppressWarnings("unused")
 	private static final boolean LOGV = true;
+
+	private static final String EMPTY = "";
 
 	@SaveState
 	private CharSequence mNeutralButtonText;
 
+	@SaveState
+	private T mValue;
+
+	@SaveState
 	private Dialog mDialog;
 
 	private static final String KEY_IS_DIALOG_SHOWING = "is_showing";
@@ -81,30 +89,77 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 		return mNeutralButtonText;
 	}
 
+	/**
+	 * Sets the internal value represented by this Preference.
+	 * <p>
+	 * Calling this function will also persist the value, if
+	 * enabled. Note that the summary will be automatically
+	 * updated with the result of <code>value.toString()</code>.
+	 * The summary may be changed again by overriding {@link #onValueSet(Object)}.
+	 */
+	public final void setValue(T value)
+	{
+		Log.d(TAG, "setValue: " + getKey() + " => " + value);
+
+		mValue = value;
+		setSummary(getSummary());
+
+		onValueSet(value);
+
+		if(shouldPersist())
+			persistString(toPersistedString(value));
+	}
+
+	/**
+	 * Similar to {@link #setValue(Object)}, but also calls the <code>OnChangeListener</code>
+	 * associated with this Preference.
+	 *
+	 * @param value
+	 * @see #setValue(Object)
+	 */
+	public final void changeValue(T value)
+	{
+		//Log.d(TAG, "changeValue: " + getKey() + " => " + value);
+		if(callChangeListener(value))
+		{
+			setValue(value);
+			notifyChanged();
+		}
+	}
+
+	public final T getValue()
+	{
+		if(mValue == null)
+		{
+			String persisted = getPersistedString(EMPTY);
+			if(persisted != null && persisted != EMPTY) // the != operator is intentional!
+				mValue = fromPersistedString(persisted);
+			else
+				Log.w(TAG, "getValue: persisted string was null or not available");
+
+		}
+
+		return mValue;
+	}
+
 	@Override
-	public Dialog getDialog() {
+	public final Dialog getDialog() {
 		return mDialog;
 	}
 
 	@Override
-	public void onClick(DialogInterface dialog, int which)
-	{
-		//super.onClick();
+	public void onClick(DialogInterface dialog, int which) {
 		onDialogClosed(which == Dialog.BUTTON_POSITIVE);
 	}
 
-	@Override
-	public void onDismiss(DialogInterface dialog) {
-		mDialog = null;
+	protected abstract String toPersistedString(T value);
+	protected abstract T fromPersistedString(String string);
+
+	protected abstract T getDialogValue();
+
+	protected void onValueSet(T value) {
+		// empty
 	}
-
-	public boolean isDialogShowing() {
-		return mDialog != null;
-	}
-
-	public abstract void setValue(Object value);
-
-	public abstract Object getValue();
 
 	/**
 	 * Returns a custom dialog, if present.
@@ -147,28 +202,15 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 	 * <p>
 	 * This function may be used to set extra options on dialogs
 	 * not created via {@link #onGetCustomDialog()}.
-	 *
+	 * <p>
 	 * Note that you cannot use {@link Dialog#setOnDismissListener(OnDismissListener)}, as
 	 * this listener is used internally by this class and will be overridden.
 	 *
 	 * @param dialog
 	 */
 	protected void onShowDialog(Dialog dialog) {
-		// stub
+		// do nothing
 	}
-
-	/*
-	 * Returns the default OnClickListener supplied to the dialog.
-	 * <p>
-	 * This function is only relevant when using {@link #onGetCustomDialog()}. You can
-	 * use this default listener for your dialog's buttons, which will ensure that
-	 * {@link #onDialogClosed(boolean)} will be called.
-	 *
-	 * @see #onGetCustomDialog()
-	 */
-	//protected final OnClickListener getDialogOnClickListener() {
-	//	return mListener;
-	//}
 
 	@Override
 	protected final void showDialog(Bundle state)
@@ -210,7 +252,7 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 
 		onShowDialog(mDialog);
 
-		mDialog.setOnDismissListener(this);
+		mDialog.setOnDismissListener(mDismissListener);
 		mDialog.show();
 	}
 
@@ -220,16 +262,13 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 	}
 
 	@Override
-	protected abstract void onDialogClosed(boolean positiveResult);
-
-	@Override
 	protected Parcelable onSaveInstanceState()
 	{
 		// This might be a hack, but it's the only way I've found to work
 		// around those pesky 'Window leaked by Activity' errors.
-		boolean isShowing = isDialogShowing();
+		final boolean isShowing = mDialog != null;
 		if(isShowing)
-			getDialog().dismiss();
+			mDialog.dismiss();
 
 		Parcelable superState = super.onSaveInstanceState();
 		Bundle extras = new Bundle();
@@ -253,12 +292,19 @@ public abstract class MyDialogPreference extends DialogPreference implements OnD
 		}
 	}
 
-	/*private final OnClickListener mListener = new OnClickListener() {
+	@Override
+	protected void onDialogClosed(boolean positiveResult)
+	{
+		if(positiveResult)
+			changeValue(getDialogValue());
+	}
+
+	private final OnDismissListener mDismissListener = new OnDismissListener() {
 
 		@Override
-		public void onClick(DialogInterface dialog, int which)
+		public void onDismiss(DialogInterface dialog)
 		{
-			onDialogClosed(which == Dialog.BUTTON_POSITIVE);
+			mDialog = null;
 		}
-	};*/
+	};
 }

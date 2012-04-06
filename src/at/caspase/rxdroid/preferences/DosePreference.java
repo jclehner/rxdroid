@@ -23,6 +23,7 @@ package at.caspase.rxdroid.preferences;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import at.caspase.rxdroid.DoseView;
@@ -33,7 +34,6 @@ import at.caspase.rxdroid.util.Util;
 
 public class DosePreference extends FractionPreference
 {
-	@SuppressWarnings("unused")
 	private static final String TAG = DosePreference.class.getName();
 
 	private int mDoseTime = -1;
@@ -64,21 +64,21 @@ public class DosePreference extends FractionPreference
 	public void setDrug(Drug drug)
 	{
 		mDrug = drug;
-		mDoseTime = getDoseTimeFromKey(getKey());
 		setValue(mDrug.getDose(mDoseTime));
-	}
-
-	@Override
-	public void setValue(Object object)
-	{
-		super.setValue(object);
-		// FIXME
-		mDoseTime = getDoseTimeFromKey(getKey());
 	}
 
 	@Override
 	public CharSequence getSummary() {
 		return null;
+	}
+
+	@Override
+	public void setKey(String key)
+	{
+		super.setKey(key);
+
+		mDoseTime = getDoseTimeFromKey(key);
+		setDialogIcon(Util.getDoseTimeDrawableFromDoseTime(mDoseTime));
 	}
 
 	@Override
@@ -88,14 +88,18 @@ public class DosePreference extends FractionPreference
 
 		if(view != null)
 		{
-
-			setDialogIcon(Util.getDoseTimeDrawableFromDoseTime(mDoseTime));
+			//setDialogIcon(Util.getDoseTimeDrawableFromDoseTime(mDoseTime));
 
 			mDoseView = (DoseView) view.findViewById(R.id.dose_view);
 			if(mDoseView == null)
 				return;
 
-			mDoseView.setDoseTime(mDoseTime);
+			if(mDoseTime != -1)
+				mDoseView.setDoseTime(mDoseTime);
+			else
+				Log.w(TAG, "onBindView: mDoseTime=-1");
+
+			//mDoseView.setDoseTime(mDoseTime);
 			//mDoseView.setDrug(mDrug);
 			//mDoseView.setDoseFromDrugAndDate(date, drug)
 			mDoseView.setDose(getValue());
@@ -115,7 +119,7 @@ public class DosePreference extends FractionPreference
 		return doseTime;
 	}
 
-	private OnClickListener mViewClickListener = new OnClickListener() {
+	private final OnClickListener mViewClickListener = new OnClickListener() {
 
 		@Override
 		public void onClick(View v)

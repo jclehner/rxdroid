@@ -30,7 +30,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -40,14 +39,12 @@ import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 
-public class DrugNamePreference2 extends MyDialogPreference
+public class DrugNamePreference2 extends MyDialogPreference<String>
 {
 	private EditText mEditText;
 	private Button mBtnPositive;
 
 	private String mOriginalName;
-	private String mName;
-
 
 	public DrugNamePreference2(Context context) {
 		this(context, null);
@@ -60,25 +57,12 @@ public class DrugNamePreference2 extends MyDialogPreference
 	}
 
 	@Override
-	public void setValue(Object value)
-	{
-		mOriginalName = mName = (String) value;
-		setTitle(mName);
-		Log.d("DrugNamePreference2", "Setting title to " + mName);
-	}
-
-	@Override
 	public void setTitle(CharSequence title)
 	{
 		if(title == null || title.equals(""))
 			super.setTitle(getContext().getString(R.string._title_drug_name));
 		else
 			super.setTitle(title);
-	}
-
-	@Override
-	public Object getValue() {
-		return mName;
 	}
 
 	@Override
@@ -100,10 +84,17 @@ public class DrugNamePreference2 extends MyDialogPreference
 	}
 
 	@Override
+	protected void onValueSet(String value)
+	{
+		mOriginalName = value;
+		setTitle(value);
+	}
+
+	@Override
 	protected View onCreateDialogView()
 	{
 		mEditText = new EditText(getContext());
-		mEditText.setText(mName);
+		mEditText.setText(getValue());
 		mEditText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 		//mEditText.setSelectAllOnFocus(true);
 		mEditText.addTextChangedListener(mWatcher);
@@ -130,19 +121,18 @@ public class DrugNamePreference2 extends MyDialogPreference
 	}
 
 	@Override
-	protected void onDialogClosed(boolean positiveResult)
-	{
-		if(positiveResult)
-		{
-			String newText = mEditText.getText().toString();
+	protected String getDialogValue() {
+		return mEditText.getText().toString();
+	}
 
-			if(callChangeListener(newText))
-			{
-				setValue(newText);
-				if(shouldPersist())
-					persistString(newText);
-			}
-		}
+	@Override
+	protected String toPersistedString(String value) {
+		return value;
+	}
+
+	@Override
+	protected String fromPersistedString(String string) {
+		return string;
 	}
 
 	private boolean isUniqueDrugName(String name)

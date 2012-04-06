@@ -48,7 +48,8 @@ public class FractionInputDialog extends AlertDialog implements OnClickListener,
 		mInput.setOnChangeListener(this);
 		mListener = listener;
 
-		setValue(value);
+		if(value != null)
+			setValue(value);
 
 		setButton(BUTTON_POSITIVE, context.getString(android.R.string.ok), this);
 		setButton(BUTTON_NEGATIVE, context.getString(android.R.string.cancel), (OnClickListener) null);
@@ -72,6 +73,10 @@ public class FractionInputDialog extends AlertDialog implements OnClickListener,
 
 	public void setAutoInputModeEnabled(boolean enabled) {
 		mInput.setAutoInputModeEnabled(enabled);
+	}
+
+	public void disableFractionInputMode(boolean disabled) {
+		mInput.disableFractionInputMode(disabled);
 	}
 
 	public void setOnFractionSetListener(OnFractionSetListener listener) {

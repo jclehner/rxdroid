@@ -36,7 +36,6 @@ import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -49,10 +48,10 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
+import at.caspase.androidutils.MyDialogPreference;
 import at.caspase.androidutils.otpm.CheckboxPreferenceHelper;
 import at.caspase.androidutils.otpm.ListPreferenceWithIntHelper;
 import at.caspase.androidutils.otpm.MyDialogPreferenceHelper;
-import at.caspase.androidutils.otpm.NumericEditTextPreferenceHelper;
 import at.caspase.androidutils.otpm.OTPM;
 import at.caspase.androidutils.otpm.OTPM.AddPreference;
 import at.caspase.androidutils.otpm.OTPM.MapToPreference;
@@ -83,7 +82,175 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	private static final String TAG = DrugEditActivity.class.getName();
 	private static final boolean LOGV = true;
 
-	public static class DrugWrapper extends ObjectWrapper<Drug>
+
+
+	private DrugWrapper mWrapper;
+	private int mDrugHash;
+
+	// if true, we're editing an existing drug; if false, we're adding a new one
+	private boolean mIsEditing;
+
+	@Override
+	public void onBackPressed()
+	{
+		final Intent intent = getIntent();
+		final String action = intent.getAction();
+
+		final Drug drug = mWrapper.get();
+		final String drugName = drug.getName();
+
+		if(drugName == null || drugName.length() == 0)
+		{
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			//builder.setTitle(R.string._title_warning);
+			builder.setIcon(android.R.drawable.ic_dialog_alert);
+			builder.setTitle(R.string._msg_err_empty_drug_name);
+			builder.setNegativeButton(android.R.string.cancel, null);
+			builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					finish();
+				}
+			});
+			builder.show();
+
+			return;
+		}
+
+		if(Intent.ACTION_EDIT.equals(action))
+		{
+			if(mDrugHash != drug.hashCode())
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string._title_save_chanes);
+				builder.setIcon(android.R.drawable.ic_dialog_info);
+				builder.setMessage(R.string._msg_save_drug_changes);
+
+				final DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						if(which == DialogInterface.BUTTON_POSITIVE)
+						{
+							Database.update(drug);
+							setResult(RESULT_OK);
+							Toast.makeText(getApplicationContext(), R.string._toast_saved, Toast.LENGTH_SHORT).show();
+						}
+
+						finish();
+					}
+				};
+
+				builder.setPositiveButton(R.string._btn_save, onClickListener);
+				builder.setNegativeButton(R.string._btn_discard, onClickListener);
+
+				builder.show();
+				return;
+			}
+		}
+		else if(Intent.ACTION_INSERT.equals(action))
+		{
+			Database.create(drug, 0);
+			setResult(RESULT_OK);
+			Toast.makeText(getApplicationContext(), getString(R.string._toast_saved), Toast.LENGTH_SHORT).show();
+		}
+
+		finish();
+	}
+
+	@Override
+	public boolean onPreferenceClick(Preference preference)
+	{
+		if(preference.getKey().equals("delete"))
+		{
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setIcon(android.R.drawable.ic_dialog_alert);
+			builder.setTitle(getString(R.string._title_delete_drug, mWrapper.get().getName()));
+			builder.setMessage(R.string._msg_delete_drug);
+
+			builder.setPositiveButton(android.R.string.yes, new OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					Database.delete(mWrapper.get());
+					Toast.makeText(getApplicationContext(), R.string._toast_deleted, Toast.LENGTH_SHORT).show();
+					finish();
+				}
+			});
+
+			builder.setNegativeButton(android.R.string.no, null);
+			builder.show();
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		addPreferencesFromResource(R.xml.empty);
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+
+		Intent intent = getIntent();
+		String action = intent.getAction();
+
+		Drug drug = null;
+
+		mWrapper = new DrugWrapper(getApplicationContext());
+
+		if(Intent.ACTION_EDIT.equals(action))
+		{
+			Serializable extra = intent.getSerializableExtra(EXTRA_DRUG);
+			if(extra == null)
+				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG");
+
+			drug = (Drug) extra;
+
+			mWrapper.set(drug);
+			mDrugHash = drug.hashCode();
+			mIsEditing = true;
+
+			setTitle(drug.getName());
+		}
+		else if(Intent.ACTION_INSERT.equals(action))
+			setTitle(R.string._title_add_drug);
+		else
+			throw new IllegalArgumentException("Unhandled action " + action);
+
+		if(drug == null)
+		{
+			mIsEditing = false;
+			mWrapper.set(new Drug());
+		}
+
+		getPreferenceScreen().removeAll(); // FIXME this is a hack
+		OTPM.mapToPreferenceScreen(getPreferenceScreen(), mWrapper);
+
+		Preference deletePref = findPreference("delete");
+		if(deletePref != null)
+		{
+			if(mIsEditing)
+				deletePref.setOnPreferenceClickListener(this);
+			else if(deletePref != null)
+				getPreferenceScreen().removePreference(deletePref);
+		}
+		else
+			Log.d(TAG, "No delete preference found");
+	}
+
+	private static class DrugWrapper extends ObjectWrapper<Drug>
 	{
 		@MapToPreference
 		(
@@ -95,7 +262,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		private String name;
 
 		@AddPreference(order = 2)
-		private Preference mDeletePreference;
+		private final Preference mDeletePreference;
 
 		@MapToPreference
 		(
@@ -168,8 +335,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		(
 			titleResId = R.string._title_refill_size,
 			order = 10,
-			type = EditTextPreference.class,
-			helper = NumericEditTextPreferenceHelper.class
+			type = FractionPreference.class,
+			helper = FractionAsIntegerPreferenceHelper.class
 		)
 		private int refillSize;
 
@@ -178,7 +345,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			titleResId = R.string._title_current_supply,
 			order = 11,
 			type = FractionPreference.class,
-			helper = MyDialogPreferenceHelper.class
+			helper = CurrentSupplyPreferenceHelper.class
 		)
 		private Fraction currentSupply;
 
@@ -254,7 +421,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 	}
 
-	public static class RepeatModePreferenceHelper extends ListPreferenceWithIntHelper
+	private static class RepeatModePreferenceHelper extends ListPreferenceWithIntHelper
 	{
 		private ListPreference mPref;
 		private Context mCtx;
@@ -270,6 +437,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 			mPref = preference;
 			mCtx = preference.getContext();
+
+			//preference.setDependency("currentSupply");
 
 			updateSummary();
 		}
@@ -502,214 +671,75 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 	}
 
-	private DrugWrapper mWrapper;
-	private int mDrugHash;
-
-	// if true, we're editing an existing drug; if false, we're adding a new one
-	private boolean mIsEditing;
-
-	@Override
-	public void onBackPressed()
+	private static class CurrentSupplyPreferenceHelper extends MyDialogPreferenceHelper
 	{
-		final Intent intent = getIntent();
-		final String action = intent.getAction();
+		private Context mContext;
 
-		final Drug drug = mWrapper.get();
-		final String drugName = drug.getName();
-
-		if(drugName == null || drugName.length() == 0)
-		{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			//builder.setTitle(R.string._title_warning);
-			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setTitle(R.string._msg_err_empty_drug_name);
-			builder.setNegativeButton(android.R.string.cancel, null);
-			builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					finish();
-				}
-			});
-			builder.show();
-
-			return;
+		public CurrentSupplyPreferenceHelper() {
+			// TODO Auto-generated constructor stub
 		}
 
-		if(Intent.ACTION_EDIT.equals(action))
+		@Override
+		public void initPreference(MyDialogPreference preference, Object fieldValue)
 		{
-			if(mDrugHash != drug.hashCode())
-			{
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string._title_save_chanes);
-				builder.setIcon(android.R.drawable.ic_dialog_info);
-				builder.setMessage(R.string._msg_save_drug_changes);
-
-				final DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which)
-					{
-						if(which == DialogInterface.BUTTON_POSITIVE)
-						{
-							Database.update(drug);
-							setResult(RESULT_OK);
-							Toast.makeText(getApplicationContext(), R.string._toast_saved, Toast.LENGTH_SHORT).show();
-						}
-
-						finish();
-					}
-				};
-
-				builder.setPositiveButton(R.string._btn_save, onClickListener);
-				builder.setNegativeButton(R.string._btn_discard, onClickListener);
-
-				builder.show();
-				return;
-			}
-		}
-		else if(Intent.ACTION_INSERT.equals(action))
-		{
-			Database.create(drug, 0);
-			setResult(RESULT_OK);
-			Toast.makeText(getApplicationContext(), getString(R.string._toast_saved), Toast.LENGTH_SHORT).show();
+			super.initPreference(preference, fieldValue);
+			mContext = preference.getContext().getApplicationContext();
+			preference.setSummary(getSummary());
+			//preference.setDependency("repeat");
 		}
 
-		finish();
-	}
-
-	@Override
-	public boolean onPreferenceClick(Preference preference)
-	{
-		if(preference.getKey().equals("delete"))
+		@Override
+		public boolean updatePreference(MyDialogPreference preference, Object newValue)
 		{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setTitle(getString(R.string._title_delete_drug, mWrapper.get().getName()));
-			builder.setMessage(R.string._msg_delete_drug);
-
-			builder.setPositiveButton(android.R.string.yes, new OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					Database.delete(mWrapper.get());
-					Toast.makeText(getApplicationContext(), R.string._toast_deleted, Toast.LENGTH_SHORT).show();
-					finish();
-				}
-			});
-
-			builder.setNegativeButton(android.R.string.no, null);
-			builder.show();
-
+			super.updatePreference(preference, newValue);
+			preference.setSummary(getSummary());
 			return true;
 		}
 
-		return false;
+		private String getSummary()
+		{
+			final Drug drug = (Drug) mWrapper.get();
+			final Fraction currentSupply = (Fraction) getFieldValue();
+
+			if(currentSupply.isZero())
+			{
+				if(drug.getRefillSize() == 0)
+					return mContext.getString(R.string._summary_not_available);
+
+				return "0";
+			}
+
+			if(drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND)
+			{
+				// TODO change?
+				return currentSupply.toString();
+			}
+
+			final int currentSupplyDays = drug.getCurrentSupplyDays();
+			final Date end = DateTime.add(DateTime.todayDate(), Calendar.DAY_OF_MONTH, currentSupplyDays);
+			return mContext.getString(R.string._msg_supply, currentSupply, DateTime.toNativeDate(end));
+		}
 	}
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	private static class FractionAsIntegerPreferenceHelper extends MyDialogPreferenceHelper
 	{
-		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.empty);
-	}
-
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-
-		Intent intent = getIntent();
-		String action = intent.getAction();
-
-		Drug drug = null;
-
-		mWrapper = new DrugWrapper(getApplicationContext());
-
-		if(Intent.ACTION_EDIT.equals(action))
-		{
-			Serializable extra = intent.getSerializableExtra(EXTRA_DRUG);
-			if(extra == null)
-				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG");
-
-			drug = (Drug) extra;
-
-			mWrapper.set(drug);
-			mDrugHash = drug.hashCode();
-			mIsEditing = true;
-
-			setTitle(drug.getName());
-		}
-		else if(Intent.ACTION_INSERT.equals(action))
-			setTitle(R.string._title_add_drug);
-		else
-			throw new IllegalArgumentException("Unhandled action " + action);
-
-		if(drug == null)
-		{
-			mIsEditing = false;
-			mWrapper.set(new Drug());
+		public FractionAsIntegerPreferenceHelper() {
+			// TODO Auto-generated constructor stub
 		}
 
-		getPreferenceScreen().removeAll(); // FIXME this is a hack
-		OTPM.mapToPreferenceScreen(getPreferenceScreen(), mWrapper);
-
-		Preference deletePref = findPreference("delete");
-		if(deletePref != null)
+		@Override
+		public void initPreference(MyDialogPreference preference, Object fieldValue)
 		{
-			if(mIsEditing)
-				deletePref.setOnPreferenceClickListener(this);
-			else if(deletePref != null)
-				getPreferenceScreen().removePreference(deletePref);
+			super.initPreference(preference, new Fraction((Integer) fieldValue));
+			((FractionPreference) preference).disableFractionInputMode(true);
 		}
-		else
-			Log.d(TAG, "No delete preference found");
+
+		@Override
+		public boolean updatePreference(MyDialogPreference preference, Object newPrefValue)
+		{
+			setFieldValue(((Fraction) newPrefValue).intValue());
+			preference.setSummary(newPrefValue.toString());
+			return true;
+		}
 	}
 }
-
-/*
-final int refillSize = mDrug.getRefillSize();
-                final Fraction currentSupply = mDrug.getCurrentSupply();
-                if(currentSupply.compareTo(0) == 0)
-                {
-                        if(refillSize == 0)
-                                mCurrentSupply.setSummary(R.string._summary_not_available);
-                        else
-                                mCurrentSupply.setSummary("0");
-
-                        mCurrentSupply.setValue(Fraction.ZERO);
-                }
-                else
-                {
-                        mCurrentSupply.setSummary(currentSupply.toString());
-                        mCurrentSupply.setValue(currentSupply);
-
-                        if(mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
-                        {
-                                final int currentSupplyDays = mDrug.getCurrentSupplyDays();
-                                if(currentSupplyDays > 0)
-                                {
-                                        Date end = DateTime.add(DateTime.todayDate(), Calendar.DAY_OF_MONTH, currentSupplyDays);
-
-                                        mCurrentSupply.setSummary(getString(R.string._msg_supply,
-                                                        currentSupply.toString(), DateTime.toNativeDate(end)));
-                                }
-                        }
-                }
-
-                if(refillSize == 0)
-                {
-                        mRefillSize.setSummary(R.string._summary_not_available);
-                        mRefillSize.setText("0");
-                }
-                else
-                {
-                        final String refillSizeStr = Integer.toString(mDrug.getRefillSize());
-                        mRefillSize.setSummary(refillSizeStr);
-                        mRefillSize.setText(refillSizeStr);
-                }
-
-                mCurrentSupply.setLongClickSummand(new Fraction(mDrug.getRefillSize()));
-*/

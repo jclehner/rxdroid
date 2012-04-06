@@ -196,7 +196,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		return sdf.format(time);
 	}
 
-	public static DumbTime valueOf(String timeString)
+	public static DumbTime fromString(String timeString)
 	{
 		if(timeString != null)
 		{

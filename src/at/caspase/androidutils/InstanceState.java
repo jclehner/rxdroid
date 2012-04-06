@@ -44,7 +44,7 @@ import android.util.Log;
 public final class InstanceState
 {
 	private static final String TAG = InstanceState.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	/**
 	 * Marks object members whose value should be saved/restored.

@@ -58,6 +58,8 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	protected ObjectWrapper<?> mWrapper;
 	private Field mField;
 
+	public PreferenceHelper() {}
+
 	/**
 	 * Sets an instance's data (used internally).
 	 *
@@ -88,7 +90,7 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	 *
 	 * @return The <code>OnPreferenceChangeListener</code> that will be applied to this helper's <code>Preference</code>.
 	 */
-	public OnPreferenceChangeListener getOnPreferenceChangeListener()
+	public final OnPreferenceChangeListener getOnPreferenceChangeListener()
 	{
 		return new OnPreferenceChangeListener() {
 
