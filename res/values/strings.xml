@@ -55,14 +55,14 @@
 
 	<string name="_toast_deleted">Deleted</string>
 	  
-    <!--  Dialogs: Errors -->    
+     
     <string name="_title_error">Error</string>    
 	
 	<string name="_msg_timepreference_constraint_failed">Time is not within specified bounds.</string>
 	<string name="_msg_err_empty_drug_name">This drug has no name and will be discarded.</string>
 	<string name="_msg_err_non_unique_drug_name">This name is already taken.</string>
     
-    <!--  Dialogs: Warnings -->
+    
 	<string name="_title_warning">Warning</string> 
     
     <string name="_title_preferences">Preferences</string>
@@ -131,7 +131,7 @@
 	<string name="_title_every_n_days">Every N days</string>
 	<string name="_title_pick_days">Pick days</string>
 	
-	<string name="_title_dont_snooze">Alarm once</string>
+	<string name="_title_dont_snooze">Notify once</string>
 	<string name="_title_repeat_alarm">Repeat alarm</string>
 	<string name="_title_snooze">Snooze</string>
 	
