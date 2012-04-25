@@ -114,6 +114,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1332930427" done="1335391436">
+        Allow disabling of the fraction mode button in FractionInput
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1316529642" done="1318944915">
         Implement DoseView long click behaviour: remove intake, mark as taken, change dose, edit drug
         <comment>
@@ -339,11 +345,8 @@
     <note priority="veryhigh" time="1332777147">
         Display GPL on first use
     </note>
-    <note priority="veryhigh" time="1332930427" done="1335391436">
-        Allow disabling of the fraction mode button in FractionInput
-        <comment>
-            done
-        </comment>
+    <note priority="veryhigh" time="1335393449">
+        Show active date by default, not current date.
     </note>
     <note priority="high" time="1324308938">
         Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?
@@ -363,8 +366,11 @@
     <note priority="high" time="1335391425">
         Support per doseTime listing in DrugListActivity
     </note>
-    <note priority="medium" time="1318540605">
-        Somehow, implement an "Every N hours" frequency option
+    <note priority="high" time="1335393421">
+        Remove PopupWindow in IntakeDialog. Move message to area of FractionInput?
+    </note>
+    <note priority="high" time="1335393523">
+        Add some Dialog titles in DrugEditActivity
     </note>
     <note priority="medium" time="1318943892">
         Consider modelling DrugNamePreference's layout after the layout found in the old DrugEditActivty layout
@@ -384,6 +390,9 @@
     <note priority="medium" time="1328223989">
         Allow scrambling of drug names
     </note>
+    <note priority="medium" time="1335393488">
+        If date is current date, clicking it should open the DatePicker!
+    </note>
     <note priority="low" time="1317226248">
         For Version, don't get the revision from strings.xml, as this requires faking a change in the file to update the revision tag.
     </note>
@@ -392,6 +401,9 @@
     </note>
     <note priority="low" time="1317226740">
         Allow moving the app to SD, but display a big fat warning (OK button should only be active after 5 seconds). Also the dialog should be displayed every time until the user checks a checkbox in the dialog.
+    </note>
+    <note priority="low" time="1318540605">
+        Somehow, implement an "Every N hours" frequency option
     </note>
     <note priority="low" time="1320793916">
         use or remove the comment field in Drug

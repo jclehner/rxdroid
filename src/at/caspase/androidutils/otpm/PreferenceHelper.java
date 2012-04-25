@@ -34,6 +34,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceGroup;
 import android.util.Log;
 import at.caspase.androidutils.otpm.OTPM.CreatePreference;
+import at.caspase.rxdroid.Version;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Reflect;
 
@@ -212,6 +213,12 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected final void notifyForwardDependencies(/*Preference preference, Object newPrefValue*/)
 	{
+		if(Version.SDK_IS_PRE_HONEYCOMB)
+		{
+			Log.w(TAG, "notifyForwardDependencies: stub");
+			return;
+		}
+
 		if(mForwardDependencies == null)
 			return;
 

@@ -38,7 +38,7 @@ public final class Version
 	private static final String TAG = Version.class.getName();
 	private static final boolean LOGV = true;
 
-	static final boolean SDK_IS_PRE_HONEYCOMB = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
+	public static final boolean SDK_IS_PRE_HONEYCOMB = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
 
 	/**
 	 * Short format. Example: <code>1.2.3</code>

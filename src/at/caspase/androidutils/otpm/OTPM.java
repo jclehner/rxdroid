@@ -40,6 +40,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+import at.caspase.rxdroid.Version;
 import at.caspase.rxdroid.util.Reflect;
 
 /*
@@ -372,8 +373,11 @@ public class OTPM
 			prefHelpers.get(key).addForwardDependencies(additionalForwardDependencies.get(key));
 		}
 
-		final Bundle hierarchyExtras = root.getExtras();
-		hierarchyExtras.putSerializable(EXTRA_PREF_HELPERS, prefHelpers);
+		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		{
+			final Bundle hierarchyExtras = root.getExtras();
+			hierarchyExtras.putSerializable(EXTRA_PREF_HELPERS, prefHelpers);
+		}
 	}
 
 	private static String getStringParameter(Annotation a, String parameterName, String defaultValue)
