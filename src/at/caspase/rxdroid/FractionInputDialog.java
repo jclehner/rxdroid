@@ -25,7 +25,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.util.Log;
 
 public class FractionInputDialog extends AlertDialog implements OnClickListener, FractionInput.OnChangedListener
 {
@@ -92,7 +91,6 @@ public class FractionInputDialog extends AlertDialog implements OnClickListener,
 	{
 		if(which == BUTTON_POSITIVE)
 		{
-			Log.d(TAG, "onClick: mListener=" + mListener);
 			if(mListener != null)
 				mListener.onFractionSet(this, mValue);
 		}
@@ -102,6 +100,6 @@ public class FractionInputDialog extends AlertDialog implements OnClickListener,
 	public void onFractionChanged(FractionInput widget, Fraction oldValue)
 	{
 		mValue = widget.getValue();
-		Log.d(TAG, "onChanged: value=" + mValue);
+		//Log.d(TAG, "onChanged: value=" + mValue);
 	}
 }

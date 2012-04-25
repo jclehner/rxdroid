@@ -66,7 +66,7 @@ public final class InstanceState
 	 * @param extras Any additional data, can be <code>null</code>.
 	 * @return
 	 */
-	public static Parcelable create(Object object, Parcelable superState, Bundle extras)
+	public static Parcelable createFrom(Object object, Parcelable superState, Bundle extras)
 	{
 		final SavedState myState = new SavedState(superState);
 		myState.extras = extras;
@@ -176,10 +176,8 @@ public final class InstanceState
 
 				try
 				{
-					boolean wasAccessibleFlagChanged = makeAccessible(f);
+					makeAccessible(f);
 					callback.invoke(o, f, mapKey);
-					if(wasAccessibleFlagChanged)
-						f.setAccessible(false);
 				}
 				catch(SecurityException e)
 				{

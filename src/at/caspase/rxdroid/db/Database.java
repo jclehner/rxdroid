@@ -88,8 +88,10 @@ public final class Database
 	private static DatabaseHelper sHelper;
 	private static boolean sIsLoaded = false;
 
-	private static Map<OnChangedListener, Void> sOnChangedListeners =
-			new WeakHashMap<OnChangedListener, Void>();
+	private static boolean sPutNewListenersInQueue = false;
+
+	private static Map<OnChangeListener, Void> sOnChangeListeners = new WeakHashMap<OnChangeListener, Void>();
+	private static Map<OnChangeListener, Void> sOnChangeListenersQueue = new WeakHashMap<OnChangeListener, Void>();
 
 	/**
 	 * Initializes the DB.
@@ -143,9 +145,15 @@ public final class Database
 	 * @see #OnDatabaseChangedListener
 	 * @param listener The listener to register.
 	 */
-	public static synchronized void registerOnChangedListener(OnChangedListener listener)
+	public static synchronized void registerOnChangedListener(OnChangeListener listener)
 	{
-		sOnChangedListeners.put(listener, null);
+		if(!sPutNewListenersInQueue)
+			sOnChangeListeners.put(listener, null);
+		else
+		{
+			sOnChangeListenersQueue.put(listener, null);
+			if(LOGV) Log.v(TAG, "registerOnChangedListener: listener was enqueued");
+		}
 		//if(LOGV) Log.v(TAG, "register: Objects in registry: " + sOnChangedListeners.size());
 	}
 
@@ -155,10 +163,10 @@ public final class Database
 	 * @see #Database.OnDatabaseChangedListener
 	 * @param listener The listener to remove.
 	 */
-	public static synchronized void unregisterOnChangedListener(OnChangedListener listener)
+	public static synchronized void unregisterOnChangedListener(OnChangeListener listener)
 	{
-		sOnChangedListeners.remove(listener);
-		if(LOGV) Log.v(TAG, "unregister: Objects in registry: " + sOnChangedListeners.size());
+		sOnChangeListeners.remove(listener);
+		if(LOGV) Log.v(TAG, "unregister: Objects in registry: " + sOnChangeListeners.size());
 	}
 
 	/**
@@ -477,17 +485,18 @@ public final class Database
 		if((flags & FLAG_DONT_NOTIFY_LISTENERS) != 0)
 			return;
 
-		final Set<OnChangedListener> listeners =
-				Collections.synchronizedSet(sOnChangedListeners.keySet());
+		sPutNewListenersInQueue = true;
+
+		final Set<OnChangeListener> listeners = Collections.synchronizedSet(sOnChangeListeners.keySet());
 
 		synchronized(listeners)
 		{
-			Iterator<OnChangedListener> i = listeners.iterator();
+			Iterator<OnChangeListener> i = listeners.iterator();
 
 			while(i.hasNext())
 			{
 				Exception ex;
-				OnChangedListener l = null;
+				OnChangeListener l = null;
 
 				try
 				{
@@ -528,6 +537,14 @@ public final class Database
 				break;
 			}
 		}
+
+		Log.i(TAG, "dispatchEventToListeners: adding " + sOnChangeListenersQueue.size() + " listeners from queue");
+
+		// FIXME we also need to take care of listeners being removed by other listeners
+
+		sPutNewListenersInQueue = false;
+		sOnChangeListeners.putAll(sOnChangeListenersQueue);
+		sOnChangeListenersQueue.clear();
 	}
 
 	/**
@@ -545,7 +562,7 @@ public final class Database
 	 * @author Joseph Lehner
 	 *
 	 */
-	public interface OnChangedListener
+	public interface OnChangeListener
 	{
 		/**
 		 * Pass this to ignore an event.

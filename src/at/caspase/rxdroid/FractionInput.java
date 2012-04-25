@@ -49,8 +49,7 @@ public class FractionInput extends LinearLayout implements OnClickListener
 	}
 
 	private static final String TAG = FractionInput.class.getName();
-
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	public static final int MODE_INTEGER = 1;
 	public static final int MODE_MIXED = 2;
@@ -251,7 +250,7 @@ public class FractionInput extends LinearLayout implements OnClickListener
 	protected Parcelable onSaveInstanceState()
 	{
 		Parcelable superState = super.onSaveInstanceState();
-		return InstanceState.create(this, superState, null);
+		return InstanceState.createFrom(this, superState, null);
 	}
 
 	@Override
@@ -266,8 +265,6 @@ public class FractionInput extends LinearLayout implements OnClickListener
 
 	private void updateView()
 	{
-		Log.d(TAG, "updateView: mFractionInputMode=" + mFractionInputMode);
-
 		// hide in fraction mode
 		mIntegerPicker.setVisibility(mFractionInputMode == MODE_FRACTION ? GONE : VISIBLE);
 		// hide in integer mode

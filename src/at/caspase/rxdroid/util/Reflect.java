@@ -26,7 +26,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import android.util.Log;
 
 /**
@@ -151,7 +150,7 @@ public final class Reflect
 	}
 
 	public static <T> T newInstance(Class<T> clazz) {
-		return newInstance(clazz, new Class<?>[0]);
+		return newInstance(clazz, EMPTY_CLASS_ARRAY, EMPTY_OBJECT_ARRAY);
 	}
 
 	public static <T> T newInstance(Class<T> clazz, Object... args) {
@@ -249,10 +248,10 @@ public final class Reflect
 			ex = e;
 		}
 
-		if(returnNullOnError)
-			return null;
+		if(!returnNullOnError)
+			throw new IllegalArgumentException("Failed to obtain paramter " + parameterName, ex);
 
-		throw new IllegalArgumentException("Failed to obtain paramter " + parameterName, ex);
+		return null;
 	}
 
 	private static Class<?>[] getTypes(Object[] args)
@@ -271,4 +270,9 @@ public final class Reflect
 	}
 
 	private Reflect() {}
+
+	private static final Class<?>[] EMPTY_CLASS_ARRAY = {};
+	private static final Object[] EMPTY_OBJECT_ARRAY = {};
+
+
 }

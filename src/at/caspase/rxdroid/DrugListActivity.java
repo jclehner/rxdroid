@@ -187,7 +187,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		// FCs that occurs when adding/updating/deleting a drug
 		// in DrugEditActivity (due to DoseView's event handlers
 		// being called)
-		mPager.removeAllViews();
+		//mPager.removeAllViews();
 	}
 
 	@Override
@@ -323,7 +323,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		Drug drug = Drug.get((Integer) view.getTag(TAG_ID));
 		intent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
 
-		startActivityForResult(intent, 0);
+		//startActivityForResult(intent, 0);
+		startActivity(intent);
 	}
 
 	@Override
@@ -791,7 +792,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 	};
 
-	private final Database.OnChangedListener mDatabaseListener = new Database.OnChangedListener() {
+	private final Database.OnChangeListener mDatabaseListener = new Database.OnChangeListener() {
 
 		@Override
 		public void onEntryUpdated(Entry entry, int flags) {}

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+if [[ $# -lt 1 ]]; then
+	FILE=db_$(date +%Y-%m-%d).sqlite
+else
+	FILE="$1"
+fi
+
+adb pull /data/data/at.caspase.rxdroid/databases/db.sqlite "$FILE"
+

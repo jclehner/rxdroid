@@ -1,4 +1,0 @@
-#!/bin/bash
-
-adb pull /data/data/at.caspase.rxdroid/databases/db.sqlite db_$(date +%Y-%m-%d).sqlite
-

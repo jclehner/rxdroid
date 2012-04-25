@@ -21,12 +21,20 @@
 
 package at.caspase.androidutils.otpm;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
+import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
-import at.caspase.androidutils.otpm.OTPM.MapToPreference;
-import at.caspase.androidutils.otpm.OTPM.ObjectWrapper;
+import android.preference.PreferenceGroup;
+import android.util.Log;
+import at.caspase.androidutils.otpm.OTPM.CreatePreference;
+import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Reflect;
 
 /**
@@ -34,43 +42,37 @@ import at.caspase.rxdroid.util.Reflect;
  * <p>
  * Implementations of this class serve two purposes:
  * <ol>
- * <li>Initialize the Preference type specified in a field's {@link MapToPreference} annotation.</li>
+ * <li>Initialize the Preference type specified in a field's {@link CreatePreference} annotation.</li>
  * <li>Update this Preference's state if the value changed (summary, title, etc.).</li>
  * </ol>
  *
  * @author Joseph Lehner
  *
  * @param <P> The Preference type to use (must correspond to the type specified in
- * 	the {@link MapToPreference} annotation).
+ * 	the {@link CreatePreference} annotation).
  * @param <T> The type of the field to map to a Preference.
  */
 public abstract class PreferenceHelper<P extends Preference, T>
 {
 	private static final String TAG = PreferenceHelper.class.getName();
+	private static final boolean LOGV = true;
 
-	/**
-	 * The wrapper around the Object that is being mapped to a PreferenceScreen.
-	 * <p>
-	 * The reason for providing this is that so you can update a Preference's
-	 * state depending on the state of other fields. As a general rule, do not
-	 * use it for anything besides calling {@link ObjectWrapper#get()}.
-	 */
-	protected ObjectWrapper<?> mWrapper;
-	private Field mField;
+	protected Object mObject;
+	protected Field mField;
+
+	//private String[] mSummaryDependencies = null;
+
+	private String mPrefKey = null;
+
+	private WeakReference<PreferenceGroup> mRootPrefGroup = null;
+	//private WeakReference<P> mPreference = null;
+
+	private String[] mAdditionalFields = null;
+	private List<String> mForwardDependencies = null;
+
+	private boolean mAutoUpdateSummaries = true;
 
 	public PreferenceHelper() {}
-
-	/**
-	 * Sets an instance's data (used internally).
-	 *
-	 * @param wrapper The wrapper that is being mapped to a <code>PreferenceScreen</code>.
-	 * @param field The wrapper's field that is being mapped to a <code>Preference</code>.
-	 */
-	/* package */ final void setData(ObjectWrapper<?> wrapper, Field field)
-	{
-		mWrapper = wrapper;
-		mField = field;
-	}
 
 	/**
 	 * Initializes the <code>Preference</code>.
@@ -83,24 +85,14 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	public abstract void initPreference(P preference, T fieldValue);
 
 	/**
-	 * Returns the <code>Preference</code>'s <code>OnPreferenceChangeListener</code>.
+	 * Converts the Preference's value to the field's type.
 	 * <p>
-	 * The default implementation simply calls {@link #updatePreference(Preference, Object)}.
-	 * If using your own listener, make sure you do the same.	 *
-	 *
-	 * @return The <code>OnPreferenceChangeListener</code> that will be applied to this helper's <code>Preference</code>.
+	 * This function must be overridden if the field's type differs from
+	 * the Preference's.
 	 */
-	public final OnPreferenceChangeListener getOnPreferenceChangeListener()
-	{
-		return new OnPreferenceChangeListener() {
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public boolean onPreferenceChange(Preference preference, Object newValue)
-			{
-				return updatePreference((P) preference, newValue);
-			}
-		};
+	@SuppressWarnings("unchecked")
+	public T toFieldType(Object prefValue) {
+		return (T) prefValue;
 	}
 
 	/**
@@ -130,11 +122,17 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	 *
 	 * @returns whether the preference should be updated. Default is <code>true</code>.
 	 */
-	@SuppressWarnings("unchecked")
-	public boolean updatePreference(P preference, Object newValue)
+	public boolean updatePreference(P preference, T newValue)
 	{
-		setFieldValue((T) newValue);
+		setFieldValue(newValue);
 		return true;
+	}
+
+	/**
+	 * Updates the preference's summary.
+	 */
+	public void updateSummary(P preference, T newValue) {
+		preference.setSummary(toString(newValue));
 	}
 
 	/**
@@ -144,17 +142,23 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	 *
 	 * @return <code>false</code> by default.
 	 */
-	public boolean isPreferenceDisabled() {
+	public boolean isPreferenceHidden() {
 		return false;
 	}
 
+	public void onDependencyChange(P preference, String depKey) {
+		if(LOGV) Log.v(TAG, "onDependencyChange: key=" + mPrefKey + ", depKey=" + depKey);
+	}
+
 	protected final void setFieldValue(T value) {
-		Reflect.setFieldValue(mField, mWrapper, value);
+		Reflect.setFieldValue(mField, mObject, value);
 	}
 
 	protected final void setFieldValue(String fieldName, Object value)
 	{
-		final Class<?> clazz = mWrapper.getClass();
+		checkAccessToField(fieldName);
+
+		final Class<?> clazz = mObject.getClass();
 		final Field field;
 
 		try
@@ -166,12 +170,17 @@ public abstract class PreferenceHelper<P extends Preference, T>
 			throw new RuntimeException("No field " + fieldName + " in type " + clazz.getSimpleName());
 		}
 
-		Reflect.setFieldValue(field, mWrapper, value);
+		Reflect.setFieldValue(field, mObject, value);
+
+		//if(isAdditionalField(fieldName))
+		//	notifyForwardDependencies(
 	}
 
 	protected final Object getFieldValue(String fieldName)
 	{
-		final Class<?> clazz = mWrapper.getClass();
+		checkAccessToField(fieldName);
+
+		final Class<?> clazz = mObject.getClass();
 		final Field field;
 
 		try
@@ -183,22 +192,156 @@ public abstract class PreferenceHelper<P extends Preference, T>
 			throw new RuntimeException(e);
 		}
 
-		return Reflect.getFieldValue(field, mWrapper);
+		return Reflect.getFieldValue(field, mObject);
 	}
 
 	@SuppressWarnings("unchecked")
 	protected final T getFieldValue() {
-		return (T) Reflect.getFieldValue(mField, mWrapper);
+		return (T) Reflect.getFieldValue(mField, mObject);
+	}
+
+	/*protected final P getPreference()
+	{
+		final P preference = mPreference.get();
+		if(preference == null)
+			throw new IllegalStateException("Preference is no longer available");
+
+		return preference;
+	}*/
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected final void notifyForwardDependencies(/*Preference preference, Object newPrefValue*/)
+	{
+		if(mForwardDependencies == null)
+			return;
+
+		final PreferenceGroup root = mRootPrefGroup.get();
+		if(root != null)
+		{
+			final Bundle extras = root.getExtras();
+			final Map<String, PreferenceHelper> prefHelpers =
+					(Map<String, PreferenceHelper>) extras.getSerializable(OTPM.EXTRA_PREF_HELPERS);
+
+			for(String key : mForwardDependencies)
+			{
+				final Preference p = root.findPreference(key);
+				final PreferenceHelper ph = prefHelpers.get(key);
+
+				if(p == null || ph == null)
+				{
+					Log.w(TAG, "No preference or associated helper for key=" + key);
+					continue;
+				}
+
+				//ph.updateSummary(p, ph.getFieldValue());
+				//ph.onDependencyChange(p, preference.getKey(), newPrefValue);
+				ph.onDependencyChange(p, mPrefKey);
+			}
+		}
+		else
+			Log.w(TAG, "notifyForwardDependencies: Root preference was destroyed, cannot notify dependencies");
+	}
+
+	/* package */ final OnPreferenceChangeListener getOnPreferenceChangeListener()
+	{
+		return new OnPreferenceChangeListener() {
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newPrefValue)
+			{
+				if(LOGV) Log.v(TAG, "onPreferenceChange: key=" + preference.getKey() + ", value=" + newPrefValue);
+
+				final T newValue = toFieldType(newPrefValue);
+				final boolean doChange = updatePreference((P) preference, newValue);
+				if(mAutoUpdateSummaries)
+					updateSummary((P) preference, newValue);
+				else if(LOGV)
+					Log.v(TAG, "Not updating summary of " + preference.getKey());
+
+				if(doChange)
+					notifyForwardDependencies();
+
+				return doChange;
+			}
+		};
+	}
+
+	/* package */ final void initPreferenceInternal(P preference, T fieldValue)
+	{
+		initPreference(preference, fieldValue);
+		if(mAutoUpdateSummaries)
+			updateSummary(preference, fieldValue);
+		mPrefKey = preference.getKey();
 	}
 
 	/**
-	 * Returns the summary, as specified in {@link MapToPreference}.
+	 * Sets an instance's data (used internally).
 	 *
-	 * @return The preference summary.
+	 * @param wrapper The wrapper that is being mapped to a <code>PreferenceScreen</code>.
+	 * @param field The wrapper's field that is being mapped to a <code>Preference</code>.
 	 */
-	/*protected final String getSummary()
+	/* package */ final void setData(Object object, Field field)
 	{
-		Annotation a = mField.getAnnotation(MapToPreference.class);
-		return Reflect.getAnnotationParameter(a, "summary");
+		mObject = object;
+		mField = field;
+	}
+
+	/* package */ final void setForwardDependencies(String[] dependencies) {
+		mForwardDependencies = Arrays.asList(dependencies);
+	}
+
+	/* package */ final void addForwardDependencies(List<String> dependencies)
+	{
+		if(mForwardDependencies == null)
+			mForwardDependencies = new ArrayList<String>(dependencies);
+		else
+			mForwardDependencies.addAll(dependencies);
+	}
+
+	/* package */ final void setAdditionalFields(String[] fieldNames) {
+		mAdditionalFields = fieldNames;
+	}
+
+	/* package */ final void enableSummaryUpdates(boolean enabled) {
+		mAutoUpdateSummaries = enabled;
+	}
+
+	/* package */ final void setRootPreferenceGroup(PreferenceGroup root) {
+		mRootPrefGroup = new WeakReference<PreferenceGroup>(root);
+	}
+
+	private void checkAccessToField(String fieldName)
+	{
+		if(fieldName.equals(mField.getName()) || isAdditionalField(fieldName))
+			return;
+
+		// XXX this might be changed to throwing an exception in the future
+		Log.w(TAG, "Undeclared access to field " + fieldName + " from PreferenceHelper of field " + mField.getName());
+	}
+
+	private boolean isAdditionalField(String fieldName)
+	{
+		if(mAdditionalFields == null)
+			return false;
+
+		return CollectionUtils.indexOf(fieldName, mAdditionalFields) != -1;
+	}
+
+	/*private PreferenceGroup getRootPreferenceGroup()
+	{
+		final PreferenceGroup pg = mRootPrefGroup.get();
+		if(pg == null)
+			throw new IllegalStateException("Root PreferenceGroup is not available");
+
+		return pg;
 	}*/
+
+	private static String toString(Object o)
+	{
+		if(o == null)
+			return "null";
+
+		return o.toString();
+	}
 }

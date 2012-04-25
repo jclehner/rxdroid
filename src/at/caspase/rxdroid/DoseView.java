@@ -29,13 +29,14 @@ import android.content.Context;
 import android.text.SpannableStringBuilder;
 import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import at.caspase.rxdroid.db.Database;
-import at.caspase.rxdroid.db.Database.OnChangedListener;
+import at.caspase.rxdroid.db.Database.OnChangeListener;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
@@ -48,10 +49,11 @@ import at.caspase.rxdroid.util.DateTime;
  *
  * @author Joseph Lehner
  */
-public class DoseView extends FrameLayout implements OnChangedListener
+public class DoseView extends FrameLayout implements OnChangeListener
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = DoseView.class.getName();
+	private static final boolean LOGV = true;
 
 	public static final int STATUS_INDETERMINATE = 0;
 	public static final int STATUS_TAKEN = 1;
@@ -182,6 +184,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			mDose.add(intake.getDose());
 
 		mIntakeCount = intakes.size();
+		//if(LOGV) Log.v(TAG, "setDoseFromDrugAndDate: drug=" + drug + ", mIntakeCount=" + mIntakeCount);
 
 		updateView();
 	}
@@ -232,6 +235,9 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			{
 				mDose.add(intake.getDose());
 				++mIntakeCount;
+
+				if(LOGV) Log.v(TAG, "onEntryCreated: mIntakeCount=" + mIntakeCount + ", entry=" + entry);
+
 				updateView();
 			}
 		}
@@ -294,33 +300,13 @@ public class DoseView extends FrameLayout implements OnChangedListener
 
 	private void updateView()
 	{
-		//if(mDrug == null)
-		//	return;
-		//
-		//final Fraction actualDose;
-		//if(mDate == null || mCumulativeDose == null || mCumulativeDose.isZero())
-		//	actualDose = getDose();
-		//else if(!mCumulativeDose.isZero())
-		//	actualDose = mCumulativeDose;
-		//else
-		//	actualDose = null;
-
-		if(mDrug != null)
-		{
-			if(mDose.isZero())
-			{
-				if(mIntakeCount != 0)
-					markAsIgnored();
-			}
-			else
-				markAsTaken();
-		}
-
 		if(mDrug != null)
 		{
 			if(!mDose.isZero())
 			{
-				Fraction scheduledDose = mDrug.getDose(mDoseTime, mDate);
+				markAsTaken();
+
+				final Fraction scheduledDose = mDrug.getDose(mDoseTime, mDate);
 				int cmp = mDose.compareTo(scheduledDose);
 				String suffix;
 
@@ -352,14 +338,19 @@ public class DoseView extends FrameLayout implements OnChangedListener
 				Fraction dose = mDrug.getDose(mDoseTime, mDate);
 				mDoseText.setText(dose.toString());
 
-				if(!dose.isZero() && mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
+				if(mIntakeCount == 0)
 				{
-					int offset = (int) Settings.instance().getTrueDoseTimeEndOffset(mDoseTime);
-					Date end = DateTime.add(mDate, Calendar.MILLISECOND, offset);
+					if(!dose.isZero() && mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
+					{
+						int offset = (int) Settings.instance().getTrueDoseTimeEndOffset(mDoseTime);
+						Date end = DateTime.add(mDate, Calendar.MILLISECOND, offset);
 
-					if(DateTime.nowDate().after(end))
-						markAsForgotten();
+						if(DateTime.nowDate().after(end))
+							markAsForgotten();
+					}
 				}
+				else
+					markAsIgnored();
 			}
 
 		}
@@ -367,7 +358,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			mDoseText.setText(mDose.toString());
 	}
 
-	private void updateIntakeStatusIcon()
+	/*private void updateIntakeStatusIcon()
 	{
 		if(mDate == null || mDrug == null)
 			return;
@@ -399,7 +390,7 @@ public class DoseView extends FrameLayout implements OnChangedListener
 			mIntakeStatus.setImageResource(R.drawable.ic_dose_forgotten);
 		else
 			mIntakeStatus.setImageDrawable(null);
-	}
+	}*/
 
 	private void markAsTaken()
 	{

@@ -30,11 +30,11 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Database;
-import at.caspase.rxdroid.db.Database.OnChangedListener;
+import at.caspase.rxdroid.db.Database.OnChangeListener;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 
-public class NotificationService extends Service implements OnChangedListener, OnSharedPreferenceChangeListener
+public class NotificationService extends Service implements OnChangeListener, OnSharedPreferenceChangeListener
 {
 	private static final String TAG = NotificationService.class.getName();
 

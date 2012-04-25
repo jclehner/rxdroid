@@ -72,7 +72,7 @@ public class StateSaverTest extends AndroidTestCase
 		{
 			Log.v(getClass().getName(), "onSaveInstanceState");
 			Parcelable superState = new Bundle();
-			return InstanceState.create(this, superState, null);
+			return InstanceState.createFrom(this, superState, null);
 		}
 
 		@Override
@@ -93,7 +93,7 @@ public class StateSaverTest extends AndroidTestCase
 		{
 			Log.v(getClass().getName(), "onSaveInstanceState");
 			Parcelable superState = super.onSaveInstanceState();
-			return InstanceState.create(this, superState, null);
+			return InstanceState.createFrom(this, superState, null);
 		}
 
 		@Override

@@ -229,9 +229,12 @@ public class TimePreference extends MyDialogPreference<DumbTime>
 		final DumbTime after = getConstraint(IDX_AFTER);
 		final DumbTime before = getConstraint(IDX_BEFORE);
 
-		Log.d(TAG, "isTimeWithinConstraints: key=" + getKey() + ", time=" + time);
-		Log.d(TAG, "  after=" + after);
-		Log.d(TAG, "  before=" + before);
+		if(LOGV)
+		{
+			Log.v(TAG, "isTimeWithinConstraints: key=" + getKey() + ", time=" + time);
+			Log.v(TAG, "  after=" + after);
+			Log.v(TAG, "  before=" + before);
+		}
 
 		if(after != null && before != null)
 		{
@@ -272,7 +275,7 @@ public class TimePreference extends MyDialogPreference<DumbTime>
 		public void onTimeChanged(TimePicker view, int hourOfDay, int minute)
 		{
 			mDialogTime = new DumbTime(hourOfDay, minute);
-			Log.d(TAG, "onTimeChanged: " + mDialogTime);
+			if(LOGV) Log.v(TAG, "onTimeChanged: " + mDialogTime);
 			if(mSetButton != null)
 				mSetButton.setEnabled(isTimeWithinConstraints(mDialogTime));
 		}

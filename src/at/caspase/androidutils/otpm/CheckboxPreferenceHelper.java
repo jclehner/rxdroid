@@ -23,8 +23,7 @@ package at.caspase.androidutils.otpm;
 
 import android.preference.CheckBoxPreference;
 
-public class CheckboxPreferenceHelper extends
-		PreferenceHelper<android.preference.CheckBoxPreference, Boolean>
+public class CheckboxPreferenceHelper extends PreferenceHelper<CheckBoxPreference, Boolean>
 {
 	@Override
 	public void initPreference(CheckBoxPreference preference, Boolean fieldValue)

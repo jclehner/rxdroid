@@ -23,6 +23,7 @@ package at.caspase.androidutils.otpm;
 
 import at.caspase.androidutils.MyDialogPreference;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class MyDialogPreferenceHelper extends PreferenceHelper<MyDialogPreference, Object>
 {
 	@Override
@@ -31,12 +32,4 @@ public class MyDialogPreferenceHelper extends PreferenceHelper<MyDialogPreferenc
 		preference.setValue(fieldValue);
 		//preference.setSummary(fieldValue.toString());
 	}
-
-	@Override
-	public boolean updatePreference(MyDialogPreference preference, Object newPrefValue)
-	{
-		setFieldValue(newPrefValue);
-		return true;
-	}
-
 }

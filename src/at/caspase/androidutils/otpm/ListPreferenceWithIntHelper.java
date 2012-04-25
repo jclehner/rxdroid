@@ -2,7 +2,6 @@ package at.caspase.androidutils.otpm;
 
 import android.content.Context;
 import android.preference.ListPreference;
-import android.util.Log;
 import at.caspase.rxdroid.util.Util;
 /**
  * Copyright (C) 2012 Joseph Lehner <joseph.c.lehner@gmail.com>
@@ -51,13 +50,13 @@ public class ListPreferenceWithIntHelper extends PreferenceHelper<ListPreference
 	}
 
 	@Override
-	public boolean updatePreference(ListPreference preference, Object newPrefValue)
-	{
-		Log.d("XXXXXXX", "(" + newPrefValue.getClass().getSimpleName() + ") = " + newPrefValue);
+	public Integer toFieldType(Object prefValue) {
+		return Integer.valueOf((String) prefValue, 10);
+	}
 
-		Integer index = Integer.valueOf((String) newPrefValue, 10);
-		setFieldValue(index);
-		preference.setSummary(mEntries[index]);
-		return true;
+	@Override
+	public void updateSummary(ListPreference preference, Integer newValue)
+	{
+		preference.setSummary(mEntries[newValue]);
 	}
 }

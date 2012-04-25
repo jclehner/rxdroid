@@ -38,8 +38,10 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceScreen;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -54,8 +56,7 @@ import at.caspase.androidutils.otpm.ListPreferenceWithIntHelper;
 import at.caspase.androidutils.otpm.MyDialogPreferenceHelper;
 import at.caspase.androidutils.otpm.OTPM;
 import at.caspase.androidutils.otpm.OTPM.AddPreference;
-import at.caspase.androidutils.otpm.OTPM.MapToPreference;
-import at.caspase.androidutils.otpm.OTPM.ObjectWrapper;
+import at.caspase.androidutils.otpm.OTPM.CreatePreference;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Schedule;
@@ -82,13 +83,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	private static final String TAG = DrugEditActivity.class.getName();
 	private static final boolean LOGV = true;
 
-
-
 	private DrugWrapper mWrapper;
 	private int mDrugHash;
 
 	// if true, we're editing an existing drug; if false, we're adding a new one
 	private boolean mIsEditing;
+
+	private boolean mFocusOnCurrentSupply = false;
 
 	@Override
 	public void onBackPressed()
@@ -194,8 +195,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		//requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.empty);
+
+		// FIXME just a quick'n dirty fix
+		getPreferenceScreen().setKey(TAG + ".root");
 	}
 
 	@Override
@@ -222,6 +228,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mDrugHash = drug.hashCode();
 			mIsEditing = true;
 
+			if(intent.getBooleanExtra(EXTRA_FOCUS_ON_CURRENT_SUPPLY, false))
+				mFocusOnCurrentSupply = true;
+
 			setTitle(drug.getName());
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
@@ -235,8 +244,23 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mWrapper.set(new Drug());
 		}
 
-		getPreferenceScreen().removeAll(); // FIXME this is a hack
-		OTPM.mapToPreferenceScreen(getPreferenceScreen(), mWrapper);
+		OTPM.mapToPreferenceHierarchy(getPreferenceScreen(), mWrapper);
+		getPreferenceScreen().setOnPreferenceChangeListener(mListener);
+
+		if(mFocusOnCurrentSupply)
+		{
+			Log.i(TAG, "Will focus on current supply preference");
+
+			final PreferenceScreen ps = getPreferenceScreen();
+			final Preference p = ps.findPreference("currentSupply");
+			if(p != null)
+			{
+				final int index = p.getOrder();
+				ps.onItemClick(null, null, index, 0);
+			}
+			else
+				Log.w(TAG, "Couldn't focus on current supply preference");
+		}
 
 		Preference deletePref = findPreference("delete");
 		if(deletePref != null)
@@ -246,13 +270,11 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			else if(deletePref != null)
 				getPreferenceScreen().removePreference(deletePref);
 		}
-		else
-			Log.d(TAG, "No delete preference found");
 	}
 
-	private static class DrugWrapper extends ObjectWrapper<Drug>
+	private static class DrugWrapper
 	{
-		@MapToPreference
+		@CreatePreference
 		(
 			titleResId = R.string._title_drug_name,
 			order = 1,
@@ -264,7 +286,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		@AddPreference(order = 2)
 		private final Preference mDeletePreference;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			//title = "Morning",
 			titleResId = R.string._Morning,
@@ -277,7 +299,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		)
 		private Fraction doseMorning;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			//title = "Noon",
 			titleResId = R.string._Noon,
@@ -288,7 +310,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		)
 		private Fraction doseNoon;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			//title = "Evening",
 			titleResId = R.string._Evening,
@@ -299,7 +321,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		)
 		private Fraction doseEvening;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			//title = "Night",
 			titleResId = R.string._Night,
@@ -311,17 +333,18 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		)
 		private Fraction doseNight;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			//title = "Repeat mode",
 			titleResId = R.string._title_repeat,
 			order = 7,
 			type = ListPreference.class,
-			helper = RepeatModePreferenceHelper.class
+			helper = RepeatModePreferenceHelper.class,
+			additionalFieldNames = { "repeatArg", "repeatOrigin" }
 		)
 		private int repeat;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			titleResId = R.string._title_icon,
 			categoryResId = R.string._title_misc,
@@ -331,7 +354,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		)
 		private int form;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			titleResId = R.string._title_refill_size,
 			order = 10,
@@ -340,18 +363,20 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		)
 		private int refillSize;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			titleResId = R.string._title_current_supply,
 			order = 11,
 			type = FractionPreference.class,
-			helper = CurrentSupplyPreferenceHelper.class
+			helper = CurrentSupplyPreferenceHelper.class,
+			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat", "repeatArg", "repeatOrigin" }
 		)
 		private Fraction currentSupply;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			titleResId = R.string._title_active,
+			summary = "",
 			//endActiveCategory = true,
 			order = 12,
 			type = CheckBoxPreference.class,
@@ -374,7 +399,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			mDeletePreference.setTitle(context.getString(R.string._title_delete));
 		}
 
-		@Override
 		public void set(Drug drug)
 		{
 			id = drug.getId();
@@ -396,7 +420,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			form = drug.getForm();
 		}
 
-		@Override
 		public Drug get()
 		{
 			Drug drug = new Drug();
@@ -408,6 +431,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			drug.setCurrentSupply(currentSupply);
 			drug.setRefillSize(refillSize);
 			drug.setRepeat(repeat);
+			drug.setSortRank(sortRank);
+			drug.setSchedule(schedule);
 
 			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };
 
@@ -426,6 +451,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		private ListPreference mPref;
 		private Context mCtx;
 
+		@SuppressWarnings("unused")
 		public RepeatModePreferenceHelper() {
 			super(GlobalContext.get(), R.array.drug_repeat);
 		}
@@ -444,10 +470,16 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		@Override
-		public boolean updatePreference(ListPreference preference, Object newPrefValue)
+		public Integer toFieldType(Object prefValue) {
+			return Integer.valueOf((String) prefValue, 10);
+		}
+
+		@Override
+		public boolean updatePreference(ListPreference preference, Integer newValue)
 		{
-			final int mode = Integer.parseInt((String) newPrefValue, 10);
-			switch(mode)
+			//preference.n
+
+			switch(newValue)
 			{
 				case Drug.REPEAT_EVERY_N_DAYS:
 					handleEveryNDaysRepeatMode();
@@ -458,19 +490,36 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					return false;
 
 				case Drug.REPEAT_DAILY:
-					mPref.setSummary(R.string._title_daily);
-					break;
-
 				case Drug.REPEAT_ON_DEMAND:
-					mPref.setSummary(R.string._title_on_demand);
-					break;
+					return super.updatePreference(preference, newValue);
 
 				default:
 					Toast.makeText(mCtx, "Not implemented", Toast.LENGTH_LONG).show();
 					return false;
 			}
+		}
 
-			return super.updatePreference(preference, newPrefValue);
+		@Override
+		public void updateSummary(ListPreference preference, Integer newValue)
+		{
+			switch(newValue)
+			{
+				case Drug.REPEAT_DAILY:
+					preference.setSummary(R.string._title_daily);
+					break;
+
+				case Drug.REPEAT_ON_DEMAND:
+					preference.setSummary(R.string._title_on_demand);
+					break;
+
+				case Drug.REPEAT_EVERY_N_DAYS:
+				case Drug.REPEAT_WEEKDAYS:
+					// summary is updated from the handle<repeat mode>() functions
+					break;
+
+				default:
+					super.updateSummary(preference, newValue);
+			}
 		}
 
 		private void handleEveryNDaysRepeatMode()
@@ -511,6 +560,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					setFieldValue("repeatArg", repeatArg);
 
 					updateSummary();
+					notifyForwardDependencies();
 				}
 			};
 
@@ -617,6 +667,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					setFieldValue("repeatArg", bitset.longValue());
 
 					updateSummary();
+					notifyForwardDependencies();
 				}
 			});
 
@@ -671,10 +722,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private static class CurrentSupplyPreferenceHelper extends MyDialogPreferenceHelper
 	{
 		private Context mContext;
+		private Object mValue;
 
+		@SuppressWarnings({ "unused" })
 		public CurrentSupplyPreferenceHelper() {
 			// TODO Auto-generated constructor stub
 		}
@@ -684,22 +738,33 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		{
 			super.initPreference(preference, fieldValue);
 			mContext = preference.getContext().getApplicationContext();
-			preference.setSummary(getSummary());
-			//preference.setDependency("repeat");
 		}
 
 		@Override
 		public boolean updatePreference(MyDialogPreference preference, Object newValue)
 		{
 			super.updatePreference(preference, newValue);
-			preference.setSummary(getSummary());
+			//preference.setSummary(getSummary());
+			//preference.notifyDependencyChange(false);
 			return true;
 		}
 
-		private String getSummary()
+		@Override
+		public void updateSummary(MyDialogPreference preference, Object newValue)
 		{
-			final Drug drug = (Drug) mWrapper.get();
-			final Fraction currentSupply = (Fraction) getFieldValue();
+			preference.setSummary(getSummary(newValue));
+			mValue = newValue;
+		}
+
+		@Override
+		public void onDependencyChange(MyDialogPreference preference, String depKey) {
+			preference.setSummary(getSummary(mValue));
+		}
+
+		private String getSummary(Object value)
+		{
+			final Drug drug = ((DrugWrapper) mObject).get();
+			final Fraction currentSupply = (Fraction) value;
 
 			if(currentSupply.isZero())
 			{
@@ -715,14 +780,16 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				return currentSupply.toString();
 			}
 
-			final int currentSupplyDays = drug.getCurrentSupplyDays();
+			final int currentSupplyDays = Math.max(drug.getCurrentSupplyDays(), 0);
 			final Date end = DateTime.add(DateTime.todayDate(), Calendar.DAY_OF_MONTH, currentSupplyDays);
 			return mContext.getString(R.string._msg_supply, currentSupply, DateTime.toNativeDate(end));
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private static class FractionAsIntegerPreferenceHelper extends MyDialogPreferenceHelper
 	{
+		@SuppressWarnings("unused")
 		public FractionAsIntegerPreferenceHelper() {
 			// TODO Auto-generated constructor stub
 		}
@@ -742,4 +809,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			return true;
 		}
 	}
+
+	private final OnPreferenceChangeListener mListener = new OnPreferenceChangeListener() {
+
+		@Override
+		public boolean onPreferenceChange(Preference preference, Object newValue)
+		{
+			Log.v(TAG, "onPreferenceChange: " + preference.getKey() + " => " + newValue);
+			return false;
+		}
+	};
 }

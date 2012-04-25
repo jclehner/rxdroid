@@ -14,8 +14,7 @@ import at.caspase.androidutils.otpm.CheckboxPreferenceHelper;
 import at.caspase.androidutils.otpm.ListPreferenceWithIntHelper;
 import at.caspase.androidutils.otpm.MyDialogPreferenceHelper;
 import at.caspase.androidutils.otpm.OTPM;
-import at.caspase.androidutils.otpm.OTPM.MapToPreference;
-import at.caspase.androidutils.otpm.OTPM.ObjectWrapper;
+import at.caspase.androidutils.otpm.OTPM.CreatePreference;
 import at.caspase.rxdroid.preferences.DosePreference;
 import at.caspase.rxdroid.preferences.DrugNamePreference2;
 import at.caspase.rxdroid.Fraction;
@@ -45,13 +44,13 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 
 
 	@SuppressWarnings("unused")
-	public static class DrugWrapper extends ObjectWrapper<Drug>
+	public static class DrugWrapper
 	{
 		//private Drug mDrug;
 
 		private int id;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			title = "Drug name",
 			order = 1,
@@ -60,7 +59,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		)
 		private String name;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			title = "Form",
 			order = 2,
@@ -73,7 +72,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 
 		private Fraction currentSupply;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			//title = "Morning",
 			titleResId = R.string._Morning,
@@ -86,7 +85,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		)
 		private Fraction doseMorning;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			//title = "Noon",
 			titleResId = R.string._Noon,
@@ -97,7 +96,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		)
 		private Fraction doseNoon;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			//title = "Evening",
 			titleResId = R.string._Evening,
@@ -108,7 +107,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		)
 		private Fraction doseEvening;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			//title = "Night",
 			titleResId = R.string._Night,
@@ -120,7 +119,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		)
 		private Fraction doseNight;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			//title = "Repeat mode",
 			titleResId = R.string._title_repeat,
@@ -130,7 +129,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		)
 		private int repeat;
 
-		@MapToPreference
+		@CreatePreference
 		(
 			//title = "Active",
 			titleResId = R.string._title_active,
@@ -158,7 +157,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 
 
 
-		@Override
+		//@Override
 		public void set(Drug drug)
 		{
 			id = drug.getId();
@@ -180,7 +179,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 			form = drug.getForm();
 		}
 
-		@Override
+		//@Override
 		public Drug get()
 		{
 			Drug drug = new Drug();
@@ -209,7 +208,8 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		mWrapper.set(drug);
 
 		addPreferencesFromResource(R.xml.empty);
-		OTPM.mapToPreferenceScreen(getPreferenceScreen(), mWrapper);
+		//OTPM.mapToPreferenceScreen(getPreferenceScreen(), mWrapper);
+		OTPM.mapToPreferenceHierarchy(getPreferenceScreen(), mWrapper);
 	}
 
 	@Override

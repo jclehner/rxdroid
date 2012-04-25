@@ -21,19 +21,20 @@
 
 package at.caspase.androidutils.otpm;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
 import android.content.Context;
+import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
@@ -61,12 +62,14 @@ public class OTPM
 	private static final String TAG = OTPM.class.getName();
 	private static final boolean LOGV = false;
 
-	public static final String EMPTY = "";
+	/* package */ static final String EXTRA_PREF_HELPERS = TAG + ".EXTRA_PREF_HELPERS";
+
+	private static final String UNDEFINED = "<!!!UNDEFINED!!!>";
 	public static final String CLOSE_GROUP = TAG + "close_group";
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
-	public @interface MapToPreference
+	public @interface CreatePreference
 	{
 		/**
 		 * The preference type to use for this field.
@@ -84,14 +87,14 @@ public class OTPM
 		/**
 		 * The preference key (defaults to the field name).
 		 */
-		String key() default EMPTY;
+		String key() default UNDEFINED;
 
 		/**
 		 * The preference title.
 		 * <p>
 		 * Note that some implementations of {@link PreferenceHelper} ignore this.
 		 */
-		String title() default EMPTY;
+		String title() default UNDEFINED;
 
 		/**
 		 * The preference title.
@@ -105,7 +108,7 @@ public class OTPM
 		 * <p>
 		 * Note that some implementations of {@link PreferenceHelper} ignore this.
 		 */
-		String summary() default EMPTY;
+		String summary() default UNDEFINED;
 
 		/**
 		 * The preference's summary.
@@ -119,7 +122,7 @@ public class OTPM
 		 * <p>
 		 * Note that the title also serves as this category's key.
 		 */
-		String category() default EMPTY;
+		String category() default UNDEFINED;
 
 		/**
 		 * Starts a new preference category with the given title.
@@ -133,7 +136,32 @@ public class OTPM
 		 * <p>
 		 * Note that this will default to the preference's title if not specified.
 		 */
-		String categoryKey() default EMPTY;
+		String categoryKey() default UNDEFINED;
+
+		/**
+		 * A list of preference keys acting as forward dependencies.
+		 * <p>
+		 * Forward dependencies are dependencies that are notified if
+		 * this preference is updated.
+		 */
+		String[] forwardDependencies() default {};
+
+		/**
+		 * A list of preference keys acting as reverse dependencies.
+		 * <p>
+		 * Reverse dependencies are Preferences that this Preference
+		 * will depend on. Thus if a preference in this list is updated,
+		 * this preference is notified of a change.
+		 */
+		String[] reverseDependencies() default {};
+
+		/**
+		 * A list of field names belonging to this preference.
+		 * <p>
+		 * If a Preference stores its value in more than one fields, the
+		 * other fields' names should be specified here.
+		 */
+		String[] additionalFieldNames() default {};
 
 		/**
 		 * Ends a preference category, if one was active.
@@ -151,10 +179,12 @@ public class OTPM
 		/**
 		 * The order of this preference within the parent {@link PreferenceScreen}.
 		 * <p>
-		 * Note that the preference's may appear in no particular order if you do not
-		 * explicitly set this property.
+		 * Note that the preferences may appear in no particular order if you do not
+		 * explicitly set this.
 		 */
 		int order() default 0;
+
+		//boolean persistent() default false;
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -170,87 +200,64 @@ public class OTPM
 		int order() default 0;
 	};
 
-	public static abstract class ObjectWrapper<T> implements Serializable
+	public static void mapToPreferenceHierarchy(PreferenceGroup root, Object object)
 	{
-		private static final long serialVersionUID = -4236965614902518944L;
+		final List<PrefInfo> prefInfoList = initializePreferenceHierarchy(root, object);
+		initializePreferences(root, object, prefInfoList);
+	}
 
-		public abstract void set(T value);
+	private static class PrefInfo
+	{
+		String key;
+		Annotation annotation;
+		Field field;
 
-		public abstract T get();
-
-		@Override
-		public final boolean equals(Object other) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public final int hashCode() {
-			throw new UnsupportedOperationException();
+		PrefInfo(String key, Annotation annotation, Field field)
+		{
+			this.key = key;
+			this.annotation = annotation;
+			this.field = field;
 		}
 	}
 
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static void mapToPreferenceScreen(PreferenceScreen prefScreen, ObjectWrapper<?> wrapper)
+	private static List<PrefInfo> initializePreferenceHierarchy(PreferenceGroup root, Object object)
 	{
-		if(prefScreen == null)
-			throw new NullPointerException("prefScreen");
-
-		if(wrapper == null)
-			throw new NullPointerException("wrapper");
-
-		final Context context = prefScreen.getContext();
+		final ArrayList<PrefInfo> prefInfoList = new ArrayList<PrefInfo>();
+		final Context context = root.getContext();
 		PreferenceGroup prefCat = null;
 
-		prefScreen.setOrderingAsAdded(true);
+		final String hierarchyKey = root.getKey();
+		if(hierarchyKey == null)
+			throw new IllegalStateException("The root PreferenceGroup must have a key");
 
-		if(LOGV) Log.v(TAG, "mapToPreferenceScreen");
-
-		for(Field field : getDeclaredAnnotatedFields(wrapper.getClass()))
+		for(Field field : getDeclaredAnnotatedFields(object.getClass()))
 		{
 			if(field.isAnnotationPresent(AddPreference.class))
 			{
-				prefScreen.addPreference((Preference) Reflect.getFieldValue(field, wrapper));
+				root.addPreference((Preference) Reflect.getFieldValue(field, object));
 				continue;
 			}
 
-			if(LOGV) Log.v(TAG, "  " + field.getName());
-
-			final String fieldName = field.getName();
-			final Annotation a = field.getAnnotation(MapToPreference.class);
-
-			final Class<? extends PreferenceHelper> prefHlpClazz = Reflect.getAnnotationParameter(a, "helper");
+			final Annotation a = field.getAnnotation(CreatePreference.class);
 			final Class<? extends Preference> prefClazz = Reflect.getAnnotationParameter(a, "type");
+			final String key = getStringParameter(a, "key", field.getName());
 
-			final PreferenceHelper prefHlp = Reflect.newInstance(prefHlpClazz);
-			prefHlp.setData(wrapper, field);
+			if(key.equals(hierarchyKey))
+				throw new IllegalStateException("Attempted to override root PreferenceGroup, key=" + key);
 
-			if(prefHlp.isPreferenceDisabled())
-				continue;
+			prefInfoList.add(new PrefInfo(key, a, field));
 
-			String key = Reflect.getAnnotationParameter(a, "key");
-			if(key == null || EMPTY.equals(key))
-				key = fieldName;
-
-			Preference pref = prefScreen.findPreference(key);
-			if(pref == null)
+			if(root.findPreference(key) != null)
 			{
-				pref = Reflect.newInstance(prefClazz, new Class<?>[] { Context.class }, context);
-				pref.setKey(key);
+				if(LOGV) Log.v(TAG, "fillPreferenceHierarchy: key=" + key + " exists");
+				continue;
 			}
 
-			// set the title before calling initPreference()
-			pref.setTitle(getStringResourceParameter(context, a, "title"));
-			pref.setSummary(getStringResourceParameter(context, a, "summary"));
-
-			prefHlp.initPreference(pref, Reflect.getFieldValue(field, wrapper));
-
-			final CharSequence title = pref.getTitle();
-			if(title == null || EMPTY.equals(title))
-				throw new IllegalStateException(prefHlpClazz.getSimpleName() + " requires you to explicitly set a title for key=" + pref.getKey());
-
-			pref.setPersistent(false);
-			pref.setOnPreferenceChangeListener(prefHlp.getOnPreferenceChangeListener());
+			final Preference p = Reflect.newInstance(prefClazz, new Class<?>[] { Context.class }, context);
+			//final Preference p = Reflect.newInstance(prefClazz, context);
+			p.setTitle(getStringResourceParameter(context, a, "title"));
+			p.setPersistent(false);
+			p.setKey(key);
 
 			String categoryTitle = getStringResourceParameter(context, a, "category");
 			if(categoryTitle != null)
@@ -259,21 +266,123 @@ public class OTPM
 				prefCat.setTitle(categoryTitle);
 
 				String prefCatKey = Reflect.getAnnotationParameter(a, "categoryKey");
-				if(title == null || EMPTY.equals(title))
+				if(prefCatKey == null || prefCatKey == UNDEFINED)
 					prefCat.setKey(categoryTitle);
 				else
 					prefCat.setKey(prefCatKey);
 
-				prefScreen.addPreference(prefCat);
+				root.addPreference(prefCat);
 			}
 			else if((Boolean) Reflect.getAnnotationParameter(a, "endActiveCategory"))
-				prefCat = null; // the preference title is
+				prefCat = null;
 
 			if(prefCat != null)
-				prefCat.addPreference(pref);
+				prefCat.addPreference(p);
 			else
-				prefScreen.addPreference(pref);
+				root.addPreference(p);
 		}
+
+		return prefInfoList;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static void initializePreferences(PreferenceGroup root, Object object, List<PrefInfo> prefInfoList)
+	{
+		final Context context = root.getContext();
+		//final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		if(LOGV) Log.v(TAG, "initializePreferences");
+
+		final HashMap<String, PreferenceHelper> prefHelpers = new HashMap<String, PreferenceHelper>();
+		final HashMap<String, ArrayList<String>> additionalForwardDependencies = new HashMap<String, ArrayList<String>>();
+
+		for(PrefInfo info : prefInfoList)
+		{
+			final String key = info.key;
+			final Preference p = root.findPreference(key);
+			if(p == null)
+				throw new IllegalStateException("No preference with key=" + key + " in hierarchy");
+
+			if(LOGV) Log.v(TAG, "  key=" + key);
+
+			final Annotation a = info.annotation;
+			final Class<? extends PreferenceHelper> prefHlpClazz = Reflect.getAnnotationParameter(a, "helper");
+
+			final PreferenceHelper prefHlp = Reflect.newInstance(prefHlpClazz);
+			prefHlp.setData(object, info.field);
+			prefHlp.setRootPreferenceGroup(root);
+
+			if(prefHlp.isPreferenceHidden())
+			{
+				root.removePreference(p);
+				continue;
+			}
+
+			prefHelpers.put(key, prefHlp);
+
+			final String summary = getStringResourceParameter(context, a, "summary");
+			if(summary != null)
+			{
+				if(summary.length() != 0)
+					p.setSummary(summary);
+
+				prefHlp.enableSummaryUpdates(false);
+				if(LOGV) Log.v(TAG, "    has static summary='" + summary + "'");
+			}
+
+			prefHlp.initPreferenceInternal(p, Reflect.getFieldValue(info.field, object));
+
+			final String[] fDependencies = Reflect.getAnnotationParameter(a, "forwardDependencies");
+			if(fDependencies.length != 0)
+			{
+				prefHlp.enableSummaryUpdates(true);
+				prefHlp.setRootPreferenceGroup(root);
+				prefHlp.setForwardDependencies(fDependencies);
+			}
+
+			final String[] rDependencies = Reflect.getAnnotationParameter(a, "reverseDependencies");
+			if(rDependencies.length != 0)
+			{
+				// We cannot set reverse dependencies, thus we have to store them in order to add
+				// them as forward dependencies once we're done.
+				for(String depKey : rDependencies)
+				{
+					if(!additionalForwardDependencies.containsKey(depKey))
+							additionalForwardDependencies.put(depKey, new ArrayList<String>());
+
+					additionalForwardDependencies.get(depKey).add(key);
+				}
+			}
+
+			final CharSequence title = p.getTitle();
+			if(title == null)
+				throw new IllegalStateException("No title set for preference " + info.key);
+
+			p.setOnPreferenceChangeListener(prefHlp.getOnPreferenceChangeListener());
+		}
+
+		for(String key : additionalForwardDependencies.keySet())
+		{
+			if(!prefHelpers.containsKey(key))
+			{
+				Log.w(TAG, "Missing preference helper for key=" + key);
+				continue;
+			}
+
+			prefHelpers.get(key).addForwardDependencies(additionalForwardDependencies.get(key));
+		}
+
+		final Bundle hierarchyExtras = root.getExtras();
+		hierarchyExtras.putSerializable(EXTRA_PREF_HELPERS, prefHelpers);
+	}
+
+	private static String getStringParameter(Annotation a, String parameterName, String defaultValue)
+	{
+		String ret = Reflect.getAnnotationParameter(a, parameterName);
+		if(ret == null || ret == UNDEFINED) // == UNDEFINED is intentional here, as we're using it as a dummy default value
+			return defaultValue;
+
+		return ret;
 	}
 
 	private static List<Field> getDeclaredAnnotatedFields(Class<?> clazz)
@@ -282,11 +391,8 @@ public class OTPM
 
 		for(Field f : clazz.getDeclaredFields())
 		{
-			if(f.isAnnotationPresent(MapToPreference.class) ||
-					f.isAnnotationPresent(AddPreference.class))
-			{
+			if(f.isAnnotationPresent(CreatePreference.class) || f.isAnnotationPresent(AddPreference.class))
 				fields.add(f);
-			}
 		}
 
 		Collections.sort(fields, FIELD_COMPARATOR);
@@ -295,17 +401,14 @@ public class OTPM
 
 	private static String getStringResourceParameter(Context context, Annotation a, String parameterName)
 	{
-		String ret = getPreferenceParameter_(context, a, parameterName);
-		if(LOGV) Log.v(TAG, "getPreferenceParameter: " + parameterName + " => '" + ret + "'");
-		return ret;
-	}
+		if(LOGV) Log.v(TAG, "getStringResourceParameter: parameterName=" + parameterName);
 
-	private static String getPreferenceParameter_(Context context, Annotation a, String parameterName)
-	{
 		String str = Reflect.findAnnotationParameter(a, parameterName);
-		if(str == null || EMPTY.equals(str))
+		if(LOGV) Log.v(TAG, "  str='" + str + "'");
+		if(str == null || str == UNDEFINED)
 		{
 			Integer resId = Reflect.findAnnotationParameter(a, parameterName + "ResId");
+			if(LOGV) Log.v(TAG, "  trying " + parameterName + "ResId => " + resId);
 			if(resId == null || resId == 0)
 				return null;
 
@@ -318,8 +421,7 @@ public class OTPM
 	@SuppressWarnings("unchecked")
 	private static Integer getFieldOrder(Field f)
 	{
-		final Class<?>[] types =
-				new Class<?>[] { MapToPreference.class, AddPreference.class };
+		final Class<?>[] types = new Class<?>[] { CreatePreference.class, AddPreference.class };
 
 		for(Class<?> type : types)
 		{

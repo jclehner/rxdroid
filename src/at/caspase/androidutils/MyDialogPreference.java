@@ -21,8 +21,6 @@
 
 package at.caspase.androidutils;
 
-import com.j256.ormlite.stmt.query.SetValue;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -35,10 +33,8 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnAttachStateChangeListener;
 import android.view.Window;
 import at.caspase.androidutils.InstanceState.SaveState;
-import at.caspase.androidutils.InstanceState.SavedState;
 
 
 /**
@@ -274,8 +270,7 @@ public abstract class MyDialogPreference<T> extends DialogPreference
 		Bundle extras = new Bundle();
 		extras.putBoolean(KEY_IS_DIALOG_SHOWING, isShowing);
 
-		InstanceState.SavedState state = (SavedState) InstanceState.create(this, superState, extras);
-		return state;
+		return InstanceState.createFrom(this, superState, extras);
 	}
 
 	@Override

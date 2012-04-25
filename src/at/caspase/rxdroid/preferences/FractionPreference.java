@@ -24,7 +24,6 @@ package at.caspase.rxdroid.preferences;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -154,7 +153,7 @@ public class FractionPreference extends MyDialogPreference<Fraction> implements 
 
 		extras.putSerializable(KEY_VALUE, value);
 		Parcelable superState = super.onSaveInstanceState();
-		return InstanceState.create(this, superState, extras);
+		return InstanceState.createFrom(this, superState, extras);
 	}
 
 	@Override

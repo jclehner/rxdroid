@@ -45,7 +45,7 @@ import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 
 public class IntakeDialog extends AlertDialog implements OnClickListener, OnShowListener,
-		OnChangedListener, Database.OnChangedListener
+		OnChangedListener, Database.OnChangeListener
 {
 	private static final String TAG = IntakeDialog.class.getName();
 
@@ -184,7 +184,16 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	public void onEntryCreated(Entry entry, int flags) {}
 
 	@Override
-	public void onEntryDeleted(Entry entry, int flags) {}
+	public void onEntryDeleted(Entry entry, int flags)
+	{
+		if(entry instanceof Drug && entry.getId() == mDrug.getId())
+		{
+			if(mPopup != null)
+				mPopup.dismiss();
+
+			dismiss();
+		}
+	}
 
 	@Override
 	public void onBackPressed()

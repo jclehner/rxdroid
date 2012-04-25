@@ -54,11 +54,4 @@ public abstract class ListPreferenceWithStringHelper extends PreferenceHelper<Li
 		preference.setEntryValues(mValues);
 		preference.setValue(fieldValue);
 	}
-
-	@Override
-	public boolean updatePreference(ListPreference preference, Object newPrefValue)
-	{
-		setFieldValue((String) newPrefValue);
-		return true;
-	}
 }

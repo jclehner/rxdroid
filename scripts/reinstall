@@ -1,0 +1,10 @@
+#!/bin/bash
+
+BAK=".backup.sqlite"
+APK="bin/RxDroid.apk"
+
+scripts/db-backup $BAK #|| exit 1
+adb uninstall at.caspase.rxdroid #|| exit 1
+adb install $APK || exit 1
+scripts/db-restore $BAK || exit 1
+rm $BAK

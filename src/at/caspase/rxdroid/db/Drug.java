@@ -315,21 +315,6 @@ public class Drug extends Entry implements Comparable<Drug>
 		return (int) Math.floor(supply / dailyDose.doubleValue() * correctionFactor);
 	}
 
-	public double getSupplyCorrectionFactor()
-	{
-		switch(repeat)
-		{
-			case REPEAT_EVERY_N_DAYS:
-				return repeatArg / 1.0;
-
-			case REPEAT_WEEKDAYS:
-				return 7.0 / Long.bitCount(repeatArg);
-
-			default:
-				return 1.0;
-		}
-	}
-
 	public Fraction[] getSimpleSchedule()
 	{
 		if(mSimpleSchedule == null)
@@ -486,7 +471,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.currentSupply = currentSupply;
 	}
 
-	public synchronized void setDose(int doseTime, Fraction value)
+	public void setDose(int doseTime, Fraction value)
 	{
 		switch(doseTime)
 		{
@@ -624,6 +609,21 @@ public class Drug extends Entry implements Comparable<Drug>
 		if(drug == null)
 			throw new NoSuchElementException("No drug with id=" + drugId);
 		return drug;
+	}
+
+	private double getSupplyCorrectionFactor()
+	{
+		switch(repeat)
+		{
+			case REPEAT_EVERY_N_DAYS:
+				return repeatArg / 1.0;
+
+			case REPEAT_WEEKDAYS:
+				return 7.0 / Long.bitCount(repeatArg);
+
+			default:
+				return 1.0;
+		}
 	}
 
 	/**
