@@ -181,7 +181,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		MyNotification.Builder builder = new MyNotification.Builder(mContext);
 
-		if(mAlarmRepeatMode == ALARM_MODE_SNOOZE && mSnoozeState != SNOOZE_STATE_2)
+		/*if(mAlarmRepeatMode == ALARM_MODE_SNOOZE && mSnoozeState != SNOOZE_STATE_2)
 		{
 			final int nextSnoozeState;
 
@@ -213,7 +213,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			}
 
 			if(LOGV) Log.v(TAG, "  posting normal notification");
-		}
+		}*/
 
 		final String message2 = getLowSupplyMessage(date, doseTime);
 		int pendingCount = isActiveDoseTime ? countOpenIntakes(date, doseTime) : 0;
@@ -235,6 +235,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setMessage2(message2);
 		builder.setForceUpdate(mAlarmRepeatMode == ALARM_MODE_REPEAT);
 		builder.setContentIntent(createDrugListIntent(date));
+		builder.setPersistent(true);
 
 		if(!mDoPostSilent)
 			builder.setDefaults(Notification.DEFAULT_ALL);

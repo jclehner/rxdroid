@@ -123,7 +123,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
 		GlobalContext.set(getApplicationContext());
-		Database.init(); // must be called before mViewSwitcher.setFactory!
+		Database.init();
 
 		mTextDate.setOnLongClickListener(this);
 		mTextDate.setOnClickListener(new OnClickListener() {
@@ -131,7 +131,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			@Override
 			public void onClick(View v)
 			{
-				setDate(DateTime.todayDate(), PAGER_INIT | PAGER_SCROLL);
+				//setDate(DateTime.todayDate(), PAGER_INIT | PAGER_SCROLL);
+				setDate(Settings.instance().getActiveDate(), PAGER_INIT | PAGER_SCROLL);
 			}
 		});
 
@@ -143,7 +144,10 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			mDate = (Date) intent.getSerializableExtra(EXTRA_DATE);
 
 		if(mDate == null)
-			mDate = DateTime.todayDate();
+		{
+			//mDate = DateTime.todayDate();
+			mDate = Settings.instance().getActiveDate();
+		}
 
 		Database.registerOnChangedListener(mDatabaseListener);
 	}

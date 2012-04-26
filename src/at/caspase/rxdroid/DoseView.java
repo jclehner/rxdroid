@@ -266,6 +266,8 @@ public class DoseView extends FrameLayout implements OnChangeListener
 				mDose.subtract(intake.getDose());
 				--mIntakeCount;
 				updateView();
+
+				Log.d(TAG, "onEntryDeleted: mDose=" + mDose + ", mIntakeCount=" + mIntakeCount);
 			}
 		}
 	}
@@ -300,6 +302,9 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	private void updateView()
 	{
+		mStatus = STATUS_INDETERMINATE;
+		mIntakeStatus.setImageDrawable(null);
+
 		if(mDrug != null)
 		{
 			if(!mDose.isZero())

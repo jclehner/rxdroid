@@ -102,7 +102,7 @@
 	<string name="_toast_saved">Saved</string>
 	
 	<string name="_title_add">Add</string>
-	<string name="_title_toggle_filtering">Show all / Apply filter</string>
+	<string name="_title_toggle_filtering">Toggle filtering</string>
 	
 	<string name="_msg_intake_already_taken">You have already taken this dose. Do you want to continue?</string>
 	<string name="_msg_intake_normal">Take this dose and press OK.</string>
