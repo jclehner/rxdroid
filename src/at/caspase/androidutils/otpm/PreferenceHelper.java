@@ -33,8 +33,8 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceGroup;
 import android.util.Log;
+import at.caspase.androidutils.Extras;
 import at.caspase.androidutils.otpm.OTPM.CreatePreference;
-import at.caspase.rxdroid.Version;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Reflect;
 
@@ -213,11 +213,11 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected final void notifyForwardDependencies(/*Preference preference, Object newPrefValue*/)
 	{
-		if(Version.SDK_IS_PRE_HONEYCOMB)
+		/*if(Version.SDK_IS_PRE_HONEYCOMB)
 		{
 			Log.w(TAG, "notifyForwardDependencies: stub");
 			return;
-		}
+		}*/
 
 		if(mForwardDependencies == null)
 			return;
@@ -225,9 +225,13 @@ public abstract class PreferenceHelper<P extends Preference, T>
 		final PreferenceGroup root = mRootPrefGroup.get();
 		if(root != null)
 		{
-			final Bundle extras = root.getExtras();
+			//final Bundle extras = root.getExtras();
+			final Bundle extras = Extras.get(root);
 			final Map<String, PreferenceHelper> prefHelpers =
 					(Map<String, PreferenceHelper>) extras.getSerializable(OTPM.EXTRA_PREF_HELPERS);
+
+			if(prefHelpers == null)
+				return;
 
 			for(String key : mForwardDependencies)
 			{
