@@ -340,7 +340,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			order = 7,
 			type = ListPreference.class,
 			helper = RepeatModePreferenceHelper.class,
-			additionalFieldNames = { "repeatArg", "repeatOrigin" }
+			fieldDependencies = { "repeatArg", "repeatOrigin" }
 		)
 		private int repeat;
 

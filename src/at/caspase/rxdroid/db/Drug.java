@@ -245,6 +245,7 @@ public class Drug extends Entry implements Comparable<Drug>
 				// fall through
 
 			default:
+				//return R.drawable.ic_drug_pill2;
 				return R.drawable.ic_drug_pill;
 
 			// FIXME

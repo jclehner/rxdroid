@@ -68,7 +68,7 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	private WeakReference<PreferenceGroup> mRootPrefGroup = null;
 	//private WeakReference<P> mPreference = null;
 
-	private String[] mAdditionalFields = null;
+	private String[] mFieldDependencies = null;
 	private List<String> mForwardDependencies = null;
 
 	private boolean mAutoUpdateSummaries = true;
@@ -310,8 +310,9 @@ public abstract class PreferenceHelper<P extends Preference, T>
 			mForwardDependencies.addAll(dependencies);
 	}
 
-	/* package */ final void setAdditionalFields(String[] fieldNames) {
-		mAdditionalFields = fieldNames;
+	/* package */ final void setFieldDependencies(String[] fieldNames) {
+		mFieldDependencies = fieldNames;
+		Log.v(TAG, "setFieldDependencies: key=" + mPrefKey + ", fieldNames=" + fieldNames);
 	}
 
 	/* package */ final void enableSummaryUpdates(boolean enabled) {
@@ -324,19 +325,26 @@ public abstract class PreferenceHelper<P extends Preference, T>
 
 	private void checkAccessToField(String fieldName)
 	{
-		if(fieldName.equals(mField.getName()) || isAdditionalField(fieldName))
+		if(fieldName.equals(mField.getName()) || isFieldDependency(fieldName))
+		{
+			if(LOGV)
+			{
+				Log.v(TAG, "Access to field " + fieldName + " granted from PreferenceHelper of field " + mField.getName());
+				Log.v(TAG, "  mFieldDependencies=" + mFieldDependencies);
+			}
 			return;
+		}
 
 		// XXX this might be changed to throwing an exception in the future
 		Log.w(TAG, "Undeclared access to field " + fieldName + " from PreferenceHelper of field " + mField.getName());
 	}
 
-	private boolean isAdditionalField(String fieldName)
+	private boolean isFieldDependency(String fieldName)
 	{
-		if(mAdditionalFields == null)
+		if(mFieldDependencies == null)
 			return false;
 
-		return CollectionUtils.indexOf(fieldName, mAdditionalFields) != -1;
+		return CollectionUtils.indexOf(fieldName, mFieldDependencies) != -1;
 	}
 
 	/*private PreferenceGroup getRootPreferenceGroup()

@@ -120,6 +120,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1335393449" done="1335481316">
+        Show active date by default, not current date.
+        <comment>
+            fixed
+        </comment>
+    </note>
     <note priority="high" time="1316529642" done="1318944915">
         Implement DoseView long click behaviour: remove intake, mark as taken, change dose, edit drug
         <comment>
@@ -188,6 +194,18 @@
     </note>
     <note priority="high" time="1326454840" done="1326536740">
         Add 'on demand' repeat mode
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="high" time="1332882595" done="1335481411">
+        Rename 'forgotten' -&gt; 'missing'
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="high" time="1332884134" done="1335481325">
+        Allow OTPM framework to use preferences from XML files
         <comment>
             done
         </comment>
@@ -345,9 +363,6 @@
     <note priority="veryhigh" time="1332777147">
         Display GPL on first use
     </note>
-    <note priority="veryhigh" time="1335393449">
-        Show active date by default, not current date.
-    </note>
     <note priority="high" time="1324308938">
         Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?
     </note>
@@ -356,12 +371,6 @@
     </note>
     <note priority="high" time="1332514498">
         Investigate spurious wierdness in DrugListActivity (e.g. marking a drug as not taken leaves the green tick if drug was not scheduled and would be hidden by reloading that date)
-    </note>
-    <note priority="high" time="1332882595">
-        Rename 'forgotten' -&gt; 'missing'
-    </note>
-    <note priority="high" time="1332884134">
-        Allow OTPM framework to use preferences from XML files
     </note>
     <note priority="high" time="1335391425">
         Support per doseTime listing in DrugListActivity
@@ -372,8 +381,11 @@
     <note priority="high" time="1335393523">
         Add some Dialog titles in DrugEditActivity
     </note>
-    <note priority="high" time="1335393677">
+    <note priority="high" time="1335393677" done="1335516379">
         To enable extras on preferences on pre-HC devices, consider creating a global extra registry (WeakHashMap!)
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="medium" time="1318943892">
         Consider modelling DrugNamePreference's layout after the layout found in the old DrugEditActivty layout

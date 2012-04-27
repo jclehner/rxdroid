@@ -162,7 +162,7 @@ public class OTPM
 		 * If a Preference stores its value in more than one fields, the
 		 * other fields' names should be specified here.
 		 */
-		String[] additionalFieldNames() default {};
+		String[] fieldDependencies() default {};
 
 		/**
 		 * Ends a preference category, if one was active.
@@ -321,39 +321,11 @@ public class OTPM
 
 			prefHelpers.put(key, prefHlp);
 
-			final String summary = getStringResourceParameter(context, a, "summary");
-			if(summary != null)
-			{
-				if(summary.length() != 0)
-					p.setSummary(summary);
-
-				prefHlp.enableSummaryUpdates(false);
-				if(LOGV) Log.v(TAG, "    has static summary='" + summary + "'");
-			}
-
+			setupFieldDependencies(prefHlp, a);
+			setupSummary(p, prefHlp, a, context);
 			prefHlp.initPreferenceInternal(p, Reflect.getFieldValue(info.field, object));
-
-			final String[] fDependencies = Reflect.getAnnotationParameter(a, "forwardDependencies");
-			if(fDependencies.length != 0)
-			{
-				prefHlp.enableSummaryUpdates(true);
-				prefHlp.setRootPreferenceGroup(root);
-				prefHlp.setForwardDependencies(fDependencies);
-			}
-
-			final String[] rDependencies = Reflect.getAnnotationParameter(a, "reverseDependencies");
-			if(rDependencies.length != 0)
-			{
-				// We cannot set reverse dependencies, thus we have to store them in order to add
-				// them as forward dependencies once we're done.
-				for(String depKey : rDependencies)
-				{
-					if(!additionalForwardDependencies.containsKey(depKey))
-							additionalForwardDependencies.put(depKey, new ArrayList<String>());
-
-					additionalForwardDependencies.get(depKey).add(key);
-				}
-			}
+			setupForwardDependencies(prefHlp, a, root);
+			collectReverseDependencies(a, key, additionalForwardDependencies);
 
 			final CharSequence title = p.getTitle();
 			if(title == null)
@@ -362,6 +334,68 @@ public class OTPM
 			p.setOnPreferenceChangeListener(prefHlp.getOnPreferenceChangeListener());
 		}
 
+		setupReverseDependencies(prefHelpers, additionalForwardDependencies);
+
+		final Bundle rootExtras = Extras.get(root);
+		rootExtras.putSerializable(EXTRA_PREF_HELPERS, prefHelpers);
+	}
+
+	@SuppressWarnings("rawtypes")
+	private static void setupFieldDependencies(PreferenceHelper prefHlp, Annotation a)
+	{
+		final String[] fieldDependencies = Reflect.getAnnotationParameter(a, "fieldDependencies");
+		if(fieldDependencies.length != 0)
+			prefHlp.setFieldDependencies(fieldDependencies);
+	}
+
+	@SuppressWarnings("rawtypes")
+	private static void setupSummary(Preference p, PreferenceHelper prefHlp, Annotation a, Context context)
+	{
+		final String summary = getStringResourceParameter(context, a, "summary");
+		if(summary != null)
+		{
+			if(summary.length() != 0)
+				p.setSummary(summary);
+
+			prefHlp.enableSummaryUpdates(false);
+			if(LOGV) Log.v(TAG, "    has static summary='" + summary + "'");
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	private static void setupForwardDependencies(PreferenceHelper prefHlp, Annotation a, PreferenceGroup root)
+	{
+		final String[] fDependencies = Reflect.getAnnotationParameter(a, "forwardDependencies");
+		if(fDependencies.length != 0)
+		{
+			prefHlp.enableSummaryUpdates(true);
+			prefHlp.setRootPreferenceGroup(root);
+			prefHlp.setForwardDependencies(fDependencies);
+		}
+	}
+
+	private static void collectReverseDependencies(Annotation a, String key,
+			HashMap<String, ArrayList<String>> additionalForwardDependenciesOut)
+	{
+		final String[] rDependencies = Reflect.getAnnotationParameter(a, "reverseDependencies");
+		if(rDependencies.length != 0)
+		{
+			// We cannot set reverse dependencies, thus we have to store them in order to add
+			// them as forward dependencies once we're done.
+			for(String depKey : rDependencies)
+			{
+				if(!additionalForwardDependenciesOut.containsKey(depKey))
+					additionalForwardDependenciesOut.put(depKey, new ArrayList<String>());
+
+				additionalForwardDependenciesOut.get(depKey).add(key);
+			}
+		}
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static void setupReverseDependencies(HashMap<String, PreferenceHelper> prefHelpers,
+			HashMap<String, ArrayList<String>> additionalForwardDependencies)
+	{
 		for(String key : additionalForwardDependencies.keySet())
 		{
 			if(!prefHelpers.containsKey(key))
@@ -372,16 +406,12 @@ public class OTPM
 
 			prefHelpers.get(key).addForwardDependencies(additionalForwardDependencies.get(key));
 		}
-
-		/*if(!Version.SDK_IS_PRE_HONEYCOMB)
-		{
-			final Bundle hierarchyExtras = root.getExtras();
-			hierarchyExtras.putSerializable(EXTRA_PREF_HELPERS, prefHelpers);
-		}*/
-
-		final Bundle rootExtras = Extras.get(root);
-		rootExtras.putSerializable(EXTRA_PREF_HELPERS, prefHelpers);
 	}
+
+
+
+
+
 
 	private static String getStringParameter(Annotation a, String parameterName, String defaultValue)
 	{

@@ -27,6 +27,8 @@
     
     -->
     
+	<!-- FIXME change these -->
+
     <string name="_Morning">Morning</string>
     <string name="_Noon">Noon</string>
     <string name="_Evening">Evening</string>
