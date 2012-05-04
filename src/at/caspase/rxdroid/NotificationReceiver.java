@@ -39,6 +39,7 @@ import android.util.Log;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Intake;
+import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
@@ -49,45 +50,14 @@ public class NotificationReceiver extends BroadcastReceiver
 	private static final boolean LOGV = true;
 
 	static final String EXTRA_SILENT = TAG + ".silent";
-	static final String EXTRA_SNOOZE = TAG + ".snooze";
-	static final String EXTRA_CANCEL_SNOOZE = TAG + ".cancel_snooze";
-	static final String EXTRA_SNOOZE_STATE = TAG + ".snooze_state";
+	//static final String EXTRA_SNOOZE = TAG + ".snooze";
+	//static final String EXTRA_CANCEL_SNOOZE = TAG + ".cancel_snooze";
+	//static final String EXTRA_SNOOZE_STATE = TAG + ".snooze_state";
 
 	private static final String EXTRA_IS_DELETE_INTENT = TAG + ".is_delete_intent";
 
 	static final int ALARM_MODE_NORMAL = 0;
 	static final int ALARM_MODE_REPEAT = 1;
-	static final int ALARM_MODE_SNOOZE = 2;
-
-	/**
-	 * The first notification was posted.
-	 * <p>
-	 * OnClick behavior:
-	 * <ol>
-	 * <li>Launch DrugListActivity</li>
-	 * <li>Delete current notification</li>
-	 * <li>(Display Toast info)</li>
-	 * <li>Post new notification with snoozing info</li>
-	 * </ol>
-	 */
-	private static final int SNOOZE_STATE_0 = 0;
-
-	/**
-	 * Currently displaying "snoozing" text.
-	 * <p>
-	 * OnClick behavior:
-	 * <ol>
-	 * <li>Delete notification</li>
-	 * <li>Replace with current notification, but w/o snooze behaviour</li>
-	 * </ol>
-	 */
-	private static final int SNOOZE_STATE_1 = 1;
-
-	/**
-	 * Snoozing was cancelled. Behave as if snoozing was disabled.
-	 */
-	private static final int SNOOZE_STATE_2 = 2;
-
 
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
@@ -96,12 +66,8 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private int mAlarmRepeatMode;
 
-	private boolean mIsManualSnoozeRequest = false;
-	private boolean mIsSnoozeCancelRequest = false;
 	private boolean mIsDeleteIntent = false;
 	private boolean mDoPostSilent = false;
-
-	private int mSnoozeState = -1;
 
 	@Override
 	public void onReceive(Context context, Intent intent)
@@ -119,21 +85,18 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		mAlarmRepeatMode = mSettings.getListPreferenceValueIndex("alarm_mode", ALARM_MODE_NORMAL);
 
-		mIsManualSnoozeRequest = intent.getBooleanExtra(EXTRA_SNOOZE, false);
-		mIsSnoozeCancelRequest = intent.getBooleanExtra(EXTRA_CANCEL_SNOOZE, false);
+		//mIsManualSnoozeRequest = intent.getBooleanExtra(EXTRA_SNOOZE, false);
+		//mIsSnoozeCancelRequest = intent.getBooleanExtra(EXTRA_CANCEL_SNOOZE, false);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
 		mIsDeleteIntent = intent.getBooleanExtra(EXTRA_IS_DELETE_INTENT, false);
-		mSnoozeState = intent.getIntExtra(EXTRA_SNOOZE_STATE, -1);
+		//mSnoozeState = intent.getIntExtra(EXTRA_SNOOZE_STATE, -1);
 
 		if(LOGV)
 		{
 			Log.d(TAG,
 					"onReceive\n" +
 					"  is delete intent       : " + mIsDeleteIntent + "\n" +
-					"  manual snooze request  : " + mIsManualSnoozeRequest + "\n" +
-					"  snooze cancel request  : " + mIsSnoozeCancelRequest + "\n" +
-					"  post silent notifcation: " + mDoPostSilent + "\n" +
-					"  current snooze state   : " + mSnoozeState + "\n");
+					"  post silent notifcation: " + mDoPostSilent + "\n");
 		}
 
 		rescheduleAlarms();
@@ -179,41 +142,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void updateNotifications(Date date, int doseTime, boolean isActiveDoseTime)
 	{
-		MyNotification.Builder builder = new MyNotification.Builder(mContext);
-
-		/*if(mAlarmRepeatMode == ALARM_MODE_SNOOZE && mSnoozeState != SNOOZE_STATE_2)
-		{
-			final int nextSnoozeState;
-
-			// if this was *not* a deleteIntent, the snooze timeout has passed, so we display
-			// the notification again, resetting the snooze state.
-
-			if(mIsDeleteIntent)
-				nextSnoozeState = mSnoozeState + 1;
-			else
-				nextSnoozeState = -1;
-
-			final Intent intent = new Intent(mContext, NotificationReceiver.class);
-			intent.putExtra(EXTRA_SNOOZE_STATE, nextSnoozeState);
-			intent.putExtra(EXTRA_IS_DELETE_INTENT, true);
-
-			final PendingIntent deleteIntent =
-					PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-			builder.setDeleteIntent(deleteIntent);
-			builder.addFlags(Notification.FLAG_AUTO_CANCEL);
-
-			if(LOGV) Log.v(TAG, "updateNotifications: snooze state was " + mSnoozeState);
-
-			if(mSnoozeState == SNOOZE_STATE_0)
-			{
-				builder.setMessage1(R.string._msg_snoozing);
-				builder.setContentIntent(createDrugListIntent(date));
-				builder.post();
-				return;
-			}
-
-			if(LOGV) Log.v(TAG, "  posting normal notification");
-		}*/
+		final MyNotification.Builder builder = new MyNotification.Builder(mContext);
 
 		final String message2 = getLowSupplyMessage(date, doseTime);
 		int pendingCount = isActiveDoseTime ? countOpenIntakes(date, doseTime) : 0;
@@ -224,6 +153,9 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.cancel();
 			return;
 		}
+
+		builder.setTitle1(R.string._title_notification_doses);
+		builder.setTitle2(R.string._title_notification_low_supplies);
 
 		if(pendingCount != 0 && forgottenCount != 0)
 			builder.setMessage1(R.string._msg_doses_fp, forgottenCount, pendingCount);
@@ -253,40 +185,14 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void scheduleNextBeginOrEndAlarm(Calendar time, int doseTime, boolean scheduleEnd)
 	{
-		final Bundle extras = new Bundle();
-		boolean isSnoozeIntent = false;
-		final long offset;
+		long offset;
 
 		if(scheduleEnd)
 		{
-			final long offsetEnd = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);
-			final long snoozeTime = mSettings.getAlarmTimeout();
+			offset = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);
 
-			if(LOGV)
-			{
-				Log.v(TAG, "scheduleNextBeginOrEndAlarm\n" +
-					"  offsetEnd=" + offsetEnd + "\n" +
-					"  snoozeTime=" + snoozeTime + "\n" +
-					"  min: " + Math.min(offsetEnd, snoozeTime) + "\n");
-			}
-
-			switch(mAlarmRepeatMode)
-			{
-				case ALARM_MODE_REPEAT:
-					offset = Math.min(offsetEnd, snoozeTime);
-					break;
-
-				case ALARM_MODE_SNOOZE:
-					if(mIsDeleteIntent)
-					{
-						offset = Math.min((mSnoozeState == SNOOZE_STATE_0 ? snoozeTime : offsetEnd), offsetEnd);
-						break;
-					}
-					// else fall through!
-
-				default:
-					offset = offsetEnd;
-			}
+			if(mAlarmRepeatMode == ALARM_MODE_REPEAT)
+				offset = Math.min(offset, mSettings.getAlarmTimeout());
 		}
 		else
 			offset = mSettings.getMillisUntilDoseTimeBegin(time, doseTime);
@@ -295,14 +201,12 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		if(LOGV)
 		{
-			Log.d(TAG, "Scheduling " + (scheduleEnd ? mAlarmRepeatMode != ALARM_MODE_REPEAT ? "end" : "next alarm" : "begin") +
+			Log.v(TAG, "Scheduling " + (scheduleEnd ? mAlarmRepeatMode != ALARM_MODE_REPEAT ? "end" : "next alarm" : "begin") +
 					" of doseTime " + doseTime + " for " + DateTime.toString(time));
-			Log.d(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
+			Log.v(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
 		}
 
-		//extras.putBoolean(EXTRA_SNOOZE, isSnoozeIntent);
-
-		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation(extras));
+		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation(null));
 	}
 
 	private void cancelAllAlarms()
@@ -355,8 +259,16 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
 		{
-			Date yesterday = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
-			count = countOpenIntakes(yesterday, Drug.TIME_NIGHT);
+			// If Drug.TIME_NIGHT ends after midnight, we must adjust the date accordingly to display
+			// the correct notifications.
+
+			final Settings settings = Settings.instance();
+			final Calendar cal = DateTime.calendarFromDate(date);
+
+			if(settings.getDoseTimeEndOffset(Drug.TIME_NIGHT) >= Constants.MILLIS_PER_DAY)
+				cal.add(Calendar.DAY_OF_MONTH, -1);
+
+			count = countOpenIntakes(cal.getTime(), Drug.TIME_NIGHT);
 		}
 		else
 		{
@@ -375,7 +287,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		for(Drug drug : mAllDrugs)
 		{
-			// refill size of zero means ignore supply values
+			// Refill size of zero means ignore supply values
 			if(!drug.isActive() || drug.getRefillSize() == 0)
 				continue;
 

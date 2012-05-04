@@ -22,6 +22,7 @@
 package at.caspase.rxdroid.db;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,6 +110,10 @@ public class Intake extends Entry
 		return dose;
 	}
 
+	public void setDose(Fraction dose) {
+		this.dose = dose;
+	}
+
 	public Date getDate() {
 		return new Date(date.getTime());
 	}
@@ -167,7 +172,7 @@ public class Intake extends Entry
 
 	@Override
 	public String toString() {
-		return drug + ": date=" + date + ", doseTime=" + doseTime + ", dose=" + dose;
+		return getDrug().getName() + ": " + date + " " + Drug.getDoseTimeString(doseTime) + ", " + dose;
 	}
 
 	/**
@@ -193,7 +198,7 @@ public class Intake extends Entry
 			intakes.add(intake);
 		}
 
-		return intakes;
+		return Collections.unmodifiableList(intakes);
 	}
 
 	public static int countAll(Drug drug, Date date, Integer doseTime) {

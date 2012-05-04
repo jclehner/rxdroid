@@ -542,31 +542,25 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
 		{
-			Fraction expectedCumulativeDose = new Fraction();
-			List<Intake> intakes = new ArrayList<Intake>();
+			int expectedIntakeCount = 0;
+			int actualIntakeCount = 0;
 
 			for(int i = 0; i != 7; ++i)
 			{
-				Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -7 + i);
+				final Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -7 + i);
 
 				for(int doseTime : Constants.DOSE_TIMES)
 				{
-					expectedCumulativeDose.add(drug.getDose(doseTime, checkDate));
-					intakes.addAll(Intake.findAll(drug, checkDate, doseTime));
+					if(!drug.getDose(doseTime, checkDate).isZero())
+						++expectedIntakeCount;
+
+					actualIntakeCount += Intake.countAll(drug, checkDate, doseTime);
 				}
 			}
 
-			Fraction actualCumulativeDose = new Fraction();
-			for(Intake intake : intakes)
-				actualCumulativeDose.add(intake.getDose());
+			if(LOGV) Log.v(TAG, "  expectedIntakeCount=" + expectedIntakeCount + ", actualIntakeCount=" + actualIntakeCount);
 
-			if(LOGV)
-			{
-				Log.v(TAG, "  expectedCumulativeDose: " + expectedCumulativeDose);
-				Log.v(TAG, "  actualCumulativeDose  : " + actualCumulativeDose);
-			}
-
-			return actualCumulativeDose.compareTo(expectedCumulativeDose) < 0;
+			return expectedIntakeCount < actualIntakeCount;
 		}
 
 		return false;

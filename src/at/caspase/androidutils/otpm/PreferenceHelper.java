@@ -59,7 +59,7 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	private static final boolean LOGV = true;
 
 	protected Object mObject;
-	protected Field mField;
+	private Field mField;
 
 	//private String[] mSummaryDependencies = null;
 

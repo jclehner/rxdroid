@@ -22,6 +22,7 @@
 package at.caspase.rxdroid.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 import android.content.Context;
 import android.preference.ListPreference;
@@ -185,5 +186,43 @@ public final class Util
 	 */
 	public static int calWeekdayToIndex(int weekday) {
 		return CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);
+	}
+
+	public static void dumpObjectMembers(String tag, int priority, Object object, String name)
+	{
+		final Class<?> clazz = object.getClass();
+		final StringBuilder sb = new StringBuilder();
+		sb.append("dumpObjectMembers: (" + clazz.getSimpleName() + ") " + name + "\n");
+
+		for(Field f : clazz.getDeclaredFields())
+		{
+			int m = f.getModifiers();
+
+			if(Modifier.isStatic(m))
+				continue;
+
+			sb.append("  (" + f.getType().getSimpleName() + ") " + f.getName() + "=");
+
+			try
+			{
+				Reflect.makeAccessible(f);
+				sb.append(f.get(object));
+			}
+			catch(IllegalArgumentException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			catch(IllegalAccessException e)
+			{
+				sb.append("(inaccessible)");
+			}
+
+			sb.append("\n");
+		}
+
+		sb.append("----------\n");
+
+		Log.println(priority, tag, sb.toString());
 	}
 }

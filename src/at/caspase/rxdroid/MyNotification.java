@@ -34,7 +34,8 @@ public class MyNotification
 	private final Context mContext;
 
 	private String mTickerText;
-	private String mTitle;
+	private String mTitle1;
+	private String mTitle2;
 	private String mMessage1;
 	private String mMessage2;
 
@@ -61,7 +62,7 @@ public class MyNotification
 		{
 			mNotification = new MyNotification(context);
 			mNotification.mTickerText = context.getString(R.string._msg_new_notification);
-			mNotification.mTitle = context.getString(R.string.app_name);
+			mNotification.mTitle1 = context.getString(R.string.app_name);
 			mContext = context;
 		}
 
@@ -75,14 +76,24 @@ public class MyNotification
 			return setTickerText(mContext.getString(resId, formatArgs));
 		}
 
-		public Builder setTitle(String title)
+		public Builder setTitle1(String title)
 		{
-			mNotification.mTitle = title;
+			mNotification.mTitle1 = title;
 			return this;
 		}
 
-		public Builder setTitle(int resId, Object... formatArgs) {
-			return setTitle(mContext.getString(resId, formatArgs));
+		public Builder setTitle1(int resId, Object... formatArgs) {
+			return setTitle1(mContext.getString(resId, formatArgs));
+		}
+
+		public Builder setTitle2(String title)
+		{
+			mNotification.mTitle2 = title;
+			return this;
+		}
+
+		public Builder setTitle2(int resId, Object... formatArgs) {
+			return setTitle2(mContext.getString(resId, formatArgs));
 		}
 
 		public Builder setMessage1(String message1)
@@ -206,7 +217,7 @@ public class MyNotification
 		notification.icon = mIconResId;
 
 		final String message = getMessage();
-		notification.setLatestEventInfo(mContext, mTitle, message, mContentIntent);
+		notification.setLatestEventInfo(mContext, getTitle(), message, mContentIntent);
 
 		int lastHash = Settings.instance().getLastNotificationMessageHash();
 		int thisHash = message.hashCode();
@@ -228,6 +239,10 @@ public class MyNotification
 
 		NotificationManager notificationMgr = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationMgr.notify(R.id.notification, notification);
+	}
+
+	public String getTitle() {
+		return mMessage1 != null ? mTitle1 : mTitle2;
 	}
 
 	public String getMessage() {

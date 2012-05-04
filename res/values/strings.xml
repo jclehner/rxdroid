@@ -38,11 +38,19 @@
     
     <string name="_msg_new_notification">New notification</string>
     <string name="_title_notifications">RxDroid</string>
+     <!-- 
     <string name="_msg_doses_fp">Doses: %1$d missed, %2$d pending.</string>
     <string name="_msg_doses_f">Doses: %1$d missed.</string>
     <string name="_msg_doses_p">Doses: %1$d pending.</string>
+   
     <string name="_msg_low_supply_single">Low supply: %1$s.</string>
     <string name="_msg_low_supply_multiple">Low supply: %1$s and %2$d other(s).</string>
+     -->
+    <string name="_msg_doses_fp">%1$d missed, %2$d pending.</string>
+    <string name="_msg_doses_f">%1$d missed.</string>
+    <string name="_msg_doses_p">%1$d pending.</string>
+    <string name="_msg_low_supply_single">%1$s</string>
+    <string name="_msg_low_supply_multiple">%1$s and %2$d other(s).</string>
     
 	<string name="_msg_constraints_ab">Pick a time between %1$s and %2$s.</string>
 	<string name="_msg_constraints_a">Pick a time after %1$s.</string>
@@ -194,17 +202,15 @@
     <string name="_toast_drug_notification_icon">The last dose of this drug was not taken.</string> 
     
     <string name="_title_add_drug">Add drug</string>
-	
-	<!-- 
-    An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
-    and thus use a different naming scheme.
     
+    <string name="_title_notification_doses">Pending/missed doses</string>
+	<string name="_title_notification_low_supplies">Low supplies</string>
+    
+	<!-- 
     Keep at the end of strings.xml!  
      -->
     <string name="dialog_set_number">@string/_btn_set</string>
     <string name="dialog_cancel">@android:string/cancel</string>
     <string name="dialog_picker_title">Choose a number</string>
     
-    
-		
 </resources>

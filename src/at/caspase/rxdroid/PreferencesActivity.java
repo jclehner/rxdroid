@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -131,15 +132,32 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 			});
 		}
 
-
-		updateLowSupplyThresholdPreferenceSummary();
 		Util.populateListPreferenceEntryValues(findPreference("alarm_mode"));
+
+		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		{
+			ActionBar ab = getActionBar();
+			ab.setDisplayShowHomeEnabled(true);
+			ab.setDisplayHomeAsUpEnabled(true);
+		}
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		updateLowSupplyThresholdPreferenceSummary();
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		menu.add(0, MENU_RESTORE_DEFAULTS, 0, "Restore defaults").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		MenuItem item = menu.add(0, MENU_RESTORE_DEFAULTS, 0, "Restore defaults").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+
+		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		{
+			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		}
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -168,9 +186,21 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 				builder.show();
 				break;
 			}
+
 			default:
 				// ignore
 		}
+
+		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		{
+			if(item.getItemId() == android.R.id.home)
+			{
+				Intent intent = new Intent(this, DrugListActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+			}
+		}
+
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -207,7 +237,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		switch(index)
 		{
 			case 1:
-				final DumbTime timeout = (DumbTime) ((TimePreference) alarmTimeout).getValue();
+				final DumbTime timeout = ((TimePreference) alarmTimeout).getValue();
 				final int minutes;
 
 				if(timeout != null)

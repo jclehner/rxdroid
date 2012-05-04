@@ -76,6 +76,10 @@ public class Drug extends Entry implements Comparable<Drug>
 	private static final String TAG = Drug.class.getName();
 	private static final long serialVersionUID = -2569745648137404894L;
 
+	private static final String[] TIME_NAMES = {
+		"MORNING", "NOON", "EVENING", "NIGHT"
+	};
+
 	public static final int FORM_PILL = 0;
 	public static final int FORM_INJECTION = 1;
 	public static final int FORM_SPRAY = 2;
@@ -389,12 +393,10 @@ public class Drug extends Entry implements Comparable<Drug>
 		if(repeat == this.repeat)
 			return;
 
-		Log.d(TAG, "setRepeat(" + repeat + ") on " + toString());
-
 		// the preference was changed, so reset all repeat-related settings
 		this.repeat = repeat;
 		this.repeatArg = 0;
-		this.repeatOrigin = DateTime.todayDate();
+		this.repeatOrigin = null;
 	}
 
 	/**
@@ -440,10 +442,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	public void setRepeatOrigin(Date repeatOrigin)
 	{
 		if(repeat != REPEAT_EVERY_N_DAYS && repeat != REPEAT_EVERY_N_HOURS)
-		{
-			//throw new UnsupportedOperationException();
 			return;
-		}
 
 		if(repeat == REPEAT_EVERY_N_DAYS && DateTime.getOffsetFromMidnight(repeatOrigin) != 0)
 			throw new IllegalArgumentException();
@@ -610,6 +609,10 @@ public class Drug extends Entry implements Comparable<Drug>
 		if(drug == null)
 			throw new NoSuchElementException("No drug with id=" + drugId);
 		return drug;
+	}
+
+	public static String getDoseTimeString(int doseTime) {
+		return TIME_NAMES[doseTime];
 	}
 
 	private double getSupplyCorrectionFactor()

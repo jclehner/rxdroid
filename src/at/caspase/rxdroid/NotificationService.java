@@ -121,19 +121,14 @@ public class NotificationService extends Service implements OnChangeListener, On
 		return START_STICKY;
 	}
 
-	public static void snooze(Context context) {
-		sendBroadcast(context, false, true);
-	}
-
 	private static void updateNotification(Context context, boolean beQuiet) {
-		sendBroadcast(context, beQuiet, false);
+		sendBroadcast(context, beQuiet);
 	}
 
-	private static void sendBroadcast(Context context, boolean silent, boolean snooze)
+	private static void sendBroadcast(Context context, boolean silent)
 	{
 		Intent intent = new Intent(context, NotificationReceiver.class);
 		intent.putExtra(NotificationReceiver.EXTRA_SILENT, silent);
-		intent.putExtra(NotificationReceiver.EXTRA_SNOOZE, snooze);
 		context.sendBroadcast(intent);
 	}
 }

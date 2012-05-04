@@ -68,6 +68,7 @@ import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.SimpleBitSet;
+import at.caspase.rxdroid.util.Util;
 
 /**
  * Edit a drug's database entry.
@@ -124,6 +125,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		{
 			if(mDrugHash != drug.hashCode())
 			{
+				if(LOGV) Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, "drug 2");
+
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string._title_save_chanes);
 				builder.setIcon(android.R.drawable.ic_dialog_info);
@@ -223,6 +226,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG");
 
 			drug = (Drug) extra;
+
+			if(LOGV) Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, "drug");
 
 			mWrapper.set(drug);
 			mDrugHash = drug.hashCode();
@@ -418,6 +423,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 			name = drug.getName();
 			form = drug.getForm();
+
+			if(LOGV) Log.v(TAG, "DrugWrapper.set: repeatOrigin=" + repeatOrigin);
 		}
 
 		public Drug get()
@@ -441,6 +448,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 			drug.setRepeatArg(repeatArg);
 			drug.setRepeatOrigin(repeatOrigin);
+
+			if(LOGV) Log.v(TAG, "DrugWrapper.get: repeatOrigin=" + repeatOrigin);
 
 			return drug;
 		}
@@ -478,6 +487,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		public boolean updatePreference(ListPreference preference, Integer newValue)
 		{
 			//preference.n
+
+			Log.v(TAG, "RepeatModePreferenceHelper.updatePreference: ");
 
 			switch(newValue)
 			{
@@ -676,7 +687,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		private void updateSummary()
 		{
-			final int repeatMode = (Integer) getFieldValue("repeat");
+			//final int repeatMode = (Integer) getFieldValue("repeat");
+			final int repeatMode = getFieldValue();
 			final long repeatArg = (Long) getFieldValue("repeatArg");
 			final Date repeatOrigin = (Date) getFieldValue("repeatOrigin");
 
