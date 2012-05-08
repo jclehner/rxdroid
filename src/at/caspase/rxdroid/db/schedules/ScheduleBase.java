@@ -56,7 +56,7 @@ public abstract class ScheduleBase implements Serializable
 	/**
 	 * Returns the beginning of the specified dose time.
 	 * <p>
-	 * @returns <code>null</code> by default, telling RxDroid to use the
+	 * @return <code>null</code> by default, telling RxDroid to use the
 	 * 	values specified in the application-wide settings.
 	 */
 	public Date getDoseTimeBegin(Date date, int doseTime) {
@@ -66,7 +66,7 @@ public abstract class ScheduleBase implements Serializable
 	/**
 	 * Returns the end of the specified dose time.
 	 * <p>
-	 * @returns <code>null</code> by default, telling RxDroid to use the
+	 * @return <code>null</code> by default, telling RxDroid to use the
 	 * 	values specified in the application-wide settings.
 	 */
 	public Date getDoseTimeEnd(Date date, int doseTime) {

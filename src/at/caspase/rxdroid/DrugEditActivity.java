@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -46,6 +47,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -205,6 +207,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		// FIXME just a quick'n dirty fix
 		getPreferenceScreen().setKey(TAG + ".root");
+
+		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		{
+			final ActionBar ab = getActionBar();
+			ab.setDisplayShowHomeEnabled(true);
+			ab.setDisplayHomeAsUpEnabled(true);
+		}
 	}
 
 	@Override
@@ -218,6 +227,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		Drug drug = null;
 
 		mWrapper = new DrugWrapper(getApplicationContext());
+		mFocusOnCurrentSupply = false;
 
 		if(Intent.ACTION_EDIT.equals(action))
 		{
@@ -239,15 +249,12 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			setTitle(drug.getName());
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
-			setTitle(R.string._title_add_drug);
-		else
-			throw new IllegalArgumentException("Unhandled action " + action);
-
-		if(drug == null)
 		{
 			mIsEditing = false;
 			mWrapper.set(new Drug());
 		}
+		else
+			throw new IllegalArgumentException("Unhandled action " + action);
 
 		OTPM.mapToPreferenceHierarchy(getPreferenceScreen(), mWrapper);
 		getPreferenceScreen().setOnPreferenceChangeListener(mListener);
@@ -277,6 +284,20 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		if(item.getItemId() == android.R.id.home)
+		{
+			// We can do this since this Activity can only be launched from
+			// DrugListActivity at the moment.
+			onBackPressed();
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
 	private static class DrugWrapper
 	{
 		@CreatePreference
@@ -293,10 +314,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@CreatePreference
 		(
-			//title = "Morning",
 			titleResId = R.string._Morning,
 			key = "morning",
-			//category = "Intake schedule",
 			categoryResId = R.string._title_intake_schedule,
 			order = 3,
 			type = DosePreference.class,
@@ -306,7 +325,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@CreatePreference
 		(
-			//title = "Noon",
 			titleResId = R.string._Noon,
 			key = "noon",
 			order = 4,
@@ -317,7 +335,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@CreatePreference
 		(
-			//title = "Evening",
 			titleResId = R.string._Evening,
 			key = "evening",
 			order = 5,
@@ -328,7 +345,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@CreatePreference
 		(
-			//title = "Night",
 			titleResId = R.string._Night,
 			key = "night",
 			endActiveCategory = true,
@@ -340,7 +356,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@CreatePreference
 		(
-			//title = "Repeat mode",
 			titleResId = R.string._title_repeat,
 			order = 7,
 			type = ListPreference.class,
@@ -382,7 +397,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		(
 			titleResId = R.string._title_active,
 			summary = "",
-			//endActiveCategory = true,
 			order = 12,
 			type = CheckBoxPreference.class,
 			helper = CheckboxPreferenceHelper.class
@@ -486,8 +500,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		@Override
 		public boolean updatePreference(ListPreference preference, Integer newValue)
 		{
-			//preference.n
-
 			Log.v(TAG, "RepeatModePreferenceHelper.updatePreference: ");
 
 			switch(newValue)
@@ -566,7 +578,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					final Date repeatOrigin = DateTime.date(year, monthOfYear, dayOfMonth);
 					final long repeatArg = Long.valueOf(editText.getText().toString());
 
-					setFieldValue("repeat", Drug.REPEAT_EVERY_N_DAYS);
+					setFieldValue(Drug.REPEAT_EVERY_N_DAYS);
 					setFieldValue("repeatOrigin", repeatOrigin);
 					setFieldValue("repeatArg", repeatArg);
 

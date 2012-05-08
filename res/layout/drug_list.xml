@@ -10,7 +10,20 @@
 			android:layout_height="0dip"
 			android:layout_weight="1"
 		/>
-		 
+		<TextView android:id="@+id/text_date"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			
+			android:text="9999-99-99"
+			android:textSize="24dp"
+			android:textColor="#000000"
+			android:gravity="center"			
+			android:clickable="true"
+			android:background="@drawable/footer_background"
+			style="@style/TextLarge"
+		/>	
+		 <!-- 
 		 <TextView android:id="@+id/text_date"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -24,5 +37,6 @@
 			android:background="@color/theme_dark"
 			style="@style/TextLarge"
 		/>	
+		 -->
 	 
 </LinearLayout>

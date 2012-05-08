@@ -152,12 +152,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		MenuItem item = menu.add(0, MENU_RESTORE_DEFAULTS, 0, "Restore defaults").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-
-		if(!Version.SDK_IS_PRE_HONEYCOMB)
-		{
-			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		}
+		menu.add(0, MENU_RESTORE_DEFAULTS, 0, "Restore defaults").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 
 		return super.onCreateOptionsMenu(menu);
 	}

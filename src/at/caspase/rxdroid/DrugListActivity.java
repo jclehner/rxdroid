@@ -111,7 +111,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		super.onCreate(savedInstanceState);
 
-		//requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.drug_list);
 
 		mInflater = LayoutInflater.from(this);
@@ -131,8 +130,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			@Override
 			public void onClick(View v)
 			{
-				//setDate(DateTime.todayDate(), PAGER_INIT | PAGER_SCROLL);
-				setDate(Settings.instance().getActiveDate(), PAGER_INIT | PAGER_SCROLL);
+				final Date activeDate = Settings.instance().getActiveDate();
+				setDate(activeDate, PAGER_INIT | PAGER_SCROLL);
 			}
 		});
 
@@ -366,7 +365,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		if(!date.equals(mDate))
 			Log.w(TAG, "Activity date " + mDate + " differs from DoseView date " + date);
 
-
 		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, date);
 		dialog.show();
 	}
@@ -543,7 +541,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
 		{
 			int expectedIntakeCount = 0;
-			int actualIntakeCount = 0;
+			int actualScheduledIntakeCount = 0;
 
 			for(int i = 0; i != 7; ++i)
 			{
@@ -554,13 +552,13 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 					if(!drug.getDose(doseTime, checkDate).isZero())
 						++expectedIntakeCount;
 
-					actualIntakeCount += Intake.countAll(drug, checkDate, doseTime);
+					actualScheduledIntakeCount += Intake.countAll(drug, checkDate, doseTime);
 				}
 			}
 
-			if(LOGV) Log.v(TAG, "  expectedIntakeCount=" + expectedIntakeCount + ", actualIntakeCount=" + actualIntakeCount);
+			if(LOGV) Log.v(TAG, "  expectedIntakeCount=" + expectedIntakeCount + ", actualIntakeCount=" + actualScheduledIntakeCount);
 
-			return expectedIntakeCount < actualIntakeCount;
+			return actualScheduledIntakeCount < expectedIntakeCount;
 		}
 
 		return false;

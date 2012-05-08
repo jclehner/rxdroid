@@ -71,6 +71,14 @@ public final class Schedule extends Entry
 		schedule.setDose(date, doseTime, dose);
 	}
 
+	public Date getDoseTimeBegin(Date date, int doseTime) {
+		return schedule.getDoseTimeBegin(date, doseTime);
+	}
+
+	public Date getDoseTimeEnd(Date date, int doseTime) {
+		return schedule.getDoseTimeEnd(date, doseTime);
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		throw new UnsupportedOperationException();

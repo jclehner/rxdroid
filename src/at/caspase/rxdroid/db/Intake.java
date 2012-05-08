@@ -188,11 +188,11 @@ public class Intake extends Entry
 
 		for(Intake intake : Database.getCached(Intake.class))
 		{
-			if(intake.getDrugId() != drug.getId())
+			if(intake.getDrugId() != drug.id)
 				continue;
-			if(date != null && !intake.getDate().equals(date))
+			if(date != null && !intake.date.equals(date))
 				continue;
-			if(doseTime != null && intake.getDoseTime() != doseTime)
+			if(doseTime != null && intake.doseTime != doseTime)
 				continue;
 
 			intakes.add(intake);

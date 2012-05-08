@@ -50,6 +50,13 @@ public class ListPreferenceWithIntHelper extends PreferenceHelper<ListPreference
 	}
 
 	@Override
+	public boolean updatePreference(ListPreference preference, Integer newValue)
+	{
+		preference.setValueIndex(newValue);
+		return super.updatePreference(preference, newValue);
+	}
+
+	@Override
 	public Integer toFieldType(Object prefValue) {
 		return Integer.valueOf((String) prefValue, 10);
 	}

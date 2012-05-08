@@ -113,7 +113,9 @@ public class DoseView extends FrameLayout implements OnChangeListener
 				break;
 		}
 
+		//setBackgroundResource(R.drawable.dose_view_background);
 		setBackgroundResource(R.drawable.doseview_background);
+		setPadding(0, 0, 0, 0);
 
 		mDoseText.setText("0");
 
@@ -207,18 +209,23 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		int action = event.getAction() & MotionEvent.ACTION_MASK;
+		// A bit of a hack, but it makes the DoseView's background change much more
+		// responsive.
+
+		final int action = event.getAction() & MotionEvent.ACTION_MASK;
 
 		switch(action)
 		{
 			case MotionEvent.ACTION_DOWN:
 				setBackgroundResource(R.drawable.doseview_background_selected);
+				setPadding(0, 0, 0, 0);
 				break;
 
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_OUTSIDE:
 				setBackgroundResource(R.drawable.doseview_background);
+				setPadding(0, 0, 0, 0);
 				break;
 		}
 
@@ -330,11 +337,11 @@ public class DoseView extends FrameLayout implements OnChangeListener
 					sb.setSpan(new SuperscriptSpan(), sb.length() - 1, sb.length(), 0);
 				}
 
-				if(!mDrug.hasDoseOnDate(mDate))
+				/*if(!mDrug.hasDoseOnDate(mDate))
 				{
 					sb.insert(0, "(");
 					sb.append(")");
-				}
+				}*/
 
 				mDoseText.setText(sb);
 			}

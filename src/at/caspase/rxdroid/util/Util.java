@@ -23,6 +23,7 @@ package at.caspase.rxdroid.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 import android.content.Context;
 import android.preference.ListPreference;
@@ -206,7 +207,20 @@ public final class Util
 			try
 			{
 				Reflect.makeAccessible(f);
-				sb.append(f.get(object));
+
+				if(f.getType().isArray())
+				{
+					try
+					{
+						sb.append(Arrays.toString((Object[]) f.get(object)));
+					}
+					catch(ClassCastException e)
+					{
+						sb.append(f.get(object));
+					}
+				}
+				else
+					sb.append(f.get(object));
 			}
 			catch(IllegalArgumentException e)
 			{
@@ -224,5 +238,17 @@ public final class Util
 		sb.append("----------\n");
 
 		Log.println(priority, tag, sb.toString());
+	}
+
+	public static void sleepAtMost(long millis)
+	{
+		try
+		{
+			Thread.sleep(millis);
+		}
+		catch(InterruptedException e)
+		{
+			// ignore
+		}
 	}
 }

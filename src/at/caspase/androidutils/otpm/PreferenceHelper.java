@@ -126,6 +126,7 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	public boolean updatePreference(P preference, T newValue)
 	{
 		setFieldValue(newValue);
+		onPreferenceUpdate(preference, newValue);
 		return true;
 	}
 
@@ -151,8 +152,18 @@ public abstract class PreferenceHelper<P extends Preference, T>
 		if(LOGV) Log.v(TAG, "onDependencyChange: key=" + mPrefKey + ", depKey=" + depKey);
 	}
 
-	protected final void setFieldValue(T value) {
+	public void onPreferenceUpdate(P preference, T newValue) {
+
+	}
+
+	public void onFieldValueSet(T value) {
+
+	}
+
+	protected final void setFieldValue(T value)
+	{
 		Reflect.setFieldValue(mField, mObject, value);
+		onFieldValueSet(value);
 	}
 
 	protected final void setFieldValue(String fieldName, Object value)
@@ -201,14 +212,15 @@ public abstract class PreferenceHelper<P extends Preference, T>
 		return (T) Reflect.getFieldValue(mField, mObject);
 	}
 
-	/*protected final P getPreference()
+	@SuppressWarnings("unchecked")
+	protected final P getPreference()
 	{
-		final P preference = mPreference.get();
-		if(preference == null)
-			throw new IllegalStateException("Preference is no longer available");
+		final PreferenceGroup root = mRootPrefGroup.get();
+		if(root == null)
+			throw new IllegalStateException("mRootPrefGroup is not available anymore");
 
-		return preference;
-	}*/
+		return (P) root.findPreference(mPrefKey);
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected final void notifyForwardDependencies(/*Preference preference, Object newPrefValue*/)
@@ -312,7 +324,6 @@ public abstract class PreferenceHelper<P extends Preference, T>
 
 	/* package */ final void setFieldDependencies(String[] fieldNames) {
 		mFieldDependencies = fieldNames;
-		Log.v(TAG, "setFieldDependencies: key=" + mPrefKey + ", fieldNames=" + fieldNames);
 	}
 
 	/* package */ final void enableSummaryUpdates(boolean enabled) {
@@ -325,15 +336,13 @@ public abstract class PreferenceHelper<P extends Preference, T>
 
 	private void checkAccessToField(String fieldName)
 	{
-		if(fieldName.equals(mField.getName()) || isFieldDependency(fieldName))
+		if(fieldName.equals(mField.getName()))
 		{
-			if(LOGV)
-			{
-				Log.v(TAG, "Access to field " + fieldName + " granted from PreferenceHelper of field " + mField.getName());
-				Log.v(TAG, "  mFieldDependencies=" + mFieldDependencies);
-			}
+			Log.w(TAG, "Accessing wrapped field \"" + fieldName + "\" from its PreferenceHelper by name is discouraged.");
 			return;
 		}
+		else if(isFieldDependency(fieldName))
+			return;
 
 		// XXX this might be changed to throwing an exception in the future
 		Log.w(TAG, "Undeclared access to field " + fieldName + " from PreferenceHelper of field " + mField.getName());
@@ -346,15 +355,6 @@ public abstract class PreferenceHelper<P extends Preference, T>
 
 		return CollectionUtils.indexOf(fieldName, mFieldDependencies) != -1;
 	}
-
-	/*private PreferenceGroup getRootPreferenceGroup()
-	{
-		final PreferenceGroup pg = mRootPrefGroup.get();
-		if(pg == null)
-			throw new IllegalStateException("Root PreferenceGroup is not available");
-
-		return pg;
-	}*/
 
 	private static String toString(Object o)
 	{

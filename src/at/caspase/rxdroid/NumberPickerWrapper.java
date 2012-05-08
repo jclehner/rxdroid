@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -40,6 +41,7 @@ import android.widget.LinearLayout;
  * @author Joseph Lehner
  *
  */
+@TargetApi(11)
 public class NumberPickerWrapper extends LinearLayout
 {
 	private static final int MIN_DEFAULT = 0;
