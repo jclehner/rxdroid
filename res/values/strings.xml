@@ -203,7 +203,7 @@
     
     <string name="_title_add_drug">Add drug</string>
     
-    <string name="_title_notification_doses">Pending/missed doses</string>
+    <string name="_title_notification_doses">Doses</string>
 	<string name="_title_notification_low_supplies">Low supplies</string>
     
 	<!-- 

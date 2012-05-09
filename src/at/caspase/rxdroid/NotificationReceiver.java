@@ -265,7 +265,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			final Settings settings = Settings.instance();
 			final Calendar cal = DateTime.calendarFromDate(date);
 
-			if(settings.getDoseTimeEndOffset(Drug.TIME_NIGHT) >= Constants.MILLIS_PER_DAY)
+			if(settings.getTrueDoseTimeEndOffset(Drug.TIME_NIGHT) >= Constants.MILLIS_PER_DAY)
 				cal.add(Calendar.DAY_OF_MONTH, -1);
 
 			count = countOpenIntakes(cal.getTime(), Drug.TIME_NIGHT);

@@ -194,9 +194,11 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	}
 
 	@Override
-	protected void onDestroy()
+	protected void onStop()
 	{
-		super.onDestroy();
+		// TODO Auto-generated method stub
+		super.onStop();
+		mPager.removeAllViews();
 		mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
 		Database.unregisterOnChangedListener(mDatabaseListener);
 	}
@@ -378,7 +380,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public View makeView(int offset)
 	{
-		final TextView textView = new TextView(this);
+		final TextView textView = new TextView(getApplication());
 		textView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		textView.setGravity(Gravity.CENTER);
 
@@ -390,7 +392,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 
 		Collections.sort(drugs);
-		final ListView listView = new ListView(this);
+		final ListView listView = new ListView(getApplication());
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(mDate);
@@ -459,7 +461,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			Collections.sort(drugs);
 		}
 
-		final DrugAdapter adapter = new DrugAdapter(this, R.layout.dose_view, drugs, date);
+		final DrugAdapter adapter = new DrugAdapter(getApplication(), R.layout.dose_view, drugs, date);
 		adapter.setFilter(mShowingAll ? null : new DrugFilter(date));
 
 		listView.setAdapter(adapter);
@@ -540,6 +542,10 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
 		{
+			// FIXME this may fail to report a missed Intake if
+			// the dose was taken on a later date (i.e. unscheduled)
+			// in the week before.
+
 			int expectedIntakeCount = 0;
 			int actualScheduledIntakeCount = 0;
 
@@ -550,9 +556,10 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 				for(int doseTime : Constants.DOSE_TIMES)
 				{
 					if(!drug.getDose(doseTime, checkDate).isZero())
+					{
 						++expectedIntakeCount;
-
-					actualScheduledIntakeCount += Intake.countAll(drug, checkDate, doseTime);
+						actualScheduledIntakeCount += Intake.countAll(drug, checkDate, doseTime);
+					}
 				}
 			}
 

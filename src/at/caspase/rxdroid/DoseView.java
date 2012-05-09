@@ -72,11 +72,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	private Fraction mDose;
 
-	// this value is updated by a call to countIntakes()
-	private Fraction mCumulativeDose = new Fraction();
-
-	private final boolean mHasDoseOnDate = true;
-
 	private int mStatus = STATUS_INDETERMINATE;
 
 	public DoseView(Context context) {
@@ -114,8 +109,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		}
 
 		//setBackgroundResource(R.drawable.dose_view_background);
-		setBackgroundResource(R.drawable.doseview_background);
-		setPadding(0, 0, 0, 0);
 
 		mDoseText.setText("0");
 
@@ -284,6 +277,9 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	{
 		super.onAttachedToWindow();
 
+		setBackgroundResource(R.drawable.doseview_background);
+		setPadding(0, 0, 0, 0);
+
 		if(mDrug != null)
 			Database.registerOnChangedListener(this);
 	}
@@ -292,6 +288,10 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	protected void onDetachedFromWindow()
 	{
 		super.onDetachedFromWindow();
+
+		setBackgroundDrawable(null);
+		setPadding(0, 0, 0, 0);
+
 		Database.unregisterOnChangedListener(this);
 	}
 
@@ -370,40 +370,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			mDoseText.setText(mDose.toString());
 	}
 
-	/*private void updateIntakeStatusIcon()
-	{
-		if(mDate == null || mDrug == null)
-			return;
-
-		if(countIntakes() != 0)
-		{
-			if(mCumulativeDose.isZero())
-				markAsIgnored();
-			else
-				markAsTaken();
-			return;
-		}
-
-		mStatus = STATUS_INDETERMINATE;
-
-		if(mHasDoseOnDate && mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
-		{
-			if(!mDrug.getDose(mDoseTime, mDate).isZero())
-			{
-				int offset = (int) Settings.instance().getTrueDoseTimeEndOffset(mDoseTime);
-				Date end = DateTime.add(mDate, Calendar.MILLISECOND, offset);
-
-				if(DateTime.nowDate().after(end))
-					mStatus = STATUS_FORGOTTEN;
-			}
-		}
-
-		if(mStatus == STATUS_FORGOTTEN)
-			mIntakeStatus.setImageResource(R.drawable.ic_dose_forgotten);
-		else
-			mIntakeStatus.setImageDrawable(null);
-	}*/
-
 	private void markAsTaken()
 	{
 		mIntakeStatus.setImageResource(R.drawable.ic_dose_taken);
@@ -420,20 +386,5 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	{
 		mIntakeStatus.setImageResource(R.drawable.ic_dose_forgotten);
 		mStatus = STATUS_FORGOTTEN;
-	}
-
-	private int countIntakes()
-	{
-		if(mDate == null || mDrug == null)
-			throw new IllegalStateException("Cannot obtain intake data from DoseView with unset date and/or drug");
-
-		List<Intake> intakes = Intake.findAll(mDrug, mDate, mDoseTime);
-
-		mCumulativeDose = new Fraction();
-
-		for(Intake intake : intakes)
-			mCumulativeDose.add(intake.getDose());
-
-		return intakes.size();
 	}
 }
