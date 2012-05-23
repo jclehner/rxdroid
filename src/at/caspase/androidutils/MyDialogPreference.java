@@ -50,7 +50,7 @@ import at.caspase.androidutils.InstanceState.SaveState;
 public abstract class MyDialogPreference<T> extends DialogPreference
 {
 	private static final String TAG = MyDialogPreference.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private static final String EMPTY = "";
 
@@ -95,8 +95,6 @@ public abstract class MyDialogPreference<T> extends DialogPreference
 	 */
 	public final void setValue(T value)
 	{
-		Log.d(TAG, "setValue: " + getKey() + " => " + value);
-
 		mValue = value;
 		setSummary(getSummary());
 

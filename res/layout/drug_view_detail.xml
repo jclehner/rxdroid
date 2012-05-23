@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:focusable="false"
+	android:focusableInTouchMode="false"
+	android:nextFocusLeft="@+id/drug_name"
+	android:orientation="vertical" >
+
+	<!-- first line: icon + name -->
+
+
+	<!-- second line: dose views android:layout_alignBottom="@id/drug_icon" -->
+
+	<ImageView
+		android:id="@+id/drug_icon"
+		android:layout_width="20dp"
+		android:layout_height="20dp"
+		android:layout_alignParentTop="true"
+		android:padding="1dp"
+		android:scaleType="fitCenter"
+		android:src="@drawable/ic_drug_pill" />
+
+	<at.caspase.rxdroid.DoseView
+		android:id="@+id/dose_view"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentRight="true"
+		android:focusable="true"
+		android:nextFocusLeft="@+id/noon"
+		android:onClick="onDoseViewClick" >
+	</at.caspase.rxdroid.DoseView>
+
+	<TextView
+		android:id="@id/drug_name"
+		style="@style/TextMedium"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignBottom="@+id/drug_icon"
+		android:layout_toRightOf="@+id/drug_icon"
+		android:clickable="true"
+		android:focusable="true"
+		android:gravity="center_vertical"
+		android:nextFocusDown="@+id/morning"
+		android:onClick="onDrugNameClick"
+		android:text="Cocaine 100mg" />
+
+	<TextView
+		android:id="@+id/text_info1"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/drug_name"
+		android:layout_alignLeft="@id/drug_name"
+		android:layout_centerVertical="true"
+		android:text="Taken: 2099-31-12, 23:59"
+		android:textAppearance="?android:attr/textAppearanceSmall" />
+
+	<TextView
+		android:id="@+id/text_info2"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/text_info1"
+		android:layout_toRightOf="@+id/drug_icon"
+		android:text="Supply low: 5 1/2 left"
+		android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</RelativeLayout>

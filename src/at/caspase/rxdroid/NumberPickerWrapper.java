@@ -96,8 +96,11 @@ public class NumberPickerWrapper extends LinearLayout
 			mNumberPickerNew.setSelected(false);
 		}
 
-		setMinValue(MIN_DEFAULT);
-		setMaxValue(MAX_DEFAULT);
+		if(!isInEditMode())
+		{
+			setMinValue(MIN_DEFAULT);
+			setMaxValue(MAX_DEFAULT);
+		}
 	}
 
 	public int getValue()

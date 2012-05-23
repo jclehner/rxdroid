@@ -28,10 +28,10 @@ public class Timer
 	private long mBegin;
 
 	public Timer() {
-		reset();
+		restart();
 	}
 
-	public void reset() {
+	public void restart() {
 		mBegin = SystemClock.uptimeMillis();
 	}
 

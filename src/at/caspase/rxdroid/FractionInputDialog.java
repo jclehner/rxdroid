@@ -25,6 +25,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.view.View;
+import android.view.ViewStub;
 
 public class FractionInputDialog extends AlertDialog implements OnClickListener, FractionInput.OnChangedListener
 {
@@ -36,6 +38,8 @@ public class FractionInputDialog extends AlertDialog implements OnClickListener,
 	}
 
 	protected FractionInput mInput;
+	protected ViewStub mFooterStub;
+
 	private Fraction mValue;
 	private OnFractionSetListener mListener;
 
@@ -43,7 +47,9 @@ public class FractionInputDialog extends AlertDialog implements OnClickListener,
 	{
 		super(context);
 
-		mInput = new FractionInput(context, null);
+		final View view = getLayoutInflater().inflate(R.layout.fraction_dialog, null, false);
+		mInput = (FractionInput) view.findViewById(R.id.input);
+		mFooterStub = (ViewStub) view.findViewById(R.id.footer_stub);
 		mInput.setOnChangeListener(this);
 		mListener = listener;
 
@@ -53,7 +59,10 @@ public class FractionInputDialog extends AlertDialog implements OnClickListener,
 		setButton(BUTTON_POSITIVE, context.getString(android.R.string.ok), this);
 		setButton(BUTTON_NEGATIVE, context.getString(android.R.string.cancel), (OnClickListener) null);
 
-		setView(mInput);
+
+		//set
+
+		setView(view);
 	}
 
 	public void setValue(Fraction value)
@@ -84,6 +93,10 @@ public class FractionInputDialog extends AlertDialog implements OnClickListener,
 
 	public OnFractionSetListener getOnFractionSetListener() {
 		return mListener;
+	}
+
+	public ViewStub getFooterStub() {
+		return mFooterStub;
 	}
 
 	@Override

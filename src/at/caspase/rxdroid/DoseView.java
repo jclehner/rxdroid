@@ -170,15 +170,20 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		mDate = date;
 		mDrug = drug;
 
-		mDose = getDose();
+		//mDose = getDose();
 
 		mDose = new Fraction();
 
 		List<Intake> intakes = Intake.findAll(mDrug, mDate, mDoseTime);
 		for(Intake intake : intakes)
+		{
 			mDose.add(intake.getDose());
+			if(LOGV) Log.v(TAG, intake.toString());
+		}
 
 		mIntakeCount = intakes.size();
+
+		if(LOGV) Log.v(TAG, mDrug + ": mIntakeCount=" + mIntakeCount);
 		//if(LOGV) Log.v(TAG, "setDoseFromDrugAndDate: drug=" + drug + ", mIntakeCount=" + mIntakeCount);
 
 		updateView();
@@ -235,8 +240,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			{
 				mDose.add(intake.getDose());
 				++mIntakeCount;
-
-				if(LOGV) Log.v(TAG, "onEntryCreated: mIntakeCount=" + mIntakeCount + ", entry=" + entry);
 
 				updateView();
 			}

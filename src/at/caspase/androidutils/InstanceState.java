@@ -68,8 +68,20 @@ public final class InstanceState
 	 */
 	public static Parcelable createFrom(Object object, Parcelable superState, Bundle extras)
 	{
-		final SavedState myState = new SavedState(superState);
-		myState.extras = extras;
+		final SavedState myState;
+		if(superState instanceof SavedState)
+		{
+			myState = (SavedState) superState;
+			if(myState.extras == null)
+				myState.extras = extras;
+			else
+				myState.extras.putAll(extras);
+		}
+		else
+		{
+			myState = new SavedState(superState);
+			myState.extras = extras;
+		}
 
 		if(!myState.wasCreateInstanceStateCalled)
 		{
@@ -130,10 +142,10 @@ public final class InstanceState
 				if(!myState.values.containsKey(mapKey))
 				{
 					Log.w(TAG, "restoreInstanceState: key does not exist: " + mapKey);
+					return;
 				}
 
-
-				Object value = myState.values.get(mapKey);
+				final Object value = myState.values.get(mapKey);
 
 				try
 				{
@@ -161,7 +173,7 @@ public final class InstanceState
 
 	private static void forEachAnnotatedMemberInternal(Class<?> clazz, Object o, Callback callback)
 	{
-		Class<?> mySuper = clazz.getSuperclass();
+		final Class<?> mySuper = clazz.getSuperclass();
 		if(mySuper != null)
 			forEachAnnotatedMemberInternal(mySuper, o, callback);
 
@@ -171,7 +183,7 @@ public final class InstanceState
 		{
 			if(f.isAnnotationPresent(SaveState.class))
 			{
-				String mapKey = f.getName() + "@" + clazz.getName();
+				final String mapKey = f.getName() + "@" + clazz.getName();
 				if(LOGV) Log.v(TAG, "  " + f.getName() + " (" + mapKey + ")");
 
 				try

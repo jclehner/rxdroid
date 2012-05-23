@@ -23,11 +23,12 @@
 		</activity>
 		
 		<activity android:name=".DrugSortActivity" />
+		<activity android:name=".ui.FragmentTabActivity" />
 		<activity android:name=".test.ObjectToPreferenceTestActivity" />
 		
 				
 		<activity android:name=".DrugListActivity"		    
-		    android:screenOrientation="nosensor"
+		    android:screenOrientation="nosensor" android:theme="@style/Theme"
 		/>
 
 		<activity android:name=".DrugEditActivity"

@@ -39,7 +39,6 @@ import android.util.Log;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Intake;
-import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
@@ -262,13 +261,18 @@ public class NotificationReceiver extends BroadcastReceiver
 			// If Drug.TIME_NIGHT ends after midnight, we must adjust the date accordingly to display
 			// the correct notifications.
 
-			final Settings settings = Settings.instance();
+			/*final Settings settings = Settings.instance();
 			final Calendar cal = DateTime.calendarFromDate(date);
 
 			if(settings.getTrueDoseTimeEndOffset(Drug.TIME_NIGHT) >= Constants.MILLIS_PER_DAY)
-				cal.add(Calendar.DAY_OF_MONTH, -1);
+				cal.add(Calendar.DAY_OF_MONTH, -1);*/
 
-			count = countOpenIntakes(cal.getTime(), Drug.TIME_NIGHT);
+			final Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
+			count = countOpenIntakes(checkDate, Drug.TIME_NIGHT);
+
+			if(LOGV) Log.v(TAG, "countForgottenIntakes: checkDate=" + checkDate + ", count=" + count);
+
+			//if(LOGV) Log.v(TAG, "countFrgottenIntakes: cal=" + DateTime.toString(cal));
 		}
 		else
 		{

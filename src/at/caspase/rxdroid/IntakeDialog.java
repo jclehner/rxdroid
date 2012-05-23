@@ -29,6 +29,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
@@ -73,6 +74,8 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		mDrug = drug;
 		mDoseTime = doseTime;
 		mDate = date;
+
+		if(LOGV) Log.v(TAG, "<init>: doseTime=" + doseTime + ", date=" + date + ", drug=" + drug);
 
 		mIntakeCount = Intake.findAll(drug, date, doseTime).size();
 

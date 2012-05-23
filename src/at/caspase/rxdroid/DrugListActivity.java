@@ -21,7 +21,6 @@
 
 package at.caspase.rxdroid;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -30,7 +29,6 @@ import java.util.List;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -52,11 +50,8 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,11 +59,11 @@ import at.caspase.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entry;
+import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.db.Intake;
+import at.caspase.rxdroid.ui.DrugOverviewAdapter;
 import at.caspase.rxdroid.util.CollectionUtils;
-import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
-import at.caspase.rxdroid.util.Timer;
 
 public class DrugListActivity extends Activity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
@@ -76,20 +71,20 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	private static final String TAG = DrugListActivity.class.getName();
 	private static final boolean LOGV = true;
 
-	public static final int MENU_ADD = 0;
-	public static final int MENU_PREFERENCES = 1;
-	public static final int MENU_TOGGLE_FILTERING = 2;
+	private static final int MENU_ADD = 0;
+	private static final int MENU_PREFERENCES = 1;
+	private static final int MENU_TOGGLE_FILTERING = 2;
 
-	public static final int CMENU_TOGGLE_INTAKE = 0;
+	private static final int CMENU_TOGGLE_INTAKE = 0;
 	// public static final int CMENU_CHANGE_DOSE = 1;
-	public static final int CMENU_EDIT_DRUG = 2;
+	private static final int CMENU_EDIT_DRUG = 2;
 	// public static final int CMENU_SHOW_SUPPLY_STATUS = 3;
-	public static final int CMENU_IGNORE_DOSE = 4;
+	private static final int CMENU_IGNORE_DOSE = 4;
 
 	public static final String EXTRA_DATE = "date";
 	public static final String EXTRA_STARTED_FROM_NOTIFICATION = "started_from_notification";
 
-	private static final int TAG_ID = R.id.tag_drug_id;
+	public static final int TAG_DRUG_ID = R.id.tag_drug_id;
 
 	private LayoutInflater mInflater;
 	private SharedPreferences mSharedPreferences;
@@ -325,7 +320,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		Intent intent = new Intent(Intent.ACTION_EDIT);
 		intent.setClass(this, DrugEditActivity.class);
 
-		Drug drug = Drug.get((Integer) view.getTag(TAG_ID));
+		Drug drug = Drug.get((Integer) view.getTag(TAG_DRUG_ID));
 		intent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
 
 		//startActivityForResult(intent, 0);
@@ -355,20 +350,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	public void onDateSet(DatePicker view, int year, int month, int day)
 	{
 		setDate(DateTime.date(year, month, day), PAGER_INIT);
-	}
-
-	public void onDoseClick(final View view)
-	{
-		final DoseView v = (DoseView) view;
-		final Drug drug = v.getDrug();
-		final int doseTime = v.getDoseTime();
-		final Date date = v.getDate();
-
-		if(!date.equals(mDate))
-			Log.w(TAG, "Activity date " + mDate + " differs from DoseView date " + date);
-
-		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, date);
-		dialog.show();
 	}
 
 	@Override
@@ -416,6 +397,35 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		return listView;
 	}
 
+	public void onDoseViewClick(View view)
+	{
+		final DoseView v = (DoseView) view;
+		final Drug drug = v.getDrug();
+		final int doseTime = v.getDoseTime();
+		final Date date = v.getDate();
+
+		if(!date.equals(mDate))
+			Log.w(TAG, "Activity date " + mDate + " differs from DoseView date " + date);
+
+		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, date);
+		dialog.show();
+	}
+
+	public void onNotificationIconClick(View view)
+	{
+		final Drug drug = (Drug) view.getTag();
+		final Calendar cal = DateTime.calendarFromDate(mDate);
+
+		do
+		{
+			cal.add(Calendar.DAY_OF_MONTH, -1);
+		} while(!drug.hasDoseOnDate(cal.getTime()));
+
+		Toast.makeText(getApplicationContext(), R.string._toast_drug_notification_icon, Toast.LENGTH_SHORT).show();
+
+		setDate(cal.getTime(), PAGER_INIT | PAGER_SCROLL);
+	}
+
 	private static final int PAGER_SCROLL = 1;
 	private static final int PAGER_INIT = 1 << 1;
 
@@ -461,7 +471,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			Collections.sort(drugs);
 		}
 
-		final DrugAdapter adapter = new DrugAdapter(getApplication(), R.layout.dose_view, drugs, date);
+		final DrugOverviewAdapter adapter = new DrugOverviewAdapter(this, drugs, date);
 		adapter.setFilter(mShowingAll ? null : new DrugFilter(date));
 
 		listView.setAdapter(adapter);
@@ -484,206 +494,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
 
 		mTextDate.setText(dateString);
-	}
-
-	private static String getDrugName(Drug drug)
-	{
-		final String name = drug.getName();
-		// this should never happen unless there's a DB problem
-		if(name == null || name.length() == 0)
-			return "<???>";
-
-		// TODO do name scrambling here, if desired by the user
-
-		return name;
-	}
-
-	/**
-	 * Checks whether for missing drug intakes before a given date.
-	 *
-	 * @param drug
-	 * @return
-	 */
-
-	private static boolean hasMissingIntakesBeforeDate(Drug drug, Date date)
-	{
-		if(LOGV) Log.v(TAG, "hasMissingIntakesBeforeDate: drug=" + drug);
-
-		int repeatMode = drug.getRepeatMode();
-
-		switch(repeatMode)
-		{
-			case Drug.REPEAT_EVERY_N_DAYS:
-			case Drug.REPEAT_WEEKDAYS:
-			{
-				if(drug.hasDoseOnDate(date))
-					return false;
-			}
-		}
-
-		if(repeatMode == Drug.REPEAT_EVERY_N_DAYS)
-		{
-			long days = drug.getRepeatArg();
-
-			Date origin = drug.getRepeatOrigin();
-			if(date.before(origin))
-				return false;
-
-			long elapsed = date.getTime() - origin.getTime();
-
-			int offset = (int) -(elapsed % days);
-			if(offset == 0)
-				offset = (int) -days;
-
-			Date lastIntakeDate = DateTime.add(date, Calendar.DAY_OF_MONTH, offset);
-			if(LOGV) Log.v(TAG, "  calculacted lastIntakeDate=" + lastIntakeDate);
-
-			return Intake.hasAll(drug, lastIntakeDate);
-		}
-		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
-		{
-			// FIXME this may fail to report a missed Intake if
-			// the dose was taken on a later date (i.e. unscheduled)
-			// in the week before.
-
-			int expectedIntakeCount = 0;
-			int actualScheduledIntakeCount = 0;
-
-			for(int i = 0; i != 7; ++i)
-			{
-				final Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -7 + i);
-
-				for(int doseTime : Constants.DOSE_TIMES)
-				{
-					if(!drug.getDose(doseTime, checkDate).isZero())
-					{
-						++expectedIntakeCount;
-						actualScheduledIntakeCount += Intake.countAll(drug, checkDate, doseTime);
-					}
-				}
-			}
-
-			if(LOGV) Log.v(TAG, "  expectedIntakeCount=" + expectedIntakeCount + ", actualIntakeCount=" + actualScheduledIntakeCount);
-
-			return actualScheduledIntakeCount < expectedIntakeCount;
-		}
-
-		return false;
-	}
-
-	private class DrugAdapter extends ArrayAdapter<Drug>
-	{
-		//private static final String TAG = DrugAdapter.class.getName();
-
-		private ArrayList<Drug> mAllItems;
-		private ArrayList<Drug> mItems;
-		private Date mAdapterDate;
-
-		// hide DrugListActivity.mDate
-		@SuppressWarnings("unused")
-		private Date mDate;
-
-		private Timer mTimer = null;
-
-		public DrugAdapter(Context context, int viewResId, List<Drug> items, Date date)
-		{
-			super(context, viewResId, items);
-
-			mAllItems = new ArrayList<Drug>(items);
-			mAdapterDate = date;
-
-			if(LOGV)
-				mTimer = new Timer();
-		}
-
-		public void setFilter(CollectionUtils.Filter<Drug> filter)
-		{
-			if(filter != null)
-				mItems = (ArrayList<Drug>) CollectionUtils.filter(mAllItems, filter);
-			else
-				mItems = mAllItems;
-
-			notifyDataSetChanged();
-		}
-
-		@Override
-		public Drug getItem(int position) {
-			return mItems.get(position);
-		}
-
-		@Override
-		public int getPosition(Drug drug) {
-			return mItems.indexOf(drug);
-		}
-
-		@Override
-		public int getCount() {
-			return mItems.size();
-		}
-
-		@Override
-		public View getView(int position, View v, ViewGroup parent)
-		{
-			if(LOGV && position == 0)
-				mTimer.reset();
-
-			final Drug drug = getItem(position);
-			final DoseViewHolder holder;
-
-			if(v == null)
-			{
-				v = mInflater.inflate(R.layout.drug_view2, null);
-
-				holder = new DoseViewHolder();
-
-				holder.name = (TextView) v.findViewById(R.id.drug_name);
-				holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
-				holder.notification = (ImageView) v.findViewById(R.id.drug_notification_icon);
-				holder.notification.setTag(drug);
-				holder.notification.setOnClickListener(mDrugNotificationIconListener);
-
-				for(int i = 0; i != holder.doseViews.length; ++i)
-				{
-					final int doseViewId = Constants.DOSE_VIEW_IDS[i];
-					holder.doseViews[i] = (DoseView) v.findViewById(doseViewId);
-					registerForContextMenu(holder.doseViews[i]);
-				}
-
-				v.setTag(holder);
-			}
-			else
-				holder = (DoseViewHolder) v.getTag();
-
-			holder.name.setText(getDrugName(drug));
-			holder.name.setTag(TAG_ID, drug.getId());
-			holder.icon.setImageResource(drug.getFormResourceId());
-
-			final int visibility;
-
-			if(DateTime.todayDate().equals(mAdapterDate) && hasMissingIntakesBeforeDate(drug, mAdapterDate))
-				visibility = View.VISIBLE;
-			else
-				visibility = View.GONE;
-
-			holder.notification.setVisibility(visibility);
-
-			for(DoseView doseView : holder.doseViews)
-			{
-				if(!doseView.hasInfo(mAdapterDate, drug))
-					doseView.setDoseFromDrugAndDate(mAdapterDate, drug);
-			}
-
-			if(LOGV && position == getCount() - 1)
-			{
-				final double elapsed = mTimer.elapsedSeconds();
-				final int viewCount = getCount() * 4;
-				final double timePerView = elapsed / viewCount;
-
-				Log.v(TAG + "$DrugAdapter", viewCount + " views created in " + elapsed + "s (" + timePerView + "s per view)");
-			}
-
-			return v;
-		}
 	}
 
 	private class DrugFilter implements CollectionUtils.Filter<Drug>
@@ -714,40 +524,12 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			if(!result && !Intake.findAll(drug, mFilterDate, null).isEmpty())
 				result = true;
 
-			if(!result && DateTime.isToday(mFilterDate) && hasMissingIntakesBeforeDate(drug, mFilterDate))
+			if(!result && DateTime.isToday(mFilterDate) && Entries.hasMissingIntakesBeforeDate(drug, mFilterDate))
 				result = true;
 
 			return result;
 		}
 	}
-
-	private static class DoseViewHolder
-	{
-		TextView name;
-		ImageView icon;
-		DoseView[] doseViews = new DoseView[4];
-		ImageView notification;
-	}
-
-	private final OnClickListener mDrugNotificationIconListener = new OnClickListener() {
-
-		@Override
-		public void onClick(View v)
-		{
-			final Drug drug = (Drug) v.getTag();
-
-			final Calendar cal = DateTime.calendarFromDate(mDate);
-
-			do
-			{
-				cal.add(Calendar.DAY_OF_MONTH, -1);
-			} while(!drug.hasDoseOnDate(cal.getTime()));
-
-			Toast.makeText(getApplicationContext(), R.string._toast_drug_notification_icon, Toast.LENGTH_SHORT).show();
-
-			setDate(cal.getTime(), PAGER_INIT | PAGER_SCROLL);
-		}
-	};
 
 	private final OnPageChangeListener mPageListener = new OnPageChangeListener() {
 

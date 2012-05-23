@@ -29,7 +29,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
@@ -327,6 +326,18 @@ public class Settings
 			mask |= Notification.DEFAULT_VIBRATE;
 
 		return mask;
+	}
+
+	public String getDrugName(Drug drug)
+	{
+		// TODO implement scrambling
+
+		final String name = drug.getName();
+		// this should never happen unless there's a DB problem
+		if(name == null || name.length() == 0)
+			return "<???>";
+
+		return name;
 	}
 
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;

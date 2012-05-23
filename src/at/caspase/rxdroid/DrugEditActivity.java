@@ -30,6 +30,7 @@ import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -48,6 +49,8 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -84,7 +87,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
 
 	private static final String TAG = DrugEditActivity.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private DrugWrapper mWrapper;
 	private int mDrugHash;
@@ -387,7 +390,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		(
 			titleResId = R.string._title_current_supply,
 			order = 11,
-			type = FractionPreference.class,
+			type = CurrentSupplyPreference.class,
 			helper = CurrentSupplyPreferenceHelper.class,
 			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat", "repeatArg", "repeatOrigin" }
 		)
@@ -686,7 +689,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					setFieldValue("repeat", Drug.REPEAT_WEEKDAYS);
+					setFieldValue(Drug.REPEAT_WEEKDAYS);
 					setFieldValue("repeatArg", bitset.longValue());
 
 					updateSummary();
@@ -762,6 +765,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		{
 			super.initPreference(preference, fieldValue);
 			mContext = preference.getContext().getApplicationContext();
+
+			((CurrentSupplyPreference) preference).setRefillSize((Integer) getFieldValue("refillSize"));
 		}
 
 		@Override
@@ -781,8 +786,11 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		@Override
-		public void onDependencyChange(MyDialogPreference preference, String depKey) {
+		public void onDependencyChange(MyDialogPreference preference, String depKey)
+		{
 			preference.setSummary(getSummary(mValue));
+			if("refillSize".equals(depKey))
+				((CurrentSupplyPreference) preference).setRefillSize((Integer) getFieldValue("refillSize"));
 		}
 
 		private String getSummary(Object value)
@@ -832,6 +840,55 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			preference.setSummary(newPrefValue.toString());
 			return true;
 		}
+	}
+
+	private static class CurrentSupplyPreference extends FractionPreference
+	{
+		private int mRefillSize;
+
+		public CurrentSupplyPreference(Context context) {
+			super(context);
+		}
+
+		public void setRefillSize(int refillSize) {
+			mRefillSize = refillSize;
+		}
+
+		@Override
+		protected Dialog onGetCustomDialog()
+		{
+			final FractionInputDialog dialog = (FractionInputDialog) super.onGetCustomDialog();
+
+			if(mRefillSize != 0)
+			{
+				//final ViewStub stub = (ViewStub) dialog.findViewById(R.id.stub);
+				//stub.setLayoutResource(R.layout.current_supply_button);
+
+				final ViewStub stub = dialog.getFooterStub();
+				stub.setLayoutResource(R.layout.current_supply_button);
+				//final View inflated = stub.inflate();
+
+				final Button btn = (Button) stub.inflate().findViewById(R.id.btn_current_supply);
+				btn.setText("+" + Integer.toString(mRefillSize));
+				btn.setOnClickListener(mListener);
+			}
+
+			return dialog;
+		}
+
+		private View.OnClickListener mListener = new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v)
+			{
+				final FractionInputDialog dialog = (FractionInputDialog) getDialog();
+				if(dialog != null)
+				{
+					dialog.setValue(dialog.getValue().plus(mRefillSize));
+					v.setEnabled(false);
+				}
+			}
+		};
 	}
 
 	private final OnPreferenceChangeListener mListener = new OnPreferenceChangeListener() {

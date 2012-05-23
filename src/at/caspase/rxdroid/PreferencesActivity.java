@@ -40,7 +40,7 @@ import android.view.MenuItem;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.preferences.TimePreference;
-import at.caspase.rxdroid.test.ObjectToPreferenceTestActivity;
+import at.caspase.rxdroid.ui.FragmentTabActivity;
 import at.caspase.rxdroid.util.Util;
 
 public class PreferencesActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener
@@ -79,7 +79,8 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 				public boolean onPreferenceClick(Preference preference)
 				{
 					//Intent intent = new Intent(PreferencesActivity.this, DrugSortActivity.class);
-					Intent intent = new Intent(PreferencesActivity.this, ObjectToPreferenceTestActivity.class);
+					//Intent intent = new Intent(PreferencesActivity.this, ObjectToPreferenceTestActivity.class);
+					Intent intent = new Intent(PreferencesActivity.this, FragmentTabActivity.class);
 					startActivity(intent);
 					return true;
 				}

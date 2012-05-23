@@ -35,7 +35,6 @@ import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -80,10 +79,14 @@ public final class Database
 		Schedule.class
 	};
 
+	static final int ID_VIRTUAL_ENTRY = 0x7fffffff;
+
 	public static final int FLAG_DONT_NOTIFY_LISTENERS = 1;
 
 	private static final HashMap<Class<?>, List<? extends Entry>> sCache =
 			new HashMap<Class<?>, List<? extends Entry>>();
+
+	private static Map<Class<?>, List<? extends Entry>> sCacheCopy = null;
 
 	private static DatabaseHelper sHelper;
 	private static boolean sIsLoaded = false;
@@ -211,8 +214,15 @@ public final class Database
 		delete(entry, 0);
 	}
 
-	public static <T extends Entry> List<T> getAll(Class<T> clazz) {
-		return new LinkedList<T>(getCached(clazz));
+	@SuppressWarnings("unchecked")
+	public static synchronized <T extends Entry> List<T> getAll(Class<T> clazz)
+	{
+		if(sCacheCopy == null)
+			sCacheCopy = Collections.unmodifiableMap(sCache);
+
+		return (List<T>) sCacheCopy.get(clazz);
+
+		//return new LinkedList<T>(getCached(clazz));
 	}
 
 	static synchronized <T extends Entry> List<T> getCached(Class<T> clazz)
@@ -358,6 +368,9 @@ public final class Database
 
 	private static <E extends Entry> void performDbOperation(String methodName, E entry, int flags)
 	{
+		if(entry.id == ID_VIRTUAL_ENTRY)
+			throw new IllegalArgumentException("Cannot perform database operation on virtual entries");
+
 		@SuppressWarnings("unchecked")
 		final Class<E> clazz = (Class<E>) entry.getClass();
 		final List<E> cached = getCached(clazz);

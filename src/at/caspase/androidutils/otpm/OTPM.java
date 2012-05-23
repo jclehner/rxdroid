@@ -244,7 +244,7 @@ public class OTPM
 			final String key = getStringParameter(a, "key", field.getName());
 
 			if(key.equals(hierarchyKey))
-				throw new IllegalStateException("Attempted to override root PreferenceGroup, key=" + key);
+				throw new IllegalStateException("Cannot use key=" + key + " of root PreferenceGroup");
 
 			prefInfoList.add(new PrefInfo(key, a, field));
 

@@ -28,20 +28,20 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import at.caspase.androidutils.InstanceState;
 import at.caspase.androidutils.InstanceState.SaveState;
 import at.caspase.rxdroid.NumberPickerWrapper.OnValueChangeListener;
+import at.caspase.rxdroid.util.CollectionUtils;
 
 /**
  * A widget for fraction input.
  *
  * @author Joseph Lehner
  */
-public class FractionInput extends LinearLayout implements OnClickListener
+public class FractionInput extends LinearLayout
 {
 	public interface OnChangedListener
 	{
@@ -51,16 +51,19 @@ public class FractionInput extends LinearLayout implements OnClickListener
 	private static final String TAG = FractionInput.class.getName();
 	private static final boolean LOGV = false;
 
-	public static final int MODE_INTEGER = 1;
-	public static final int MODE_MIXED = 2;
-	public static final int MODE_FRACTION = 3;
-	public static final int MODE_INVALID = 4;
+	private static final String[] MODE_SWITCHER_LABELS = { "1", "1¾", "¾" };
+
+	public static final int MODE_INTEGER = 0;
+	public static final int MODE_MIXED = 1;
+	public static final int MODE_FRACTION = 2;
+	public static final int MODE_INVALID = 3;
 
 	private NumberPickerWrapper mIntegerPicker;
 	private NumberPickerWrapper mNumeratorPicker;
 	private NumberPickerWrapper mDenominatorPicker;
 	private TextView mFractionBar;
 	private Button mModeSwitcher;
+	private Button mCustomButton;
 
 	@SaveState
 	private int mInteger = 0;
@@ -88,6 +91,7 @@ public class FractionInput extends LinearLayout implements OnClickListener
 		mDenominatorPicker = (NumberPickerWrapper) findViewById(R.id.denominator);
 		mFractionBar = (TextView) findViewById(R.id.fraction_bar);
 		mModeSwitcher = (Button) findViewById(R.id.mode_switcher);
+		//mCustomButton = (Button) findViewById(R.id.custom_button);
 
 		mIntegerPicker.setOnValueChangeListener(mPickerListener);
 		mIntegerPicker.setWrapSelectorWheel(false);
@@ -99,7 +103,7 @@ public class FractionInput extends LinearLayout implements OnClickListener
 		mDenominatorPicker.setMinValue(1); // must be called before setWrapSelectorWheel!
 		mDenominatorPicker.setWrapSelectorWheel(false);
 
-		mModeSwitcher.setOnClickListener(this);
+		mModeSwitcher.setOnClickListener(mModeSwitcherListener);
 
 		setOrientation(HORIZONTAL);
 		setGravity(Gravity.CENTER_HORIZONTAL);
@@ -135,7 +139,7 @@ public class FractionInput extends LinearLayout implements OnClickListener
 		// for MODE_INTEGER and MODE_MIXED get the value as a mixed number
 		int data[] = value.getFractionData(mFractionInputMode != MODE_FRACTION);
 
-		mInteger = mFractionInputMode == MODE_FRACTION ? 0 : data[0];
+		mInteger = data[0];
 		mNumerator = data[1];
 		mDenominator = data[2];
 
@@ -237,16 +241,6 @@ public class FractionInput extends LinearLayout implements OnClickListener
 	}
 
 	@Override
-	public void onClick(View v)
-	{
-		if(v.getId() == R.id.mode_switcher)
-		{
-			if(mFractionInputMode == MODE_INTEGER)
-				setFractionInputMode(MODE_FRACTION);
-		}
-	}
-
-	@Override
 	protected Parcelable onSaveInstanceState()
 	{
 		Parcelable superState = super.onSaveInstanceState();
@@ -271,12 +265,32 @@ public class FractionInput extends LinearLayout implements OnClickListener
 		mNumeratorPicker.setVisibility(mFractionInputMode == MODE_INTEGER ? GONE: VISIBLE);
 		mDenominatorPicker.setVisibility(mFractionInputMode == MODE_INTEGER ? GONE: VISIBLE);
 		mFractionBar.setVisibility(mFractionInputMode == MODE_INTEGER ? GONE: VISIBLE);
-		// show in integer mode
-		mModeSwitcher.setVisibility(mFractionInputMode == MODE_INTEGER ? VISIBLE : GONE);
 
 		mIntegerPicker.setValue(mInteger);
 		mNumeratorPicker.setValue(mNumerator);
 		mDenominatorPicker.setValue(mDenominator);
+
+		updateModeSwitcher();
+	}
+
+	private void updateModeSwitcher()
+	{
+		final int nextMode = getNextInputMode();
+		mModeSwitcher.setText(MODE_SWITCHER_LABELS[nextMode]);
+	}
+
+	private int getNextInputMode()
+	{
+		final int[] modes = getValue().isInteger() ? MODES_IF_INTEGER_VALUE : MODES_IF_FRACTION_VALUE;
+		final int modeIndex = CollectionUtils.indexOf(mFractionInputMode, modes);
+
+		if(modeIndex == -1)
+		{
+			Log.e(TAG, "Unexpected input mode, defaulting to MODE_MIXED");
+			return MODE_MIXED;
+		}
+
+		return modes[(modeIndex + 1) % modes.length];
 	}
 
 	private OnValueChangeListener mPickerListener = new OnValueChangeListener() {
@@ -300,8 +314,22 @@ public class FractionInput extends LinearLayout implements OnClickListener
 			else
 				return;
 
+			updateModeSwitcher();
+
 			if(mListener != null)
 				mListener.onFractionChanged(FractionInput.this, oldValue);
+		}
+	};
+
+	private static final int[] MODES_IF_INTEGER_VALUE = { MODE_FRACTION, MODE_MIXED, MODE_INTEGER };
+	private static final int[] MODES_IF_FRACTION_VALUE = { MODE_MIXED, MODE_FRACTION };
+
+	private OnClickListener mModeSwitcherListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v)
+		{
+			setFractionInputMode(getNextInputMode());
 		}
 	};
 }

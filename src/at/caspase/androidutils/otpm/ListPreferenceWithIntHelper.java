@@ -49,12 +49,12 @@ public class ListPreferenceWithIntHelper extends PreferenceHelper<ListPreference
 		preference.setSummary(mEntries[fieldValue]);
 	}
 
-	@Override
+	/*@Override
 	public boolean updatePreference(ListPreference preference, Integer newValue)
 	{
 		preference.setValueIndex(newValue);
 		return super.updatePreference(preference, newValue);
-	}
+	}*/
 
 	@Override
 	public Integer toFieldType(Object prefValue) {
@@ -65,5 +65,10 @@ public class ListPreferenceWithIntHelper extends PreferenceHelper<ListPreference
 	public void updateSummary(ListPreference preference, Integer newValue)
 	{
 		preference.setSummary(mEntries[newValue]);
+	}
+
+	@Override
+	public void onFieldValueSet(Integer value) {
+		getPreference().setValueIndex(value);
 	}
 }
