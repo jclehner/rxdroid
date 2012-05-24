@@ -63,7 +63,7 @@ public class FractionInput extends LinearLayout
 	private NumberPickerWrapper mDenominatorPicker;
 	private TextView mFractionBar;
 	private Button mModeSwitcher;
-	private Button mCustomButton;
+	//private Button mCustomButton;
 
 	@SaveState
 	private int mInteger = 0;
@@ -172,7 +172,7 @@ public class FractionInput extends LinearLayout
 			if(!getValue().isInteger())
 				return false;
 		}
-		else if(mode == MODE_INVALID)
+		else if(mode >= MODE_INVALID)
 			throw new IllegalArgumentException();
 
 		// an explicit request for a specific mode overrides the automatic setting
@@ -238,6 +238,17 @@ public class FractionInput extends LinearLayout
 
 	public void setOnChangeListener(OnChangedListener listener) {
 		mListener = listener;
+	}
+
+	@Override
+	public void setEnabled(boolean enabled)
+	{
+		super.setEnabled(enabled);
+
+		mIntegerPicker.setEnabled(enabled);
+		mNumeratorPicker.setEnabled(enabled);
+		mDenominatorPicker.setEnabled(enabled);
+		mModeSwitcher.setEnabled(enabled);
 	}
 
 	@Override
