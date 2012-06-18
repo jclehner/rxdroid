@@ -1,15 +1,13 @@
 package at.caspase.rxdroid.db;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
 public final class Entries
 {
+	/*
 	private static final List<Intake> sConsolidatedIntakes = new ArrayList<Intake>();
 
 	public static Intake findAllIntakesConsolidated(Drug drug, Date date, int doseTime)
@@ -20,6 +18,7 @@ public final class Entries
 
 		return intake;
 	}
+	*/
 
 	public static boolean hasMissingIntakesBeforeDate(Drug drug, Date date)
 	{
@@ -39,19 +38,18 @@ public final class Entries
 		{
 			long days = drug.getRepeatArg();
 
-			Date origin = drug.getRepeatOrigin();
+			final Date origin = drug.getRepeatOrigin();
 			if(date.before(origin))
 				return false;
 
-			long elapsed = date.getTime() - origin.getTime();
+			long elapsedDays = (date.getTime() - origin.getTime()) / Constants.MILLIS_PER_DAY;
 
-			int offset = (int) -(elapsed % days);
+			int offset = (int) -(elapsedDays % days);
 			if(offset == 0)
 				offset = (int) -days;
 
-			Date lastIntakeDate = DateTime.add(date, Calendar.DAY_OF_MONTH, offset);
-
-			return Intake.hasAll(drug, lastIntakeDate);
+			final Date lastIntakeDate = DateTime.add(date, Calendar.DAY_OF_MONTH, offset);
+			return !Intake.hasAll(drug, lastIntakeDate);
 		}
 		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
 		{

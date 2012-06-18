@@ -112,7 +112,8 @@ public class Drug extends Entry implements Comparable<Drug>
 	public static final int REPEAT_WEEKDAYS = 2;
 	public static final int REPEAT_ON_DEMAND = 3;
 	public static final int REPEAT_CUSTOM = 4;
-	public static final int REPEAT_INVALID = 5;
+	public static final int REPEAT_21_7 = 5; // for oral contraceptives, 21 days on, 7 off
+	public static final int REPEAT_INVALID = 6;
 
 	// TODO valid arguments: 6, 8, 12, with automapping to doseTimes
 	public static final int REPEAT_EVERY_N_HOURS = -1;

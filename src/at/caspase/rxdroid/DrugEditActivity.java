@@ -272,6 +272,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			{
 				final int index = p.getOrder();
 				ps.onItemClick(null, null, index, 0);
+				//p.getOnPreferenceClickListener().onPreferenceClick(p);
 			}
 			else
 				Log.w(TAG, "Couldn't focus on current supply preference");
@@ -290,12 +291,15 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		if(item.getItemId() == android.R.id.home)
+		if(!Version.SDK_IS_PRE_HONEYCOMB)
 		{
-			// We can do this since this Activity can only be launched from
-			// DrugListActivity at the moment.
-			onBackPressed();
-			return true;
+			if(item.getItemId() == android.R.id.home)
+			{
+				// We can do this since this Activity can only be launched from
+				// DrugListActivity at the moment.
+				onBackPressed();
+				return true;
+			}
 		}
 
 		return super.onOptionsItemSelected(item);

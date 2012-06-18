@@ -193,7 +193,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	@Override
 	public void onBackPressed()
 	{
-		if(!mPopup.isShowing())
+		if(mPopup == null || !mPopup.isShowing())
 			super.onBackPressed();
 		else
 			dismissPopup();
