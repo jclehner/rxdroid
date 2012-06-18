@@ -46,9 +46,9 @@
     <string name="_msg_low_supply_single">Low supply: %1$s.</string>
     <string name="_msg_low_supply_multiple">Low supply: %1$s and %2$d other(s).</string>
      -->
-    <string name="_msg_doses_fp">%1$d missed, %2$d pending.</string>
+    <string name="_msg_doses_fp">%1$d missed, %2$d due.</string>
     <string name="_msg_doses_f">%1$d missed.</string>
-    <string name="_msg_doses_p">%1$d pending.</string>
+    <string name="_msg_doses_p">%1$d due.</string>
     <string name="_msg_low_supply_single">%1$s</string>
     <string name="_msg_low_supply_multiple">%1$s and %2$d other(s).</string>
     
@@ -133,8 +133,8 @@
 	<string name="_title_tablet">Tablet</string>
 	<string name="_title_injection">Syringe</string>
 	<string name="_title_spray">Spray</string>
-	<string name="_title_drop">Drop</string>
-	<string name="_title_gel">Gel</string>
+	<string name="_title_drop">Glass</string>
+	<string name="_title_gel">Tube</string>
 	<string name="_title_other">Other</string>
 	
 	<string name="_title_daily">Daily</string>
