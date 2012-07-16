@@ -53,7 +53,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = DoseView.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	public static final int STATUS_INDETERMINATE = 0;
 	public static final int STATUS_TAKEN = 1;
@@ -128,7 +128,12 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			return mDose;
 
 		if(mDrug != null && mDoseTime != -1)
-			return mDrug.getDose(mDoseTime);
+		{
+			if(mDate == null)
+				return mDrug.getDose(mDoseTime);
+
+			return mDrug.getDose(mDoseTime, mDate);
+		}
 
 		throw new IllegalStateException("Neither dose nor drug and dose time were set");
 	}

@@ -458,7 +458,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			drug.setComment(comment);
 			drug.setCurrentSupply(currentSupply);
 			drug.setRefillSize(refillSize);
-			drug.setRepeat(repeat);
+			drug.setRepeatMode(repeat);
 			drug.setSortRank(sortRank);
 			drug.setSchedule(schedule);
 
@@ -479,7 +479,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	private static class RepeatModePreferenceHelper extends ListPreferenceWithIntHelper
 	{
 		private ListPreference mPref;
-		private Context mCtx;
+		private Context mContext;
 
 		@SuppressWarnings("unused")
 		public RepeatModePreferenceHelper() {
@@ -492,7 +492,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			super.initPreference(preference, fieldValue);
 
 			mPref = preference;
-			mCtx = preference.getContext();
+			mContext = preference.getContext();
 
 			//preference.setDependency("currentSupply");
 
@@ -519,12 +519,16 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					handleWeekdaysRepeatMode();
 					return false;
 
+				case Drug.REPEAT_21_7:
+					handle21_7RepeatMode();
+					return false;
+
 				case Drug.REPEAT_DAILY:
 				case Drug.REPEAT_ON_DEMAND:
 					return super.updatePreference(preference, newValue);
 
 				default:
-					Toast.makeText(mCtx, "Not implemented", Toast.LENGTH_LONG).show();
+					Toast.makeText(mContext, "Not implemented", Toast.LENGTH_LONG).show();
 					return false;
 			}
 		}
@@ -544,6 +548,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 				case Drug.REPEAT_EVERY_N_DAYS:
 				case Drug.REPEAT_WEEKDAYS:
+				case Drug.REPEAT_21_7:
 					// summary is updated from the handle<repeat mode>() functions
 					break;
 
@@ -570,31 +575,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				repeatArg = (Long) getFieldValue("repeatArg");
 			}
 
-			final EditText editText = new EditText(mCtx);
+			final EditText editText = new EditText(mContext);
 			editText.setText(Long.toString(repeatArg));
 			editText.setEms(20);
 			editText.setMaxLines(1);
 			editText.setInputType(InputType.TYPE_CLASS_NUMBER);
 			editText.setSelectAllOnFocus(true);
 
-			final OnDateSetListener onDateSetListener = new OnDateSetListener() {
-
-				@Override
-				public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-				{
-					final Date repeatOrigin = DateTime.date(year, monthOfYear, dayOfMonth);
-					final long repeatArg = Long.valueOf(editText.getText().toString());
-
-					setFieldValue(Drug.REPEAT_EVERY_N_DAYS);
-					setFieldValue("repeatOrigin", repeatOrigin);
-					setFieldValue("repeatArg", repeatArg);
-
-					updateSummary();
-					notifyForwardDependencies();
-				}
-			};
-
-			final AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
+			final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 			builder.setTitle(R.string._title_every_n_days);
 			builder.setMessage(R.string._msg_every_n_days_distance);
 			builder.setView(editText);
@@ -605,16 +593,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					int year = 1900 + repeatOrigin.getYear();
-					int month = repeatOrigin.getMonth();
-					int day = repeatOrigin.getDate();
-
-					DatePickerDialog datePickerDialog =
-							new DatePickerDialog(mCtx, onDateSetListener, year, month, day);
-
-					datePickerDialog.setCancelable(false);
-					datePickerDialog.setMessage(mCtx.getString(R.string._msg_repetition_origin));
-					datePickerDialog.show();
+					final long repeatArg = Long.valueOf(editText.getText().toString());
+					showRepeatOriginDateDialog(Drug.REPEAT_EVERY_N_DAYS, repeatOrigin, repeatArg);
 				}
 			});
 
@@ -642,7 +622,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(enabled);
 
 					if(!enabled)
-						editText.setError(mCtx.getString(R.string._msg_drug_repeat_ge_2));
+						editText.setError(mContext.getString(R.string._msg_drug_repeat_ge_2));
 					else
 						editText.setError(null);
 				}
@@ -674,7 +654,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 			final SimpleBitSet bitset = new SimpleBitSet(repeatArg);
 
-			final AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
+			final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 			builder.setTitle(R.string._title_weekdays);
 			builder.setMultiChoiceItems(Constants.LONG_WEEK_DAY_NAMES, checkedItems, new OnMultiChoiceClickListener() {
 
@@ -704,6 +684,45 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			builder.show();
 		}
 
+		private void handle21_7RepeatMode()
+		{
+			if(getFieldValue() != Drug.REPEAT_21_7)
+				setFieldValue("repeatOrigin", DateTime.todayDate());
+
+			showRepeatOriginDateDialog(Drug.REPEAT_21_7, (Date) getFieldValue("repeatOrigin"), 0);
+		}
+
+		private void showRepeatOriginDateDialog(final int repeatMode, Date repeatOrigin, final long repeatArg)
+		{
+			final OnDateSetListener onDateSetListener = new OnDateSetListener() {
+
+				@Override
+				public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+				{
+					final Date newRepeatOrigin = DateTime.date(year, monthOfYear, dayOfMonth);
+
+					setFieldValue(repeatMode);
+					setFieldValue("repeatOrigin", newRepeatOrigin);
+					setFieldValue("repeatArg", repeatArg);
+
+					updateSummary();
+					notifyForwardDependencies();
+				}
+			};
+
+
+
+			final Calendar cal = DateTime.calendarFromDate(repeatOrigin);
+			final int year = cal.get(Calendar.YEAR);
+			final int month = cal.get(Calendar.MONTH);
+			final int day = cal.get(Calendar.DAY_OF_MONTH);
+
+			final DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, onDateSetListener, year, month, day);
+			datePickerDialog.setCancelable(false);
+			datePickerDialog.setMessage(mContext.getString(R.string._msg_repetition_origin));
+			datePickerDialog.show();
+		}
+
 		private void updateSummary()
 		{
 			//final int repeatMode = (Integer) getFieldValue("repeat");
@@ -716,7 +735,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			if(repeatMode == Drug.REPEAT_EVERY_N_DAYS)
 			{
 				// FIXME change to next occurence
-				summary = mCtx.getString(
+				summary = mContext.getString(
 						R.string._msg_freq_every_n_days,
 						repeatArg,
 						DateTime.toNativeDate(repeatOrigin)
@@ -724,6 +743,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			}
 			else if(repeatMode == Drug.REPEAT_WEEKDAYS)
 				summary = getWeekdayRepeatSummary(repeatArg);
+			else if(repeatMode == Drug.REPEAT_21_7)
+			{
+				summary = mContext.getString(
+						R.string._msg_freq_21days_on_7days_off,
+						DateTime.toNativeDate(repeatOrigin)
+				);
+			}
 			else
 				summary = null;
 
@@ -742,7 +768,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			}
 
 			if(weekdays.isEmpty())
-				return mCtx.getString(R.string._summary_intake_never);
+				return mContext.getString(R.string._summary_intake_never);
 
 			StringBuilder sb = new StringBuilder(weekdays.get(0));
 

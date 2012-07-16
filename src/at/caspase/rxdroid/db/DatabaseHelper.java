@@ -30,6 +30,8 @@ import java.util.List;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import at.caspase.rxdroid.util.Reflect;
+
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
@@ -189,29 +191,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 		try
 		{
-			try
-			{
-				final Class<?> hook = Class.forName(oldPackageName + ".Hook");
-				Log.i(TAG, "  Found hook in " + oldPackageName);
-
-				final Constructor<?> ctor = hook.getConstructor(cs.getClass());
-				Runnable r = (Runnable) ctor.newInstance(cs);
-				r.run();
-
+			if(runHook(oldPackageName, "BeforeDatabaseUpdateHook", cs))
 				++updatedDataCount;
-			}
-			catch(ClassNotFoundException e)
-			{
-				// ignore
-			}
-			catch(InstantiationException e)
-			{
-				Log.w(TAG, e);
-			}
-			catch(NoSuchMethodException e)
-			{
-				Log.w(TAG, e);
-			}
 
 			for(Class<?> clazz : Database.CLASSES)
 			{
@@ -225,14 +206,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 				//TableUtils.createTableIfNotExists(cs, newDataClass);
 				//++updatedDataCount;
 
-				try
-				{
-					oldDataClass = Class.forName(oldDataClassName);
-				}
-				catch(ClassNotFoundException e)
-				{
+				oldDataClass = Reflect.classForName(oldDataClassName);
+				if(oldDataClass == null)
 					continue;
-				}
 
 				Log.i(TAG, "  Found " + oldDataClassName);
 
@@ -282,6 +258,47 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 
 		Log.e(TAG, "upgrade", ex);
+
+		return false;
+	}
+
+	private boolean runHook(String packageName, String hookName, ConnectionSource cs)
+	{
+		try
+		{
+			final Class<?> hook = Class.forName(packageName + "." + hookName);
+			Log.i(TAG, "  Found " + hookName + " in " + packageName);
+
+			final Constructor<?> ctor = hook.getConstructor(cs.getClass());
+			Runnable r = (Runnable) ctor.newInstance(cs);
+			r.run();
+
+			return true;
+		}
+		catch(ClassNotFoundException e)
+		{
+			// ignore
+		}
+		catch(InstantiationException e)
+		{
+			Log.w(TAG, e);
+		}
+		catch(NoSuchMethodException e)
+		{
+			Log.w(TAG, e);
+		}
+		catch(IllegalArgumentException e)
+		{
+			Log.w(TAG, e);
+		}
+		catch(IllegalAccessException e)
+		{
+			Log.w(TAG, e);
+		}
+		catch(InvocationTargetException e)
+		{
+			Log.w(TAG, e);
+		}
 
 		return false;
 	}

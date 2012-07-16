@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import android.widget.TimePicker;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
 
@@ -196,6 +197,26 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		return sdf.format(time);
 	}
 
+	public static final int ALLOW_BEGIN_WRAP = 1;
+	public static final int ALLOW_END_WRAP = 2;
+
+	public boolean isWithinRange(DumbTime begin, DumbTime end, boolean allowWrap)
+	{
+		if(begin != null && end != null)
+		{
+			if(!allowWrap)
+				return (equals(begin) || after(begin)) && before(end);
+			else if(allowWrap)
+				return equals(begin) || after(begin) || before(end);
+		}
+		else if(begin == null)
+			return before(end);
+		else if(end == null)
+			return equals(begin) || after(begin);
+
+		throw new IllegalArgumentException();
+	}
+
 	public static DumbTime fromString(String timeString)
 	{
 		if(timeString != null)
@@ -221,5 +242,11 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	public static DumbTime fromCalendar(Calendar cal) {
 		return new DumbTime(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
 	}
+
+	public static DumbTime fromTimePicker(TimePicker picker) {
+		return new DumbTime(picker.getCurrentHour(), picker.getCurrentMinute());
+	}
+
+	//public static void applyToTimePicker(TimePicker)
 }
 

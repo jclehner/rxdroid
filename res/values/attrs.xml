@@ -9,6 +9,18 @@
     	<attr name="allowAfterWrap" format="boolean" />
     </declare-styleable>
     
+    <declare-styleable name="TimePeriodPreference">
+        <attr name="minTime" format="string" />
+        <attr name="maxTime" format="string" />
+        <attr name="allowMinWrap" format="boolean" />
+        <attr name="allowMaxWrap" format="boolean" />
+    </declare-styleable>
+    
+    
+    
+    
+    
+    
    <!--  <declare-styleable name="numberpicker">
         <attr name="startRange" format="integer" />
         <attr name="endRange" format="integer" />

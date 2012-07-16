@@ -21,6 +21,8 @@
 
 package at.caspase.androidutils.otpm;
 
+import java.io.Serializable;
+
 import at.caspase.androidutils.MyDialogPreference;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -29,7 +31,7 @@ public class MyDialogPreferenceHelper extends PreferenceHelper<MyDialogPreferenc
 	@Override
 	public void initPreference(MyDialogPreference preference, Object fieldValue)
 	{
-		preference.setValue(fieldValue);
+		preference.setValue((Serializable) fieldValue);
 		//preference.setSummary(fieldValue.toString());
 	}
 }

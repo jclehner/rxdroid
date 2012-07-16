@@ -29,13 +29,13 @@ import at.caspase.rxdroid.db.Schedule;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
-public class Hook implements Runnable
+public class BeforeDatabaseUpgradeHook implements Runnable
 {
 	ConnectionSource mCs;
 
-	public Hook() {}
+	public BeforeDatabaseUpgradeHook() {}
 
-	public Hook(ConnectionSource cs) {
+	public BeforeDatabaseUpgradeHook(ConnectionSource cs) {
 		mCs = cs;
 	}
 

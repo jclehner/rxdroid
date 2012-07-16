@@ -80,8 +80,5 @@ public final class Entries
 		return false;
 	}
 
-
-
-
 	private Entries() {}
 }

@@ -110,6 +110,13 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void scheduleNextAlarms()
 	{
+		if(mSettings.getDoseTimeBegin(Drug.TIME_MORNING) == null)
+		{
+			Log.w(TAG, "No dose-time settings available. Not scheduling alarms.");
+			return;
+		}
+
+
 		Log.d(TAG, "Scheduling next alarms...");
 
 		final Calendar now = DateTime.nowCalendar();
@@ -239,7 +246,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		for(Drug drug : mAllDrugs)
 		{
-			final Fraction dose = drug.getDose(doseTime);
+			final Fraction dose = drug.getDose(doseTime, date);
 
 			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date) || drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND)
 				continue;
@@ -299,7 +306,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			for(int doseTime = 0; doseTime != Drug.TIME_INVALID; ++doseTime)
 			{
-				final Fraction dose = drug.getDose(doseTime);
+				final Fraction dose = drug.getDose(doseTime, date);
 				if(dose.compareTo(0) != 0)
 					dailyDose += dose.doubleValue();
 			}
@@ -324,10 +331,6 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 
 		return message;
-	}
-
-	private String getString(int resId) {
-		return mContext.getString(resId);
 	}
 
 	private String getString(int resId, Object... formatArgs) {

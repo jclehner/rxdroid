@@ -196,6 +196,18 @@ public final class Reflect
 		throw new RuntimeException(ex);
 	}
 
+	public static Class<?> classForName(String className)
+	{
+		try
+		{
+			return Class.forName(className);
+		}
+		catch(ClassNotFoundException e)
+		{
+			return null;
+		}
+	}
+
 	/**
 	 * Obtains the value of an <code>Annotation</code>'s parameter.
 	 *

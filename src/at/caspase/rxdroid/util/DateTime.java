@@ -190,4 +190,9 @@ public final class DateTime
 		Calendar cal = calendarFromDate(date);
 		return cal.get(field);
 	}
+
+	public static long diffDays(Date date1, Date date2)
+	{
+		return (date1.getTime() - date2.getTime()) / Constants.MILLIS_PER_DAY;
+	}
 }

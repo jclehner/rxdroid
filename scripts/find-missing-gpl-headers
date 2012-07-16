@@ -1,3 +1,3 @@
 #!/bin/bash
 
-grep --include=*.java --exclude=R.java -L -R 'Copyright' . 
+grep --include=*.java --exclude=R.java -L -R 'Copyright' src/

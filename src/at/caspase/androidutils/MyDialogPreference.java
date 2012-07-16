@@ -21,18 +21,22 @@
 
 package at.caspase.androidutils;
 
+import java.io.Serializable;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import at.caspase.androidutils.InstanceState.SaveState;
 
@@ -47,12 +51,12 @@ import at.caspase.androidutils.InstanceState.SaveState;
  * @author Joseph Lehner
  *
  */
-public abstract class MyDialogPreference<T> extends DialogPreference
+public abstract class MyDialogPreference<T extends Serializable> extends DialogPreference
 {
 	private static final String TAG = MyDialogPreference.class.getName();
 	private static final boolean LOGV = false;
 
-	private static final String EMPTY = "";
+	private static final String EMPTY = "<!!!!!!!!!!!!!!!!!!!!!!EMPTY";
 
 	@SaveState
 	private CharSequence mNeutralButtonText;
@@ -60,7 +64,7 @@ public abstract class MyDialogPreference<T> extends DialogPreference
 	@SaveState
 	private T mValue;
 
-	@SaveState
+	//@SaveState
 	private Dialog mDialog;
 
 	private static final String KEY_IS_DIALOG_SHOWING = "is_showing";
@@ -70,7 +74,7 @@ public abstract class MyDialogPreference<T> extends DialogPreference
 	}
 
 	public MyDialogPreference(Context context, AttributeSet attrs) {
-		super(context, attrs, android.R.attr.dialogPreferenceStyle);
+		super(context, attrs, android.R.attr.preferenceStyle);
 	}
 
 	public void setNeutralButtonText(CharSequence text) {
@@ -149,6 +153,16 @@ public abstract class MyDialogPreference<T> extends DialogPreference
 	protected abstract String toPersistedString(T value);
 	protected abstract T fromPersistedString(String string);
 
+	@Override
+	protected Object onGetDefaultValue(TypedArray a, int index)
+	{
+		final String string = a.getString(index);
+		final T newValue = fromPersistedString(string);
+
+		setValue(newValue);
+		return newValue;
+	}
+
 	protected abstract T getDialogValue();
 
 	protected void onValueSet(T value) {
@@ -226,6 +240,16 @@ public abstract class MyDialogPreference<T> extends DialogPreference
 			View contentView = onCreateDialogView();
 			if(contentView != null)
 			{
+				/*ViewGroup parent = (ViewGroup) mDialog.findViewById(android.R.id.custom);
+				if(parent != null)
+				{
+					parent.removeView(contentView);
+
+
+				}
+
+				mDialog.findViewById(android.R.id.custom).remove*/
+
 				onBindDialogView(contentView);
 				builder.setView(contentView);
 			}

@@ -14,10 +14,11 @@ PKG=at.caspase.rxdroid
 DATABASES=/data/data/$PKG/databases
 TARGET=$DATABASES/db.sqlite
 
-INFO=`adb shell ls -l $DATABASES/..`
+INFO=`adb shell ls -l /data/data | grep $PKG`
 FUID=`awk '{ print $2 }' <<<$INFO`
 FGID=`awk '{ print $3 }' <<<$INFO`
 
+adb shell mkdir -p $(dirname $TARGET)
 adb push "$1" $TARGET || exit 1
 adb shell busybox chown -R $FUID:$FGID $DATABASES  || exit 1
 adb shell am kill $PKG || exit 1

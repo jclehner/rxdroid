@@ -13,26 +13,49 @@
 		android:title="@string/_title_prefscreen_times"
 		android:summary="@string/_summary_prefscreen_times"
 		android:icon="@drawable/android:ic_menu_recent_history">
-				
-		<PreferenceCategory android:key="cat_time_morning"
-			android:title="@string/_Morning">
-			
-			<at.caspase.rxdroid.preferences.TimePreference android:key="time_morning_begin"
-				android:title="@string/_Begin"
-				android:dialogIcon="@drawable/ic_morning"
-				android:defaultValue="@string/pref_default_time_morning_begin"
-				rxdroid:after="time_night_end"
-				rxdroid:before="time_morning_end"
-				rxdroid:allowAfterWrap="true"
-			/>
-				
-			<at.caspase.rxdroid.preferences.TimePreference android:key="time_morning_end"
-				android:title="@string/_End"
-				android:defaultValue="@string/pref_default_time_morning_end"
-				rxdroid:after="time_morning_begin"
-				rxdroid:before="time_noon_begin" />
-			
-		</PreferenceCategory>
+		
+	    <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_morning"
+	        android:title="@string/_title_morning"
+	        android:dialogIcon="@drawable/ic_morning"
+	        rxdroid:minTime="time_night"
+	        rxdroid:maxTime="time_morning"
+	        rxdroid:allowMinWrap="true"
+	        
+	        android:defaultValue="08:00-10:00"
+	    />
+	    
+	    <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_noon"
+	        android:title="@string/_title_noon"
+	        android:dialogIcon="@drawable/ic_noon"
+	        rxdroid:minTime="time_morning"
+	        rxdroid:maxTime="time_evening"
+	        	        
+	        android:defaultValue="12:00-14:00"
+	    />
+	    
+	     <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_evening"
+	        android:title="@string/_title_evening"
+	        android:dialogIcon="@drawable/ic_evening"
+	        rxdroid:minTime="time_noon"
+	        rxdroid:maxTime="time_night"
+	        
+	        android:defaultValue="18:00-20:00"
+	    />
+	     
+	     <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_night"
+	        android:title="@string/_title_night"
+	        android:dialogIcon="@drawable/ic_night"
+	        rxdroid:minTime="time_evening"
+	        rxdroid:maxTime="time_morning"
+	        rxdroid:allowMaxWrap="true"
+	        
+	        android:defaultValue="21:00-23:00"
+	    />
+	    
+	    
+	    
+	    <!-- 		
+		
 		
 		<PreferenceCategory android:key="cat_time_noon"
 			android:title="@string/_Noon">
@@ -91,7 +114,7 @@
 			/>	
 				
 		</PreferenceCategory>
-	
+	 -->
 	</PreferenceScreen>
 	
 	<!-- DISPLAY -->
@@ -202,7 +225,18 @@
 		<CheckBoxPreference android:key="debug_snooze_time_short"
 			android:title="Short snooze time"
 			android:summary="Set snooze time to 10 seconds"			
-			android:defaultValue="false" 
+			android:defaultValue="false"
+		/>
+		
+		<at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_period"
+		    android:title="TimePeriodPreference"
+		    android:defaultValue="07:00|13:00"
+		    android:persistent="true"
+		    rxdroid:minTime="23:00"
+		    rxdroid:allowMinWrap="true"
+		    rxdroid:maxTime="14:00"
+		    
+		    
 		/>
 	
 	</PreferenceScreen>

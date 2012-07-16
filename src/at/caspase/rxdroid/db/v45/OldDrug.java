@@ -41,7 +41,7 @@ public class OldDrug extends Entry
 	{
 		Drug drug = new Drug();
 		drug.setId(id);
-		drug.setRepeat(frequency);
+		drug.setRepeatMode(frequency);
 		drug.setRepeatArg(frequencyArg);
 		drug.setRepeatOrigin(frequencyOrigin);
 

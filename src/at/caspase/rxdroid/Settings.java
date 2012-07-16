@@ -30,6 +30,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
@@ -76,38 +77,6 @@ public class Settings
 		return defaults;
 	}
 
-	public Calendar getDoseTimeBegin(Calendar date, int doseTime) {
-		return getDoseTimeBeginOrEnd(date, doseTime, true);
-	}
-
-	public Calendar getDoseTimeEnd(Calendar date, int doseTime) {
-		return getDoseTimeBeginOrEnd(date, doseTime, false);
-	}
-
-	private Calendar getDoseTimeBeginOrEnd(Calendar date, int doseTime, boolean getDoseTimeBegin)
-	{
-		final DumbTime time;
-
-		if(getDoseTimeBegin)
-			time = getTimePreferenceBegin(doseTime);
-		else
-			time = getTimePreferenceEnd(doseTime);
-
-		date.set(Calendar.HOUR, time.getHours());
-		date.set(Calendar.MINUTE, time.getMinutes());
-		date.set(Calendar.SECOND, 0);
-		date.set(Calendar.MILLISECOND, 0);
-
-		if(doseTime == Drug.TIME_NIGHT && !getDoseTimeBegin)
-		{
-			DumbTime end = getTimePreferenceEnd(doseTime);
-			if(end.before(time))
-				date.add(Calendar.DAY_OF_MONTH, 1);
-		}
-
-		return date;
-	}
-
 	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_GET_MILLIS_UNTIL_BEGIN);
 	}
@@ -116,32 +85,22 @@ public class Settings
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, 0);
 	}
 
-	/**
-	 * Gets the time until the end of that dose time in respect to
-	 * the given time.
-	 * <p>
-	 * As opposed to {@link #getMillisUntilDoseTimeEnd(Calendar, int)}, this
-	 * function will return a negative value if the start of the given dose time
-	 * lies in the past.
-	 */
-	public long getMillisUntilDoseTimeEndRaw(Calendar time, int doseTime) {
-		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_DONT_CORRECT_TIME);
-	}
-
 	public long getAlarmTimeout()
 	{
+		// FIXME
+
 		if(!sSharedPrefs.getBoolean("debug_snooze_time_short", false))
-			return getTimePreference("alarm_timeout").getTime();
+			return 1800 * 1000;
 
 		return 10000;
 	}
 
 	private long getDoseTimeBeginOffset(int doseTime) {
-		return getTimePreference(KEY_PREFIXES[doseTime] + "_begin").getTime();
+		return getDoseTimeBegin(doseTime).getTime();
 	}
 
 	public long getDoseTimeEndOffset(int doseTime) {
-		return getTimePreference(KEY_PREFIXES[doseTime] + "_end").getTime();
+		return getDoseTimeEnd(doseTime).getTime();
 	}
 
 	public long getTrueDoseTimeEndOffset(int doseTime)
@@ -159,15 +118,19 @@ public class Settings
 		return getDoseTimeEndOffset(Drug.TIME_NIGHT) != getTrueDoseTimeEndOffset(Drug.TIME_NIGHT);
 	}
 
-	public DumbTime getTimePreferenceBegin(int doseTime) {
-		return getTimePreference(doseTime, "_begin");
+	public DumbTime getDoseTimeBegin(int doseTime)
+	{
+		final TimePeriod p = getTimePeriodPreference(KEY_PREFIXES[doseTime]);
+		return p == null ? null : p.begin;
 	}
 
-	public DumbTime getTimePreferenceEnd(int doseTime) {
-		return getTimePreference(doseTime, "_end");
+	public DumbTime getDoseTimeEnd(int doseTime)
+	{
+		final TimePeriod p = getTimePeriodPreference(KEY_PREFIXES[doseTime]);
+		return p == null ? null : p.end;
 	}
 
-	public DumbTime getTimePreference(String key)
+	/*public DumbTime getTimePreference(String key)
 	{
 		if(key == null)
 			return null;
@@ -183,10 +146,18 @@ public class Settings
 		}
 
 		return DumbTime.fromString(value);
-	}
+	}*/
 
-	private DumbTime getTimePreference(int doseTime, String suffix) {
-		return getTimePreference(KEY_PREFIXES[doseTime] + suffix);
+	public TimePeriod getTimePeriodPreference(String key)
+	{
+		if(key == null)
+			throw new NullPointerException();
+
+		final String value = sSharedPrefs.getString(key, null);
+		if(value != null)
+			return TimePeriod.fromString(value);
+
+		return null;
 	}
 
 	public Date getActiveDate(Calendar time)
@@ -224,7 +195,7 @@ public class Settings
 	{
 		for(int doseTime : DOSE_TIMES)
 		{
-			if(DateTime.isWithinRange(time, getTimePreferenceBegin(doseTime), getTimePreferenceEnd(doseTime)))
+			if(DateTime.isWithinRange(time, getDoseTimeBegin(doseTime), getDoseTimeEnd(doseTime)))
 				return doseTime;
 		}
 

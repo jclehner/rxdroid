@@ -6,14 +6,6 @@
     
     <!-- FIXME remove these -->
     
-    <string name="pref_default_time_morning_begin">06:00</string>
-    <string name="pref_default_time_morning_end">10:00</string>
-    <string name="pref_default_time_noon_begin">12:00</string>
-    <string name="pref_default_time_noon_end">15:00</string>
-    <string name="pref_default_time_evening_begin">19:00</string>
-    <string name="pref_default_time_evening_end">21:00</string>
-    <string name="pref_default_time_night_begin">22:00</string>
-    <string name="pref_default_time_night_end">23:30</string>
     <string name="pref_default_alarm_timeout">00:30</string>
         
     <!-- 
@@ -29,12 +21,14 @@
     
 	<!-- FIXME change these -->
 
-    <string name="_Morning">Morning</string>
-    <string name="_Noon">Noon</string>
-    <string name="_Evening">Evening</string>
-    <string name="_Night">Night</string>
+    <string name="_title_morning">Morning</string>
+    <string name="_title_noon">Noon</string>
+    <string name="_title_evening">Evening</string>
+    <string name="_title_night">Night</string>
+    <!-- 
     <string name="_Begin">Begin</string>
     <string name="_End">End</string>
+     -->
     
     <string name="_msg_new_notification">New notification</string>
     <string name="_title_notifications">RxDroid</string>
@@ -123,6 +117,7 @@
 	<string name="_title_mark_taken">Mark as taken</string>
 	
 	<string name="_msg_freq_every_n_days">Every %1$s days, beginning on %2$s</string>
+	<string name="_msg_freq_21days_on_7days_off">21 days beginning on %1$s, followed by a 7 day pause.</string>
 	
 	<string name="_summary_intake_never">Never</string>
 	<string name="_msg_drug_repeat_ge_2">Must be greater than or equal to 2</string>
@@ -140,6 +135,7 @@
 	<string name="_title_daily">Daily</string>
 	<string name="_title_every_n_days">Every N days</string>
 	<string name="_title_pick_days">Pick days</string>
+	<string name="_title_21_days_on_7_days_off">7 day pause every 21 days</string>
 	
 	<string name="_title_dont_snooze">Notify once</string>
 	<string name="_title_repeat_alarm">Repeat alarm</string>
@@ -205,6 +201,9 @@
     
     <string name="_title_notification_doses">Doses</string>
 	<string name="_title_notification_low_supplies">Low supplies</string>
+	
+	<string name="_btn_next">Next</string>
+	<string name="_btn_back">Back</string>
     
 	<!-- 
     Keep at the end of strings.xml!  

@@ -1,10 +1,12 @@
 package at.caspase.rxdroid.db.schedules;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.util.DateTime;
 
 public class ScheduleHourly extends ScheduleBase
 {
@@ -66,4 +68,15 @@ public class ScheduleHourly extends ScheduleBase
 			mDoses[doseTime] = dose;
 	}
 
+	@Override
+	public Date getDoseTimeBegin(Date date, int doseTime)
+	{
+		if(!mIn8HourMode && doseTime == mDoseTimeToSkip)
+			throw new IllegalArgumentException();
+
+		Date begin = DateTime.add(date, Calendar.MILLISECOND, (int) mOffset.getTime());
+
+		return null;
+
+	}
 }

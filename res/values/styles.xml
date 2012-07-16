@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 	<style name="TextLarge" parent="@android:style/TextAppearance.Large.Inverse">
 		<item name="android:textColor">@color/color_text</item>
 	</style>
 	<style name="TextMedium" parent="@android:style/TextAppearance.Medium.Inverse">
 		<item name="android:textColor">@color/color_text</item>		
-	</style>		
+	</style>
+	<style name="FractionInputBottomPadding">
+	    <item name="android:paddingBottom">30dip</item>
+	</style>
+			
 </resources>

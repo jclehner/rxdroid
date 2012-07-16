@@ -1,0 +1,138 @@
+#!/bin/bash
+
+GIT_REPOS=( 
+	"NumberPicker git://github.com/mrn/numberpicker.git lib" 
+	"ActionBarSherlock git://github.com/JakeWharton/ActionBarSherlock.git library" 
+)
+
+DEFAULT_BUILDCOMMANDS=(
+	com.android.ide.eclipse.adt.ResourceManagerBuilder
+	com.android.ide.eclipse.adt.PreCompilerBuilder
+	com.android.ide.eclipse.adt.ApkBuilder
+	org.eclipse.jdt.core.javabuilder
+)
+
+DEFAULT_NATURES=( 
+	com.android.ide.eclipse.adt.AndroidNature 
+	org.eclipse.jdt.core.javanature 
+)
+
+if ! command -v git &> /dev/null; then
+	echo "ERROR: git is required to run this script" >&2
+	exit 1
+fi
+
+if [[ "$1" == "update" ]]; then
+	UPDATE=1
+else if [[ "$1" == "cleanup" ]]; then
+	rm -rf thirdparty || exit 1
+	mkdir thirdparty || exit 1
+	echo "INFO: Emptied directory \`thirdparty'"
+	exit 0
+fi
+	UPDATE=0
+fi
+
+# clone_or_fetch(string repoUrl, string targetDirectory)
+clone_or_fetch()
+{
+	if [[ $UPDATE -eq 1 ]]; then
+		( cd "$2" && git fetch) || exit 1
+	else
+		if [[ -d "$2" ]]; then
+			echo "ERROR: Directory $2 already exists. Run \`$(basename $0) update' instead'" >&2
+			exit 1
+		fi
+		git clone "$1" "$2" || exit 1
+	fi
+}
+
+install_dotproject()
+{
+	local file="$1/.project"
+
+	if [[ -e "$file" ]]; then
+		echo "INFO: Not overwriting $file"
+		return 0
+	fi
+
+	cat > "$file" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>$TARGET</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+EOF
+
+	for CMD in ${DEFAULT_BUILDCOMMANDS[@]}; do
+		cat >> "$file" <<EOF
+		<buildCommand>
+			<name>$CMD</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+EOF
+	done
+
+	echo -e "\t</buildSpec>\n\t<natures>" >> "$file"
+
+
+	for NATURE in ${DEFAULT_NATURES[@]}; do
+		echo -e "\t\t<nature>$NATURE</nature>" >> "$file"
+	done
+
+	echo -e "\t</natures>\n</projectDescription>" >> "$file"
+
+	echo "INFO: created $file"
+}
+
+install_dotclasspath()
+{
+	local file="$1/.classpath"
+
+	if [[ -e "$file" ]]; then
+		echo "INFO: Not overwriting $file"
+		return 0
+	fi
+
+	cat > "$file" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/" />
+	<classpathentry kind="src" path="gen/" />
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK" />
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES" />
+	<classpathentry kind="output" path="bin/classes" />
+</classpath>
+EOF
+
+	echo "INFO: created $file"
+}
+
+install_eclipse_files()
+{
+	install_dotproject "$1"
+	install_dotclasspath "$1"
+}
+
+cd thirdparty || exit 1
+
+for REPO in "${GIT_REPOS[@]}"; do
+
+	TARGET=$(awk '{ print $1 }' <<< ${REPO})
+	URL=$(awk '{ print $2 }' <<< ${REPO})
+	LIBDIR=$(awk '{ print $3 }' <<< ${REPO})
+
+	if [[ -z "${LIBDIR}" ]]; then
+		clone_or_fetch "${URL}" "${TARGET}"
+		install_eclipse_files "${TARGET}"
+	else
+		CLONEDIR=".${TARGET}Git"
+		clone_or_fetch "${URL}" "${CLONEDIR}"
+		ln -fs "${CLONEDIR}/${LIBDIR}" "${TARGET}"
+		install_eclipse_files "${TARGET}"
+	fi
+done
+

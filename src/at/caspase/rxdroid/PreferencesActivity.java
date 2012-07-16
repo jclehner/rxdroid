@@ -43,6 +43,7 @@ import at.caspase.rxdroid.preferences.TimePreference;
 import at.caspase.rxdroid.ui.FragmentTabActivity;
 import at.caspase.rxdroid.util.Util;
 
+@SuppressWarnings("deprecation")
 public class PreferencesActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener
 {
 	@SuppressWarnings("unused")

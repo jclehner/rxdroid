@@ -1,6 +1,5 @@
 package at.caspase.rxdroid.ui;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,10 +14,8 @@ import at.caspase.rxdroid.DoseView;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.util.CollectionUtils;
 
-public abstract class AbsDrugAdapter extends ArrayAdapter<Drug> implements Serializable
+public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 {
-	private static final long serialVersionUID = -3488495259055390205L;
-
 	private final ArrayList<Drug> mAllItems;
 
 	protected final Activity mActivity;

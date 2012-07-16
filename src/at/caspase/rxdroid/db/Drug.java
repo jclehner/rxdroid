@@ -92,7 +92,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	public static final int TIME_EVENING = 2;
 	public static final int TIME_NIGHT = 3;
 	/**
-	 * All dose-times &lt;= this value are considered invalid.
+	 * All dose-times &gt;= this value are considered invalid.
 	 * <p>
 	 * You can also use this value in a <code>for</code> loop, which
 	 * will guarantee that the value of <code>doseTime</code> will always
@@ -111,8 +111,8 @@ public class Drug extends Entry implements Comparable<Drug>
 	public static final int REPEAT_EVERY_N_DAYS = 1;
 	public static final int REPEAT_WEEKDAYS = 2;
 	public static final int REPEAT_ON_DEMAND = 3;
-	public static final int REPEAT_CUSTOM = 4;
-	public static final int REPEAT_21_7 = 5; // for oral contraceptives, 21 days on, 7 off
+	public static final int REPEAT_21_7 = 4; // for oral contraceptives, 21 days on, 7 off
+	public static final int REPEAT_CUSTOM = 5;
 	public static final int REPEAT_INVALID = 6;
 
 	// TODO valid arguments: 6, 8, 12, with automapping to doseTimes
@@ -154,8 +154,8 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
 	private Fraction doseNight = new Fraction();
 
-	@DatabaseField(canBeNull = true)
-	private int repeat = REPEAT_DAILY;
+	@DatabaseField(canBeNull = true, columnName = "repeat")
+	private int repeatMode= REPEAT_DAILY;
 
 	/**
 	 * Defines the repeat origin.
@@ -200,22 +200,38 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public boolean hasDoseOnDate(Date date)
 	{
-		switch(repeat)
+		if(repeatOrigin != null)
+		{
+			switch(repeatMode)
+			{
+				case REPEAT_EVERY_N_DAYS:
+				case REPEAT_EVERY_N_HOURS:
+				case REPEAT_21_7:
+				{
+					if(repeatOrigin.after(date))
+						return false;
+				}
+
+				default:
+					//Log.w(TAG, "hasDoseOnDate: repeatOrigin set for repeatMode=" + repeatMode);
+			}
+		}
+
+		switch(repeatMode)
 		{
 			case REPEAT_DAILY:
 			case REPEAT_ON_DEMAND:
 				return true;
 
 			case REPEAT_EVERY_N_DAYS:
-				if(date.before(repeatOrigin))
-					return false;
-
-				final long diffDays = (repeatOrigin.getTime() - date.getTime()) / Constants.MILLIS_PER_DAY;
-				return diffDays % repeatArg == 0;
+				return (DateTime.diffDays(date, repeatOrigin) % repeatArg) == 0;
 
 			case REPEAT_WEEKDAYS:
 				final Calendar cal = DateTime.calendarFromDate(date);
 				return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
+
+			case REPEAT_21_7:
+				return (DateTime.diffDays(date, repeatOrigin) % 28) < 21;
 
 			case REPEAT_CUSTOM:
 				return schedule.hasDoseOnDate(date);
@@ -258,7 +274,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	}
 
 	public int getRepeatMode() {
-		return repeat;
+		return repeatMode;
 	}
 
 	public long getRepeatArg() {
@@ -281,6 +297,10 @@ public class Drug extends Entry implements Comparable<Drug>
 		return currentSupply;
 	}
 
+	/**
+	 * @deprecated Move to Entries.java
+	 */
+	@Deprecated
 	public int getCurrentSupplyDays()
 	{
 		final Fraction dailyDose = getDailyDose();
@@ -331,7 +351,7 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public Fraction getDose(int doseTime)
 	{
-		if(repeat == REPEAT_CUSTOM)
+		if(repeatMode == REPEAT_CUSTOM)
 			throw new UnsupportedOperationException("This function cannot be used in conjunction with a custom schedule");
 
 		switch(doseTime)
@@ -351,7 +371,7 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public Fraction getDose(int doseTime, Date date)
 	{
-		if(repeat != REPEAT_CUSTOM)
+		if(repeatMode != REPEAT_CUSTOM)
 		{
 			if(!hasDoseOnDate(date))
 				return new Fraction(0);
@@ -386,16 +406,16 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.form = form;
 	}
 
-	public void setRepeat(int repeat)
+	public void setRepeatMode(int repeatMode)
 	{
-		if(repeat >= REPEAT_INVALID)
+		if(repeatMode >= REPEAT_INVALID)
 			throw new IllegalArgumentException();
 
-		if(repeat == this.repeat)
+		if(repeatMode == this.repeatMode)
 			return;
 
 		// the preference was changed, so reset all repeat-related settings
-		this.repeat = repeat;
+		this.repeatMode = repeatMode;
 		this.repeatArg = 0;
 		this.repeatOrigin = null;
 	}
@@ -409,18 +429,18 @@ public class Drug extends Entry implements Comparable<Drug>
 	 */
 	public void setRepeatArg(long repeatArg)
 	{
-		if(repeat == REPEAT_EVERY_N_DAYS)
+		if(repeatMode == REPEAT_EVERY_N_DAYS)
 		{
 			if(repeatArg <= 1)
 				throw new IllegalArgumentException();
 		}
-		else if(repeat == REPEAT_WEEKDAYS)
+		else if(repeatMode == REPEAT_WEEKDAYS)
 		{
 			// binary(01111111) = hex(0x7f) (all weekdays)
 			if(repeatArg <= 0 || repeatArg > 0x7f)
 				throw new IllegalArgumentException();
 		}
-		else if(repeat == REPEAT_EVERY_N_HOURS)
+		else if(repeatMode == REPEAT_EVERY_N_HOURS)
 		{
 			if(repeatArg != 6 && repeatArg != 8 && repeatArg != 12)
 				throw new IllegalArgumentException();
@@ -442,10 +462,10 @@ public class Drug extends Entry implements Comparable<Drug>
 	 */
 	public void setRepeatOrigin(Date repeatOrigin)
 	{
-		if(repeat != REPEAT_EVERY_N_DAYS && repeat != REPEAT_EVERY_N_HOURS)
+		if(repeatMode != REPEAT_EVERY_N_DAYS && repeatMode != REPEAT_EVERY_N_HOURS && repeatMode != REPEAT_21_7)
 			return;
 
-		if(repeat == REPEAT_EVERY_N_DAYS && DateTime.getOffsetFromMidnight(repeatOrigin) != 0)
+		if(repeatMode != REPEAT_EVERY_N_HOURS && DateTime.getOffsetFromMidnight(repeatOrigin) != 0)
 			throw new IllegalArgumentException();
 
 		this.repeatOrigin = repeatOrigin;
@@ -618,13 +638,16 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	private double getSupplyCorrectionFactor()
 	{
-		switch(repeat)
+		switch(repeatMode)
 		{
 			case REPEAT_EVERY_N_DAYS:
-				return repeatArg / 1.0;
+				return repeatArg;
 
 			case REPEAT_WEEKDAYS:
 				return 7.0 / Long.bitCount(repeatArg);
+
+			case REPEAT_21_7:
+				return 1.0 / 0.75;
 
 			default:
 				return 1.0;
@@ -651,7 +674,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.doseNight,
 			this.currentSupply,
 			this.refillSize,
-			this.repeat,
+			this.repeatMode,
 			this.repeatArg,
 			this.repeatOrigin,
 			this.comment
@@ -662,7 +685,7 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	private boolean hasDoseOnWeekday(int calWeekday)
 	{
-		if(repeat != REPEAT_WEEKDAYS)
+		if(repeatMode != REPEAT_WEEKDAYS)
 			throw new IllegalStateException("repeat != FREQ_WEEKDAYS");
 
 		// first, translate Calendar's weekday representation to our

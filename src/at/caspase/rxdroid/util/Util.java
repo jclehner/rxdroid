@@ -30,6 +30,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.widget.TimePicker;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Drug;
@@ -250,5 +251,11 @@ public final class Util
 		{
 			// ignore
 		}
+	}
+
+	public static void setTimePickerTime(TimePicker picker, DumbTime time)
+	{
+		picker.setCurrentHour(time.getHours());
+		picker.setCurrentMinute(time.getMinutes());
 	}
 }
