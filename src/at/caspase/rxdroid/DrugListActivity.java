@@ -21,11 +21,13 @@
 
 package at.caspase.rxdroid;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -58,12 +60,13 @@ import android.widget.Toast;
 import at.caspase.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
-import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Entries;
+import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.ui.DrugOverviewAdapter;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Util;
 
 public class DrugListActivity extends Activity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
@@ -198,6 +201,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		Database.unregisterOnChangedListener(mDatabaseListener);
 	}
 
+	@TargetApi(11)
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{

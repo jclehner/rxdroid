@@ -17,39 +17,45 @@
 	    <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_morning"
 	        android:title="@string/_title_morning"
 	        android:dialogIcon="@drawable/ic_morning"
+	        android:persistent="true"
 	        rxdroid:minTime="time_night"
-	        rxdroid:maxTime="time_morning"
+	        rxdroid:maxTime="time_noon"
 	        rxdroid:allowMinWrap="true"
 	        
-	        android:defaultValue="08:00-10:00"
+	        
+	        android:defaultValue="@string/pref_default_time_morning"
 	    />
 	    
 	    <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_noon"
 	        android:title="@string/_title_noon"
 	        android:dialogIcon="@drawable/ic_noon"
+	        android:persistent="true"
 	        rxdroid:minTime="time_morning"
 	        rxdroid:maxTime="time_evening"
 	        	        
-	        android:defaultValue="12:00-14:00"
+	        android:defaultValue="@string/pref_default_time_noon"
 	    />
 	    
 	     <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_evening"
 	        android:title="@string/_title_evening"
 	        android:dialogIcon="@drawable/ic_evening"
+	        android:persistent="true"
 	        rxdroid:minTime="time_noon"
 	        rxdroid:maxTime="time_night"
 	        
-	        android:defaultValue="18:00-20:00"
+	        android:defaultValue="@string/pref_default_time_evening"
 	    />
 	     
 	     <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_night"
 	        android:title="@string/_title_night"
 	        android:dialogIcon="@drawable/ic_night"
+	        android:persistent="true"
 	        rxdroid:minTime="time_evening"
 	        rxdroid:maxTime="time_morning"
 	        rxdroid:allowMaxWrap="true"
+	        rxdroid:allowEndWrap="true"
 	        
-	        android:defaultValue="21:00-23:00"
+	        android:defaultValue="@string/pref_default_time_night"
 	    />
 	    
 	    

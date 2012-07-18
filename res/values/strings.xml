@@ -4,8 +4,10 @@
     <string name="version">0.6</string>
     <string name="vcs_revision">$Revision$</string>
     
-    <!-- FIXME remove these -->
-    
+    <string name="pref_default_time_morning">06:00-10:00</string>
+    <string name="pref_default_time_noon">12:00-14:00</string>
+    <string name="pref_default_time_evening">19:00-21:00</string>
+    <string name="pref_default_time_night">22:00-23:00</string>
     <string name="pref_default_alarm_timeout">00:30</string>
         
     <!-- 
@@ -25,10 +27,10 @@
     <string name="_title_noon">Noon</string>
     <string name="_title_evening">Evening</string>
     <string name="_title_night">Night</string>
-    <!-- 
-    <string name="_Begin">Begin</string>
-    <string name="_End">End</string>
-     -->
+     
+    <string name="_title_begin">Begin</string>
+    <string name="_title_end">End</string>
+    
     
     <string name="_msg_new_notification">New notification</string>
     <string name="_title_notifications">RxDroid</string>

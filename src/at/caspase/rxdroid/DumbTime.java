@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import android.util.Log;
 import android.widget.TimePicker;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
@@ -53,16 +54,17 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	private static final String TAG = DumbTime.class.getName();
 	private static final String[] FORMATS = { "HH:mm:ss", "HH:mm" };
 
+	private static final int S_MILLIS = 1000;
+	private static final int M_MILLIS = 60 * S_MILLIS;
+	private static final int H_MILLIS = 60 * M_MILLIS;
+
 	private int mHours;
 	private int mMinutes;
 	private int mSeconds;
 	private int mMillis = 0;
 
-	public DumbTime(int hours, int minutes, int seconds)
-	{
-		setHours(hours);
-		setMinutes(minutes);
-		setSeconds(seconds);
+	public DumbTime(int hours, int minutes, int seconds) {
+		this(hours * H_MILLIS + minutes * M_MILLIS + seconds * S_MILLIS);
 	}
 
 	public DumbTime(int hours, int minutes) {
@@ -78,9 +80,6 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		this(offset, false);
 	}
 
-	private static final int S_MILLIS = 1000;
-	private static final int M_MILLIS = 60 * S_MILLIS;
-	private static final int H_MILLIS = 60 * M_MILLIS;
 
 	/**
 	 * Creates an instance using an offset from midnight.
@@ -120,30 +119,6 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 	public long getTime() {
 		return mMillis + 1000 * (mHours * 3600 + mMinutes * 60 + mSeconds);
-	}
-
-	public void setHours(int hours)
-	{
-		if(hours < 0 || hours > 23)
-			throw new IllegalArgumentException();
-
-		mHours = hours;
-	}
-
-	public void setMinutes(int minutes)
-	{
-		if(minutes < 0 || minutes > 59)
-			throw new IllegalArgumentException();
-
-		mMinutes = minutes;
-	}
-
-	public void setSeconds(int seconds)
-	{
-		if(seconds < 0 || seconds > 59)
-			throw new IllegalArgumentException();
-
-		mSeconds = seconds;
 	}
 
 	public boolean before(DumbTime time) {
@@ -202,19 +177,22 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 	public boolean isWithinRange(DumbTime begin, DumbTime end, boolean allowWrap)
 	{
+		Log.d(TAG, "\"" + this + "\".isWithinRange(" + begin + ", " + end + ", " + allowWrap + ")");
+		//Log.d(TAG, "  ")
+
 		if(begin != null && end != null)
 		{
-			if(!allowWrap)
-				return (equals(begin) || after(begin)) && before(end);
-			else if(allowWrap)
+			if(allowWrap && end.before(begin))
 				return equals(begin) || after(begin) || before(end);
+			else
+				return (equals(begin) || after(begin)) && before(end);
 		}
 		else if(begin == null)
 			return before(end);
 		else if(end == null)
 			return equals(begin) || after(begin);
 
-		throw new IllegalArgumentException();
+		throw new NullPointerException();
 	}
 
 	public static DumbTime fromString(String timeString)

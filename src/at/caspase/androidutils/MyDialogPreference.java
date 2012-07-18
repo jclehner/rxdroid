@@ -22,6 +22,7 @@
 package at.caspase.androidutils;
 
 import java.io.Serializable;
+import java.util.NoSuchElementException;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -37,6 +38,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.Window;
 import at.caspase.androidutils.InstanceState.SaveState;
 
@@ -63,6 +65,9 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 
 	@SaveState
 	private T mValue;
+
+	@SaveState
+	private T mDefaultValue;
 
 	//@SaveState
 	private Dialog mDialog;
@@ -117,7 +122,6 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	 */
 	public final void changeValue(T value)
 	{
-		//Log.d(TAG, "changeValue: " + getKey() + " => " + value);
 		if(callChangeListener(value))
 		{
 			setValue(value);
@@ -133,8 +137,10 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 			if(persisted != null && persisted != EMPTY) // the != operator is intentional!
 				mValue = fromPersistedString(persisted);
 			else
-				Log.w(TAG, "getValue: persisted string was null or not available");
-
+			{
+				Log.w(TAG, "getValue: key=" + getKey() + " persisted string was null or not available");
+				return mDefaultValue;
+			}
 		}
 
 		return mValue;
@@ -159,8 +165,21 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		final String string = a.getString(index);
 		final T newValue = fromPersistedString(string);
 
-		setValue(newValue);
+		mDefaultValue = newValue;
 		return newValue;
+	}
+
+	@Override
+	protected void onBindDialogView(View view)
+	{
+		if(view != null)
+		{
+			final ViewParent parent = view.getParent();
+			if(parent != null && parent instanceof ViewGroup)
+				((ViewGroup) parent).removeView(view);
+		}
+
+		super.onBindDialogView(view);
 	}
 
 	protected abstract T getDialogValue();
@@ -201,7 +220,7 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		return null;
 	}
 
-	protected int getSoftInputMode() {
+	protected int onGetSoftInputMode() {
 		return 0;
 	}
 
@@ -216,7 +235,18 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	 *
 	 * @param dialog
 	 */
-	protected void onShowDialog(Dialog dialog) {
+	protected void onCustomizeDialog(Dialog dialog) {
+		// do nothing
+	}
+
+	/**
+	 * Called when the dialog is dismissed.
+	 * <p>
+	 * Due to technical reasons, you cannot call {@link Dialog#setOnDismissListener(OnDismissListener)}
+	 * in {@link #onCustomizeDialog(Dialog)} or {@link #onGetCustomDialog()}. Use this function instead
+	 * do perform any additional cleanup.
+	 */
+	protected void onDialogDismissed() {
 		// do nothing
 	}
 
@@ -240,16 +270,6 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 			View contentView = onCreateDialogView();
 			if(contentView != null)
 			{
-				/*ViewGroup parent = (ViewGroup) mDialog.findViewById(android.R.id.custom);
-				if(parent != null)
-				{
-					parent.removeView(contentView);
-
-
-				}
-
-				mDialog.findViewById(android.R.id.custom).remove*/
-
 				onBindDialogView(contentView);
 				builder.setView(contentView);
 			}
@@ -261,14 +281,14 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		}
 
 
-		int softInputMode = getSoftInputMode();
+		int softInputMode = onGetSoftInputMode();
 		if(softInputMode != 0)
 		{
 			Window window = mDialog.getWindow();
 			window.setSoftInputMode(softInputMode);
 		}
 
-		onShowDialog(mDialog);
+		onCustomizeDialog(mDialog);
 
 		mDialog.setOnDismissListener(mDismissListener);
 		mDialog.show();
@@ -322,6 +342,7 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		public void onDismiss(DialogInterface dialog)
 		{
 			mDialog = null;
+			onDialogDismissed();
 		}
 	};
 }

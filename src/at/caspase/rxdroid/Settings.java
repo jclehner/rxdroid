@@ -42,7 +42,7 @@ public class Settings
 	private static final String KEY_LAST_MSG_HASH = "_last_msg_hash";
 	private static final String KEY_LAST_MSG_COUNT = "_last_msg_count";
 
-	private static final String KEY_PREFIXES[] = { "time_morning", "time_noon", "time_evening", "time_night" };
+	private static final String KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 	private static final int DOSE_TIMES[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 
 	private static SharedPreferences sSharedPrefs = null;
@@ -120,14 +120,14 @@ public class Settings
 
 	public DumbTime getDoseTimeBegin(int doseTime)
 	{
-		final TimePeriod p = getTimePeriodPreference(KEY_PREFIXES[doseTime]);
-		return p == null ? null : p.begin;
+		final TimePeriod p = getTimePeriodPreference(doseTime);
+		return p == null ? null : p.getBegin();
 	}
 
 	public DumbTime getDoseTimeEnd(int doseTime)
 	{
-		final TimePeriod p = getTimePeriodPreference(KEY_PREFIXES[doseTime]);
-		return p == null ? null : p.end;
+		final TimePeriod p = getTimePeriodPreference(doseTime);
+		return p == null ? null : p.getEnd();
 	}
 
 	/*public DumbTime getTimePreference(String key)
@@ -148,16 +148,21 @@ public class Settings
 		return DumbTime.fromString(value);
 	}*/
 
-	public TimePeriod getTimePeriodPreference(String key)
+	public TimePeriod getTimePeriodPreference(int doseTime)
 	{
-		if(key == null)
-			throw new NullPointerException();
+		final String key = KEYS[doseTime];
 
-		final String value = sSharedPrefs.getString(key, null);
-		if(value != null)
-			return TimePeriod.fromString(value);
+		String value = sSharedPrefs.getString(key, null);
+		if(value == null)
+		{
+			int resId = sApplicationContext.getResources().
+				getIdentifier("at.caspase.rxdroid:string/pref_default_" + key, null, null);
 
-		return null;
+			if(resId == 0 || (value = sApplicationContext.getString(resId)) == null)
+				throw new IllegalStateException("No default value for time preference " + key + " in strings.xml");
+		}
+
+		return TimePeriod.fromString(value);
 	}
 
 	public Date getActiveDate(Calendar time)

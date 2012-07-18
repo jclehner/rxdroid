@@ -170,7 +170,7 @@ public class TimePreference extends MyDialogPreference<DumbTime>
 	}
 
 	@Override
-	protected void onShowDialog(Dialog dialog)
+	protected void onCustomizeDialog(Dialog dialog)
 	{
 		dialog.setOnShowListener(new OnShowListener() {
 
@@ -233,7 +233,6 @@ public class TimePreference extends MyDialogPreference<DumbTime>
 
 			mSetButton.setEnabled(mDialogTime.isWithinRange(begin, end, mWrapFlags != 0));
 		}
-
 	}
 
 	private boolean isTimeWithinConstraints(DumbTime time)
@@ -241,26 +240,10 @@ public class TimePreference extends MyDialogPreference<DumbTime>
 		final DumbTime after = getConstraint(IDX_AFTER);
 		final DumbTime before = getConstraint(IDX_BEFORE);
 
-		if(LOGV)
-		{
-			Log.v(TAG, "isTimeWithinConstraints: key=" + getKey() + ", time=" + time);
-			Log.v(TAG, "  after=" + after);
-			Log.v(TAG, "  before=" + before);
-		}
+		if(after == null && before == null)
+			return true;
 
-		if(after != null && before != null)
-		{
-			if(mWrapFlags != 0 && before.before(after))
-				return time.after(after) || time.before(before);
-
-			return time.after(after) && time.before(before);
-		}
-		else if(after != null)
-			return time.after(after);
-		else if(before != null)
-			return time.before(before);
-
-		return true;
+		return time.isWithinRange(after, before, mWrapFlags != 0);
 	}
 
 	private DumbTime getConstraint(int index)

@@ -18,6 +18,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -29,30 +30,34 @@ import at.caspase.androidutils.MyDialogPreference;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.preferences.TimePeriodPreference.TimePeriod;
+import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Util;
 
 public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 {
 	private static final String TAG = TimePeriodPreference.class.getName();
 
-	private static final int BEFORE = 1;
-	private static final int MAX = BEFORE;
-	private static final int AFTER = 0;
-	private static final int MIN = AFTER;
+	private static final int END = 1;
+	private static final int MAX = END;
+	private static final int BEGIN = 0;
+	private static final int MIN = BEGIN;
 
 	public static class TimePeriod implements Serializable
 	{
 		private static final long serialVersionUID = -2432714902425872383L;
 
+		private final DumbTime mBegin;
+		private final DumbTime mEnd;
+
 		public TimePeriod(DumbTime begin, DumbTime end)
 		{
-			this.begin = begin;
-			this.end = end;
+			this.mBegin = begin;
+			this.mEnd = end;
 		}
 
 		@Override
 		public String toString() {
-			return "" + begin + "-" + end;
+			return "" + mBegin + "-" + mEnd;
 		}
 
 		public static TimePeriod fromString(String string)
@@ -66,17 +71,25 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			return new TimePeriod(begin, end);
 		}
 
-		public final DumbTime begin;
-		public final DumbTime end;
+		public DumbTime getBegin() {
+			return mBegin;
+		}
+
+		public DumbTime getEnd() {
+			return mEnd;
+		}
 	}
 
-	private CharSequence mSummary;
+	//private CharSequence mSummary;
+	//private TimePeriod mDialogValue;
 
-	private TimePeriod mDialogValue;
+	private DumbTime mBegin;
+	private DumbTime mEnd;
 
 	private String[] mConstraintKeys = new String[2];
 	private DumbTime[] mConstraintTimes = new DumbTime[2];
-	private boolean[] mAllowConstraintWrap = { false, false };
+	//private boolean[] mAllowConstraintWrap = { false, false };
+	private boolean[] mAllowTimeWrap = { false, false };
 
 	private View mContainer;
 	private TimePicker mTimePicker;
@@ -103,22 +116,16 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		this(context, attrs, android.R.attr.preferenceStyle);
 	}
 
-	public DumbTime getBegin() {
-		return mDialogValue.begin;
-	}
-
-	public DumbTime getEnd() {
-		return mDialogValue.end;
-	}
-
 	@Override
 	public CharSequence getSummary()
 	{
-		final CharSequence summary = super.getSummary();
+		/*final CharSequence summary = super.getSummary();
 		if(summary == null)
 			return getValue().toString();
 
-		return summary;
+		return summary;*/
+
+		return getValue().toString();
 
 		/*if(mSummary == null)
 			return super.getSummary();
@@ -142,13 +149,17 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 	}
 
 	@Override
-	protected TimePeriod getDialogValue() {
-		return mDialogValue;
+	protected TimePeriod getDialogValue()
+	{
+		Log.d(TAG, "getDialogValue: value=" + mBegin + "-" + mEnd);
+		return new TimePeriod(mBegin, mEnd);
 	}
 
 	@Override
-	protected void onValueSet(TimePeriod value) {
-		mDialogValue = value;
+	protected void onValueSet(TimePeriod value)
+	{
+		mBegin = value.getBegin();
+		mEnd = value.getEnd();
 	}
 
 	@Override
@@ -173,39 +184,8 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 	}
 
 	@Override
-	protected void onShowDialog(Dialog dialog)
-	{
+	protected void onCustomizeDialog(Dialog dialog) {
 		dialog.setOnShowListener(mOnShowListener);
-
-		final ViewParent parent = mContainer.getParent();
-		if(parent instanceof ViewGroup)
-		{
-			((ViewGroup) parent).removeView(mContainer);
-			Log.d(TAG, "onShowDialog: removed mContainer from parent");
-		}
-	}
-
-	@Override
-	protected boolean callChangeListener(Object newValue)
-	{
-		/*if(!checkTime())
-		{
-			Log.w(TAG, "Attempting to persist a time period that is not within specified constraints.");
-			Log.w(TAG "         value: " + getValue());
-			Log.w(TAG, "  minTime/Key: " + mConstraintTimes[MIN] + "/" + mConstraintKeys[MIN]);
-			Log.w(TAG, "  maxTime/Key: " + mConstraintTimes[MAX] + "/" + mConstraintKeys[MAX]);
-		}*/
-
-		return super.callChangeListener(newValue);
-	}
-
-	@Override
-	protected void onAttachedToHierarchy(PreferenceManager preferenceManager)
-	{
-		super.onAttachedToHierarchy(preferenceManager);
-
-		if(!hasValidConstraints(true))
-			throw new IllegalStateException("Referenced constraints are invalid without wrapping enabled");
 	}
 
 	private void handleAttributes(Context context, AttributeSet attrs)
@@ -213,7 +193,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TimePeriodPreference);
 
 		final int[] timeIds = { R.styleable.TimePeriodPreference_minTime, R.styleable.TimePeriodPreference_maxTime };
-		final int[] wrapIds = { R.styleable.TimePeriodPreference_allowMinWrap, R.styleable.TimePeriodPreference_allowMaxWrap };
+		final int[] timeWrapIds = { R.styleable.TimePeriodPreference_allowBeginWrap, R.styleable.TimePeriodPreference_allowEndWrap };
 
 		for(int i = 0; i != timeIds.length; ++i)
 		{
@@ -226,23 +206,23 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 				}
 				catch(IllegalArgumentException e)
 				{
+					if(str.equals(getKey()))
+						throw new IllegalArgumentException("Preference references itself in min/maxTime");
+
 					mConstraintKeys[i] = str;
 				}
 			}
 		}
 
-		for(int i = 0; i != wrapIds.length; ++i)
-			mAllowConstraintWrap[i] = a.getBoolean(wrapIds[i], false);
+		for(int i = 0; i != timeWrapIds.length; ++i)
+		{
+			//mAllowConstraintWrap[i] = a.getBoolean(constraintWrapIds[i], false);
+			mAllowTimeWrap[i] = a.getBoolean(timeWrapIds[i], false);
+		}
 
-		if(mAllowConstraintWrap[MIN] && mAllowConstraintWrap[MAX])
-			throw new IllegalArgumentException("allowMinWrap and allowMaxWrap are mutually exclusive");
+		if(mAllowTimeWrap[BEGIN] && mAllowTimeWrap[END])
+			throw new IllegalArgumentException("Cannot set both allowBeginWrap and allowEndWrap");
 
-		if(!hasValidConstraints(false))
-			throw new IllegalArgumentException("Specified range is invalid without wrapping enabled");
-
-		mSummary = getSummary();
-
-		//mSummary = context.obtainStyledAttributes(attrs, android.R.attr.pref)
 	}
 
 	private void onPageChanged(int page)
@@ -254,20 +234,28 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		// be called, so we temporarily replace it with a dummy.
 		mTimePicker.setOnTimeChangedListener(mTimeListenerDummy);
 
-		if(page == 0)
+		if(page == BEGIN)
 		{
 			mBackButton.setText(android.R.string.cancel);
 			mNextButton.setText(R.string._btn_next);
 
-			Util.setTimePickerTime(mTimePicker, mDialogValue.begin);
+			Util.setTimePickerTime(mTimePicker, mBegin);
 		}
-		else if(page == 1)
+		else if(page == END)
 		{
 			mBackButton.setText(R.string._btn_back);
 			mNextButton.setText(android.R.string.ok);
 
-			Util.setTimePickerTime(mTimePicker, mDialogValue.end);
+			Util.setTimePickerTime(mTimePicker, mEnd);
 		}
+
+		final Dialog dialog = getDialog();
+		if(dialog != null)
+		{
+			final int[] titleIds = { R.string._title_begin, R.string._title_end };
+			dialog.setTitle(getTitle() + " - " + getContext().getString(titleIds[page]));
+		}
+
 
 		mTimePicker.setOnTimeChangedListener(mTimeListener);
 		updateMessageAndButtons();
@@ -281,7 +269,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		min = getConstraintTimeForCurrentlyVisibleTimePicker(MIN);
 		max = getConstraintTimeForCurrentlyVisibleTimePicker(MAX);
 
-		return current.isWithinRange(min, max, mAllowConstraintWrap[mCurrentPage == 0 ? MIN : MAX]);
+		return current.isWithinRange(min, max, mAllowTimeWrap[mCurrentPage]);
 	}
 
 	private DumbTime getConstraintTime(int which)
@@ -291,21 +279,17 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			final Preference p = findPreferenceInHierarchy(mConstraintKeys[which]);
 			if(p == null || (!(p instanceof TimePeriodPreference) && !(p instanceof TimePreference)))
 			{
-				Log.w(TAG, "No TimePreference or TimePeriodPreference with key=" + mConstraintKeys[which] + " in hierarchy.");
+				Log.w(TAG, "No TimePreference or TimePeriodPreference with key=" + mConstraintKeys[which] + " in hierarchy (yet).");
 				return null;
 			}
-
-			final DumbTime constraintTime;
 
 			if(p instanceof TimePeriodPreference)
 			{
 				final TimePeriod period = ((TimePeriodPreference) p).getValue();
-				constraintTime = (which == MIN) ? period.end : period.begin;
+				return (which == MIN) ? period.mEnd : period.mBegin;
 			}
 			else
-				constraintTime = ((TimePreference) p).getValue();
-
-			return constraintTime;
+				return ((TimePreference) p).getValue();
 		}
 
 		return mConstraintTimes[which];
@@ -313,10 +297,34 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 
 	private DumbTime getConstraintTimeForCurrentlyVisibleTimePicker(int which)
 	{
-		if(mCurrentPage == 0)
-			return which == MIN ? getConstraintTime(MIN) : mDialogValue.end;
+		if(mCurrentPage == BEGIN)
+		{
+			final DumbTime min = getConstraintTime(MIN);
+
+			if(which == MAX)
+			{
+				if(mEnd.before(min))
+					return null;
+
+				return mEnd;
+			}
+			else
+				return min;
+		}
 		else
-			return which == MIN ? mDialogValue.begin : getConstraintTime(MAX);
+		{
+			final DumbTime max = getConstraintTime(MAX);
+
+			if(which == MIN)
+			{
+				if(mBegin.after(max))
+					return null;
+
+				return mBegin;
+			}
+			else
+				return max;
+		}
 	}
 
 	private void updateMessageAndButtons()
@@ -341,22 +349,16 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			mBackButton.setEnabled(isValidTime);
 	}
 
-	private String toDebugString()
-	{
-		return
-			"TimePeriodPreference(key=\"" + getKey() + "\", range=" + getValue() +
-			", wrap=" + Arrays.toString(mAllowConstraintWrap) + ")";
-	}
-
 	private final OnTimeChangedListener mTimeListener = new OnTimeChangedListener() {
 
 		@Override
 		public void onTimeChanged(TimePicker view, int hourOfDay, int minute)
 		{
-			final DumbTime time = mCurrentPage == 0 ? mDialogValue.begin : mDialogValue.end;
-
-			time.setHours(hourOfDay);
-			time.setMinutes(minute);
+			final DumbTime newTime = new DumbTime(hourOfDay, minute);
+			if(mCurrentPage == 0)
+				mBegin = newTime;
+			else
+				mEnd = newTime;
 
 			//mNextButton.setEnabled(isCurrentlyVisibleTimePickerValueValid());
 			updateMessageAndButtons();
@@ -390,17 +392,19 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			{
 				mBackButton = positiveButton;
 				mNextButton = negativeButton;
-				Log.d(TAG, "onShow: positive button is on the left");
 			}
 			else
 			{
 				mBackButton = negativeButton;
 				mNextButton = positiveButton;
-				Log.d(TAG, "onShow: positive button is on the right");
 			}
 
 			mBackButton.setOnClickListener(mOnBtnClickListener);
 			mNextButton.setOnClickListener(mOnBtnClickListener);
+
+			final TimePeriod value = getValue();
+			mBegin = value.getBegin();
+			mEnd = value.getEnd();
 
 			onPageChanged(0);
 		}
@@ -436,20 +440,14 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		}
 	};
 
-	private boolean hasValidConstraints(boolean checkRefs)
+	/*private boolean hasValidConstraints(boolean checkRefs)
 	{
 		final DumbTime min = checkRefs ? getConstraintTime(MIN) : mConstraintTimes[MIN];
 		final DumbTime max = checkRefs ? getConstraintTime(MAX) : mConstraintTimes[MAX];
 
-		Log.d(TAG, "hasValidConstraints");
-		Log.d(TAG, "  min=" + min);
-		Log.d(TAG, "  max=" + max);
-		Log.d(TAG, " this=" + toDebugString());
-
-
-		if(min != null && max != null)
-			return (min.after(max) && mAllowConstraintWrap[MIN]) || (max.before(min) && mAllowConstraintWrap[MAX]);
+		//if(min != null && max != null)
+		//	return (min.after(max) && mAllowConstraintWrap[MIN]) || (max.before(min) && mAllowConstraintWrap[MAX]);
 
 		return true;
-	}
+	}*/
 }

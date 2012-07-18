@@ -102,7 +102,7 @@ public class DrugNamePreference2 extends MyDialogPreference<String>
 	}
 
 	@Override
-	protected void onShowDialog(Dialog dialog)
+	protected void onCustomizeDialog(Dialog dialog)
 	{
 		dialog.setOnShowListener(new OnShowListener() {
 
@@ -114,7 +114,7 @@ public class DrugNamePreference2 extends MyDialogPreference<String>
 	};
 
 	@Override
-	protected int getSoftInputMode()
+	protected int onGetSoftInputMode()
 	{
 		return WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE |
 				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN;

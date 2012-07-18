@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid.util;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -103,20 +104,6 @@ public final class Util
 		return value == null ? defaultValue : value;
 	}
 
-	public static<T> int toInteger(T t)
-	{
-		if(t == null)
-			throw new NullPointerException();
-
-		final String str = t.toString();
-
-		if(str.length() == 0)
-			return 0;
-
-		return Integer.parseInt(str, 10);
-	}
-
-
 	public static void populateListPreferenceEntryValues(Preference preference)
 	{
 		ListPreference pref = (ListPreference) preference;
@@ -142,42 +129,6 @@ public final class Util
 			return a.equals(b);
 
 		return b.equals(a);
-	}
-
-	/**
-	 * Gets a named id from <code>android.R.style</code>.
-	 * <p>
-	 * With the help of this function, you can use style resources only
-	 * available in later versions of android than the one you're developing
-	 * for.
-	 *
-	 * @param resIdFieldName The name of the resource id (e.g. "textAppearanceLarge").
-	 * @param defaultResId The resource id to return if the requested resource does not exist.
-	 * @return The resource id of the requested name, or the supplied default value.
-	 */
-
-	public static int getStyleResId(String resIdFieldName, int defaultResId)
-	{
-		try
-		{
-			Field f = android.R.style.class.getField(resIdFieldName);
-			return f.getInt(null);
-		}
-		catch(IllegalAccessException e)
-		{
-			// eat exception
-		}
-		catch(SecurityException e)
-		{
-			// eat exception
-		}
-		catch(NoSuchFieldException e)
-		{
-			// eat exception
-		}
-
-		Log.i(TAG, "getAppearance: inaccessible field in android.R.style: " + resIdFieldName);
-		return defaultResId;
 	}
 
 	/**
@@ -210,16 +161,7 @@ public final class Util
 				Reflect.makeAccessible(f);
 
 				if(f.getType().isArray())
-				{
-					try
-					{
-						sb.append(Arrays.toString((Object[]) f.get(object)));
-					}
-					catch(ClassCastException e)
-					{
-						sb.append(f.get(object));
-					}
-				}
+					sb.append(arrayToString(f.get(object)));
 				else
 					sb.append(f.get(object));
 			}
@@ -257,5 +199,44 @@ public final class Util
 	{
 		picker.setCurrentHour(time.getHours());
 		picker.setCurrentMinute(time.getMinutes());
+	}
+
+	public static String arrayToString(Object array)
+	{
+		if(array == null)
+			return "null";
+
+		final Class<?> type = array.getClass();
+		if(!type.isArray())
+			throw new IllegalArgumentException("Not an array");
+
+		final int length = Array.getLength(array);
+		if(length == 0)
+			return "[]";
+
+		final StringBuilder sb = new StringBuilder("[");
+
+		for(int i = 0; i != length; ++i)
+		{
+			if(i != 0)
+				sb.append(", ");
+
+			final Object elem = Array.get(array, i);
+			if(elem != null)
+			{
+				final Class<?> elemType = elem.getClass();
+
+				if(elemType.isArray())
+					sb.append(arrayToString(elem));
+				else if(elemType == String.class)
+					sb.append("\"" + elem.toString() + "\""); // TODO escape string?
+				else
+					sb.append(elem.toString());
+			}
+			else
+				sb.append("null");
+		}
+
+		return sb.append("]").toString();
 	}
 }

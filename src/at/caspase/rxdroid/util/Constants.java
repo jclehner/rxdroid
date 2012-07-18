@@ -24,6 +24,7 @@ package at.caspase.rxdroid.util;
 import java.util.Calendar;
 
 import android.text.format.DateUtils;
+import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Drug;
 
@@ -34,6 +35,8 @@ public final class Constants
 	public static final long NOTIFICATION_INITIAL_DELAY = 5000;
 
 	public static final String EMPTY_STRING = "";
+
+	public static final DumbTime MIDNIGHT = new DumbTime(0, 0);
 
 	public static int getDoseViewId(int doseTime) {
 		return DOSE_VIEW_IDS[doseTime];
