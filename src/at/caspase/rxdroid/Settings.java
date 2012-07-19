@@ -31,8 +31,10 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.preferences.TimePeriodPreference.TimePeriod;
+import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Util;
 
 public class Settings
 {
@@ -306,12 +308,30 @@ public class Settings
 
 	public String getDrugName(Drug drug)
 	{
-		// TODO implement scrambling
-
 		final String name = drug.getName();
 		// this should never happen unless there's a DB problem
 		if(name == null || name.length() == 0)
 			return "<???>";
+
+		if(sSharedPrefs.getBoolean("privacy_scramble_names", false))
+		{
+			// We rot13 word by word and ignore those beginning with
+			// a digit, so things like 10mg won't get converted to 10zt.
+
+			final StringBuilder sb = new StringBuilder(name.length());
+			for(String word : name.split(" "))
+			{
+				if(word.length() == 0 || Character.isDigit(word.charAt(0)))
+					sb.append(word);
+				else
+					sb.append(Util.rot13(word));
+
+				sb.append(" ");
+			}
+
+
+			return Util.rot13(name);
+		}
 
 		return name;
 	}

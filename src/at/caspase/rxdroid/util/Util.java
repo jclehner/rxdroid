@@ -141,6 +141,33 @@ public final class Util
 		return CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);
 	}
 
+	public static String rot13(String string)
+	{
+		final StringBuilder sb = new StringBuilder(string.length());
+
+		for(int i = 0; i != string.length(); ++i)
+		{
+			char c = string.charAt(i);
+
+			if(Character.isJavaIdentifierStart(c) && c != '_') // this can only be an ASCII letter
+			{
+				final int start = Character.isUpperCase(c) ? 65 : 97;
+				if(c - start < 26)
+				{
+					c -= start;
+					c = (char) ((c + 13) % 26);
+					c += start;
+				}
+				else
+					throw new IllegalStateException("Character out of range: c=" + c + "(" + (int) c + "), start=" + start);
+			}
+
+			sb.append(c);
+		}
+
+		return sb.toString();
+	}
+
 	public static void dumpObjectMembers(String tag, int priority, Object object, String name)
 	{
 		final Class<?> clazz = object.getClass();

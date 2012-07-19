@@ -6,7 +6,8 @@
 #
 
 patterns="@string/_\w* R.string._\w*"
-temp=$(mktemp tmpXXXXXX)
+temp=$(mktemp -t foobar)
+
 
 scan_file()
 {
@@ -35,11 +36,23 @@ scan_dir()
 
 scan_string_xml()
 {
-	#for t in $(cat $temp | sort | uniq); do
 	for f in res/values*/strings.xml; do
 		echo "-- $f:"
 
-		for t in $(cat $temp); do
+		for t in $(cat $temp | sort | uniq); do
+			if [[ "$(dirname $f)" != "values" ]]; then
+				if ! grep -q $t "res/values/strings.xml" && grep -q $t "$f"; then
+					echo "!!! Resource R.string.$t exists in $f but not in res/values/strings.xml" >&2
+					echo "!!! This is known to cause exceptions in Context.getString()" >&2
+					echo "!!! t=$t, f=$f, temp=$temp"
+					echo "!!! Affected files: "
+
+					grep --include=*.{xml,java} -R -l "$t" src res | grep -v "$f"
+
+					exit 1
+				fi
+			fi
+
 			if ! grep -q $t $f; then
 				echo "<string name=\"$t\"> !!EMPTY!! </string>"
 			fi
@@ -48,8 +61,6 @@ scan_string_xml()
 		echo
 	done
 }
-
-
 
 scan_dir src
 scan_dir res

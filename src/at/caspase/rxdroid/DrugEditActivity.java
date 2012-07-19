@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -200,6 +201,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		return false;
 	}
 
+	@TargetApi(11)
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -321,7 +323,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@CreatePreference
 		(
-			titleResId = R.string._Morning,
+			titleResId = R.string._title_morning,
 			key = "morning",
 			categoryResId = R.string._title_intake_schedule,
 			order = 3,
@@ -332,7 +334,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@CreatePreference
 		(
-			titleResId = R.string._Noon,
+			titleResId = R.string._title_noon,
 			key = "noon",
 			order = 4,
 			type = DosePreference.class,
@@ -342,7 +344,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@CreatePreference
 		(
-			titleResId = R.string._Evening,
+			titleResId = R.string._title_evening,
 			key = "evening",
 			order = 5,
 			type = DosePreference.class,
@@ -352,7 +354,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@CreatePreference
 		(
-			titleResId = R.string._Night,
+			titleResId = R.string._title_night,
 			key = "night",
 			endActiveCategory = true,
 			order = 6,

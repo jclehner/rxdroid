@@ -116,6 +116,17 @@ public final class CollectionUtils
 		return ret;
 	}
 
+	public static boolean getRandomPermutation(StringBuilder sb)
+	{
+		for(int i = 0; i != sb.length(); ++i)
+		{
+			if(!getNextPermutation(sb))
+				return false;
+		}
+
+		return true;
+	}
+
 	public static boolean getNextPermutation(StringBuilder sb)
 	{
 		List<Character> list = asList(sb.toString().toCharArray());

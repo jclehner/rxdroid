@@ -45,10 +45,10 @@ public class FragmentTabActivity extends SherlockFragmentActivity
 			//mTabManager = new TabManager(this, mTabHost, R.id.realtabcontent);
 
 			final Object[][] allTabArgs = {
-					{ "morning", R.string._Morning, R.drawable.ic_morning, Drug.TIME_MORNING },
-					{ "noon", R.string._Noon, R.drawable.ic_noon, Drug.TIME_NOON },
-					{ "evening", R.string._Evening, R.drawable.ic_evening, Drug.TIME_EVENING },
-					{ "night", R.string._Night, R.drawable.ic_night, Drug.TIME_NIGHT }
+					{ "morning", R.string._title_morning, R.drawable.ic_morning, Drug.TIME_MORNING },
+					{ "noon", R.string._title_noon, R.drawable.ic_noon, Drug.TIME_NOON },
+					{ "evening", R.string._title_evening, R.drawable.ic_evening, Drug.TIME_EVENING },
+					{ "night", R.string._title_night, R.drawable.ic_night, Drug.TIME_NIGHT }
 			};
 
 			final Resources res = getResources();

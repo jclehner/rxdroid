@@ -75,7 +75,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		@CreatePreference
 		(
 			//title = "Morning",
-			titleResId = R.string._Morning,
+			titleResId = R.string._title_morning,
 			key = "morning",
 			//category = "Intake schedule",
 			categoryResId = R.string._title_intake_schedule,
@@ -88,7 +88,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		@CreatePreference
 		(
 			//title = "Noon",
-			titleResId = R.string._Noon,
+			titleResId = R.string._title_noon,
 			key = "noon",
 			order = 4,
 			type = DosePreference.class,
@@ -99,7 +99,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		@CreatePreference
 		(
 			//title = "Evening",
-			titleResId = R.string._Evening,
+			titleResId = R.string._title_evening,
 			key = "evening",
 			order = 5,
 			type = DosePreference.class,
@@ -110,7 +110,7 @@ public class ObjectToPreferenceTestActivity extends PreferenceActivity
 		@CreatePreference
 		(
 			//title = "Night",
-			titleResId = R.string._Night,
+			titleResId = R.string._title_night,
 			key = "night",
 			endActiveCategory = true,
 			order = 6,

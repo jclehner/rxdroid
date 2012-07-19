@@ -256,7 +256,6 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			dialog.setTitle(getTitle() + " - " + getContext().getString(titleIds[page]));
 		}
 
-
 		mTimePicker.setOnTimeChangedListener(mTimeListener);
 		updateMessageAndButtons();
 	}

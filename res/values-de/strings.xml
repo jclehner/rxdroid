@@ -12,13 +12,6 @@
     
     -->
     
-    <string name="_Morning">Morgens</string>
-    <string name="_Noon">Mittags</string>
-    <string name="_Evening">Abends</string>
-    <string name="_Night">Nachts</string>
-    <string name="_Begin">Anfang</string>
-    <string name="_End">Ende</string>
-    
     <string name="_msg_new_notification">Neue Benachrichtigung</string>
     <string name="_title_notifications">RxDroid</string>
     <string name="_msg_doses_fp">Einnahmen: %1$d vergessen, %2$d ausstehend.</string>

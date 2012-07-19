@@ -5,6 +5,7 @@ import java.util.List;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import at.caspase.rxdroid.util.CollectionUtils;
+import at.caspase.rxdroid.util.Util;
 
 public class UtilTest extends AndroidTestCase
 {
@@ -32,6 +33,23 @@ public class UtilTest extends AndroidTestCase
 		} while(CollectionUtils.getNextPermutation(list));
 
 		assertEquals(expectedCount, permutationCount);
+	}
+
+	public void testRot13()
+	{
+		String[][] testCases = {
+				{ "300", "300" },
+				{ "Amlodipine", "Nzybqvcvar" },
+				{ "Amlodipine 10mg", "Nzybqvcvar 10zt" },
+				{ "*_Am70d1p1n3 10mg_*", "*_Nz70q1c1a3 10zt_*" }
+		};
+
+		for(String[] testCase : testCases)
+		{
+			assertEquals(testCase[0], Util.rot13(testCase[1]));
+			assertEquals(testCase[0], Util.rot13(Util.rot13(testCase[0])));
+		}
+
 	}
 
 	private static int factorial(int n)

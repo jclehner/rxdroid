@@ -57,70 +57,6 @@
 	        
 	        android:defaultValue="@string/pref_default_time_night"
 	    />
-	    
-	    
-	    
-	    <!-- 		
-		
-		
-		<PreferenceCategory android:key="cat_time_noon"
-			android:title="@string/_Noon">
-			
-			<at.caspase.rxdroid.preferences.TimePreference android:key="time_noon_begin"
-				android:title="@string/_Begin"
-				android:defaultValue="@string/pref_default_time_noon_begin"
-				rxdroid:after="time_morning_end"
-				rxdroid:before="time_noon_end" />
-			
-			<at.caspase.rxdroid.preferences.TimePreference android:key="time_noon_end"
-				android:title="@string/_End"
-				android:defaultValue="@string/pref_default_time_noon_end"
-				rxdroid:after="time_noon_begin"
-				rxdroid:before="time_evening_begin" />
-				
-		</PreferenceCategory>
-		
-		<PreferenceCategory android:key="cat_time_evening"
-			android:title="@string/_Evening"
-		>
-			<at.caspase.rxdroid.preferences.TimePreference android:key="time_evening_begin"
-				android:title="@string/_Begin"
-				android:defaultValue="@string/pref_default_time_evening_begin"
-				rxdroid:after="time_noon_end"
-				rxdroid:before="time_evening_end"
-			/>
-			
-			<at.caspase.rxdroid.preferences.TimePreference android:key="time_evening_end"
-				android:title="@string/_End"
-				android:defaultValue="@string/pref_default_time_evening_end"
-				rxdroid:after="time_evening_begin"
-				rxdroid:before="time_night_begin"
-			/>		
-				
-		</PreferenceCategory>
-		
-		<PreferenceCategory android:key="cat_time_night"
-			android:title="@string/_Night"
-		>
-			<at.caspase.rxdroid.preferences.TimePreference android:key="time_night_begin"
-				android:title="@string/_Begin"
-				android:defaultValue="@string/pref_default_time_night_begin"
-				rxdroid:after="time_evening_end"
-				rxdroid:before="time_night_end"
-				rxdroid:allowBeforeWrap="true"
-			/>
-			
-			<at.caspase.rxdroid.preferences.TimePreference android:key="time_night_end"
-				android:title="@string/_End"
-				android:defaultValue="@string/pref_default_time_night_end"
-				rxdroid:after="time_night_begin"
-				rxdroid:before="time_morning_begin"
-				rxdroid:allowBeforeWrap="true"
-				rxdroid:allowAfterWrap="true"
-			/>	
-				
-		</PreferenceCategory>
-	 -->
 	</PreferenceScreen>
 	
 	<!-- DISPLAY -->
@@ -146,6 +82,11 @@
 			android:defaultValue="true"
 		/>
 		
+		<CheckBoxPreference android:key="privacy_scramble_names"
+		    android:title="@string/_title_scramble_names"
+		    android:summary="@string/_summary_scramble_names"
+		    android:defaultValue="false"
+		/>	
 		
 		<Preference
 			android:title="@string/_title_prefscreen_display_info"
