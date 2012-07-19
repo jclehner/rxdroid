@@ -132,6 +132,12 @@
             fixed
         </comment>
     </note>
+    <note priority="veryhigh" time="1340009802" done="1342625177">
+        Implement 21 on, 7 off schedule (e.g. oral contraceptives w/o 7 placebo tablets)
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1316529642" done="1318944915">
         Implement DoseView long click behaviour: remove intake, mark as taken, change dose, edit drug
         <comment>
@@ -339,10 +345,22 @@
             will be fixed by OTPM
         </comment>
     </note>
+    <note priority="medium" time="1328223989" done="1342731715">
+        Allow scrambling of drug names
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1335393488" done="1340009740">
         If date is current date, clicking it should open the DatePicker!
         <comment>
             won't implement
+        </comment>
+    </note>
+    <note priority="medium" time="1340009847" done="1342731833">
+        Rename: Intake -&gt; Dose
+        <comment>
+            Dictionary says otherwise...
         </comment>
     </note>
     <note priority="low" time="1316529505" done="1316548042">
@@ -369,6 +387,12 @@
             duplicate entry
         </comment>
     </note>
+    <note priority="low" time="1317226470" done="1342731736">
+        Externalize all strings
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="low" time="1317306209" done="1318783849">
         Implement the "show doseless/inactive" settings
         <comment>
@@ -387,11 +411,8 @@
     <note priority="veryhigh" time="1332777147">
         Display GPL on first use
     </note>
-    <note priority="veryhigh" time="1340009802" done="1342625177">
-        Implement 21 on, 7 off schedule (e.g. oral contraceptives w/o 7 placebo tablets)
-        <comment>
-            done
-        </comment>
+    <note priority="veryhigh" time="1342732195">
+        Fix TimePeriodPreference! Rename: constraints -&gt; limits?
     </note>
     <note priority="high" time="1324308938">
         Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?
@@ -414,6 +435,9 @@
     <note priority="high" time="1336603048">
         Investigate RAM usage of ~10MB (DrugListActivity?)
     </note>
+    <note priority="high" time="1342730192">
+        Move tests to separate test project
+    </note>
     <note priority="medium" time="1318943892">
         Consider modelling DrugNamePreference's layout after the layout found in the old DrugEditActivty layout
     </note>
@@ -429,17 +453,11 @@
     <note priority="medium" time="1328223980">
         Add PIN protection
     </note>
-    <note priority="medium" time="1328223989">
-        Allow scrambling of drug names
-    </note>
-    <note priority="medium" time="1340009847">
-        Rename: Intake -&gt; Dose
+    <note priority="medium" time="1342731693">
+        Tapping a scrambled drug name should reveal the true name for a short time. Taping the unscrambled name launches DrugEditActivity. Long clicking the scrambled name should open DrugEditActivity. Maybe extend a TextView?
     </note>
     <note priority="low" time="1317226248">
         For Version, don't get the revision from strings.xml, as this requires faking a change in the file to update the revision tag.
-    </note>
-    <note priority="low" time="1317226470">
-        Externalize all strings
     </note>
     <note priority="low" time="1317226740">
         Allow moving the app to SD, but display a big fat warning (OK button should only be active after 5 seconds). Also the dialog should be displayed every time until the user checks a checkbox in the dialog.
@@ -454,10 +472,10 @@
         Allow per-weekday doseTime definitions
     </note>
     <note priority="low" time="1326753387">
-        Move icon selection in DrugEditActivity to DrugNamePreference itself!
+        Move icon selection in DrugEditActivity to DrugNamePreference itself?
     </note>
     <note priority="verylow" time="1316529783">
-        Add icons for all drug forms. Also change the current injection and liquid icons.
+        Add icons for all drug forms.
     </note>
     <note priority="verylow" time="1316548559">
         Handle landscape view

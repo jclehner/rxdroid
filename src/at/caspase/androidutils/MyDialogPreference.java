@@ -246,8 +246,9 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	 * in {@link #onCustomizeDialog(Dialog)} or {@link #onGetCustomDialog()}. Use this function instead
 	 * do perform any additional cleanup.
 	 */
-	protected void onDialogDismissed() {
-		// do nothing
+	@Override
+	public void onDismiss(DialogInterface dialog) {
+		super.onDismiss(dialog);
 	}
 
 	@Override
@@ -341,8 +342,8 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		@Override
 		public void onDismiss(DialogInterface dialog)
 		{
+			MyDialogPreference.this.onDismiss(mDialog);
 			mDialog = null;
-			onDialogDismissed();
 		}
 	};
 }

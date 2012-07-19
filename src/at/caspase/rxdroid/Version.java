@@ -34,10 +34,6 @@ import android.os.Build;
  */
 public final class Version
 {
-	@SuppressWarnings("unused")
-	private static final String TAG = Version.class.getName();
-	private static final boolean LOGV = true;
-
 	public static final boolean SDK_IS_PRE_HONEYCOMB = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
 
 	/**

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2012 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  * This file is part of RxDroid.
  *
@@ -8,7 +8,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * RxDroid is distributed in the hope that it will be useful,
+ * RxDroid is distribute in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -26,9 +26,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-public class MyBroadcastReceiver extends BroadcastReceiver
+public class SystemEventReceiver extends BroadcastReceiver
 {
-	private static final String TAG = MyBroadcastReceiver.class.getName();
+	private static final String TAG = SystemEventReceiver.class.getName();
 
 	@Override
 	public void onReceive(Context context, Intent intent)

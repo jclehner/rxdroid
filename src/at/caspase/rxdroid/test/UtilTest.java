@@ -6,6 +6,7 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Util;
+import at.caspase.rxdroid.util.WrappedCheckedException;
 
 public class UtilTest extends AndroidTestCase
 {
@@ -50,6 +51,21 @@ public class UtilTest extends AndroidTestCase
 			assertEquals(testCase[0], Util.rot13(Util.rot13(testCase[0])));
 		}
 
+	}
+
+	public void testWrappedCheckedException()
+	{
+		try
+		{
+			//throwsWrappedWrappedCheckedException();
+			final Exception e = new WrappedCheckedException(new ClassNotFoundException());
+			throw new WrappedCheckedException(e);
+		}
+		catch(WrappedCheckedException e)
+		{
+			assertEquals(ClassNotFoundException.class, e.getFirstWrappedCause().getClass());
+			Log.d(TAG, "", e);
+		}
 	}
 
 	private static int factorial(int n)

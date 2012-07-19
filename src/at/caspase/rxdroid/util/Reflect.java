@@ -193,7 +193,7 @@ public final class Reflect
 			ex = e;
 		}
 
-		throw new RuntimeException(ex);
+		throw new WrappedCheckedException(ex);
 	}
 
 	public static Class<?> classForName(String className)

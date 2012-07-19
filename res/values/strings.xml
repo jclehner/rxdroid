@@ -21,8 +21,6 @@
     
     -->
     
-	<!-- FIXME change these -->
-
     <string name="_title_morning">Morning</string>
     <string name="_title_noon">Noon</string>
     <string name="_title_evening">Evening</string>
@@ -34,14 +32,6 @@
     
     <string name="_msg_new_notification">New notification</string>
     <string name="_title_notifications">RxDroid</string>
-     <!-- 
-    <string name="_msg_doses_fp">Doses: %1$d missed, %2$d pending.</string>
-    <string name="_msg_doses_f">Doses: %1$d missed.</string>
-    <string name="_msg_doses_p">Doses: %1$d pending.</string>
-   
-    <string name="_msg_low_supply_single">Low supply: %1$s.</string>
-    <string name="_msg_low_supply_multiple">Low supply: %1$s and %2$d other(s).</string>
-     -->
     <string name="_msg_doses_fp">%1$d missed, %2$d due.</string>
     <string name="_msg_doses_f">%1$d missed.</string>
     <string name="_msg_doses_p">%1$d due.</string>

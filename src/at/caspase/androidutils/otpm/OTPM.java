@@ -33,25 +33,18 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
+import android.util.AttributeSet;
 import android.util.Log;
 import at.caspase.androidutils.Extras;
 import at.caspase.rxdroid.util.Reflect;
-
-/*
- * TODO
- *
- * - Add some other mechanism to update summaries (maybe function name as
- *   a property of @MapToPreference)
- * - Allow preferences to be loaded from XML files
- *
- */
-
+import at.caspase.rxdroid.util.WrappedCheckedException;
 /**
  * Helper functions for creating a preference hierarchy from an arbitrary <code>Object</code>.
  *
@@ -66,7 +59,7 @@ public class OTPM
 	/* package */ static final String EXTRA_PREF_HELPERS = TAG + ".EXTRA_PREF_HELPERS";
 
 	private static final String UNDEFINED = "<!!!UNDEFINED!!!>";
-	public static final String CLOSE_GROUP = TAG + "close_group";
+	public static final String CLOSE_GROUP = TAG + ".close_group";
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
@@ -254,7 +247,7 @@ public class OTPM
 				continue;
 			}
 
-			final Preference p = Reflect.newInstance(prefClazz, new Class<?>[] { Context.class }, context);
+			final Preference p = newPreferenceInstance(prefClazz, context);
 			//final Preference p = Reflect.newInstance(prefClazz, context);
 			p.setTitle(getStringResourceParameter(context, a, "title"));
 			p.setPersistent(false);
@@ -408,10 +401,20 @@ public class OTPM
 		}
 	}
 
+	private static Preference newPreferenceInstance(Class<? extends Preference> prefClazz, Context context)
+	{
+		try
+		{
+			return Reflect.newInstance(prefClazz, new Class<?>[] { Context.class }, context);
+		}
+		catch(WrappedCheckedException e)
+		{
+			if(e.getCauseType() == NoSuchMethodException.class)
+				return Reflect.newInstance(prefClazz, new Class<?>[] { Context.class, AttributeSet.class } , context, null);
 
-
-
-
+			throw e;
+		}
+	}
 
 	private static String getStringParameter(Annotation a, String parameterName, String defaultValue)
 	{

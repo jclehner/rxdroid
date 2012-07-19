@@ -51,12 +51,12 @@ public class DrugNamePreference extends EditTextPreference implements TextWatche
 	}
 
 	public DrugNamePreference(Context context, AttributeSet attrs) {
-		this(context, attrs, android.R.attr.editTextPreferenceStyle);
+		this(context, attrs, 0);
 	}
 
 	public DrugNamePreference(Context context, AttributeSet attrs, int defStyle)
 	{
-		super(context, attrs, defStyle);
+		super(context, attrs, android.R.attr.editTextPreferenceStyle);
 
 		mInput = getEditText();
 		mInput.addTextChangedListener(this);

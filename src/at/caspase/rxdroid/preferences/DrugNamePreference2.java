@@ -50,10 +50,8 @@ public class DrugNamePreference2 extends MyDialogPreference<String>
 		this(context, null);
 	}
 
-	public DrugNamePreference2(Context context, AttributeSet attrs)
-	{
-		super(context, attrs);
-		setWidgetLayoutResource(0);
+	public DrugNamePreference2(Context context, AttributeSet attrs) {
+		super(context, attrs, android.R.attr.editTextPreferenceStyle);
 	}
 
 	@Override
