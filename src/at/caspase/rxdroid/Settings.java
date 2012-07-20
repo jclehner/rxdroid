@@ -29,9 +29,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.preferences.TimePeriodPreference.TimePeriod;
-import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
@@ -318,9 +318,14 @@ public class Settings
 			// We rot13 word by word and ignore those beginning with
 			// a digit, so things like 10mg won't get converted to 10zt.
 
+			Log.d(TAG, "getDrugName: drug=" + drug);
+
 			final StringBuilder sb = new StringBuilder(name.length());
 			for(String word : name.split(" "))
 			{
+				Log.d(TAG, "  word=" + word);
+				Log.d(TAG, "  word[0]=" + word.charAt(0) + "(isDigit: " + Character.isDigit(word.charAt(0)) + ")");
+
 				if(word.length() == 0 || Character.isDigit(word.charAt(0)))
 					sb.append(word);
 				else
@@ -329,8 +334,7 @@ public class Settings
 				sb.append(" ");
 			}
 
-
-			return Util.rot13(name);
+			return sb.toString();
 		}
 
 		return name;

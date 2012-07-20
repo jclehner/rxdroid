@@ -148,7 +148,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	{
 		if(which == BUTTON_POSITIVE)
 		{
-			if(hasInsufficientSupplies() && !mPopup.isShowing())
+			if(hasInsufficientSupplies() && !isPopupShowing())
 				showPopup();
 			else
 				addIntakeAndDismiss();
@@ -193,7 +193,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	@Override
 	public void onBackPressed()
 	{
-		if(mPopup == null || !mPopup.isShowing())
+		if(!isPopupShowing())
 			super.onBackPressed();
 		else
 			dismissPopup();
@@ -221,6 +221,10 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		if(mPopup == null)
 			setupPopupWindow();
 		mPopup.showAtLocation(mDoseEdit, Gravity.CENTER, 0, 0);
+	}
+
+	private boolean isPopupShowing() {
+		return mPopup == null ? false : mPopup.isShowing();
 	}
 
 	private void dismissPopup()

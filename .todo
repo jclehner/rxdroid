@@ -438,6 +438,9 @@
     <note priority="high" time="1342730192">
         Move tests to separate test project
     </note>
+    <note priority="high" time="1342732778">
+        Move functions accessing other Entry types to Entries.java
+    </note>
     <note priority="medium" time="1318943892">
         Consider modelling DrugNamePreference's layout after the layout found in the old DrugEditActivty layout
     </note>
