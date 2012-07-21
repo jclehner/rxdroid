@@ -237,7 +237,7 @@ public class Drug extends Entry implements Comparable<Drug>
 				return schedule.hasDoseOnDate(date);
 
 			default:
-				throw new RuntimeException("Unknown repeat mode");
+				throw new IllegalStateException("Unknown repeat mode");
 		}
 	}
 
@@ -297,50 +297,6 @@ public class Drug extends Entry implements Comparable<Drug>
 		return currentSupply;
 	}
 
-	/**
-	 * @deprecated Move to Entries.java
-	 */
-	@Deprecated
-	public int getCurrentSupplyDays()
-	{
-		final Fraction dailyDose = getDailyDose();
-		if(dailyDose.isZero())
-			return 0;
-
-		final Date today = DateTime.todayDate();
-
-		// determine the sum of the doses still to be taken today and
-		// subtract that from the current supply to get the true
-		// number of days remaining
-		double doseRemainingToday = 0.0;
-
-		for(int doseTime : Constants.DOSE_TIMES)
-		{
-			Fraction cumulativeDose = new Fraction();
-
-			final List<Intake> intakes = Intake.findAll(this, today, doseTime);
-			for(Intake intake : intakes)
-				cumulativeDose.add(intake.getDose());
-
-			if(cumulativeDose.isZero())
-			{
-				final Fraction dose = getDose(doseTime, today);
-				doseRemainingToday += dose.doubleValue();
-			}
-
-			//
-			//Fraction expectedDose = getDose(doseTime, today);
-			//if(cumulativeDose.compareTo(expectedDose) < 0)
-			//	doseRemainingToday += expectedDose.minus(cumulativeDose).doubleValue();
-			//
-		}
-
-		final double supply = this.currentSupply.doubleValue() - doseRemainingToday;
-		final double correctionFactor = getSupplyCorrectionFactor();
-
-		return (int) Math.floor(supply / dailyDose.doubleValue() * correctionFactor);
-	}
-
 	public Fraction[] getSimpleSchedule()
 	{
 		if(mSimpleSchedule == null)
@@ -379,16 +335,6 @@ public class Drug extends Entry implements Comparable<Drug>
 		}
 
 		return schedule.getDose(date, doseTime);
-	}
-
-	private Fraction getDailyDose()
-	{
-		final Fraction dailyDose = new Fraction();
-
-		for(Fraction dose : getSimpleSchedule())
-			dailyDose.add(dose);
-
-		return dailyDose;
 	}
 
 	public String getComment() {
@@ -634,24 +580,6 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public static String getDoseTimeString(int doseTime) {
 		return TIME_NAMES[doseTime];
-	}
-
-	private double getSupplyCorrectionFactor()
-	{
-		switch(repeatMode)
-		{
-			case REPEAT_EVERY_N_DAYS:
-				return repeatArg;
-
-			case REPEAT_WEEKDAYS:
-				return 7.0 / Long.bitCount(repeatArg);
-
-			case REPEAT_21_7:
-				return 1.0 / 0.75;
-
-			default:
-				return 1.0;
-		}
 	}
 
 	/**

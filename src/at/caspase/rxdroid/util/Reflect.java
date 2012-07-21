@@ -72,19 +72,16 @@ public final class Reflect
 	{
 		try
 		{
-			boolean wasMadeAccessible = makeAccessible(field);
-			Object value = field.get(object);
-			if(wasMadeAccessible)
-				field.setAccessible(false);
-			return value;
+			makeAccessible(field);
+			return field.get(object);
 		}
 		catch(IllegalArgumentException e)
 		{
-			throw new RuntimeException(e);
+			throw new WrappedCheckedException(e);
 		}
 		catch(IllegalAccessException e)
 		{
-			throw new RuntimeException(e);
+			throw new WrappedCheckedException(e);
 		}
 	}
 
@@ -105,11 +102,7 @@ public final class Reflect
 			ex = e;
 		}
 
-		if(LOGV)
-		{
-			Class<?> clazz = field.getDeclaringClass();
-			Log.d(TAG, "getFieldValue: failed to obtain field value from field " + fieldName(field), ex);
-		}
+		Log.i(TAG, "getFieldValue: failed to obtain field value from field " + fieldName(field), ex);
 
 		return defValue;
 	}
@@ -124,11 +117,11 @@ public final class Reflect
 		}
 		catch(IllegalArgumentException e)
 		{
-			throw new RuntimeException(e);
+			throw new WrappedCheckedException(e);
 		}
 		catch(IllegalAccessException e)
 		{
-			throw new RuntimeException(e);
+			throw new WrappedCheckedException(e);
 		}
 	}
 
@@ -261,7 +254,7 @@ public final class Reflect
 		}
 
 		if(!returnNullOnError)
-			throw new IllegalArgumentException("Failed to obtain paramter " + parameterName, ex);
+			throw new WrappedCheckedException("Failed to obtain parameter " + parameterName, ex);
 
 		return null;
 	}
@@ -285,6 +278,4 @@ public final class Reflect
 
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = {};
 	private static final Object[] EMPTY_OBJECT_ARRAY = {};
-
-
 }

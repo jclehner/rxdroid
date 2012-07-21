@@ -65,6 +65,7 @@ import at.caspase.androidutils.otpm.OTPM.AddPreference;
 import at.caspase.androidutils.otpm.OTPM.CreatePreference;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.db.Schedule;
 import at.caspase.rxdroid.preferences.DosePreference;
 import at.caspase.rxdroid.preferences.DrugNamePreference2;
@@ -844,7 +845,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				return currentSupply.toString();
 			}
 
-			final int currentSupplyDays = Math.max(drug.getCurrentSupplyDays(), 0);
+			final int currentSupplyDays = Math.max(Entries.getSupplyDaysLeftForDrug(drug, null), 0);
 			final Date end = DateTime.add(DateTime.todayDate(), Calendar.DAY_OF_MONTH, currentSupplyDays);
 			return mContext.getString(R.string._msg_supply, currentSupply, DateTime.toNativeDate(end));
 		}

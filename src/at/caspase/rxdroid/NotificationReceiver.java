@@ -38,6 +38,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
@@ -313,7 +314,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			if(dailyDose != 0)
 			{
-				if(Double.compare(drug.getCurrentSupplyDays(), minDays) == -1)
+				if(Double.compare(Entries.getSupplyDaysLeftForDrug(drug, null), minDays) == -1)
 					drugsWithLowSupply.add(drug);
 			}
 		}

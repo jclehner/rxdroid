@@ -2,6 +2,9 @@ package at.caspase.rxdroid.db;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
+import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
@@ -19,7 +22,6 @@ public final class Entries
 		return intake;
 	}
 	*/
-
 	public static boolean hasMissingIntakesBeforeDate(Drug drug, Date date)
 	{
 		int repeatMode = drug.getRepeatMode();
@@ -78,6 +80,58 @@ public final class Entries
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get the number of days the drug's supply will last.
+	 */
+	public static int getSupplyDaysLeftForDrug(Drug drug, Date date)
+	{
+		// TODO this function currently does not take into account doses
+		// that were taken after the specified date.
+
+		if(date == null)
+			date = DateTime.todayDate();
+
+		final Fraction doseLeftOnDate = new Fraction();
+
+		if(date.equals(DateTime.todayDate()) && drug.hasDoseOnDate(date))
+		{
+			for(int doseTime : Constants.DOSE_TIMES)
+			{
+				if(Intake.countAll(drug, date, doseTime) == 0)
+					doseLeftOnDate.add(drug.getDose(doseTime, date));
+			}
+		}
+
+		final double supply = drug.getCurrentSupply().doubleValue() - doseLeftOnDate.doubleValue();
+		return (int) Math.floor(supply / getDailyDose(drug) * getSupplyCorrectionFactor(drug));
+	}
+
+	private static double getDailyDose(Drug drug)
+	{
+		double dailyDose = 0.0;
+		for(int doseTime : Constants.DOSE_TIMES)
+			dailyDose += drug.getDose(doseTime).doubleValue();
+		return dailyDose;
+	}
+
+	private static double getSupplyCorrectionFactor(Drug drug)
+	{
+		switch(drug.getRepeatMode())
+		{
+			case Drug.REPEAT_EVERY_N_DAYS:
+				return drug.getRepeatArg();
+
+			case Drug.REPEAT_WEEKDAYS:
+				return 7.0 / Long.bitCount(drug.getRepeatArg());
+
+			case Drug.REPEAT_21_7:
+				return 1.0 / 0.75;
+
+			default:
+				return 1.0;
+		}
 	}
 
 	private Entries() {}
