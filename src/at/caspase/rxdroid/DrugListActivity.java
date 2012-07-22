@@ -21,7 +21,6 @@
 
 package at.caspase.rxdroid;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -45,7 +44,6 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
@@ -66,13 +64,12 @@ import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.ui.DrugOverviewAdapter;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.DateTime;
-import at.caspase.rxdroid.util.Util;
 
 public class DrugListActivity extends Activity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
 {
 	private static final String TAG = DrugListActivity.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private static final int MENU_ADD = 0;
 	private static final int MENU_PREFERENCES = 1;
@@ -89,7 +86,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	public static final int TAG_DRUG_ID = R.id.tag_drug_id;
 
-	private LayoutInflater mInflater;
 	private SharedPreferences mSharedPreferences;
 
 	private ViewPager mPager;
@@ -110,8 +106,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.drug_list);
-
-		mInflater = LayoutInflater.from(this);
 
 		mPager = (ViewPager) findViewById(R.id.drug_list_pager);
 		mTextDate = (TextView) findViewById(R.id.text_date);
@@ -134,7 +128,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		});
 
 		mPager.setOnPageChangeListener(mPageListener);
-
 
 		Intent intent = getIntent();
 		if(intent != null)
@@ -164,15 +157,15 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		else
 			wasStartedFromNotification = false;
 
-		if(wasStartedFromNotification)
-		{
+		//if(wasStartedFromNotification)
+		//{
 			//int snoozeType = Settings.instance().getListPreferenceValueIndex("snooze_type", -1);
 			//if(snoozeType == NotificationReceiver.ALARM_MODE_SNOOZE)
 			//{
 			//	NotificationService.snooze(this);
 			//	Toast.makeText(this, R.string._toast_snoozing, Toast.LENGTH_SHORT).show();
 			//}
-		}
+		//}
 
 		startNotificationService();
 
@@ -184,11 +177,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		super.onPause();
 		mIsShowing = false;
-		// TODO this is an ugly hack, required for now to prevent
-		// FCs that occurs when adding/updating/deleting a drug
-		// in DrugEditActivity (due to DoseView's event handlers
-		// being called)
-		//mPager.removeAllViews();
 	}
 
 	@Override
@@ -484,10 +472,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	private void startNotificationService()
 	{
-		Intent serviceIntent = new Intent();
-		serviceIntent.setClass(this, NotificationService.class);
-
-		startService(serviceIntent);
+		NotificationReceiver.sendBroadcastToSelf(false);
+		Database.registerOnChangedListener(DATABASE_WATCHER);
 	}
 
 	private void updateDateString()
@@ -599,6 +585,25 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		{
 			if(entry instanceof Drug)
 				setDate(mDate, PAGER_INIT);
+		}
+	};
+
+
+	private static final Database.OnChangeListener DATABASE_WATCHER = new Database.OnChangeListener() {
+
+		@Override
+		public void onEntryUpdated(Entry entry, int flags) {
+			NotificationReceiver.sendBroadcastToSelf(entry instanceof Intake);
+		}
+
+		@Override
+		public void onEntryDeleted(Entry entry, int flags) {
+			NotificationReceiver.sendBroadcastToSelf(false);
+		}
+
+		@Override
+		public void onEntryCreated(Entry entry, int flags) {
+			NotificationReceiver.sendBroadcastToSelf(false);
 		}
 	};
 }

@@ -46,6 +46,7 @@ import com.j256.ormlite.table.TableUtils;
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 {
 	private static final String TAG = DatabaseHelper.class.getName();
+	@SuppressWarnings("unused")
 	private static final boolean LOGV = true;
 
 	public static class DatabaseError extends RuntimeException
@@ -112,12 +113,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	public static final int DB_VERSION = 50;
 	public static final String DB_NAME = "db.sqlite";
 
-	private final Context mContext;
-
-	DatabaseHelper(Context context)
-	{
+	DatabaseHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
-		mContext = context;
 	}
 
 	@Override

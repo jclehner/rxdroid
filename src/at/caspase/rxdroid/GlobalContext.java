@@ -22,6 +22,7 @@
 package at.caspase.rxdroid;
 
 import android.content.Context;
+import android.util.Log;
 
 /**
  * Provides a globally available context.
@@ -31,6 +32,7 @@ import android.content.Context;
 public final class GlobalContext
 {
 	private static Context sContext;
+	private static Object sContextLock = new Object();
 
 	/**
 	 * Set the globally available context.
@@ -74,6 +76,22 @@ public final class GlobalContext
 
 	public static String getString(int resId, Object... formatArgs) {
 		return sContext.getString(resId, formatArgs);
+	}
+
+	public static void waitForContext()
+	{
+		while(sContext == null)
+		{
+			try
+			{
+				sContextLock.wait(100);
+			}
+			catch (InterruptedException e)
+			{
+				Log.e(GlobalContext.class.getName(), "waitForContext: interrupted");
+			}
+		}
+
 	}
 
 	private GlobalContext() {}

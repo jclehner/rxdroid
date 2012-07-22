@@ -199,14 +199,6 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 			dismissPopup();
 	}
 
-	private void initViews()
-	{
-
-
-
-
-	}
-
 	private boolean hasInsufficientSupplies()
 	{
 		if(mDrug.getRefillSize() == 0)
@@ -261,7 +253,9 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
 
+		@SuppressWarnings("deprecation")
 		int width  = display.getWidth()  * 8 / 10;
+		@SuppressWarnings("deprecation")
 		int height = display.getHeight() * 1 / 3;
 
 		mPopup = new PopupWindow(

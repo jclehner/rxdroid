@@ -51,7 +51,6 @@ import at.caspase.rxdroid.util.DateTime;
  */
 public class DoseView extends FrameLayout implements OnChangeListener
 {
-	@SuppressWarnings("unused")
 	private static final String TAG = DoseView.class.getName();
 	private static final boolean LOGV = false;
 

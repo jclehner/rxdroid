@@ -39,10 +39,11 @@ import at.caspase.rxdroid.util.Util;
 public class Settings
 {
 	private static final String TAG = Settings.class.getName();
+	@SuppressWarnings("unused")
 	private static final boolean LOGV = true;
 
 	private static final String KEY_LAST_MSG_HASH = "_last_msg_hash";
-	private static final String KEY_LAST_MSG_COUNT = "_last_msg_count";
+	//private static final String KEY_LAST_MSG_COUNT = "_last_msg_count";
 
 	private static final String KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 	private static final int DOSE_TIMES[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
@@ -162,6 +163,9 @@ public class Settings
 
 			if(resId == 0 || (value = sApplicationContext.getString(resId)) == null)
 				throw new IllegalStateException("No default value for time preference " + key + " in strings.xml");
+
+			Log.i(TAG, "Persisting preference: " + key + "=" + value);
+			sSharedPrefs.edit().putString(key, value).commit();
 		}
 
 		return TimePeriod.fromString(value);
@@ -182,14 +186,12 @@ public class Settings
 		return cal.getTime();
 	}
 
+	@SuppressWarnings("deprecation")
 	public Date getActiveDate() {
 		return getActiveDate(DateTime.nowCalendar());
 	}
 
-	public int getActiveOrNextDoseTime() {
-		return getActiveDoseTime(DateTime.nowCalendar());
-	}
-
+	@Deprecated
 	public int getActiveOrNextDoseTime(Calendar time)
 	{
 		int ret = getActiveDoseTime(time);
@@ -207,10 +209,6 @@ public class Settings
 		}
 
 		return -1;
-	}
-
-	public int getActiveDoseTime() {
-		return getActiveDoseTime(DateTime.nowCalendar());
 	}
 
 	public int getNextDoseTime(Calendar time) {
@@ -242,22 +240,14 @@ public class Settings
 		if(retDoseTime == -1)
 		{
 			if(!useNextDayOffsets)
-			{
-				//Log.d(TAG, "  retrying with offsets from next day");
 				return getNextDoseTime(time, true);
-			}
 
-			throw new RuntimeException("retDoseTime == -1");
+			throw new IllegalStateException("retDoseTime == -1");
 		}
 
 		//Log.d(TAG, "  retDoseTime=" + retDoseTime);
 		return retDoseTime;
 	}
-
-	public int getNextDoseTime() {
-		return getNextDoseTime(DateTime.nowCalendar());
-	}
-
 
 	public int getLastNotificationMessageHash() {
 		return sSharedPrefs.getInt(KEY_LAST_MSG_HASH, 0);
@@ -270,7 +260,7 @@ public class Settings
 		editor.commit();
 	}
 
-	public int getLastNotificationCount() {
+	/*public int getLastNotificationCount() {
 		return sSharedPrefs.getInt(KEY_LAST_MSG_COUNT, 0);
 	}
 
@@ -282,7 +272,7 @@ public class Settings
 		Editor editor = sSharedPrefs.edit();
 		editor.putInt(KEY_LAST_MSG_COUNT, notificationCount);
 		editor.commit();
-	}
+	}*/
 
 	public int getListPreferenceValueIndex(String key, int defValue)
 	{
@@ -318,14 +308,9 @@ public class Settings
 			// We rot13 word by word and ignore those beginning with
 			// a digit, so things like 10mg won't get converted to 10zt.
 
-			Log.d(TAG, "getDrugName: drug=" + drug);
-
 			final StringBuilder sb = new StringBuilder(name.length());
 			for(String word : name.split(" "))
 			{
-				Log.d(TAG, "  word=" + word);
-				Log.d(TAG, "  word[0]=" + word.charAt(0) + "(isDigit: " + Character.isDigit(word.charAt(0)) + ")");
-
 				if(word.length() == 0 || Character.isDigit(word.charAt(0)))
 					sb.append(word);
 				else

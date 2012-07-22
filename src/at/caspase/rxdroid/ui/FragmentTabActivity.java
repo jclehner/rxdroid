@@ -11,6 +11,7 @@ import android.widget.TabHost;
 import at.caspase.androidutils.compat.TabManager;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.Settings;
+import at.caspase.rxdroid.Version;
 import at.caspase.rxdroid.db.Drug;
 
 import com.actionbarsherlock.app.ActionBar;

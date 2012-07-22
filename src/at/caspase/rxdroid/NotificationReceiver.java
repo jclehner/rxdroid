@@ -39,6 +39,7 @@ import android.util.Log;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entries;
+import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
@@ -120,6 +121,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		Log.d(TAG, "Scheduling next alarms...");
 
+		@SuppressWarnings("deprecation")
 		final Calendar now = DateTime.nowCalendar();
 		int activeDoseTime = mSettings.getActiveDoseTime(now);
 		int nextDoseTime = mSettings.getNextDoseTime(now);
@@ -132,6 +134,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void updateCurrentNotifications()
 	{
+		@SuppressWarnings("deprecation")
 		Calendar now = DateTime.nowCalendar();
 		final boolean isActiveDoseTime;
 		int doseTime = mSettings.getActiveDoseTime(now);
@@ -338,4 +341,68 @@ public class NotificationReceiver extends BroadcastReceiver
 		return mContext.getString(resId, formatArgs);
 	}
 
+	/* package */ static void sendBroadcastToSelf(boolean silent) {
+		sendBroadcastToSelf(null, silent);
+	}
+
+	/* package */ static void sendBroadcastToSelf(Context context, boolean silent)
+	{
+		if(context == null)
+			context = GlobalContext.get();
+		Intent intent = new Intent(context, NotificationReceiver.class);
+		intent.putExtra(NotificationReceiver.EXTRA_SILENT, silent);
+		context.sendBroadcast(intent);
+	}
+
+
+	/*static
+	{
+		final Runnable r = new Runnable() {
+
+			@Override
+			public void run()
+			{
+				while(GlobalContext.get(true) == null)
+				{
+					Log.i(TAG, "Waiting for context...");
+
+					try
+					{
+						wait(100);
+					}
+					catch (InterruptedException e)
+					{
+						Log.e(TAG, "Thread while waiting for context");
+						return;
+					}
+				}
+
+				Log.i(TAG, "Got context, registering database listener");
+
+				NotificationReceiver.sendBroadcastToSelf(false);
+
+				Database.registerOnChangedListener(new Database.OnChangeListener() {
+
+					@Override
+					public void onEntryUpdated(Entry entry, int flags) {
+						NotificationReceiver.sendBroadcastToSelf(entry instanceof Intake);
+					}
+
+					@Override
+					public void onEntryDeleted(Entry entry, int flags) {
+						NotificationReceiver.sendBroadcastToSelf(false);
+					}
+
+					@Override
+					public void onEntryCreated(Entry entry, int flags) {
+						NotificationReceiver.sendBroadcastToSelf(false);
+					}
+				});
+			}
+		};
+
+		final Thread t = new Thread(r);
+		t.setName("DatabaseWatcherRegistrar");
+		t.start();
+	}*/
 }

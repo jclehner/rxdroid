@@ -46,10 +46,6 @@ public class DrugNamePreference2 extends MyDialogPreference<String>
 
 	private String mOriginalName;
 
-	public DrugNamePreference2(Context context) {
-		this(context, null);
-	}
-
 	public DrugNamePreference2(Context context, AttributeSet attrs) {
 		super(context, attrs, android.R.attr.editTextPreferenceStyle);
 	}

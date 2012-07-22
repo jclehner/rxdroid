@@ -46,7 +46,6 @@ import at.caspase.rxdroid.util.Util;
 @SuppressWarnings("deprecation")
 public class PreferencesActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener
 {
-	@SuppressWarnings("unused")
 	private static final String TAG = PreferencesActivity.class.getName();
 
 	private static final int MENU_RESTORE_DEFAULTS = 0;

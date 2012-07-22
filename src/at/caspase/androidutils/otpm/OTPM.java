@@ -200,7 +200,7 @@ public class OTPM
 		initializePreferences(root, object, prefInfoList);
 	}
 
-	private static class PrefInfo
+	static class PrefInfo
 	{
 		String key;
 		Annotation annotation;

@@ -28,8 +28,8 @@ import android.content.Context;
 
 public class MyNotification
 {
-	private static final String TAG = MyNotification.class.getName();
-	private static final boolean LOGV = false;
+	//private static final String TAG = MyNotification.class.getName();
+	//private static final boolean LOGV = false;
 
 	private final Context mContext;
 
@@ -184,6 +184,7 @@ public class MyNotification
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void post()
 	{
 		final Notification notification = new Notification();

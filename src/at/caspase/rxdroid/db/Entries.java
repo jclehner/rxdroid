@@ -2,7 +2,6 @@ package at.caspase.rxdroid.db;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.util.Constants;

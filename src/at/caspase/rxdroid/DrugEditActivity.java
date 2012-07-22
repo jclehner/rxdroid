@@ -83,6 +83,7 @@ import at.caspase.rxdroid.util.Util;
  *
  */
 
+@SuppressWarnings("deprecation")
 public class DrugEditActivity extends PreferenceActivity implements OnPreferenceClickListener
 {
 	public static final String EXTRA_DRUG = "drug";
@@ -275,7 +276,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			{
 				final int index = p.getOrder();
 				ps.onItemClick(null, null, index, 0);
-				//p.getOnPreferenceClickListener().onPreferenceClick(p);
 			}
 			else
 				Log.w(TAG, "Couldn't focus on current supply preference");

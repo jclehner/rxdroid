@@ -56,6 +56,7 @@ import at.caspase.androidutils.InstanceState.SaveState;
 public abstract class MyDialogPreference<T extends Serializable> extends DialogPreference
 {
 	private static final String TAG = MyDialogPreference.class.getName();
+	@SuppressWarnings("unused")
 	private static final boolean LOGV = false;
 
 	private static final String EMPTY = "<!!!!!!!!!!!!!!!!!!!!!!EMPTY";

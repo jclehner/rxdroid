@@ -28,7 +28,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import android.util.Log;
 import android.widget.TimePicker;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
@@ -177,9 +176,6 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 	public boolean isWithinRange(DumbTime begin, DumbTime end, boolean allowWrap)
 	{
-		Log.d(TAG, "\"" + this + "\".isWithinRange(" + begin + ", " + end + ", " + allowWrap + ")");
-		//Log.d(TAG, "  ")
-
 		if(begin != null && end != null)
 		{
 			if(allowWrap && end.before(begin))
@@ -195,6 +191,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		throw new NullPointerException();
 	}
 
+	@SuppressWarnings("deprecation")
 	public static DumbTime fromString(String timeString)
 	{
 		if(timeString != null)

@@ -49,12 +49,9 @@ import com.j256.ormlite.field.DatabaseField;
  */
 public abstract class Entry implements Serializable
 {
-	private static final String TAG = Entry.class.getName();
 	private static final long serialVersionUID = 8300191193261799857L;
 
-	//public static final String COLUMN_ID = "id";
-
-	@DatabaseField(/*columnName = COLUMN_ID,*/ generatedId = true)
+	@DatabaseField(generatedId = true)
 	protected int id = -1;
 
 	@Override

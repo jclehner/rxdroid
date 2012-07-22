@@ -34,10 +34,11 @@ public class SystemEventReceiver extends BroadcastReceiver
 	public void onReceive(Context context, Intent intent)
 	{
 		Log.d(TAG, "Received intent with action " + intent.getAction());
+		NotificationReceiver.sendBroadcastToSelf(context, false);
 
-		Intent service = new Intent();
-		service.setClass(context.getApplicationContext(), NotificationService.class);
+		//Intent service = new Intent();
+		//service.setClass(context.getApplicationContext(), NotificationService.class);
 		//service.putExtra(NotificationService.EXTRA_RESTART_FLAGS, NotificationService.RESTART_FORCE);
-		context.startService(service);
+		//context.startService(service);
 	}
 }

@@ -38,8 +38,6 @@ import at.caspase.rxdroid.db.Drug;
 
 public final class Util
 {
-	private static final String TAG = Util.class.getName();
-
 	public static int getDoseTimeDrawableFromDoseViewId(int doseViewId)
 	{
 		switch(doseViewId)
