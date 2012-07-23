@@ -7,7 +7,7 @@ die() {
 	if [[ $# -ne 0 ]]; then
 		echo $* >&2
 	else
-		echo "error" >&2
+		echo "Error" >&2
 	fi
 
 	# don't exit in interactive mode
@@ -42,3 +42,5 @@ adb-shell() {
 run() {
 	$* || die "$1 exited with status $?"
 }
+
+grep -P foobar < /dev/null || die "Error: grep -P does not work"
