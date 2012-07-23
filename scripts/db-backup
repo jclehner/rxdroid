@@ -7,5 +7,6 @@ else
 	FILE="$1"
 fi
 
+echo -n "Pulling database from device ... "
 adb pull /data/data/at.caspase.rxdroid/databases/db.sqlite "$FILE"
 

@@ -1,10 +1,17 @@
 #!/bin/bash
 
+source "$(dirname $_)/shared.sh"
+
 BAK=".backup.sqlite"
 APK="bin/RxDroid.apk"
 
-scripts/db-backup $BAK || exit 1
-adb uninstall at.caspase.rxdroid || exit 1
-adb install $APK || exit 1
-scripts/db-restore $BAK || exit 1
+scripts/db-backup $BAK || die
+
+echo -n "Removing $PKG ... "
+adb uninstall $PKG || die
+
+echo -n "Reinstalling $PKG ... "
+adb install $APK || die
+
+scripts/db-restore $BAK || die
 rm -f $BAK

@@ -1,16 +1,18 @@
 #!/bin/bash
 
+source "$(dirname $_)/shared.sh"
+
+
 if [[ ! -f "$1" ]]; then
 	echo "$1: No such file" >&2
 	exit 1
 fi
 
-if ! grep -i "sqlite" <<< `file -b "$1"`; then
+if ! grep -i "sqlite" <<< $(file -b "$1"); then
 	echo "$1: Not an SQLite database" >&2
 	exit 1
 fi
 
-PKG=at.caspase.rxdroid
 DATABASES=/data/data/$PKG/databases
 TARGET=$DATABASES/db.sqlite
 
@@ -19,6 +21,12 @@ FUID=`awk '{ print $2 }' <<<$INFO`
 FGID=`awk '{ print $3 }' <<<$INFO`
 
 adb shell mkdir -p $(dirname $TARGET)
+
+echo -n "Pushing database to device ... "
 adb push "$1" $TARGET || exit 1
+
+echo -n "Fixing permissions ... "
 adb shell busybox chown -R $FUID:$FGID $DATABASES  || exit 1
 adb shell am kill $PKG || exit 1
+
+echo "done"
