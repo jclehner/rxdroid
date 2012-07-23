@@ -23,7 +23,6 @@ package at.caspase.rxdroid.db;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.Collection;
 
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.caspase.rxdroid.util.Reflect;
@@ -80,19 +79,8 @@ public abstract class Entry implements Serializable
 	/**
 	 * Converts this Entry to an instance usable by the current database version.
 	 */
-	public Entry convert() {
+	protected Entry convertToCurrentDatabaseFormat() {
 		throw new UnsupportedOperationException();
-	}
-
-	public static<T extends Entry> T findInCollection(Collection<T> collection, int id)
-	{
-		for(T t : collection)
-		{
-			if(t.getId() == id)
-				return t;
-		}
-
-		return null;
 	}
 
 	protected static void copy(Entry dest, Entry src)

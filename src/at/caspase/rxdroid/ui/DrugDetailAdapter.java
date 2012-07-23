@@ -94,9 +94,9 @@ public class DrugDetailAdapter extends AbsDrugAdapter
 		holder.info2.setVisibility(View.GONE);
 
 		//// FIXME hack
-		if(Intake.countAll(drug, mAdapterDate, mDoseTime) != 0)
+		if(Entries.countIntakes(drug, mAdapterDate, mDoseTime) != 0)
 		{
-			final Intake intake = Intake.findAll(drug, mAdapterDate, mDoseTime).get(0);
+			final Intake intake = Entries.findIntakes(drug, mAdapterDate, mDoseTime).get(0);
 
 			holder.info1.setText("Taken: " + intake.getTimestamp());
 			holder.info1.setVisibility(View.VISIBLE);

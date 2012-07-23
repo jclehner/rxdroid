@@ -37,7 +37,7 @@ public class OldDrug extends Entry
 	private static final long serialVersionUID = -2569745648137404894L;
 
 	@Override
-	public Entry convert()
+	protected Entry convertToCurrentDatabaseFormat()
 	{
 		Drug drug = new Drug();
 		drug.setId(id);

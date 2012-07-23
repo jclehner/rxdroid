@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -48,6 +49,7 @@ import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.caspase.rxdroid.util.Reflect;
+import at.caspase.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
@@ -307,17 +309,27 @@ public final class Database
 						if(isSerializable)
 							fs.write("(dataType=DataType.SERIALIZABLE) // TODO verify");
 
-						fs.write("\n");
+						fs.write("\n\t");
 
-						fs.write("\tprivate " + type.getSimpleName() + " " + f.getName() + ";\n\n");
+						int m = f.getModifiers();
+						if(Modifier.isProtected(m))
+							fs.write("protected");
+						else if(Modifier.isPublic(m))
+							fs.write("public");
+						else if(Modifier.isPrivate(m))
+							fs.write("private");
+						else
+							fs.write("/* package */");
+
+						fs.write(" " + type.getSimpleName() + " " + f.getName() + ";\n\n");
 					}
 				}
 
 				fs.write(
-						// convert()
+						// convertToCurrentDatabaseFormat()
 
 						"\t@Override\n" +
-						"\tpublic Entry convert()\n" +
+						"\tprotected Entry convertToCurrentDatabaseFormat()\n" +
 						"\t{\n" +
 						"\t\t// FIXME stub\n" +
 						"\t\treturn null;\n" +
@@ -381,7 +393,7 @@ public final class Database
 			cached.remove(entry);
 		else if("update".equals(methodName))
 		{
-			final Entry oldEntry = Entry.findInCollection(cached, entry.getId());
+			final Entry oldEntry = Entries.findInCollectionById(cached, entry.getId());
 			int index = cached.indexOf(oldEntry);
 
 			cached.remove(index);
@@ -397,25 +409,7 @@ public final class Database
 		final Field hookField = Reflect.getDeclaredField(clazz, hookName);
 		if(hookField != null)
 		{
-			Runnable hook = null;
-
-			try
-			{
-				hook = (Runnable) hookField.get(null);
-			}
-			catch(IllegalArgumentException e)
-			{
-				Log.w(TAG, hookName, e);
-			}
-			catch(IllegalAccessException e)
-			{
-				Log.w(TAG, hookName, e);
-			}
-			catch(ClassCastException e)
-			{
-				Log.w(TAG, hookName, e);
-			}
-
+			final Runnable hook = (Runnable) Reflect.getFieldValue(hookField, null, null);
 			if(hook != null)
 			{
 				// don't run this in a thread as we want a clean state when events are
@@ -474,7 +468,7 @@ public final class Database
 					// handled at end of function
 				}
 
-				throw new RuntimeException("Failed to run DAO method " + methodName, ex);
+				throw new WrappedCheckedException("Failed to run DAO method " + methodName, ex);
 			}
 		});
 

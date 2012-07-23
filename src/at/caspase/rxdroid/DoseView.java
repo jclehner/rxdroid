@@ -38,6 +38,7 @@ import android.widget.TextView;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Database.OnChangeListener;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.DateTime;
@@ -178,7 +179,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		mDose = new Fraction();
 
-		List<Intake> intakes = Intake.findAll(mDrug, mDate, mDoseTime);
+		List<Intake> intakes = Entries.findIntakes(mDrug, mDate, mDoseTime);
 		for(Intake intake : intakes)
 		{
 			mDose.add(intake.getDose());

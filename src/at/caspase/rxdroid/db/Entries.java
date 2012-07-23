@@ -1,7 +1,11 @@
 package at.caspase.rxdroid.db;
 
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.util.Constants;
@@ -50,7 +54,7 @@ public final class Entries
 				offset = (int) -days;
 
 			final Date lastIntakeDate = DateTime.add(date, Calendar.DAY_OF_MONTH, offset);
-			return !Intake.hasAll(drug, lastIntakeDate);
+			return !hasAllIntakes(drug, lastIntakeDate);
 		}
 		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
 		{
@@ -70,7 +74,7 @@ public final class Entries
 					if(!drug.getDose(doseTime, checkDate).isZero())
 					{
 						++expectedIntakeCount;
-						actualScheduledIntakeCount += Intake.countAll(drug, checkDate, doseTime);
+						actualScheduledIntakeCount += countIntakes(drug, checkDate, doseTime);
 					}
 				}
 			}
@@ -98,13 +102,73 @@ public final class Entries
 		{
 			for(int doseTime : Constants.DOSE_TIMES)
 			{
-				if(Intake.countAll(drug, date, doseTime) == 0)
+				if(countIntakes(drug, date, doseTime) == 0)
 					doseLeftOnDate.add(drug.getDose(doseTime, date));
 			}
 		}
 
 		final double supply = drug.getCurrentSupply().doubleValue() - doseLeftOnDate.doubleValue();
 		return (int) Math.floor(supply / getDailyDose(drug) * getSupplyCorrectionFactor(drug));
+	}
+
+	public static<T extends Entry> T findInCollectionById(Collection<T> collection, int id)
+	{
+		for(T t : collection)
+		{
+			if(t.getId() == id)
+				return t;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Find all intakes meeting the specified criteria.
+	 * <p>
+	 * @param drug The drug to search for (based on its database ID).
+	 * @param date The Intake's date. Can be <code>null</code>.
+	 * @param doseTime The Intake's doseTime. Can be <code>null</code>.
+	 */
+	public static synchronized List<Intake> findIntakes(Drug drug, Date date, Integer doseTime)
+	{
+		final List<Intake> intakes = new LinkedList<Intake>();
+
+		for(Intake intake : Database.getCached(Intake.class))
+		{
+			if(intake.getDrugId() != drug.id)
+				continue;
+			if(date != null && !intake.getDate().equals(date))
+				continue;
+			if(doseTime != null && intake.getDoseTime() != doseTime)
+				continue;
+
+			intakes.add(intake);
+		}
+
+		return Collections.unmodifiableList(intakes);
+	}
+
+	public static int countIntakes(Drug drug, Date date, Integer doseTime) {
+		return findIntakes(drug, date, doseTime).size();
+	}
+
+	public static boolean hasAllIntakes(Drug drug, Date date)
+	{
+		if(!drug.hasDoseOnDate(date))
+			return true;
+
+		//List<Intake> intakes = findAll(drug, date, null);
+		for(int doseTime : Constants.DOSE_TIMES)
+		{
+			Fraction dose = drug.getDose(doseTime, date);
+			if(!dose.isZero())
+			{
+				if(countIntakes(drug, date, doseTime) == 0)
+					return false;
+			}
+		}
+
+		return true;
 	}
 
 	private static double getDailyDose(Drug drug)

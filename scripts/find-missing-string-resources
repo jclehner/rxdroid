@@ -5,9 +5,10 @@
 # be echoed in copy-'n-pastable XML. 
 #
 
-patterns="@string/_\w* R.string._\w*"
-temp=$(mktemp -t fooXXXXXX)
+source "$(dirname $_)/shared.sh"
 
+patterns="@string/_\w* R.string._\w*"
+temp=$(mktemp)
 
 scan_file()
 {

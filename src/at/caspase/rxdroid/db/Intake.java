@@ -22,13 +22,8 @@
 package at.caspase.rxdroid.db;
 
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
 import at.caspase.rxdroid.Fraction;
-import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
 
 import com.j256.ormlite.field.DataType;
@@ -173,54 +168,5 @@ public class Intake extends Entry
 	@Override
 	public String toString() {
 		return getDrug().getName() + ": " + date + " " + Drug.getDoseTimeString(doseTime) + ", " + dose;
-	}
-
-	/**
-	 * Find all intakes meeting the specified criteria.
-	 * <p>
-	 * @param drug The drug to search for (based on its database ID).
-	 * @param date The Intake's date. Can be <code>null</code>.
-	 * @param doseTime The Intake's doseTime. Can be <code>null</code>.
-	 */
-	public static synchronized List<Intake> findAll(Drug drug, Date date, Integer doseTime)
-	{
-		final List<Intake> intakes = new LinkedList<Intake>();
-
-		for(Intake intake : Database.getCached(Intake.class))
-		{
-			if(intake.getDrugId() != drug.id)
-				continue;
-			if(date != null && !intake.date.equals(date))
-				continue;
-			if(doseTime != null && intake.doseTime != doseTime)
-				continue;
-
-			intakes.add(intake);
-		}
-
-		return Collections.unmodifiableList(intakes);
-	}
-
-	public static int countAll(Drug drug, Date date, Integer doseTime) {
-		return findAll(drug, date, doseTime).size();
-	}
-
-	public static boolean hasAll(Drug drug, Date date)
-	{
-		if(!drug.hasDoseOnDate(date))
-			return true;
-
-		//List<Intake> intakes = findAll(drug, date, null);
-		for(int doseTime : Constants.DOSE_TIMES)
-		{
-			Fraction dose = drug.getDose(doseTime, date);
-			if(!dose.isZero())
-			{
-				if(countAll(drug, date, doseTime) == 0)
-					return false;
-			}
-		}
-
-		return true;
 	}
 }

@@ -80,7 +80,7 @@ public class OldDrug extends Entry
 	private int sortRank;
 
 	@Override
-	public Entry convert()
+	protected Entry convertToCurrentDatabaseFormat()
 	{
 		Drug drug = new Drug();
 		Entry.copy(drug, this);

@@ -149,7 +149,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		throw new DatabaseError(isUpgrade ? DatabaseError.E_UPGRADE : DatabaseError.E_DOWNGRADE);
 	}
 
-	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) { // Do NOT @Override (crashes on API < 11)
+	// !!! Do NOT @Override (crashes on API < 11) !!!
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		onUpgrade(db, oldVersion, newVersion);
 	}
 

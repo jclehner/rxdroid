@@ -75,7 +75,7 @@ public class OldDrug extends Entry
 	private String comment;
 
 	@Override
-	public Drug convert()
+	protected Drug convertToCurrentDatabaseFormat()
 	{
 		Drug drug = new Drug();
 		copy(drug, this);

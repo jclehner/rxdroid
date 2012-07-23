@@ -272,7 +272,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 					else
 					{
 						Fraction dose = new Fraction();
-						for(Intake intake : Intake.findAll(drug, mDate, doseTime))
+						for(Intake intake : Entries.findIntakes(drug, mDate, doseTime))
 						{
 							dose.add(intake.getDose());
 							Database.delete(intake);
@@ -512,7 +512,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			if(!mShowInactive && !drug.isActive())
 				result = false;
 
-			if(!result && !Intake.findAll(drug, mFilterDate, null).isEmpty())
+			if(!result && Entries.countIntakes(drug, mFilterDate, null) != 0)
 				result = true;
 
 			if(!result && DateTime.isToday(mFilterDate) && Entries.hasMissingIntakesBeforeDate(drug, mFilterDate))

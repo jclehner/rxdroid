@@ -115,7 +115,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	public static final int REPEAT_INVALID = 6;
 
 	// TODO valid arguments: 6, 8, 12, with automapping to doseTimes
-	public static final int REPEAT_EVERY_N_HOURS = -1;
+	public static final int REPEAT_EVERY_N_HOURS = REPEAT_INVALID;
 
 	public static final int REPEATARG_DAY_MON = 1;
 	public static final int REPEATARG_DAY_TUE = 1 << 1;
@@ -192,11 +192,6 @@ public class Drug extends Entry implements Comparable<Drug>
 	 */
 	public Drug() {}
 
-	@Deprecated
-	public boolean hasDoseOnDate(Calendar cal) {
-		return hasDoseOnDate(cal.getTime());
-	}
-
 	public boolean hasDoseOnDate(Date date)
 	{
 		if(repeatOrigin != null)
@@ -212,7 +207,7 @@ public class Drug extends Entry implements Comparable<Drug>
 				}
 
 				default:
-					//Log.w(TAG, "hasDoseOnDate: repeatOrigin set for repeatMode=" + repeatMode);
+					;
 			}
 		}
 

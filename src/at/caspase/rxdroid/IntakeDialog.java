@@ -41,6 +41,7 @@ import android.widget.Toast;
 import at.caspase.rxdroid.FractionInput.OnChangedListener;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 
@@ -77,7 +78,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 
 		if(LOGV) Log.v(TAG, "<init>: doseTime=" + doseTime + ", date=" + date + ", drug=" + drug);
 
-		mIntakeCount = Intake.findAll(drug, date, doseTime).size();
+		mIntakeCount = Entries.findIntakes(drug, date, doseTime).size();
 
 		if(mIntakeCount == 0)
 			mDose = drug.getDose(doseTime, date);

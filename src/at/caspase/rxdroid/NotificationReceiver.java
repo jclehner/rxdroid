@@ -39,8 +39,6 @@ import android.util.Log;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entries;
-import at.caspase.rxdroid.db.Entry;
-import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
@@ -255,7 +253,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date) || drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND)
 				continue;
 
-			if(Intake.findAll(drug, date, doseTime).isEmpty())
+			if(Entries.countIntakes(drug, date, doseTime) == 0)
 				++count;
 		}
 
