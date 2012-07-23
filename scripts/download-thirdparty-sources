@@ -41,8 +41,7 @@ clone_or_fetch()
 		( cd "$2" && git fetch) || exit 1
 	else
 		if [[ -d "$2" ]]; then
-			echo "ERROR: Directory $2 already exists. Run \`$(basename $0) update' instead'" >&2
-			exit 1
+			die "ERROR: Directory $2 already exists. Run \`$(basename $0) update' instead'"
 		fi
 		git clone "$1" "$2" || exit 1
 	fi
