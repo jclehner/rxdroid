@@ -105,7 +105,7 @@ public final class InstanceState
 				}
 			});
 
-			myState.wasCreateInstanceStateCalled = true;
+			//myState.wasCreateInstanceStateCalled = true;
 		}
 
 		return myState;

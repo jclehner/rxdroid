@@ -38,6 +38,7 @@ import at.caspase.androidutils.MyDialogPreference;
 import at.caspase.androidutils.InstanceState.SaveState;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
+import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
 public class TimePreference extends MyDialogPreference<DumbTime>
@@ -114,7 +115,7 @@ public class TimePreference extends MyDialogPreference<DumbTime>
 	{
 		final DumbTime value = getValue();
 		if(value != null)
-			return value.toString(DateFormat.is24HourFormat(getContext()), false);
+			return DateTime.toNativeTime(value);
 
 		return super.getSummary();
 	}
@@ -212,7 +213,7 @@ public class TimePreference extends MyDialogPreference<DumbTime>
 
 	@Override
 	protected String toPersistedString(DumbTime value) {
-		return value.toString(true);
+		return value.toString(true, false);
 	}
 
 	@Override

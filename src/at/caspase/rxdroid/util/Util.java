@@ -24,8 +24,6 @@ package at.caspase.rxdroid.util;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-
 import android.content.Context;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -116,7 +114,7 @@ public final class Util
 
 	public static String millis(long millis)
 	{
-		return millis + "ms (" + new DumbTime(millis, true).toString(true) + ")";
+		return millis + "ms (" + new DumbTime(millis, true).toString(true, true) + ")";
 	}
 
 	public static boolean equals(Object a, Object b)
