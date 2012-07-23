@@ -1,0 +1,28 @@
+#!/bin/bash
+
+source "$(dirname $_)/shared.sh"
+
+TEMPD=$(mktempd)
+SRCDIR=
+
+echo "INFO: Pulling files from device"
+for f in $(adb shell busybox ls -1 /sdcard/Rxdroid/Old*.java | tr "\r" "\n"); do
+	echo -n "$(basename $f) ... "
+	adb pull "$f" "$TEMPD/$(basename $f)" || die
+	
+	if [[ -z $SRCDIR ]]; then
+		SRCDIR=$(cat "$TEMPD/$(basename $f)" | grep -P '^package' | awk '{ print $2 }')
+	fi
+done
+
+SRCDIR="src/$(sed -e 's/\./\//g' -e 's/;$//g' <<<$SRCDIR)"
+
+if [[ -d "$SRCDIR" ]]; then
+	echo "INFO: $SRCDIR already exists; not moving files"
+	exit 0
+fi
+
+echo "INFO: Creating directory $SRCDIR"
+mkdir -p "$SRCDIR"
+echo "INFO: Moving files to $SRCDIR ..."
+mv -v $TEMPD/*.java "$SRCDIR" || die
