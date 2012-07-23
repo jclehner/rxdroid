@@ -12,7 +12,7 @@
 		/>
 		<TextView android:id="@+id/text_date"
 			android:layout_width="match_parent"
-			android:layout_height="30sp"
+			android:layout_height="40sp"
 			android:layout_gravity="center"
 			
 			android:text="9999-99-99"

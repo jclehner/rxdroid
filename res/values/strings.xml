@@ -29,10 +29,8 @@
      
     <string name="_title_begin">Begin</string>
     <string name="_title_end">End</string>
-    
-    
+        
     <string name="_msg_new_notification">New notification</string>
-    <string name="_title_notifications">RxDroid</string>
     <string name="_msg_doses_fp">%1$d missed, %2$d due.</string>
     <string name="_msg_doses_f">%1$d missed.</string>
     <string name="_msg_doses_p">%1$d due.</string>

@@ -24,6 +24,7 @@ import at.caspase.androidutils.MyDialogPreference;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.preferences.TimePeriodPreference.TimePeriod;
+import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
@@ -282,9 +283,14 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		{
 			final DumbTime min = getConstraintTime(MIN);
 
+			/*if(mEnd.before(min) && !mAllowTimeWrap[BEGIN])
+				return Constants.MIDNIGHT;
+
+			return which == MAX ? mEnd : min;*/
+
 			if(which == MAX)
 			{
-				if(mEnd.before(min) && !mAllowTimeWrap[BEGIN])
+				if(mEnd.before(min) /*&& !mAllowTimeWrap[BEGIN]*/)
 					return null;
 
 				return mEnd;
@@ -296,9 +302,14 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		{
 			final DumbTime max = getConstraintTime(MAX);
 
+			/*if(mBegin.after(max) && !mAllowTimeWrap[END])
+				return Constants.MIDNIGHT;
+
+			return which == MIN ? mBegin : max;*/
+
 			if(which == MIN)
 			{
-				if(mBegin.after(max) && !mAllowTimeWrap[END])
+				if(mBegin.after(max) /*&& !mAllowTimeWrap[END]*/)
 					return null;
 
 				return mBegin;
@@ -310,8 +321,8 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 
 	private void updateMessageAndButtons()
 	{
-		final DumbTime min = getConstraintTimeForCurrentlyVisibleTimePicker(MIN);
-		final DumbTime max = getConstraintTimeForCurrentlyVisibleTimePicker(MAX);
+		final String min = getConstraintTimeForCurrentlyVisibleTimePickerAsString(MIN);
+		final String max = getConstraintTimeForCurrentlyVisibleTimePickerAsString(MAX);
 
 		final int resId;
 
@@ -328,6 +339,15 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		mNextButton.setEnabled(isCurrentlyVisibleTimePickerValueValid());
 		if(mCurrentPage == 1)
 			mBackButton.setEnabled(isValidTime);
+	}
+
+	private String getConstraintTimeForCurrentlyVisibleTimePickerAsString(int which)
+	{
+		final DumbTime time = getConstraintTimeForCurrentlyVisibleTimePicker(which);
+		if(time == null || time.equals(Constants.MIDNIGHT))
+			return null;
+
+		return DateTime.toNativeTime(time);
 	}
 
 	private final OnTimeChangedListener mTimeListener = new OnTimeChangedListener() {
