@@ -43,4 +43,4 @@ run() {
 	$* || die "$1 exited with status $?"
 }
 
-grep -P foobar < /dev/null || die "Error: grep -P does not work"
+grep -q -P foobar <<< foobar || die "Error: grep -P does not work"
