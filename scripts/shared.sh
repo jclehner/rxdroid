@@ -1,6 +1,7 @@
 #!/bin/bash
 
-PKG="at.caspase.rxdroid"
+readonly PKG="at.caspase.rxdroid"
+readonly DTEMP="/sdcard/"
 
 die() {
 	if [[ $# -ne 0 ]]; then
@@ -9,17 +10,35 @@ die() {
 		echo "error" >&2
 	fi
 
-	exit 1
+	# don't exit in interactive mode
+	[[ $- != *i* ]] && exit 1
 }
 
-mktemp() {
-	command mktemp -t fooXXXXXX
+MKTEMP_CMDLINE="-t fooXXXXXX"
+
+mktempf() {
+	mktemp $MKTEMP_CMDLINE
 }
 
 mktempd() {
-	command mktemp -d -t fooXXXXXX
+	mktemp -d $MKTEMP_CMDLINE
+}
+
+# For some obscure reason, adb shell always returns 0, regardless
+# of the executed command's exit status. Hence this dirty hack.
+adb-shell() {
+	[[ $# -eq 0 ]] || die "adb-shell: no arguments"
+
+	local tmp="${DTEMP}/.exitstatus"
+	adb shell "$*; echo $? > $tmp"
+	local status=$(adb shell cat $tmp | tr -d "\r\n")
+	let status=$status+0
+
+	adb shell rm -f $tmp
+
+	return $status
 }
 
 run() {
-	command -v $0 &> /dev/null || die "No such command: $0"
+	$* || die "$1 exited with status $?"
 }

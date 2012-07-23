@@ -8,7 +8,7 @@
 source "$(dirname $_)/shared.sh"
 
 patterns="@string/_\w* R.string._\w*"
-temp=$(mktemp)
+temp=$(mktempf)
 
 scan_file()
 {

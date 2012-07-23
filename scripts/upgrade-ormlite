@@ -5,11 +5,13 @@ source "$(dirname $_)/shared.sh"
 ORMLITE_FETCHURL="http://ormlite.com/releases"
 PACKAGES="ormlite-core ormlite-android"
 
-if [[ $# -lt 1 ]]; then
-	die "usage: upgrade-ormlite [new version]"
+[[ $# -lt 1 ]] && die "usage: upgrade-ormlite [new version]"
+
+if svn stat | grep -q -v -P '^\?'; then
+	die "Local modifications found, refusing to update. Commit pending changes first!"
 fi
 
-oldversion=`grep -o -m1 -P 'ormlite-android-(\d+\.\d+)' .classpath | awk 'BEGIN { FS="-" }; { print $3 }'`
+oldversion=`grep -o -m1 -P 'ormlite-android-(\d+\.\d+)' .classpath | awk 'BEGIN { FS="-" }; { print $3 }'` || die
 
 if [[ "$1" == "$oldversion" ]]; then
 	die "Already at version $1"
@@ -17,19 +19,15 @@ fi
 
 echo "Old version is $oldversion"
 
-
 for P in $PACKAGES; do
 	base="$P-$1"
 	jar="$base.jar"
 	#javadoc="$base-javadoc.jar"
 
-	wget -nv "$ORMLITE_FETCHURL/$1/$jar" -O libs/$jar || exit 1
-	svn add libs/$lib
+	run wget -nv "$ORMLITE_FETCHURL/$1/$jar" -O libs/$jar 
+	run svn add libs/$lib
 
-	#wget -nv "$ORMLITE_FETCHURL/$1/$javadoc" -O libs/$javadoc || exit 1
-	#svn add libs/$javadoc
-
-	sed -i -e "s/$P-$oldversion/$base/" .classpath
+	run sed -i -e "s/$P-$oldversion/$base/" .classpath
 
 done
 svn rm --force libs/ormlite-*$oldversion*.jar

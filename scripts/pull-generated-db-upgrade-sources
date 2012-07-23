@@ -6,16 +6,31 @@ TEMPD=$(mktempd)
 SRCDIR=
 
 echo "INFO: Pulling files from device"
-for f in $(adb shell busybox ls -1 /sdcard/Rxdroid/Old*.java | tr "\r" "\n"); do
-	echo -n "$(basename $f) ... "
-	adb pull "$f" "$TEMPD/$(basename $f)" || die
+for f in $(run adb-shell busybox ls -1 /sdcard/RxDroid/Olx*.java | tr "\r" "\n"); do
+
+	FILE=$(basename $f)
+	TARGET="$TEMPD/$FILE"
+
+	echo -n "$FILE ... "
+	adb pull "$f" "$TARGET" || die
 	
 	if [[ -z $SRCDIR ]]; then
-		SRCDIR=$(cat "$TEMPD/$(basename $f)" | grep -P '^package' | awk '{ print $2 }')
+		SRCDIR=$(cat "$TARGET" | grep -P '^package' | awk '{ print $2 }')
 	fi
 done
 
+# replace dots with slashes and remove the semicolon
 SRCDIR="src/$(sed -e 's/\./\//g' -e 's/;$//g' <<<$SRCDIR)"
+
+# current version
+CURVER=$(grep -o -P 'DB_VERSION = \d+' src/at/caspase/rxdroid/db/DatabaseHelper.java | awk '{ print $3 }') || die
+# version of source files from device
+SRCVER=$(basename $SRCDIR | tr -d "v")
+
+if [[ $CURVER -ne $SRCVER ]]; then
+	echo "INFO: Ignoring files for DB v$SRCVER; current: v$CURVER"
+	exit 0
+fi
 
 if [[ -d "$SRCDIR" ]]; then
 	echo "INFO: $SRCDIR already exists; not moving files"
@@ -25,4 +40,4 @@ fi
 echo "INFO: Creating directory $SRCDIR"
 mkdir -p "$SRCDIR"
 echo "INFO: Moving files to $SRCDIR ..."
-mv -v $TEMPD/*.java "$SRCDIR" || die
+mv $TEMPD/*.java "$SRCDIR" || die
