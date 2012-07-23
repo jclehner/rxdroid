@@ -6,7 +6,7 @@
 #
 
 patterns="@string/_\w* R.string._\w*"
-temp=$(mktemp -t foobar)
+temp=$(mktemp -t fooXXXXXX)
 
 
 scan_file()
