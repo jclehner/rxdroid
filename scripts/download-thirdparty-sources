@@ -20,8 +20,7 @@ DEFAULT_NATURES=(
 )
 
 if ! command -v git &> /dev/null; then
-	echo "ERROR: git is required to run this script" >&2
-	exit 1
+	die "ERROR: git is required to run this script"
 fi
 
 if [[ "$1" == "update" ]]; then
