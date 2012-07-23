@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import android.text.format.DateFormat;
 import android.widget.TimePicker;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.Hasher;
@@ -116,6 +117,10 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		return mSeconds;
 	}
 
+	/*public int getMillis() {
+		return mMillis;
+	}*/
+
 	public long getTime() {
 		return mMillis + 1000 * (mHours * 3600 + mMinutes * 60 + mSeconds);
 	}
@@ -160,19 +165,22 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 	@Override
 	public String toString() {
-		return toString(false);
+		return toString(true, true);
 	}
 
-	public String toString(boolean withSeconds)
+	public String toString(boolean use24HourTime, boolean withMillis)
 	{
-		final Date time = new Date(getTime());
-		final SimpleDateFormat sdf = new SimpleDateFormat(withSeconds ? FORMATS[0] + ".SSS" : FORMATS[1]);
-		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-		return sdf.format(time);
-	}
+		final String pattern;
 
-	public static final int ALLOW_BEGIN_WRAP = 1;
-	public static final int ALLOW_END_WRAP = 2;
+		if(DateFormat.is24HourFormat((GlobalContext.get())))
+			pattern = "HH:mm" + (mSeconds == 0 ? "" : ":ss") + (withMillis ? ".SSS" : "");
+		else
+			pattern = "K:mm" + (mSeconds == 0 ? "" : ":ss") + (withMillis ? ".SSS" : "") + " aa";
+
+		final SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+		sdf.setTimeZone(TimeZone.getTimeZone(("UTC")));
+		return sdf.format(new Date(getTime()));
+	}
 
 	public boolean isWithinRange(DumbTime begin, DumbTime end, boolean allowWrap)
 	{

@@ -110,8 +110,13 @@ public class TimePreference extends MyDialogPreference<DumbTime>
 	}
 
 	@Override
-	public CharSequence getSummary() {
-		return getValue() != null ? getValue().toString() : mDefaultValue;
+	public CharSequence getSummary()
+	{
+		final DumbTime value = getValue();
+		if(value != null)
+			return value.toString(DateFormat.is24HourFormat(getContext()), false);
+
+		return super.getSummary();
 	}
 
 	@Override

@@ -1,8 +1,6 @@
 package at.caspase.rxdroid.preferences;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Formatter;
 import java.util.StringTokenizer;
 
 import android.app.AlertDialog;
@@ -12,16 +10,12 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
 import android.content.res.TypedArray;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -30,7 +24,7 @@ import at.caspase.androidutils.MyDialogPreference;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.preferences.TimePeriodPreference.TimePeriod;
-import at.caspase.rxdroid.util.Constants;
+import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
 public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
@@ -119,24 +113,14 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 	@Override
 	public CharSequence getSummary()
 	{
-		/*final CharSequence summary = super.getSummary();
-		if(summary == null)
-			return getValue().toString();
+		final TimePeriod value = getValue();
+		//return value == null ? super.getSummary() : value.toString();
 
-		return summary;*/
+		if(value != null)
+			return DateTime.toNativeTime(value.getBegin()) + "-" + DateTime.toNativeTime(value.getEnd());
 
-		return getValue().toString();
-
-		/*if(mSummary == null)
-			return super.getSummary();
-
-		Formatter f = new Formatter();
-		return f.format(mSummary.toString(), getValue()).toString();*/
-
-		//return getContext().getStr
+		return super.getSummary();
 	}
-
-	//public set
 
 	@Override
 	protected String toPersistedString(TimePeriod value) {
@@ -149,9 +133,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 	}
 
 	@Override
-	protected TimePeriod getDialogValue()
-	{
-		Log.d(TAG, "getDialogValue: value=" + mBegin + "-" + mEnd);
+	protected TimePeriod getDialogValue() {
 		return new TimePeriod(mBegin, mEnd);
 	}
 

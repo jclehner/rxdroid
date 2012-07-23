@@ -26,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
 import android.text.format.DateFormat;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.GlobalContext;
@@ -145,6 +144,10 @@ public final class DateTime
 
 	public static String toNativeDate(Date date) {
 		return DateFormat.getDateFormat(GlobalContext.get()).format(date);
+	}
+
+	public static String toNativeTime(DumbTime time) {
+		return time.toString(DateFormat.is24HourFormat(GlobalContext.get()), false);
 	}
 
 	public static long getOffsetFromMidnight(Calendar date)

@@ -22,8 +22,6 @@
 package at.caspase.androidutils;
 
 import java.io.Serializable;
-import java.util.NoSuchElementException;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -70,10 +68,9 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	@SaveState
 	private T mDefaultValue;
 
-	//@SaveState
 	private Dialog mDialog;
 
-	private static final String KEY_IS_DIALOG_SHOWING = "is_showing";
+	private static final String KEY_IS_DIALOG_SHOWING = TAG + ".is_showing";
 
 	public MyDialogPreference(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);

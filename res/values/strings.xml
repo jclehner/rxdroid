@@ -199,8 +199,7 @@
 	<string name="_btn_back">Back</string>
 	
 	<string name="_title_scramble_names">Scramble names</string>
-	<string name="_summary_scramble_names">Scrambles the names of your drugs. 
-	    Note that this only works with characters from the standard English alphabet.</string>
+	<string name="_summary_scramble_names">Scrambles the names of your drugs to protect your privacy when using the app in public.</string>
     
 	<!-- 
     Keep at the end of strings.xml!  
