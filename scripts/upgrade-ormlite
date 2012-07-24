@@ -25,7 +25,7 @@ for P in $PACKAGES; do
 	#javadoc="$base-javadoc.jar"
 
 	run wget -nv "$ORMLITE_FETCHURL/$1/$jar" -O libs/$jar 
-	run svn add libs/$lib
+	run svn add libs/$jar
 
 	run sed -i -e "s/$P-$oldversion/$base/" .classpath
 
