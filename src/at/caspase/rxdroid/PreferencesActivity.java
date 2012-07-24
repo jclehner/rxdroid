@@ -21,6 +21,10 @@
 
 package at.caspase.rxdroid;
 
+import java.io.File;
+import java.util.Date;
+
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -28,13 +32,14 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import at.caspase.rxdroid.db.Database;
@@ -54,6 +59,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 
 	SharedPreferences mSharedPreferences;
 
+	@TargetApi(11)
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -67,6 +73,18 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		if(p != null)
 		{
 			String summary = Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION;
+			//String apkModTime = new Date(new File(getP))
+
+			try
+			{
+				final String apkModDate = new Date(new File(getPackageCodePath()).lastModified()).toString();
+				summary = summary + "\n" + apkModDate;
+			}
+			catch(NullPointerException e)
+			{
+				// eat
+			}
+
 			p.setSummary(summary);
 		}
 
@@ -116,21 +134,6 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 				}
 			});
 
-		}
-
-		p = findPreference("time_morning_begin");
-		if(p != null)
-		{
-			p.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-
-				@Override
-				public boolean onPreferenceChange(Preference preference, Object newValue)
-				{
-					Log.d(TAG, "onPreferenceChange: preference=" + preference +
-							", type=" + newValue.getClass() + ", value=" + newValue);
-					return true;
-				}
-			});
 		}
 
 		Util.populateListPreferenceEntryValues(findPreference("alarm_mode"));

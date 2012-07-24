@@ -27,7 +27,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Display;
@@ -45,8 +44,7 @@ import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 
-public class IntakeDialog extends AlertDialog implements OnClickListener, OnShowListener,
-		OnChangedListener, Database.OnChangeListener
+public class IntakeDialog extends AlertDialog implements OnChangedListener, Database.OnChangeListener
 {
 	private static final String TAG = IntakeDialog.class.getName();
 	private static final boolean LOGV = true;
@@ -65,6 +63,8 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	private FractionInput mDoseEdit;
 
 	private PopupWindow mPopup;
+
+	private OnShowListener mOnShowListener;
 
 	public static final int FLAG_ALLOW_DOSE_EDIT = 1;
 
@@ -109,12 +109,13 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		//setTitle(mDrug.getName());
 		setView(view);
 
+		setButton(BUTTON_NEGATIVE, getString(android.R.string.cancel), mLocalOnClickListener);
+		// The actual listener for this button is added in mLocalOnShowListener!
 		setButton(BUTTON_POSITIVE, getString(android.R.string.ok), (OnClickListener) null);
-		setButton(BUTTON_NEGATIVE, getString(android.R.string.cancel), this);
 
 		setupMessages();
 
-		setOnShowListener(this);
+		super.setOnShowListener(mLocalOnShowListener);
 		Database.registerOnChangedListener(this);
 	}
 
@@ -129,31 +130,15 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 	}
 
 	@Override
-	public void onShow(final DialogInterface dialog)
-	{
-		setNonDismissingListener(BUTTON_POSITIVE);
-		setNonDismissingListener(BUTTON_NEUTRAL);
-
-		setupViews();
+	public void setOnShowListener(android.content.DialogInterface.OnShowListener listener) {
+		mOnShowListener = listener;
 	}
 
 	@Override
-	public void onStop()
+	protected void onStop()
 	{
 		dismissPopup();
 		Database.unregisterOnChangedListener(this);
-	}
-
-	@Override
-	public void onClick(DialogInterface dialog, int which)
-	{
-		if(which == BUTTON_POSITIVE)
-		{
-			if(hasInsufficientSupplies() && !isPopupShowing())
-				showPopup();
-			else
-				addIntakeAndDismiss();
-		}
 	}
 
 	@Override
@@ -322,6 +307,36 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 		return getContext().getString(resId);
 	}
 
+	private final OnShowListener mLocalOnShowListener = new OnShowListener() {
+
+		@Override
+		public void onShow(final DialogInterface dialog)
+		{
+			setNonDismissingListener(BUTTON_POSITIVE);
+			setNonDismissingListener(BUTTON_NEUTRAL);
+
+			setupViews();
+
+			if(mOnShowListener != null)
+				mOnShowListener.onShow(dialog);
+		}
+	};
+
+	private final OnClickListener mLocalOnClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(DialogInterface dialog, int which)
+		{
+			if(which == BUTTON_POSITIVE)
+			{
+				if(hasInsufficientSupplies() && !isPopupShowing())
+					showPopup();
+				else
+					addIntakeAndDismiss();
+			}
+		}
+	};
+
 	private class NonDismissingListener implements View.OnClickListener
 	{
 		private int mButton;
@@ -336,7 +351,7 @@ public class IntakeDialog extends AlertDialog implements OnClickListener, OnShow
 			// Allows handling the click in the expected place,
 			// while allowing control over whether the dialog
 			// should be dismissed or not.
-			IntakeDialog.this.onClick(IntakeDialog.this, mButton);
+			mLocalOnClickListener.onClick(IntakeDialog.this, mButton);
 		}
 	}
 }

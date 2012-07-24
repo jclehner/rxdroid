@@ -30,6 +30,9 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
+import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -64,6 +67,7 @@ import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.ui.DrugOverviewAdapter;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Util;
 
 public class DrugListActivity extends Activity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
@@ -400,8 +404,17 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		if(!date.equals(mDate))
 			Log.w(TAG, "Activity date " + mDate + " differs from DoseView date " + date);
 
-		IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, date);
-		dialog.show();
+		if(!MultipleDialogsPreventer.INSTANCE.isDialogShowing())
+		{
+			IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, date);
+			dialog.setOnShowListener(MultipleDialogsPreventer.INSTANCE);
+			dialog.setOnDismissListener(MultipleDialogsPreventer.INSTANCE);
+			dialog.show();
+		}
+		else
+			Log.i(TAG, "IntakeDialog is showing, not showing a new one.");
+
+		//Util.sleepAtMost(200);
 	}
 
 	public void onNotificationIconClick(View view)
@@ -588,6 +601,36 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 	};
 
+	private static enum MultipleDialogsPreventer implements OnShowListener, OnDismissListener
+	{
+		INSTANCE;
+
+		private boolean mIsShowing = false;
+
+		public void reset() {
+			mIsShowing = false;
+		}
+
+		public boolean isDialogShowing() {
+			return mIsShowing;
+		}
+
+		@Override
+		public void onDismiss(DialogInterface dialog) {
+			mIsShowing = false;
+		}
+
+		@Override
+		public void onShow(DialogInterface dialog)
+		{
+			if(mIsShowing)
+				dialog.dismiss();
+
+			mIsShowing = true;
+		}
+	}
+
+	//private static final MultipleDialogsPreventer MUTIPLE_DIALOGS_PREVENTER = new MultipleDialogsPreventer();
 
 	private static final Database.OnChangeListener DATABASE_WATCHER = new Database.OnChangeListener() {
 
