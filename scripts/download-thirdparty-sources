@@ -23,15 +23,17 @@ if ! command -v git &> /dev/null; then
 	die "ERROR: git is required to run this script"
 fi
 
-if [[ "$1" == "update" ]]; then
-	UPDATE=1
-elif [[ "$1" == "cleanup" ]]; then
-	run rm -rf thirdparty
-	run mkdir thirdparty
-	echo "INFO: Emptied directory \`thirdparty'"
-	exit 0
-else
-	UPDATE=0
+UPDATE=0
+
+if [[ $# -gt 0 ]]; then
+	if [[ "$1" == "update" ]]; then
+		UPDATE=1
+	elif [[ "$1" == "cleanup" ]]; then
+		run rm -rf thirdparty
+		run mkdir thirdparty
+		echo "INFO: Emptied directory \`thirdparty'"
+		exit 0
+	fi
 fi
 
 # clone_or_fetch(string repoUrl, string targetDirectory)
@@ -111,10 +113,30 @@ EOF
 	echo "INFO: created $file"
 }
 
-create_eclipse_files()
+create_lint_xml()
+{
+	local file="$1/lint.xml"
+
+	if [[ -e "$file" ]]; then
+		echo "WARNING: Overwriting $file"
+	else
+		echo "INFO: creating $file"
+	fi
+
+	cat > "$file" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+<!-- Created by $0 -->
+</lint>
+EOF
+
+}
+
+create_project_files()
 {
 	create_dotproject "$1"
 	create_dotclasspath "$1"
+	create_lint_xml "$1"
 
 	mkdir -p "$1/bin" "$1/gen"
 }
@@ -129,12 +151,12 @@ for REPO in "${GIT_REPOS[@]}"; do
 
 	if [[ -z "${LIBDIR}" ]]; then
 		clone_or_fetch "${URL}" "${TARGET}"
-		create_eclipse_files "${TARGET}"
+		create_project_files "${TARGET}"
 	else
 		CLONEDIR=".${TARGET}Git"
 		clone_or_fetch "${URL}" "${CLONEDIR}"
 		ln -fs "${CLONEDIR}/${LIBDIR}" "${TARGET}"
-		create_eclipse_files "${TARGET}"
+		create_project_files "${TARGET}"
 	fi
 done
 
