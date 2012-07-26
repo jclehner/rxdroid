@@ -25,12 +25,12 @@ fi
 
 if [[ "$1" == "update" ]]; then
 	UPDATE=1
-else if [[ "$1" == "cleanup" ]]; then
-	rm -rf thirdparty || exit 1
-	mkdir thirdparty || exit 1
+elif [[ "$1" == "cleanup" ]]; then
+	run rm -rf thirdparty
+	run mkdir thirdparty
 	echo "INFO: Emptied directory \`thirdparty'"
 	exit 0
-fi
+else
 	UPDATE=0
 fi
 
