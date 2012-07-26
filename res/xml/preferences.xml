@@ -175,6 +175,10 @@
 			android:defaultValue="false"
 		/>
 		
+		<Preference android:key="debug_add_5_drugs"
+		    android:title="Add 5 random drugs"
+		/>
+		
 		<at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_period"
 		    android:title="TimePeriodPreference"
 		    android:defaultValue="07:00|13:00"

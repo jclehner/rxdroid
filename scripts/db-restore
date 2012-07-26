@@ -21,6 +21,6 @@ adb push "$1" $TARGET || exit 1
 
 echo -n "Fixing permissions ... "
 run adb-shell busybox chown -R $FUID:$FGID $DATABASES
-run adb-shell am kill $PKG
+run adb-shell am force-stop $PKG
 
 echo "done"

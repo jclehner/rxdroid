@@ -16,16 +16,6 @@
         <attr name="allowMaxWrap" format="boolean" />
         <attr name="allowBeginWrap" format="boolean" />
         <attr name="allowEndWrap" format="boolean" />
-    </declare-styleable>    
-    
-   <!--  <declare-styleable name="numberpicker">
-        <attr name="startRange" format="integer" />
-        <attr name="endRange" format="integer" />
-		<attr name="defaultValue" format="integer" />
-		<attr name="maxValue" format="integer" />
-		<attr name="wrap" format="boolean" />
-    </declare-styleable>
-     -->
-    
+    </declare-styleable>     
         
 </resources>

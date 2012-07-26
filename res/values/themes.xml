@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 	<style name="Theme" parent="@android:style/Theme.Black" />
 	<style name="Theme.Dialog" parent="@android:style/Theme.Dialog" />
+	
+	<style name="LightListElementBackgroundColor">
+	    <item name="android:background">@color/background_listview_element_light</item>
+	</style>
+	
+	<style name="LightListElement">
+	    <item name="android:background">@drawable/bg_list_element_light</item>	    
+	</style>
+	
+	<style name="DarkListElementBackgroundColor">
+	    <item name="android:background">@color/background_listview_element_dark</item>
+	</style>
+	
+	<style name="DarkListElement">
+	    <item name="android:background">@drawable/bg_list_element_dark</item>	    
+	</style>
+	
 </resources>

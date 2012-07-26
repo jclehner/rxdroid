@@ -143,6 +143,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			mDate = Settings.instance().getActiveDate();
 		}
 
+		startNotificationService();
+
 		Database.registerOnChangedListener(mDatabaseListener);
 	}
 
@@ -171,7 +173,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			//}
 		//}
 
-		startNotificationService();
 
 		setDate(mDate, PAGER_INIT);
 	}
@@ -371,6 +372,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		Collections.sort(drugs);
 		final ListView listView = new ListView(getApplication());
+		listView.setDividerHeight(0);
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(mDate);

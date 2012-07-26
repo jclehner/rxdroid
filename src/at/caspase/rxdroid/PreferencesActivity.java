@@ -23,6 +23,7 @@ package at.caspase.rxdroid;
 
 import java.io.File;
 import java.util.Date;
+import java.util.UUID;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -44,6 +45,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
+import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.preferences.TimePreference;
 import at.caspase.rxdroid.ui.FragmentTabActivity;
 import at.caspase.rxdroid.util.Util;
@@ -135,6 +137,33 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 			});
 
 		}
+
+		p = findPreference("debug_add_5_drugs");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					for(int i = 0; i != 5; ++i)
+					{
+						UUID uuid = UUID.randomUUID();
+						Drug drug = new Drug();
+						drug.setName(uuid.toString().substring(0, 16));
+						drug.setDose(Drug.TIME_NOON, new Fraction(1, 2));
+
+						Database.create(drug, i != 4 ? Database.FLAG_DONT_NOTIFY_LISTENERS : 0);
+					}
+
+					return true;
+				}
+			});
+		}
+
+
+
+
 
 		Util.populateListPreferenceEntryValues(findPreference("alarm_mode"));
 

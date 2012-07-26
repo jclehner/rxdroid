@@ -9,5 +9,7 @@
 	<style name="FractionInputBottomPadding">
 	    <item name="android:paddingBottom">30dip</item>
 	</style>
+	
+	
 			
 </resources>
