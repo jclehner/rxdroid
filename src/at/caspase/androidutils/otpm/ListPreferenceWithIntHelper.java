@@ -24,25 +24,31 @@ import at.caspase.rxdroid.util.Util;
  *
  */
 
-public class ListPreferenceWithIntHelper extends PreferenceHelper<ListPreference, Integer>
+public abstract class ListPreferenceWithIntHelper extends PreferenceHelper<ListPreference, Integer>
 {
-	private final String[] mEntries;
+	private String[] mEntries;
+	private int mEntriesResId;
 
 	public ListPreferenceWithIntHelper() {
 		throw new UnsupportedOperationException("You must extend this class to use it");
 	}
 
-	public ListPreferenceWithIntHelper(Context context, int entriesResId) {
-		this(context.getResources().getStringArray(entriesResId));
+	public ListPreferenceWithIntHelper(int entriesResId) {
+		mEntriesResId = entriesResId;
 	}
 
-	public ListPreferenceWithIntHelper(String[] entries) {
-		mEntries = entries;
+	public ListPreferenceWithIntHelper(String[] entries)
+	{
+		if((mEntries = entries) == null)
+			throw new NullPointerException();
 	}
 
 	@Override
 	public void initPreference(ListPreference preference, Integer fieldValue)
 	{
+		if(mEntries == null)
+			mEntries = preference.getContext().getResources().getStringArray(mEntriesResId);
+
 		preference.setEntries(mEntries);
 		Util.populateListPreferenceEntryValues(preference);
 		preference.setValueIndex(fieldValue);

@@ -94,11 +94,11 @@ public final class InstanceState
 					{
 						myState.values.put(mapKey, f.get(o));
 					}
-					catch (IllegalArgumentException e)
+					catch(IllegalArgumentException e)
 					{
 						Log.w(TAG, e);
 					}
-					catch (IllegalAccessException e)
+					catch(IllegalAccessException e)
 					{
 						Log.w(TAG, e);
 					}

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+grep -q -P foobar <<< foobar || die "Error: grep -P does not work"
+set -u
+
 readonly PKG="at.caspase.rxdroid"
 readonly DTEMP="/sdcard/"
 
@@ -43,4 +46,3 @@ run() {
 	$* || die "$1 exited with status $?"
 }
 
-grep -q -P foobar <<< foobar || die "Error: grep -P does not work"

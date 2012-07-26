@@ -36,6 +36,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.content.res.Configuration;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -70,7 +71,6 @@ import at.caspase.rxdroid.db.Schedule;
 import at.caspase.rxdroid.preferences.DosePreference;
 import at.caspase.rxdroid.preferences.DrugNamePreference2;
 import at.caspase.rxdroid.preferences.FractionPreference;
-import at.caspase.rxdroid.test.ObjectToPreferenceTestActivity.FormPreferenceHelper;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
@@ -263,8 +263,18 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		else
 			throw new IllegalArgumentException("Unhandled action " + action);
 
+
 		OTPM.mapToPreferenceHierarchy(getPreferenceScreen(), mWrapper);
 		getPreferenceScreen().setOnPreferenceChangeListener(mListener);
+
+		Preference deletePref = findPreference("delete");
+		if(deletePref != null)
+		{
+			if(mIsEditing)
+				deletePref.setOnPreferenceClickListener(this);
+			else if(deletePref != null)
+				getPreferenceScreen().removePreference(deletePref);
+		}
 
 		if(mFocusOnCurrentSupply)
 		{
@@ -279,15 +289,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			}
 			else
 				Log.w(TAG, "Couldn't focus on current supply preference");
-		}
-
-		Preference deletePref = findPreference("delete");
-		if(deletePref != null)
-		{
-			if(mIsEditing)
-				deletePref.setOnPreferenceClickListener(this);
-			else if(deletePref != null)
-				getPreferenceScreen().removePreference(deletePref);
 		}
 	}
 
@@ -306,6 +307,15 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig)
+	{
+		super.onConfigurationChanged(newConfig);
+		// This activity will not be restarted when the screen orientation changes, otherwise
+		// the OTPM stuff in onCreate() would reinitialize the Preferences in the hierarchy,
+		// thus not restoring their original state.
 	}
 
 	private static class DrugWrapper
@@ -486,7 +496,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@SuppressWarnings("unused")
 		public RepeatModePreferenceHelper() {
-			super(GlobalContext.get(), R.array.drug_repeat);
+			super(R.array.drug_repeat);
 		}
 
 		@Override
@@ -872,6 +882,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			setFieldValue(((Fraction) newPrefValue).intValue());
 			preference.setSummary(newPrefValue.toString());
 			return true;
+		}
+	}
+
+	public static class FormPreferenceHelper extends ListPreferenceWithIntHelper
+	{
+		public FormPreferenceHelper() {
+			super(R.array.drug_forms);
 		}
 	}
 

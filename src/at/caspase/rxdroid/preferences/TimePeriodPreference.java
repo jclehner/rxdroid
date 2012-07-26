@@ -309,7 +309,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 
 			if(which == MIN)
 			{
-				if(mBegin.after(max) /*&& !mAllowTimeWrap[END]*/)
+				if(mBegin.after(max) && !mAllowTimeWrap[END])
 					return null;
 
 				return mBegin;

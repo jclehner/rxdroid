@@ -3,15 +3,9 @@
 source "$(dirname $_)/shared.sh"
 
 
-if [[ ! -f "$1" ]]; then
-	echo "$1: No such file" >&2
-	exit 1
-fi
+[[ -f "$1" ]] || die "$1: No such file"
 
-if ! grep -i "sqlite" <<< $(file -b "$1"); then
-	echo "$1: Not an SQLite database" >&2
-	exit 1
-fi
+grep -q -i "sqlite" <<< $(file -b "$1") || die "$1: Not an SQLite database"
 
 DATABASES=/data/data/$PKG/databases
 TARGET=$DATABASES/db.sqlite
@@ -20,13 +14,13 @@ INFO=`adb shell ls -l /data/data | grep $PKG`
 FUID=`awk '{ print $2 }' <<<$INFO`
 FGID=`awk '{ print $3 }' <<<$INFO`
 
-adb shell mkdir -p $(dirname $TARGET)
+run adb-shell mkdir -p $(dirname $TARGET)
 
 echo -n "Pushing database to device ... "
 adb push "$1" $TARGET || exit 1
 
 echo -n "Fixing permissions ... "
-adb shell busybox chown -R $FUID:$FGID $DATABASES  || exit 1
-adb shell am kill $PKG || exit 1
+run adb-shell busybox chown -R $FUID:$FGID $DATABASES
+run adb-shell am kill $PKG
 
 echo "done"

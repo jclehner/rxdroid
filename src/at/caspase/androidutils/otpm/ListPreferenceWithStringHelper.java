@@ -27,22 +27,27 @@ import android.preference.ListPreference;
 
 public abstract class ListPreferenceWithStringHelper extends PreferenceHelper<ListPreference, String>
 {
-	private final String[] mEntries;
-	private final String[] mValues;
+	private String[] mEntries;
+	private String[] mValues;
+
+	private int mEntriesResId;
+	private int mValuesResId;
 
 	public ListPreferenceWithStringHelper() {
 		throw new UnsupportedOperationException("You must extend this class to use it");
 	}
 
-	public ListPreferenceWithStringHelper(Context context, int entriesResId, int valuesResId)
+	public ListPreferenceWithStringHelper(int entriesResId, int valuesResId)
 	{
-		Resources r = context.getResources();
-		mEntries = r.getStringArray(entriesResId);
-		mValues = r.getStringArray(valuesResId);
+		mEntriesResId = entriesResId;
+		mValuesResId = valuesResId;
 	}
 
 	public ListPreferenceWithStringHelper(String[] entries, String[] values)
 	{
+		if(entries == null || values == null)
+			throw new NullPointerException();
+
 		mEntries = entries;
 		mValues = values;
 	}
@@ -50,6 +55,13 @@ public abstract class ListPreferenceWithStringHelper extends PreferenceHelper<Li
 	@Override
 	public void initPreference(ListPreference preference, String fieldValue)
 	{
+		if(mEntries == null || mValues == null)
+		{
+			final Resources r = preference.getContext().getResources();
+			mEntries = r.getStringArray(mEntriesResId);
+			mValues = r.getStringArray(mValuesResId);
+		}
+
 		preference.setEntries(mEntries);
 		preference.setEntryValues(mValues);
 		preference.setValue(fieldValue);

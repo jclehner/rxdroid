@@ -321,10 +321,16 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		InstanceState.restoreTo(this, state);
 
 		Bundle extras = InstanceState.getExtras(state);
+
+		Log.d(TAG, "onRestoreInstanceState: key=" + getKey() + ", extras=" + extras);
+
+
 		if(extras != null)
 		{
 			if(extras.getBoolean(KEY_IS_DIALOG_SHOWING, false))
 				showDialog(null);
+			else if(getKey() == "morning")
+				Log.d(TAG, "  Extra KEY_IS_DIALOG_SHOWING is false");
 		}
 	}
 
