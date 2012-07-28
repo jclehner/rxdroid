@@ -19,23 +19,6 @@ DEFAULT_NATURES=(
 	org.eclipse.jdt.core.javanature 
 )
 
-if ! command -v git &> /dev/null; then
-	die "ERROR: git is required to run this script"
-fi
-
-UPDATE=0
-
-if [[ $# -gt 0 ]]; then
-	if [[ "$1" == "update" ]]; then
-		UPDATE=1
-	elif [[ "$1" == "cleanup" ]]; then
-		run rm -rf thirdparty
-		run mkdir thirdparty
-		echo "INFO: Emptied directory \`thirdparty'"
-		exit 0
-	fi
-fi
-
 # clone_or_fetch(string repoUrl, string targetDirectory)
 clone_or_fetch()
 {
@@ -141,6 +124,46 @@ create_project_files()
 	mkdir -p "$1/bin" "$1/gen"
 }
 
+fix_project_properties()
+{
+	sed -i -E 's/target=Google Inc.:Google APIs([[:digit:]]+)/target=android-\1/g' "$1/project.properties"
+}
+
+link_or_copy()
+{
+	# Eclipse 3.6 under Mac OS X 10.7 doesn't like Android library dependencies
+	# that are softlinks, apparently.
+	case $(uname -s) in 
+		Darwin)
+			echo -n "Copying files to $2... "
+			run cp -r "$1" "$2"
+			echo "done"
+			;;
+		*)
+			ln -sf "$1" "$2"
+			;;
+	esac
+}
+
+if ! command -v git &> /dev/null; then
+	die "ERROR: git is required to run this script"
+fi
+
+UPDATE=0
+
+if [[ $# -gt 0 ]]; then
+	if [[ "$1" == "update" ]]; then
+		UPDATE=1
+	elif [[ "$1" == "cleanup" ]]; then
+		run rm -rf thirdparty
+		run mkdir thirdparty
+		echo "INFO: Emptied directory \`thirdparty'"
+		exit 0
+	fi
+fi
+
+
+run mkdir -p thirdparty
 cd thirdparty || exit 1
 
 for REPO in "${GIT_REPOS[@]}"; do
@@ -151,11 +174,13 @@ for REPO in "${GIT_REPOS[@]}"; do
 
 	if [[ -z "${LIBDIR}" ]]; then
 		clone_or_fetch "${URL}" "${TARGET}"
+		fix_project_properties "${TARGET}"
 		create_project_files "${TARGET}"
 	else
 		CLONEDIR=".${TARGET}Git"
 		clone_or_fetch "${URL}" "${CLONEDIR}"
-		ln -fs "${CLONEDIR}/${LIBDIR}" "${TARGET}"
+		link_or_copy "${CLONEDIR}/${LIBDIR}" "${TARGET}"
+		fix_project_properties "${TARGET}"
 		create_project_files "${TARGET}"
 	fi
 done
