@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 import at.caspase.rxdroid.DoseView;
 import at.caspase.rxdroid.DrugListActivity;
 import at.caspase.rxdroid.R;
@@ -18,6 +17,7 @@ import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Timer;
+import at.caspase.rxdroid.view.Rot13TextView;
 
 public class DrugOverviewAdapter extends AbsDrugAdapter
 {
@@ -49,7 +49,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 			holder = new DoseViewHolder();
 
-			holder.name = (TextView) v.findViewById(R.id.drug_name);
+			holder.name = (Rot13TextView) v.findViewById(R.id.drug_name);
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
 			holder.notification = (ImageView) v.findViewById(R.id.drug_notification_icon);
 			holder.notification.setTag(drug);
@@ -66,7 +66,11 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		else
 			holder = (DoseViewHolder) v.getTag();
 
-		holder.name.setText(Settings.instance().getDrugName(drug));
+		//holder.name.setScramblingEnabled(Settings.inst)
+		//holder.name.setScramblingEnabled(true);
+		holder.name.setText(drug.getName());
+		holder.name.setScramblingEnabled(Settings.instance().getBoolean("privacy_scramble_names", false));
+
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
 		holder.icon.setImageResource(drug.getFormResourceId());
 

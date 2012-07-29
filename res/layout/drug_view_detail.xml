@@ -31,7 +31,7 @@
 		android:onClick="onDoseViewClick" >
 	</at.caspase.rxdroid.DoseView>
 
-	<TextView
+	<at.caspase.rxdroid.view.Rot13TextView
 		android:id="@id/drug_name"
 		style="@style/TextMedium"
 		android:layout_width="wrap_content"

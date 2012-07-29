@@ -36,6 +36,7 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
@@ -47,6 +48,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
@@ -314,6 +316,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	public void onDrugNameClick(View view)
 	{
+		Log.d(TAG, "onDrugNameClick: view.class=" + view);
+
 		Intent intent = new Intent(Intent.ACTION_EDIT);
 		intent.setClass(this, DrugEditActivity.class);
 
@@ -359,7 +363,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public View makeView(int offset)
 	{
-		final TextView textView = new TextView(getApplication());
+		/*final TextView textView = new TextView(getApplication());
 		textView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		textView.setGravity(Gravity.CENTER);
 
@@ -372,7 +376,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		Collections.sort(drugs);
 		final ListView listView = new ListView(getApplication());
-		listView.setDividerHeight(0);
+		//listView.setDividerHeight(0);
+		//listView.setDivider(Color.)
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(mDate);
@@ -392,6 +397,28 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			textView.setText(getString(R.string._msg_no_doses_on_this_day));
 			return textView;
 		}
+
+		return listView;*/
+
+		final View v = getLayoutInflater().inflate(R.layout.drug_list_fragment, null);
+
+		final TextView emptyView = (TextView) v.findViewById(android.R.id.empty);
+		emptyView.setText(R.string._msg_no_doses_on_this_day);
+
+		final ListView listView = (ListView) v.findViewById(android.R.id.list);
+		listView.setEmptyView(emptyView);
+
+		final Calendar cal = DateTime.calendarFromDate(mDate);
+
+		if(mSwipeDirection == 0)
+			cal.add(Calendar.DAY_OF_MONTH, offset);
+		else
+			cal.add(Calendar.DAY_OF_MONTH, mSwipeDirection < 0 ? -1 : 1);
+
+		final List<Drug> drugs = Database.getAll(Drug.class);
+		Collections.sort(drugs);
+
+		updateListAdapter(listView, cal.getTime(), drugs);
 
 		return listView;
 	}

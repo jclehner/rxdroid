@@ -25,6 +25,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
+import at.caspase.rxdroid.util.Util;
 
 public class InfiniteViewPagerAdapter extends PagerAdapter
 {
@@ -64,6 +65,7 @@ public class InfiniteViewPagerAdapter extends PagerAdapter
 		final int offset = position - CENTER;
 
 		View v = mFactory.makeView(offset);
+		Util.detachFromParent(v);
 		container.addView(v);
 		return v;
 	}

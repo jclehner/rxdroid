@@ -24,11 +24,15 @@ package at.caspase.rxdroid.util;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+
 import android.content.Context;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.TimePicker;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
@@ -36,6 +40,23 @@ import at.caspase.rxdroid.db.Drug;
 
 public final class Util
 {
+	private static final String TAG = Util.class.getName();
+
+	public static void detachFromParent(View v)
+	{
+		if(v == null)
+			return;
+
+		ViewParent parent = v.getParent();
+		if(parent != null)
+		{
+			if(parent instanceof ViewGroup)
+				((ViewGroup) parent).removeView(v);
+			else
+				Log.w(TAG, "detachFromParent: parent is not a ViewGroup");
+		}
+	}
+
 	public static int getDoseTimeDrawableFromDoseViewId(int doseViewId)
 	{
 		switch(doseViewId)

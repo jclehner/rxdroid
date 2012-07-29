@@ -296,6 +296,10 @@ public class Settings
 		return mask;
 	}
 
+	public boolean getBoolean(String key, boolean defaultValue) {
+		return sSharedPrefs.getBoolean(key, defaultValue);
+	}
+
 	public String getDrugName(Drug drug)
 	{
 		final String name = drug.getName();

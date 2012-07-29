@@ -36,6 +36,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,6 +49,7 @@ import android.os.Environment;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
+import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Reflect;
 import at.caspase.rxdroid.util.WrappedCheckedException;
 
@@ -88,7 +90,7 @@ public final class Database
 	private static final HashMap<Class<?>, List<? extends Entry>> sCache =
 			new HashMap<Class<?>, List<? extends Entry>>();
 
-	private static Map<Class<?>, List<? extends Entry>> sCacheCopy = null;
+	//private static Map<Class<?>, List<? extends Entry>> sCacheCopy = null;
 
 	private static DatabaseHelper sHelper;
 	private static boolean sIsLoaded = false;
@@ -216,14 +218,11 @@ public final class Database
 		delete(entry, 0);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static synchronized <T extends Entry> List<T> getAll(Class<T> clazz)
 	{
-		if(sCacheCopy == null)
-			sCacheCopy = Collections.unmodifiableMap(sCache);
-
-		return (List<T>) sCacheCopy.get(clazz);
-
+		return new LinkedList<T>(getCached(clazz));
+		//return (List<T>) CollectionUtils.copy(getCached(clazz));
+		//return getCached(clazz);
 		//return new LinkedList<T>(getCached(clazz));
 	}
 
@@ -233,8 +232,6 @@ public final class Database
 		{
 			if(!sIsLoaded)
 			{
-				if(LOGV) Log.v(TAG, "getCached: clazz=" + clazz);
-
 				final List<T> entries = queryForAll(clazz);
 				sCache.put(clazz, entries);
 
@@ -374,7 +371,7 @@ public final class Database
 		}
 		catch(SQLException e)
 		{
-			throw new RuntimeException("Error getting DAO for " + clazz.getSimpleName());
+			throw new WrappedCheckedException("Error getting DAO for " + clazz.getSimpleName(), e);
 		}
 	}
 
@@ -479,7 +476,7 @@ public final class Database
 	{
 		try
 		{
-			return getDaoChecked(clazz).queryForAll();
+			return sHelper.getDao(clazz).queryForAll();
 		}
 		catch(SQLException e)
 		{

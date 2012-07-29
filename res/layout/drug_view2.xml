@@ -26,7 +26,7 @@
 		android:src="@drawable/ic_drug_pill"
 	/>
   
-  	<TextView android:id="@id/drug_name"
+  	<at.caspase.rxdroid.view.Rot13TextView android:id="@id/drug_name"
   		android:layout_width="wrap_content"
   		android:layout_height="wrap_content"
   		  		
