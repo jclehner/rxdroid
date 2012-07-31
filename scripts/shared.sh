@@ -30,7 +30,7 @@ mktempd() {
 # For some obscure reason, adb shell always returns 0, regardless
 # of the executed command's exit status. Hence this dirty hack.
 adb-shell() {
-	[[ $# -eq 0 ]] || die "adb-shell: no arguments"
+	[[ $# -eq 0 ]] && die "adb-shell: no arguments"
 
 	local tmp="${DTEMP}/.exitstatus"
 	adb shell "$*; echo $? > $tmp"

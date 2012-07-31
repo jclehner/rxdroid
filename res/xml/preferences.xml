@@ -18,10 +18,9 @@
 	        android:title="@string/_title_morning"
 	        android:dialogIcon="@drawable/ic_morning"
 	        android:persistent="true"
-	        rxdroid:minTime="time_night"
-	        rxdroid:maxTime="time_noon"
-	        rxdroid:allowMinWrap="true"
 	        
+	        rxdroid:after="time_night"
+	        rxdroid:before="time_noon"        
 	        
 	        android:defaultValue="@string/pref_default_time_morning"
 	    />
@@ -30,8 +29,9 @@
 	        android:title="@string/_title_noon"
 	        android:dialogIcon="@drawable/ic_noon"
 	        android:persistent="true"
-	        rxdroid:minTime="time_morning"
-	        rxdroid:maxTime="time_evening"
+	        
+	        rxdroid:after="time_morning"
+	        rxdroid:before="time_evening"
 	        	        
 	        android:defaultValue="@string/pref_default_time_noon"
 	    />
@@ -40,8 +40,9 @@
 	        android:title="@string/_title_evening"
 	        android:dialogIcon="@drawable/ic_evening"
 	        android:persistent="true"
-	        rxdroid:minTime="time_noon"
-	        rxdroid:maxTime="time_night"
+	        
+	        rxdroid:after="time_noon"
+	        rxdroid:before="time_night"
 	        
 	        android:defaultValue="@string/pref_default_time_evening"
 	    />
@@ -50,9 +51,9 @@
 	        android:title="@string/_title_night"
 	        android:dialogIcon="@drawable/ic_night"
 	        android:persistent="true"
-	        rxdroid:minTime="time_evening"
-	        rxdroid:maxTime="time_morning"
-	        rxdroid:allowMaxWrap="true"
+	        
+	        rxdroid:after="time_evening"
+	        rxdroid:before="time_morning"
 	        rxdroid:allowEndWrap="true"
 	        
 	        android:defaultValue="@string/pref_default_time_night"
@@ -181,13 +182,12 @@
 		
 		<at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_period"
 		    android:title="TimePeriodPreference"
-		    android:defaultValue="07:00|13:00"
+		    android:defaultValue="07:00-13:00"
 		    android:persistent="true"
-		    rxdroid:minTime="23:00"
-		    rxdroid:allowMinWrap="true"
-		    rxdroid:maxTime="14:00"
-		    
-		    
+		   
+		    rxdroid:before="23:00"
+		    rxdroid:allowEndWrap="true"
+		    rxdroid:after="14:00"		    
 		/>
 	
 	</PreferenceScreen>

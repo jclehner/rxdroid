@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
    
-    
+    <!-- 
     <declare-styleable name="TimePreference">
     	<attr name="before" format="string" />
     	<attr name="after" format="string" />
     	<attr name="allowBeforeWrap" format="boolean" />
     	<attr name="allowAfterWrap" format="boolean" />
     </declare-styleable>
-    
+     -->
     <declare-styleable name="TimePeriodPreference">
-        <attr name="minTime" format="string" />
-        <attr name="maxTime" format="string" />
-        <attr name="allowMinWrap" format="boolean" />
-        <attr name="allowMaxWrap" format="boolean" />
-        <attr name="allowBeginWrap" format="boolean" />
+        <attr name="after" format="string" />
+        <attr name="before" format="string" />
         <attr name="allowEndWrap" format="boolean" />
     </declare-styleable>     
         

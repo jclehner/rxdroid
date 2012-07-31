@@ -1,18 +1,16 @@
-package at.caspase.rxdroid.view;
+package at.caspase.rxdroid.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import at.caspase.rxdroid.util.Util;
 
 public class Rot13TextView extends TextView
 {
-	private static final String TAG = Rot13TextView.class.getName();
+	//private static final String TAG = Rot13TextView.class.getName();
 
 	private boolean mIsCurrentlyScrambled = false;
-	//private boolean mWasUnscramblerPosted = false;
 	private long mUnscrambledDuration = 1000;
 	private OnClickListener mOnClickListener;
 	private OnLongClickListener mOnLongClickListener;
@@ -73,7 +71,12 @@ public class Rot13TextView extends TextView
 					postDelayed(mRescrambler, mUnscrambledDuration);
 			}
 			else if(mOnClickListener != null)
+			{
+				removeCallbacks(mRescrambler);
 				mOnClickListener.onClick(v);
+				if(!mIsCurrentlyScrambled)
+					mRescrambler.run();
+			}
 		}
 	};
 
@@ -101,7 +104,6 @@ public class Rot13TextView extends TextView
 		{
 			applyRot13();
 			mIsCurrentlyScrambled = true;
-			//mWasUnscramblerPosted = false;
 		}
 	};
 }

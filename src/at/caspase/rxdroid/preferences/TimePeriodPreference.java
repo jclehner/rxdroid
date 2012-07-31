@@ -84,7 +84,8 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 	private String[] mConstraintKeys = new String[2];
 	private DumbTime[] mConstraintTimes = new DumbTime[2];
 	//private boolean[] mAllowConstraintWrap = { false, false };
-	private boolean[] mAllowTimeWrap = { false, false };
+	//private boolean[] mAllowTimeWrap = { false, false };
+	private boolean mAllowEndWrap = false;
 
 	private View mContainer;
 	private TimePicker mTimePicker;
@@ -174,10 +175,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 	private void handleAttributes(Context context, AttributeSet attrs)
 	{
 		final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TimePeriodPreference);
-
-		final int[] timeIds = { R.styleable.TimePeriodPreference_minTime, R.styleable.TimePeriodPreference_maxTime };
-		final int[] timeWrapIds = { R.styleable.TimePeriodPreference_allowBeginWrap, R.styleable.TimePeriodPreference_allowEndWrap };
-
+		final int[] timeIds = { R.styleable.TimePeriodPreference_after, R.styleable.TimePeriodPreference_before };
 		for(int i = 0; i != timeIds.length; ++i)
 		{
 			final String str = a.getString(timeIds[i]);
@@ -197,15 +195,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			}
 		}
 
-		for(int i = 0; i != timeWrapIds.length; ++i)
-		{
-			//mAllowConstraintWrap[i] = a.getBoolean(constraintWrapIds[i], false);
-			mAllowTimeWrap[i] = a.getBoolean(timeWrapIds[i], false);
-		}
-
-		if(mAllowTimeWrap[BEGIN] && mAllowTimeWrap[END])
-			throw new IllegalArgumentException("Cannot set both allowBeginWrap and allowEndWrap");
-
+		mAllowEndWrap = a.getBoolean(R.styleable.TimePeriodPreference_allowEndWrap, false);
 	}
 
 	private void onPageChanged(int page)
@@ -251,7 +241,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		min = getConstraintTimeForCurrentlyVisibleTimePicker(MIN);
 		max = getConstraintTimeForCurrentlyVisibleTimePicker(MAX);
 
-		return current.isWithinRange(min, max, mAllowTimeWrap[mCurrentPage]);
+		return current.isWithinRange(min, max, mCurrentPage == END ? mAllowEndWrap : false);
 	}
 
 	private DumbTime getConstraintTime(int which)
@@ -283,14 +273,9 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		{
 			final DumbTime min = getConstraintTime(MIN);
 
-			/*if(mEnd.before(min) && !mAllowTimeWrap[BEGIN])
-				return Constants.MIDNIGHT;
-
-			return which == MAX ? mEnd : min;*/
-
 			if(which == MAX)
 			{
-				if(mEnd.before(min) /*&& !mAllowTimeWrap[BEGIN]*/)
+				if(mEnd.before(min))
 					return null;
 
 				return mEnd;
@@ -302,14 +287,9 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		{
 			final DumbTime max = getConstraintTime(MAX);
 
-			/*if(mBegin.after(max) && !mAllowTimeWrap[END])
-				return Constants.MIDNIGHT;
-
-			return which == MIN ? mBegin : max;*/
-
 			if(which == MIN)
 			{
-				if(mBegin.after(max) && !mAllowTimeWrap[END])
+				if(mBegin.after(max) && !mAllowEndWrap)
 					return null;
 
 				return mBegin;

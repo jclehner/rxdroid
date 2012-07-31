@@ -17,7 +17,7 @@ import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Timer;
-import at.caspase.rxdroid.view.Rot13TextView;
+import at.caspase.rxdroid.widget.Rot13TextView;
 
 public class DrugOverviewAdapter extends AbsDrugAdapter
 {

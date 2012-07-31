@@ -13,7 +13,7 @@ import android.widget.TextView;
 import at.caspase.rxdroid.DoseView;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.util.CollectionUtils;
-import at.caspase.rxdroid.view.Rot13TextView;
+import at.caspase.rxdroid.widget.Rot13TextView;
 
 public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 {
