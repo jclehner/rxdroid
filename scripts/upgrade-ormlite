@@ -2,6 +2,8 @@
 
 source "$(dirname $_)/shared.sh"
 
+require-grep-P
+
 ORMLITE_FETCHURL="http://ormlite.com/releases"
 PACKAGES="ormlite-core ormlite-android"
 

@@ -134,7 +134,7 @@ link_or_copy()
 	# Eclipse 3.6 under Mac OS X 10.7 doesn't like Android library dependencies
 	# that are softlinks, apparently.
 	case $(uname -s) in 
-		Darwin)
+		Darwin|MINGW*)
 			echo -n "Copying files to $2... "
 			run cp -r "$1" "$2"
 			echo "done"

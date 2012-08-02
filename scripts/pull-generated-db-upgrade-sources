@@ -2,11 +2,13 @@
 
 source "$(dirname $_)/shared.sh"
 
+require-grep-P
+
 TEMPD=$(mktempd)
 SRCDIR=
 
 echo "INFO: Pulling files from device"
-for f in $(run adb-shell busybox ls -1 /sdcard/RxDroid/Olx*.java | tr "\r" "\n"); do
+for f in $(run adb-shell busybox ls -1 /sdcard/RxDroid/Old.java | tr "\r" "\n"); do
 
 	FILE=$(basename $f)
 	TARGET="$TEMPD/$FILE"

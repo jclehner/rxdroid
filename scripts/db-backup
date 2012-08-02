@@ -1,12 +1,13 @@
 #!/bin/bash
 
+source "$(dirname $_)/shared.sh" || exit 1
 
-if [[ $# -lt 1 ]]; then
+if [[ $# -eq 0 ]]; then
 	FILE=db_$(date +%Y-%m-%d).sqlite
 else
 	FILE="$1"
 fi
 
 echo -n "Pulling database from device ... "
-adb pull /data/data/at.caspase.rxdroid/databases/db.sqlite "$FILE"
+adb pull $(adb-path /data/data/at.caspase.rxdroid/databases/db.sqlite) "$FILE"
 

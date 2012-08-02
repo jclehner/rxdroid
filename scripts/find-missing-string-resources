@@ -7,6 +7,8 @@
 
 source "$(dirname $_)/shared.sh"
 
+require-grep-P
+
 patterns="@string/_\w* R.string._\w*"
 temp=$(mktempf)
 

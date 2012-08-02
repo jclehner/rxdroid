@@ -5,7 +5,9 @@ source "$(dirname $_)/shared.sh"
 
 [[ -f "$1" ]] || die "$1: No such file"
 
-grep -q -i "sqlite" <<< $(file -b "$1") || die "$1: Not an SQLite database"
+if [[ "$(head -c 6 "$1")" != "SQLite" ]]; then
+	die "$1: Not an SQLite database"
+fi
 
 DATABASES=/data/data/$PKG/databases
 TARGET=$DATABASES/db.sqlite

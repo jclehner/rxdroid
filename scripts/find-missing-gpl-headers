@@ -1,3 +1,5 @@
 #!/bin/bash
 
-grep --include=*.java --exclude=R.java -L -R 'Copyright' src/
+source "$(dirname $_)/shared.sh"
+
+grep -L 'Copyright' $(find src -name "*.java")
