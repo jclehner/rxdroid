@@ -19,7 +19,7 @@ FGID=`awk '{ print $3 }' <<<$INFO`
 run adb-shell mkdir -p $(dirname $TARGET)
 
 echo -n "Pushing database to device ... "
-adb push "$1" $TARGET || exit 1
+adb push "$1" $TARGET || die
 
 echo -n "Fixing permissions ... "
 run adb-shell busybox chown -R $FUID:$FGID $DATABASES

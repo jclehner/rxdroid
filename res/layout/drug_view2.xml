@@ -10,7 +10,7 @@
 	
 	android:nextFocusLeft="@+id/drug_name"
 	
-	style="@style/DarkListElement"
+	
 >
 	<!-- first line: icon + name -->
 	

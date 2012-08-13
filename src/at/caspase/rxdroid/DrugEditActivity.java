@@ -409,7 +409,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			order = 11,
 			type = CurrentSupplyPreference.class,
 			helper = CurrentSupplyPreferenceHelper.class,
-			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat", "repeatArg", "repeatOrigin" }
+			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat"},
+			fieldDependencies = { "repeatArg", "repeatOrigin" }
 		)
 		private Fraction currentSupply;
 

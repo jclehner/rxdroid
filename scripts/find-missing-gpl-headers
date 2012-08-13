@@ -1,5 +1,0 @@
-#!/bin/bash
-
-source "$(dirname $_)/shared.sh"
-
-grep -L 'Copyright' $(find src -name "*.java")

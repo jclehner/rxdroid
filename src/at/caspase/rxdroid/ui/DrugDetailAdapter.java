@@ -1,3 +1,24 @@
+/**
+ * Copyright (C) 2011, 2012 Joseph Lehner <joseph.c.lehner@gmail.com>
+ *
+ * This file is part of RxDroid.
+ *
+ * RxDroid is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * RxDroid is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package at.caspase.rxdroid.ui;
 
 import java.util.Date;
@@ -16,6 +37,7 @@ import at.caspase.rxdroid.Settings;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.db.Intake;
+import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.widget.Rot13TextView;
@@ -29,7 +51,8 @@ public class DrugDetailAdapter extends AbsDrugAdapter
 
 	private final Timer mTimer;
 
-	public DrugDetailAdapter(Activity activity, List<Drug> items, Date date, int doseTime) {
+	public DrugDetailAdapter(Activity activity, List<Drug> items, Date date, int doseTime)
+	{
 		super(activity, items, date);
 
 		mDoseTime = doseTime;
@@ -115,4 +138,14 @@ public class DrugDetailAdapter extends AbsDrugAdapter
 
 		return v;
 	}
+
+	private static final CollectionUtils.Filter<Drug> DRUG_WITH_DOSE_FILTER = new CollectionUtils.Filter<Drug>() {
+
+		@Override
+		public boolean matches(Drug e)
+		{
+			// TODO Auto-generated method stub
+			return false;
+		}
+	};
 }

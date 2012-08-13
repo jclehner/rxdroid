@@ -21,7 +21,6 @@
 
 package at.caspase.androidutils.otpm;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.preference.ListPreference;
 

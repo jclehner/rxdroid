@@ -202,9 +202,9 @@ public class OTPM
 
 	static class PrefInfo
 	{
-		String key;
-		Annotation annotation;
-		Field field;
+		final String key;
+		final Annotation annotation;
+		final Field field;
 
 		PrefInfo(String key, Annotation annotation, Field field)
 		{
@@ -228,8 +228,13 @@ public class OTPM
 		{
 			if(field.isAnnotationPresent(AddPreference.class))
 			{
-				root.addPreference((Preference) Reflect.getFieldValue(field, object));
-				continue;
+				final Preference p = (Preference) Reflect.getFieldValue(field, object);
+				if(p != null)
+				{
+					if(p.hasKey() && root.findPreference(p.getKey()) == null)
+						root.addPreference(p);
+					continue;
+				}
 			}
 
 			final Annotation a = field.getAnnotation(CreatePreference.class);

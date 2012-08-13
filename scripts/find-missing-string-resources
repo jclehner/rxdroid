@@ -9,14 +9,14 @@ source "$(dirname $_)/shared.sh"
 
 require-grep-P
 
-patterns="@string/_\w* R.string._\w*"
-temp=$(mktempf)
+PATTERNS="@string/_\w* R.string._\w*"
+TEMP=$(mktempf)
 
 scan_file()
 {
-	for p in $patterns; do
+	for p in $PATTERNS; do
 		for t in $(grep -o -P $p $1 | grep -o -P '_\w*'); do
-			echo $t >> $temp
+			echo $t >> $TEMP
 		done
 	done
 
@@ -39,16 +39,22 @@ scan_dir()
 
 scan_string_xml()
 {
-	for f in res/values*/strings.xml; do
+	for f in res/values/strings.xml res/values-{de,fr}/strings.xml; do
+		[[ -e $f ]] || continue
+
 		echo "-- $f:"
 
-		for t in $(cat $temp | sort | uniq); do
-			if [[ "$(dirname $f)" != "values" ]]; then
+		for t in $(cat $TEMP | sort | uniq); do
+			local dir=$(basename $(dirname $f))
+
+			if [[ $dir != "values" ]]; then
+
 				if ! grep -q $t "res/values/strings.xml" && grep -q $t "$f"; then
+					echo >&2
 					echo "!!! Resource R.string.$t exists in $f but not in res/values/strings.xml" >&2
 					echo "!!! This is known to cause exceptions in Context.getString()" >&2
-					echo "!!! t=$t, f=$f, temp=$temp"
 					echo "!!! Affected files: "
+					echo >&2
 
 					grep --include=*.{xml,java} -R -l "$t" src res | grep -v "$f"
 
@@ -57,7 +63,11 @@ scan_string_xml()
 			fi
 
 			if ! grep -q $t $f; then
-				echo "<string name=\"$t\"> !!EMPTY!! </string>"
+				if [[ $dir == "values" ]]; then
+					echo "<string name=\"$t\"> !!EMPTY!! </string>"
+				else
+					grep "\"$t\"" res/values/strings.xml | sed -e 's/^[[:blank:]]*//'
+				fi
 			fi
 		done
 
@@ -67,7 +77,8 @@ scan_string_xml()
 
 scan_dir src
 scan_dir res
+scan_file AndroidManifest.xml
 
 scan_string_xml
 
-rm $temp
+rm $TEMP

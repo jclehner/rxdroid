@@ -1,0 +1,12 @@
+#!/bin/bash
+
+source "$(dirname $_)/shared.sh"
+
+TEMP=$(mktempf)
+
+for f in $(grep -L 'Copyright (C)' $(find src -name "*.java")); do
+	echo "$f"
+	cat $MISC/LICENSE.java $f > $TEMP || die
+	cp $TEMP $f || die
+done
+

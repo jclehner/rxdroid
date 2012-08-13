@@ -1,8 +1,3 @@
-package at.caspase.androidutils.otpm;
-
-import android.content.Context;
-import android.preference.ListPreference;
-import at.caspase.rxdroid.util.Util;
 /**
  * Copyright (C) 2012 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
@@ -23,6 +18,11 @@ import at.caspase.rxdroid.util.Util;
  *
  *
  */
+
+package at.caspase.androidutils.otpm;
+
+import android.preference.ListPreference;
+import at.caspase.rxdroid.util.Util;
 
 public abstract class ListPreferenceWithIntHelper extends PreferenceHelper<ListPreference, Integer>
 {

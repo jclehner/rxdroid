@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -36,7 +37,6 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
@@ -47,15 +47,12 @@ import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -69,7 +66,6 @@ import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.ui.DrugOverviewAdapter;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.DateTime;
-import at.caspase.rxdroid.util.Util;
 
 public class DrugListActivity extends Activity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
@@ -144,6 +140,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			//mDate = DateTime.todayDate();
 			mDate = Settings.instance().getActiveDate();
 		}
+
+
 
 		startNotificationService();
 
@@ -401,12 +399,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		return listView;*/
 
 		final View v = getLayoutInflater().inflate(R.layout.drug_list_fragment, null);
-
-		final TextView emptyView = (TextView) v.findViewById(android.R.id.empty);
-		emptyView.setText(R.string._msg_no_doses_on_this_day);
-
 		final ListView listView = (ListView) v.findViewById(android.R.id.list);
-		listView.setEmptyView(emptyView);
+		final TextView emptyView = (TextView) v.findViewById(android.R.id.empty);
 
 		final Calendar cal = DateTime.calendarFromDate(mDate);
 
@@ -417,10 +411,14 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		final List<Drug> drugs = Database.getAll(Drug.class);
 		Collections.sort(drugs);
-
 		updateListAdapter(listView, cal.getTime(), drugs);
 
-		return listView;
+		final int emptyResId = drugs.isEmpty() ? R.string.virtual_msg_no_drugs : R.string._msg_no_doses_on_this_day;
+		emptyView.setText(getString(emptyResId, getString(R.string._title_add)));
+
+		listView.setEmptyView(emptyView);
+
+		return v;
 	}
 
 	public void onDoseViewClick(View view)
@@ -433,17 +431,13 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		if(!date.equals(mDate))
 			Log.w(TAG, "Activity date " + mDate + " differs from DoseView date " + date);
 
-		if(!MultipleDialogsPreventer.INSTANCE.isDialogShowing())
+		if(MultipleIntakeDialogsPreventer.INSTANCE.canShowDialog())
 		{
 			IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, date);
-			dialog.setOnShowListener(MultipleDialogsPreventer.INSTANCE);
-			dialog.setOnDismissListener(MultipleDialogsPreventer.INSTANCE);
+			dialog.setOnShowListener(MultipleIntakeDialogsPreventer.INSTANCE);
+			dialog.setOnDismissListener(MultipleIntakeDialogsPreventer.INSTANCE);
 			dialog.show();
 		}
-		else
-			Log.i(TAG, "IntakeDialog is showing, not showing a new one.");
-
-		//Util.sleepAtMost(200);
 	}
 
 	public void onNotificationIconClick(View view)
@@ -518,6 +512,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		Database.registerOnChangedListener(DATABASE_WATCHER);
 	}
 
+	@TargetApi(11)
 	private void updateDateString()
 	{
 		//final Date date = DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy);
@@ -527,6 +522,12 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
 
 		mTextDate.setText(dateString);
+
+		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		{
+			ActionBar ab = getActionBar();
+			ab.setSubtitle(dateString);
+		}
 	}
 
 	private class DrugFilter implements CollectionUtils.Filter<Drug>
@@ -630,32 +631,26 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 	};
 
-	private static enum MultipleDialogsPreventer implements OnShowListener, OnDismissListener
+	private static enum MultipleIntakeDialogsPreventer implements OnShowListener, OnDismissListener
 	{
 		INSTANCE;
 
-		private boolean mIsShowing = false;
+		private static final int TIMEOUT_MILLIS = 300;
 
-		public void reset() {
-			mIsShowing = false;
-		}
+		private long mTime = 0;
 
-		public boolean isDialogShowing() {
-			return mIsShowing;
+		public boolean canShowDialog() {
+			return Math.abs(System.currentTimeMillis() - mTime) > TIMEOUT_MILLIS;
 		}
 
 		@Override
 		public void onDismiss(DialogInterface dialog) {
-			mIsShowing = false;
+			mTime = 0;
 		}
 
 		@Override
-		public void onShow(DialogInterface dialog)
-		{
-			if(mIsShowing)
-				dialog.dismiss();
-
-			mIsShowing = true;
+		public void onShow(DialogInterface dialog) {
+			mTime = System.currentTimeMillis();
 		}
 	}
 

@@ -2,6 +2,7 @@
 
 readonly PKG="at.caspase.rxdroid"
 readonly DTEMP="/sdcard/"
+readonly MISC="scripts/misc/"
 
 die() {
 	if [[ $# -ne 0 ]]; then
@@ -13,6 +14,10 @@ die() {
 	# don't exit in interactive mode
 	[[ $- != *i* ]] && exit 1
 }
+
+if [[ ! -f "scripts/shared.sh" ]]; then
+	die "Script must be run from the project's root directory"
+fi
 
 MKTEMP_CMDLINE="-t fooXXXXXX"
 

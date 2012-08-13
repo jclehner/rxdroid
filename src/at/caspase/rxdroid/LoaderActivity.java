@@ -35,6 +35,7 @@ import android.widget.Toast;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
+import at.caspase.rxdroid.util.Timer;
 
 public class LoaderActivity extends Activity implements OnClickListener
 {
@@ -79,7 +80,9 @@ public class LoaderActivity extends Activity implements OnClickListener
 
 		try
 		{
+			Timer t = new Timer();
 			Database.init();
+			Log.i(TAG, "Finished caching database: " + t);
 			return true;
 		}
 		catch(DatabaseError e)
@@ -143,8 +146,7 @@ public class LoaderActivity extends Activity implements OnClickListener
 
 	private void launchMainActivity()
 	{
-		Intent intent = new Intent(this, DrugListActivity.class);
-		//Intent intent = new Intent(this, DrugSortActivity.class); // XXX
+		Intent intent = new Intent(getApplicationContext(), DrugListActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		startActivity(intent);
 
