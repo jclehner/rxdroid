@@ -1,0 +1,57 @@
+#!/bin/bash
+
+source "$(dirname $_)/shared.sh"
+
+TEMP=$(mktempf)
+
+SEARCHDIRS=(
+	".java src"
+	".xml res"
+)
+
+# void insert_gpl_info(filename, extension)
+insert_gpl_info() 
+{
+	local license="${MISC}/LICENSE${2}"
+
+	if [[ ! -f "$license" ]]; then
+		die "No license file found for extension ${2}"
+	fi
+
+	if ! insert_gpl_info_${2:1} "$1" "$license"; then
+		insert_gpl_info_default "$1" "$license"
+	fi
+}
+
+# void insert_gpl_info_java(filename, license)
+insert_gpl_info_default()
+{
+	cat $2 $1 > $TEMP || die
+	cp $TEMP $1 || die
+}
+
+# void insert_gpl_info_xml(filename, license)
+insert_gpl_info_xml()
+{
+	local xmldecl=$(grep -P '^<\?xml' $1)
+	if ! grep -P -q "\?>$" <<< "$xmldecl"; then
+		die "$1: Refusing to work with XML declaration '$xmldecl'"
+	fi
+
+	echo $xmldecl > $TEMP
+	local xmldecl="$xmldecl"
+
+	cat $2 >> $TEMP
+	grep -F -v "$xmldecl" $1 >> $TEMP
+	cp $TEMP $1
+}
+
+for s in "${SEARCHDIRS[@]}"; do
+	read -ra INFO <<< "$s"
+	
+	for f in $(grep -L 'Copyright (C)' $(find ${INFO[1]} -name "*${INFO[0]}")); do
+		echo "$f"
+		insert_gpl_info "$f" ${INFO[0]}
+	done
+done
+

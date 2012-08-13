@@ -4,6 +4,8 @@ readonly PKG="at.caspase.rxdroid"
 readonly DTEMP="/sdcard/"
 readonly MISC="scripts/misc/"
 
+DEBUG=0
+
 die() {
 	if [[ $# -ne 0 ]]; then
 		echo $* >&2
@@ -61,7 +63,8 @@ adb-shell() {
 }
 
 run() {
-	$@ || die "$1 exited with status $?"
+	[[ $DEBUG -eq 1 ]] && echo $@
+	"$@" || die "$1 exited with status $?"
 }
 
 require-grep-P()
