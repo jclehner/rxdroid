@@ -37,7 +37,19 @@ public class Extras
 		return sExtras.get(object);
 	}
 
+	public static void remove(Object object) {
+		sExtras.remove(object);
+	}
+
 	public static boolean isRegistered(Object object) {
 		return sExtras.containsKey(object);
+	}
+
+	public static boolean containsKey(Object object, String extraKey)
+	{
+		if(!isRegistered(object))
+			return false;
+
+		return sExtras.get(object).containsKey(extraKey);
 	}
 }

@@ -34,6 +34,8 @@ import at.caspase.rxdroid.util.DateTime;
 
 public final class Entries
 {
+	private static final String TAG = Entries.class.getName();
+
 	/*
 	private static final List<Intake> sConsolidatedIntakes = new ArrayList<Intake>();
 

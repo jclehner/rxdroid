@@ -47,10 +47,11 @@ import java.util.WeakHashMap;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
+import at.caspase.androidutils.Extras;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
-import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Reflect;
+import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.dao.Dao;
@@ -380,6 +381,9 @@ public final class Database
 		if(entry.id == ID_VIRTUAL_ENTRY)
 			throw new IllegalArgumentException("Cannot perform database operation on virtual entries");
 
+		// Extras might be invalid after the entry has changed
+		Extras.remove(entry);
+
 		@SuppressWarnings("unchecked")
 		final Class<E> clazz = (Class<E>) entry.getClass();
 		final List<E> cached = getCached(clazz);
@@ -436,7 +440,9 @@ public final class Database
 				try
 				{
 					final Method m = dao.getClass().getMethod(methodName, Object.class);
+					final Timer t = new Timer();
 					m.invoke(dao, entry);
+					Log.i(TAG, "dao." + methodName + ": " + t);
 					return;
 				}
 				catch(IllegalArgumentException e)

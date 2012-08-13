@@ -476,6 +476,20 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.schedule = schedule;
 	}
 
+	public boolean hasNoDoses()
+	{
+		if(repeatMode == REPEAT_CUSTOM)
+			return schedule.hasNoDoses();
+
+		for(Fraction dose : getSimpleSchedule())
+		{
+			if(!dose.isZero())
+				return false;
+		}
+
+		return true;
+	}
+
 
 	@Override
 	public boolean equals(Object o)
@@ -620,7 +634,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		return (repeatArg & 1 << weekday) != 0;
 	}
 
-	static final Runnable HOOK_DELETE = new Runnable() {
+	protected static final Runnable HOOK_DELETE = new Runnable() {
 
 		@Override
 		public void run()

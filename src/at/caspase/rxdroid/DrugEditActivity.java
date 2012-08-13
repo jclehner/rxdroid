@@ -850,7 +850,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				return "0";
 			}
 
-			if(drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND)
+			if(drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND || drug.hasNoDoses())
 			{
 				// TODO change?
 				return currentSupply.toString();

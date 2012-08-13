@@ -79,6 +79,10 @@ public final class Schedule extends Entry
 		return schedule.getDoseTimeEnd(date, doseTime);
 	}
 
+	public boolean hasNoDoses() {
+		throw new UnsupportedOperationException();
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		throw new UnsupportedOperationException();
