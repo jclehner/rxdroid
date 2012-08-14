@@ -83,7 +83,8 @@
 
 	</application>
 
-	
+	<!--
 	<instrumentation android:targetPackage="at.caspase.rxdroid" android:label="RxDroid Tests" android:name="android.test.InstrumentationTestRunner"/>
-	
+	-->
+	  
 	</manifest> 

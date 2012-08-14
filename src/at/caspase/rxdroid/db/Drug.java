@@ -634,16 +634,18 @@ public class Drug extends Entry implements Comparable<Drug>
 		return (repeatArg & 1 << weekday) != 0;
 	}
 
-	protected static final Runnable HOOK_DELETE = new Runnable() {
+	public static final Callback<Drug> CALLBACK_DELETE = new Callback<Drug>() {
 
 		@Override
-		public void run()
+		public void call(Drug drug)
 		{
+			Log.d(TAG, "CALLBACK_DELETE.call()");
+
 			for(Intake intake : Database.getAll(Intake.class))
 			{
-				if(intake.getDrug() == null)
+				if(intake.getDrug() == null || intake.getDrugId() == drug.id)
 				{
-					Log.d(TAG, "Deleting intake for drug id " + intake.getDrugId());
+					Log.d(TAG, "  Deleteing intake" + intake);
 					Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
 				}
 			}

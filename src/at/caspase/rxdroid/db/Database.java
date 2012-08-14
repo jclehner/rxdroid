@@ -227,6 +227,10 @@ public final class Database
 		//return new LinkedList<T>(getCached(clazz));
 	}
 
+	public static <T extends Entry> int countAll(Class<T> clazz) {
+		return getCached(clazz).size();
+	}
+
 	static synchronized <T extends Entry> List<T> getCached(Class<T> clazz)
 	{
 		if(!sCache.containsKey(clazz))
@@ -376,6 +380,7 @@ public final class Database
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private static <E extends Entry> void performDbOperation(String methodName, E entry, int flags)
 	{
 		if(entry.id == ID_VIRTUAL_ENTRY)
@@ -384,7 +389,6 @@ public final class Database
 		// Extras might be invalid after the entry has changed
 		Extras.remove(entry);
 
-		@SuppressWarnings("unchecked")
 		final Class<E> clazz = (Class<E>) entry.getClass();
 		final List<E> cached = getCached(clazz);
 
@@ -406,17 +410,18 @@ public final class Database
 		final Dao<E, Integer> dao = getDaoChecked(clazz);
 		runDaoMethodInThread(dao, methodName, entry);
 
-		final String hookName = "HOOK_" + methodName.toUpperCase(Locale.US);
-		final Field hookField = Reflect.getDeclaredField(clazz, hookName);
-		if(hookField != null)
+		final String callbackName = "CALLBACK_" + methodName.toUpperCase(Locale.US);
+		final Field callbackField = Reflect.getDeclaredField(clazz, callbackName);
+		if(callbackField != null)
 		{
-			final Runnable hook = (Runnable) Reflect.getFieldValue(hookField, null, null);
-			if(hook != null)
+			@SuppressWarnings("rawtypes")
+			final Entry.Callback callback = (Entry.Callback) Reflect.getFieldValue(callbackField, null, null);
+			if(callback != null)
 			{
 				// don't run this in a thread as we want a clean state when events are
 				// dispatched to listeners
-				hook.run();
-				if(LOGV) Log.v(TAG, "Ran hook " + hookField.getName());
+				callback.call(entry);
+				if(LOGV) Log.v(TAG, "Ran callback " + callbackField.getName());
 			}
 		}
 

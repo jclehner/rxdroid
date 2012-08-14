@@ -48,6 +48,11 @@ import com.j256.ormlite.field.DatabaseField;
  */
 public abstract class Entry implements Serializable
 {
+	interface Callback<E extends Entry>
+	{
+		void call(E entry);
+	}
+
 	private static final long serialVersionUID = 8300191193261799857L;
 
 	@DatabaseField(generatedId = true)

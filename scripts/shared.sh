@@ -1,7 +1,7 @@
 #!/bin/bash
 
 readonly PKG="at.caspase.rxdroid"
-readonly DTEMP="/sdcard/"
+readonly DTEMP="/mnt/sdcard/"
 readonly MISC="scripts/misc/"
 
 DEBUG=0
@@ -57,7 +57,7 @@ adb-shell() {
 	local status=$(adb shell cat $tmp | tr -d "\r\n")
 	let status=$status+0
 
-	adb shell rm -f $tmp
+	adb shell rm $tmp
 
 	return $status
 }

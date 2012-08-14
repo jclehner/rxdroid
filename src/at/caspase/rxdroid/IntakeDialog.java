@@ -26,7 +26,6 @@ import java.util.Date;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Display;
@@ -172,7 +171,8 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 			if(mPopup != null)
 				dismissPopup();
 
-			dismiss();
+			if(isShowing())
+				dismiss();
 		}
 	}
 

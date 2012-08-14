@@ -166,7 +166,11 @@ public class Intake extends Entry
 	}
 
 	@Override
-	public String toString() {
-		return getDrug().getName() + ": " + date + " " + Drug.getDoseTimeString(doseTime) + ", " + dose;
+	public String toString()
+	{
+		final Drug drug = getDrug();
+		final String drugName = drug == null ? "<deleted>" : drug.getName();
+
+		return drugName + ": " + date + " " + Drug.getDoseTimeString(doseTime) + ", " + dose;
 	}
 }

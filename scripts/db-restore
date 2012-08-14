@@ -16,13 +16,17 @@ INFO=`adb shell ls -l /data/data | grep $PKG`
 FUID=`awk '{ print $2 }' <<<$INFO`
 FGID=`awk '{ print $3 }' <<<$INFO`
 
+echo -n "Remounting data/ ... "
+run adb-shell mount -o remount,rw /data
+echo "done"
+
 run adb-shell mkdir -p $(dirname $TARGET)
 
 echo -n "Pushing database to device ... "
 adb push "$1" $TARGET || die
 
 echo -n "Fixing permissions ... "
-run adb-shell busybox chown -R $FUID:$FGID $DATABASES
+run adb-shell chown $FUID.$FGID $DATABASES $DATABASES/"*"
 run adb-shell am force-stop $PKG
 
 echo "done"

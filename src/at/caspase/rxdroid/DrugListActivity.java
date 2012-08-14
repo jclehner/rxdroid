@@ -39,6 +39,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.SpannableString;
@@ -49,6 +50,7 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -66,6 +68,7 @@ import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.ui.DrugOverviewAdapter;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Util;
 
 public class DrugListActivity extends Activity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
@@ -479,8 +482,44 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			mLastPage = -1;
 
 			mPager.removeAllViews();
-			mPager.setAdapter(new InfiniteViewPagerAdapter(this));
-			mPager.setCurrentItem(InfiniteViewPagerAdapter.CENTER, smoothScroll);
+
+			if(Database.countAll(Drug.class) != 0)
+			{
+				mPager.setAdapter(new InfiniteViewPagerAdapter(this));
+				mPager.setCurrentItem(InfiniteViewPagerAdapter.CENTER, smoothScroll);
+			}
+			else
+			{
+				mPager.setAdapter(new PagerAdapter() {
+
+					@Override
+					public boolean isViewFromObject(View v, Object o) {
+						return v == (View) o;
+					}
+
+					@Override
+					public int getCount()
+					{
+						// TODO Auto-generated method stub
+						return 1;
+					}
+
+					@Override
+					public Object instantiateItem(ViewGroup container, int position)
+					{
+						final View v = makeView(0);
+						Util.detachFromParent(v);
+						container.addView(v);
+						return v;
+					}
+
+					@Override
+					public void destroyItem(ViewGroup container, int position, Object item) {
+						container.removeView((View) item);
+					}
+				});
+				mPager.setCurrentItem(0);
+			}
 		}
 
 		updateDateString();
@@ -653,8 +692,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			mTime = System.currentTimeMillis();
 		}
 	}
-
-	//private static final MultipleDialogsPreventer MUTIPLE_DIALOGS_PREVENTER = new MultipleDialogsPreventer();
 
 	private static final Database.OnChangeListener DATABASE_WATCHER = new Database.OnChangeListener() {
 
