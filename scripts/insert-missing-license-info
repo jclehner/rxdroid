@@ -7,6 +7,7 @@ TEMP=$(mktempf)
 SEARCHDIRS=(
 	".java src"
 	".xml res"
+	".svg ../svg"
 )
 
 # void insert_gpl_info(filename, extension)
@@ -44,6 +45,11 @@ insert_gpl_info_xml()
 	cat $2 >> $TEMP
 	grep -F -v "$xmldecl" $1 >> $TEMP
 	cp $TEMP $1
+}
+
+insert_gpl_info_svg()
+{
+	insert_gpl_info_xml "$1" "$2"
 }
 
 for s in "${SEARCHDIRS[@]}"; do
