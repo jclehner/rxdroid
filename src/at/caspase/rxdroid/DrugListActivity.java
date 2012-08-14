@@ -132,6 +132,9 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			}
 		});
 
+		// FIXME hack
+		mTextDate.setVisibility(Version.SDK_IS_PRE_HONEYCOMB ? View.VISIBLE : View.GONE);
+
 		mPager.setOnPageChangeListener(mPageListener);
 
 		Intent intent = getIntent();
@@ -324,7 +327,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		Drug drug = Drug.get((Integer) view.getTag(TAG_DRUG_ID));
 		intent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
-		//intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 
 		//startActivityForResult(intent, 0);
 		startActivity(intent);

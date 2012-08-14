@@ -26,8 +26,7 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:rxdroid="http://schemas.android.com/apk/res/at.caspase.rxdroid"
   android:title="@string/_title_preferences"
-  android:orderingFromXml="true"
-  
+  android:orderingFromXml="true"  
 >
 	
 	<!-- TIMES -->

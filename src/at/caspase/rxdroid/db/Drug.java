@@ -243,25 +243,27 @@ public class Drug extends Entry implements Comparable<Drug>
 		return form;
 	}
 
-	public int getFormResourceId()
+	public int getFormResourceId(/*boolean isDarkTheme*/)
 	{
+		boolean isDarkTheme = false;
+
 		switch(form)
 		{
 			case FORM_INJECTION:
-				return R.drawable.ic_drug_syringe;
+				return isDarkTheme ? R.drawable.ic_drug_syringe_light : R.drawable.ic_drug_syringe_dark;
 
 			case FORM_DROP:
-				return R.drawable.ic_drug_drink;
+				return isDarkTheme ? R.drawable.ic_drug_glass_light : R.drawable.ic_drug_glass_dark;
 
 			case FORM_GEL:
-				return R.drawable.ic_drug_tube;
+				return isDarkTheme ? R.drawable.ic_drug_tube_light : R.drawable.ic_drug_tube_dark;
 
 			case FORM_PILL:
 				// fall through
 
 			default:
 				//return R.drawable.ic_drug_pill2;
-				return R.drawable.ic_drug_pill;
+				return isDarkTheme ? R.drawable.ic_drug_tablet_light : R.drawable.ic_drug_tablet_dark;
 
 			// FIXME
 		}
@@ -468,8 +470,12 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.sortRank = sortRank;
 	}
 
-	public Schedule getSchedule() {
-		return schedule;
+	public Schedule getSchedule()
+	{
+		if(schedule == null)
+			return null;
+
+		return Database.get(Schedule.class, schedule.id);
 	}
 
 	public void setSchedule(Schedule schedule) {

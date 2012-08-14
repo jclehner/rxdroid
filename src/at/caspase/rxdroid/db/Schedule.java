@@ -21,10 +21,15 @@
 
 package at.caspase.rxdroid.db;
 
+import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 
+import android.app.Activity;
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.db.schedules.ScheduleBase;
+import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Util;
 
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
@@ -50,37 +55,92 @@ public final class Schedule extends Entry
 {
 	private static final long serialVersionUID = 7534352445550766725L;
 
-	@DatabaseField(dataType=DataType.SERIALIZABLE)
-	private ScheduleBase schedule;
+	public static final int DOSE_MORNING = 0;
+	public static final int DOSE_NOON    = 1;
+	public static final int DOSE_EVENING = 2;
+	public static final int DOSE_NIGHT   = 3;
+	public static final int DOSE_INVALID = 4;
 
-	public Schedule() {}
-
-	public Schedule(ScheduleBase scheduleImpl) {
-		schedule = scheduleImpl;
+	@SuppressWarnings("serial")
+	public static abstract class Repetiton implements Serializable
+	{
+		public abstract boolean hasDoseOnDate(Date date);
+		public abstract Date getNextDateWithDose(Date date);
+		public abstract int getSupplyDaysLeft(Fraction supplyLeft);
+		public abstract Class<? extends Activity> getPreferenceActivityClass();
 	}
 
-	public Fraction getDose(Date date, int doseTime) {
-		return schedule.getDose(date, doseTime);
+	@DatabaseField(canBeNull = true)
+	private String name;
+
+	@DatabaseField(canBeNull = true)
+	private Date begin;
+
+	@DatabaseField(canBeNull = true)
+	private Date end;
+
+	@DatabaseField(dataType = DataType.SERIALIZABLE, canBeNull = true)
+	private Repetiton repetition;
+
+	/**
+	 * The schedule's doses.
+	 * <p>
+	 * Values are stored in a two-dimensional array and are accessed
+	 * in the following way:
+	 *
+	 * weeklySchedule[weekday index*][dose time]
+	 *
+	 * If weeklySchedule[weekday index] is null, weeklySchedule[7] is used.
+	 *
+	 * *) 0 = Monday, 1 = Tuesday, ..., 6 = Sunday
+	 *
+	 */
+	@DatabaseField(dataType = DataType.SERIALIZABLE)
+	private Fraction[][] weeklySchedule = new Fraction[8][4];
+
+	public String getName() {
+		return name;
 	}
 
-	public boolean hasDoseOnDate(Date date) {
-		return schedule.hasDoseOnDate(date);
+	public Fraction getDose(Date date, int doseTime)
+	{
+		if(date == null || doseTime >= DOSE_INVALID)
+			throw new IllegalArgumentException();
+
+		if(!hasDoseOnDate(date))
+			return Fraction.ZERO;
+
+		return getDoses(date)[doseTime];
 	}
 
-	public void setDose(Date date, int doseTime, Fraction dose) {
-		schedule.setDose(date, doseTime, dose);
+	public boolean hasDoseOnDate(Date date)
+	{
+		if(begin != null && date.before(begin))
+			return false;
+		else if(end != null && date.after(end))
+			return false;
+
+		if(repetition != null)
+			return repetition.hasDoseOnDate(date);
+
+		return !sum(getDoses(date)).isZero();
 	}
 
-	public Date getDoseTimeBegin(Date date, int doseTime) {
-		return schedule.getDoseTimeBegin(date, doseTime);
-	}
+	public boolean hasNoDoses()
+	{
+		for(Fraction[] doses : weeklySchedule)
+		{
+			if(doses == null)
+				continue;
 
-	public Date getDoseTimeEnd(Date date, int doseTime) {
-		return schedule.getDoseTimeEnd(date, doseTime);
-	}
+			for(Fraction dose : doses)
+			{
+				if(dose != null && !dose.isZero())
+					return false;
+			}
+		}
 
-	public boolean hasNoDoses() {
-		throw new UnsupportedOperationException();
+		return true;
 	}
 
 	@Override
@@ -91,5 +151,21 @@ public final class Schedule extends Entry
 	@Override
 	public int hashCode() {
 		throw new UnsupportedOperationException();
+	}
+
+	private Fraction[] getDoses(Date date)
+	{
+		final int weekdayIndex = Util.calWeekdayToIndex(DateTime.get(date, Calendar.DAY_OF_WEEK));
+		final Fraction[] doses = weeklySchedule[weekdayIndex];
+		return doses == null ? weeklySchedule[7] : doses;
+	}
+
+	private static Fraction sum(Fraction[] fractions)
+	{
+		final Fraction sum = new Fraction();
+		for(Fraction f : fractions)
+			sum.add(f);
+
+		return sum;
 	}
 }

@@ -23,6 +23,9 @@
 -->
 
 <resources>
-	<style name="Theme" parent="@android:style/Theme.Holo" />
-	<style name="Theme.Dialog" parent="@android:style/Theme.Holo.Dialog" />
+	<style name="Theme.Dark" parent="@android:style/Theme.Holo" />
+	<style name="Theme.Dark.Dialog" parent="@android:style/Theme.Holo.Dialog" />
+	
+	<style name="Theme.Light" parent="@android:style/Theme.Holo.Light.DarkActionBar" />
+	<style name="Theme.Light.Dialog" parent="@android:style/Theme.Holo.Light.Dialog" />
 </resources>

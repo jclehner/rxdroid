@@ -16,9 +16,11 @@ INFO=`adb shell ls -l /data/data | grep $PKG`
 FUID=`awk '{ print $2 }' <<<$INFO`
 FGID=`awk '{ print $3 }' <<<$INFO`
 
-echo -n "Remounting data/ ... "
-run adb-shell mount -o remount,rw /data
-echo "done"
+if [[ -z $(run adb-shell mount | grep /data | grep rw) ]]; then
+	echo -n "Remounting data/ read-write ... "
+	run adb-shell mount -o remount,rw /data
+	echo "done"
+fi
 
 run adb-shell mkdir -p $(dirname $TARGET)
 

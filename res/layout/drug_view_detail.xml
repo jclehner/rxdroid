@@ -42,7 +42,7 @@
 		android:layout_alignParentTop="true"
 		android:padding="1dp"
 		android:scaleType="fitCenter"
-		android:src="@drawable/ic_drug_pill" />
+		android:src="@drawable/ic_drug_tablet_light" />
 
 	<at.caspase.rxdroid.DoseView
 		android:id="@+id/dose_view"

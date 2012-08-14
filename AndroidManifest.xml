@@ -9,10 +9,13 @@
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 		
 	<application android:icon="@drawable/ic_launcher" 
-	    android:label="@string/app_name">
+	    android:label="@string/app_name"
+	    android:theme="@style/Theme.Light"
+	>
 	
 		<activity android:name=".LoaderActivity"
 			android:label="@string/app_name"
+			android:theme="@style/Theme.Light"
 		>
 		
 			<intent-filter>
@@ -29,13 +32,15 @@
 				
 		<activity android:name=".DrugListActivity"
 		    android:exported="false"
-		    android:screenOrientation="nosensor" android:theme="@style/Theme"
+		    android:screenOrientation="nosensor"
+		    android:theme="@style/Theme.Light"
 		/>
 
 		<activity android:name=".DrugEditActivity"
 		    android:exported="false"
 		    android:windowSoftInputMode="adjustResize"
 		    android:configChanges="orientation|screenSize|keyboardHidden"
+			android:theme="@style/Theme.Light"
 		>	    
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
@@ -49,6 +54,7 @@
 		<activity android:name=".PreferencesActivity"
 		    android:exported="false"
 		    android:windowSoftInputMode="adjustPan"
+			android:theme="@style/Theme.Light"
 		>
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />

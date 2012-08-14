@@ -219,6 +219,19 @@ public final class Database
 		delete(entry, 0);
 	}
 
+	public static <T extends Entry> T find(Class<T> clazz, int id) {
+		return Entries.findInCollectionById(getCached(clazz), id);
+	}
+
+	public static <T extends Entry> T get(Class<T> clazz, int id)
+	{
+		final T t = find(clazz, id);
+		if(t == null)
+			throw new NoSuchElementException();
+
+		return t;
+	}
+
 	public static synchronized <T extends Entry> List<T> getAll(Class<T> clazz)
 	{
 		return new LinkedList<T>(getCached(clazz));

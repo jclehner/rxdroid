@@ -46,7 +46,7 @@
 							
 		android:scaleType="fitCenter"
 		android:padding="1dp"
-		android:src="@drawable/ic_drug_pill"
+		android:src="@drawable/ic_drug_tablet_dark"
 	/>
   
   	<at.caspase.rxdroid.widget.Rot13TextView android:id="@id/drug_name"

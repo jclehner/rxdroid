@@ -233,7 +233,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		Drug drug = null;
 
-		mWrapper = new DrugWrapper(getApplicationContext());
+		mWrapper = new DrugWrapper(this);
 		mFocusOnCurrentSupply = false;
 
 		if(Intent.ACTION_EDIT.equals(action))

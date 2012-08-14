@@ -27,7 +27,6 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:layout_gravity="center"
-	style="@style/DarkListElementBackgroundColor"
 >	
 		<android.support.v4.view.ViewPager android:id="@+id/drug_list_pager"
 			android:layout_width="fill_parent"

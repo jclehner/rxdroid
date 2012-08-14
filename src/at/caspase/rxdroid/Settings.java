@@ -329,6 +329,12 @@ public class Settings
 		return name;
 	}
 
+	public boolean isDarkThemeActive()
+	{
+		// FIXME stub
+		return true;
+	}
+
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;
 	private static final int FLAG_DONT_CORRECT_TIME = 2;
 

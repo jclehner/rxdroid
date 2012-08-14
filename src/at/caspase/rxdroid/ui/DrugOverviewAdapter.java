@@ -91,8 +91,8 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		//holder.name.setScramblingEnabled(true);
 		holder.name.setText(drug.getName());
 		holder.name.setScramblingEnabled(Settings.instance().getBoolean("privacy_scramble_names", false));
-
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
+
 		holder.icon.setImageResource(drug.getFormResourceId());
 
 		final int visibility;

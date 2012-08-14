@@ -1,7 +1,7 @@
 #!/bin/bash
 
 readonly PKG="at.caspase.rxdroid"
-readonly DTEMP="/mnt/sdcard/"
+readonly DTEMP="/dev/"
 readonly MISC="scripts/misc/"
 
 DEBUG=0

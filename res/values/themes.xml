@@ -23,8 +23,18 @@
 -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-	<style name="Theme" parent="@android:style/Theme.Black" />
-	<style name="Theme.Dialog" parent="@android:style/Theme.Dialog" />
+	
+	<style name="MyTheme" parent="@style/Theme.Light" />
+	<style name="MyTheme.Dialog" parent="@style/Theme.Light.Dialog" />
+	
+	<style name="Theme.Dark" parent="@android:style/Theme.Black" />
+	<style name="Theme.Dark.Dialog" parent="@android:style/Theme.Dialog" />
+	
+	<style name="Theme.Light" parent="@android:style/Theme.Light" />
+	<style name="Theme.Light.Dialog" parent="@android:style/Theme.Dialog" />
+		
+	
+	
 	
 	<style name="LightListElementBackgroundColor">
 	    <item name="android:background">@color/background_listview_element_light</item>
