@@ -244,6 +244,43 @@ public final class Database
 		return getCached(clazz).size();
 	}
 
+	/*public static <E extends Entry> void rebuild()
+	{
+		final Timer t = new Timer();
+		final ConnectionSource cs = sHelper.getConnectionSource();
+
+		int entryCount = 0;
+
+		try
+		{
+			for(Class<?> clazz : CLASSES)
+			{
+				TableUtils.dropTable(cs, clazz, false);
+				TableUtils.createTable(cs, clazz);
+
+				for(Entry entry : sCache.get(clazz))
+				{
+					final Entry tmp = (Entry) Reflect.newInstance(clazz);
+					Entry.copy(tmp, entry);
+					tmp.id = 0;
+					createWithoutMagic(entry);
+
+					++entryCount;
+				}
+			}
+		}
+		catch(SQLException e)
+		{
+			throw new DatabaseError(DatabaseError.E_GENERAL, e);
+		}
+
+		sCache.clear();
+		sIsLoaded = false;
+		init();
+
+		Log.i(TAG, "Database rebuilt (" + entryCount + " entries in " + CLASSES.length + " tables): " + t);
+	}*/
+
 	static synchronized <T extends Entry> List<T> getCached(Class<T> clazz)
 	{
 		if(!sCache.containsKey(clazz))
@@ -268,6 +305,13 @@ public final class Database
 		@SuppressWarnings("unchecked")
 		List<T> cached = (List<T>) sCache.get(clazz);
 		return cached;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <E extends Entry> void createWithoutMagic(E entry) throws SQLException
+	{
+		final Dao<E, Integer> dao = (Dao<E, Integer>) getDaoChecked(entry.getClass());
+		dao.create(entry);
 	}
 
 	public static void generateJavaSourceForDbUpgrade()
@@ -451,49 +495,53 @@ public final class Database
 		final Thread th = new Thread(new Runnable() {
 
 			@Override
-			public void run()
-			{
-				Exception ex;
-
-				try
-				{
-					final Method m = dao.getClass().getMethod(methodName, Object.class);
-					final Timer t = new Timer();
-					m.invoke(dao, entry);
-					Log.i(TAG, "dao." + methodName + ": " + t);
-					return;
-				}
-				catch(IllegalArgumentException e)
-				{
-					ex = e;
-					// handled at end of function
-				}
-				catch(IllegalAccessException e)
-				{
-					ex = e;
-					// handled at end of function
-				}
-				catch(InvocationTargetException e)
-				{
-					ex = e;
-					// handled at end of function
-				}
-				catch(SecurityException e)
-				{
-					ex = e;
-					// handled at end of function
-				}
-				catch(NoSuchMethodException e)
-				{
-					ex = e;
-					// handled at end of function
-				}
-
-				throw new WrappedCheckedException("Failed to run DAO method " + methodName, ex);
+			public void run() {
+				runDaoMethod(dao, methodName, entry);
 			}
 		});
 
 		th.start();
+	}
+
+	private static <E extends Entry, ID> void runDaoMethod(final Dao<E, ID> dao, final String methodName, final E entry)
+	{
+		Exception ex;
+
+		try
+		{
+			final Method m = dao.getClass().getMethod(methodName, Object.class);
+			final Timer t = new Timer();
+			m.invoke(dao, entry);
+			Log.i(TAG, "dao." + methodName + ": " + t);
+			return;
+		}
+		catch(IllegalArgumentException e)
+		{
+			ex = e;
+			// handled at end of function
+		}
+		catch(IllegalAccessException e)
+		{
+			ex = e;
+			// handled at end of function
+		}
+		catch(InvocationTargetException e)
+		{
+			ex = e;
+			// handled at end of function
+		}
+		catch(SecurityException e)
+		{
+			ex = e;
+			// handled at end of function
+		}
+		catch(NoSuchMethodException e)
+		{
+			ex = e;
+			// handled at end of function
+		}
+
+		throw new WrappedCheckedException("Failed to run DAO method " + methodName, ex);
 	}
 
 	private static<T> List<T> queryForAll(Class<T> clazz)
