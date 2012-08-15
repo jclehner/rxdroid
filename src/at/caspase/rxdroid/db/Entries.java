@@ -36,6 +36,10 @@ public final class Entries
 {
 	private static final String TAG = Entries.class.getName();
 
+	private static final String[] TIME_NAMES = {
+		"MORNING", "NOON", "EVENING", "NIGHT"
+	};
+
 	/*
 	private static final List<Intake> sConsolidatedIntakes = new ArrayList<Intake>();
 
@@ -195,6 +199,10 @@ public final class Entries
 		}
 
 		return true;
+	}
+
+	public static String getDoseTimeString(int doseTime) {
+		return TIME_NAMES[doseTime];
 	}
 
 	private static double getDailyDose(Drug drug)

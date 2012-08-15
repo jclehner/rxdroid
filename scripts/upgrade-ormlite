@@ -23,11 +23,13 @@ echo "Old version is $oldversion"
 
 for P in $PACKAGES; do
 	base="$P-$1"
-	jar="$base.jar"
-	#javadoc="$base-javadoc.jar"
+	library="$base.jar"
+	javadoc="$base-javadoc.jar"
 
-	run wget -nv "$ORMLITE_FETCHURL/$1/$jar" -O libs/$jar 
-	run svn add libs/$jar
+	for f in $library $javadoc; do
+		run wget -nv "$ORMLITE_FETCHURL/$1/$f" -O libs/$f
+		run svn add libs/$f
+	done
 
 	run sed -i -e "s/$P-$oldversion/$base/" .classpath
 
