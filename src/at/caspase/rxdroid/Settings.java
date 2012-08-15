@@ -31,6 +31,7 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
@@ -78,6 +79,15 @@ public class Settings
 			defaults ^= Notification.DEFAULT_VIBRATE;
 
 		return defaults;
+	}
+
+	public boolean hasLowSupplies(Drug drug)
+	{
+		if(!drug.isActive() || drug.getRefillSize() == 0 || drug.hasNoDoses())
+			return false;
+
+		final int minSupplyDays = Integer.parseInt(sSharedPrefs.getString("num_min_supply_days", "10"), 10);
+		return Entries.getSupplyDaysLeftForDrug(drug, null) < minSupplyDays;
 	}
 
 	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {

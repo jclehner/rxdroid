@@ -28,6 +28,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -68,10 +69,8 @@ public class LoaderActivity extends Activity implements OnClickListener
 		finish();
 	}
 
-	private void loadDatabaseAndLaunchMainActivity()
-	{
-		if(loadDatabase())
-			launchMainActivity();
+	private void loadDatabaseAndLaunchMainActivity() {
+		new DatabaseIntializerTask().execute((Void) null);
 	}
 
 	private boolean loadDatabase()
@@ -151,5 +150,22 @@ public class LoaderActivity extends Activity implements OnClickListener
 		startActivity(intent);
 
 		finish();
+	}
+
+	private class DatabaseIntializerTask extends AsyncTask<Void, Void, Boolean>
+	{
+
+		@Override
+		protected Boolean doInBackground(Void... params)
+		{
+			return loadDatabase();
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result)
+		{
+			if(result)
+				launchMainActivity();
+		}
 	}
 }

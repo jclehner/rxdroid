@@ -23,6 +23,6 @@
 -->
 
 <resources>
-	<color name="theme_dark">#0099cc</color>
-	<color name="theme_light">#33b5e5</color>
+	<color name="active_text_light">#0099cc</color>
+	<color name="active_text_dark">#33b5e5</color>
 </resources>

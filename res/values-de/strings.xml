@@ -37,11 +37,11 @@
     
     <string name="_msg_new_notification">Neue Benachrichtigung</string>
     <string name="_title_notifications">RxDroid</string>
-    <string name="_msg_doses_fp">Einnahmen: %1$d vergessen, %2$d ausstehend.</string>
-    <string name="_msg_doses_f">Einnahmen: %1$d vergessen.</string>
-    <string name="_msg_doses_p">Einnahmen: %1$d ausstehend.</string>
-    <string name="_msg_low_supply_single">Niedriger Vorrat: %1$s.</string>
-    <string name="_msg_low_supply_multiple">Niedrige Vorräte: %1$s und %2$d andere(s).</string>
+    <string name="_msg_doses_fp">%1$d vergessen, %2$d ausstehend.</string>
+    <string name="_msg_doses_f">%1$d vergessen.</string>
+    <string name="_msg_doses_p">%1$d ausstehend.</string>
+    <string name="_msg_low_supply_single">%1$s</string>
+    <string name="_msg_low_supply_multiple">%1$s und %2$d andere(s).</string>
     
 	<string name="_msg_constraints_ab">Wähle eine Zeit zwischen %1$s und %2$s.</string>
 	<string name="_msg_constraints_a">Wähle eine Zeit nach %1$s.</string>
@@ -76,7 +76,7 @@
     
     <string name="_title_pref_notification_methods">Benachrichtigungsmethoden</string>
     
-    <string name="_title_min_supply_days">Niedrige Vorräte</string>
+    <string name="_title_min_supply_days">Vorrat niedrig</string>
     <string name="_summary_min_supply_days">Eine Benachrichtigung anzeigen, wenn der Vorrat eines Medikaments für weniger als %1$s
     	Tag(e) ausreicht</string>
     
@@ -199,7 +199,7 @@
 	<string name="_msg_no_drugs_v11">Drücke den +-Button in der Aktionsleiste, um ein Medikament hinzuzufügen.</string>
 	<string name="_summary_scramble_names">Namen von Medikamenten unkenntlich machen, um die Privatsphäre zu schützen.</string>
 	<string name="_title_21_days_on_7_days_off">7-tägige Pause alle 21 Tage</string>
-	<string name="_title_begin">Anfang</string>
+	<string name="_title_begin">Beginn</string>
 	<string name="_title_end">Ende</string>
 	<string name="_title_evening">Abend</string>
 	<string name="_title_morning">Morgen</string>
@@ -209,7 +209,9 @@
 	<string name="_title_notification_low_supplies">Niedrige Vorräte</string>
 	<string name="_title_scramble_names">Unkenntliche Namen</string>
 	
-	
+	<string name="_title_repetition_origin">Anfangsdatum</string>
+	<string name="_title_select_date">Datum auswählen</string>
+		
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.

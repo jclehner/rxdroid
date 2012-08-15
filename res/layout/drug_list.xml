@@ -45,7 +45,7 @@
 			android:textColor="#000000"
 			android:gravity="center"			
 			android:clickable="true"
-			android:background="@color/theme_dark"
+			android:background="@color/active_text_light"
 			style="@style/TextLarge"
 		/>	
 		 <!-- 

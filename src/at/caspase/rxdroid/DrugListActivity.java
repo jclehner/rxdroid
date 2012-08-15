@@ -44,17 +44,20 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.SpannableString;
 import android.text.format.DateFormat;
+import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -76,9 +79,10 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	private static final String TAG = DrugListActivity.class.getName();
 	private static final boolean LOGV = false;
 
+	private static final int MENU_SELECT_DATE = 1;
 	private static final int MENU_ADD = 0;
-	private static final int MENU_PREFERENCES = 1;
-	private static final int MENU_TOGGLE_FILTERING = 2;
+	private static final int MENU_PREFERENCES = 2;
+	private static final int MENU_TOGGLE_FILTERING = 3;
 
 	private static final int CMENU_TOGGLE_INTAKE = 0;
 	// public static final int CMENU_CHANGE_DOSE = 1;
@@ -105,10 +109,15 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	private boolean mIsShowing = false;
 
+	@TargetApi(11)
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		setProgressBarIndeterminateVisibility(true);
+		setProgressBarIndeterminate(true);
 
 		setContentView(R.layout.drug_list);
 
@@ -121,21 +130,15 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		GlobalContext.set(getApplicationContext());
 		Database.init();
 
-		mTextDate.setOnLongClickListener(this);
-		mTextDate.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v)
-			{
-				final Date activeDate = Settings.instance().getActiveDate();
-				setDate(activeDate, PAGER_INIT | PAGER_SCROLL);
-			}
-		});
+		mTextDate.setOnLongClickListener(mDateClickListener);
+		mTextDate.setOnClickListener(mDateClickListener);
 
 		// FIXME hack
-		mTextDate.setVisibility(Version.SDK_IS_PRE_HONEYCOMB ? View.VISIBLE : View.GONE);
+		if(!Version.SDK_IS_PRE_HONEYCOMB)
+			mTextDate.setVisibility(View.GONE);
 
 		mPager.setOnPageChangeListener(mPageListener);
+		mPager.setOffscreenPageLimit(1);
 
 		Intent intent = getIntent();
 		if(intent != null)
@@ -147,8 +150,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			mDate = Settings.instance().getActiveDate();
 		}
 
-
-
 		startNotificationService();
 
 		Database.registerOnChangedListener(mDatabaseListener);
@@ -158,28 +159,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	protected void onResume()
 	{
 		super.onResume();
-
 		mIsShowing = true;
-
-		final boolean wasStartedFromNotification;
-
-		Intent intent = getIntent();
-		if(intent != null)
-			wasStartedFromNotification = intent.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION, false);
-		else
-			wasStartedFromNotification = false;
-
-		//if(wasStartedFromNotification)
-		//{
-			//int snoozeType = Settings.instance().getListPreferenceValueIndex("snooze_type", -1);
-			//if(snoozeType == NotificationReceiver.ALARM_MODE_SNOOZE)
-			//{
-			//	NotificationService.snooze(this);
-			//	Toast.makeText(this, R.string._toast_snoozing, Toast.LENGTH_SHORT).show();
-			//}
-		//}
-
-
 		setDate(mDate, PAGER_INIT);
 	}
 
@@ -205,13 +185,22 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add(0, MENU_ADD, 0, R.string._title_add).setIcon(android.R.drawable.ic_menu_add);
+
+		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		{
+			menu.add(0, MENU_SELECT_DATE, 0, R.string._title_select_date)
+				.setIcon(R.drawable.ic_menu_calendar_light)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+			;
+		}
+
 		menu.add(0, MENU_PREFERENCES, 0, R.string._title_preferences).setIcon(android.R.drawable.ic_menu_preferences);
 		menu.add(0, MENU_TOGGLE_FILTERING, 0, R.string._title_toggle_filtering).setIcon(android.R.drawable.ic_menu_view);
 
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
 		{
-			menu.getItem(MENU_ADD).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			menu.getItem(MENU_PREFERENCES).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			menu.getItem(MENU_ADD).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			menu.getItem(MENU_PREFERENCES).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			menu.getItem(MENU_TOGGLE_FILTERING).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 		}
 
@@ -223,6 +212,16 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		switch(item.getItemId())
 		{
+			case MENU_SELECT_DATE:
+			{
+				if(mDate.equals(Settings.instance().getActiveDate()))
+					mDateClickListener.onLongClick(null);
+				else
+					mDateClickListener.onClick(null);
+
+				return true;
+			}
+
 			case MENU_ADD:
 			{
 				Intent intent = new Intent(Intent.ACTION_INSERT);
@@ -338,16 +337,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		if(view.getId() == R.id.text_date)
 		{
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(mDate);
 
-			final int year = cal.get(Calendar.YEAR);
-			final int month = cal.get(Calendar.MONTH);
-			final int day = cal.get(Calendar.DAY_OF_MONTH);
-
-			DatePickerDialog dialog = new DatePickerDialog(this, this, year, month, day);
-			dialog.show();
-			return true;
 		}
 		return false;
 	}
@@ -367,42 +357,16 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public View makeView(int offset)
 	{
-		/*final TextView textView = new TextView(getApplication());
-		textView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-		textView.setGravity(Gravity.CENTER);
-
-		final List<Drug> drugs = Database.getAll(Drug.class);
-		if(drugs.isEmpty())
+		if(offset <= -(InfiniteViewPagerAdapter.MAX/2))
 		{
-			textView.setText(getString(R.string._msg_empty_list_text, getString(R.string._title_add)));
-			return textView;
+			Log.i(TAG, "makeView: returning stub for offset=" + offset);
+			return new ViewStub(this);
 		}
 
-		Collections.sort(drugs);
-		final ListView listView = new ListView(getApplication());
-		//listView.setDividerHeight(0);
-		//listView.setDivider(Color.)
+		Log.d(TAG, "makeView: offset=" + offset);
 
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(mDate);
-
-		// mSwipeDirection is zero when we're initializing the first 3 pages
-		// of the view pager (-1, 0, +1).
-
-		if(mSwipeDirection == 0)
-			cal.add(Calendar.DAY_OF_MONTH, offset);
-		else
-			cal.add(Calendar.DAY_OF_MONTH, mSwipeDirection < 0 ? -1 : 1);
-
-		updateListAdapter(listView, cal.getTime(), drugs);
-
-		if(listView.getAdapter().getCount() == 0)
-		{
-			textView.setText(getString(R.string._msg_no_doses_on_this_day));
-			return textView;
-		}
-
-		return listView;*/
+		if(offset == 1)
+			setProgressBarIndeterminateVisibility(false);
 
 		final View v = getLayoutInflater().inflate(R.layout.drug_list_fragment, null);
 		final ListView listView = (ListView) v.findViewById(android.R.id.list);
@@ -446,7 +410,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 	}
 
-	public void onNotificationIconClick(View view)
+	public void onMissedIndicatorClicked(View view)
 	{
 		final Drug drug = (Drug) view.getTag();
 		final Calendar cal = DateTime.calendarFromDate(mDate);
@@ -459,6 +423,11 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		Toast.makeText(getApplicationContext(), R.string._toast_drug_notification_icon, Toast.LENGTH_SHORT).show();
 
 		setDate(cal.getTime(), PAGER_INIT | PAGER_SCROLL);
+	}
+
+	public void onLowSupplyIndicatorClicked(View view)
+	{
+		// FIXME stub
 	}
 
 	private static final int PAGER_SCROLL = 1;
@@ -563,13 +532,16 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		if(mDate.equals(DateTime.todayDate()))
 			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
 
-		mTextDate.setText(dateString);
-
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
 		{
 			ActionBar ab = getActionBar();
+			dateString.setSpan(new RelativeSizeSpan(0.75f), 0, dateString.length(), 0);
 			ab.setSubtitle(dateString);
+			//ab.setTitle(dateString);
+
 		}
+		else
+			mTextDate.setText(dateString);
 	}
 
 	private class DrugFilter implements CollectionUtils.Filter<Drug>
@@ -606,6 +578,33 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			return result;
 		}
 	}
+
+	interface OnClickAndLongClickListener extends OnClickListener, OnLongClickListener {};
+
+	private final OnClickAndLongClickListener mDateClickListener = new OnClickAndLongClickListener() {
+
+		@Override
+		public boolean onLongClick(View v)
+		{
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(mDate);
+
+			final int year = cal.get(Calendar.YEAR);
+			final int month = cal.get(Calendar.MONTH);
+			final int day = cal.get(Calendar.DAY_OF_MONTH);
+
+			DatePickerDialog dialog = new DatePickerDialog(DrugListActivity.this, DrugListActivity.this, year, month, day);
+			dialog.show();
+			return true;
+		}
+
+		@Override
+		public void onClick(View v)
+		{
+			final Date activeDate = Settings.instance().getActiveDate();
+			setDate(activeDate, PAGER_INIT | PAGER_SCROLL);
+		}
+	};
 
 	private final OnPageChangeListener mPageListener = new OnPageChangeListener() {
 

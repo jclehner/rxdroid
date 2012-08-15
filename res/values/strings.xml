@@ -159,7 +159,6 @@
 	<string name="_title_save_chanes">Save changes</string>
 	<string name="_msg_save_drug_changes">Do you want to save changes made to this drug?</string>
 	<string name="_msg_every_n_days_distance">Days between each repetition.</string>
-	<string name="_msg_repetition_origin">Pick a starting date.</string>
 	
 	<string name="_title_intake_schedule">Intake schedule</string>
 	<string name="_title_repeat">Repeat</string>
@@ -225,6 +224,10 @@
     
 	<string name="_title_loading">Loading&#8230;</string>
 	
+	<string name="_title_select_date">Select date</string>
+	
+	<string name="_title_repetition_origin">Starting date</string>
+			
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 

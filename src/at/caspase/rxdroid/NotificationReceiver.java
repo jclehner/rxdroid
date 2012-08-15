@@ -32,9 +32,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
@@ -164,6 +162,9 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		builder.setTitle1(R.string._title_notification_doses);
 		builder.setTitle2(R.string._title_notification_low_supplies);
+
+		builder.setIcon1(R.drawable.ic_stat_normal);
+		builder.setIcon2(R.drawable.ic_stat_exclamation);
 
 		if(pendingCount != 0 && forgottenCount != 0)
 			builder.setMessage1(R.string._msg_doses_fp, forgottenCount, pendingCount);
@@ -295,29 +296,11 @@ public class NotificationReceiver extends BroadcastReceiver
 	private String getLowSupplyMessage(Date date, int activeDoseTime)
 	{
 		final List<Drug> drugsWithLowSupply = new ArrayList<Drug>();
-		final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
-		final int minDays = Integer.parseInt(sp.getString("num_min_supply_days", "7"), 10);
 
 		for(Drug drug : mAllDrugs)
 		{
-			// Refill size of zero means ignore supply values
-			if(!drug.isActive() || drug.getRefillSize() == 0)
-				continue;
-
-			double dailyDose = 0;
-
-			for(int doseTime = 0; doseTime != Drug.TIME_INVALID; ++doseTime)
-			{
-				final Fraction dose = drug.getDose(doseTime, date);
-				if(dose.compareTo(0) != 0)
-					dailyDose += dose.doubleValue();
-			}
-
-			if(dailyDose != 0)
-			{
-				if(Double.compare(Entries.getSupplyDaysLeftForDrug(drug, null), minDays) == -1)
-					drugsWithLowSupply.add(drug);
-			}
+			if(Settings.instance().hasLowSupplies(drug))
+				drugsWithLowSupply.add(drug);
 		}
 
 		String message = null;
@@ -351,56 +334,4 @@ public class NotificationReceiver extends BroadcastReceiver
 		intent.putExtra(NotificationReceiver.EXTRA_SILENT, silent);
 		context.sendBroadcast(intent);
 	}
-
-
-	/*static
-	{
-		final Runnable r = new Runnable() {
-
-			@Override
-			public void run()
-			{
-				while(GlobalContext.get(true) == null)
-				{
-					Log.i(TAG, "Waiting for context...");
-
-					try
-					{
-						wait(100);
-					}
-					catch (InterruptedException e)
-					{
-						Log.e(TAG, "Thread while waiting for context");
-						return;
-					}
-				}
-
-				Log.i(TAG, "Got context, registering database listener");
-
-				NotificationReceiver.sendBroadcastToSelf(false);
-
-				Database.registerOnChangedListener(new Database.OnChangeListener() {
-
-					@Override
-					public void onEntryUpdated(Entry entry, int flags) {
-						NotificationReceiver.sendBroadcastToSelf(entry instanceof Intake);
-					}
-
-					@Override
-					public void onEntryDeleted(Entry entry, int flags) {
-						NotificationReceiver.sendBroadcastToSelf(false);
-					}
-
-					@Override
-					public void onEntryCreated(Entry entry, int flags) {
-						NotificationReceiver.sendBroadcastToSelf(false);
-					}
-				});
-			}
-		};
-
-		final Thread t = new Thread(r);
-		t.setName("DatabaseWatcherRegistrar");
-		t.start();
-	}*/
 }

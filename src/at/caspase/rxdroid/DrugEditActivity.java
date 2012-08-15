@@ -733,7 +733,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 			final DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, onDateSetListener, year, month, day);
 			datePickerDialog.setCancelable(false);
-			datePickerDialog.setMessage(mContext.getString(R.string._msg_repetition_origin));
+			datePickerDialog.setTitle(R.string._title_repetition_origin);
 			datePickerDialog.show();
 		}
 

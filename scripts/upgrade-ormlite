@@ -9,7 +9,7 @@ PACKAGES="ormlite-core ormlite-android"
 
 [[ $# -lt 1 ]] && die "usage: upgrade-ormlite [new version]"
 
-if svn stat | grep -q -v -P '^\?'; then
+if svn stat | grep -q -v -P '^\?' && [[ $# -lt 2 || $2 != "nocommit" ]]; then
 	die "Local modifications found, refusing to update. Commit pending changes first!"
 fi
 
@@ -26,10 +26,10 @@ for P in $PACKAGES; do
 	library="$base.jar"
 	javadoc="$base-javadoc.jar"
 
-	for f in $library $javadoc; do
-		run wget -nv "$ORMLITE_FETCHURL/$1/$f" -O libs/$f
-		run svn add libs/$f
-	done
+	run wget -nv "$ORMLITE_FETCHURL/$1/$library" -O libs/$library
+	run svn add libs/$library
+
+	run wget -nv "$ORMLITE_FETCHURL/$1/$javadoc" -O doc/$javadoc
 
 	run sed -i -e "s/$P-$oldversion/$base/" .classpath
 

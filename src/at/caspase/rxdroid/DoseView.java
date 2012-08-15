@@ -107,13 +107,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 				setDoseTime(Drug.TIME_NIGHT);
 				break;
 		}
-
-		//setBackgroundResource(R.drawable.dose_view_background);
-
-		mDoseText.setText("0");
-
-		setClickable(true);
-		setFocusable(true);
 	}
 
 	public void setDose(Fraction dose)
@@ -212,24 +205,27 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		// A bit of a hack, but it makes the DoseView's background change much more
-		// responsive.
-
-		final int action = event.getAction() & MotionEvent.ACTION_MASK;
-
-		switch(action)
+		if(isClickable())
 		{
-			case MotionEvent.ACTION_DOWN:
-				setBackgroundResource(R.drawable.doseview_background_selected);
-				setPadding(0, 0, 0, 0);
-				break;
+			// A bit of a hack, but it makes the DoseView's background change much more
+			// responsive.
 
-			case MotionEvent.ACTION_UP:
-			case MotionEvent.ACTION_CANCEL:
-			case MotionEvent.ACTION_OUTSIDE:
-				setBackgroundResource(R.drawable.doseview_background);
-				setPadding(0, 0, 0, 0);
-				break;
+			final int action = event.getAction() & MotionEvent.ACTION_MASK;
+
+			switch(action)
+			{
+				case MotionEvent.ACTION_DOWN:
+					setBackgroundResource(R.drawable.doseview_background_selected);
+					setPadding(0, 0, 0, 0);
+					break;
+
+				case MotionEvent.ACTION_UP:
+				case MotionEvent.ACTION_CANCEL:
+				case MotionEvent.ACTION_OUTSIDE:
+					setBackgroundResource(R.drawable.doseview_background);
+					setPadding(0, 0, 0, 0);
+					break;
+			}
 		}
 
 		return super.onTouchEvent(event);
@@ -380,19 +376,19 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	private void markAsTaken()
 	{
-		mIntakeStatus.setImageResource(R.drawable.ic_dose_taken);
+		mIntakeStatus.setImageResource(R.drawable.ic_dose_taken_light);
 		mStatus = STATUS_TAKEN;
 	}
 
 	private void markAsIgnored()
 	{
-		mIntakeStatus.setImageResource(R.drawable.ic_dose_ignored);
+		mIntakeStatus.setImageResource(R.drawable.ic_dose_ignored_light);
 		mStatus = STATUS_TAKEN; // this is intentional!
 	}
 
 	private void markAsForgotten()
 	{
-		mIntakeStatus.setImageResource(R.drawable.ic_dose_forgotten);
+		mIntakeStatus.setImageResource(R.drawable.ic_dose_forgotten_light);
 		mStatus = STATUS_FORGOTTEN;
 	}
 }

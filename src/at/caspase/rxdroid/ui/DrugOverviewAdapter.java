@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.ImageView;
 import at.caspase.rxdroid.DoseView;
 import at.caspase.rxdroid.DrugListActivity;
@@ -72,8 +73,11 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 			holder.name = (Rot13TextView) v.findViewById(R.id.drug_name);
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
-			holder.notification = (ImageView) v.findViewById(R.id.drug_notification_icon);
-			holder.notification.setTag(drug);
+			holder.missedDoseIndicator = (ViewStub) v.findViewById(R.id.missed_dose_indicator);
+			holder.lowSupplyIndicator = (ViewStub) v.findViewById(R.id.low_supply_indicator);
+
+			//holder.missedDoseIndicator.setTag(drug);
+			//holder.lowSupplyIndicator.setTag(drug);
 
 			for(int i = 0; i != holder.doseViews.length; ++i)
 			{
@@ -95,14 +99,18 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		holder.icon.setImageResource(drug.getFormResourceId());
 
-		final int visibility;
+		if(DateTime.todayDate().equals(mAdapterDate))
+		{
+			if(Entries.hasMissingIntakesBeforeDate(drug, mAdapterDate))
+				holder.missedDoseIndicator.inflate().setTag(drug);
+			else
+				holder.missedDoseIndicator.setVisibility(View.GONE);
 
-		if(DateTime.todayDate().equals(mAdapterDate) && Entries.hasMissingIntakesBeforeDate(drug, mAdapterDate))
-			visibility = View.VISIBLE;
-		else
-			visibility = View.GONE;
-
-		holder.notification.setVisibility(visibility);
+			if(Settings.instance().hasLowSupplies(drug))
+				holder.lowSupplyIndicator.inflate().setTag(drug);
+			else
+				holder.lowSupplyIndicator.setVisibility(View.GONE);
+		}
 
 		for(DoseView doseView : holder.doseViews)
 		{
@@ -116,7 +124,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			final int viewCount = getCount() * 4;
 			final double timePerView = elapsed / viewCount;
 
-			Log.v(TAG, viewCount + " views created in " + elapsed + "s (" + timePerView + "s per view)");
+			Log.v(TAG, mAdapterDate + ": " + viewCount + " views created in " + elapsed + "s (" + timePerView + "s per view)");
 		}
 
 		return v;

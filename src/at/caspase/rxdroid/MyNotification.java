@@ -38,10 +38,10 @@ public class MyNotification
 	private String mTitle2;
 	private String mMessage1;
 	private String mMessage2;
+	private int mIcon1 = R.drawable.ic_stat_normal;
+	private int mIcon2;
 
 	private int mDefaults = Notification.DEFAULT_LIGHTS;
-
-	private int mIconResId = R.drawable.ic_stat_pill;
 
 	private boolean mDoAutoCancel = false;
 	private boolean mForceUpdate = false;
@@ -116,9 +116,15 @@ public class MyNotification
 			return setMessage2(mContext.getString(resId, formatArgs));
 		}
 
-		public Builder setIcon(int iconResId)
+		public Builder setIcon1(int iconResId)
 		{
-			mNotification.mIconResId = iconResId;
+			mNotification.mIcon1 = iconResId;
+			return this;
+		}
+
+		public Builder setIcon2(int iconResId)
+		{
+			mNotification.mIcon2 = iconResId;
 			return this;
 		}
 
@@ -215,7 +221,7 @@ public class MyNotification
 			notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
 
 		notification.tickerText = mTickerText;
-		notification.icon = mIconResId;
+		notification.icon = getIcon();
 
 		final String message = getMessage();
 		notification.setLatestEventInfo(mContext, getTitle(), message, mContentIntent);
@@ -250,12 +256,10 @@ public class MyNotification
 		return mMessage1 != null ? mMessage1 : mMessage2;
 	}
 
-	public String getMessage1() {
-		return mMessage1;
-	}
-
-	public String getMessage2() {
-		return mMessage2;
+	public int getIcon()
+	{
+		// The use of mMessage2 is intentional here!
+		return mMessage2 != null ? mIcon2 : mIcon1;
 	}
 
 	private MyNotification(Context context) {

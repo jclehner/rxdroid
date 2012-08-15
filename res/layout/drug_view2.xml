@@ -65,9 +65,11 @@
   		android:clickable="true"
   		android:onClick="onDrugNameClick"
   		
-  		android:nextFocusDown="@+id/morning"
+  		android:textColor="@color/clickable_text_light"
+  		
+  		style="@android:style/TextAppearance.Large"
   		  		
-  		style="@style/TextLarge"
+  		android:nextFocusDown="@+id/morning"
 	/>
 	
 	<!-- second line: dose views android:layout_alignBottom="@id/drug_icon" -->
@@ -118,20 +120,24 @@
   		android:onClick="onDoseViewClick"
   	/>
   	
-  	<ImageView android:id="@+id/drug_notification_icon" 
-  		android:layout_width="50dp"
+  	<ViewStub android:id="@+id/missed_dose_indicator" android:inflatedId="@+id/missed_dose_indicator_inflated"
+  		
+  		android:layout_width="30dp"
   		android:layout_height="30dp"
-  		
   		android:layout_alignParentRight="true"
-  		android:layout_alignBottom="@id/drug_name"
+  		android:layout_alignParentTop="true"
   		
-  		android:padding="3dp"
-  		android:scaleType="fitCenter"  		
-  		android:src="@android:drawable/ic_dialog_alert"
-  		android:clickable="true"
-  		android:onClick="onNotificationIconClick"
+  		android:layout="@layout/stub_missed_dose_indicator"
+   	/>
+  	<!-- android:layout_alignBottom="@id/drug_name" -->
+  	
+  	<ViewStub android:id="@+id/low_supply_indicator"
   		
-  		android:visibility="visible"
+  		android:layout="@layout/stub_low_supply_indicator"
+  		android:layout_width="30dp"
+  		android:layout_height="30dp"
+  		android:layout_alignParentRight="true"
+  		android:layout_below="@id/missed_dose_indicator_inflated"
   	/>
     
 </RelativeLayout>

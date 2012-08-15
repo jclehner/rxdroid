@@ -171,6 +171,6 @@ public class Intake extends Entry
 		final Drug drug = getDrug();
 		final String drugName = drug == null ? "<deleted>" : drug.getName();
 
-		return drugName + ": " + date + " " + Drug.getDoseTimeString(doseTime) + ", " + dose;
+		return drugName + ": " + date + " " + Entries.getDoseTimeString(doseTime) + ", " + dose;
 	}
 }

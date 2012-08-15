@@ -23,8 +23,8 @@
 -->
 
 <resources>
-	<color name="theme_dark">#ff8800</color>
-	<color name="theme_light">#ffbb33</color>
+	<color name="active_text_light">#ff8800</color>
+	<color name="active_text_dark">#ffbb33</color>
 	<color name="background_listview_element_light">#dddddd</color>
 	<color name="background_listview_element_dark">#222222</color>
 	<color name="list_divider_dark">#1b1b1b</color>

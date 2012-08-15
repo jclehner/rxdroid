@@ -65,7 +65,7 @@ public final class Schedule extends Entry
 	public static abstract class Repetiton implements Serializable
 	{
 		public abstract boolean hasDoseOnDate(Date date);
-		public abstract Date getNextDateWithDose(Date date);
+		public abstract Date getNextDoseDate(Date date);
 		public abstract int getSupplyDaysLeft(Fraction supplyLeft);
 		public abstract Class<? extends Activity> getPreferenceActivityClass();
 	}

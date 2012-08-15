@@ -28,6 +28,7 @@ import java.util.List;
 import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -91,7 +92,8 @@ public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 		Rot13TextView name;
 		ImageView icon;
 		DoseView[] doseViews = new DoseView[4];
-		ImageView notification;
+		ViewStub missedDoseIndicator;
+		ViewStub lowSupplyIndicator;
 		TextView info1;
 		TextView info2;
 	}

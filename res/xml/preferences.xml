@@ -127,12 +127,15 @@
 		android:title="@string/_title_prefscreen_notifications"
 		android:summary="@string/_summary_prefscreen_notifications"
 		android:icon="@drawable/android:ic_menu_info_details"
-	>		
+	>
+		<!--  
+				
 		<ListPreference android:key="alarm_mode"
 			android:title="@string/_title_alarm_mode"
 			android:summary="@string/_summary_alarm_mode_normal"
 			android:entries="@array/alarm_modes"
 			android:defaultValue="0"
+			android:enabled="false"
 		/>		
 		
 		<at.caspase.rxdroid.preferences.TimePreference android:key="alarm_timeout"
@@ -140,6 +143,8 @@
 			android:defaultValue="@string/pref_default_alarm_timeout"
 			android:enabled="false"
 		/>	
+		
+		-->
 		
 		<EditTextPreference android:key="num_min_supply_days"
 			android:title="@string/_title_min_supply_days"

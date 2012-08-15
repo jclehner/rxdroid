@@ -423,7 +423,7 @@ public final class Database
 		final Dao<E, Integer> dao = getDaoChecked(clazz);
 		runDaoMethodInThread(dao, methodName, entry);
 
-		final String callbackName = "CALLBACK_" + methodName.toUpperCase(Locale.US);
+		final String callbackName = "CALLBACK_" + methodName.toUpperCase(Locale.US) + "D";
 		final Field callbackField = Reflect.getDeclaredField(clazz, callbackName);
 		if(callbackField != null)
 		{

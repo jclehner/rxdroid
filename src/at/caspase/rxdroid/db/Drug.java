@@ -26,7 +26,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
-import android.util.Log;
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.util.CollectionUtils;
@@ -633,21 +632,25 @@ public class Drug extends Entry implements Comparable<Drug>
 		return (repeatArg & 1 << weekday) != 0;
 	}
 
-	public static final Callback<Drug> CALLBACK_DELETE = new Callback<Drug>() {
+	public static final Callback<Drug> CALLBACK_DELETED = new Callback<Drug>() {
 
 		@Override
 		public void call(Drug drug)
 		{
-			Log.d(TAG, "CALLBACK_DELETE.call()");
-
 			for(Intake intake : Database.getAll(Intake.class))
 			{
 				if(intake.getDrug() == null || intake.getDrugId() == drug.id)
-				{
-					Log.d(TAG, "  Deleteing intake" + intake);
 					Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
-				}
 			}
+		}
+	};
+
+	public static final Callback<Drug> CALLBACK_ALL_CACHED = new Callback<Drug>() {
+
+		@Override
+		public void call(Drug entry)
+		{
+
 		}
 	};
 }

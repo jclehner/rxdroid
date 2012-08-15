@@ -79,7 +79,6 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		if(p != null)
 		{
 			String summary = Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION;
-			//String apkModTime = new Date(new File(getP))
 
 			try
 			{
@@ -125,6 +124,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 			});
 
 			updateAlarmModePreferenceSummary(p, null);
+			Util.populateListPreferenceEntryValues(p);
 		}
 
 		p = findPreference("debug_generate_db_source");
@@ -164,12 +164,6 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 				}
 			});
 		}
-
-
-
-
-
-		Util.populateListPreferenceEntryValues(findPreference("alarm_mode"));
 
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
 		{

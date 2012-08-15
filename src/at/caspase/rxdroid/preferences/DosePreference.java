@@ -103,7 +103,7 @@ public class DosePreference extends FractionPreference
 			//mDoseView.setDrug(mDrug);
 			//mDoseView.setDoseFromDrugAndDate(date, drug)
 			mDoseView.setDose(getValue());
-			mDoseView.setOnClickListener(mViewClickListener);
+			//mDoseView.setOnClickListener(mViewClickListener);
 		}
 	}
 
