@@ -38,9 +38,9 @@ import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.caspase.rxdroid.util.Timer;
 
-public class LoaderActivity extends Activity implements OnClickListener
+public class SplashScreenActivity extends Activity implements OnClickListener
 {
-	private static final String TAG = LoaderActivity.class.getName();
+	private static final String TAG = SplashScreenActivity.class.getName();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)

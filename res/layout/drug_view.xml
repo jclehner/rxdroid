@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * Copyright (C) 2011, 2012 Joseph Lehner <joseph.c.lehner@gmail.com>
+ *
+ * This file is part of RxDroid.
+ *
+ * RxDroid is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * RxDroid is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
+-->
+
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:paddingRight="5dip"
+	
+	android:orientation="vertical"
+	
+	android:nextFocusLeft="@+id/drug_name"	
+>
+	<!-- first line: icon + name -->
+	
+	<ImageView android:id="@+id/drug_icon"
+		android:layout_width="30dp"
+		android:layout_height="30dp"
+		
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentTop="true"
+							
+		android:scaleType="fitCenter"
+		android:padding="1dp"
+		android:src="@drawable/ic_drug_tablet_dark"
+	/>
+	
+  
+  	<at.caspase.rxdroid.widget.Rot13TextView android:id="@id/drug_name"
+  		android:layout_width="wrap_content"
+  		android:layout_height="wrap_content"
+  		  		
+  		android:layout_toRightOf="@id/drug_icon"
+  		android:layout_alignParentTop="true"
+  		
+  		android:layout_marginLeft="5dp"
+  		  		  		  		
+  		android:gravity="center_vertical"
+  		android:text="Cocaine 100mg"
+  		
+  		android:focusable="true"
+  		android:clickable="true"
+  		android:onClick="onDrugNameClick"
+  		
+  		android:textColor="@color/clickable_text_light"
+  		
+  		style="@android:style/TextAppearance.Large"
+  		  		
+  		android:nextFocusDown="@+id/morning"
+	/>
+	
+	<!-- second line: dose views android:layout_alignBottom="@id/drug_icon" -->
+  	
+  	<LinearLayout android:id="@+id/dose_container"
+  		android:layout_height="wrap_content"
+  		android:layout_width="match_parent"
+  		
+  		android:layout_toRightOf="@id/drug_icon"
+  		android:layout_toLeftOf="@+id/indicators"
+  		android:layout_below="@id/drug_name"  		
+  	>  	
+  	
+	  	<at.caspase.rxdroid.DoseView android:id="@id/morning"
+	  		android:layout_height="wrap_content"
+	  		android:layout_width="0dip"
+	  		android:layout_weight="1"
+	  		
+	  		android:nextFocusLeft="@+id/noon"
+	  		
+	  		android:focusable="true"
+	  		android:onClick="onDoseViewClick"
+	  	/>	  	
+	  	
+		<include android:id="@+id/divider1" 
+	  		layout="@layout/divider" 
+	  	/>
+	  	
+	  	<at.caspase.rxdroid.DoseView android:id="@id/noon"
+	  		android:layout_height="wrap_content"
+	  		android:layout_width="0dip"
+	  		android:layout_weight="1"
+	  		
+	  		android:focusable="true"
+	  		android:onClick="onDoseViewClick"
+	  	/>
+	  	
+	  	<include android:id="@+id/divider2" 
+	  		layout="@layout/divider" 
+	  	/>
+	  	
+	  	<at.caspase.rxdroid.DoseView android:id="@+id/evening"
+	  		android:layout_height="wrap_content"
+	  		android:layout_width="0dip"
+	  		android:layout_weight="1"
+	  		
+	  		android:focusable="true"
+	  		android:onClick="onDoseViewClick"
+	  	/>
+	  	
+	  	<include android:id="@+id/divider3" 
+	  		layout="@layout/divider" 
+	  	/>
+	  	
+	  	<at.caspase.rxdroid.DoseView android:id="@+id/night"
+	  		android:layout_height="wrap_content"
+	  		android:layout_width="0dip"
+	  		android:layout_weight="1"
+	  		
+	  		android:focusable="true"
+	  		android:onClick="onDoseViewClick"
+	  	/>	  	
+	  		
+	  </LinearLayout>
+	  <LinearLayout android:id="@id/indicators"
+	  		android:layout_height="match_parent"
+	  		android:layout_width="30dip"
+	  		android:layout_alignBottom="@id/dose_container"
+	  		android:layout_alignParentRight="true"
+	  			  		 		
+	  		android:orientation="vertical"
+	  >
+	  	
+	  	
+	  		<ViewStub android:id="@+id/missed_dose_indicator"
+		  		android:layout_width="match_parent"
+		  		android:layout_height="30dp"  		
+		  		android:layout="@layout/stub_missed_dose_indicator"
+	   		/>
+		  	<!-- android:layout_alignBottom="@id/drug_name" -->
+		  	
+		  	<ViewStub android:id="@+id/low_supply_indicator"
+		  		android:layout_width="match_parent"
+		  		android:layout_height="30dp"
+		  		android:layout="@layout/stub_low_supply_indicator"
+		  	/>  		
+	  	</LinearLayout>    
+</RelativeLayout>

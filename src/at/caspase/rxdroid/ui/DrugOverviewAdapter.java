@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,17 +68,14 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		if(v == null)
 		{
-			v = mActivity.getLayoutInflater().inflate(R.layout.drug_view2, null);
+			v = mActivity.getLayoutInflater().inflate(R.layout.drug_view, null);
 
 			holder = new DoseViewHolder();
 
 			holder.name = (Rot13TextView) v.findViewById(R.id.drug_name);
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
-			holder.missedDoseIndicator = (ViewStub) v.findViewById(R.id.missed_dose_indicator);
-			holder.lowSupplyIndicator = (ViewStub) v.findViewById(R.id.low_supply_indicator);
-
-			//holder.missedDoseIndicator.setTag(drug);
-			//holder.lowSupplyIndicator.setTag(drug);
+			holder.missedDoseIndicator = v.findViewById(R.id.missed_dose_indicator);
+			holder.lowSupplyIndicator = v.findViewById(R.id.low_supply_indicator);
 
 			for(int i = 0; i != holder.doseViews.length; ++i)
 			{
@@ -85,6 +83,10 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 				holder.doseViews[i] = (DoseView) v.findViewById(doseViewId);
 				mActivity.registerForContextMenu(holder.doseViews[i]);
 			}
+
+			final int[] dividerIds = { R.id.divider1, R.id.divider2, R.id.divider3 /*, R.id.divider4*/ };
+			for(int i = 0; i != holder.dividers.length; ++i)
+				holder.dividers[i] = v.findViewById(dividerIds[i]);
 
 			v.setTag(holder);
 		}
@@ -101,21 +103,53 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		if(DateTime.todayDate().equals(mAdapterDate))
 		{
+			boolean isIndicatorIconVisible = false;
+
 			if(Entries.hasMissingIntakesBeforeDate(drug, mAdapterDate))
-				holder.missedDoseIndicator.inflate().setTag(drug);
+			{
+				if(holder.missedDoseIndicator instanceof ViewStub)
+					holder.missedDoseIndicator = ((ViewStub) holder.missedDoseIndicator).inflate();
+
+				holder.missedDoseIndicator.setTag(drug);
+				holder.missedDoseIndicator.setVisibility(View.VISIBLE);
+				isIndicatorIconVisible |= true;
+			}
 			else
 				holder.missedDoseIndicator.setVisibility(View.GONE);
 
 			if(Settings.instance().hasLowSupplies(drug))
-				holder.lowSupplyIndicator.inflate().setTag(drug);
+			{
+				if(holder.lowSupplyIndicator instanceof ViewStub)
+					holder.lowSupplyIndicator = ((ViewStub) holder.lowSupplyIndicator).inflate();
+
+				holder.lowSupplyIndicator.setTag(drug);
+				holder.lowSupplyIndicator.setVisibility(View.VISIBLE);
+				isIndicatorIconVisible |= true;
+			}
 			else
 				holder.lowSupplyIndicator.setVisibility(View.GONE);
+
+			//holder.dividers[3].setVisibility(isIndicatorIconVisible ? View.VISIBLE : View.GONE);
 		}
 
 		for(DoseView doseView : holder.doseViews)
 		{
 			if(!doseView.hasInfo(mAdapterDate, drug))
 				doseView.setDoseFromDrugAndDate(mAdapterDate, drug);
+		}
+
+
+		final int dividerVisibility;
+		if(v.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+			dividerVisibility = View.GONE;
+		else
+			dividerVisibility = View.VISIBLE;
+
+		for(int i = 0; i != holder.dividers.length; ++i)
+		{
+			final View divider = holder.dividers[i];
+			if(divider != null)
+				divider.setVisibility(dividerVisibility);
 		}
 
 		if(LOGV && position == getCount() - 1)

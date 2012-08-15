@@ -201,7 +201,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		{
 			menu.getItem(MENU_ADD).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 			menu.getItem(MENU_PREFERENCES).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			menu.getItem(MENU_TOGGLE_FILTERING).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			menu.getItem(MENU_TOGGLE_FILTERING).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		}
 
 		return super.onCreateOptionsMenu(menu);

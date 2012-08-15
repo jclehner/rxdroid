@@ -28,7 +28,6 @@ import java.util.List;
 import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -92,10 +91,11 @@ public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 		Rot13TextView name;
 		ImageView icon;
 		DoseView[] doseViews = new DoseView[4];
-		ViewStub missedDoseIndicator;
-		ViewStub lowSupplyIndicator;
+		View missedDoseIndicator;
+		View lowSupplyIndicator;
 		TextView info1;
 		TextView info2;
+		View[] dividers = new View[3];
 	}
 }
 

@@ -25,7 +25,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 	
 	<style name="LightTheme" parent="@style/Theme.Light">
-		<item name="android:textColorPrimary">@style/ClickableTextStyleLight</item>
+		<item name="textColorPrimary">@style/ClickableTextStyleLight</item>
 		
 	</style>
 	
@@ -33,8 +33,12 @@
 		<item name="android:windowAnimationStyle">@null</item>
 	</style>
 	
+	<style name="LightTheme.WipeAnimation" parent="@style/LightTheme">
+		<item name="android:windowAnimationStyle">@android:anim/slide_out_right</item>
+	</style>
+	
 	<style name="DarkTheme" parent="@style/Theme.Dark">
-		<item name="android:textColorPrimary">@style/ClickableTextStyleDark</item>
+		<item name="textColorPrimary">@style/ClickableTextStyleDark</item>
 	</style>
 	
 	<style name="MyTheme" parent="@style/Theme.Light" />
