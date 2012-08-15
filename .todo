@@ -375,6 +375,12 @@
             Dictionary says otherwise...
         </comment>
     </note>
+    <note priority="medium" time="1342731693" done="1344937833">
+        Tapping a scrambled drug name should reveal the true name for a short time. Taping the unscrambled name launches DrugEditActivity. Long clicking the scrambled name should open DrugEditActivity. Maybe extend a TextView?
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="low" time="1316529505" done="1316548042">
         Ask the user for confirmation before resetting all preferences to their defaults
     </note>
@@ -471,12 +477,6 @@
     <note priority="medium" time="1328223980">
         Add PIN protection
     </note>
-    <note priority="medium" time="1342731693" done="1344937833">
-        Tapping a scrambled drug name should reveal the true name for a short time. Taping the unscrambled name launches DrugEditActivity. Long clicking the scrambled name should open DrugEditActivity. Maybe extend a TextView?
-        <comment>
-            done
-        </comment>
-    </note>
     <note priority="low" time="1317226248">
         For Version, don't get the revision from strings.xml, as this requires faking a change in the file to update the revision tag.
     </note>
@@ -498,8 +498,11 @@
     <note priority="verylow" time="1316529783">
         Add icons for all drug forms.
     </note>
-    <note priority="verylow" time="1316548559">
+    <note priority="verylow" time="1316548559" done="1345059406">
         Handle landscape view
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="verylow" time="1316548662">
         Consider keeping intake entries only for a certain number of days, before removing them from the DB. The user should be able to choose this history size, within reasonable bounds.

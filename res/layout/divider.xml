@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content"
+	android:layout_height="match_parent"
+>
+-->
+	<View xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="1dip"
+		android:layout_height="match_parent"
+		android:layout_marginLeft="0dip"
+		android:layout_marginRight="7dip"	
+		android:layout_marginTop="3dip"
+		android:layout_marginBottom="3dip"	
+		
+		android:background="@color/list_divider_light"
+	/>	
+<!-- 
+</merge>
+-->

@@ -41,6 +41,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.db.Drug;
@@ -159,6 +160,23 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 
 						Database.create(drug, i != 4 ? Database.FLAG_DONT_NOTIFY_LISTENERS : 0);
 					}
+
+					return true;
+				}
+			});
+		}
+
+		p = findPreference("db_max_history_age");
+		if(p != null)
+		{
+			Util.populateListPreferenceEntryValues(p);
+			p.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue)
+				{
+					if("4".equals(newValue))
+						Toast.makeText(getApplicationContext(), R.string._toast_unlimited_history_size, Toast.LENGTH_LONG).show();
 
 					return true;
 				}

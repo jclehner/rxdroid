@@ -39,7 +39,15 @@
     	<item>@string/_title_on_demand</item>
     	<item>@string/_title_21_days_on_7_days_off</item>
     </string-array>
-   
+    
+    <string-array name="history_size">
+    	<item>@string/_title_history_2_weeks</item>
+    	<item>@string/_title_history_1_month</item>
+    	<item>@string/_title_history_6_months</item>
+    	<item>@string/_title_history_1_year</item>
+    	<item>@string/_title_history_unlimited</item>    	
+    </string-array>
+       
 	<string-array name="alarm_modes">
 		<item>@string/_title_dont_snooze</item>
 		<item>@string/_title_repeat_alarm</item>

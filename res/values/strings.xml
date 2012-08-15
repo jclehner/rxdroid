@@ -24,7 +24,7 @@
 
 <resources>
     <string name="app_name">RxDroid</string>
-    <string name="version">0.6</string>
+    <string name="version">0.9</string>
     <string name="vcs_revision">$Revision$</string>
     
     <!--  WARNING: Do NOT replace - with an en dash as suggested by lint -->
@@ -227,7 +227,18 @@
 	<string name="_title_select_date">Select date</string>
 	
 	<string name="_title_repetition_origin">Starting date</string>
-			
+	
+	<string name="_title_history_age">History age</string>
+	<string name="_summary_history_age">The amount of time that intake information will be stored. Longer periods result in larger databases.</string>
+	<string name="_title_history_2_weeks">Two weeks</string>
+	<string name="_title_history_1_month">One Month</string>
+	<string name="_title_history_6_months">Six months</string>
+	<string name="_title_history_1_year">One year</string>
+	<string name="_title_history_unlimited">Unlimited</string>	
+	
+	<string name="_title_database">Database</string>
+	
+	<string name="_toast_unlimited_history_size">Warning: this setting might cause very long loading times.</string>			
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 

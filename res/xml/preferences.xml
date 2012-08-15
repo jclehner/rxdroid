@@ -175,8 +175,20 @@
 		
 		</PreferenceCategory>
 	</PreferenceScreen>
-	
-	
+		
+	<PreferenceScreen android:key="prefscreen_db"
+		android:title="@string/_title_database"
+		android:icon="@android:drawable/ic_menu_save"	
+	>
+		
+		<ListPreference android:key="db_max_history_age"
+			android:title="@string/_title_history_age"
+			android:summary="@string/_summary_history_age"
+			android:entries="@array/history_size"
+			android:defaultValue="2"
+		/>
+		
+	</PreferenceScreen>
 	
 	<PreferenceScreen android:key="prefscreen_debug"
 		android:title="Debugging options"
@@ -217,7 +229,7 @@
 		    rxdroid:after="14:00"		    
 		/>
 	
-	</PreferenceScreen>
+	</PreferenceScreen>	
 	
 	<Preference android:key="version"
 		android:title="@string/_title_version"
