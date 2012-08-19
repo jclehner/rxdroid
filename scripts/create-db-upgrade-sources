@@ -1,0 +1,23 @@
+#!/bin/bash
+
+source "$(dirname $_)/shared.sh" || exit 1
+
+PKGPATH="$(sed -e 's/\./\//g' <<< $PKG)"
+CLASSES="Drug Intake Schedule"
+
+read -ra DB_VERSION <<< $(grep -o -E 'DB_VERSION = [[:digit:]]+' src/${PKGPATH}/db/DatabaseHelper.java)
+
+TARGET=src/${PKGPATH}/db/v${DB_VERSION[2]}
+mkdir -p ${TARGET}
+
+for c in $CLASSES; do
+	echo "@SuppressWarnings({ \"unused\", \"serial\" })" > ${TARGET}/Old$c.java
+	grep @DatabaseTable src/${PKGPATH}/db/$c.java >> ${TARGET}/Old$c.java
+	echo "public class $c extends Entry" >> ${TARGET}/Old$c.java
+	echo "{" >> ${TARGET}/Old$c.java
+
+	grep @DatabaseField -A1 src/${PKGPATH}/db/$c.java | sed -r -e 's/^--//' >> ${TARGET}/Old$c.java
+	echo "${TARGET}/Old$c.java"
+
+	echo "}" >> ${TARGET}/Old$c.java
+done

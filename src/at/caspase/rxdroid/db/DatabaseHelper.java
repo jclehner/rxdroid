@@ -31,6 +31,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import at.caspase.rxdroid.util.Reflect;
+import at.caspase.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
@@ -144,9 +145,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			if(upgrade(cs, oldVersion, newVersion))
 				return; // everything ok
 		}
+		else if(newVersion != 1)
+		{
+			db.setVersion(oldVersion);
+			throw new DatabaseError(isUpgrade ? DatabaseError.E_UPGRADE : DatabaseError.E_DOWNGRADE);
 
-		db.setVersion(oldVersion);
-		throw new DatabaseError(isUpgrade ? DatabaseError.E_UPGRADE : DatabaseError.E_DOWNGRADE);
+		}
 	}
 
 	// !!! Do NOT @Override (crashes on API < 11) !!!
@@ -170,6 +174,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 
 		onCreate(getWritableDatabase(), cs);
+	}
+
+	/* package */ <T> Dao<T, Integer> getDaoChecked(Class<T> clazz)
+	{
+		try
+		{
+			return getDao(clazz);
+		}
+		catch(SQLException e)
+		{
+			throw new WrappedCheckedException("Error getting DAO for " + clazz.getSimpleName(), e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

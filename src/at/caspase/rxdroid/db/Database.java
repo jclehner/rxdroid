@@ -425,16 +425,8 @@ public final class Database
 		}
 	}
 
-	private static synchronized <T> Dao<T, Integer> getDaoChecked(Class<T> clazz)
-	{
-		try
-		{
-			return sHelper.getDao(clazz);
-		}
-		catch(SQLException e)
-		{
-			throw new WrappedCheckedException("Error getting DAO for " + clazz.getSimpleName(), e);
-		}
+	private static <T> Dao<T, Integer> getDaoChecked(Class<T> clazz) {
+		return sHelper.getDaoChecked(clazz);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -26,6 +26,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.util.Log;
 
 /**
@@ -235,6 +238,18 @@ public final class Reflect
 		{
 			return null;
 		}
+	}
+
+	public static List<Field> getDeclaredAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotationType)
+	{
+		final ArrayList<Field> fields = new ArrayList<Field>();
+		for(Field f : clazz.getDeclaredFields())
+		{
+			if(f.getAnnotation(annotationType) != null)
+				fields.add(f);
+		}
+
+		return fields;
 	}
 
 	/**
