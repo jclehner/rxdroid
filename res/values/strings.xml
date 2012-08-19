@@ -179,7 +179,7 @@
 	<string name="_msg_db_error_upgrade">An error has occurred while upgrading the database.</string>
 	<string name="_msg_db_error_downgrade">The local data was created by a newer version of this
 		app and cannot be read.</string>
-	
+		
 	<string name="_msg_db_error_footer">If you reset the database, all your data will be lost!</string>	
 	
 	<string name="_btn_reset">Reset</string>
@@ -239,6 +239,8 @@
 	<string name="_title_database">Database</string>
 	
 	<string name="_toast_unlimited_history_size">Warning: this setting might cause very long loading times.</string>			
+	<string name="_toast_db_upgraded">Database upgrade successful. Restarting app&#8230;</string>
+	
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 

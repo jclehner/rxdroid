@@ -207,13 +207,12 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		//requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
 		super.onCreate(savedInstanceState);
+		
+		GlobalContext.set(getApplicationContext());
+		Database.init();
+		
 		addPreferencesFromResource(R.xml.empty);
-
-		// FIXME just a quick'n dirty fix
-		getPreferenceScreen().setKey(TAG + ".root");
 
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
 		{

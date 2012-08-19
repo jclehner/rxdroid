@@ -65,6 +65,8 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
+		GlobalContext.set(getApplicationContext());
 
 		if(Version.SDK_IS_PRE_HONEYCOMB)
 		{

@@ -31,12 +31,15 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.caspase.rxdroid.util.Timer;
+import at.caspase.rxdroid.util.Util;
+import at.caspase.rxdroid.util.WrappedCheckedException;
 
 public class SplashScreenActivity extends Activity implements OnClickListener
 {
@@ -152,20 +155,72 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		finish();
 	}
 
-	private class DatabaseIntializerTask extends AsyncTask<Void, Void, Boolean>
+	private class DatabaseIntializerTask extends AsyncTask<Void, Void, WrappedCheckedException>
 	{
 
 		@Override
-		protected Boolean doInBackground(Void... params)
+		protected WrappedCheckedException doInBackground(Void... params)
 		{
-			return loadDatabase();
+			GlobalContext.set(getApplicationContext());
+
+			try
+			{
+				Database.init();
+			}
+			catch(Exception e)
+			{
+				return new WrappedCheckedException(e);
+			}
+
+			return null;
 		}
 
 		@Override
-		protected void onPostExecute(Boolean result)
+		protected void onPostExecute(WrappedCheckedException result)
 		{
-			if(result)
+			if(result == null)
+			{
 				launchMainActivity();
+			}
+			else
+			{
+				Log.w(TAG, result.getRootCause());
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreenActivity.this);
+				builder.setTitle(R.string._title_error);
+				builder.setIcon(android.R.drawable.ic_dialog_alert);
+				builder.setCancelable(false);
+
+				StringBuilder sb = new StringBuilder();
+
+				if(result.getCauseType() == DatabaseError.class)
+				{
+					switch(((DatabaseError) result.getCause()).getType())
+					{
+						case DatabaseError.E_GENERAL:
+							sb.append(getString(R.string._msg_db_error_general));
+							break;
+
+						case DatabaseError.E_UPGRADE:
+							sb.append(getString(R.string._msg_db_error_upgrade));
+							break;
+
+						case DatabaseError.E_DOWNGRADE:
+							sb.append(getString(R.string._msg_db_error_downgrade));
+							break;
+					}
+				}
+				else
+					sb.append(getString(R.string._msg_db_error_general));
+
+				sb.append(getString(R.string._msg_db_error_footer));
+
+				builder.setMessage(sb.toString());
+				builder.setNegativeButton(R.string._btn_exit, SplashScreenActivity.this);
+				builder.setPositiveButton(R.string._btn_reset, SplashScreenActivity.this);
+
+				builder.show();
+			}
 		}
 	}
 }

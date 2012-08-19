@@ -40,6 +40,14 @@ public class WrappedCheckedException extends RuntimeException
 	public WrappedCheckedException(String detailMessage, WrappedCheckedException ex) {
 		super(detailMessage, ex.getCause());
 	}*/
+	
+	public Throwable getRootCause()
+	{
+		Throwable cause = getFirstWrappedCause();
+		while(cause.getCause() != null)
+			cause = cause.getCause();
+		return cause;
+	}
 
 	@Override
 	public Throwable getCause() {

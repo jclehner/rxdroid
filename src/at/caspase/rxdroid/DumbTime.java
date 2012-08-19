@@ -117,10 +117,6 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		return mSeconds;
 	}
 
-	/*public int getMillis() {
-		return mMillis;
-	}*/
-
 	public long getTime() {
 		return mMillis + 1000 * (mHours * 3600 + mMinutes * 60 + mSeconds);
 	}

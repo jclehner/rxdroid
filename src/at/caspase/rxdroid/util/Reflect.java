@@ -125,6 +125,42 @@ public final class Reflect
 		}
 	}
 
+	public static Method getMethod(Class<?> clazz, String name, Class<?>... parameterTypes)
+	{
+		try
+		{
+			return clazz.getMethod(name, parameterTypes);
+		}
+		catch(NoSuchMethodException e)
+		{
+			return null;
+		}
+	}
+
+	public static Object invokeMethod(Method m, Object receiver, Object... args)
+	{
+		Exception ex;
+
+		try
+		{
+			return m.invoke(receiver, args);
+		}
+		catch(IllegalArgumentException e)
+		{
+			ex = e;
+		}
+		catch(IllegalAccessException e)
+		{
+			ex = e;
+		}
+		catch(InvocationTargetException e)
+		{
+			ex = e;
+		}
+
+		throw new WrappedCheckedException(ex);
+	}
+
 	/**
 	 * Makes a <code>Field</code> accessible.
 	 *
