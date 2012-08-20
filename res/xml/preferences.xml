@@ -95,14 +95,14 @@
 			android:key="show_inactive"
 			android:title="@string/_title_pref_show_inactive"
 			android:summary="@string/_summary_pref_show_inactive"
-			android:defaultValue="true"
+			android:defaultValue="false"
 		/>
 		
 		<CheckBoxPreference
 			android:key="show_doseless"
 			android:title="@string/_title_pref_show_days_without_intakes"
 			android:summary="@string/_summary_pref_show_days_without_intakes"
-			android:defaultValue="true"
+			android:defaultValue="false"
 		/>
 		
 		<CheckBoxPreference android:key="privacy_scramble_names"

@@ -47,6 +47,7 @@ import java.util.WeakHashMap;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.SlidingDrawer;
 import at.caspase.androidutils.Extras;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
@@ -91,6 +92,8 @@ public final class Database
 	private static final HashMap<Class<?>, List<? extends Entry>> sCache =
 			new HashMap<Class<?>, List<? extends Entry>>();
 
+	private static final Object LOCK_INIT = new Object();
+
 	//private static Map<Class<?>, List<? extends Entry>> sCacheCopy = null;
 
 	private static DatabaseHelper sHelper;
@@ -117,14 +120,31 @@ public final class Database
 	 *
 	 * @param context an android Context for creating the ORMLite database helper.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static synchronized void init(Context context)
 	{
-		if(context == null)
-			throw new NullPointerException("Argument 'context' must not be null. Did you call GlobalContext.set() ?");
-
-		if(!sIsLoaded)
+		synchronized(LOCK_INIT)
 		{
+			if(!sIsLoaded)
+				reload(context);
+		}
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static synchronized void reload(Context context)
+	{
+		if(context == null)
+			throw new NullPointerException();
+
+		synchronized(LOCK_INIT)
+		{
+			sCache.clear();
+
+			if(sHelper != null)
+			{
+				sHelper.close();
+				sHelper = null;
+			}
+
 			sHelper = new DatabaseHelper(context);
 
 			// precache entries

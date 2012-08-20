@@ -5,6 +5,8 @@ source "$(dirname $_)/shared.sh"
 BAK=".backup.sqlite"
 APK="bin/RxDroid.apk"
 
+rm -f "$BAK"
+
 scripts/db-backup $BAK || die
 
 echo -n "Removing $PKG ... "

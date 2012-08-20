@@ -173,6 +173,9 @@ public class Drug extends Entry implements Comparable<Drug>
 	private Date repeatOrigin;
 
 	@DatabaseField
+	private boolean isSupplyMonitorOnly = false;
+
+	@DatabaseField
 	private int sortRank = 0;
 
 	@DatabaseField(foreign = true, canBeNull = true)
@@ -275,6 +278,14 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public Date getRepeatOrigin() {
 		return repeatOrigin;
+	}
+
+	public void setIsSupplyMonitorOnly(boolean isMonitorOnly) {
+		this.isSupplyMonitorOnly = isMonitorOnly;
+	}
+
+	public boolean isSupplyMonitorOnly() {
+		return isSupplyMonitorOnly;
 	}
 
 	public boolean isActive() {

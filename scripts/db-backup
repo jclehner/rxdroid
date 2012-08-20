@@ -8,6 +8,8 @@ else
 	FILE="$1"
 fi
 
+[[ ! -e "$FILE" ]] || die "Refusing to overwrite $FILE"
+
 echo -n "Pulling database from device ... "
 adb pull $(adb-path /data/data/at.caspase.rxdroid/databases/db.sqlite) "$FILE"
 

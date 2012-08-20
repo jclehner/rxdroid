@@ -35,7 +35,9 @@ import at.caspase.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.DatabaseTable;
 import com.j256.ormlite.table.TableUtils;
 
 /**
@@ -111,7 +113,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		private static final long serialVersionUID = 4326067582393937172L;
 	}
 
-	public static final int DB_VERSION = 50;
+	public static final int DB_VERSION = 51;
 	public static final String DB_NAME = "db.sqlite";
 
 	DatabaseHelper(Context context) {
@@ -124,7 +126,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		try
 		{
 			for(Class<?> clazz : Database.CLASSES)
-				TableUtils.createTable(cs, clazz);
+				TableUtils.createTableIfNotExists(cs, clazz);
 		}
 		catch(SQLException e)
 		{
@@ -138,19 +140,19 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		if(oldVersion == newVersion)
 			return;
 
-		final boolean isUpgrade = newVersion > oldVersion;
+		db.beginTransaction();
 
-		if(isUpgrade)
+		if(upgrade(cs, oldVersion, newVersion))
 		{
-			if(upgrade(cs, oldVersion, newVersion))
-				return; // everything ok
+			db.setTransactionSuccessful();
+			db.endTransaction();
+			return; // everything ok
 		}
-		else if(newVersion != 1)
-		{
-			db.setVersion(oldVersion);
-			throw new DatabaseError(isUpgrade ? DatabaseError.E_UPGRADE : DatabaseError.E_DOWNGRADE);
 
-		}
+		db.endTransaction();
+
+		db.setVersion(oldVersion);
+		throw new DatabaseError(oldVersion < newVersion ? DatabaseError.E_UPGRADE : DatabaseError.E_DOWNGRADE);
 	}
 
 	// !!! Do NOT @Override (crashes on API < 11) !!!
@@ -235,7 +237,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 				for(Object data : oldData)
 				{
-					final Method convertMethod = oldDataClass.getMethod("convert");
+					final Method convertMethod = oldDataClass.getMethod("convertToCurrentDatabaseFormat");
 
 					Entry entry = (Entry) convertMethod.invoke(data);
 					newDao.create(entry);
@@ -243,6 +245,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 					++updatedDataCount;
 				}
 			}
+
+			DaoManager.clearCache();
+			DaoManager.clearDaoCache();
 
 			return updatedDataCount != 0;
 		}
@@ -315,6 +320,20 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 
 		return false;
+	}
+
+	@SuppressWarnings("rawtypes")
+	private static String getTableNameFromDao( Dao dao)
+	{
+		Class<?> clazz = dao.getDataClass();
+		DatabaseTable a = clazz.getAnnotation(DatabaseTable.class);
+		if(a == null)
+			throw new IllegalArgumentException();
+
+		String tableName = Reflect.getAnnotationParameter(a, "tableName");
+		if(tableName.length() == 0)
+			return clazz.getSimpleName();
+		return tableName;
 	}
 
 	/*

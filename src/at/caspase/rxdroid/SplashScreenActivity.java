@@ -76,55 +76,6 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		new DatabaseIntializerTask().execute((Void) null);
 	}
 
-	private boolean loadDatabase()
-	{
-		GlobalContext.set(getApplicationContext());
-
-		try
-		{
-			Timer t = new Timer();
-			Database.init();
-			Log.i(TAG, "Finished caching database: " + t);
-			return true;
-		}
-		catch(DatabaseError e)
-		{
-			Log.w(TAG, e);
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string._title_error);
-			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setCancelable(false);
-
-			StringBuilder sb = new StringBuilder();
-
-			switch(e.getType())
-			{
-				case DatabaseError.E_GENERAL:
-					sb.append(getString(R.string._msg_db_error_general));
-					break;
-
-				case DatabaseError.E_UPGRADE:
-					sb.append(getString(R.string._msg_db_error_upgrade));
-					break;
-
-				case DatabaseError.E_DOWNGRADE:
-					sb.append(getString(R.string._msg_db_error_downgrade));
-					break;
-			}
-
-			sb.append(getString(R.string._msg_db_error_footer));
-
-			builder.setMessage(sb.toString());
-			builder.setNegativeButton(R.string._btn_exit, this);
-			builder.setPositiveButton(R.string._btn_reset, this);
-
-			builder.show();
-		}
-
-		return false;
-	}
-
 	private boolean deleteDatabase()
 	{
 		final String packageName = getApplicationInfo().packageName;
@@ -157,6 +108,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 
 	private class DatabaseIntializerTask extends AsyncTask<Void, Void, WrappedCheckedException>
 	{
+		private boolean mAttemptedDatabaseReload = false;
 
 		@Override
 		protected WrappedCheckedException doInBackground(Void... params)
@@ -169,7 +121,17 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			}
 			catch(Exception e)
 			{
+				//
+
+				if(!mAttemptedDatabaseReload)
+				{
+					mAttemptedDatabaseReload = true;
+					Database.reload(GlobalContext.get());
+					return doInBackground(params);
+				}
+
 				return new WrappedCheckedException(e);
+
 			}
 
 			return null;

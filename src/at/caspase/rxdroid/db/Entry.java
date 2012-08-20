@@ -117,6 +117,8 @@ public abstract class Entry implements Serializable
 				}
 			}
 		}
+
+		dest.id = src.id;
 	}
 }
 
