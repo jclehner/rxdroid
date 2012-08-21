@@ -322,20 +322,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		return false;
 	}
 
-	@SuppressWarnings("rawtypes")
-	private static String getTableNameFromDao( Dao dao)
-	{
-		Class<?> clazz = dao.getDataClass();
-		DatabaseTable a = clazz.getAnnotation(DatabaseTable.class);
-		if(a == null)
-			throw new IllegalArgumentException();
-
-		String tableName = Reflect.getAnnotationParameter(a, "tableName");
-		if(tableName.length() == 0)
-			return clazz.getSimpleName();
-		return tableName;
-	}
-
 	/*
 	private void backup()
 	{

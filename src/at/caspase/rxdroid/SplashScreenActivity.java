@@ -31,14 +31,11 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
-import at.caspase.rxdroid.util.Timer;
-import at.caspase.rxdroid.util.Util;
 import at.caspase.rxdroid.util.WrappedCheckedException;
 
 public class SplashScreenActivity extends Activity implements OnClickListener
@@ -121,8 +118,10 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			}
 			catch(Exception e)
 			{
-				//
-
+				// Database.getCached() will throw after a database
+				// upgrade. This is a dirty hack to work around this
+				// issue, since I'm pretty sure there's a sane way
+				// to do it - but hey, it works ;)
 				if(!mAttemptedDatabaseReload)
 				{
 					mAttemptedDatabaseReload = true;

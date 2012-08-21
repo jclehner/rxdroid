@@ -34,6 +34,7 @@ import at.caspase.rxdroid.util.DateTime;
 
 public final class Entries
 {
+	@SuppressWarnings("unused")
 	private static final String TAG = Entries.class.getName();
 
 	private static final String[] TIME_NAMES = {

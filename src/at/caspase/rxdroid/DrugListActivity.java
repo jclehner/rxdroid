@@ -546,8 +546,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	private class DrugFilter implements CollectionUtils.Filter<Drug>
 	{
-		final boolean mShowDoseless = mSharedPreferences.getBoolean("show_doseless", true);
-		final boolean mShowInactive = mSharedPreferences.getBoolean("show_inactive", true);
+		final boolean mShowDoseless = mSharedPreferences.getBoolean("show_doseless", false);
+		final boolean mShowInactive = mSharedPreferences.getBoolean("show_inactive", false);
 
 		private Date mFilterDate;
 

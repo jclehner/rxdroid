@@ -71,6 +71,7 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "drugs")
 public class Drug extends Entry implements Comparable<Drug>
 {
+	@SuppressWarnings("unused")
 	private static final String TAG = Drug.class.getName();
 	private static final long serialVersionUID = -2569745648137404894L;
 

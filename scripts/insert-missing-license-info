@@ -19,7 +19,7 @@ insert_gpl_info()
 		die "No license file found for extension ${2}"
 	fi
 
-	if ! insert_gpl_info_${2:1} "$1" "$license"; then
+	if ! insert_gpl_info_${2:1} "$1" "$license" &> /dev/null; then
 		insert_gpl_info_default "$1" "$license"
 	fi
 }
