@@ -168,10 +168,15 @@ run mkdir -p thirdparty
 cd thirdparty || exit 1
 
 for REPO in "${GIT_REPOS[@]}"; do
+	
+	read -ra REPO_INFO <<< "${REPO}"
+	TARGET=${REPO_INFO[0]}
+	URL=${REPO_INFO[1]}
+	LIBDIR=${REPO_INFO[2]}
 
-	TARGET=$(awk '{ print $1 }' <<< ${REPO})
-	URL=$(awk '{ print $2 }' <<< ${REPO})
-	LIBDIR=$(awk '{ print $3 }' <<< ${REPO})
+	if [[ -z ${TARGET} || -z ${URL} ]]; then
+		die "No URL or LIBDIR in ${REPO_INFO[@]}"
+	fi
 
 	if [[ -z "${LIBDIR}" ]]; then
 		clone_or_fetch "${URL}" "${TARGET}"

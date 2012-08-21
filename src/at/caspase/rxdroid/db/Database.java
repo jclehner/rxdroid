@@ -252,12 +252,8 @@ public final class Database
 		return t;
 	}
 
-	public static synchronized <T extends Entry> List<T> getAll(Class<T> clazz)
-	{
+	public static synchronized <T extends Entry> List<T> getAll(Class<T> clazz) {
 		return new LinkedList<T>(getCached(clazz));
-		//return (List<T>) CollectionUtils.copy(getCached(clazz));
-		//return getCached(clazz);
-		//return new LinkedList<T>(getCached(clazz));
 	}
 
 	public static <T extends Entry> int countAll(Class<T> clazz) {

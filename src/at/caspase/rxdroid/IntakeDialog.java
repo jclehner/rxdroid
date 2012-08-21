@@ -77,7 +77,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 		if(LOGV) Log.v(TAG, "<init>: doseTime=" + doseTime + ", date=" + date + ", drug=" + drug);
 
-		mIntakeCount = Entries.findIntakes(drug, date, doseTime).size();
+		mIntakeCount = Entries.countIntakes(drug, date, doseTime);
 
 		if(mIntakeCount == 0)
 			mDose = drug.getDose(doseTime, date);

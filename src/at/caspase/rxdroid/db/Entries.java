@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid.db;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,6 +41,9 @@ public final class Entries
 	private static final String[] TIME_NAMES = {
 		"MORNING", "NOON", "EVENING", "NIGHT"
 	};
+
+	private static final List<Intake> sConsolidatedIntakes =
+			new LinkedList<Intake>();
 
 	/*
 	private static final List<Intake> sConsolidatedIntakes = new ArrayList<Intake>();
@@ -229,6 +233,17 @@ public final class Entries
 
 			default:
 				return 1.0;
+		}
+	}
+
+	private static void fillConsolidatedIntakesListMaybe()
+	{
+		synchronized(sConsolidatedIntakes)
+		{
+			if(!sConsolidatedIntakes.isEmpty())
+				return;
+
+			final List<Intake> intakes = Database.getAll(Intake.class);
 		}
 	}
 

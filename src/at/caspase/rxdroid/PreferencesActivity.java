@@ -256,6 +256,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	{
 		if(PREF_LOW_SUPPLY_THRESHOLD.equals(key))
 			updateLowSupplyThresholdPreferenceSummary();
+		NotificationReceiver.sendBroadcastToSelf(true);
 	}
 
 	private void updateLowSupplyThresholdPreferenceSummary()
