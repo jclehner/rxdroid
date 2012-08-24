@@ -208,10 +208,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		
+
 		GlobalContext.set(getApplicationContext());
 		Database.init();
-		
+
 		addPreferencesFromResource(R.xml.empty);
 
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
@@ -415,9 +415,19 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@CreatePreference
 		(
+			titleResId = R.string._title_supply_monitor,
+			summaryResId = R.string._summary_supply_monitor,
+			order = 12,
+			type = CheckBoxPreference.class,
+			helper = CheckboxPreferenceHelper.class
+		)
+		private boolean isSupplyMonitorOnly;
+
+		@CreatePreference
+		(
 			titleResId = R.string._title_active,
 			summary = "",
-			order = 12,
+			order = 13,
 			type = CheckBoxPreference.class,
 			helper = CheckboxPreferenceHelper.class
 		)
@@ -454,6 +464,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			repeatOrigin = drug.getRepeatOrigin();
 			schedule = drug.getSchedule();
 			sortRank = drug.getSortRank();
+			isSupplyMonitorOnly = drug.isSupplyMonitorOnly();
 
 			name = drug.getName();
 			form = drug.getForm();
@@ -474,6 +485,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			drug.setRepeatMode(repeat);
 			drug.setSortRank(sortRank);
 			drug.setSchedule(schedule);
+			drug.setIsSupplyMonitorOnly(isSupplyMonitorOnly);
 
 			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };
 

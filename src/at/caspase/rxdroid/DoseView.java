@@ -70,7 +70,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	private Date mDate;
 	private int mIntakeCount = 0;
 
-	private Fraction mDose;
+	private Fraction mDisplayDose;
 
 	private int mStatus = STATUS_INDETERMINATE;
 
@@ -111,14 +111,14 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	public void setDose(Fraction dose)
 	{
-		mDose = dose;
+		mDisplayDose = dose;
 		updateView();
 	}
 
 	public Fraction getDose()
 	{
-		if(mDose != null)
-			return mDose;
+		if(mDisplayDose != null)
+			return mDisplayDose;
 
 		if(mDrug != null && mDoseTime != -1)
 		{
@@ -170,19 +170,16 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		//mDose = getDose();
 
-		mDose = new Fraction();
+		mDisplayDose = new Fraction();
 
 		List<Intake> intakes = Entries.findIntakes(mDrug, mDate, mDoseTime);
 		for(Intake intake : intakes)
 		{
-			mDose.add(intake.getDose());
+			mDisplayDose.add(intake.getDose());
 			if(LOGV) Log.v(TAG, intake.toString());
 		}
 
 		mIntakeCount = intakes.size();
-
-		if(LOGV) Log.v(TAG, mDrug + ": mIntakeCount=" + mIntakeCount);
-		//if(LOGV) Log.v(TAG, "setDoseFromDrugAndDate: drug=" + drug + ", mIntakeCount=" + mIntakeCount);
 
 		updateView();
 	}
@@ -239,7 +236,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			Intake intake = (Intake) entry;
 			if(isApplicableIntake(intake))
 			{
-				mDose.add(intake.getDose());
+				mDisplayDose.add(intake.getDose());
 				++mIntakeCount;
 
 				updateView();
@@ -267,11 +264,11 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			Intake intake = (Intake) entry;
 			if(isApplicableIntake(intake))
 			{
-				mDose.subtract(intake.getDose());
+				mDisplayDose.subtract(intake.getDose());
 				--mIntakeCount;
 				updateView();
 
-				Log.d(TAG, "onEntryDeleted: mDose=" + mDose + ", mIntakeCount=" + mIntakeCount);
+				Log.d(TAG, "onEntryDeleted: mDose=" + mDisplayDose + ", mIntakeCount=" + mIntakeCount);
 			}
 		}
 	}
@@ -318,12 +315,12 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		if(mDrug != null)
 		{
-			if(!mDose.isZero())
+			if(!mDisplayDose.isZero())
 			{
 				markAsTaken();
 
 				final Fraction scheduledDose = mDrug.getDose(mDoseTime, mDate);
-				int cmp = mDose.compareTo(scheduledDose);
+				int cmp = mDisplayDose.compareTo(scheduledDose);
 				String suffix;
 
 				if(cmp < 0)
@@ -333,19 +330,13 @@ public class DoseView extends FrameLayout implements OnChangeListener
 				else
 					suffix = null;
 
-				SpannableStringBuilder sb = new SpannableStringBuilder(mDose.toString());
+				SpannableStringBuilder sb = new SpannableStringBuilder(mDisplayDose.toString());
 
 				if(suffix != null)
 				{
 					sb.append(suffix);
 					sb.setSpan(new SuperscriptSpan(), sb.length() - 1, sb.length(), 0);
 				}
-
-				/*if(!mDrug.hasDoseOnDate(mDate))
-				{
-					sb.insert(0, "(");
-					sb.append(")");
-				}*/
 
 				mDoseText.setText(sb);
 			}
@@ -356,13 +347,18 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 				if(mIntakeCount == 0)
 				{
-					if(!dose.isZero() && mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
+					if(!dose.isZero() && (mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND || mDrug.isSupplyMonitorOnly()))
 					{
 						int offset = (int) Settings.instance().getTrueDoseTimeEndOffset(mDoseTime);
 						Date end = DateTime.add(mDate, Calendar.MILLISECOND, offset);
 
 						if(DateTime.nowDate().after(end))
-							markAsForgotten();
+						{
+							if(mDrug.isSupplyMonitorOnly())
+								markAsTaken();
+							else
+								markAsForgotten();
+						}
 					}
 				}
 				else
@@ -370,8 +366,8 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			}
 
 		}
-		else if(mDose != null)
-			mDoseText.setText(mDose.toString());
+		else if(mDisplayDose != null)
+			mDoseText.setText(mDisplayDose.toString());
 	}
 
 	private void markAsTaken()

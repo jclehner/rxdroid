@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid;
 
+import java.lang.ref.WeakReference;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -34,7 +35,10 @@ import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.DialogInterface.OnShowListener;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -57,7 +61,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -109,15 +112,15 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	private boolean mIsShowing = false;
 
+	private static WeakReference<DrugListActivity> mReference;
+
 	@TargetApi(11)
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		setProgressBarIndeterminateVisibility(true);
-		setProgressBarIndeterminate(true);
+		mReference = new WeakReference<DrugListActivity>(this);
 
 		setContentView(R.layout.drug_list);
 
@@ -153,6 +156,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		startNotificationService();
 
 		Database.registerOnChangedListener(mDatabaseListener);
+
+		registerReceiver(mBroadcastReceiver, new IntentFilter(NotificationReceiver.ACTION_DOSE_TIME_BEGIN_OR_END));
 	}
 
 	@Override
@@ -186,9 +191,11 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		menu.add(0, MENU_ADD, 0, R.string._title_add).setIcon(android.R.drawable.ic_menu_add);
 
-		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		if(Version.SDK_IS_HONEYCOMB_OR_LATER)
 		{
-			menu.add(0, MENU_SELECT_DATE, 0, R.string._title_select_date)
+			// Title is set in onPrepareOptionsMenu
+
+			menu.add(0, MENU_SELECT_DATE, 0, null)
 				.setIcon(R.drawable.ic_menu_calendar_light)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
 			;
@@ -197,7 +204,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		menu.add(0, MENU_PREFERENCES, 0, R.string._title_preferences).setIcon(android.R.drawable.ic_menu_preferences);
 		menu.add(0, MENU_TOGGLE_FILTERING, 0, R.string._title_toggle_filtering).setIcon(android.R.drawable.ic_menu_view);
 
-		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		if(Version.SDK_IS_HONEYCOMB_OR_LATER)
 		{
 			menu.getItem(MENU_ADD).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 			menu.getItem(MENU_PREFERENCES).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -205,6 +212,18 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu)
+	{
+		if(Version.SDK_IS_HONEYCOMB_OR_LATER)
+		{
+			final int titleResId = DateTime.isToday(mDate) ? R.string._title_go_to_date : R.string._title_today;
+			menu.findItem(MENU_SELECT_DATE).setTitle(titleResId);
+		}
+
+		return true;
 	}
 
 	@Override
@@ -265,6 +284,9 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		// ////////////////////////////////////////////////
 
+		if(drug.isSupplyMonitorOnly())
+			return;
+
 		final boolean wasDoseTaken = doseView.wasDoseTaken();
 		final int toggleIntakeMessageId;
 
@@ -295,12 +317,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 					return true;
 				}
 		});
-		// ///////////////////////////////////////////////
-
-		// menu.add(0, CMENU_CHANGE_DOSE, 0, R.string._title_change_dose);
-
-
-		// menu.add(0, CMENU_SHOW_SUPPLY_STATUS, 0, "Show supply status");
 
 		if(!wasDoseTaken)
 		{
@@ -393,13 +409,19 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	public void onDoseViewClick(View view)
 	{
-		final DoseView v = (DoseView) view;
-		final Drug drug = v.getDrug();
-		final int doseTime = v.getDoseTime();
-		final Date date = v.getDate();
+		final DoseView doseView = (DoseView) view;
+		final Drug drug = doseView.getDrug();
+		final int doseTime = doseView.getDoseTime();
+		final Date date = doseView.getDate();
 
 		if(!date.equals(mDate))
 			Log.w(TAG, "Activity date " + mDate + " differs from DoseView date " + date);
+
+		if(drug.isSupplyMonitorOnly())
+		{
+			Toast.makeText(this, R.string._toast_drug_is_supply_monitor, Toast.LENGTH_SHORT).show();
+			return;
+		}
 
 		if(MultipleIntakeDialogsPreventer.INSTANCE.canShowDialog())
 		{
@@ -433,6 +455,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	private static final int PAGER_SCROLL = 1;
 	private static final int PAGER_INIT = 1 << 1;
 
+	@TargetApi(11)
 	private void setDate(Date date, int flags)
 	{
 		if(LOGV) Log.v(TAG, "setDate: date=" + date + ", flags=" + flags);
@@ -494,6 +517,9 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			}
 		}
 
+		if(Version.SDK_IS_HONEYCOMB_OR_LATER)
+			invalidateOptionsMenu();
+
 		updateDateString();
 	}
 
@@ -537,11 +563,21 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			ActionBar ab = getActionBar();
 			dateString.setSpan(new RelativeSizeSpan(0.75f), 0, dateString.length(), 0);
 			ab.setSubtitle(dateString);
-			//ab.setTitle(dateString);
 
 		}
 		else
 			mTextDate.setText(dateString);
+	}
+
+	/**
+	 * Calls {@link #setDate(Date, int)} with {@link #mDate} on the most recently created instance, if available.
+	 */
+
+	/* package */ static void refreshMostRecentlyCreatedInstance()
+	{
+		final DrugListActivity instance = mReference.get();
+		if(instance != null && instance.mIsShowing)
+			instance.setDate(instance.mDate, PAGER_INIT);
 	}
 
 	private class DrugFilter implements CollectionUtils.Filter<Drug>
@@ -669,6 +705,15 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		{
 			if(entry instanceof Drug)
 				setDate(mDate, PAGER_INIT);
+		}
+	};
+
+	private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent)
+		{
+			Log.d(TAG, "mBroadcastReceiver.onReceive");
 		}
 	};
 

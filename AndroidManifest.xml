@@ -36,6 +36,7 @@
 		    android:screenOrientation="sensor"
 		    android:theme="@style/LightTheme.WipeAnimation"
 		    android:uiOptions="none"
+		    android:launchMode="singleTop"
 		    android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
 

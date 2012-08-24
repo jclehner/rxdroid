@@ -211,6 +211,23 @@
 	
 	<string name="_title_repetition_origin">Anfangsdatum</string>
 	<string name="_title_select_date">Datum auswählen</string>
+	
+	<string name="_summary_history_age">The amount of time that intake information will be stored. Longer periods result in larger databases.</string>
+	
+	<string name="_title_supply_monitor">Nur Vorrat überwachen</string>
+	<string name="_summary_supply_monitor">Nur benachrichtigen, wenn Vorräte zur Neige gehen.</string>
+	<string name="_toast_drug_is_supply_monitor">Für dieses Medikament wird nur der Vorrat überwacht.</string>
+	
+	<string name="_title_database">Datenbank</string>
+	<string name="_title_history_1_month">Ein Monat</string>
+	<string name="_title_history_1_year">Ein Jahr</string>
+	<string name="_title_history_2_weeks">Zwei Wochen</string>
+	<string name="_title_history_6_months">Sechs Wochen</string>
+	<string name="_title_history_age">Verlaufsgröße</string>
+	<string name="_title_history_unlimited">Unbegrenzt</string>	
+	
+	
+	<string name="_toast_unlimited_history_size">Warnung: diese Einstellung kann zu langen Ladezeiten führen.</string>
 		
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

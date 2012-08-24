@@ -620,6 +620,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.doseNight,
 			this.currentSupply,
 			this.refillSize,
+			this.isSupplyMonitorOnly,
 			this.repeatMode,
 			this.repeatArg,
 			this.repeatOrigin,

@@ -127,8 +127,8 @@
 	<string name="_msg_intake_unscheduled">Enter a dose and press OK.</string>
 	<string name="_title_change_dose">Change dose</string>
 	<string name="_title_edit_drug">Edit drug</string>
-	<string name="_title_mark_not_taken">Mark as not taken</string>
-	<string name="_title_mark_taken">Mark as taken</string>
+	<string name="_title_mark_not_taken">Remove taken dose</string>
+	<string name="_title_mark_taken">Take dose</string>
 	
 	<string name="_msg_freq_every_n_days">Every %1$s days, beginning on %2$s</string>
 	<string name="_msg_freq_21days_on_7days_off">21 days beginning on %1$s, followed by a 7 day pause.</string>
@@ -167,7 +167,7 @@
 	<string name="_title_current_supply">Current supply</string>
 	<string name="_title_refill_size">Refill size</string>
 	<string name="_title_active">Active</string>
-	<string name="_title_ignore_dose">Mark as ignored</string>
+	<string name="_title_ignore_dose">Ignore dose</string>
 	
     <string name="_msg_touch_to_edit">(touch to edit)</string>
    
@@ -240,6 +240,13 @@
 	
 	<string name="_toast_unlimited_history_size">Warning: this setting might cause very long loading times.</string>			
 	<string name="_toast_db_upgraded">Database upgrade successful. Restarting app&#8230;</string>
+	
+	<string name="_toast_drug_is_supply_monitor">This entry is monitoring supplies only.</string>
+	<string name="_title_supply_monitor">Monitor supplies only</string>
+	<string name="_summary_supply_monitor">Notify only when supplies are low.</string>
+		
+	<string name="_title_go_to_date">Go to date</string>
+	<string name="_title_today">Today</string>
 	
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

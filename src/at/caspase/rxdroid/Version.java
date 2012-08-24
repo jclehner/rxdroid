@@ -35,6 +35,7 @@ import android.os.Build;
 public final class Version
 {
 	public static final boolean SDK_IS_PRE_HONEYCOMB = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
+	public static final boolean SDK_IS_HONEYCOMB_OR_LATER = !SDK_IS_PRE_HONEYCOMB;
 
 	/**
 	 * Short format. Example: <code>1.2.3</code>

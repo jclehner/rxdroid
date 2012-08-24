@@ -303,6 +303,7 @@ public final class Database
 		{
 			if(!sIsLoaded)
 			{
+				final Timer timer = new Timer();
 				final List<T> entries = queryForAll(clazz);
 				sCache.put(clazz, entries);
 
@@ -312,7 +313,7 @@ public final class Database
 						Log.v(TAG, "  " + t);
 				}
 
-				Log.i(TAG, "Cached " + entries.size() + " entries of type " + clazz.getSimpleName());
+				Log.i(TAG, "Cached " + entries.size() + " entries of type " + clazz.getSimpleName() + "(" + timer + ")");
 			}
 			else
 				throw new NoSuchElementException(clazz.getSimpleName());

@@ -150,7 +150,7 @@
 			android:title="@string/_title_min_supply_days"
 			android:summary="@string/_summary_min_supply_days"
 			
-			android:defaultValue="7"
+			android:defaultValue="10"
 			android:inputType="number"
 			android:selectAllOnFocus="true"
 		/>

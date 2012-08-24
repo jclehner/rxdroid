@@ -51,6 +51,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	//static final String EXTRA_CANCEL_SNOOZE = TAG + ".cancel_snooze";
 	//static final String EXTRA_SNOOZE_STATE = TAG + ".snooze_state";
 
+	public static final String ACTION_DOSE_TIME_BEGIN_OR_END = TAG + ".notification_event";
+
 	private static final String EXTRA_IS_DELETE_INTENT = TAG + ".is_delete_intent";
 
 	static final int ALARM_MODE_NORMAL = 0;
@@ -71,6 +73,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		if(intent == null)
 			return;
+
+		DrugListActivity.refreshMostRecentlyCreatedInstance();
 
 		GlobalContext.set(context.getApplicationContext());
 		Database.init();
@@ -227,6 +231,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	private PendingIntent createOperation(Bundle extras)
 	{
 		Intent intent = new Intent(mContext, NotificationReceiver.class);
+		intent.setAction(ACTION_DOSE_TIME_BEGIN_OR_END);
+
 		if(extras != null)
 			intent.putExtras(extras);
 
@@ -251,7 +257,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		{
 			final Fraction dose = drug.getDose(doseTime, date);
 
-			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date) || drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND)
+			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date) || drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND || drug.isSupplyMonitorOnly())
 				continue;
 
 			if(Entries.countIntakes(drug, date, doseTime) == 0)
@@ -331,6 +337,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		if(context == null)
 			context = GlobalContext.get();
 		Intent intent = new Intent(context, NotificationReceiver.class);
+		intent.setAction(ACTION_DOSE_TIME_BEGIN_OR_END);
 		intent.putExtra(NotificationReceiver.EXTRA_SILENT, silent);
 		context.sendBroadcast(intent);
 	}
