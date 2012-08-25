@@ -421,7 +421,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			type = CheckBoxPreference.class,
 			helper = CheckboxPreferenceHelper.class
 		)
-		private boolean isSupplyMonitorOnly;
+		private boolean autoAddIntakes;
 
 		@CreatePreference
 		(
@@ -464,7 +464,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			repeatOrigin = drug.getRepeatOrigin();
 			schedule = drug.getSchedule();
 			sortRank = drug.getSortRank();
-			isSupplyMonitorOnly = drug.isSupplyMonitorOnly();
+			autoAddIntakes = drug.isAutoAddIntakesEnabled();
 
 			name = drug.getName();
 			form = drug.getForm();
@@ -485,7 +485,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			drug.setRepeatMode(repeat);
 			drug.setSortRank(sortRank);
 			drug.setSchedule(schedule);
-			drug.setIsSupplyMonitorOnly(isSupplyMonitorOnly);
+			drug.setAutoAddIntakesEnabled(autoAddIntakes);
 
 			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };
 

@@ -282,7 +282,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		setPadding(0, 0, 0, 0);
 
 		if(mDrug != null)
-			Database.registerOnChangedListener(this);
+			Database.registerEventListener(this);
 	}
 
 	@Override
@@ -293,7 +293,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		setBackgroundDrawable(null);
 		setPadding(0, 0, 0, 0);
 
-		Database.unregisterOnChangedListener(this);
+		Database.unregisterEventListener(this);
 	}
 
 	private boolean isApplicableIntake(Intake intake)
@@ -347,18 +347,13 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 				if(mIntakeCount == 0)
 				{
-					if(!dose.isZero() && (mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND || mDrug.isSupplyMonitorOnly()))
+					if(!dose.isZero() && mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
 					{
 						int offset = (int) Settings.instance().getTrueDoseTimeEndOffset(mDoseTime);
 						Date end = DateTime.add(mDate, Calendar.MILLISECOND, offset);
 
-						if(DateTime.nowDate().after(end))
-						{
-							if(mDrug.isSupplyMonitorOnly())
-								markAsTaken();
-							else
-								markAsForgotten();
-						}
+						if(DateTime.now().after(end))
+							markAsForgotten();
 					}
 				}
 				else

@@ -43,7 +43,7 @@ import android.preference.PreferenceScreen;
 import android.util.AttributeSet;
 import android.util.Log;
 import at.caspase.androidutils.Extras;
-import at.caspase.rxdroid.util.Reflect;
+import at.caspase.androidutils.Reflect;
 import at.caspase.rxdroid.util.WrappedCheckedException;
 /**
  * Helper functions for creating a preference hierarchy from an arbitrary <code>Object</code>.

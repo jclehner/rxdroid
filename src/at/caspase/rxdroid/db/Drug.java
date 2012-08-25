@@ -125,17 +125,17 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField(unique = true)
 	private String name;
 
-	@DatabaseField(useGetSet = true)
+	@DatabaseField
 	private int form;
 
-	@DatabaseField(defaultValue = "true")
+	@DatabaseField
 	private boolean active = true;
 
 	// if mRefillSize == 0, mCurrentSupply should be ignored
-	@DatabaseField(useGetSet = true)
+	@DatabaseField
 	private int refillSize;
 
-	@DatabaseField(dataType = DataType.SERIALIZABLE, useGetSet = true)
+	@DatabaseField(dataType = DataType.SERIALIZABLE)
 	private Fraction currentSupply = new Fraction();
 
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
@@ -174,7 +174,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	private Date repeatOrigin;
 
 	@DatabaseField
-	private boolean isSupplyMonitorOnly = false;
+	private boolean autoAddIntakes = false;
 
 	@DatabaseField
 	private int sortRank = 0;
@@ -281,12 +281,12 @@ public class Drug extends Entry implements Comparable<Drug>
 		return repeatOrigin;
 	}
 
-	public void setIsSupplyMonitorOnly(boolean isMonitorOnly) {
-		this.isSupplyMonitorOnly = isMonitorOnly;
+	public void setAutoAddIntakesEnabled(boolean autoAddIntakes) {
+		this.autoAddIntakes = autoAddIntakes;
 	}
 
-	public boolean isSupplyMonitorOnly() {
-		return isSupplyMonitorOnly;
+	public boolean isAutoAddIntakesEnabled() {
+		return autoAddIntakes;
 	}
 
 	public boolean isActive() {
@@ -620,7 +620,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.doseNight,
 			this.currentSupply,
 			this.refillSize,
-			this.isSupplyMonitorOnly,
+			this.autoAddIntakes,
 			this.repeatMode,
 			this.repeatArg,
 			this.repeatOrigin,

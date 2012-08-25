@@ -72,6 +72,9 @@ public class Intake extends Entry
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
 	private Fraction dose;
 
+	@DatabaseField
+	private boolean wasAutoCreated = false;
+
 	public Intake() {}
 
 	public Intake(Drug drug, Date date, int doseTime, Fraction dose)
@@ -123,6 +126,10 @@ public class Intake extends Entry
 
 	public boolean isEmptyIntake() {
 		return dose == null || dose.isZero();
+	}
+
+	public void setWasAutoCreated(boolean wasAutoCreated) {
+		this.wasAutoCreated = wasAutoCreated;
 	}
 
 	@Override

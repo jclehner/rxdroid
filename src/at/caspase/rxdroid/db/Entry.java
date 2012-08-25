@@ -24,8 +24,8 @@ package at.caspase.rxdroid.db;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
+import at.caspase.androidutils.Reflect;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
-import at.caspase.rxdroid.util.Reflect;
 
 import com.j256.ormlite.field.DatabaseField;
 

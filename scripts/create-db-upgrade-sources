@@ -3,21 +3,53 @@
 source "$(dirname $_)/shared.sh" || exit 1
 
 PKGPATH="$(sed -e 's/\./\//g' <<< $PKG)"
-CLASSES="Drug Intake Schedule"
+
+if [[ $# -eq 0 ]]; then
+	CLASSES="Drug Intake Schedule"
+else
+	CLASSES="$@"
+fi
 
 read -ra DB_VERSION <<< $(grep -o -E 'DB_VERSION = [[:digit:]]+' src/${PKGPATH}/db/DatabaseHelper.java)
 
-TARGET=src/${PKGPATH}/db/v${DB_VERSION[2]}
-mkdir -p ${TARGET}
+TARGET_DIR=src/${PKGPATH}/db/v${DB_VERSION[2]}
+mkdir -p ${TARGET_DIR}
 
 for c in $CLASSES; do
-	echo "@SuppressWarnings({ \"unused\", \"serial\" })" > ${TARGET}/Old$c.java
-	grep @DatabaseTable src/${PKGPATH}/db/$c.java >> ${TARGET}/Old$c.java
-	echo "public class $c extends Entry" >> ${TARGET}/Old$c.java
-	echo "{" >> ${TARGET}/Old$c.java
+	f="${TARGET_DIR}/Old$c.java"	
+	[[ -e "$f" ]] && die "Refusing to overwrite $f"
 
-	grep @DatabaseField -A1 src/${PKGPATH}/db/$c.java | sed -r -e 's/^--//' >> ${TARGET}/Old$c.java
-	echo "${TARGET}/Old$c.java"
+	echo ${f}
 
-	echo "}" >> ${TARGET}/Old$c.java
+	echo -e "package $PKG.db.v${DB_VERSION[2]};\n" > ${f}
+	echo "@SuppressWarnings({ \"unused\", \"serial\" })" >> ${f}
+	run grep @DatabaseTable src/${PKGPATH}/db/$c.java >> ${f}
+	echo "public class Old$c extends Entry" >> ${f}
+	echo "{" >> ${f}
+
+	grep @DatabaseField -A1 src/${PKGPATH}/db/$c.java | sed -r -e 's/^--//' -e 's/useGetSet = true/useGetSet = false/g' >> ${f}
+
+	cat >> ${f} <<EOF
+		
+	@Override
+	public Entry convertToCurrentDatabaseFormat()
+	{
+		$c new$c = new $c();
+		Entry.copy(newEntry, this);
+		// TODO some more magic here?
+		return newEntry;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int hashCode() {
+		throw new UnsupportedOperationException();
+	}
+EOF
+
+	echo "}" >> ${f}
 done

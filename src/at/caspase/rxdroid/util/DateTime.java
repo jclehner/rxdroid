@@ -67,14 +67,14 @@ public final class DateTime
 	 * Returns the current time.
 	 *
 	 * @return the result of <code>Gregorian.getInstance()</code>
-	 * @deprecated Use {@link #nowDate()}
+	 * @deprecated Use {@link #now()}
 	 */
 	@Deprecated
 	public static Calendar nowCalendar() {
 		return Calendar.getInstance();
 	}
 
-	public static Date nowDate() {
+	public static Date now() {
 		return nowCalendar().getTime();
 	}
 

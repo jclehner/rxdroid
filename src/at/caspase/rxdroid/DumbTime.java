@@ -80,7 +80,6 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		this(offset, false);
 	}
 
-
 	/**
 	 * Creates an instance using an offset from midnight.
 	 *

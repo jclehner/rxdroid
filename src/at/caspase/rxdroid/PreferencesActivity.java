@@ -131,21 +131,6 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 			Util.populateListPreferenceEntryValues(p);
 		}
 
-		p = findPreference("debug_generate_db_source");
-		if(p != null)
-		{
-			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-
-				@Override
-				public boolean onPreferenceClick(Preference preference)
-				{
-					Database.generateJavaSourceForDbUpgrade();
-					return true;
-				}
-			});
-
-		}
-
 		p = findPreference("debug_add_5_drugs");
 		if(p != null)
 		{

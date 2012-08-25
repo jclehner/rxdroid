@@ -48,10 +48,11 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.SlidingDrawer;
+import at.caspase.androidutils.EventDispatcher;
 import at.caspase.androidutils.Extras;
+import at.caspase.androidutils.Reflect;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
-import at.caspase.rxdroid.util.Reflect;
 import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.WrappedCheckedException;
 
@@ -99,10 +100,8 @@ public final class Database
 	private static DatabaseHelper sHelper;
 	private static boolean sIsLoaded = false;
 
-	private static boolean sPutNewListenersInQueue = false;
-
-	private static Map<OnChangeListener, Void> sOnChangeListeners = new WeakHashMap<OnChangeListener, Void>();
-	private static Map<OnChangeListener, Void> sOnChangeListenersQueue = new WeakHashMap<OnChangeListener, Void>();
+	private static EventDispatcher<Object> sEventMgr =
+			new EventDispatcher<Object>();
 
 	/**
 	 * Initializes the DB.
@@ -152,6 +151,7 @@ public final class Database
 				getCached(clazz);
 
 			sIsLoaded = true;
+			sEventMgr.post("onDatabaseLoaded");
 		}
 	}
 
@@ -173,16 +173,8 @@ public final class Database
 	 * @see #OnDatabaseChangedListener
 	 * @param listener The listener to register.
 	 */
-	public static synchronized void registerOnChangedListener(OnChangeListener listener)
-	{
-		if(!sPutNewListenersInQueue)
-			sOnChangeListeners.put(listener, null);
-		else
-		{
-			sOnChangeListenersQueue.put(listener, null);
-			if(LOGV) Log.v(TAG, "registerOnChangedListener: listener was enqueued");
-		}
-		//if(LOGV) Log.v(TAG, "register: Objects in registry: " + sOnChangedListeners.size());
+	public static synchronized void registerEventListener(Object listener) {
+		sEventMgr.register(listener);
 	}
 
 	/**
@@ -191,10 +183,8 @@ public final class Database
 	 * @see #Database.OnDatabaseChangedListener
 	 * @param listener The listener to remove.
 	 */
-	public static synchronized void unregisterOnChangedListener(OnChangeListener listener)
-	{
-		sOnChangeListeners.remove(listener);
-		if(LOGV) Log.v(TAG, "unregister: Objects in registry: " + sOnChangeListeners.size());
+	public static synchronized void unregisterEventListener(Object listener) {
+		sEventMgr.unregister(listener);
 	}
 
 	/**
@@ -324,122 +314,11 @@ public final class Database
 		return cached;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	private static <E extends Entry> void createWithoutMagic(E entry) throws SQLException
 	{
 		final Dao<E, Integer> dao = (Dao<E, Integer>) getDaoChecked(entry.getClass());
 		dao.create(entry);
-	}
-
-	public static void generateJavaSourceForDbUpgrade()
-	{
-		final File dir = new File(Environment.getExternalStorageDirectory(), "RxDroid");
-
-		Log.i(TAG, "generateJavaSourceForDbUpgrade: dir=" + dir);
-
-		for(Class<?> clazz : CLASSES)
-		{
-			final File file = new File(dir, "Old" + clazz.getSimpleName() + ".java");
-
-			try
-			{
-				if(!clazz.isAnnotationPresent(DatabaseTable.class))
-					continue;
-
-				String tableName = Reflect.getAnnotationParameter(clazz.getAnnotation(DatabaseTable.class), "tableName");
-
-				FileWriter fs = new FileWriter(file);
-				fs.write(
-						"package " + Database.class.getPackage().getName() + ".v" + DatabaseHelper.DB_VERSION + ";\n" +
-						"\n" +
-						"@SuppressWarnings({\"serial\", \"unused\"})\n" +
-						"@DatabaseTable(tableName=\"" + tableName + "\")\n" +
-						"public class Old" + clazz.getSimpleName() + " extends Entry\n" +
-						"{\n" +
-						"\tpublic Old" + clazz.getSimpleName() + "() {}\n\n"
-				);
-
-				for(Field f : clazz.getDeclaredFields())
-				{
-					final Class<?> type = f.getType();
-
-					if(f.isAnnotationPresent(DatabaseField.class))
-					{
-						boolean isSerializable = false;
-
-						if(type == Integer.TYPE)
-							;
-						else if(type == Long.TYPE)
-							;
-						else if(type == Boolean.TYPE)
-							;
-						else if(type == Date.class)
-							;
-						else if(type == String.class)
-							;
-						else
-							isSerializable = true;
-
-						fs.write("\t@DatabaseField");
-
-						if(isSerializable)
-							fs.write("(dataType=DataType.SERIALIZABLE) // TODO verify");
-
-						fs.write("\n\t");
-
-						int m = f.getModifiers();
-						if(Modifier.isProtected(m))
-							fs.write("protected");
-						else if(Modifier.isPublic(m))
-							fs.write("public");
-						else if(Modifier.isPrivate(m))
-							fs.write("private");
-						else
-							fs.write("/* package */");
-
-						fs.write(" " + type.getSimpleName() + " " + f.getName() + ";\n\n");
-					}
-				}
-
-				fs.write(
-						// convertToCurrentDatabaseFormat()
-
-						"\t@Override\n" +
-						"\tprotected Entry convertToCurrentDatabaseFormat()\n" +
-						"\t{\n" +
-						"\t\t// FIXME stub\n" +
-						"\t\treturn null;\n" +
-						"\t}\n\n" +
-
-						// equals()
-
-						"\t@Override\n" +
-						"\tpublic boolean equals(Object other) {\n" +
-						"\t\tthrow new UnsupportedOperationException();\n" +
-						"\t}\n\n" +
-
-						// hashCode()
-
-						"\t@Override\n" +
-						"\tpublic int hashCode() {\n" +
-						"\t\tthrow new UnsupportedOperationException();\n" +
-						"\t}\n"
-				);
-
-				fs.write("}\n");
-				fs.close();
-			}
-			catch(FileNotFoundException e)
-			{
-				Log.w(TAG, "generateJavaSourceForDbUpgrade", e);
-				break;
-			}
-			catch(IOException e)
-			{
-				Log.w(TAG, "generateJavaSourceForDbUpgrade", e);
-				break;
-			}
-		}
 	}
 
 	private static <T> Dao<T, Integer> getDaoChecked(Class<T> clazz) {
@@ -570,66 +449,7 @@ public final class Database
 		if((flags & FLAG_DONT_NOTIFY_LISTENERS) != 0)
 			return;
 
-		sPutNewListenersInQueue = true;
-
-		final Set<OnChangeListener> listeners = Collections.synchronizedSet(sOnChangeListeners.keySet());
-
-		synchronized(listeners)
-		{
-			Iterator<OnChangeListener> i = listeners.iterator();
-
-			while(i.hasNext())
-			{
-				Exception ex;
-				OnChangeListener l = null;
-
-				try
-				{
-					l = i.next();
-					Method m = l.getClass().getMethod(functionName, Entry.class, Integer.TYPE);
-					m.invoke(l, entry, flags);
-
-					if(LOGV) Log.v(TAG, "dispatchEventToListeners: success for " + l);
-
-					continue;
-				}
-				catch(SecurityException e)
-				{
-					ex = e;
-				}
-				catch(NoSuchMethodException e)
-				{
-					ex = e;
-				}
-				catch(IllegalArgumentException e)
-				{
-					ex = e;
-				}
-				catch(IllegalAccessException e)
-				{
-					ex = e;
-				}
-				catch(InvocationTargetException e)
-				{
-					ex = e;
-				}
-				catch(ConcurrentModificationException e)
-				{
-					ex = e;
-				}
-
-				Log.e(TAG, "Failed to dispatch event " + functionName + " to listener " + l, ex);
-				break;
-			}
-		}
-
-		Log.i(TAG, "dispatchEventToListeners: adding " + sOnChangeListenersQueue.size() + " listeners from queue");
-
-		// FIXME we also need to take care of listeners being removed by other listeners
-
-		sPutNewListenersInQueue = false;
-		sOnChangeListeners.putAll(sOnChangeListenersQueue);
-		sOnChangeListenersQueue.clear();
+		sEventMgr.dispatchEvent(functionName, EVENT_HANDLER_ARG_TYPES, entry, flags);
 	}
 
 	/**
@@ -688,4 +508,6 @@ public final class Database
 	}
 
 	private Database() {}
+
+	private static final Class<?>[] EVENT_HANDLER_ARG_TYPES = { Entry.class, Integer.TYPE };
 }

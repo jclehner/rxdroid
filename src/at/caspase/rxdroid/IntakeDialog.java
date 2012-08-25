@@ -115,7 +115,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		setupMessages();
 
 		super.setOnShowListener(mLocalOnShowListener);
-		Database.registerOnChangedListener(this);
+		Database.registerEventListener(this);
 	}
 
 	public void setEditable(boolean editable)
@@ -137,7 +137,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	protected void onStop()
 	{
 		dismissPopup();
-		Database.unregisterOnChangedListener(this);
+		Database.unregisterEventListener(this);
 	}
 
 	@Override

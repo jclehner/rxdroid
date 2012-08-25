@@ -19,7 +19,7 @@
  *
  */
 
-package at.caspase.rxdroid.util;
+package at.caspase.androidutils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.util.Log;
+import at.caspase.rxdroid.util.WrappedCheckedException;
 
 /**
  * Utility functions for reflection.
@@ -274,6 +275,15 @@ public final class Reflect
 		return getAnnotationParameterInternal(annotation, parameterName, true);
 	}
 
+	public static Class<?>[] getTypes(Object[] args)
+	{
+		Class<?>[] types = new Class<?>[args.length];
+		for(int i = 0; i != args.length; ++i)
+			types[i] = args[i].getClass();
+
+		return types;
+	}
+
 	@SuppressWarnings("unchecked")
 	private static <T> T getAnnotationParameterInternal(Annotation annotation, String parameterName, boolean returnNullOnError)
 	{
@@ -308,15 +318,6 @@ public final class Reflect
 			throw new WrappedCheckedException("Failed to obtain parameter " + parameterName, ex);
 
 		return null;
-	}
-
-	private static Class<?>[] getTypes(Object[] args)
-	{
-		Class<?>[] types = new Class<?>[args.length];
-		for(int i = 0; i != args.length; ++i)
-			types[i] = args[i].getClass();
-
-		return types;
 	}
 
 	private static String fieldName(Field f)

@@ -34,9 +34,9 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceGroup;
 import android.util.Log;
 import at.caspase.androidutils.Extras;
+import at.caspase.androidutils.Reflect;
 import at.caspase.androidutils.otpm.OTPM.CreatePreference;
 import at.caspase.rxdroid.util.CollectionUtils;
-import at.caspase.rxdroid.util.Reflect;
 
 /**
  * A helper class for intializing Preferences.

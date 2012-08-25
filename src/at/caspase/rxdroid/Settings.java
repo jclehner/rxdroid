@@ -21,6 +21,8 @@
 
 package at.caspase.rxdroid;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -36,6 +38,7 @@ import at.caspase.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
+import at.caspase.rxdroid.util.WrappedCheckedException;
 
 public class Settings
 {
@@ -65,6 +68,34 @@ public class Settings
 			sInstance = new Settings();
 
 		return sInstance;
+	}
+
+	public static String getString(String key, String defValue) {
+		return sSharedPrefs.getString(key, defValue);
+	}
+
+	public static void putString(String key, String value) {
+		sSharedPrefs.edit().putString(key, value).commit();
+	}
+
+	public static Date getDate(String key)
+	{
+		String str = getString(key, null);
+		if(str == null)
+			return null;
+
+		try
+		{
+			return DATE_FORMAT.parse(str);
+		}
+		catch(ParseException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
+	}
+
+	public static void putDate(String key, Date date) {
+		putString(key, DATE_FORMAT.format(date));
 	}
 
 	public int filterNotificationDefaults(int defaults)
@@ -179,6 +210,21 @@ public class Settings
 		}
 
 		return TimePeriod.fromString(value);
+	}
+
+	public class DoseTimeInfo
+	{
+		Date activeDate;
+		int activeDoseTime;
+		int nextDoseTime;
+	}
+
+	public void getDoseTimeInfo(DoseTimeInfo outInfo)
+	{
+		final Calendar now = DateTime.nowCalendar();
+		outInfo.activeDate = getActiveDate(now);
+		outInfo.activeDoseTime = getActiveDoseTime(now);
+		outInfo.nextDoseTime = getNextDoseTime(now);
 	}
 
 	public Date getActiveDate(Calendar time)
@@ -368,4 +414,6 @@ public class Settings
 
 		return target.getTimeInMillis() - time.getTimeInMillis();
 	}
+
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 }

@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.TimePicker;
+import at.caspase.androidutils.Reflect;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.db.Drug;

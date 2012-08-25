@@ -30,7 +30,7 @@ import java.util.List;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-import at.caspase.rxdroid.util.Reflect;
+import at.caspase.androidutils.Reflect;
 import at.caspase.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
@@ -113,7 +113,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		private static final long serialVersionUID = 4326067582393937172L;
 	}
 
-	public static final int DB_VERSION = 51;
+	public static final int DB_VERSION = 52;
 	public static final String DB_NAME = "db.sqlite";
 
 	DatabaseHelper(Context context) {

@@ -34,22 +34,35 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import at.caspase.androidutils.EventDispatcher;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entries;
+import at.caspase.rxdroid.db.Schedule;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 
 public class NotificationReceiver extends BroadcastReceiver
 {
 	private static final String TAG = NotificationReceiver.class.getName();
-
 	private static final boolean LOGV = true;
+
+	private static final Class<?>[] EVENT_HANDLER_ARG_TYPES = { Date.class, Integer.TYPE };
+
+	public interface OnDoseTimeChangeListener
+	{
+		void onDoseTimeBegin(Date date, int doseTime);
+		void onDoseTimeEnd(Date date, int doseTime);
+	}
 
 	static final String EXTRA_SILENT = TAG + ".silent";
 	//static final String EXTRA_SNOOZE = TAG + ".snooze";
 	//static final String EXTRA_CANCEL_SNOOZE = TAG + ".cancel_snooze";
 	//static final String EXTRA_SNOOZE_STATE = TAG + ".snooze_state";
+
+	static final String EXTRA_DATE = TAG + ".date";
+	static final String EXTRA_DOSE_TIME = TAG + ".dose_time";
+	static final String EXTRA_IS_DOSE_TIME_END = TAG + ".is_dose_time_end";
 
 	public static final String ACTION_DOSE_TIME_BEGIN_OR_END = TAG + ".notification_event";
 
@@ -68,16 +81,35 @@ public class NotificationReceiver extends BroadcastReceiver
 	private boolean mIsDeleteIntent = false;
 	private boolean mDoPostSilent = false;
 
+	private static final EventDispatcher<OnDoseTimeChangeListener> sEventMgr =
+			new EventDispatcher<OnDoseTimeChangeListener>();
+
+	public static void registerOnReceiveListener(OnDoseTimeChangeListener l) {
+		sEventMgr.register(l);
+	}
+
+	public static void unregisterOnReceiveListener(OnDoseTimeChangeListener l) {
+		sEventMgr.unregister(l);
+	}
+
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
 		if(intent == null)
 			return;
 
-		DrugListActivity.refreshMostRecentlyCreatedInstance();
-
 		GlobalContext.set(context.getApplicationContext());
 		Database.init();
+
+		final int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Schedule.DOSE_INVALID);
+		if(doseTime != Schedule.DOSE_INVALID)
+		{
+			final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
+			final boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_DOSE_TIME_END, false);
+			final String eventName = isDoseTimeEnd ? "onDoseTimeEnd" : "onDoseTimeBegin";
+
+			sEventMgr.dispatchEvent(eventName, EVENT_HANDLER_ARG_TYPES, date, doseTime);
+		}
 
 		mContext = context;
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -219,7 +251,11 @@ public class NotificationReceiver extends BroadcastReceiver
 			Log.v(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
 		}
 
-		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation(null));
+		final Bundle extras = new Bundle();
+		extras.putInt(EXTRA_DOSE_TIME, doseTime);
+		extras.putBoolean(EXTRA_IS_DOSE_TIME_END, scheduleEnd);
+
+		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation(extras));
 	}
 
 	private void cancelAllAlarms()
@@ -231,7 +267,6 @@ public class NotificationReceiver extends BroadcastReceiver
 	private PendingIntent createOperation(Bundle extras)
 	{
 		Intent intent = new Intent(mContext, NotificationReceiver.class);
-		intent.setAction(ACTION_DOSE_TIME_BEGIN_OR_END);
 
 		if(extras != null)
 			intent.putExtras(extras);
@@ -257,7 +292,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		{
 			final Fraction dose = drug.getDose(doseTime, date);
 
-			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date) || drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND || drug.isSupplyMonitorOnly())
+			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date) || drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND)
+				continue;
+
+			// XXX is this really neccessary?
+			if(drug.isAutoAddIntakesEnabled())
 				continue;
 
 			if(Entries.countIntakes(drug, date, doseTime) == 0)
