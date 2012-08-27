@@ -61,12 +61,9 @@ public class NotificationReceiver extends BroadcastReceiver
 	//static final String EXTRA_CANCEL_SNOOZE = TAG + ".cancel_snooze";
 	//static final String EXTRA_SNOOZE_STATE = TAG + ".snooze_state";
 
-	static final String EXTRA_BUNDLE = TAG + ".all";
-	static final String EXTRA_DATE = TAG + ".date";
-	static final String EXTRA_DOSE_TIME = TAG + ".dose_time";
-	static final String EXTRA_IS_DOSE_TIME_END = TAG + ".is_dose_time_end";
-
-	public static final String ACTION_DOSE_TIME_BEGIN_OR_END = TAG + ".notification_event";
+	static final String EXTRA_DATE = "at.caspase.rxdroid.extra.DATE";
+	static final String EXTRA_DOSE_TIME = "at.caspase.rxdroid.extra.DOSE_TIME";
+	static final String EXTRA_IS_DOSE_TIME_END = "at.caspase.rxdroid.extra.IS_DOSE_TIME_END";
 
 	private static final String EXTRA_IS_DELETE_INTENT = TAG + ".is_delete_intent";
 
@@ -101,35 +98,22 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		Database.init();
 
-		/*final int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Schedule.TIME_INVALID);
+		final int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Schedule.TIME_INVALID);
 		if(doseTime != Schedule.TIME_INVALID)
 		{
 			final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
 			final boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_DOSE_TIME_END, false);
 			final String eventName = isDoseTimeEnd ? "onDoseTimeEnd" : "onDoseTimeBegin";
 
-			//sEventMgr.post(eventName, EVENT_HANDLER_ARG_TYPES, date, doseTime);
-		}*/
+			sEventMgr.post(eventName, EVENT_HANDLER_ARG_TYPES, date, doseTime);
+		}
 
 		mContext = context;
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mAllDrugs = Database.getAll(Drug.class);
-
 		mAlarmRepeatMode = Settings.getListPreferenceValueIndex("alarm_mode", ALARM_MODE_NORMAL);
-
-		//mIsManualSnoozeRequest = intent.getBooleanExtra(EXTRA_SNOOZE, false);
-		//mIsSnoozeCancelRequest = intent.getBooleanExtra(EXTRA_CANCEL_SNOOZE, false);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
 		mIsDeleteIntent = intent.getBooleanExtra(EXTRA_IS_DELETE_INTENT, false);
-		//mSnoozeState = intent.getIntExtra(EXTRA_SNOOZE_STATE, -1);
-
-		if(LOGV)
-		{
-			Log.d(TAG,
-					"onReceive\n" +
-					"  is delete intent       : " + mIsDeleteIntent + "\n" +
-					"  post silent notifcation: " + mDoPostSilent + "\n");
-		}
 
 		rescheduleAlarms();
 		updateCurrentNotifications();
@@ -149,7 +133,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			return;
 		}
 
-		Log.d(TAG, "Scheduling next alarms...");
+		if(LOGV) Log.d(TAG, "Scheduling next alarms...");
 
 		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
 
@@ -261,11 +245,12 @@ public class NotificationReceiver extends BroadcastReceiver
 	private PendingIntent createOperation(Bundle extras)
 	{
 		Intent intent = new Intent(mContext, NotificationReceiver.class);
+		intent.setAction(Intent.ACTION_MAIN);
 
 		if(extras != null)
 			intent.putExtras(extras);
 
-		return PendingIntent.getBroadcast(mContext, 0, intent, 0);
+		return PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	}
 
 	private PendingIntent createDrugListIntent(Date date)
@@ -310,18 +295,8 @@ public class NotificationReceiver extends BroadcastReceiver
 			// If Drug.TIME_NIGHT ends after midnight, we must adjust the date accordingly to display
 			// the correct notifications.
 
-			/*final Settings settings = Settings.instance();
-			final Calendar cal = DateTime.calendarFromDate(date);
-
-			if(settings.getTrueDoseTimeEndOffset(Drug.TIME_NIGHT) >= Constants.MILLIS_PER_DAY)
-				cal.add(Calendar.DAY_OF_MONTH, -1);*/
-
 			final Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
 			count = countOpenIntakes(checkDate, Drug.TIME_NIGHT);
-
-			if(LOGV) Log.v(TAG, "countForgottenIntakes: checkDate=" + checkDate + ", count=" + count);
-
-			//if(LOGV) Log.v(TAG, "countFrgottenIntakes: cal=" + DateTime.toString(cal));
 		}
 		else
 		{
@@ -369,8 +344,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		if(context == null)
 			context = GlobalContext.get();
-		Intent intent = new Intent(context, NotificationReceiver.class);
-		intent.setAction(ACTION_DOSE_TIME_BEGIN_OR_END);
+		final Intent intent = new Intent(context, NotificationReceiver.class);
+		intent.setAction(Intent.ACTION_MAIN);
 		intent.putExtra(NotificationReceiver.EXTRA_SILENT, silent);
 		context.sendBroadcast(intent);
 	}

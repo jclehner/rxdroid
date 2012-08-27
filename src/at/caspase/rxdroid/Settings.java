@@ -228,6 +228,7 @@ public final class Settings
 			@Override
 			protected DoseTimeInfo initialValue()
 			{
+				Log.d(TAG, "Creating DoseTimeInfo instance for thread " + Thread.currentThread().getName());
 				return new DoseTimeInfo();
 			}
 

@@ -412,14 +412,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		)
 		private Fraction currentSupply;
 
-		/*@CreatePreference
+		@CreatePreference
 		(
 			titleResId = R.string._title_supply_monitor,
 			summaryResId = R.string._summary_supply_monitor,
 			order = 12,
 			type = CheckBoxPreference.class,
 			helper = CheckboxPreferenceHelper.class
-		)*/
+		)
 		private boolean autoAddIntakes;
 
 		@CreatePreference
@@ -439,6 +439,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		private int sortRank;
 		private Schedule schedule;
 		private String comment;
+
+		private Date lastAutoIntakeCreationDate;
 
 		public DrugWrapper(Context context)
 		{
@@ -464,6 +466,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			schedule = drug.getSchedule();
 			sortRank = drug.getSortRank();
 			autoAddIntakes = drug.isAutoAddIntakesEnabled();
+			lastAutoIntakeCreationDate = drug.getLastAutoIntakeCreationDate();
 
 			name = drug.getName();
 			form = drug.getForm();
@@ -484,6 +487,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			drug.setRepeatMode(repeat);
 			drug.setSortRank(sortRank);
 			drug.setSchedule(schedule);
+			drug.setLastAutoIntakeCreationDate(lastAutoIntakeCreationDate);
 			drug.setAutoAddIntakesEnabled(autoAddIntakes);
 
 			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };

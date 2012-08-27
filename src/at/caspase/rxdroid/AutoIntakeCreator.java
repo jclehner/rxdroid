@@ -19,16 +19,21 @@
  *
  */
 
-package at.caspase.rxdroid.db;
+package at.caspase.rxdroid;
 
 import java.util.Calendar;
 import java.util.Date;
 
 import android.util.Log;
-import at.caspase.rxdroid.Fraction;
-import at.caspase.rxdroid.NotificationReceiver;
-import at.caspase.rxdroid.Settings;
 import at.caspase.rxdroid.Settings.DoseTimeInfo;
+import at.caspase.rxdroid.db.Database;
+import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Entries;
+import at.caspase.rxdroid.db.Entry;
+import at.caspase.rxdroid.db.Intake;
+import at.caspase.rxdroid.db.Schedule;
+import at.caspase.rxdroid.db.Database.OnChangeListener;
+import at.caspase.rxdroid.db.Database.OnInitializedListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
@@ -98,7 +103,7 @@ public enum AutoIntakeCreator implements
 		if(!drug.isAutoAddIntakesEnabled())
 			return;
 
-		Date date = drug.lastAutoIntakeCreationDate;
+		Date date = drug.getLastAutoIntakeCreationDate();
 		if(date == null)
 			throw new IllegalStateException();
 
@@ -138,14 +143,14 @@ public enum AutoIntakeCreator implements
 		intake.setWasAutoCreated(true);
 
 		if(doseTime == Schedule.TIME_NIGHT)
-			drug.lastAutoIntakeCreationDate = date;
+			drug.setLastAutoIntakeCreationDate(date);
 		else
 		{
-			if(DateTime.diffDays(date, drug.lastAutoIntakeCreationDate) != 1)
-			{
-				Log.w(TAG, "Correcting unexpected value of lastAutoIntakeCreationDate");
-				drug.lastAutoIntakeCreationDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
-			}
+			final Date lastAutoIntakeCreationDate = drug.getLastAutoIntakeCreationDate();
+			if(lastAutoIntakeCreationDate == null)
+				drug.setLastAutoIntakeCreationDate(DateTime.yesterday());
+			else if(DateTime.diffDays(date, lastAutoIntakeCreationDate) != 1)
+				drug.setLastAutoIntakeCreationDate(DateTime.add(date, Calendar.DAY_OF_MONTH, -1));
 		}
 
 		drug.setCurrentSupply(newSupply);

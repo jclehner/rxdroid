@@ -178,6 +178,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	private boolean autoAddIntakes = false;
 
 	@DatabaseField
+	private
 	/* package */ Date lastAutoIntakeCreationDate;
 
 	@DatabaseField
@@ -229,16 +230,7 @@ public class Drug extends Entry implements Comparable<Drug>
 				return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
 
 			case REPEAT_21_7:
-			{
-				Log.d(TAG, "hasDoseOnDate");
-				Log.d(TAG, "          date: " + date);
-				Log.d(TAG, "  repeatOrigin: " + repeatOrigin);
-				Log.d(TAG, "      diffDays: " + DateTime.diffDays(date, repeatOrigin));
-				Log.d(TAG, "          % 28: " + DateTime.diffDays(date, repeatOrigin) % 28);
-				Log.d(TAG, "");
-
 				return (DateTime.diffDays(date, repeatOrigin) % 28) < 21;
-			}
 
 			case REPEAT_CUSTOM:
 				return schedule.hasDoseOnDate(date);
@@ -302,7 +294,10 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.autoAddIntakes = autoAddIntakes;
 
 		if(autoAddIntakes)
-			lastAutoIntakeCreationDate = DateTime.yesterday();
+		{
+			if(lastAutoIntakeCreationDate == null)
+				lastAutoIntakeCreationDate = DateTime.yesterday();
+		}
 		else
 			lastAutoIntakeCreationDate = null;
 	}
@@ -512,6 +507,14 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.schedule = schedule;
 	}
 
+	public /* package */ Date getLastAutoIntakeCreationDate() {
+		return lastAutoIntakeCreationDate;
+	}
+
+	public void setLastAutoIntakeCreationDate(/* package */ Date lastAutoIntakeCreationDate) {
+		this.lastAutoIntakeCreationDate = lastAutoIntakeCreationDate;
+	}
+
 	public boolean hasNoDoses()
 	{
 		if(repeatMode == REPEAT_CUSTOM)
@@ -525,7 +528,6 @@ public class Drug extends Entry implements Comparable<Drug>
 
 		return true;
 	}
-
 
 	@Override
 	public boolean equals(Object o)
@@ -643,6 +645,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.currentSupply,
 			this.refillSize,
 			this.autoAddIntakes,
+			this.lastAutoIntakeCreationDate,
 			this.repeatMode,
 			this.repeatArg,
 			this.repeatOrigin,

@@ -38,7 +38,7 @@ import at.caspase.rxdroid.util.WrappedCheckedException;
 public class EventDispatcher<T>
 {
 	private static final String TAG = EventDispatcher.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private final WeakHashMap<Object, Void> mReceivers =
 			new WeakHashMap<Object, Void>();

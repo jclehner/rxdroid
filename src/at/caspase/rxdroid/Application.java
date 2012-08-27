@@ -21,7 +21,6 @@
 
 package at.caspase.rxdroid;
 
-import at.caspase.rxdroid.db.AutoIntakeCreator;
 
 public class Application extends android.app.Application
 {
@@ -32,6 +31,6 @@ public class Application extends android.app.Application
 
 		GlobalContext.set(getApplicationContext());
 		Settings.init();
-		//AutoIntakeCreator.registerSelf();
+		AutoIntakeCreator.registerSelf();
 	}
 }
