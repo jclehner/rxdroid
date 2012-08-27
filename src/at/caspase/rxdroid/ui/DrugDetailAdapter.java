@@ -95,13 +95,13 @@ public class DrugDetailAdapter extends AbsDrugAdapter
 		else
 			holder = (DoseViewHolder) v.getTag();
 
-		holder.name.setText(Settings.instance().getDrugName(drug));
+		holder.name.setText(Settings.getDrugName(drug));
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
 		holder.icon.setImageResource(drug.getFormResourceId());
 
 		final int visibility;
 
-		if(DateTime.todayDate().equals(mAdapterDate) && Entries.hasMissingIntakesBeforeDate(drug, mAdapterDate))
+		if(DateTime.today().equals(mAdapterDate) && Entries.hasMissingIntakesBeforeDate(drug, mAdapterDate))
 			visibility = View.VISIBLE;
 		else
 			visibility = View.GONE;

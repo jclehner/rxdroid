@@ -34,10 +34,10 @@ for c in $CLASSES; do
 	@Override
 	public Entry convertToCurrentDatabaseFormat()
 	{
-		$c new$c = new $c();
-		Entry.copy(newEntry, this);
+		final $c new$c = new $c();
+		Entry.copy(new$c, this);
 		// TODO some more magic here?
-		return newEntry;
+		return new$c;
 	}
 
 	@Override

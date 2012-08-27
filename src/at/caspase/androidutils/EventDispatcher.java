@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.util.WeakHashMap;
 
 import android.util.Log;
+import at.caspase.rxdroid.util.Util;
 import at.caspase.rxdroid.util.WrappedCheckedException;
 
 /**
@@ -47,6 +48,7 @@ public class EventDispatcher<T>
 	public synchronized void register(T eventHandler)
 	{
 		mReceivers.put(eventHandler, null);
+		//if(LOGV) Log.v(TAG, "register: " + eventHandler.getClass() + " (" + mReceivers.size() + ")");
 	}
 
 	public synchronized void unregister(T eventHandler) {
@@ -54,21 +56,26 @@ public class EventDispatcher<T>
 	}
 
 	public void post(String eventName, Object... args) {
-		dispatchEvent(eventName, Reflect.getTypes(args), args);
+		post(eventName, Reflect.getTypes(args), args);
 	}
 
-	public synchronized void dispatchEvent(String eventName, Class<?>[] argTypes, Object... args)
+	public synchronized void post(String eventName, Class<?>[] argTypes, Object... args)
 	{
+		if(LOGV) Log.v(TAG, "post: event=" + eventName + ": " + mReceivers.size() + " potential receivers");
+
 		for(Object receiver : mReceivers.keySet())
 		{
 			final Method m = Reflect.getMethod(receiver.getClass(), eventName, argTypes);
 			if(m == null)
+			{
+				Log.w(TAG, "  no such method: " + receiver.getClass().getSimpleName() + "." + eventName + Util.arrayToString(argTypes));
 				continue;
+			}
 
 			try
 			{
 				Reflect.invokeMethod(m, receiver, args);
-				if(LOGV) Log.v(TAG, "dispatchEvent: " + m);
+				if(LOGV) Log.v(TAG, "  found method " + m);
 			}
 			catch(WrappedCheckedException e)
 			{

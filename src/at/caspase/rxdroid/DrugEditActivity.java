@@ -209,7 +209,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	{
 		super.onCreate(savedInstanceState);
 
-		GlobalContext.set(getApplicationContext());
 		Database.init();
 
 		addPreferencesFromResource(R.xml.empty);
@@ -413,14 +412,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		)
 		private Fraction currentSupply;
 
-		@CreatePreference
+		/*@CreatePreference
 		(
 			titleResId = R.string._title_supply_monitor,
 			summaryResId = R.string._summary_supply_monitor,
 			order = 12,
 			type = CheckBoxPreference.class,
 			helper = CheckboxPreferenceHelper.class
-		)
+		)*/
 		private boolean autoAddIntakes;
 
 		@CreatePreference
@@ -591,7 +590,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 			if(oldRepeatMode != Drug.REPEAT_EVERY_N_DAYS)
 			{
-				repeatOrigin = DateTime.todayDate();
+				repeatOrigin = DateTime.today();
 				repeatArg = 2;
 			}
 			else
@@ -662,7 +661,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			if(getFieldValue() != Drug.REPEAT_WEEKDAYS)
 			{
 				setFieldValue("repeatArg", 0);
-				setFieldValue("repeatOrigin", DateTime.todayDate());
+				setFieldValue("repeatOrigin", DateTime.today());
 			}
 
 			long repeatArg = (Long) getFieldValue("repeatArg");
@@ -712,7 +711,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		private void handle21_7RepeatMode()
 		{
 			if(getFieldValue() != Drug.REPEAT_21_7)
-				setFieldValue("repeatOrigin", DateTime.todayDate());
+				setFieldValue("repeatOrigin", DateTime.today());
 
 			showRepeatOriginDateDialog(Drug.REPEAT_21_7, (Date) getFieldValue("repeatOrigin"), 0);
 		}
@@ -868,7 +867,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			}
 
 			final int currentSupplyDays = Math.max(Entries.getSupplyDaysLeftForDrug(drug, null), 0);
-			final Date end = DateTime.add(DateTime.todayDate(), Calendar.DAY_OF_MONTH, currentSupplyDays);
+			final Date end = DateTime.add(DateTime.today(), Calendar.DAY_OF_MONTH, currentSupplyDays);
 			return mContext.getString(R.string._msg_supply, currentSupply, DateTime.toNativeDate(end));
 		}
 	}

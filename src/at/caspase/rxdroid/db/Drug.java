@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
+import android.util.Log;
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.util.CollectionUtils;
@@ -150,7 +151,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
 	private Fraction doseNight = new Fraction();
 
-	@DatabaseField(canBeNull = true, columnName = "repeat")
+	@DatabaseField(columnName = "repeat")
 	private int repeatMode= REPEAT_DAILY;
 
 	/**
@@ -167,22 +168,25 @@ public class Drug extends Entry implements Comparable<Drug>
 	 *     <li><code>FREQ_WEEKLY</code>: field is set to a week day value from {@link java.util.Calendar}.</li>
 	 * </ul>
 	 */
-	@DatabaseField(canBeNull = true)
+	@DatabaseField
 	private long repeatArg = 0;
 
-	@DatabaseField(canBeNull = true)
+	@DatabaseField
 	private Date repeatOrigin;
 
 	@DatabaseField
 	private boolean autoAddIntakes = false;
 
 	@DatabaseField
+	/* package */ Date lastAutoIntakeCreationDate;
+
+	@DatabaseField
 	private int sortRank = 0;
 
-	@DatabaseField(foreign = true, canBeNull = true)
+	@DatabaseField(foreign = true)
 	private Schedule schedule;
 
-	@DatabaseField(canBeNull = true)
+	@DatabaseField
 	private String comment;
 
 	private Fraction[] mSimpleSchedule;
@@ -202,7 +206,7 @@ public class Drug extends Entry implements Comparable<Drug>
 				case REPEAT_EVERY_N_HOURS:
 				case REPEAT_21_7:
 				{
-					if(repeatOrigin.after(date))
+					if(date.before(repeatOrigin))
 						return false;
 				}
 
@@ -225,7 +229,16 @@ public class Drug extends Entry implements Comparable<Drug>
 				return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
 
 			case REPEAT_21_7:
+			{
+				Log.d(TAG, "hasDoseOnDate");
+				Log.d(TAG, "          date: " + date);
+				Log.d(TAG, "  repeatOrigin: " + repeatOrigin);
+				Log.d(TAG, "      diffDays: " + DateTime.diffDays(date, repeatOrigin));
+				Log.d(TAG, "          % 28: " + DateTime.diffDays(date, repeatOrigin) % 28);
+				Log.d(TAG, "");
+
 				return (DateTime.diffDays(date, repeatOrigin) % 28) < 21;
+			}
 
 			case REPEAT_CUSTOM:
 				return schedule.hasDoseOnDate(date);
@@ -281,8 +294,17 @@ public class Drug extends Entry implements Comparable<Drug>
 		return repeatOrigin;
 	}
 
-	public void setAutoAddIntakesEnabled(boolean autoAddIntakes) {
+	public void setAutoAddIntakesEnabled(boolean autoAddIntakes)
+	{
+		if(this.autoAddIntakes == autoAddIntakes)
+			return;
+
 		this.autoAddIntakes = autoAddIntakes;
+
+		if(autoAddIntakes)
+			lastAutoIntakeCreationDate = DateTime.yesterday();
+		else
+			lastAutoIntakeCreationDate = null;
 	}
 
 	public boolean isAutoAddIntakesEnabled() {
@@ -546,7 +568,7 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	@Override
 	public String toString() {
-		return id + ":\"" + name + "\"=" + Arrays.toString(getSimpleSchedule());
+		return name;
 	}
 
 	@Override

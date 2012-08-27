@@ -288,23 +288,25 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		return mConstraintTimes[which];
 	}
 
-	private DumbTime getConstraintTimeForCurrentlyVisibleTimePicker(int which)
+	/*private DumbTime getConstraintTimeForCurrentlyVisibleTimePicker(int which)
 	{
-		final String[] WHICH = { "MIN", "MAX" };
-		final String[] PAGE = { "BEGIN", "END" };
-
-
 		final DumbTime ret = getConstraintTimeForCurrentlyVisibleTimePicker_(which);
 
-		Log.d(TAG, "getConstraintTimeForCurrentlyVisibleTimePicker: key=" + getKey());
-		Log.d(TAG, "  which: " + WHICH[which]);
-		Log.d(TAG, "  page : " + PAGE[mCurrentPage]);
-		Log.d(TAG, "  returning " + ret);
+		if(LOGV)
+		{
+			final String[] WHICH = { "MIN", "MAX" };
+			final String[] PAGE = { "BEGIN", "END" };
+
+			Log.d(TAG, "getConstraintTimeForCurrentlyVisibleTimePicker: key=" + getKey());
+			Log.d(TAG, "  which: " + WHICH[which]);
+			Log.d(TAG, "  page : " + PAGE[mCurrentPage]);
+			Log.d(TAG, "  returning " + ret);
+		}
 
 		return ret;
-	}
+	}*/
 
-	private DumbTime getConstraintTimeForCurrentlyVisibleTimePicker_(int which)
+	private DumbTime getConstraintTimeForCurrentlyVisibleTimePicker(int which)
 	{
 		if(mCurrentPage == BEGIN)
 		{

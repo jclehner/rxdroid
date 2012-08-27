@@ -349,7 +349,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 				{
 					if(!dose.isZero() && mDrug.getRepeatMode() != Drug.REPEAT_ON_DEMAND)
 					{
-						int offset = (int) Settings.instance().getTrueDoseTimeEndOffset(mDoseTime);
+						int offset = (int) Settings.getTrueDoseTimeEndOffset(mDoseTime);
 						Date end = DateTime.add(mDate, Calendar.MILLISECOND, offset);
 
 						if(DateTime.now().after(end))

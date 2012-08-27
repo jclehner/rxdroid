@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011, 2012 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  * This file is part of RxDroid.
  *
@@ -22,32 +22,18 @@
 package at.caspase.rxdroid.db;
 
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.ConcurrentModificationException;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.WeakHashMap;
 
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
-import android.widget.SlidingDrawer;
 import at.caspase.androidutils.EventDispatcher;
 import at.caspase.androidutils.Extras;
 import at.caspase.androidutils.Reflect;
@@ -57,8 +43,6 @@ import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
 
 /**
  * All DB access goes here.
@@ -151,7 +135,7 @@ public final class Database
 				getCached(clazz);
 
 			sIsLoaded = true;
-			sEventMgr.post("onDatabaseLoaded");
+			sEventMgr.post("onDatabaseInitialized");
 		}
 	}
 
@@ -173,7 +157,7 @@ public final class Database
 	 * @see #OnDatabaseChangedListener
 	 * @param listener The listener to register.
 	 */
-	public static synchronized void registerEventListener(Object listener) {
+	public static synchronized void registerEventListener(OnChangeListener listener) {
 		sEventMgr.register(listener);
 	}
 
@@ -183,7 +167,7 @@ public final class Database
 	 * @see #Database.OnDatabaseChangedListener
 	 * @param listener The listener to remove.
 	 */
-	public static synchronized void unregisterEventListener(Object listener) {
+	public static synchronized void unregisterEventListener(OnChangeListener listener) {
 		sEventMgr.unregister(listener);
 	}
 
@@ -449,7 +433,7 @@ public final class Database
 		if((flags & FLAG_DONT_NOTIFY_LISTENERS) != 0)
 			return;
 
-		sEventMgr.dispatchEvent(functionName, EVENT_HANDLER_ARG_TYPES, entry, flags);
+		sEventMgr.post(functionName, EVENT_HANDLER_ARG_TYPES, entry, flags);
 	}
 
 	/**
@@ -500,6 +484,11 @@ public final class Database
 		 * @param flags for private implementation details.
 		 */
 		public void onEntryDeleted(Entry entry, int flags);
+	}
+
+	public interface OnInitializedListener
+	{
+		void onDatabaseInitialized();
 	}
 
 	public interface Filter<T extends Entry>

@@ -19,7 +19,7 @@
  *
  */
 
-package at.caspase.rxdroid.db.v51;
+package at.caspase.rxdroid.db.v52;
 
 import java.util.Date;
 
@@ -63,33 +63,32 @@ public class OldDrug extends Entry
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
 	private Fraction doseNight = new Fraction();
 
-	@DatabaseField(canBeNull = true, columnName = "repeat")
+	@DatabaseField(columnName = "repeat")
 	private int repeatMode= Drug.REPEAT_DAILY;
 
-	@DatabaseField(canBeNull = true)
+	@DatabaseField
 	private long repeatArg = 0;
 
-	@DatabaseField(canBeNull = true)
+	@DatabaseField
 	private Date repeatOrigin;
 
 	@DatabaseField
-	private boolean isSupplyMonitorOnly = false;
+	private boolean autoAddIntakes = false;
 
 	@DatabaseField
 	private int sortRank = 0;
 
-	@DatabaseField(foreign = true, canBeNull = true)
+	@DatabaseField(foreign = true)
 	private Schedule schedule;
 
-	@DatabaseField(canBeNull = true)
+	@DatabaseField
 	private String comment;
 
 	@Override
 	public Entry convertToCurrentDatabaseFormat()
 	{
-		Drug newDrug = new Drug();
+		final Drug newDrug = new Drug();
 		Entry.copy(newDrug, this);
-		newDrug.setAutoAddIntakesEnabled(isSupplyMonitorOnly);
 		return newDrug;
 	}
 

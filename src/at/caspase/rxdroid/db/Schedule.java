@@ -55,11 +55,11 @@ public final class Schedule extends Entry
 {
 	private static final long serialVersionUID = 7534352445550766725L;
 
-	public static final int DOSE_MORNING = 0;
-	public static final int DOSE_NOON    = 1;
-	public static final int DOSE_EVENING = 2;
-	public static final int DOSE_NIGHT   = 3;
-	public static final int DOSE_INVALID = 4;
+	public static final int TIME_MORNING = 0;
+	public static final int TIME_NOON    = 1;
+	public static final int TIME_EVENING = 2;
+	public static final int TIME_NIGHT   = 3;
+	public static final int TIME_INVALID = 4;
 
 	@SuppressWarnings("serial")
 	public static abstract class Repetiton implements Serializable
@@ -104,7 +104,7 @@ public final class Schedule extends Entry
 
 	public Fraction getDose(Date date, int doseTime)
 	{
-		if(date == null || doseTime >= DOSE_INVALID)
+		if(date == null || doseTime >= TIME_INVALID)
 			throw new IllegalArgumentException();
 
 		if(!hasDoseOnDate(date))

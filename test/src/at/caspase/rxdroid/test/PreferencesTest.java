@@ -215,7 +215,7 @@ public class PreferencesTest extends AndroidTestCase
 			final Calendar expected = (Calendar) today.clone();
 			expected.add(Calendar.DAY_OF_MONTH, testCases[i][2]);
 
-			assertEquals(expected.getTime(), Settings.instance().getActiveDate(time));
+			assertEquals(expected.getTime(), Settings.getActiveDate(time));
 		}
 
 	}

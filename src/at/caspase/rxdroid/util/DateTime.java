@@ -21,7 +21,6 @@
 
 package at.caspase.rxdroid.util;
 
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,7 +41,7 @@ public final class DateTime
 
 	public static Calendar calendarFromDate(Date date)
 	{
-		Calendar cal = Calendar.getInstance();
+		final Calendar cal = GregorianCalendar.getInstance();
 		cal.setTime(date);
 		return cal;
 	}
@@ -52,15 +51,19 @@ public final class DateTime
 	 *
 	 * @return a <code>Calendar</code> set to the current date, its time
 	 *     set to 00:00:00
-	 * @deprecated Use {@link #todayDate()}
+	 * @deprecated Use {@link #today()}
 	 */
 	@Deprecated
 	public static Calendar todayCalendar() {
 		return getDatePart(DateTime.nowCalendar());
 	}
 
-	public static Date todayDate() {
+	public static Date today() {
 		return todayCalendar().getTime();
+	}
+
+	public static Date yesterday() {
+		return DateTime.add(DateTime.today(), Calendar.DAY_OF_MONTH, -1);
 	}
 
 	/**
@@ -71,7 +74,7 @@ public final class DateTime
 	 */
 	@Deprecated
 	public static Calendar nowCalendar() {
-		return Calendar.getInstance();
+		return GregorianCalendar.getInstance();
 	}
 
 	public static Date now() {
@@ -105,7 +108,7 @@ public final class DateTime
 
 	public static Calendar calendar(int year, int month, int day)
 	{
-		Calendar cal = new GregorianCalendar();
+		final Calendar cal = GregorianCalendar.getInstance();
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
@@ -116,21 +119,6 @@ public final class DateTime
 		cal.set(Calendar.DAY_OF_MONTH, day);
 
 		return cal;
-	}
-
-	public static java.sql.Date toSqlDate(Calendar cal)
-	{
-		final int year = cal.get(Calendar.YEAR);
-		final int month = cal.get(Calendar.MONTH);
-		final int day = cal.get(Calendar.DAY_OF_MONTH);
-
-		return new java.sql.Date(year - 1900, month, day);
-	}
-
-	public static Time toSqlTime(Calendar cal)
-	{
-		final Time time = new java.sql.Time(cal.getTimeInMillis());
-		return time;
 	}
 
 	public static String toString(Calendar calendar)
@@ -162,9 +150,9 @@ public final class DateTime
 
 	public static long getOffsetFromMidnight(Date date)
 	{
-		Calendar theDate = Calendar.getInstance();
-		theDate.setTime(date);
-		return getOffsetFromMidnight(theDate);
+		final Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return getOffsetFromMidnight(cal);
 	}
 
 	public static boolean isWithinRange(Calendar time, DumbTime begin, DumbTime end)
@@ -178,7 +166,7 @@ public final class DateTime
 	}
 
 	public static boolean isToday(Date date) {
-		return todayDate().equals(date);
+		return today().equals(date);
 	}
 
 	public static Date add(Date date, int field, int value)
@@ -188,10 +176,8 @@ public final class DateTime
 		return cal.getTime();
 	}
 
-	public static int get(Date date, int field)
-	{
-		Calendar cal = calendarFromDate(date);
-		return cal.get(field);
+	public static int get(Date date, int field) {
+		return calendarFromDate(date).get(field);
 	}
 
 	public static long diffDays(Date date1, Date date2)

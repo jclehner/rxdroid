@@ -35,6 +35,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import at.caspase.androidutils.EventDispatcher;
+import at.caspase.rxdroid.Settings.DoseTimeInfo;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entries;
@@ -60,6 +61,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	//static final String EXTRA_CANCEL_SNOOZE = TAG + ".cancel_snooze";
 	//static final String EXTRA_SNOOZE_STATE = TAG + ".snooze_state";
 
+	static final String EXTRA_BUNDLE = TAG + ".all";
 	static final String EXTRA_DATE = TAG + ".date";
 	static final String EXTRA_DOSE_TIME = TAG + ".dose_time";
 	static final String EXTRA_IS_DOSE_TIME_END = TAG + ".is_dose_time_end";
@@ -73,7 +75,6 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
-	private Settings mSettings;
 	private List<Drug> mAllDrugs;
 
 	private int mAlarmRepeatMode;
@@ -84,7 +85,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	private static final EventDispatcher<OnDoseTimeChangeListener> sEventMgr =
 			new EventDispatcher<OnDoseTimeChangeListener>();
 
-	public static void registerOnReceiveListener(OnDoseTimeChangeListener l) {
+	public static void registerOnDoseTimeChangeListener(OnDoseTimeChangeListener l) {
 		sEventMgr.register(l);
 	}
 
@@ -98,25 +99,23 @@ public class NotificationReceiver extends BroadcastReceiver
 		if(intent == null)
 			return;
 
-		GlobalContext.set(context.getApplicationContext());
 		Database.init();
 
-		final int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Schedule.DOSE_INVALID);
-		if(doseTime != Schedule.DOSE_INVALID)
+		/*final int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Schedule.TIME_INVALID);
+		if(doseTime != Schedule.TIME_INVALID)
 		{
 			final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
 			final boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_DOSE_TIME_END, false);
 			final String eventName = isDoseTimeEnd ? "onDoseTimeEnd" : "onDoseTimeBegin";
 
-			sEventMgr.dispatchEvent(eventName, EVENT_HANDLER_ARG_TYPES, date, doseTime);
-		}
+			//sEventMgr.post(eventName, EVENT_HANDLER_ARG_TYPES, date, doseTime);
+		}*/
 
 		mContext = context;
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		mSettings = Settings.instance();
 		mAllDrugs = Database.getAll(Drug.class);
 
-		mAlarmRepeatMode = mSettings.getListPreferenceValueIndex("alarm_mode", ALARM_MODE_NORMAL);
+		mAlarmRepeatMode = Settings.getListPreferenceValueIndex("alarm_mode", ALARM_MODE_NORMAL);
 
 		//mIsManualSnoozeRequest = intent.getBooleanExtra(EXTRA_SNOOZE, false);
 		//mIsSnoozeCancelRequest = intent.getBooleanExtra(EXTRA_CANCEL_SNOOZE, false);
@@ -144,42 +143,37 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void scheduleNextAlarms()
 	{
-		if(mSettings.getDoseTimeBegin(Drug.TIME_MORNING) == null)
+		if(Settings.getDoseTimeBegin(Drug.TIME_MORNING) == null)
 		{
 			Log.w(TAG, "No dose-time settings available. Not scheduling alarms.");
 			return;
 		}
 
-
 		Log.d(TAG, "Scheduling next alarms...");
 
-		@SuppressWarnings("deprecation")
-		final Calendar now = DateTime.nowCalendar();
-		int activeDoseTime = mSettings.getActiveDoseTime(now);
-		int nextDoseTime = mSettings.getNextDoseTime(now);
+		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
 
-		if(activeDoseTime != -1)
-			scheduleEndAlarm(now, activeDoseTime);
+		if(dtInfo.activeDoseTime != Schedule.TIME_INVALID)
+			scheduleEndAlarm(dtInfo.currentTime, dtInfo.activeDoseTime);
 		else
-			scheduleBeginAlarm(now, nextDoseTime);
+			scheduleBeginAlarm(dtInfo.currentTime, dtInfo.nextDoseTime);
 	}
 
 	private void updateCurrentNotifications()
 	{
-		@SuppressWarnings("deprecation")
-		Calendar now = DateTime.nowCalendar();
+		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
 		final boolean isActiveDoseTime;
-		int doseTime = mSettings.getActiveDoseTime(now);
-		if(doseTime == -1)
+
+		int doseTime = dtInfo.activeDoseTime;
+		if(doseTime == Schedule.TIME_INVALID)
 		{
 			isActiveDoseTime = false;
-			doseTime = mSettings.getNextDoseTime(now);
+			doseTime = dtInfo.nextDoseTime;
 		}
 		else
 			isActiveDoseTime = true;
 
-		Date date = mSettings.getActiveDate(now);
-		updateNotifications(date, doseTime, isActiveDoseTime);
+		updateNotifications(dtInfo.activeDate, doseTime, isActiveDoseTime);
 	}
 
 	private void updateNotifications(Date date, int doseTime, boolean isActiveDoseTime)
@@ -234,13 +228,13 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		if(scheduleEnd)
 		{
-			offset = mSettings.getMillisUntilDoseTimeEnd(time, doseTime);
+			offset = Settings.getMillisUntilDoseTimeEnd(time, doseTime);
 
 			if(mAlarmRepeatMode == ALARM_MODE_REPEAT)
-				offset = Math.min(offset, mSettings.getAlarmTimeout());
+				offset = Math.min(offset, Settings.getAlarmTimeout());
 		}
 		else
-			offset = mSettings.getMillisUntilDoseTimeBegin(time, doseTime);
+			offset = Settings.getMillisUntilDoseTimeBegin(time, doseTime);
 
 		time.add(Calendar.MILLISECOND, (int) offset);
 
@@ -344,7 +338,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		for(Drug drug : mAllDrugs)
 		{
-			if(Settings.instance().hasLowSupplies(drug))
+			if(Settings.hasLowSupplies(drug))
 				drugsWithLowSupply.add(drug);
 		}
 

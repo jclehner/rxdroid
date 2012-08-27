@@ -57,6 +57,7 @@ public final class Entries
 		return intake;
 	}
 	*/
+
 	public static boolean hasMissingIntakesBeforeDate(Drug drug, Date date)
 	{
 		if(!drug.isActive())
@@ -129,11 +130,11 @@ public final class Entries
 		// that were taken after the specified date.
 
 		if(date == null)
-			date = DateTime.todayDate();
+			date = DateTime.today();
 
 		final Fraction doseLeftOnDate = new Fraction();
 
-		if(date.equals(DateTime.todayDate()) && drug.hasDoseOnDate(date))
+		if(date.equals(DateTime.today()) && drug.hasDoseOnDate(date))
 		{
 			for(int doseTime : Constants.DOSE_TIMES)
 			{

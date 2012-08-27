@@ -124,7 +124,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-		GlobalContext.set(getApplicationContext());
 		Database.init();
 
 		mTextDate.setOnLongClickListener(mDateClickListener);
@@ -144,7 +143,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		if(mDate == null)
 		{
 			//mDate = DateTime.todayDate();
-			mDate = Settings.instance().getActiveDate();
+			mDate = Settings.getActiveDate();
 		}
 
 		startNotificationService();
@@ -158,7 +157,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		super.onResume();
 		mIsShowing = true;
 		setDate(mDate, PAGER_INIT);
-		NotificationReceiver.registerOnReceiveListener(mDoseTimeListener);
+		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
 	}
 
 	@Override
@@ -193,6 +192,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 				.setIcon(R.drawable.ic_menu_calendar_light)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
 			;
+
+			//menu.add
 		}
 
 		menu.add(0, MENU_PREFERENCES, 0, R.string._title_preferences).setIcon(android.R.drawable.ic_menu_preferences);
@@ -227,7 +228,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		{
 			case MENU_SELECT_DATE:
 			{
-				if(mDate.equals(Settings.instance().getActiveDate()))
+				if(mDate.equals(Settings.getActiveDate()))
 					mDateClickListener.onLongClick(null);
 				else
 					mDateClickListener.onClick(null);
@@ -549,7 +550,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		//final Date date = DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy);
 		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
 
-		if(mDate.equals(DateTime.todayDate()))
+		if(mDate.equals(DateTime.today()))
 			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
 
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
@@ -620,7 +621,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public void onClick(View v)
 		{
-			final Date activeDate = Settings.instance().getActiveDate();
+			final Date activeDate = Settings.getActiveDate();
 			setDate(activeDate, PAGER_INIT | PAGER_SCROLL);
 		}
 	};
@@ -696,7 +697,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public void onDoseTimeBegin(Date date, int doseTime)
 		{
-			setDate(date, PAGER_INIT);
+			if(!date.equals(mDate))
+				setDate(date, PAGER_INIT);
 		}
 
 		public void onDoseTimeEnd(Date date, int doseTime)

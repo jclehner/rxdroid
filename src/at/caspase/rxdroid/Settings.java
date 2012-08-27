@@ -34,13 +34,14 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entries;
+import at.caspase.rxdroid.db.Schedule;
 import at.caspase.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
 import at.caspase.rxdroid.util.WrappedCheckedException;
 
-public class Settings
+public final class Settings
 {
 	private static final String TAG = Settings.class.getName();
 	@SuppressWarnings("unused")
@@ -53,22 +54,30 @@ public class Settings
 	private static final int DOSE_TIMES[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 
 	private static SharedPreferences sSharedPrefs = null;
-	private static Context sApplicationContext;
+	private static Context sContext;
 
-	private static Settings sInstance;
-
-	public synchronized static Settings instance()
+	/*public synchronized static Settings instance()
 	{
-		if(sApplicationContext == null)
-			sApplicationContext = GlobalContext.get();
+		if(sContext == null)
+			sContext = GlobalContext.get();
 
-		sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sApplicationContext);
+		sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sContext);
 
 		if(sInstance == null)
 			sInstance = new Settings();
 
 		return sInstance;
+	}*/
+
+	public static synchronized void init()
+	{
+		if(sContext == null)
+		{
+			sContext = GlobalContext.get();
+			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sContext);
+		}
 	}
+
 
 	public static String getString(String key, String defValue) {
 		return sSharedPrefs.getString(key, defValue);
@@ -98,7 +107,7 @@ public class Settings
 		putString(key, DATE_FORMAT.format(date));
 	}
 
-	public int filterNotificationDefaults(int defaults)
+	public static int filterNotificationDefaults(int defaults)
 	{
 		if(!sSharedPrefs.getBoolean("use_led", true))
 			defaults ^= Notification.DEFAULT_LIGHTS;
@@ -112,7 +121,7 @@ public class Settings
 		return defaults;
 	}
 
-	public boolean hasLowSupplies(Drug drug)
+	public static boolean hasLowSupplies(Drug drug)
 	{
 		if(!drug.isActive() || drug.getRefillSize() == 0 || drug.hasNoDoses())
 			return false;
@@ -121,15 +130,15 @@ public class Settings
 		return Entries.getSupplyDaysLeftForDrug(drug, null) < minSupplyDays;
 	}
 
-	public long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
+	public static long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_GET_MILLIS_UNTIL_BEGIN);
 	}
 
-	public long getMillisUntilDoseTimeEnd(Calendar time, int doseTime) {
+	public static long getMillisUntilDoseTimeEnd(Calendar time, int doseTime) {
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, 0);
 	}
 
-	public long getAlarmTimeout()
+	public static long getAlarmTimeout()
 	{
 		// FIXME
 
@@ -139,15 +148,15 @@ public class Settings
 		return 10000;
 	}
 
-	private long getDoseTimeBeginOffset(int doseTime) {
+	private static long getDoseTimeBeginOffset(int doseTime) {
 		return getDoseTimeBegin(doseTime).getTime();
 	}
 
-	public long getDoseTimeEndOffset(int doseTime) {
+	public static long getDoseTimeEndOffset(int doseTime) {
 		return getDoseTimeEnd(doseTime).getTime();
 	}
 
-	public long getTrueDoseTimeEndOffset(int doseTime)
+	public static long getTrueDoseTimeEndOffset(int doseTime)
 	{
 		final long doseTimeBeginOffset = getDoseTimeBeginOffset(doseTime);
 		long doseTimeEndOffset = getDoseTimeEndOffset(doseTime);
@@ -158,17 +167,17 @@ public class Settings
 		return doseTimeEndOffset;
 	}
 
-	public boolean hasWrappingDoseTimeNight() {
+	public static boolean hasWrappingDoseTimeNight() {
 		return getDoseTimeEndOffset(Drug.TIME_NIGHT) != getTrueDoseTimeEndOffset(Drug.TIME_NIGHT);
 	}
 
-	public DumbTime getDoseTimeBegin(int doseTime)
+	public static DumbTime getDoseTimeBegin(int doseTime)
 	{
 		final TimePeriod p = getTimePeriodPreference(doseTime);
 		return p == null ? null : p.getBegin();
 	}
 
-	public DumbTime getDoseTimeEnd(int doseTime)
+	public static DumbTime getDoseTimeEnd(int doseTime)
 	{
 		final TimePeriod p = getTimePeriodPreference(doseTime);
 		return p == null ? null : p.getEnd();
@@ -192,17 +201,17 @@ public class Settings
 		return DumbTime.fromString(value);
 	}*/
 
-	public TimePeriod getTimePeriodPreference(int doseTime)
+	public static TimePeriod getTimePeriodPreference(int doseTime)
 	{
 		final String key = KEYS[doseTime];
 
 		String value = sSharedPrefs.getString(key, null);
 		if(value == null)
 		{
-			int resId = sApplicationContext.getResources().
+			int resId = sContext.getResources().
 				getIdentifier("at.caspase.rxdroid:string/pref_default_" + key, null, null);
 
-			if(resId == 0 || (value = sApplicationContext.getString(resId)) == null)
+			if(resId == 0 || (value = sContext.getString(resId)) == null)
 				throw new IllegalStateException("No default value for time preference " + key + " in strings.xml");
 
 			Log.i(TAG, "Persisting preference: " + key + "=" + value);
@@ -212,22 +221,39 @@ public class Settings
 		return TimePeriod.fromString(value);
 	}
 
-	public class DoseTimeInfo
+	public static class DoseTimeInfo
 	{
-		Date activeDate;
-		int activeDoseTime;
-		int nextDoseTime;
+		private static final ThreadLocal<DoseTimeInfo> INSTANCES = new ThreadLocal<Settings.DoseTimeInfo>() {
+
+			@Override
+			protected DoseTimeInfo initialValue()
+			{
+				return new DoseTimeInfo();
+			}
+
+		};
+
+		public Calendar currentTime;
+		public Date activeDate;
+		public int activeDoseTime;
+		public int nextDoseTime;
+
+		private DoseTimeInfo() {}
 	}
 
-	public void getDoseTimeInfo(DoseTimeInfo outInfo)
+	public static DoseTimeInfo getDoseTimeInfo()
 	{
-		final Calendar now = DateTime.nowCalendar();
-		outInfo.activeDate = getActiveDate(now);
-		outInfo.activeDoseTime = getActiveDoseTime(now);
-		outInfo.nextDoseTime = getNextDoseTime(now);
+		final DoseTimeInfo dtInfo = DoseTimeInfo.INSTANCES.get();
+
+		dtInfo.currentTime = DateTime.nowCalendar();
+		dtInfo.activeDate = getActiveDate(dtInfo.currentTime);
+		dtInfo.activeDoseTime = getActiveDoseTime(dtInfo.currentTime);
+		dtInfo.nextDoseTime = getNextDoseTime(dtInfo.currentTime);
+
+		return dtInfo;
 	}
 
-	public Date getActiveDate(Calendar time)
+	public static Date getActiveDate(Calendar time)
 	{
 		final Calendar cal = DateTime.getDatePart(time);
 		final int activeDoseTime = getActiveDoseTime(time);
@@ -243,20 +269,11 @@ public class Settings
 	}
 
 	@SuppressWarnings("deprecation")
-	public Date getActiveDate() {
+	public static Date getActiveDate() {
 		return getActiveDate(DateTime.nowCalendar());
 	}
 
-	@Deprecated
-	public int getActiveOrNextDoseTime(Calendar time)
-	{
-		int ret = getActiveDoseTime(time);
-		if(ret == -1)
-			return getNextDoseTime(time);
-		return ret;
-	}
-
-	public int getActiveDoseTime(Calendar time)
+	public static int getActiveDoseTime(Calendar time)
 	{
 		for(int doseTime : DOSE_TIMES)
 		{
@@ -264,14 +281,14 @@ public class Settings
 				return doseTime;
 		}
 
-		return -1;
+		return Schedule.TIME_INVALID;
 	}
 
-	public int getNextDoseTime(Calendar time) {
+	public static int getNextDoseTime(Calendar time) {
 		return getNextDoseTime(time, false);
 	}
 
-	public int getNextDoseTime(Calendar time, boolean useNextDayOffsets)
+	public static int getNextDoseTime(Calendar time, boolean useNextDayOffsets)
 	{
 		int retDoseTime = -1;
 		long smallestDiff = 0;
@@ -305,11 +322,11 @@ public class Settings
 		return retDoseTime;
 	}
 
-	public int getLastNotificationMessageHash() {
+	public static int getLastNotificationMessageHash() {
 		return sSharedPrefs.getInt(KEY_LAST_MSG_HASH, 0);
 	}
 
-	public void setLastNotificationMessageHash(int messageHash)
+	public static void setLastNotificationMessageHash(int messageHash)
 	{
 		Editor editor = sSharedPrefs.edit();
 		editor.putInt(KEY_LAST_MSG_HASH, messageHash);
@@ -330,13 +347,13 @@ public class Settings
 		editor.commit();
 	}*/
 
-	public int getListPreferenceValueIndex(String key, int defValue)
+	public static int getListPreferenceValueIndex(String key, int defValue)
 	{
 		String valueStr = sSharedPrefs.getString(key, null);
 		return valueStr != null ? Integer.parseInt(valueStr, 10) : defValue;
 	}
 
-	public int getNotificationDefaultsXorMask()
+	public static int getNotificationDefaultsXorMask()
 	{
 		int mask = 0;
 
@@ -352,11 +369,11 @@ public class Settings
 		return mask;
 	}
 
-	public boolean getBoolean(String key, boolean defaultValue) {
+	public static boolean getBoolean(String key, boolean defaultValue) {
 		return sSharedPrefs.getBoolean(key, defaultValue);
 	}
 
-	public String getDrugName(Drug drug)
+	public static String getDrugName(Drug drug)
 	{
 		final String name = drug.getName();
 		// this should never happen unless there's a DB problem
@@ -385,16 +402,10 @@ public class Settings
 		return name;
 	}
 
-	public boolean isDarkThemeActive()
-	{
-		// FIXME stub
-		return true;
-	}
-
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;
 	private static final int FLAG_DONT_CORRECT_TIME = 2;
 
-	private long getMillisUntilDoseTimeBeginOrEnd(Calendar time, int doseTime, int flags)
+	private static long getMillisUntilDoseTimeBeginOrEnd(Calendar time, int doseTime, int flags)
 	{
 		final long doseTimeOffsetMillis = (flags & FLAG_GET_MILLIS_UNTIL_BEGIN) != 0 ?
 				getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
@@ -416,4 +427,6 @@ public class Settings
 	}
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+	private Settings() {}
 }

@@ -113,7 +113,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		private static final long serialVersionUID = 4326067582393937172L;
 	}
 
-	public static final int DB_VERSION = 52;
+	public static final int DB_VERSION = 53;
 	public static final String DB_NAME = "db.sqlite";
 
 	DatabaseHelper(Context context) {

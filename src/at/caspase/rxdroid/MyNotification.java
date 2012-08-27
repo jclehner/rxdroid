@@ -226,16 +226,16 @@ public class MyNotification
 		final String message = getMessage();
 		notification.setLatestEventInfo(mContext, getTitle(), message, mContentIntent);
 
-		int lastHash = Settings.instance().getLastNotificationMessageHash();
+		int lastHash = Settings.getLastNotificationMessageHash();
 		int thisHash = message.hashCode();
 
 		if(lastHash != thisHash)
 		{
 			notification.flags ^= Notification.FLAG_ONLY_ALERT_ONCE;
-			Settings.instance().setLastNotificationMessageHash(thisHash);
+			Settings.setLastNotificationMessageHash(thisHash);
 		}
 
-		int defaultsXorMask = Settings.instance().getNotificationDefaultsXorMask();
+		int defaultsXorMask = Settings.getNotificationDefaultsXorMask();
 		notification.defaults ^= defaultsXorMask;
 
 		if((notification.defaults & Notification.DEFAULT_LIGHTS) != 0)

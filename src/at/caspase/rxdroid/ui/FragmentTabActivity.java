@@ -74,7 +74,7 @@ public class FragmentTabActivity extends SherlockFragmentActivity
 			};
 
 			final Resources res = getResources();
-			final Date date = Settings.instance().getActiveDate();
+			final Date date = Settings.getActiveDate();
 
 			for(Object[] tabArgs: allTabArgs)
 			{

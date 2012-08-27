@@ -25,6 +25,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.util.Hasher;
+import at.caspase.rxdroid.util.Util;
 
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
@@ -128,8 +129,11 @@ public class Intake extends Entry
 		return dose == null || dose.isZero();
 	}
 
-	public void setWasAutoCreated(boolean wasAutoCreated) {
+	public void setWasAutoCreated(boolean wasAutoCreated)
+	{
 		this.wasAutoCreated = wasAutoCreated;
+		if(wasAutoCreated)
+			timestamp = null;
 	}
 
 	@Override
@@ -157,7 +161,7 @@ public class Intake extends Entry
 		if(this.doseTime != other.doseTime)
 			return false;
 
-		if(!this.timestamp.equals(other.timestamp))
+		if(!Util.equals(this.timestamp, other.timestamp))
 			return false;
 
 		if(!this.date.equals(other.date))

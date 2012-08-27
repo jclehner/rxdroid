@@ -241,9 +241,8 @@
 	<string name="_toast_unlimited_history_size">Warning: this setting might cause very long loading times.</string>			
 	<string name="_toast_db_upgraded">Database upgrade successful. Restarting app&#8230;</string>
 	
-	<string name="_toast_drug_is_supply_monitor">This entry is monitoring supplies only.</string>
-	<string name="_title_supply_monitor">Monitor supplies only</string>
-	<string name="_summary_supply_monitor">Notify only when supplies are low.</string>
+	<string name="_title_supply_monitor">Only monitor supplies.</string>
+	<string name="_summary_supply_monitor">Doses are automatically marked as taken.</string>
 		
 	<string name="_title_go_to_date">Go to date</string>
 	<string name="_title_today">Today</string>

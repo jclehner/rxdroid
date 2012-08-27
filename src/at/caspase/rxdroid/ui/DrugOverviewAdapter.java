@@ -45,7 +45,7 @@ import at.caspase.rxdroid.widget.Rot13TextView;
 public class DrugOverviewAdapter extends AbsDrugAdapter
 {
 	private static final String TAG = DrugOverviewAdapter.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private final Timer mTimer;
 
@@ -53,10 +53,10 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 	{
 		super(activity, items, date);
 
-		if(LOGV)
-			mTimer = new Timer();
+		mTimer = LOGV ? new Timer() : null;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public View getView(int position, View v, ViewGroup parent)
 	{
@@ -96,12 +96,12 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		//holder.name.setScramblingEnabled(Settings.inst)
 		//holder.name.setScramblingEnabled(true);
 		holder.name.setText(drug.getName());
-		holder.name.setScramblingEnabled(Settings.instance().getBoolean("privacy_scramble_names", false));
+		holder.name.setScramblingEnabled(Settings.getBoolean("privacy_scramble_names", false));
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
 
 		holder.icon.setImageResource(drug.getFormResourceId());
 
-		if(DateTime.todayDate().equals(mAdapterDate))
+		if(DateTime.today().equals(mAdapterDate))
 		{
 			boolean isIndicatorIconVisible = false;
 
@@ -117,7 +117,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			else
 				holder.missedDoseIndicator.setVisibility(View.GONE);
 
-			if(Settings.instance().hasLowSupplies(drug))
+			if(Settings.hasLowSupplies(drug))
 			{
 				if(holder.lowSupplyIndicator instanceof ViewStub)
 					holder.lowSupplyIndicator = ((ViewStub) holder.lowSupplyIndicator).inflate();

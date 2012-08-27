@@ -87,7 +87,6 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		Log.d(TAG, "  currentDb.exists() = " + currentDb.exists());
 		Log.d(TAG, "  currentDb.canWrite() = " + currentDb.canWrite());
 
-
 		if(!dbDir.canWrite() || !currentDb.exists() || !currentDb.canWrite())
 			return false;
 
@@ -110,8 +109,6 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		@Override
 		protected WrappedCheckedException doInBackground(Void... params)
 		{
-			GlobalContext.set(getApplicationContext());
-
 			try
 			{
 				Database.init();

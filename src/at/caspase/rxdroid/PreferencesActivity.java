@@ -67,8 +67,6 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	{
 		super.onCreate(savedInstanceState);
 
-		GlobalContext.set(getApplicationContext());
-
 		if(Version.SDK_IS_PRE_HONEYCOMB)
 		{
 			// See android issue #4611
