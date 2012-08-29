@@ -121,6 +121,20 @@ public final class Settings
 		putString(key, DATE_FORMAT.format(date));
 	}
 
+	private static int[] HISTORY_AGE_IN_DAYS = {
+		14,
+		28,
+		28 * 6,
+		365,
+		0
+	};
+
+	public static int getMaxHistoryAgeInDays()
+	{
+		int index = getListPreferenceValueIndex("db_max_history_age", 2);
+		return HISTORY_AGE_IN_DAYS[index];
+	}
+
 	public static int filterNotificationDefaults(int defaults)
 	{
 		if(!sSharedPrefs.getBoolean("use_led", true))

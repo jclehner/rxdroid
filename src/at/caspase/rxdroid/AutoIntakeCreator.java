@@ -23,6 +23,7 @@ package at.caspase.rxdroid;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import android.util.Log;
 import at.caspase.rxdroid.Settings.DoseTimeInfo;
@@ -86,13 +87,36 @@ public enum AutoIntakeCreator implements
 	@Override
 	public void onDatabaseInitialized()
 	{
+		Log.d(TAG, "onDatabaseInitialized");
+
 		for(Drug drug : Database.getAll(Drug.class))
 			createMissingIntakes(drug);
+
+		////////////////////////////////////
+
+		final Date today = DateTime.today();
+		final long maxHistoryAgeInDays = Settings.getMaxHistoryAgeInDays();
+
+		final List<Intake> intakes = Database.getAll(Intake.class);
+		final int oldIntakeCount = intakes.size();
+		int deleteCount = 0;
+
+		for(Intake intake : intakes)
+		{
+			long diffDays = DateTime.diffDays(today, intake.getDate());
+			if(diffDays > maxHistoryAgeInDays)
+				++deleteCount;
+		}
+
+		final int deletedPercentage = oldIntakeCount / deleteCount;
+
+		Log.d(TAG, "Would have deleted " + deleteCount + " entries older than " + maxHistoryAgeInDays + " (~" + deletedPercentage + "%)");
 	}
 
 	public static void registerSelf()
 	{
 		//Database.registerEventListener(INSTANCE);
+		Database.registerOnInitializedListener(INSTANCE);
 		NotificationReceiver.registerOnDoseTimeChangeListener(INSTANCE);
 	}
 

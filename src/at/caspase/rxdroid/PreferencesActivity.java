@@ -181,7 +181,15 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	protected void onResume()
 	{
 		super.onResume();
+		Application.setIsVisible(this, true);
 		updateLowSupplyThresholdPreferenceSummary();
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		Application.setIsVisible(this, false);
 	}
 
 	@Override

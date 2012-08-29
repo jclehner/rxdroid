@@ -226,6 +226,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	{
 		super.onResume();
 
+		Application.setIsVisible(this, true);
+
 		Intent intent = getIntent();
 		String action = intent.getAction();
 
@@ -288,6 +290,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			else
 				Log.w(TAG, "Couldn't focus on current supply preference");
 		}
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onStop();
+		Application.setIsVisible(this, false);
 	}
 
 	@Override

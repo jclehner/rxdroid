@@ -21,11 +21,17 @@
 
 package at.caspase.rxdroid;
 
+import java.util.WeakHashMap;
+
+import android.app.Activity;
 import android.util.Log;
 
 
 public class Application extends android.app.Application
 {
+	private static WeakHashMap<Activity, Boolean> sActivityVisibility =
+			new WeakHashMap<Activity, Boolean>();
+
 	@Override
 	public void onCreate()
 	{
@@ -35,5 +41,20 @@ public class Application extends android.app.Application
 		AutoIntakeCreator.registerSelf();
 
 		super.onCreate();
+	}
+
+	public static void setIsVisible(Activity activity, boolean isVisible) {
+		sActivityVisibility.put(activity, isVisible);
+	}
+
+	public static boolean isUiVisible()
+	{
+		for(Activity activity : sActivityVisibility.keySet())
+		{
+			if(sActivityVisibility.get(activity))
+				return true;
+		}
+
+		return false;
 	}
 }

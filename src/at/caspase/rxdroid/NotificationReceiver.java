@@ -192,6 +192,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setContentIntent(createDrugListIntent(date));
 		builder.setPersistent(true);
 
+		/*int defaults = Notification.DEFAULT_ALL ^ Settings.getNotificationDefaultsXorMask();
+
+		if(mDoPostSilent || Application.isUiVisible())
+			defaults ^= Notification.DEFAULT_SOUND;*/
+
 		if(!mDoPostSilent)
 			builder.setDefaults(Notification.DEFAULT_ALL);
 

@@ -171,6 +171,10 @@ public final class Database
 		sEventMgr.unregister(listener);
 	}
 
+	public static synchronized void registerOnInitializedListener(OnInitializedListener l) {
+		sEventMgr.register(l);
+	}
+
 	/**
 	 * Creates a new database entry and notifies listeners.
 	 */

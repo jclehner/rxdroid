@@ -155,6 +155,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		super.onResume();
 		mIsShowing = true;
+		Application.setIsVisible(this, true);
+
 		setDate(mDate, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
 	}
@@ -164,6 +166,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		super.onPause();
 		mIsShowing = false;
+		Application.setIsVisible(this, false);
 		NotificationReceiver.unregisterOnDoseTimeChangeListener(mDoseTimeListener);
 	}
 
