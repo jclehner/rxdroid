@@ -29,22 +29,20 @@ import at.caspase.rxdroid.Settings.DoseTimeInfo;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entries;
-import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.db.Schedule;
-import at.caspase.rxdroid.db.Database.OnChangeListener;
-import at.caspase.rxdroid.db.Database.OnInitializedListener;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
 public enum AutoIntakeCreator implements
 		NotificationReceiver.OnDoseTimeChangeListener,
-		Database.OnChangeListener,
+		/*Database.OnChangeListener,*/
 		Database.OnInitializedListener
 {
 	INSTANCE;
 
 	private static final String TAG = AutoIntakeCreator.class.getName();
+	private static final boolean LOGV = true;
 
 	@Override
 	public void onDoseTimeBegin(Date date, int doseTime) {
@@ -52,12 +50,16 @@ public enum AutoIntakeCreator implements
 	}
 
 	@Override
-	public void onDoseTimeEnd(Date date, int doseTime) {
+	public void onDoseTimeEnd(Date date, int doseTime)
+	{
+		if(LOGV) Log.v(TAG, "onDoseTimeEnd");
 		createIntakes(date, doseTime);
 	}
 
-	@Override
-	public void onEntryCreated(Entry entry, int flags) {
+	/*@Override
+	public void onEntryCreated(Entry entry, int flags)
+	{
+		if(LOGV) Log.v(TAG, "onEntryCreated");
 		onEntryUpdated(entry, flags);
 	}
 
@@ -66,6 +68,8 @@ public enum AutoIntakeCreator implements
 	{
 		if(!(entry instanceof Drug))
 			return;
+
+		if(LOGV) Log.v(TAG, "onEntryUpdated");
 
 		final Drug drug = (Drug) entry;
 		if(!drug.isAutoAddIntakesEnabled())
@@ -77,7 +81,7 @@ public enum AutoIntakeCreator implements
 	@Override
 	public void onEntryDeleted(Entry entry, int flags) {
 		// do nothing
-	}
+	}*/
 
 	@Override
 	public void onDatabaseInitialized()
@@ -88,7 +92,7 @@ public enum AutoIntakeCreator implements
 
 	public static void registerSelf()
 	{
-		Database.registerEventListener(INSTANCE);
+		//Database.registerEventListener(INSTANCE);
 		NotificationReceiver.registerOnDoseTimeChangeListener(INSTANCE);
 	}
 
@@ -107,13 +111,18 @@ public enum AutoIntakeCreator implements
 		if(date == null)
 			throw new IllegalStateException();
 
+		if(LOGV) Log.v(TAG, "createMissingIntakes: drug=" + drug + ", date=" + date);
+
 		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
 
 		while(date.before(dtInfo.activeDate))
 		{
 			for(int doseTime : Constants.DOSE_TIMES)
+			{
 				createIntake(drug, date, doseTime);
+			}
 
+			if(LOGV) Log.v(TAG, "  date=" + date);
 			date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
 		}
 
@@ -155,8 +164,8 @@ public enum AutoIntakeCreator implements
 
 		drug.setCurrentSupply(newSupply);
 
-		Database.create(intake);
-		Database.update(drug);
+		Database.create(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
+		Database.update(drug, Database.FLAG_DONT_NOTIFY_LISTENERS);
 	}
 }
 

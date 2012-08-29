@@ -86,7 +86,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		sEventMgr.register(l);
 	}
 
-	public static void unregisterOnReceiveListener(OnDoseTimeChangeListener l) {
+	public static void unregisterOnDoseTimeChangeListener(OnDoseTimeChangeListener l) {
 		sEventMgr.unregister(l);
 	}
 
@@ -222,14 +222,41 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		time.add(Calendar.MILLISECOND, (int) offset);
 
+		if(time.getTimeInMillis() < System.currentTimeMillis())
+			throw new IllegalStateException("Alarm time is in the past: " + DateTime.toString(time));
+
+		// There are two cases where the current date is not the date of the scheduled
+		// dose-time alarm:
+		//
+		// 1) Wrapping TIME_NIGHT, scheduling end alarm of TIME_NIGHT, time is after midnight.
+		// 2) Non-wrapping TIME_NIGHT, scheduling begin alarm of TIME_MORNING, time is before midnight.
+		//
+		// In this case we must adjust the time accordingly, to provide a correct date to be used in the
+		// intent.
+
+		final Calendar doseTimeDate = DateTime.todayCalendarMutable();
+
+		if(doseTime == Schedule.TIME_NIGHT && scheduleEnd && Settings.hasWrappingDoseTimeNight())
+		{
+			if(offset >= Settings.getDoseTimeEndOffset(Schedule.TIME_NIGHT))
+				doseTimeDate.add(Calendar.DAY_OF_MONTH, -1);
+		}
+		else if(doseTime == Schedule.TIME_MORNING && !scheduleEnd && !Settings.hasWrappingDoseTimeNight())
+		{
+			if(offset < Settings.getDoseTimeBeginOffset(Schedule.TIME_MORNING))
+				doseTimeDate.add(Calendar.DAY_OF_MONTH, 1);
+		}
+
 		if(LOGV)
 		{
+			Log.v(TAG, "offset: " + Util.millis(offset));
 			Log.v(TAG, "Scheduling " + (scheduleEnd ? mAlarmRepeatMode != ALARM_MODE_REPEAT ? "end" : "next alarm" : "begin") +
 					" of doseTime " + doseTime + " for " + DateTime.toString(time));
 			Log.v(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
 		}
 
 		final Bundle extras = new Bundle();
+		extras.putSerializable(EXTRA_DATE, doseTimeDate.getTime());
 		extras.putInt(EXTRA_DOSE_TIME, doseTime);
 		extras.putBoolean(EXTRA_IS_DOSE_TIME_END, scheduleEnd);
 

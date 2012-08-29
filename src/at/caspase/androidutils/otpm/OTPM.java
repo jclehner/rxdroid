@@ -90,6 +90,8 @@ public class OTPM
 		 */
 		String title() default UNDEFINED;
 
+		boolean enabled() default true;
+
 		/**
 		 * The preference title.
 		 * <p>

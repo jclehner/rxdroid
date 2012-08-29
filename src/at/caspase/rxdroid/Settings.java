@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 import android.app.Notification;
 import android.content.Context;
@@ -47,7 +48,7 @@ public final class Settings
 	@SuppressWarnings("unused")
 	private static final boolean LOGV = true;
 
-	private static final String KEY_LAST_MSG_HASH = "_last_msg_hash";
+	private static final String KEY_LAST_MSG_HASH = "last_msg_hash";
 	//private static final String KEY_LAST_MSG_COUNT = "_last_msg_count";
 
 	private static final String KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
@@ -76,8 +77,21 @@ public final class Settings
 			sContext = GlobalContext.get();
 			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sContext);
 		}
-	}
 
+		if(LOGV)
+		{
+
+			final Map<String, ?> prefs = sSharedPrefs.getAll();
+			if(!prefs.isEmpty())
+			{
+				Log.v(TAG, "init: preference dump: ");
+				for(String key : prefs.keySet())
+					Log.v(TAG, "  " + key + "=\"" + prefs.get(key) + "\"");
+			}
+			else
+				Log.v(TAG, "init: no preferences to dump");
+		}
+	}
 
 	public static String getString(String key, String defValue) {
 		return sSharedPrefs.getString(key, defValue);
@@ -148,7 +162,7 @@ public final class Settings
 		return 10000;
 	}
 
-	private static long getDoseTimeBeginOffset(int doseTime) {
+	public static long getDoseTimeBeginOffset(int doseTime) {
 		return getDoseTimeBegin(doseTime).getTime();
 	}
 
@@ -201,6 +215,7 @@ public final class Settings
 		return DumbTime.fromString(value);
 	}*/
 
+	@SuppressWarnings("unused")
 	public static TimePeriod getTimePeriodPreference(int doseTime)
 	{
 		final String key = KEYS[doseTime];
@@ -214,7 +229,7 @@ public final class Settings
 			if(resId == 0 || (value = sContext.getString(resId)) == null)
 				throw new IllegalStateException("No default value for time preference " + key + " in strings.xml");
 
-			Log.i(TAG, "Persisting preference: " + key + "=" + value);
+			if(LOGV) Log.i(TAG, "Persisting preference: " + key + "=" + value);
 			sSharedPrefs.edit().putString(key, value).commit();
 		}
 
@@ -247,6 +262,8 @@ public final class Settings
 		final DoseTimeInfo dtInfo = DoseTimeInfo.INSTANCES.get();
 
 		dtInfo.currentTime = DateTime.nowCalendar();
+		//dtInfo.currentTime = ImmutableCalendar.getInstance();
+
 		dtInfo.activeDate = getActiveDate(dtInfo.currentTime);
 		dtInfo.activeDoseTime = getActiveDoseTime(dtInfo.currentTime);
 		dtInfo.nextDoseTime = getNextDoseTime(dtInfo.currentTime);
@@ -269,9 +286,10 @@ public final class Settings
 		return cal.getTime();
 	}
 
+
 	@SuppressWarnings("deprecation")
 	public static Date getActiveDate() {
-		return getActiveDate(DateTime.nowCalendar());
+		return getActiveDate(DateTime.nowCalendarMutable());
 	}
 
 	public static int getActiveDoseTime(Calendar time)
@@ -409,7 +427,13 @@ public final class Settings
 	private static long getMillisUntilDoseTimeBeginOrEnd(Calendar time, int doseTime, int flags)
 	{
 		final long doseTimeOffsetMillis = (flags & FLAG_GET_MILLIS_UNTIL_BEGIN) != 0 ?
-				getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
+					getDoseTimeBeginOffset(doseTime) : getDoseTimeEndOffset(doseTime);
+
+		/*final long doseTimeOffsetMillis;
+		if((flags & FLAG_GET_MILLIS_UNTIL_BEGIN) != 0)
+			doseTimeOffsetMillis = getDoseTimeBeginOffset(doseTime);
+		else
+			doseTimeOffsetMillis = getDoseTimeEndOffset(doseTime);*/
 
 		final DumbTime doseTimeOffset = new DumbTime(doseTimeOffsetMillis);
 		final Calendar target = DateTime.getDatePart(time);

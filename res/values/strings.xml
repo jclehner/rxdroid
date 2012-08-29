@@ -54,7 +54,7 @@
     <string name="_title_end">End</string>
         
     <string name="_msg_new_notification">New notification</string>
-    <string name="_msg_doses_fp">%1$d missed, %2$d due.</string>
+    <string name="_msg_doses_fp">%2$d due, %1$d missed.</string>
     <string name="_msg_doses_f">%1$d missed.</string>
     <string name="_msg_doses_p">%1$d due.</string>
     <string name="_msg_low_supply_single">%1$s</string>
@@ -241,7 +241,7 @@
 	<string name="_toast_unlimited_history_size">Warning: this setting might cause very long loading times.</string>			
 	<string name="_toast_db_upgraded">Database upgrade successful. Restarting app&#8230;</string>
 	
-	<string name="_title_supply_monitor">Only monitor supplies.</string>
+	<string name="_title_supply_monitor">Automatically mark as taken</string>
 	<string name="_summary_supply_monitor">Doses are automatically marked as taken.</string>
 		
 	<string name="_title_go_to_date">Go to date</string>

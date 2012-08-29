@@ -21,7 +21,6 @@
 
 package at.caspase.rxdroid.db;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.NoSuchElementException;
@@ -300,6 +299,8 @@ public class Drug extends Entry implements Comparable<Drug>
 		}
 		else
 			lastAutoIntakeCreationDate = null;
+
+		Log.d(TAG, "setAutoAddIntakesEnabled: lastAutoIntakeCreationDate=" + lastAutoIntakeCreationDate);
 	}
 
 	public boolean isAutoAddIntakesEnabled() {

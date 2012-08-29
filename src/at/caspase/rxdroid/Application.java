@@ -21,16 +21,19 @@
 
 package at.caspase.rxdroid;
 
+import android.util.Log;
+
 
 public class Application extends android.app.Application
 {
 	@Override
 	public void onCreate()
 	{
-		super.onCreate();
-
+		Log.d("at.caspase.rxdroid.Application", "<init>");
 		GlobalContext.set(getApplicationContext());
 		Settings.init();
 		AutoIntakeCreator.registerSelf();
+
+		super.onCreate();
 	}
 }

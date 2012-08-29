@@ -22,7 +22,6 @@
 package at.caspase.rxdroid;
 
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 import at.caspase.rxdroid.util.Util;
@@ -51,6 +50,11 @@ public class InfiniteViewPagerAdapter extends PagerAdapter
 		return ITEM_COUNT;
 	}
 
+	/*@Override
+	public int getItemPosition(Object object) {
+		return 1;
+	}*/
+
 	@Override
 	public boolean isViewFromObject(View v, Object o) {
 		return v == (View) o;
@@ -62,9 +66,7 @@ public class InfiniteViewPagerAdapter extends PagerAdapter
 		if(mFactory == null)
 			throw new IllegalStateException("No ViewFactory supplied");
 
-		final int offset = position - CENTER;
-
-		View v = mFactory.makeView(offset);
+		View v = mFactory.makeView(position - CENTER);
 		Util.detachFromParent(v);
 		container.addView(v);
 		return v;
@@ -75,7 +77,7 @@ public class InfiniteViewPagerAdapter extends PagerAdapter
 		container.removeView((View) item);
 	}
 
-	public static int getPagerOffset(ViewPager pager) {
+	/*public static int getPagerOffset(ViewPager pager) {
 		return pager.getCurrentItem() - CENTER;
-	}
+	}*/
 }

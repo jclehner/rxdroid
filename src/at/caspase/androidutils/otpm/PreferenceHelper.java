@@ -149,15 +149,15 @@ public abstract class PreferenceHelper<P extends Preference, T>
 	}
 
 	public void onDependencyChange(P preference, String depKey) {
-		if(LOGV) Log.v(TAG, "onDependencyChange: key=" + mPrefKey + ", depKey=" + depKey);
+		// do nothing
 	}
 
 	public void onPreferenceUpdate(P preference, T newValue) {
-
+		// do nothing
 	}
 
 	public void onFieldValueSet(T value) {
-
+		// do nothing
 	}
 
 	protected final void setFieldValue(T value)

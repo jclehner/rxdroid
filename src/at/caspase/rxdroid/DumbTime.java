@@ -52,7 +52,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 	@SuppressWarnings("unused")
 	private static final String TAG = DumbTime.class.getName();
-	private static final String[] FORMATS = { "HH:mm:ss", "HH:mm" };
+	private static final String[] FORMATS = { "HH:mm:ss", "HH:mm", "HH:mm:ss.SSS" };
 
 	private static final int S_MILLIS = 1000;
 	private static final int M_MILLIS = 60 * S_MILLIS;
@@ -89,7 +89,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	 */
 	public DumbTime(long offset, boolean allowMoreThan24Hours)
 	{
-		if(offset >= Constants.MILLIS_PER_DAY && !allowMoreThan24Hours)
+		if(offset < 0 || (offset >= Constants.MILLIS_PER_DAY && !allowMoreThan24Hours))
 			throw new IllegalArgumentException(offset + " is out of range");
 
 		mHours = (int) (offset / H_MILLIS);
@@ -165,14 +165,23 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 	public String toString(boolean use24HourTime, boolean withMillis)
 	{
-		final String pattern;
+		final boolean is24HourFormat = DateFormat.is24HourFormat(GlobalContext.get());
+		final StringBuilder pattern = new StringBuilder();
 
-		if(DateFormat.is24HourFormat((GlobalContext.get())))
-			pattern = "HH:mm" + (mSeconds == 0 ? "" : ":ss") + (withMillis ? ".SSS" : "");
+		if(is24HourFormat)
+			pattern.append("HH:mm");
 		else
-			pattern = "K:mm" + (mSeconds == 0 ? "" : ":ss") + (withMillis ? ".SSS" : "") + " aa";
+			pattern.append("K:mm");
 
-		final SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+		if(withMillis)
+			pattern.append(":ss.SSS");
+		else if(mSeconds != 0)
+			pattern.append(":ss");
+
+		if(!is24HourFormat)
+			pattern.append(" aa");
+
+		final SimpleDateFormat sdf = new SimpleDateFormat(pattern.toString());
 		sdf.setTimeZone(TimeZone.getTimeZone(("UTC")));
 		return sdf.format(new Date(getTime()));
 	}
@@ -194,7 +203,10 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		throw new NullPointerException();
 	}
 
-	@SuppressWarnings("deprecation")
+	public static DumbTime now() {
+		return new DumbTime(new Date().getTime());
+	}
+
 	public static DumbTime fromString(String timeString)
 	{
 		if(timeString != null)

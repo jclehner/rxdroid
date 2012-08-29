@@ -25,6 +25,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
 import android.text.format.DateFormat;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.GlobalContext;
@@ -54,12 +56,12 @@ public final class DateTime
 	 * @deprecated Use {@link #today()}
 	 */
 	@Deprecated
-	public static Calendar todayCalendar() {
-		return getDatePart(DateTime.nowCalendar());
+	public static Calendar todayCalendarMutable() {
+		return getDatePart(DateTime.nowCalendarMutable());
 	}
 
 	public static Date today() {
-		return todayCalendar().getTime();
+		return todayCalendarMutable().getTime();
 	}
 
 	public static Date yesterday() {
@@ -73,12 +75,16 @@ public final class DateTime
 	 * @deprecated Use {@link #now()}
 	 */
 	@Deprecated
-	public static Calendar nowCalendar() {
+	public static Calendar nowCalendarMutable() {
 		return GregorianCalendar.getInstance();
 	}
 
+	public static Calendar nowCalendar() {
+		return ImmutableCalendar.getInstance();
+	}
+
 	public static Date now() {
-		return nowCalendar().getTime();
+		return nowCalendarMutable().getTime();
 	}
 
 	/**
@@ -183,5 +189,81 @@ public final class DateTime
 	public static long diffDays(Date date1, Date date2)
 	{
 		return (date1.getTime() - date2.getTime()) / Constants.MILLIS_PER_DAY;
+	}
+
+	/* package */ class ImmutableCalendar extends GregorianCalendar
+	{
+		private static final long serialVersionUID = -3883494047745731717L;
+
+		private long mTime = -1;
+
+		@Override
+		public void add(int field, int value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void set(int field, int value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void roll(int field, boolean increment) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setTimeInMillis(long milliseconds) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setTimeZone(TimeZone timezone) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		protected void complete()
+		{
+			checkTimeForIllegalModification();
+			super.complete();
+			checkTimeForIllegalModification();
+		}
+
+		@Override
+		protected void computeFields()
+		{
+			checkTimeForIllegalModification();
+			super.computeFields();
+			checkTimeForIllegalModification();
+		}
+
+		@Override
+		protected void computeTime()
+		{
+			checkTimeForIllegalModification();
+			super.computeTime();
+			checkTimeForIllegalModification();
+		}
+
+		private void setTimeZoneInternal(TimeZone timezone) {
+			super.setTimeZone(timezone);
+		}
+
+		private void setTimeInMillisInternal(long milliseconds) {
+			super.setTimeInMillis(milliseconds);
+		}
+
+		private void checkTimeForIllegalModification()
+		{
+			if(mTime == -1)
+			{
+				mTime = getTimeInMillis();
+				return;
+			}
+
+			if(mTime != getTimeInMillis())
+				throw new IllegalStateException("Modification of immutable instance detected");
+		}
 	}
 }

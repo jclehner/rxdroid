@@ -34,7 +34,9 @@ import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.Settings;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Schedule;
 import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.WrappedCheckedException;
 
 /**
  * Tests for the time handling methods from the Preferences class.
@@ -57,6 +59,9 @@ public class PreferencesTest extends AndroidTestCase
 {
 	private static final String TAG = PreferencesTest.class.getName();
 
+	private static final int TRUE = 1;
+	private static final int FALSE = 0;
+
 	private SharedPreferences mPrefs;
 	private Map<String, String> mPrefBackup;
 
@@ -64,11 +69,11 @@ public class PreferencesTest extends AndroidTestCase
 	{
 		final int[][] testCases = {
 				{      18, 00, Drug.TIME_EVENING, Drug.TIME_NIGHT },
-				{      21, 00, -1, Drug.TIME_NIGHT },
+				{      21, 00, Schedule.TIME_INVALID, Drug.TIME_NIGHT },
 				{      23, 00, Drug.TIME_NIGHT, Drug.TIME_MORNING },
 				{ 24 + 00, 00, Drug.TIME_NIGHT, Drug.TIME_MORNING },
 				{ 24 + 00, 30, Drug.TIME_NIGHT, Drug.TIME_MORNING },
-				{ 24 + 01, 30, -1, Drug.TIME_MORNING }
+				{ 24 + 01, 30, Schedule.TIME_INVALID, Drug.TIME_MORNING }
 		};
 
 		for(int i = 0; i != testCases.length; ++i)
@@ -78,22 +83,22 @@ public class PreferencesTest extends AndroidTestCase
 			final int doseTime     = testCases[i][2];
 			final int nextDoseTime = testCases[i][3];
 
-			final Calendar date = DateTime.todayCalendar();
+			final Calendar date = DateTime.todayCalendarMutable();
 			final Calendar time = (Calendar) date.clone();
 
 			time.set(Calendar.HOUR_OF_DAY, hours);
 			time.set(Calendar.MINUTE, minutes);
 
-			final Settings prefs = Settings.instance();
+			//final Settings prefs = Settings.instance();
 
 			Log.d(TAG, "testGetActiveDoseTimeAndGetNextDoseTime:");
 			//Log.d(TAG, "  date/time   : " + date + ", " + time);
 			Log.d(TAG, "  doseTime    : " + doseTime);
 			Log.d(TAG, "  nextDoseTime: " + nextDoseTime + "\n");
 
-			assertEquals(doseTime, prefs.getActiveDoseTime(time));
+			assertEquals(doseTime, Settings.getActiveDoseTime(time));
 			Log.d(TAG, "  [OK] getActiveDoseTime");
-			assertEquals(nextDoseTime, prefs.getNextDoseTime(time));
+			assertEquals(nextDoseTime, Settings.getNextDoseTime(time));
 			Log.d(TAG, "  [OK] getNextDoseTime");
 			Log.d(TAG, "-----------------------------");
 		}
@@ -110,7 +115,7 @@ public class PreferencesTest extends AndroidTestCase
 				{ 24 + 01, 30, 16200000, -1 } // (06:00 - 01:30) = 270min in millis
 		};
 
-		testTimeOffsets(DateTime.todayCalendar(), testCases);
+		testTimeOffsets(DateTime.todayCalendarMutable(), testCases);
 	}
 
 	public void testTimeOffsetsWithDst()
@@ -155,12 +160,15 @@ public class PreferencesTest extends AndroidTestCase
 			time.set(Calendar.HOUR_OF_DAY, (int) hours);
 			time.set(Calendar.MINUTE, (int) minutes);
 
-			final Settings prefs = Settings.instance();
+			//final int activeOrNextDoseTime = Settings.getActiveOrNextDoseTime(time);
 
-			final int activeOrNextDoseTime = prefs.getActiveOrNextDoseTime(time);
+			int activeOrNextDoseTime = Settings.getActiveDoseTime(time);
+			if(activeOrNextDoseTime == Schedule.TIME_INVALID)
+				activeOrNextDoseTime = Settings.getNextDoseTime(time);
+
 
 			Log.d(TAG, "testTimeOffsets:");
-			Log.d(TAG, "  date/time           : " + DateTime.toSqlDate(date) + ", " + DateTime.toSqlTime(time));
+			Log.d(TAG, "  date/time           : " + toSqlDate(date) + ", " + toSqlTime(time));
 			Log.d(TAG, "  hours               : " + hours);
 			Log.d(TAG, "  minutes             : " + minutes);
 			Log.d(TAG, "  millisUntilBegin    : " + millisUntilBegin);
@@ -169,7 +177,7 @@ public class PreferencesTest extends AndroidTestCase
 
 			if(millisUntilBegin != -1)
 			{
-				assertEquals(millisUntilBegin, prefs.getMillisUntilDoseTimeBegin(time, activeOrNextDoseTime));
+				assertEquals(millisUntilBegin, Settings.getMillisUntilDoseTimeBegin(time, activeOrNextDoseTime));
 				Log.d(TAG, "  [OK] getMillisUntilDoseTimeBegin");
 			}
 			else
@@ -177,7 +185,7 @@ public class PreferencesTest extends AndroidTestCase
 
 			if(millisUntilEnd != -1)
 			{
-				assertEquals(millisUntilEnd, prefs.getMillisUntilDoseTimeEnd(time, activeOrNextDoseTime));
+				assertEquals(millisUntilEnd, Settings.getMillisUntilDoseTimeEnd(time, activeOrNextDoseTime));
 				Log.d(TAG, "  [OK] getMillisUntilDoseTimeEnd");
 			}
 			else
@@ -204,21 +212,66 @@ public class PreferencesTest extends AndroidTestCase
 			{ 48 + 06, 30, 2 }
 		};
 
-		final Calendar today = DateTime.todayCalendar();
+		final Calendar today = DateTime.todayCalendarMutable();
 
 		for(int i = 0; i != testCases.length; ++i)
 		{
+			Log.d(TAG, "testGetActiveDate");
+
 			final Calendar time = (Calendar) today.clone();
-			time.add(Calendar.HOUR_OF_DAY, testCases[i][0]);
-			time.add(Calendar.MINUTE, testCases[i][1]);
+			time.set(Calendar.HOUR_OF_DAY, testCases[i][0]);
+			time.set(Calendar.MINUTE, testCases[i][1]);
 
 			final Calendar expected = (Calendar) today.clone();
 			expected.add(Calendar.DAY_OF_MONTH, testCases[i][2]);
 
+			Log.d(TAG, "  currentTime       : " + DateTime.toString(time));
+			Log.d(TAG, "  expectedActiveDate: " + DateTime.toString(expected) + " (+" + testCases[i][2] + "d)");
 			assertEquals(expected.getTime(), Settings.getActiveDate(time));
+			Log.d(TAG, "[OK]");
+			Log.d(TAG, "-----------------------------");
 		}
-
 	}
+
+	/*public void testGetDateForFutureDoseTime()
+	{
+		final int[][] testCases = {
+				//hours		mins	doseTime				expect same date?
+				{ 5,		00,		Schedule.TIME_MORNING,	TRUE },
+				{ 8,		00,		Schedule.TIME_NIGHT,	TRUE },
+				{ 8,		00,		Schedule.TIME_MORNING,	FALSE },
+				{ 24 + 01,	00,		Schedule.TIME_MORNING,	TRUE }
+		};
+
+		final Calendar cal = DateTime.todayCalendar();
+
+		Log.d(TAG, "testGetDateForFutureDoseTime: ");
+
+		for(int[] testCase : testCases)
+		{
+			cal.set(Calendar.HOUR_OF_DAY, testCase[0]);
+			cal.set(Calendar.MINUTE, testCase[1]);
+
+			final Date doseTimeDate = Settings.getDateForFutureDoseTime(cal, testCase[2]);
+			final boolean expectSameDate = testCase[3] == TRUE ? true : false;
+
+			final int calDay = cal.get(Calendar.DAY_OF_MONTH);
+			final int doseTimeDateDay = DateTime.get(doseTimeDate, Calendar.DAY_OF_MONTH);
+
+			final boolean success = expectSameDate ? (calDay == doseTimeDateDay) : (calDay != doseTimeDateDay);
+
+			Log.d(TAG, "  cal=" + DateTime.toString(cal));
+			Log.d(TAG, "  doseTime=" + testCase[2]);
+			Log.d(TAG, "  wantSameDate=" + expectSameDate);
+			Log.d(TAG, "  date=" + doseTimeDate);
+			Log.d(TAG, success ? "[OK]" : "[FAIL]");
+
+			if(!success)
+			{
+				fail("Expected date of " + DateTime.toString(cal) + " to be " + (expectSameDate ? "equal" : "not equal") + ", got " + doseTimeDate);
+			}
+		}
+	}*/
 
 	@Override
 	protected void setUp()
@@ -227,9 +280,9 @@ public class PreferencesTest extends AndroidTestCase
 		{
 			super.setUp();
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			throw new WrappedCheckedException(e);
 		}
 
 		GlobalContext.set(mContext);
@@ -237,22 +290,17 @@ public class PreferencesTest extends AndroidTestCase
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		mPrefBackup = new HashMap<String, String>();
 
-		for (String key : mPrefs.getAll().keySet())
+		for(String key : mPrefs.getAll().keySet())
 		{
-			if (key.startsWith("time_"))
+			if(key.startsWith("time_"))
 				mPrefBackup.put(key, mPrefs.getString(key, null));
 		}
 
 		Editor e = mPrefs.edit();
 
-		e.putString("time_morning_begin", "06:00");
-		e.putString("time_morning_end", "10:00");
-
-		e.putString("time_evening_begin", "18:00");
-		e.putString("time_evening_end", "21:00");
-
-		e.putString("time_night_begin", "23:00");
-		e.putString("time_night_end", "01:30");
+		e.putString("time_morning", "06:00-10:00");
+		e.putString("time_evening", "18:00-21:00");
+		e.putString("time_night", "23:00-01:30");
 
 		e.commit();
 	}
@@ -264,18 +312,34 @@ public class PreferencesTest extends AndroidTestCase
 		{
 			super.tearDown();
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			throw new WrappedCheckedException(e);
 		}
 
 		Editor e = mPrefs.edit();
 
-		for (String key : mPrefBackup.keySet())
+		for(String key : mPrefBackup.keySet())
 			e.putString(key, mPrefBackup.get(key));
 
 		e.commit();
 	}
+
+	private static java.sql.Date toSqlDate(Calendar cal)
+    {
+            final int year = cal.get(Calendar.YEAR);
+            final int month = cal.get(Calendar.MONTH);
+            final int day = cal.get(Calendar.DAY_OF_MONTH);
+
+            return new java.sql.Date(year - 1900, month, day);
+    }
+
+	private static java.sql.Time toSqlTime(Calendar cal)
+    {
+            final java.sql.Time time = new java.sql.Time(cal.getTimeInMillis());
+            return time;
+    }
+
 
 	private static void assertEquals(Calendar expected, Calendar actual) {
 		assertEquals(DateTime.toString(expected), DateTime.toString(actual));

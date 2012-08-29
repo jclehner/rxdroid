@@ -35,7 +35,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -165,7 +164,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		super.onPause();
 		mIsShowing = false;
-		NotificationReceiver.unregisterOnReceiveListener(mDoseTimeListener);
+		NotificationReceiver.unregisterOnDoseTimeChangeListener(mDoseTimeListener);
 	}
 
 	@Override
@@ -279,9 +278,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		// ////////////////////////////////////////////////
 
-		if(drug.isAutoAddIntakesEnabled())
-			return;
-
 		final boolean wasDoseTaken = doseView.wasDoseTaken();
 		final int toggleIntakeMessageId;
 
@@ -330,8 +326,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	public void onDrugNameClick(View view)
 	{
-		Log.d(TAG, "onDrugNameClick: view.class=" + view);
-
 		Intent intent = new Intent(Intent.ACTION_EDIT);
 		intent.setClass(this, DrugEditActivity.class);
 
@@ -412,11 +406,11 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		if(!date.equals(mDate))
 			Log.w(TAG, "Activity date " + mDate + " differs from DoseView date " + date);
 
-		if(drug.isAutoAddIntakesEnabled())
+		/*if(drug.isAutoAddIntakesEnabled())
 		{
 			Toast.makeText(this, R.string._toast_drug_is_supply_monitor, Toast.LENGTH_SHORT).show();
 			return;
-		}
+		}*/
 
 		if(MultipleIntakeDialogsPreventer.INSTANCE.canShowDialog())
 		{
@@ -476,6 +470,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			if(Database.countAll(Drug.class) != 0)
 			{
 				mPager.setAdapter(new InfiniteViewPagerAdapter(this));
+				//mPager.setCurrentItem(1);
 				mPager.setCurrentItem(InfiniteViewPagerAdapter.CENTER, smoothScroll);
 			}
 			else

@@ -31,6 +31,29 @@ mktempd() {
 	mktemp -d $MKTEMP_CMDLINE
 }
 
+if false; then
+	adb()
+	{
+		set +u
+
+		if [[ -z "${ANDROID_SERIAL}" ]]; then
+			local DEVICES=$(adb devices | grep -v 'List of devices attached' | awk '{ print $1 }')
+			read -ra DEVICES <<< $DEVICES
+
+			if [[ ${#DEVICES[@]} -gt 1 ]]; then
+				echo "Select Android device to use"	
+				select DEVICE in ${DEVICES[@]}; do
+					export ANDROID_SERIAL=${DEVICE}
+				done
+			fi
+		fi
+
+		set -u
+
+		command adb "$@"
+	}
+fi
+
 # Hack to prevent expansion of paths like /foo to
 # C:\Program Files\Git\foo when using Git Bash under
 # M$ Windows

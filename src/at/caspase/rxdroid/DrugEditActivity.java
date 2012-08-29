@@ -90,7 +90,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
 
 	private static final String TAG = DrugEditActivity.class.getName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = true;
 
 	private DrugWrapper mWrapper;
 	private int mDrugHash;
@@ -440,6 +440,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		private Schedule schedule;
 		private String comment;
 
+		/*@CreatePreference
+		(
+			title = "lastAutoIntakeCreationDate",
+			order = 14,
+			type = Preference.class,
+			helper = ReadonlyPreferenceHelper.class,
+			reverseDependencies = "autoAddIntakes"
+		)*/
 		private Date lastAutoIntakeCreationDate;
 
 		public DrugWrapper(Context context)
@@ -674,7 +682,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			if(repeatArg == 0)
 			{
 				// check the current weekday if none is selected
-				final int weekday = DateTime.nowCalendar().get(Calendar.DAY_OF_WEEK);
+				final int weekday = DateTime.nowCalendarMutable().get(Calendar.DAY_OF_WEEK);
 				final int index = CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);
 				checkedItems[index] = true;
 				repeatArg |= 1 << index;
