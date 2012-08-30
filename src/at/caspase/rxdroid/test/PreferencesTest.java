@@ -22,10 +22,14 @@
 package at.caspase.rxdroid.test;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+//import junit.framework.Assert;
+
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
@@ -33,10 +37,13 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.Settings;
+import at.caspase.rxdroid.Settings.DoseTimeInfo;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Schedule;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.WrappedCheckedException;
+//import static org.hamcrest.CoreMatchers.*;
+import org.junit.Assert;
 
 /**
  * Tests for the time handling methods from the Preferences class.
@@ -233,6 +240,44 @@ public class PreferencesTest extends AndroidTestCase
 		}
 	}
 
+	public void testGetDoseTimeInfo()
+	{
+		final int[][] testCases = {
+				//hours		mins	nextDoseTimeDate == currentDate
+				{ 22, 		00,		TRUE },
+				{ 23,		30,		FALSE },
+				{ 01,		00,		TRUE },
+				{ 06,		30,		TRUE }
+		};
+
+		for(int testData[] : testCases)
+		{
+			final Calendar time = todayCalendarWithTime(testData[0], testData[1]);
+			final Date date = DateTime.getDatePart(time).getTime();
+
+			final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo(time);
+			final boolean wantSameDate = testData[2] == TRUE;
+
+			Log.d(TAG, "testGetDoseTimeInfo");
+			Log.d(TAG, "  time=" + DateTime.toString(time));
+			Log.d(TAG, "  date=" + date);
+			Log.d(TAG, "  nextDoseTime=" + dtInfo.nextDoseTime());
+			Log.d(TAG, "  wantSameDate=" + wantSameDate);
+			Log.d(TAG, "  nextDoseTimeDate=" + dtInfo.nextDoseTimeDate());
+
+			if(wantSameDate)
+				Assert.assertEquals(date, dtInfo.nextDoseTimeDate());
+			else
+			{
+				if(date.equals(dtInfo.nextDoseTimeDate()))
+					fail("Expected date other than " + date);
+			}
+
+			Log.d(TAG, "[OK]");
+			Log.d(TAG,"-----------------------------------------");
+		}
+	}
+
 	/*public void testGetDateForFutureDoseTime()
 	{
 		final int[][] testCases = {
@@ -274,6 +319,13 @@ public class PreferencesTest extends AndroidTestCase
 	}*/
 
 	@Override
+	public void setContext(Context context)
+	{
+		super.setContext(context);
+		Log.i(TAG, "setContext: context=" + context);
+	}
+
+	@Override
 	protected void setUp()
 	{
 		try
@@ -285,24 +337,13 @@ public class PreferencesTest extends AndroidTestCase
 			throw new WrappedCheckedException(e);
 		}
 
+		if(mContext == null)
+			fail("mContext == null");
+
 		GlobalContext.set(mContext);
+		Settings.init();
 
-		mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		mPrefBackup = new HashMap<String, String>();
-
-		for(String key : mPrefs.getAll().keySet())
-		{
-			if(key.startsWith("time_"))
-				mPrefBackup.put(key, mPrefs.getString(key, null));
-		}
-
-		Editor e = mPrefs.edit();
-
-		e.putString("time_morning", "06:00-10:00");
-		e.putString("time_evening", "18:00-21:00");
-		e.putString("time_night", "23:00-01:30");
-
-		e.commit();
+		backupPreferences();
 	}
 
 	@Override
@@ -325,6 +366,26 @@ public class PreferencesTest extends AndroidTestCase
 		e.commit();
 	}
 
+	private void backupPreferences()
+	{
+		mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		mPrefBackup = new HashMap<String, String>();
+
+		for(String key : mPrefs.getAll().keySet())
+		{
+			if(key.startsWith("time_"))
+				mPrefBackup.put(key, mPrefs.getString(key, null));
+		}
+
+		Editor e = mPrefs.edit();
+
+		e.putString("time_morning", "06:00-10:00");
+		e.putString("time_evening", "18:00-21:00");
+		e.putString("time_night", "23:00-01:30");
+
+		e.commit();
+	}
+
 	private static java.sql.Date toSqlDate(Calendar cal)
     {
             final int year = cal.get(Calendar.YEAR);
@@ -340,6 +401,21 @@ public class PreferencesTest extends AndroidTestCase
             return time;
     }
 
+	private static Calendar todayCalendarWithTime(int hours, int minutes) {
+		return todayCalendarWithTime(hours, minutes, 0);
+	}
+
+	private static Calendar todayCalendarWithTime(int hours, int minutes, int millis)
+	{
+		final Calendar cal = DateTime.todayCalendarMutable();
+		cal.set(Calendar.HOUR_OF_DAY, hours);
+		cal.set(Calendar.MINUTE, minutes);
+
+		if(millis != 0)
+			cal.set(Calendar.MILLISECOND, millis);
+
+		return cal;
+	}
 
 	private static void assertEquals(Calendar expected, Calendar actual) {
 		assertEquals(DateTime.toString(expected), DateTime.toString(actual));

@@ -78,7 +78,7 @@ public final class Settings
 			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sContext);
 		}
 
-		if(LOGV)
+		if(LOGV && false)
 		{
 
 			final Map<String, ?> prefs = sSharedPrefs.getAll();
@@ -263,42 +263,133 @@ public final class Settings
 
 		};
 
-		public Calendar currentTime;
-		public Date activeDate;
-		public int activeDoseTime;
-		public int nextDoseTime;
+		public Calendar currentTime() {
+			return mCurrentTime;
+		}
+
+		public Date activeDate() {
+			return mActiveDate;
+		}
+
+		public Date nextDoseTimeDate() {
+			return mNextDoseTimeDate;
+		}
+
+		public int activeDoseTime() {
+			return mActiveDoseTime;
+		}
+
+		public int nextDoseTime() {
+			return mNextDoseTime;
+		}
+
+		private Calendar mCurrentTime;
+		private Date mActiveDate;
+		private Date mNextDoseTimeDate = null;
+		private int mActiveDoseTime;
+		private int mNextDoseTime;
 
 		private DoseTimeInfo() {}
 	}
 
 	public static DoseTimeInfo getDoseTimeInfo()
 	{
+		/*final DoseTimeInfo dtInfo = DoseTimeInfo.INSTANCES.get();
+
+		dtInfo.mCurrentTime = DateTime.nowCalendar();
+		dtInfo.mActiveDate = getActiveDate(dtInfo.mCurrentTime);
+		dtInfo.mActiveDoseTime = getActiveDoseTime(dtInfo.mCurrentTime);
+		dtInfo.mNextDoseTime = getNextDoseTime(dtInfo.mCurrentTime);
+
+		final Date currentDate = DateTime.getDatePart(dtInfo.mCurrentTime).getTime();
+
+		if(dtInfo.mActiveDoseTime == Schedule.TIME_INVALID && dtInfo.mNextDoseTime == Schedule.TIME_MORNING)
+		{
+			// If active date is equal to the current date, we're somewhere before
+			// midnight on that date and thus need to adjust mNextDoseTimeDate.
+
+			if(dtInfo.mActiveDate.equals(currentDate))
+				dtInfo.mNextDoseTimeDate = DateTime.add(currentDate, Calendar.DAY_OF_MONTH, 1);
+		}
+
+		if(dtInfo.mNextDoseTimeDate == null)
+			dtInfo.mNextDoseTimeDate = currentDate;
+
+		return dtInfo;*/
+
+		return getDoseTimeInfo(DateTime.nowCalendar());
+	}
+
+	public static DoseTimeInfo getDoseTimeInfo(Calendar currentTime)
+	{
 		final DoseTimeInfo dtInfo = DoseTimeInfo.INSTANCES.get();
 
-		dtInfo.currentTime = DateTime.nowCalendar();
-		//dtInfo.currentTime = ImmutableCalendar.getInstance();
+		dtInfo.mCurrentTime = currentTime;
+		dtInfo.mActiveDate = getActiveDate(dtInfo.mCurrentTime);
+		dtInfo.mActiveDoseTime = getActiveDoseTime(dtInfo.mCurrentTime);
+		dtInfo.mNextDoseTime = getNextDoseTime(dtInfo.mCurrentTime);
 
-		dtInfo.activeDate = getActiveDate(dtInfo.currentTime);
-		dtInfo.activeDoseTime = getActiveDoseTime(dtInfo.currentTime);
-		dtInfo.nextDoseTime = getNextDoseTime(dtInfo.currentTime);
+		final Date currentDate = DateTime.getDatePartMutable(dtInfo.mCurrentTime).getTime();
+
+		if(dtInfo.mActiveDoseTime == Schedule.TIME_INVALID && dtInfo.mNextDoseTime == Schedule.TIME_MORNING)
+		{
+			// FIXME problem lies here, as mActiveDoseTime could also be TIME_NIGHT
+
+			// If active date is equal to the current date, we're somewhere before
+			// midnight on that date and thus need to adjust mNextDoseTimeDate.
+
+			if(dtInfo.mActiveDate.equals(currentDate))
+				dtInfo.mNextDoseTimeDate = DateTime.add(currentDate, Calendar.DAY_OF_MONTH, 1);
+		}
+
+		if(dtInfo.mNextDoseTimeDate == null)
+			dtInfo.mNextDoseTimeDate = currentDate;
 
 		return dtInfo;
 	}
 
 	public static Date getActiveDate(Calendar time)
 	{
-		final Calendar cal = DateTime.getDatePart(time);
+		Log.d(TAG, "getActiveDate: time=" + DateTime.toString(time));
+
+		final Calendar activeDate = DateTime.getDatePartMutable(time);
 		final int activeDoseTime = getActiveDoseTime(time);
+
+		Log.d(TAG, "  date=" + DateTime.toString(activeDate));
 
 		if(activeDoseTime == Drug.TIME_NIGHT && hasWrappingDoseTimeNight())
 		{
 			final DumbTime end = new DumbTime(getDoseTimeEndOffset(Drug.TIME_NIGHT));
-			if(DateTime.isWithinRange(time, new DumbTime(0), end))
-				cal.add(Calendar.DAY_OF_MONTH, -1);
+			if(DateTime.isWithinRange(time, Constants.MIDNIGHT, end))
+			{
+				activeDate.add(Calendar.DAY_OF_MONTH, -1);
+				Log.d(TAG, "  adjusted activeDate");
+			}
 		}
 
-		return cal.getTime();
+		Log.d(TAG, "  time=" + DateTime.toString(time));
+		Log.d(TAG, "  activeDoseTime=" + activeDoseTime);
+		Log.d(TAG, "  activeDate=" + DateTime.toString(activeDate));
+
+		return activeDate.getTime();
 	}
+
+
+
+	public static boolean isBeforeDoseTimeNightWrap(DoseTimeInfo dtInfo)
+	{
+		if(!hasWrappingDoseTimeNight())
+			throw new IllegalStateException("!hasWrappingDoseTimeNight()");
+
+		if(dtInfo.mActiveDoseTime != Schedule.TIME_NIGHT)
+			throw new IllegalStateException("dtInfo.activeDoseTime != Schedule.TIME_NIGHT");
+
+		final long endOfNightOffset = getDoseTimeEndOffset(Schedule.TIME_NIGHT);
+		final long currentTimeOffset = DateTime.getOffsetFromMidnight(dtInfo.mCurrentTime);
+
+		return currentTimeOffset > endOfNightOffset;
+	}
+
 
 
 	@SuppressWarnings("deprecation")
@@ -450,7 +541,7 @@ public final class Settings
 			doseTimeOffsetMillis = getDoseTimeEndOffset(doseTime);*/
 
 		final DumbTime doseTimeOffset = new DumbTime(doseTimeOffsetMillis);
-		final Calendar target = DateTime.getDatePart(time);
+		final Calendar target = DateTime.getDatePartMutable(time);
 
 		// simply adding the millisecond offset is tempting, but leads to errors
 		// when the DST begins/ends in this interval

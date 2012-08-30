@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import android.text.format.DateFormat;
@@ -40,6 +41,8 @@ public final class DateTime
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = DateTime.class.getName();
+
+	private static final int[] CALENDAR_TIME_FIELDS = { Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND };
 
 	public static Calendar calendarFromDate(Date date)
 	{
@@ -57,7 +60,7 @@ public final class DateTime
 	 */
 	@Deprecated
 	public static Calendar todayCalendarMutable() {
-		return getDatePart(DateTime.nowCalendarMutable());
+		return getDatePartMutable(DateTime.nowCalendarMutable());
 	}
 
 	public static Date today() {
@@ -80,7 +83,7 @@ public final class DateTime
 	}
 
 	public static Calendar nowCalendar() {
-		return ImmutableCalendar.getInstance();
+		return ImmutableGregorianCalendar.getInstance();
 	}
 
 	public static Date now() {
@@ -90,13 +93,28 @@ public final class DateTime
 	/**
 	 * Sets a <code>Calendar's</code> time to 00:00:00.000.
 	 */
+	public static Calendar getDatePartMutable(Calendar time)
+	{
+		final int year = time.get(Calendar.YEAR);
+		final int month = time.get(Calendar.MONTH);
+		final int day = time.get(Calendar.DAY_OF_MONTH);
+
+		//final Calendar date = (Calendar) time.clone();
+		final Calendar date = new GregorianCalendar(year, month, day);
+		date.setTimeZone(time.getTimeZone());
+
+		//for(int field: CALENDAR_TIME_FIELDS)
+		//	date.set(field, 0);
+
+		return date;
+	}
+
 	public static Calendar getDatePart(Calendar time)
 	{
-		final Calendar date = (Calendar) time.clone();
-		final int calFields[] = { Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND };
+		final ImmutableGregorianCalendar date = getImmutableInstance(time);
 
-		for(int calField: calFields)
-			date.set(calField, 0);
+		for(int field : CALENDAR_TIME_FIELDS)
+			date.setInternal(field, 0);
 
 		return date;
 	}
@@ -191,11 +209,25 @@ public final class DateTime
 		return (date1.getTime() - date2.getTime()) / Constants.MILLIS_PER_DAY;
 	}
 
-	/* package */ class ImmutableCalendar extends GregorianCalendar
+	private static ImmutableGregorianCalendar getImmutableInstance(Calendar cal)
+	{
+		final ImmutableGregorianCalendar r = new ImmutableGregorianCalendar(cal);
+		r.setTimeInMillisInternal(cal.getTimeInMillis());
+		return r;
+	}
+
+	private static final class ImmutableGregorianCalendar extends GregorianCalendar
 	{
 		private static final long serialVersionUID = -3883494047745731717L;
 
-		private long mTime = -1;
+		private ImmutableGregorianCalendar(Calendar other)
+		{
+			super(other.getTimeZone(), Locale.getDefault());
+			time = other.getTimeInMillis();
+			areFieldsSet = true;
+			isTimeSet = true;
+			complete();
+		}
 
 		@Override
 		public void add(int field, int value) {
@@ -213,37 +245,31 @@ public final class DateTime
 		}
 
 		@Override
-		public void setTimeInMillis(long milliseconds) {
+		public void setTimeInMillis(long milliseconds)
+		{
+			if(!isTimeSet)
+			{
+				super.setTimeInMillis(milliseconds);
+				return;
+			}
+
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public void setTimeZone(TimeZone timezone) {
+		public void setTimeZone(TimeZone timezone)
+		{
+			if(getTimeZone() == null)
+			{
+				super.setTimeZone(timezone);
+				return;
+			}
+
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
-		protected void complete()
-		{
-			checkTimeForIllegalModification();
-			super.complete();
-			checkTimeForIllegalModification();
-		}
-
-		@Override
-		protected void computeFields()
-		{
-			checkTimeForIllegalModification();
-			super.computeFields();
-			checkTimeForIllegalModification();
-		}
-
-		@Override
-		protected void computeTime()
-		{
-			checkTimeForIllegalModification();
-			super.computeTime();
-			checkTimeForIllegalModification();
+		private void setInternal(int field, int value) {
+			super.set(field, value);
 		}
 
 		private void setTimeZoneInternal(TimeZone timezone) {
@@ -252,18 +278,6 @@ public final class DateTime
 
 		private void setTimeInMillisInternal(long milliseconds) {
 			super.setTimeInMillis(milliseconds);
-		}
-
-		private void checkTimeForIllegalModification()
-		{
-			if(mTime == -1)
-			{
-				mTime = getTimeInMillis();
-				return;
-			}
-
-			if(mTime != getTimeInMillis())
-				throw new IllegalStateException("Modification of immutable instance detected");
 		}
 	}
 }

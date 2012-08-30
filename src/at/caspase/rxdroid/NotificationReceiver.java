@@ -137,10 +137,10 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
 
-		if(dtInfo.activeDoseTime != Schedule.TIME_INVALID)
-			scheduleEndAlarm(dtInfo.currentTime, dtInfo.activeDoseTime);
+		if(dtInfo.activeDoseTime() != Schedule.TIME_INVALID)
+			scheduleEndAlarm(dtInfo.currentTime(), dtInfo.activeDoseTime());
 		else
-			scheduleBeginAlarm(dtInfo.currentTime, dtInfo.nextDoseTime);
+			scheduleBeginAlarm(dtInfo.currentTime(), dtInfo.nextDoseTime());
 	}
 
 	private void updateCurrentNotifications()
@@ -148,16 +148,21 @@ public class NotificationReceiver extends BroadcastReceiver
 		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
 		final boolean isActiveDoseTime;
 
-		int doseTime = dtInfo.activeDoseTime;
+		Date date = dtInfo.activeDate();
+
+		int doseTime = dtInfo.activeDoseTime();
 		if(doseTime == Schedule.TIME_INVALID)
 		{
+			if(dtInfo.nextDoseTime() == Schedule.TIME_MORNING && !Settings.hasWrappingDoseTimeNight())
+				date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
+
 			isActiveDoseTime = false;
-			doseTime = dtInfo.nextDoseTime;
+			doseTime = dtInfo.nextDoseTime();
 		}
 		else
 			isActiveDoseTime = true;
 
-		updateNotifications(dtInfo.activeDate, doseTime, isActiveDoseTime);
+		updateNotifications(/*dtInfo.activeDate()*/ date, doseTime, isActiveDoseTime);
 	}
 
 	private void updateNotifications(Date date, int doseTime, boolean isActiveDoseTime)
@@ -165,10 +170,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		final MyNotification.Builder builder = new MyNotification.Builder(mContext);
 
 		final String message2 = getLowSupplyMessage(date, doseTime);
-		int pendingCount = isActiveDoseTime ? countOpenIntakes(date, doseTime) : 0;
-		int forgottenCount = countForgottenIntakes(date, doseTime, isActiveDoseTime);
+		int dueCount = isActiveDoseTime ? countOpenIntakes(date, doseTime) : 0;
+		int missedCount = countMissedIntakes(date, doseTime, isActiveDoseTime);
 
-		if((pendingCount + forgottenCount) == 0 && message2 == null)
+		Log.d(TAG, "updateNotifications: date=" + date + ", doseTime=" + doseTime + " (" + (isActiveDoseTime ? "active" : "not active") + ")");
+
+		if((dueCount + missedCount) == 0 && message2 == null)
 		{
 			builder.cancel();
 			return;
@@ -180,12 +187,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setIcon1(R.drawable.ic_stat_normal);
 		builder.setIcon2(R.drawable.ic_stat_exclamation);
 
-		if(pendingCount != 0 && forgottenCount != 0)
-			builder.setMessage1(R.string._msg_doses_fp, forgottenCount, pendingCount);
-		else if(pendingCount != 0)
-			builder.setMessage1(R.string._msg_doses_p, pendingCount);
-		else if(forgottenCount != 0)
-			builder.setMessage1(R.string._msg_doses_f, forgottenCount);
+		if(dueCount != 0 && missedCount != 0)
+			builder.setMessage1(R.string._msg_doses_fp, missedCount, dueCount);
+		else if(dueCount != 0)
+			builder.setMessage1(R.string._msg_doses_p, dueCount);
+		else if(missedCount != 0)
+			builder.setMessage1(R.string._msg_doses_f, missedCount);
 
 		builder.setMessage2(message2);
 		builder.setForceUpdate(mAlarmRepeatMode == ALARM_MODE_REPEAT);
@@ -254,9 +261,8 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		if(LOGV)
 		{
-			Log.v(TAG, "offset: " + Util.millis(offset));
 			Log.v(TAG, "Scheduling " + (scheduleEnd ? mAlarmRepeatMode != ALARM_MODE_REPEAT ? "end" : "next alarm" : "begin") +
-					" of doseTime " + doseTime + " for " + DateTime.toString(time));
+					" of doseTime " + doseTime + " on date " + DateTime.toString(doseTimeDate) + " for " + DateTime.toString(time));
 			Log.v(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
 		}
 
@@ -306,10 +312,6 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date) || drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND)
 				continue;
 
-			// XXX is this really neccessary?
-			if(drug.isAutoAddIntakesEnabled())
-				continue;
-
 			if(Entries.countIntakes(drug, date, doseTime) == 0)
 				++count;
 		}
@@ -318,17 +320,16 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	}
 
-	private int countForgottenIntakes(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime)
+	private int countMissedIntakes(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime)
 	{
 		int count = 0;
 
 		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
 		{
-			// If Drug.TIME_NIGHT ends after midnight, we must adjust the date accordingly to display
-			// the correct notifications.
-
 			final Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
 			count = countOpenIntakes(checkDate, Drug.TIME_NIGHT);
+
+			Log.i(TAG, "countMissingIntakes: checkDate adjusted to " + checkDate + ", count=" + count);
 		}
 		else
 		{

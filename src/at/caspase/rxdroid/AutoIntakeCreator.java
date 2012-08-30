@@ -139,7 +139,7 @@ public enum AutoIntakeCreator implements
 
 		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
 
-		while(date.before(dtInfo.activeDate))
+		while(date.before(dtInfo.activeDate()))
 		{
 			for(int doseTime : Constants.DOSE_TIMES)
 			{
@@ -150,8 +150,8 @@ public enum AutoIntakeCreator implements
 			date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
 		}
 
-		for(int doseTime = Schedule.TIME_MORNING; doseTime != dtInfo.nextDoseTime; ++doseTime)
-			createIntake(drug, dtInfo.activeDate, doseTime);
+		for(int doseTime = Schedule.TIME_MORNING; doseTime != dtInfo.nextDoseTime(); ++doseTime)
+			createIntake(drug, dtInfo.activeDate(), doseTime);
 	}
 
 	private static void createIntake(Drug drug, Date date, int doseTime)

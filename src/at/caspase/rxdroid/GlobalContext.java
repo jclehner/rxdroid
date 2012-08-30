@@ -40,7 +40,11 @@ public final class GlobalContext
 	public static synchronized void set(Context context)
 	{
 		if(sContext == null)
+		{
 			sContext = context.getApplicationContext();
+			if(sContext == null)
+				sContext = context;
+		}
 	}
 
 	/**
