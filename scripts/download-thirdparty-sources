@@ -126,8 +126,8 @@ create_project_files()
 
 fix_project_properties()
 {
-	sed -ri -e 's/target=Google Inc.:Google APIs([:digit:]+)/target=android-\1/g' "$1/project.properties"
-	sed -ri -e 's/-:/-/g' "$1/project.properties"
+	sed -i -e 's/target=Google Inc.:Google APIs\(\d+\)/target=android-\1/g' "$1/project.properties"
+	sed -i -e 's/-:/-/g' "$1/project.properties"
 }
 
 link_or_copy()

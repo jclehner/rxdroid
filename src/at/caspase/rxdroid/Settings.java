@@ -24,8 +24,10 @@ package at.caspase.rxdroid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 import android.app.Notification;
 import android.content.Context;
@@ -57,19 +59,6 @@ public final class Settings
 	private static SharedPreferences sSharedPrefs = null;
 	private static Context sContext;
 
-	/*public synchronized static Settings instance()
-	{
-		if(sContext == null)
-			sContext = GlobalContext.get();
-
-		sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sContext);
-
-		if(sInstance == null)
-			sInstance = new Settings();
-
-		return sInstance;
-	}*/
-
 	public static synchronized void init()
 	{
 		if(sContext == null)
@@ -91,6 +80,16 @@ public final class Settings
 			else
 				Log.v(TAG, "init: no preferences to dump");
 		}
+	}
+
+	public static Set<String> getStringSet(String key)
+	{
+		final Set<String> empty = Collections.emptySet();
+		return sSharedPrefs.getStringSet(key, empty);
+	}
+
+	public static void putStringSet(String key, Set<String> set) {
+		sSharedPrefs.edit().putStringSet(key, set).commit();
 	}
 
 	public static String getString(String key, String defValue) {

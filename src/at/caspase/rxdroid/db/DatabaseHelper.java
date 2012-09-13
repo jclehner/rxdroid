@@ -196,7 +196,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		if(oldVersion >= newVersion)
 			return true;
 
-		Log.i(TAG, "upgrade: v" + oldVersion + " -> v" + newVersion);
+		Log.i(TAG, "Upgrading DB v" + oldVersion + " -> v" + newVersion);
 
 		final String packageName = Database.class.getPackage().getName();
 		final String oldPackageName = packageName + ".v" + oldVersion;
@@ -212,38 +212,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 			for(Class<?> clazz : Database.CLASSES)
 			{
-				final String className = clazz.getSimpleName();
-				final String oldDataClassName = oldPackageName + ".Old" + className;
-				final String newDataClassName = packageName + "." + className;
-
-				final Class<?> oldDataClass;
-				final Class<?> newDataClass = Class.forName(newDataClassName);
-
-				//TableUtils.createTableIfNotExists(cs, newDataClass);
-				//++updatedDataCount;
-
-				oldDataClass = Reflect.classForName(oldDataClassName);
-				if(oldDataClass == null)
-					continue;
-
-				Log.i(TAG, "  Found " + oldDataClassName);
-
-				@SuppressWarnings("rawtypes")
-				final Dao newDao = getDao(newDataClass);
-				final List<?> oldData = getDao(oldDataClass).queryForAll();
-
-				TableUtils.dropTable(cs, oldDataClass, true);
-				TableUtils.createTable(cs, newDataClass);
-
-				for(Object data : oldData)
-				{
-					final Method convertMethod = oldDataClass.getMethod("convertToCurrentDatabaseFormat");
-
-					Entry entry = (Entry) convertMethod.invoke(data);
-					newDao.create(entry);
-
+				if(upgradeTable(cs, oldVersion, newVersion, clazz))
 					++updatedDataCount;
-				}
 			}
 
 			DaoManager.clearCache();
@@ -279,6 +249,53 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		Log.e(TAG, "upgrade", ex);
 
 		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean upgradeTable(ConnectionSource cs, int oldVersion, int newVersion, Class<?> clazz)
+			throws ClassNotFoundException, SQLException, IllegalArgumentException, IllegalAccessException,
+			InvocationTargetException, NoSuchMethodException
+	{
+		final String packageName = Database.class.getPackage().getName();
+		final String oldPackageName = packageName + ".v" + oldVersion;
+
+		final String className = clazz.getSimpleName();
+		final String oldDataClassName = oldPackageName + ".Old" + className;
+		final String newDataClassName = packageName + "." + className;
+
+		final Class<?> oldDataClass = Reflect.classForName(oldDataClassName);
+		if(oldDataClass == null)
+		{
+			if(oldVersion + 1 < newVersion)
+			{
+				// If the database is older than newVersion - 1, a change
+				// might have been introduced somewhere between oldVersion
+				// and newVersion.
+				return upgradeTable(cs, oldVersion + 1, newVersion, clazz);
+			}
+
+			return false;
+		}
+
+		Log.i(TAG, "  Found " + oldDataClassName);
+
+		final Class<?> newDataClass = Class.forName(newDataClassName);
+
+		@SuppressWarnings("rawtypes")
+		final Dao newDao = getDao(newDataClass);
+		final List<?> oldData = getDao(oldDataClass).queryForAll();
+
+		TableUtils.dropTable(cs, oldDataClass, true);
+		TableUtils.createTableIfNotExists(cs, newDataClass);
+
+		for(Object data : oldData)
+		{
+			final Method convertMethod = oldDataClass.getMethod("convertToCurrentDatabaseFormat");
+			final Entry entry = (Entry) convertMethod.invoke(data);
+			newDao.create(entry);
+		}
+
+		return !oldData.isEmpty();
 	}
 
 	private boolean runHook(String packageName, String hookName, ConnectionSource cs)

@@ -36,9 +36,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
-import android.content.res.Configuration;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -282,6 +284,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 			final PreferenceScreen ps = getPreferenceScreen();
 			final Preference p = ps.findPreference("currentSupply");
+
+
 			if(p != null)
 			{
 				final int index = p.getOrder();

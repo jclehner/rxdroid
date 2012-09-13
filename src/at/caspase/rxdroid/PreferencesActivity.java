@@ -70,7 +70,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		if(Version.SDK_IS_PRE_HONEYCOMB)
 		{
 			// See android issue #4611
-			setTheme(android.R.style.Theme_Black);
+			setTheme(android.R.style.Theme);
 		}
 
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
@@ -209,7 +209,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setIcon(android.R.drawable.ic_dialog_alert);
-				builder.setTitle("This will reset all settings to their default values.");
+				builder.setTitle(R.string._title_restore_default_settings);
 				builder.setNegativeButton(android.R.string.cancel, null);
 				/////////////////////
 				builder.setPositiveButton(android.R.string.ok, new OnClickListener() {

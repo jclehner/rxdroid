@@ -19,7 +19,7 @@
  *
  */
 
-package at.caspase.rxdroid.db.v51;
+package at.caspase.rxdroid.db.v50;
 
 import at.caspase.rxdroid.Fraction;
 import at.caspase.rxdroid.db.Drug;

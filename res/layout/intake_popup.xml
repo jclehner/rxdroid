@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         
-        style="@style/MyTheme.Dialog"
+        android:textColor="@android:color/white"
     />
     
 </ScrollView>

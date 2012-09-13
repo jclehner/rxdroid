@@ -247,6 +247,27 @@
 	<string name="_title_go_to_date">Go to date</string>
 	<string name="_title_today">Today</string>
 	
+	
+	<string name="_toast_drug_is_supply_monitor"> !!EMPTY!! </string>
+	
+	<string name="_title_filter">Filter</string>
+	<string name="_summary_filter">Hide drugs in the main list based on the following criteria.</string>
+
+	<string name="_title_hide_doseless">Doseless</string>
+	<string name="_summary_hide_doseless">Drugs that have no dose on the displayed date.</string>
+	
+	<string name="_title_hide_supply_monitors">Supply monitors</string>
+	<string name="_title_hide_inactive">Inactive</string>
+	
+	<string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
+	<string name="_msg_restore_default_settings">This will reset all settings to their default values.</string>
+	
+	<string name="_title_show_supply_monitors">Supply monitors</string>
+	<string name="_summary_show_supply_monitors">Show drugs that are marked as monitoring supplies only.</string>
+	
+	
+	<string name="_title_show_in_list">Show in drug list</string>
+	
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 

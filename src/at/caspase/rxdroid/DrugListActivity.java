@@ -135,15 +135,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		mPager.setOnPageChangeListener(mPageListener);
 		mPager.setOffscreenPageLimit(1);
 
-		Intent intent = getIntent();
-		if(intent != null)
-			mDate = (Date) intent.getSerializableExtra(EXTRA_DATE);
-
-		if(mDate == null)
-		{
-			//mDate = DateTime.todayDate();
-			mDate = Settings.getActiveDate();
-		}
 
 		startNotificationService();
 
@@ -156,6 +147,13 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		super.onResume();
 		mIsShowing = true;
 		Application.setIsVisible(this, true);
+
+		final Intent intent = getIntent();
+		if(intent != null)
+			mDate = (Date) intent.getSerializableExtra(EXTRA_DATE);
+
+		if(mDate == null)
+			mDate = Settings.getActiveDate();
 
 		setDate(mDate, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
@@ -545,6 +543,9 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@TargetApi(11)
 	private void updateDateString()
 	{
+		if(mDate == null)
+			return;
+
 		//final Date date = DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy);
 		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
 
@@ -604,8 +605,10 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public boolean onLongClick(View v)
 		{
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(mDate);
+			//Calendar cal = Calendar.getInstance();
+			//cal.setTime(mDate);
+
+			Calendar cal = DateTime.calendarFromDate(mDate);
 
 			final int year = cal.get(Calendar.YEAR);
 			final int month = cal.get(Calendar.MONTH);

@@ -89,21 +89,48 @@
 		android:title="@string/_title_prefscreen_display"
 		android:summary="@string/_summary_prefscreen_display"
 		android:icon="@drawable/android:ic_menu_view"
-	>	
-	
-		<CheckBoxPreference
-			android:key="show_inactive"
-			android:title="@string/_title_pref_show_inactive"
-			android:summary="@string/_summary_pref_show_inactive"
-			android:defaultValue="false"
+	>
+	     
+	    <CheckBoxPreference android:key="privacy_scramble_names"
+		    android:title="@string/_title_scramble_names"
+		    android:summary="@string/_summary_scramble_names"
+		    android:defaultValue="false"
 		/>
+	     
+	    <PreferenceCategory 
+	    	android:title="@string/_title_show_in_list" 
+	    >
+	    
+	        <CheckBoxPreference android:key="show_supply_monitors"
+	            android:title="@string/_title_show_supply_monitors"
+	            android:summary="@string/_summary_show_supply_monitors"
+	            android:defaultValue="true"
+	        />
+	            
+	        
+	   
+	    </PreferenceCategory>	    	
+	 <!-- 
+			<CheckBoxPreference
+				android:key="show_inactive"
+				android:title="@string/_title_pref_show_inactive"
+				android:summary="@string/_summary_pref_show_inactive"
+				android:defaultValue="false"
+			/>
+			
+			<CheckBoxPreference
+				android:key="show_doseless"
+				android:title="@string/_title_pref_show_days_without_intakes"
+				android:summary="@string/_summary_pref_show_days_without_intakes"
+				android:defaultValue="false"
+			/>
+			
+			<CheckBoxPreference android:key="show_supply_monitors"
+			    android:title="@string/_title_show_supply_monitors"
+			    
+			    />
 		
-		<CheckBoxPreference
-			android:key="show_doseless"
-			android:title="@string/_title_pref_show_days_without_intakes"
-			android:summary="@string/_summary_pref_show_days_without_intakes"
-			android:defaultValue="false"
-		/>
+		
 		
 		<CheckBoxPreference android:key="privacy_scramble_names"
 		    android:title="@string/_title_scramble_names"
@@ -117,6 +144,7 @@
 			android:enabled="false"
 			android:selectable="false"
 		/>
+		 -->    
 	
 	</PreferenceScreen>
 	
