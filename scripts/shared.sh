@@ -42,7 +42,12 @@ adb()
 		if [[ ${#DEVICES[@]} -gt 1 ]]; then
 			echo "Select Android device to use"	
 			select DEVICE in ${DEVICES[@]}; do
-				export ANDROID_SERIAL=${DEVICE}
+				if [[ ! -z "${DEVICE}" ]]; then
+					export ANDROID_SERIAL=${DEVICE}
+					break
+				else
+					echo >&2 "Invalid selection"
+				fi
 			done
 		fi
 	fi

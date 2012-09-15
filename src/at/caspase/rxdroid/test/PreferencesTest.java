@@ -22,9 +22,10 @@
 package at.caspase.rxdroid.test;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 //import junit.framework.Assert;
@@ -37,13 +38,10 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.Settings;
-import at.caspase.rxdroid.Settings.DoseTimeInfo;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Schedule;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.WrappedCheckedException;
-//import static org.hamcrest.CoreMatchers.*;
-import org.junit.Assert;
 
 /**
  * Tests for the time handling methods from the Preferences class.
@@ -65,6 +63,8 @@ import org.junit.Assert;
 public class PreferencesTest extends AndroidTestCase
 {
 	private static final String TAG = PreferencesTest.class.getName();
+
+	private static final String KEY_FOOBAR = "foobar";
 
 	private static final int TRUE = 1;
 	private static final int FALSE = 0;
@@ -240,7 +240,7 @@ public class PreferencesTest extends AndroidTestCase
 		}
 	}
 
-	public void testGetDoseTimeInfo()
+	/*public void testGetDoseTimeInfo()
 	{
 		final int[][] testCases = {
 				//hours		mins	nextDoseTimeDate == currentDate
@@ -266,7 +266,7 @@ public class PreferencesTest extends AndroidTestCase
 			Log.d(TAG, "  nextDoseTimeDate=" + dtInfo.nextDoseTimeDate());
 
 			if(wantSameDate)
-				Assert.assertEquals(date, dtInfo.nextDoseTimeDate());
+				assertEquals(date, dtInfo.nextDoseTimeDate());
 			else
 			{
 				if(date.equals(dtInfo.nextDoseTimeDate()))
@@ -276,6 +276,25 @@ public class PreferencesTest extends AndroidTestCase
 			Log.d(TAG, "[OK]");
 			Log.d(TAG,"-----------------------------------------");
 		}
+	}*/
+
+	public void testStringSetSharedPref()
+	{
+		final HashSet<String> set = new HashSet<String>();
+		set.add("foo");
+		set.add("bar");
+		set.add("foobar");
+		set.add("barz");
+		set.add(":bastard1");
+		set.add("bastard2:");
+		set.add(":bastard3:");
+		set.add("very long and oily, newline-containing\n bastard");
+
+		Settings.putStringSet(KEY_FOOBAR, set);
+
+		final Set<String> persisted = Settings.getStringSet(KEY_FOOBAR);
+
+		assertEquals(set, persisted);
 	}
 
 	/*public void testGetDateForFutureDoseTime()
@@ -359,6 +378,7 @@ public class PreferencesTest extends AndroidTestCase
 		}
 
 		Editor e = mPrefs.edit();
+		e.remove(KEY_FOOBAR);
 
 		for(String key : mPrefBackup.keySet())
 			e.putString(key, mPrefBackup.get(key));

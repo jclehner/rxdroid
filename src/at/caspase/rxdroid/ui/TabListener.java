@@ -24,14 +24,11 @@ package at.caspase.rxdroid.ui;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 /*
  * Copied from http://developer.android.com/reference/android/app/ActionBar.html#newTab%28%29
  */
-public class TabListener<T extends Fragment> implements ActionBar.TabListener
+/*public class TabListener<T extends Fragment> implements ActionBar.TabListener
 {
 	private final SherlockFragmentActivity mActivity;
 	private final String mTag;
@@ -80,5 +77,5 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
 
     }
-}
+}*/
 

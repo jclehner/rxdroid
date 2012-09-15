@@ -64,6 +64,11 @@
 				<action android:name="android.intent.action.MAIN" />
 			</intent-filter>
 		</activity>
+		
+		<activity android:name=".HelpActivity"
+			android:exported="false"
+			android:theme="@style/LightTheme"
+		/>
 
 		<uses-library android:name="android.test.runner" />
 

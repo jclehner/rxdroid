@@ -42,6 +42,7 @@
     _toast_<foobar>		Message for Toast notifications (w/ trailing dot)
     _btn_<foobar>		Button label. Should be as short as possible. (w/o trailing dot)
     _msg_<foobar>		Everything that does not fit into the categories above (w/ trailing dot)   
+    _help_<foobar>		Very long text for HelpActivity.
     
     -->
     
@@ -267,6 +268,17 @@
 	
 	
 	<string name="_title_show_in_list">Show in drug list</string>
+	
+	<string name="_title_help">Help</string>
+	<string name="_title_n_of_n">%1$d of %2$d</string>
+	
+	<string name="_help_added_drug">
+		You\'ve just added your first drug. If you want to edit it, simply click its name in the list.
+		To mark a dose as taken, touch the corresponding dose icon and follow the on-screen instructions. Touching
+		and holding the dose icon will allow you to select other options as well.
+	</string>
+	
+	
 	
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

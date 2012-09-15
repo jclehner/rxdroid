@@ -25,8 +25,9 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 	
 	<style name="LightTheme" parent="@style/Theme.Light">
-		<item name="textColorPrimary">@style/ClickableTextStyleLight</item>
-		
+		<!--
+		<item name="android:textColorPrimary">@color/clickable_text_light</item>
+		-->
 	</style>
 	
 	<style name="LightTheme.NoAnimation" parent="@style/LightTheme">
@@ -38,7 +39,9 @@
 	</style>
 	
 	<style name="DarkTheme" parent="@style/Theme.Dark">
-		<item name="textColorPrimary">@style/ClickableTextStyleDark</item>
+		<!--
+		<item name="android:textColorPrimary">@color/clickable_text_dark</item>
+		-->
 	</style>
 	
 	<style name="MyTheme" parent="@style/Theme.Light" />

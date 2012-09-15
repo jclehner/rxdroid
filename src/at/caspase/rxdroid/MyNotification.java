@@ -209,6 +209,8 @@ public class MyNotification
 
 		if(mShowTime)
 			notification.when = System.currentTimeMillis();
+		else
+			notification.when = 0;
 
 		//notification.flags |= Notification.FLAG_SHOW_LIGHTS;
 

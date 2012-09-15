@@ -24,8 +24,8 @@ package at.caspase.rxdroid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -82,14 +82,12 @@ public final class Settings
 		}
 	}
 
-	public static Set<String> getStringSet(String key)
-	{
-		final Set<String> empty = Collections.emptySet();
-		return sSharedPrefs.getStringSet(key, empty);
+	public static Set<String> getStringSet(String key) {
+		return stringToStringSet(sSharedPrefs.getString(key, null));
 	}
 
 	public static void putStringSet(String key, Set<String> set) {
-		sSharedPrefs.edit().putStringSet(key, set).commit();
+		sSharedPrefs.edit().putString(key, stringSetToString(set)).commit();
 	}
 
 	public static String getString(String key, String defValue) {
@@ -256,7 +254,6 @@ public final class Settings
 			@Override
 			protected DoseTimeInfo initialValue()
 			{
-				Log.d(TAG, "Creating DoseTimeInfo instance for thread " + Thread.currentThread().getName());
 				return new DoseTimeInfo();
 			}
 
@@ -270,9 +267,9 @@ public final class Settings
 			return mActiveDate;
 		}
 
-		public Date nextDoseTimeDate() {
+		/*public Date nextDoseTimeDate() {
 			return mNextDoseTimeDate;
-		}
+		}*/
 
 		public int activeDoseTime() {
 			return mActiveDoseTime;
@@ -553,6 +550,77 @@ public final class Settings
 			target.add(Calendar.DAY_OF_MONTH, 1);
 
 		return target.getTimeInMillis() - time.getTimeInMillis();
+	}
+
+	// converts the string set [ "foo", "bar", "foobar", "barz" ] to the following string:
+	// 4:3:foo3:bar6:foobar4:barz
+
+	private static String stringSetToString(Set<String> set)
+	{
+		final StringBuilder sb = new StringBuilder();
+		sb.append(set.size() + ":");
+
+		for(String str : set)
+			sb.append(str.length() + ":" + str);
+
+		return sb.toString();
+	}
+
+	private static Set<String> stringToStringSet(String str)
+	{
+		final HashSet<String> stringSet = new HashSet<String>();
+
+		if(str == null || str.length() == 0)
+			return stringSet;
+
+		SizePrefix info = getSizePrefix(str, 0);
+		if(info.size == 0)
+			return stringSet;
+
+		final int size = info.size;
+
+		int end = info.firstCharPos;
+
+		for(int i = 0; i != size; ++i)
+		{
+			info = getSizePrefix(str, end);
+			end = info.firstCharPos + info.size;
+			stringSet.add(str.substring(info.firstCharPos, end));
+		}
+
+		return stringSet;
+	}
+
+	private static class SizePrefix
+	{
+		int size;
+		int firstCharPos;
+	}
+
+	private static SizePrefix getSizePrefix(String str, int pos)
+	{
+		final StringBuilder sb = new StringBuilder();
+		int i = pos;
+
+		//Log.d(TAG, "getSizePrefix: pos=" + pos);
+		//Log.d(TAG, "  str=" + str.substring(pos, pos + 5) + "...");
+
+		for(; i != str.length() && str.charAt(i) != ':'; ++i)
+		{
+			final char ch = str.charAt(i);
+			if(!Character.isDigit(ch))
+				throw new IllegalArgumentException("Unexpected non-digit char at pos=" + i);
+
+			sb.append(ch);
+		}
+
+		if(sb.length() == 0)
+			throw new IllegalArgumentException("Unexpected token at pos=" + pos + " (" + str + ")");
+
+		final SizePrefix prefix = new SizePrefix();
+		prefix.size = Integer.parseInt(sb.toString());
+		prefix.firstCharPos = i + 1;
+		return prefix;
 	}
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");

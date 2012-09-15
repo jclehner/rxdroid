@@ -212,8 +212,8 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			switch(action)
 			{
 				case MotionEvent.ACTION_DOWN:
-					//setBackgroundResource(R.drawable.doseview_background_selected);
-					setBackgroundResource(android.R.drawable.list_selector_background);
+					setBackgroundResource(R.drawable.doseview_background_selected);
+					//setBackgroundResource(android.R.drawable.list_selector_background);
 					setPadding(0, 0, 0, 0);
 					break;
 

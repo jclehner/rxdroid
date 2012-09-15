@@ -23,6 +23,8 @@ package at.caspase.rxdroid;
 
 import java.io.File;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import android.annotation.TargetApi;
@@ -46,7 +48,6 @@ import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.preferences.TimePreference;
-import at.caspase.rxdroid.ui.FragmentTabActivity;
 import at.caspase.rxdroid.util.Util;
 
 @SuppressWarnings("deprecation")
@@ -65,13 +66,13 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		super.onCreate(savedInstanceState);
-
 		if(Version.SDK_IS_PRE_HONEYCOMB)
 		{
 			// See android issue #4611
 			setTheme(android.R.style.Theme);
 		}
+
+		super.onCreate(savedInstanceState);
 
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -105,8 +106,18 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 				{
 					//Intent intent = new Intent(PreferencesActivity.this, DrugSortActivity.class);
 					//Intent intent = new Intent(PreferencesActivity.this, ObjectToPreferenceTestActivity.class);
-					Intent intent = new Intent(PreferencesActivity.this, FragmentTabActivity.class);
-					startActivity(intent);
+					//Intent intent = new Intent(PreferencesActivity.this, FragmentTabActivity.class);
+					//Intent intent = new Intent(PreferencesActivity.this, HelpActivity.class);
+
+					//Set<Integer> helpIds = new HashSet<Integer>();
+					//helpIds.add(R.string._help_added_drug);
+					//intent.set
+
+					HelpActivity.enqueue(R.string._help_added_drug);
+					HelpActivity.showQueued();
+
+
+					//startActivity(intent);
 					return true;
 				}
 			});

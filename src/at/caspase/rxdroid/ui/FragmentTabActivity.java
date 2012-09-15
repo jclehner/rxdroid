@@ -21,25 +21,7 @@
 
 package at.caspase.rxdroid.ui;
 
-
-import java.util.Date;
-
-import android.content.res.Resources;
-import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.TabHost;
-import at.caspase.androidutils.compat.TabManager;
-import at.caspase.rxdroid.R;
-import at.caspase.rxdroid.Settings;
-import at.caspase.rxdroid.Version;
-import at.caspase.rxdroid.db.Drug;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-public class FragmentTabActivity extends SherlockFragmentActivity
+/*public class FragmentTabActivity extends SherlockFragmentActivity
 {
 	private TabHost mTabHost;
 	private TabManager mTabManager;
@@ -51,7 +33,7 @@ public class FragmentTabActivity extends SherlockFragmentActivity
 	{
 		super.onCreate(savedInstanceState);
 
-		setTheme(com.actionbarsherlock.R.style.Theme_Sherlock);
+		//setTheme(com.actionbarsherlock.R.style.Theme_Sherlock);
 		super.setContentView(R.layout.fragment_tab_activity);
 
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
@@ -61,7 +43,7 @@ public class FragmentTabActivity extends SherlockFragmentActivity
 		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		ab.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
 
-		if(/* TODO some check */ true)
+		if(true) // TODO some check
 		{
 			//mTabHost.setup();
 			//mTabManager = new TabManager(this, mTabHost, R.id.realtabcontent);
@@ -82,15 +64,6 @@ public class FragmentTabActivity extends SherlockFragmentActivity
 				final int titleResId = (Integer) tabArgs[1];
 				final int iconResId = (Integer) tabArgs[2];
 				final int doseTime = (Integer) tabArgs[3];
-
-				/*final TabSpec tabSpec = mTabHost.newTabSpec(tag);
-				tabSpec.setIndicator(getString(titleResId), res.getDrawable(iconResId));
-
-				final Bundle args = new Bundle();
-				args.putSerializable(DrugListFragment.ARG_DATE, date);
-				args.putInt(DrugListFragment.ARG_DOSE_TIME, doseTime);
-
-				mTabManager.addTab(tabSpec, DrugListFragment.class, args);*/
 
 				final Bundle args = new Bundle();
 				args.putSerializable(DrugListFragment.ARG_DATE, date);
@@ -123,3 +96,4 @@ public class FragmentTabActivity extends SherlockFragmentActivity
 		throw new UnsupportedOperationException();
 	}
 }
+*/
