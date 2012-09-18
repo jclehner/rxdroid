@@ -230,6 +230,16 @@
 	
 	<string name="_title_go_to_date">Datum wählen</string>
 	<string name="_title_today">Heute</string>
+	
+	<string name="_msg_restore_default_settings">Hiermit werden alle Einstellungen zurückgesetzt</string>
+	
+	<string name="_title_help">Hilfe</string>
+	<string name="_title_n_of_n">%1$d von %2$d</string>
+	<string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
+	<string name="_title_show_in_list">In Medikamentenliste anzeigen</string>
+	
+	<string name="_title_show_supply_monitors">@string/_title_supply_monitor</string>
+	<string name="_summary_show_supply_monitors">Show drugs that are marked as monitoring supplies only</string>
 		
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
@@ -239,6 +249,6 @@
      -->
     <string name="dialog_set_number">@string/_btn_set</string>
     <string name="dialog_cancel">@android:string/cancel</string>
-    <string name="dialog_picker_title">Wähle eine Zahl</string>
+    <string name="dialog_picker_title">Zahl wählen</string>
 	
 </resources>

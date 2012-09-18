@@ -23,16 +23,16 @@
 -->
 
 <resources>
-    <string name="app_name">RxDroid</string>
-    <string name="version">0.9</string>
-    <string name="vcs_revision">$Revision$</string>
+    <string name="app_name" translatable="false">RxDroid</string>
+    <string name="version" translatable="false">0.9</string>
+    <string name="vcs_revision" translatable="false">$Revision$</string>
     
     <!--  WARNING: Do NOT replace - with an en dash as suggested by lint -->
-    <string name="pref_default_time_morning">06:00-10:00</string>
-    <string name="pref_default_time_noon">12:00-14:00</string>
-    <string name="pref_default_time_evening">19:00-21:00</string>
-    <string name="pref_default_time_night">22:00-23:00</string>
-    <string name="pref_default_alarm_timeout">00:30</string>
+    <string name="pref_default_time_morning" translatable="false">06:00-10:00</string>
+    <string name="pref_default_time_noon" translatable="false">12:00-14:00</string>
+    <string name="pref_default_time_evening" translatable="false">19:00-21:00</string>
+    <string name="pref_default_time_night" translatable="false">22:00-23:00</string>
+    <string name="pref_default_alarm_timeout" translatable="false">00:30</string>
         
     <!-- 
     Translatable strings start here. The naming scheme is as follows:
@@ -242,14 +242,13 @@
 	<string name="_toast_unlimited_history_size">Warning: this setting might cause very long loading times.</string>			
 	<string name="_toast_db_upgraded">Database upgrade successful. Restarting app&#8230;</string>
 	
-	<string name="_title_supply_monitor">Automatically mark as taken</string>
-	<string name="_summary_supply_monitor">Doses are automatically marked as taken.</string>
+	<string name="_title_supply_monitor">Mark as taken</string>
+	<string name="_summary_supply_monitor">Doses are automatically marked as taken. Notifications will only be
+		displayed if supplies are low.
+	</string>
 		
 	<string name="_title_go_to_date">Go to date</string>
 	<string name="_title_today">Today</string>
-	
-	
-	<string name="_toast_drug_is_supply_monitor"> !!EMPTY!! </string>
 	
 	<string name="_title_filter">Filter</string>
 	<string name="_summary_filter">Hide drugs in the main list based on the following criteria.</string>
@@ -288,7 +287,7 @@
 	file. 
 	-->
 	
-	<string name="virtual_msg_no_drugs">@string/_msg_no_drugs_v8</string>
+	<string name="virtual_msg_no_drugs" translatable="false">@string/_msg_no_drugs_v8</string>
 	
 	<!-- 
     Keep at the end of strings.xml!  

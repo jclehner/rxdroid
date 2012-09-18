@@ -563,10 +563,12 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			mTextDate.setText(dateString);
 	}
 
-	private class DrugFilter implements CollectionUtils.Filter<Drug>
+	static class DrugFilter implements CollectionUtils.Filter<Drug>
 	{
-		final boolean mShowDoseless = mSharedPreferences.getBoolean("show_doseless", false);
-		final boolean mShowInactive = mSharedPreferences.getBoolean("show_inactive", false);
+		//final boolean mShowDoseless = mSharedPreferences.getBoolean("show_doseless", false);
+		//final boolean mShowInactive = mSharedPreferences.getBoolean("show_inactive", false);
+
+		final boolean mShowSupplyMonitors = Settings.getBoolean("show_supply_monitors", false);
 
 		private Date mFilterDate;
 
@@ -577,24 +579,25 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public boolean matches(Drug drug)
 		{
-			boolean result = true;
+			if(mFilterDate == null)
+				return true;
 
-			if(!mShowDoseless && mFilterDate != null)
-			{
-				if(!drug.hasDoseOnDate(mFilterDate))
-					result = false;
-			}
+			if(!drug.isActive())
+				return false;
 
-			if(!mShowInactive && !drug.isActive())
-				result = false;
+			if(!mShowSupplyMonitors && drug.isAutoAddIntakesEnabled())
+				return false;
 
-			if(!result && Entries.countIntakes(drug, mFilterDate, null) != 0)
-				result = true;
+			if(DateTime.isToday(mFilterDate) && Entries.hasMissingIntakesBeforeDate(drug, mFilterDate))
+				return true;
 
-			if(!result && DateTime.isToday(mFilterDate) && Entries.hasMissingIntakesBeforeDate(drug, mFilterDate))
-				result = true;
+			if(Entries.countIntakes(drug, mFilterDate, null) != 0)
+				return true;
 
-			return result;
+			if(mFilterDate != null && !drug.hasDoseOnDate(mFilterDate))
+				return false;
+
+			return true;
 		}
 	}
 

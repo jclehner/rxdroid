@@ -43,10 +43,10 @@ public final class Constants
 	}
 
 	public static final int[] DOSE_VIEW_IDS = {
-		R.id.morning,
-		R.id.noon,
-		R.id.evening,
-		R.id.night
+			R.id.morning,
+			R.id.noon,
+			R.id.evening,
+			R.id.night
 	};
 
 	public static final int[] WEEK_DAYS = {

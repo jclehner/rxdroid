@@ -23,8 +23,6 @@ package at.caspase.rxdroid;
 
 import java.io.File;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import android.annotation.TargetApi;
@@ -113,9 +111,13 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 					//helpIds.add(R.string._help_added_drug);
 					//intent.set
 
-					HelpActivity.enqueue(R.string._help_added_drug);
-					HelpActivity.showQueued();
+					//HelpActivity.enqueue(R.string._help_added_drug);
+					//HelpActivity.showQueued();
 
+					//HelpDialog.enqueue(R.string._help_added_drug);
+					//HelpDialog.showIfNeccessary(this);
+
+					//FragmentManager.
 
 					//startActivity(intent);
 					return true;

@@ -39,7 +39,8 @@ public class HelpActivity extends Activity
 
 	public static void showQueued()
 	{
-		final Set<String> displayedHelpIds = Settings.getStringSet(KEY_DISPLAYED_HELP_IDS);
+		Set<String> displayedHelpIds = Settings.getStringSet(KEY_DISPLAYED_HELP_IDS);
+		displayedHelpIds = new HashSet<String>();
 		final HashSet<Integer> helpIdSet = new HashSet<Integer>();
 
 		for(Integer helpId : sHelpIdQueue)
@@ -116,18 +117,22 @@ public class HelpActivity extends Activity
 	{
 		final String title = getString(R.string._title_help);
 		final String subtitle = getString(R.string._title_n_of_n,
-				mCurrentHelpIndex - 1,
+				mCurrentHelpIndex + 1,
 				mHelpIds.size()
 		);
 
 		if(Version.SDK_IS_HONEYCOMB_OR_LATER)
 		{
 			final ActionBar ab = getActionBar();
-			ab.setTitle(title);
-			ab.setSubtitle(subtitle);
+			if(ab != null)
+			{
+				ab.setTitle(title);
+				ab.setSubtitle(subtitle);
+				return;
+			}
 		}
-		else
-			setTitle(title + " (" + subtitle + ")");
+
+		setTitle(title + " (" + subtitle + ")");
 	}
 
 	private void showHelpIndex(int index)

@@ -26,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import android.app.Notification;
@@ -54,7 +53,6 @@ public final class Settings
 	//private static final String KEY_LAST_MSG_COUNT = "_last_msg_count";
 
 	private static final String KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
-	private static final int DOSE_TIMES[] = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
 
 	private static SharedPreferences sSharedPrefs = null;
 	private static Context sContext;
@@ -64,21 +62,7 @@ public final class Settings
 		if(sContext == null)
 		{
 			sContext = GlobalContext.get();
-			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(sContext);
-		}
-
-		if(LOGV && false)
-		{
-
-			final Map<String, ?> prefs = sSharedPrefs.getAll();
-			if(!prefs.isEmpty())
-			{
-				Log.v(TAG, "init: preference dump: ");
-				for(String key : prefs.keySet())
-					Log.v(TAG, "  " + key + "=\"" + prefs.get(key) + "\"");
-			}
-			else
-				Log.v(TAG, "init: no preferences to dump");
+			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(GlobalContext.get());
 		}
 	}
 
@@ -395,7 +379,7 @@ public final class Settings
 
 	public static int getActiveDoseTime(Calendar time)
 	{
-		for(int doseTime : DOSE_TIMES)
+		for(int doseTime : Constants.DOSE_TIMES)
 		{
 			if(DateTime.isWithinRange(time, getDoseTimeBegin(doseTime), getDoseTimeEnd(doseTime)))
 				return doseTime;
@@ -415,7 +399,7 @@ public final class Settings
 
 		//Log.d(TAG, "getNextDoseTime: time=" + time);
 
-		for(int doseTime : DOSE_TIMES)
+		for(int doseTime : Constants.DOSE_TIMES)
 		{
 			long diff = getMillisUntilDoseTimeBegin(time, doseTime);
 			if(useNextDayOffsets)
@@ -572,6 +556,8 @@ public final class Settings
 
 		if(str == null || str.length() == 0)
 			return stringSet;
+
+		Log.d(TAG, "stringToStringSet: str=" + str);
 
 		SizePrefix info = getSizePrefix(str, 0);
 		if(info.size == 0)

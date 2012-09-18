@@ -104,7 +104,7 @@
 	        <CheckBoxPreference android:key="show_supply_monitors"
 	            android:title="@string/_title_show_supply_monitors"
 	            android:summary="@string/_summary_show_supply_monitors"
-	            android:defaultValue="true"
+	            android:defaultValue="false"
 	        />
 	            
 	        
