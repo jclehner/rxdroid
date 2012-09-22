@@ -170,8 +170,8 @@ public class NotificationReceiver extends BroadcastReceiver
 		final MyNotification.Builder builder = new MyNotification.Builder(mContext);
 
 		final String message2 = getLowSupplyMessage(date, doseTime);
-		int dueCount = isActiveDoseTime ? countOpenIntakes(date, doseTime) : 0;
-		int missedCount = countMissedIntakes(date, doseTime, isActiveDoseTime);
+		int dueCount = isActiveDoseTime ? getDueDoseCount(date, doseTime) : 0;
+		int missedCount = getMissedDoseCount(date, doseTime, isActiveDoseTime);
 
 		Log.d(TAG, "updateNotifications: date=" + date + ", doseTime=" + doseTime + " (" + (isActiveDoseTime ? "active" : "not active") + ")");
 
@@ -301,7 +301,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	}
 
-	private int countOpenIntakes(Date date, int doseTime)
+	private int getDueDoseCount(Date date, int doseTime)
 	{
 		int count = 0;
 
@@ -309,7 +309,8 @@ public class NotificationReceiver extends BroadcastReceiver
 		{
 			final Fraction dose = drug.getDose(doseTime, date);
 
-			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date) || drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND)
+			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date)
+					|| drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND || drug.isAutoAddIntakesEnabled())
 				continue;
 
 			if(Entries.countIntakes(drug, date, doseTime) == 0)
@@ -320,21 +321,19 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	}
 
-	private int countMissedIntakes(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime)
+	private int getMissedDoseCount(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime)
 	{
 		int count = 0;
 
 		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
 		{
 			final Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
-			count = countOpenIntakes(checkDate, Drug.TIME_NIGHT);
-
-			Log.i(TAG, "countMissingIntakes: checkDate adjusted to " + checkDate + ", count=" + count);
+			count = getDueDoseCount(checkDate, Drug.TIME_NIGHT);
 		}
 		else
 		{
 			for(int doseTime = Drug.TIME_MORNING; doseTime != activeOrNextDoseTime; ++doseTime)
-				count += countOpenIntakes(date, doseTime);
+				count += getDueDoseCount(date, doseTime);
 		}
 
 		return count;

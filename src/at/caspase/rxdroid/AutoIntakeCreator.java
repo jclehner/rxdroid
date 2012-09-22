@@ -87,8 +87,6 @@ public enum AutoIntakeCreator implements
 	@Override
 	public void onDatabaseInitialized()
 	{
-		Log.d(TAG, "onDatabaseInitialized");
-
 		for(Drug drug : Database.getAll(Drug.class))
 			createMissingIntakes(drug);
 
@@ -108,8 +106,7 @@ public enum AutoIntakeCreator implements
 				++deleteCount;
 		}
 
-		final int deletedPercentage = oldIntakeCount / deleteCount;
-
+		final int deletedPercentage = deleteCount == 0 ? 0 : oldIntakeCount / deleteCount;
 		Log.d(TAG, "Would have deleted " + deleteCount + " entries older than " + maxHistoryAgeInDays + " (~" + deletedPercentage + "%)");
 	}
 

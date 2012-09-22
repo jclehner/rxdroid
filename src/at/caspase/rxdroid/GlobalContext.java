@@ -22,6 +22,7 @@
 package at.caspase.rxdroid;
 
 import android.content.Context;
+import android.content.Intent;
 
 /**
  * Provides a globally available context.
@@ -70,6 +71,14 @@ public final class GlobalContext
 		}
 
 		return sContext;
+	}
+
+	public static void startActivity(Intent intent) {
+		sContext.startActivity(intent);
+	}
+
+	public static void sendBroadcast(Intent intent) {
+		sContext.sendBroadcast(intent);
 	}
 
 	public static String getString(int resId) {
