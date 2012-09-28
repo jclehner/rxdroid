@@ -22,18 +22,20 @@
 package at.caspase.androidutils;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.widget.Button;
 import at.caspase.rxdroid.Version;
 
-public abstract class MultiPageDialog extends AlertDialogFragment
+public abstract class MultiPageDialog extends AdvancedAlertDialog implements OnClickListener
 {
 	private static final int BUTTON_BACK;
 	private static final int BUTTON_NEXT;
 
 	static
 	{
-		if(Version.SDK_IS_HONEYCOMB_OR_LATER)
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 		{
 			BUTTON_BACK = Dialog.BUTTON_NEGATIVE;
 			BUTTON_NEXT = Dialog.BUTTON_POSITIVE;
@@ -45,11 +47,19 @@ public abstract class MultiPageDialog extends AlertDialogFragment
 		}
 	}
 
-	private int mPage;
+	private int mCurrentPage;
+
+	public MultiPageDialog(Context context, boolean cancelable, OnCancelListener cancelListener) {
+		super(context, cancelable, cancelListener);
+	}
+
+	public MultiPageDialog(Context context) {
+		super(context);
+	}
 
 	public final void setPage(int page)
 	{
-		mPage = page;
+		mCurrentPage = page;
 		onPageChanged(page);
 		updateButtonTexts();
 	}
@@ -59,17 +69,17 @@ public abstract class MultiPageDialog extends AlertDialogFragment
 	{
 		if(which == BUTTON_NEXT)
 		{
-			if(mPage + 1 < getPageCount())
+			if(mCurrentPage + 1 < getPageCount())
 			{
-				setPage(mPage + 1);
+				setPage(mCurrentPage + 1);
 				return;
 			}
 		}
 		else if(which == BUTTON_BACK)
 		{
-			if(mPage > 0)
+			if(mCurrentPage > 0)
 			{
-				setPage(mPage - 1);
+				setPage(mCurrentPage - 1);
 				return;
 			}
 		}
@@ -79,12 +89,6 @@ public abstract class MultiPageDialog extends AlertDialogFragment
 		dismiss();
 	}
 
-	@Override
-	public void onShow()
-	{
-		setPage(mPage);
-	}
-
 	protected abstract CharSequence getBackButtonText(boolean isAtBeginning);
 	protected abstract CharSequence getNextButtonText(boolean isAtEnd);
 
@@ -92,17 +96,22 @@ public abstract class MultiPageDialog extends AlertDialogFragment
 	protected abstract int getPageCount();
 
 	protected final int getCurrentPage() {
-		return mPage;
+		return mCurrentPage;
+	}
+
+	@Override
+	protected void onShow() {
+		setPage(mCurrentPage);
 	}
 
 	private void updateButtonTexts()
 	{
 		Button b = getButton(BUTTON_BACK);
 		if(b != null)
-			b.setText(getBackButtonText(mPage == 0));
+			b.setText(getBackButtonText(mCurrentPage == 0));
 
 		b = getButton(BUTTON_NEXT);
 		if(b != null)
-			b.setText(getNextButtonText(mPage == getPageCount() - 1));
+			b.setText(getNextButtonText(mCurrentPage == getPageCount() - 1));
 	}
 }

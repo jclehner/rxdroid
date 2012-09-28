@@ -46,7 +46,6 @@ import at.caspase.rxdroid.util.WrappedCheckedException;
 public final class Settings
 {
 	private static final String TAG = Settings.class.getName();
-	@SuppressWarnings("unused")
 	private static final boolean LOGV = true;
 
 	private static final String KEY_LAST_MSG_HASH = "last_msg_hash";
@@ -210,7 +209,6 @@ public final class Settings
 		return DumbTime.fromString(value);
 	}*/
 
-	@SuppressWarnings("unused")
 	public static TimePeriod getTimePeriodPreference(int doseTime)
 	{
 		final String key = KEYS[doseTime];

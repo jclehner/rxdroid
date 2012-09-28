@@ -314,14 +314,14 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 
 			if(which == MIN)
 			{
-				if(min.after(mEnd) && !mAllowEndWrap)
+				if(min.isGreaterThan(mEnd) && !mAllowEndWrap)
 					return null;
 
 				return min;
 			}
 			else
 			{
-				if(mEnd.before(min) && mAllowEndWrap)
+				if(mEnd.isLessThan(min) && mAllowEndWrap)
 					return null;
 
 				return mEnd;
@@ -333,7 +333,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 
 			if(which == MIN)
 			{
-				if(mBegin.after(max) && !mAllowEndWrap)
+				if(mBegin.isGreaterThan(max) && !mAllowEndWrap)
 					return null;
 
 				return mBegin;

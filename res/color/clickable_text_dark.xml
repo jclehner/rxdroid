@@ -28,10 +28,11 @@
 	<item android:color="@color/active_text_light" android:state_selected="true" />
 	<!-- <item android:color="@color/active_text_light" android:state_hovered="true" />  -->
 	
-	<item android:color="@android:color/black"
+	<item android:color="?android:attr/textColorPrimary"
 		android:state_pressed="false"
 		android:state_focused="false" 
 		android:state_selected="false"
 		android:state_hovered="false"		
 	/>
+	
 </selector>

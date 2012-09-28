@@ -120,11 +120,11 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		return mMillis + 1000 * (mHours * 3600 + mMinutes * 60 + mSeconds);
 	}
 
-	public boolean before(DumbTime time) {
+	public boolean isLessThan(DumbTime time) {
 		return getTime() < time.getTime();
 	}
 
-	public boolean after(DumbTime time) {
+	public boolean isGreaterThan(DumbTime time) {
 		return getTime() > time.getTime();
 	}
 
@@ -133,7 +133,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	{
 		if(this.getTime() == other.getTime())
 			return 0;
-		return this.before(other) ? -1 : 1;
+		return this.isLessThan(other) ? -1 : 1;
 	}
 
 	@Override
@@ -190,15 +190,15 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	{
 		if(begin != null && end != null)
 		{
-			if(allowWrap && end.before(begin))
-				return equals(begin) || after(begin) || before(end);
+			if(allowWrap && end.isLessThan(begin))
+				return equals(begin) || isGreaterThan(begin) || isLessThan(end);
 			else
-				return (equals(begin) || after(begin)) && before(end);
+				return (equals(begin) || isGreaterThan(begin)) && isLessThan(end);
 		}
 		else if(begin == null)
-			return before(end);
+			return isLessThan(end);
 		else if(end == null)
-			return equals(begin) || after(begin);
+			return equals(begin) || isGreaterThan(begin);
 
 		throw new NullPointerException();
 	}
@@ -207,6 +207,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		return new DumbTime(new Date().getTime());
 	}
 
+	@SuppressWarnings("deprecation")
 	public static DumbTime fromString(String timeString)
 	{
 		if(timeString != null)

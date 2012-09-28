@@ -184,7 +184,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		menu.add(0, MENU_ADD, 0, R.string._title_add).setIcon(android.R.drawable.ic_menu_add);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_LATER)
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 		{
 			// Title is set in onPrepareOptionsMenu
 
@@ -192,18 +192,16 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 				.setIcon(R.drawable.ic_menu_calendar_light)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
 			;
-
-			//menu.add
 		}
 
 		menu.add(0, MENU_PREFERENCES, 0, R.string._title_preferences).setIcon(android.R.drawable.ic_menu_preferences);
 		menu.add(0, MENU_TOGGLE_FILTERING, 0, R.string._title_toggle_filtering).setIcon(android.R.drawable.ic_menu_view);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_LATER)
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 		{
-			menu.getItem(MENU_ADD).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-			menu.getItem(MENU_PREFERENCES).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			menu.getItem(MENU_TOGGLE_FILTERING).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			//menu.getItem(MENU_ADD).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			//menu.getItem(MENU_PREFERENCES).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			//menu.getItem(MENU_TOGGLE_FILTERING).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		}
 
 		return super.onCreateOptionsMenu(menu);
@@ -212,7 +210,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
-		if(Version.SDK_IS_HONEYCOMB_OR_LATER)
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 		{
 			final int titleResId = DateTime.isToday(mDate) ? R.string._title_go_to_date : R.string._title_today;
 			menu.findItem(MENU_SELECT_DATE).setTitle(titleResId);
@@ -508,7 +506,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			}
 		}
 
-		if(Version.SDK_IS_HONEYCOMB_OR_LATER)
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 			invalidateOptionsMenu();
 
 		updateDateString();

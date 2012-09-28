@@ -218,9 +218,9 @@ public final class InstanceState
 
 	public static class SavedState extends BaseSavedState
 	{
-		private HashMap<String, Object> values = new HashMap<String, Object>();
-		private Bundle extras;
-		private boolean wasCreateInstanceStateCalled = false;
+		protected HashMap<String, Object> values = new HashMap<String, Object>();
+		protected Bundle extras;
+		protected boolean wasCreateInstanceStateCalled = false;
 
 		@SuppressWarnings("unchecked")
 		public SavedState(Parcel parcel)

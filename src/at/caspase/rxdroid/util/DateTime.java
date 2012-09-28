@@ -183,10 +183,10 @@ public final class DateTime
 	{
 		final DumbTime theTime = DumbTime.fromCalendar(time);
 
-		if(end.before(begin))
-			return theTime.before(end) || theTime.compareTo(begin) != -1;
+		if(end.isLessThan(begin))
+			return theTime.isLessThan(end) || theTime.compareTo(begin) != -1;
 
-		return theTime.compareTo(begin) != -1 && theTime.before(end);
+		return theTime.compareTo(begin) != -1 && theTime.isLessThan(end);
 	}
 
 	public static boolean isToday(Date date) {

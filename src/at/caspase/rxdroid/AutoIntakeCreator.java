@@ -105,8 +105,8 @@ public enum AutoIntakeCreator implements
 			if(diffDays > maxHistoryAgeInDays)
 				++deleteCount;
 		}
+		final double deletedPercentage = deleteCount == 0 ? 0 : (deleteCount * 100.0) / oldIntakeCount;
 
-		final int deletedPercentage = deleteCount == 0 ? 0 : oldIntakeCount / deleteCount;
 		Log.d(TAG, "Would have deleted " + deleteCount + " entries older than " + maxHistoryAgeInDays + " (~" + deletedPercentage + "%)");
 	}
 

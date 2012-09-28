@@ -62,9 +62,7 @@
   		android:focusable="true"
   		android:clickable="true"
   		android:onClick="onDrugNameClick"
-  		
-  		android:textColor="@color/clickable_text_light"
-  		
+  		  		
   		style="@android:style/TextAppearance.Large"
   		  		
   		android:nextFocusDown="@+id/morning"
