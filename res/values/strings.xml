@@ -33,7 +33,9 @@
     <string name="pref_default_time_evening" translatable="false">19:00-21:00</string>
     <string name="pref_default_time_night" translatable="false">22:00-23:00</string>
     <string name="pref_default_alarm_timeout" translatable="false">00:30</string>
-        
+    
+    <string name="pref_default_theme_is_dark" translatable="false">true</string>
+    
     <!-- 
     Translatable strings start here. The naming scheme is as follows:
     
@@ -101,8 +103,8 @@
     <string name="_title_pref_use_sound">Sound</string>
     <string name="_title_pref_use_vibrator">Vibration</string>
     
-    <string name="_title_prefscreen_display">Display</string>
-    <string name="_summary_prefscreen_display">Choose which drugs to display</string>
+    <string name="_title_prefscreen_display">Appearance</string>
+    <string name="_summary_prefscreen_display"></string>
     
     <string name="_title_pref_show_days_without_intakes">Show doseless</string>
 	<string name="_summary_pref_show_days_without_intakes">Show drugs having no doses on the currently displayed day.</string>
@@ -277,8 +279,11 @@
 		and holding the dose icon will allow you to select other options as well.
 	</string>
 	
+	<string name="_title_dark_theme">Use dark theme</string>
+	<string name="_toast_theme_changed">Restarting app&#8230;</string>
 	
-	
+	<string name="_toast_low_supplies">This drug\'s supplies are low</string>
+			
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 

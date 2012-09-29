@@ -69,6 +69,8 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 			// See android issue #4611
 			setTheme(android.R.style.Theme);
 		}
+		else
+			setTheme(Theme.get());
 
 		super.onCreate(savedInstanceState);
 

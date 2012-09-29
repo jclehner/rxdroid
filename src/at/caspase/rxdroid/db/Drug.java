@@ -27,7 +27,6 @@ import java.util.NoSuchElementException;
 
 import android.util.Log;
 import at.caspase.rxdroid.Fraction;
-import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
@@ -75,13 +74,12 @@ public class Drug extends Entry implements Comparable<Drug>
 	private static final String TAG = Drug.class.getName();
 	private static final long serialVersionUID = -2569745648137404894L;
 
-
-	public static final int FORM_PILL = 0;
-	public static final int FORM_INJECTION = 1;
-	public static final int FORM_SPRAY = 2;
-	public static final int FORM_DROP = 3;
-	public static final int FORM_GEL = 4;
-	public static final int FORM_OTHER = 5;
+	public static final int ICON_TABLET = 0;
+	public static final int ICON_SYRINGE = 1;
+	public static final int ICON_SPRAY = 2;
+	public static final int ICON_GLASS = 3;
+	public static final int ICON_TUBE = 4;
+	public static final int ICON_OTHER = 5;
 
 	public static final int TIME_MORNING = 0;
 	public static final int TIME_NOON = 1;
@@ -125,8 +123,8 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField(unique = true)
 	private String name;
 
-	@DatabaseField
-	private int form;
+	@DatabaseField(columnName = "form")
+	private int icon;
 
 	@DatabaseField
 	private boolean active = true;
@@ -243,26 +241,26 @@ public class Drug extends Entry implements Comparable<Drug>
 		return name;
 	}
 
-	public int getForm() {
-		return form;
+	public int getIcon() {
+		return icon;
 	}
 
-	public int getFormResourceId(/*boolean isDarkTheme*/)
+	/*public int getIconResourceId()
 	{
-		boolean isDarkTheme = false;
+		final boolean isDarkTheme = Theme.isDark();
 
-		switch(form)
+		switch(icon)
 		{
-			case FORM_INJECTION:
+			case ICON_SYRINGE:
 				return isDarkTheme ? R.drawable.ic_drug_syringe_light : R.drawable.ic_drug_syringe_dark;
 
-			case FORM_DROP:
+			case ICON_GLASS:
 				return isDarkTheme ? R.drawable.ic_drug_glass_light : R.drawable.ic_drug_glass_dark;
 
-			case FORM_GEL:
+			case ICON_TUBE:
 				return isDarkTheme ? R.drawable.ic_drug_tube_light : R.drawable.ic_drug_tube_dark;
 
-			case FORM_PILL:
+			case ICON_TABLET:
 				// fall through
 
 			default:
@@ -271,7 +269,7 @@ public class Drug extends Entry implements Comparable<Drug>
 
 			// FIXME
 		}
-	}
+	}*/
 
 	public int getRepeatMode() {
 		return repeatMode;
@@ -369,9 +367,9 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public void setForm(int form)
 	{
-		if(form > FORM_OTHER)
+		if(form > ICON_OTHER)
 			throw new IllegalArgumentException();
-		this.form = form;
+		this.icon = form;
 	}
 
 	public void setRepeatMode(int repeatMode)
@@ -637,7 +635,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	{
 		final Object[] members = {
 			this.name,
-			this.form,
+			this.icon,
 			this.active,
 			this.doseMorning,
 			this.doseNoon,

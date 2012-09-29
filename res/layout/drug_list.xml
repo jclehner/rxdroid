@@ -46,7 +46,7 @@
 			android:gravity="center"			
 			android:clickable="true"
 			android:background="@color/active_text_light"
-			style="@style/TextLarge"
+			style="@android:style/TextAppearance.Large"
 		/>	
 		 <!-- 
 		 <TextView android:id="@+id/text_date"

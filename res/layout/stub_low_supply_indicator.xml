@@ -27,7 +27,7 @@
 	android:layout_height="match_parent" 
 	
 	android:scaleType="fitCenter"  		
-	android:src="@drawable/ic_low_supply_warning"
+	android:src="?attr/iconLowSupplies"
 		 		
   	android:clickable="false"
   	android:onClick="onLowSupplyIndicatorClicked"

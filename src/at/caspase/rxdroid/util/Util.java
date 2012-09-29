@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.util.AttributeSet;
@@ -37,6 +38,7 @@ import android.widget.TimePicker;
 import at.caspase.androidutils.Reflect;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
+import at.caspase.rxdroid.Theme;
 import at.caspase.rxdroid.db.Drug;
 
 public final class Util
@@ -96,6 +98,45 @@ public final class Util
 
 		throw new IllegalArgumentException();
 	}
+
+	public static int getDrugIconDrawable(Context context, int icon)
+	{
+		final int[] attrs = { R.attr.drugIconTablet, R.attr.drugIconSyringe, R.attr.drugIconGlass, R.attr.drugIconTube };
+		final TypedArray a = context.obtainStyledAttributes(Theme.get(), attrs);
+
+		final int index;
+
+		switch(icon)
+		{
+			case Drug.ICON_SYRINGE:
+				index = 1;
+				break;
+
+			case Drug.ICON_GLASS:
+				index = 2;
+				break;
+			case Drug.ICON_TUBE:
+				index = 3;
+				break;
+
+			default: // includes ICON_TABLET for now
+				index = 0;
+				break;
+		}
+
+		final int resId = a.getResourceId(index, 0);
+
+		a.recycle();
+
+		return resId;
+	}
+
+
+
+
+
+
+
 
 	/**
 	 * Obtains a string attribute from an AttributeSet.
@@ -171,11 +212,7 @@ public final class Util
 			{
 				final int start = Character.isUpperCase(c) ? 65 : 97;
 				if(c - start < 26)
-				{
-					c -= start;
-					c = (char) ((c + 13) % 26);
-					c += start;
-				}
+					c = (char) (((c - start + 13) % 26) + start);
 				else
 					throw new IllegalStateException("Character out of range: c=" + c + "(" + (int) c + "), start=" + start);
 			}

@@ -27,7 +27,7 @@
 	android:layout_height="match_parent"
   		
 	android:scaleType="fitCenter"  		
-	android:src="@drawable/ic_warning"
+	android:src="?attr/iconMissedDose"
 	
 	android:clickable="true"
   	android:onClick="onMissedIndicatorClicked"

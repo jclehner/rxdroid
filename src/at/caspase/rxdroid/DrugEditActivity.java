@@ -39,8 +39,6 @@ import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -209,10 +207,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		setTheme(Theme.get());
 		super.onCreate(savedInstanceState);
-
-		Database.init();
-
 		addPreferencesFromResource(R.xml.empty);
 
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
@@ -490,7 +486,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			lastAutoIntakeCreationDate = drug.getLastAutoIntakeCreationDate();
 
 			name = drug.getName();
-			form = drug.getForm();
+			form = drug.getIcon();
 
 			if(LOGV) Log.v(TAG, "DrugWrapper.set: repeatOrigin=" + repeatOrigin);
 		}

@@ -22,54 +22,49 @@
  */
 -->
 
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
-	
-	<style name="LightTheme" parent="@style/Theme.Light">
-		<!--
-		<item name="android:textColorPrimary">@color/clickable_text_light</item>
-		-->
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:rxdroid="http://schemas.android.com/apk/res/at.caspase.rxdroid"
+>
+	<style name="NoBackground">
+		<item name="android:background">@null</item>
 	</style>
 	
-	<style name="LightTheme.NoAnimation" parent="@style/LightTheme">
-		<item name="android:windowAnimationStyle">@null</item>
-	</style>
-	
-	<style name="LightTheme.WipeAnimation" parent="@style/LightTheme">
-		<item name="android:windowAnimationStyle">@android:anim/slide_out_right</item>
-	</style>
-	
-	<style name="DarkTheme" parent="@style/Theme.Dark">
-		<!--
-		<item name="android:textColorPrimary">@color/clickable_text_dark</item>
-		-->
-	</style>
-	
-	<style name="MyTheme" parent="@style/Theme.Light" />
-	<style name="MyTheme.Dialog" parent="@style/Theme.Light.Dialog" />
-	
-	<style name="Theme.Dark" parent="@android:style/Theme.Black" />
-	<style name="Theme.Dark.Dialog" parent="@android:style/Theme.Dialog" />
-	
-	<style name="Theme.Light" parent="@android:style/Theme.Light" />
-	<style name="Theme.Light.Dialog" parent="@android:style/Theme.Dialog" />
+	<style name="LightTheme" parent="@style/_ApiSpecificLightTheme">
+		<item name="drugIconTablet">@drawable/ic_drug_tablet_black</item>
+		<item name="drugIconTube">@drawable/ic_drug_tube_black</item>
+		<item name="drugIconGlass">@drawable/ic_drug_glass_black</item>
+		<item name="drugIconSyringe">@drawable/ic_drug_syringe_black</item>
 		
-	
-	
-	
-	<style name="LightListElementBackgroundColor">
-	    <item name="android:background">@color/background_listview_element_light</item>
+		<item name="doseStatusTaken">@drawable/ic_dose_taken_dark</item>
+		<item name="doseStatusMissed">@drawable/ic_dose_forgotten_dark</item>
+		<item name="doseStatusIgnored">@drawable/ic_dose_ignored_dark</item>
+		
+		<item name="textColorClickable">@color/black_clickable</item>
+		
+		<item name="iconLowSupplies">@drawable/ic_low_supply_warning</item>
+		<item name="iconMissedDose">@drawable/ic_warning</item>
 	</style>
 	
-	<style name="LightListElement">
-	    <item name="android:background">@drawable/bg_list_element_light</item>	    
+	<style name="DarkTheme" parent="@style/_ApiSpecificDarkTheme">
+		<item name="drugIconTablet">@drawable/ic_drug_tablet_white</item>
+		<item name="drugIconTube">@drawable/ic_drug_tube_white</item>
+		<item name="drugIconGlass">@drawable/ic_drug_glass_white</item>
+		<item name="drugIconSyringe">@drawable/ic_drug_syringe_white</item>
+		
+		<item name="doseStatusTaken">@drawable/ic_dose_taken</item>
+		<item name="doseStatusMissed">@drawable/ic_dose_forgotten</item>
+		<item name="doseStatusIgnored">@drawable/ic_dose_ignored</item>
+		
+		<item name="textColorClickable">@color/white_clickable</item>
+		
+		<item name="iconLowSupplies">@drawable/ic_low_supply_warning_white</item>
+		<item name="iconMissedDose">@drawable/ic_warning_white</item>
 	</style>
 	
-	<style name="DarkListElementBackgroundColor">
-	    <item name="android:background">@color/background_listview_element_dark</item>
-	</style>
+	<style name="TextAppearance.Large.Clickable" parent="@android:style/TextAppearance.Large">
+		<item name="android:textColor">?attr/textColorClickable</item>
+	</style>	
 	
-	<style name="DarkListElement">
-	    <item name="android:background">@drawable/bg_list_element_dark</item>	    
-	</style>
-	
+	<style name="_ApiSpecificLightTheme" parent="@android:style/Theme.Light" />
+	<style name="_ApiSpecificDarkTheme" parent="@android:style/Theme" />		
 </resources>

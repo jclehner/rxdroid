@@ -30,10 +30,14 @@ import java.util.Set;
 
 import android.app.Notification;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.db.Schedule;
@@ -62,6 +66,7 @@ public final class Settings
 		{
 			sContext = GlobalContext.get();
 			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(GlobalContext.get());
+			sSharedPrefs.registerOnSharedPreferenceChangeListener(LISTENER);
 		}
 	}
 
@@ -99,6 +104,14 @@ public final class Settings
 
 	public static void putDate(String key, Date date) {
 		putString(key, DATE_FORMAT.format(date));
+	}
+
+	public static boolean getBoolean(String key, boolean defaultValue) {
+		return sSharedPrefs.getBoolean(key, defaultValue);
+	}
+
+	public static void putBoolean(String key, boolean value) {
+		sSharedPrefs.edit().putBoolean(key, value).commit();
 	}
 
 	private static int[] HISTORY_AGE_IN_DAYS = {
@@ -471,10 +484,6 @@ public final class Settings
 		return mask;
 	}
 
-	public static boolean getBoolean(String key, boolean defaultValue) {
-		return sSharedPrefs.getBoolean(key, defaultValue);
-	}
-
 	public static String getDrugName(Drug drug)
 	{
 		final String name = drug.getName();
@@ -608,6 +617,24 @@ public final class Settings
 	}
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+	private static final OnSharedPreferenceChangeListener LISTENER = new OnSharedPreferenceChangeListener() {
+
+		@Override
+		public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
+		{
+			if(Theme.KEY.equals(key))
+			{
+				Toast.makeText(sContext, R.string._toast_theme_changed, Toast.LENGTH_LONG).show();
+
+				final PackageManager pm = sContext.getPackageManager();
+				final Intent intent = pm.getLaunchIntentForPackage(sContext.getPackageName());
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+				GlobalContext.startActivity(intent);
+			}
+		}
+	};
+
 
 	private Settings() {}
 }

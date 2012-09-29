@@ -43,7 +43,7 @@
 							
 		android:scaleType="fitCenter"
 		android:padding="1dp"
-		android:src="@drawable/ic_drug_tablet_dark"
+		android:src="?attr/drugIconTablet"
 	/>
 	
   
@@ -62,8 +62,8 @@
   		android:focusable="true"
   		android:clickable="true"
   		android:onClick="onDrugNameClick"
-  		  		
-  		style="@android:style/TextAppearance.Large"
+  		  		  		
+  		style="@style/TextAppearance.Large.Clickable"
   		  		
   		android:nextFocusDown="@+id/morning"
 	/>

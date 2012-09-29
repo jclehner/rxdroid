@@ -84,8 +84,8 @@
     <string name="_title_pref_use_sound">Ton</string>
     <string name="_title_pref_use_vibrator">Vibration</string>
     
-    <string name="_title_prefscreen_display">Anzeige</string>
-    <string name="_summary_prefscreen_display">Filteroptionen, etc.</string>
+    <string name="_title_prefscreen_display">Ansicht</string>
+    <string name="_summary_prefscreen_display"></string>
     
     <string name="_title_pref_show_days_without_intakes">Ohne Einnahme</string>
 	<string name="_summary_pref_show_days_without_intakes">Medikamente ohne Einnahmen am ausgewählten Tag anzeigen.</string>
@@ -240,6 +240,9 @@
 	
 	<string name="_title_show_supply_monitors">@string/_title_supply_monitor</string>
 	<string name="_summary_show_supply_monitors">Show drugs that are marked as monitoring supplies only</string>
+	
+	<string name="_title_dark_theme">Dunkles Theme verwenden</string>
+	<string name="_toast_theme_changed">App wird neu gestartet&#8230;</string>
 		
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

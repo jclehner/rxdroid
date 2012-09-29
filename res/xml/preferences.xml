@@ -33,7 +33,6 @@
 
 	<PreferenceScreen android:key="prefscreen_times"
 		android:title="@string/_title_prefscreen_times"
-		android:summary="@string/_summary_prefscreen_times"
 		android:icon="@drawable/android:ic_menu_recent_history">
 		
 	    <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_morning"
@@ -87,9 +86,14 @@
 	<PreferenceScreen 
 		android:key="prefscreen_display"
 		android:title="@string/_title_prefscreen_display"
-		android:summary="@string/_summary_prefscreen_display"
 		android:icon="@drawable/android:ic_menu_view"
 	>
+	     
+		<CheckBoxPreference android:key="theme_is_dark" 
+			android:title="@string/_title_dark_theme"
+			android:defaultValue="@string/pref_default_theme_is_dark"
+		/>
+		
 	     
 	    <CheckBoxPreference android:key="privacy_scramble_names"
 		    android:title="@string/_title_scramble_names"
@@ -153,7 +157,6 @@
 	<PreferenceScreen
 		android:key="prefscreen_notifications"
 		android:title="@string/_title_prefscreen_notifications"
-		android:summary="@string/_summary_prefscreen_notifications"
 		android:icon="@drawable/android:ic_menu_info_details"
 	>
 		<!--  

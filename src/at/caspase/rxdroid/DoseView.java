@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.text.SpannableStringBuilder;
 import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;
@@ -57,8 +58,8 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	public static final int STATUS_INDETERMINATE = 0;
 	public static final int STATUS_TAKEN = 1;
-	public static final int STATUS_FORGOTTEN = 2;
-	//public static final int STATUS_IGNORED = 3;
+	public static final int STATUS_MISSED = 2;
+	public static final int STATUS_IGNORED = 3;
 
 	private final ImageView mIntakeStatus;
 	private final TextView mDoseText;
@@ -318,7 +319,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		{
 			if(!mDisplayDose.isZero())
 			{
-				markAsTaken();
+				setStatus(STATUS_TAKEN);
 
 				final Fraction scheduledDose = mDrug.getDose(mDoseTime, mDate);
 				int cmp = mDisplayDose.compareTo(scheduledDose);
@@ -354,11 +355,11 @@ public class DoseView extends FrameLayout implements OnChangeListener
 						Date end = DateTime.add(mDate, Calendar.MILLISECOND, offset);
 
 						if(DateTime.now().after(end))
-							markAsForgotten();
+							setStatus(STATUS_MISSED);
 					}
 				}
 				else
-					markAsIgnored();
+					setStatus(STATUS_IGNORED);
 			}
 
 		}
@@ -366,21 +367,33 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			mDoseText.setText(mDisplayDose.toString());
 	}
 
-	private void markAsTaken()
+	private void setStatus(int status)
 	{
-		mIntakeStatus.setImageResource(R.drawable.ic_dose_taken_light);
-		mStatus = STATUS_TAKEN;
-	}
+		if(status == mStatus)
+			return;
 
-	private void markAsIgnored()
-	{
-		mIntakeStatus.setImageResource(R.drawable.ic_dose_ignored_light);
-		mStatus = STATUS_TAKEN; // this is intentional!
-	}
+		mStatus = status;
 
-	private void markAsForgotten()
-	{
-		mIntakeStatus.setImageResource(R.drawable.ic_dose_forgotten_light);
-		mStatus = STATUS_FORGOTTEN;
+		int imageResId;
+
+		final int[] attrs = { R.attr.doseStatusTaken, R.attr.doseStatusMissed, R.attr.doseStatusIgnored };
+		final TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs);
+
+		if(status == STATUS_INDETERMINATE)
+			imageResId = 0;
+		else
+		{
+			if(status == STATUS_IGNORED)
+				mStatus = STATUS_TAKEN; // this is intentional!
+
+			imageResId = a.getResourceId(status - 1, 0);
+
+			if(imageResId == 0)
+				Log.w(TAG, "Status image resource not found");
+		}
+
+		a.recycle();
+
+		mIntakeStatus.setImageResource(imageResId);
 	}
 }

@@ -24,6 +24,7 @@ package at.caspase.rxdroid;
 import java.util.WeakHashMap;
 
 import android.app.Activity;
+import android.util.Log;
 
 
 public class Application extends android.app.Application
@@ -37,6 +38,8 @@ public class Application extends android.app.Application
 		GlobalContext.set(getApplicationContext());
 		Settings.init();
 		AutoIntakeCreator.registerSelf();
+
+		Log.d("[[[RxDroid]]]", "onCreate");
 
 		super.onCreate();
 	}

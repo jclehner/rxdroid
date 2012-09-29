@@ -40,6 +40,7 @@ import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Timer;
+import at.caspase.rxdroid.util.Util;
 import at.caspase.rxdroid.widget.Rot13TextView;
 
 public class DrugOverviewAdapter extends AbsDrugAdapter
@@ -93,13 +94,12 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		else
 			holder = (DoseViewHolder) v.getTag();
 
-		//holder.name.setScramblingEnabled(Settings.inst)
-		//holder.name.setScramblingEnabled(true);
 		holder.name.setText(drug.getName());
 		holder.name.setScramblingEnabled(Settings.getBoolean("privacy_scramble_names", false));
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
 
-		holder.icon.setImageResource(drug.getFormResourceId());
+		//holder.icon.setImageResource(drug.getIconResourceId());
+		holder.icon.setImageResource(Util.getDrugIconDrawable(getContext(), drug.getIcon()));
 
 		if(DateTime.today().equals(mAdapterDate))
 		{

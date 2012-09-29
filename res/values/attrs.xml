@@ -36,6 +36,19 @@
         <attr name="after" format="string" />
         <attr name="before" format="string" />
         <attr name="allowEndWrap" format="boolean" />
-    </declare-styleable>     
-        
+    </declare-styleable>
+    
+    <attr name="drugIconTablet" format="reference" />
+    <attr name="drugIconTube" format="reference" />
+    <attr name="drugIconSyringe" format="reference" />
+    <attr name="drugIconGlass" format="reference" />
+    
+    <attr name="doseStatusTaken" format="reference" />
+    <attr name="doseStatusMissed" format="reference" />
+    <attr name="doseStatusIgnored" format="reference" />
+    
+    <attr name="iconLowSupplies" format="reference" />
+    <attr name="iconMissedDose" format="reference" />
+    
+    <attr name="textColorClickable" format="color|reference" />
 </resources>

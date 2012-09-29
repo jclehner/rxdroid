@@ -23,27 +23,7 @@
 -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-	<style name="TextLarge" parent="@android:style/TextAppearance.Large.Inverse">
-		<item name="android:textColor">@color/color_text</item>
-	</style>
-	<style name="TextMedium" parent="@android:style/TextAppearance.Medium.Inverse">
-		<item name="android:textColor">@color/color_text</item>		
-	</style>
-	<style name="TextSmall" parent="@android:style/TextAppearance.Small.Inverse">
-		<item name="android:textColor">@color/color_text</item>		
-	</style>	
 	<style name="FractionInputBottomPadding">
 	    <item name="android:paddingBottom">30dip</item>
-	</style>
-	
-	<style name="ClickableTextStyleLight">
-		<item name="android:textColor">@color/clickable_text_light</item>
-	</style>
-	
-	<style name="ClickableTextStyleDark">
-		<item name="android:textColor">@color/clickable_text_dark</item>
-	</style>
-	
-	
-			
+	</style>			
 </resources>

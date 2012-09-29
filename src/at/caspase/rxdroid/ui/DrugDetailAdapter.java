@@ -40,6 +40,7 @@ import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Timer;
+import at.caspase.rxdroid.util.Util;
 import at.caspase.rxdroid.widget.Rot13TextView;
 
 public class DrugDetailAdapter extends AbsDrugAdapter
@@ -97,7 +98,8 @@ public class DrugDetailAdapter extends AbsDrugAdapter
 
 		holder.name.setText(Settings.getDrugName(drug));
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
-		holder.icon.setImageResource(drug.getFormResourceId());
+		//holder.icon.setImageResource(drug.getIconResourceId());
+		holder.icon.setImageResource(Util.getDrugIconDrawable(mActivity, drug.getIcon()));
 
 		final int visibility;
 

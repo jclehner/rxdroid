@@ -23,16 +23,6 @@
 -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-	<style name="TextLarge" parent="@android:style/TextAppearance.Holo.Large">
-		<item name="android:textColor">@color/color_text</item>
-	</style>
-	<style name="TextMedium" parent="@android:style/TextAppearance.Holo.Medium">
-	    <item name="android:textColor">@color/color_text</item>
-	</style>
-	<style name="TextSmall" parent="@android:style/TextAppearance.Holo.Small">
-		<item name="android:textColor">@color/color_text</item>		
-	</style>	
-	
 	<style name="FractionInputBottomPadding">
 	    <item name="android:paddingBottom">0dip</item>
 	</style>

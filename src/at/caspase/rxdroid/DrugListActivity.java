@@ -113,8 +113,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		super.onCreate(savedInstanceState);
-
+		setTheme(Theme.get());
 		setContentView(R.layout.drug_list);
 
 		mPager = (ViewPager) findViewById(R.id.drug_list_pager);
@@ -122,8 +121,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-
-		Database.init();
 
 		mTextDate.setOnLongClickListener(mDateClickListener);
 		mTextDate.setOnClickListener(mDateClickListener);
@@ -135,16 +132,18 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		mPager.setOnPageChangeListener(mPageListener);
 		mPager.setOffscreenPageLimit(1);
 
-
 		startNotificationService();
 
 		Database.registerEventListener(mDatabaseListener);
+
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
+
 		mIsShowing = true;
 		Application.setIsVisible(this, true);
 
@@ -174,7 +173,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		// TODO Auto-generated method stub
 		super.onStop();
 		mPager.removeAllViews();
-		mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+		//mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
 		Database.unregisterEventListener(mDatabaseListener);
 	}
 
@@ -355,7 +354,10 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences preferences, String key)
 	{
-		setDate(mDate, PAGER_INIT);
+		if(Theme.KEY.equals(key))
+			finish(); // TODO fix this naughty hack
+		else if(mIsShowing)
+			setDate(mDate, PAGER_INIT);
 	}
 
 	@Override
@@ -435,9 +437,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		setDate(cal.getTime(), PAGER_INIT | PAGER_SCROLL);
 	}
 
-	public void onLowSupplyIndicatorClicked(View view)
-	{
-		// FIXME stub
+	public void onLowSupplyIndicatorClicked(View view) {
+		Toast.makeText(this, R.string._toast_low_supplies, Toast.LENGTH_SHORT).show();
 	}
 
 	private static final int PAGER_SCROLL = 1;
