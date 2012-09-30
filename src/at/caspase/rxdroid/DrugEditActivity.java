@@ -224,6 +224,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	{
 		super.onResume();
 
+		Database.init();
 		Application.setIsVisible(this, true);
 
 		Intent intent = getIntent();
