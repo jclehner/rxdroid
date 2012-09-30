@@ -138,6 +138,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1342732195" done="1348963967">
+        Fix TimePeriodPreference! Rename: constraints -&gt; limits?
+        <comment>
+            kinda fixed
+        </comment>
+    </note>
     <note priority="veryhigh" time="1343325046" done="1343649703">
         Remove list element backgrounds, use solid color, but custom dividers!
         <comment>
@@ -146,6 +152,12 @@
     </note>
     <note priority="veryhigh" time="1344884389" done="1344937776">
         Fix HOOK_DELETE
+        <comment>
+            fixed
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1346277627" done="1348963975">
+        Fix bug: when TIME_NIGHT not wrapping and time between end of TIME_NIGHT and midnight -&gt; no notification!
         <comment>
             fixed
         </comment>
@@ -447,12 +459,6 @@
     <note priority="veryhigh" time="1332777147">
         Display GPL on first use
     </note>
-    <note priority="veryhigh" time="1342732195">
-        Fix TimePeriodPreference! Rename: constraints -&gt; limits?
-    </note>
-    <note priority="veryhigh" time="1346277627">
-        Fix bug: when TIME_NIGHT not wrapping and time between end of TIME_NIGHT and midnight -&gt; no notification!
-    </note>
     <note priority="high" time="1324308938">
         Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?
     </note>
@@ -473,6 +479,12 @@
     </note>
     <note priority="high" time="1343595716">
         Don't play notification sound if UI is visible
+    </note>
+    <note priority="high" time="1348963921">
+        Add option to change notification sound
+    </note>
+    <note priority="high" time="1348964002">
+        Add immutable Fraction class
     </note>
     <note priority="medium" time="1318943892">
         Consider modelling DrugNamePreference's layout after the layout found in the old DrugEditActivty layout
