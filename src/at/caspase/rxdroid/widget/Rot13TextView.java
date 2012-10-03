@@ -36,6 +36,8 @@ public class Rot13TextView extends TextView
 	private OnClickListener mOnClickListener;
 	private OnLongClickListener mOnLongClickListener;
 
+	private String mText;
+
 	public Rot13TextView(Context context) {
 		this(context, null);
 	}
@@ -52,12 +54,13 @@ public class Rot13TextView extends TextView
 		super.setOnLongClickListener(mLocalOnLongClickListener);
 	}
 
-	public void setScramblingEnabled(boolean enabled)
+	public void setScrambled(boolean scrambled)
 	{
-		if(mIsCurrentlyScrambled != enabled)
-			applyRot13();
+		if(mText == null)
+			mText = getText().toString();
 
-		mIsCurrentlyScrambled = enabled;
+		super.setText(scrambled ? Util.rot13(mText) : mText);
+		mIsCurrentlyScrambled = scrambled;
 	}
 
 	public void setUnscrambledDuration(long millis) {
@@ -74,10 +77,6 @@ public class Rot13TextView extends TextView
 		mOnLongClickListener = l;
 	}
 
-	private void applyRot13() {
-		setText(Util.rot13(getText().toString()));
-	}
-
 	private final OnClickListener mLocalOnClickListener = new OnClickListener() {
 
 		@Override
@@ -85,8 +84,7 @@ public class Rot13TextView extends TextView
 		{
 			if(mIsCurrentlyScrambled)
 			{
-				applyRot13();
-				mIsCurrentlyScrambled = false;
+				setScrambled(false);
 
 				if(mUnscrambledDuration > 0)
 					postDelayed(mRescrambler, mUnscrambledDuration);
@@ -109,7 +107,10 @@ public class Rot13TextView extends TextView
 			if(mIsCurrentlyScrambled)
 			{
 				if(mOnClickListener != null)
+				{
 					mOnClickListener.onClick(v);
+					return true;
+				}
 			}
 			else if(mOnLongClickListener != null)
 				return mOnLongClickListener.onLongClick(v);
@@ -123,8 +124,7 @@ public class Rot13TextView extends TextView
 		@Override
 		public void run()
 		{
-			applyRot13();
-			mIsCurrentlyScrambled = true;
+			setScrambled(true);
 		}
 	};
 }

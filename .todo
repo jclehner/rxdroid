@@ -252,6 +252,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1335393523" done="1349281575">
+        Add some Dialog titles in DrugEditActivity
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1335393677" done="1335516379">
         To enable extras on preferences on pre-HC devices, consider creating a global extra registry (WeakHashMap!)
         <comment>
@@ -266,6 +272,12 @@
     </note>
     <note priority="high" time="1342732778" done="1346276508">
         Move functions accessing other Entry types to Entries.java
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="high" time="1348964002" done="1349281586">
+        Add immutable Fraction class
         <comment>
             done
         </comment>
@@ -471,9 +483,6 @@
     <note priority="high" time="1335393421">
         Remove PopupWindow in IntakeDialog. Move message to area of FractionInput?
     </note>
-    <note priority="high" time="1335393523">
-        Add some Dialog titles in DrugEditActivity
-    </note>
     <note priority="high" time="1342730192">
         Move tests to separate test project
     </note>
@@ -482,9 +491,6 @@
     </note>
     <note priority="high" time="1348963921">
         Add option to change notification sound
-    </note>
-    <note priority="high" time="1348964002">
-        Add immutable Fraction class
     </note>
     <note priority="medium" time="1318943892">
         Consider modelling DrugNamePreference's layout after the layout found in the old DrugEditActivty layout
@@ -495,8 +501,11 @@
     <note priority="medium" time="1320778180">
         Better tablet support; use Fragments!
     </note>
-    <note priority="medium" time="1326455007">
+    <note priority="medium" time="1326455007" done="1349281673">
         Allow intakes to be updated!
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="medium" time="1328223980">
         Add PIN protection
