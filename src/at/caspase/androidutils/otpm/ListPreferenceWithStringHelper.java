@@ -60,5 +60,6 @@ public abstract class ListPreferenceWithStringHelper extends PreferenceHelper<Li
 		preference.setEntries(mEntries);
 		preference.setEntryValues(mValues);
 		preference.setValue(fieldValue);
+		preference.setDialogTitle(preference.getTitle());
 	}
 }

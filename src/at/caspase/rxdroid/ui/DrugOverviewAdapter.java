@@ -94,7 +94,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		else
 			holder = (DoseViewHolder) v.getTag();
 
-		holder.name.setText(drug.getName());
+		holder.name.setUnscrambledText(drug.getName());
 		holder.name.setScrambled(Settings.getBoolean("privacy_scramble_names", false));
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
 

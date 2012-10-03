@@ -237,8 +237,13 @@ public abstract class PreferenceHelper<P extends Preference, T>
 		final PreferenceGroup root = mRootPrefGroup.get();
 		if(root != null)
 		{
-			//final Bundle extras = root.getExtras();
 			final Bundle extras = Extras.get(root);
+			if(extras == null)
+			{
+				Log.w(TAG, "Missing extras, cannot notify dependencies");
+				return;
+			}
+
 			final Map<String, PreferenceHelper> prefHelpers =
 					(Map<String, PreferenceHelper>) extras.getSerializable(OTPM.EXTRA_PREF_HELPERS);
 
@@ -262,7 +267,7 @@ public abstract class PreferenceHelper<P extends Preference, T>
 			}
 		}
 		else
-			Log.w(TAG, "notifyForwardDependencies: Root preference was destroyed, cannot notify dependencies");
+			Log.w(TAG, "Root preference was destroyed, cannot notify dependencies");
 	}
 
 	/* package */ final OnPreferenceChangeListener getOnPreferenceChangeListener()

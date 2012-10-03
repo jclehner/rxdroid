@@ -40,7 +40,7 @@ public class WrappedCheckedException extends RuntimeException
 	public WrappedCheckedException(String detailMessage, WrappedCheckedException ex) {
 		super(detailMessage, ex.getCause());
 	}*/
-	
+
 	public Throwable getRootCause()
 	{
 		Throwable cause = getFirstWrappedCause();
@@ -60,6 +60,10 @@ public class WrappedCheckedException extends RuntimeException
 		final Throwable cause = getFirstWrappedCause();
 		if(cause == null)
 			return super.toString();
+
+		final String message = getMessage();
+		if(message != null)
+			return cause.toString() + ": " + message;
 
 		return cause.toString();
 	}

@@ -308,8 +308,20 @@ public class OTPM
 
 			final Annotation a = info.annotation;
 			final Class<? extends PreferenceHelper> prefHlpClazz = Reflect.getAnnotationParameter(a, "helper");
+			final PreferenceHelper prefHlp;
 
-			final PreferenceHelper prefHlp = Reflect.newInstance(prefHlpClazz);
+			try
+			{
+				prefHlp = Reflect.newInstance(prefHlpClazz);
+			}
+			catch(WrappedCheckedException e)
+			{
+				if(e.getCauseType() == NoSuchMethodException.class)
+					throw new WrappedCheckedException(prefHlpClazz + " lacks a visible default constructor", e);
+				else
+					throw e;
+			}
+
 			prefHlp.setData(object, info.field);
 			prefHlp.setRootPreferenceGroup(root);
 

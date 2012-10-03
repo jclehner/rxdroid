@@ -990,6 +990,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		private static final int NOTIFY_SUPPLIES_ONLY = 1;
 		private String[] mEntries;
 
+		public NotificationsPreferenceHelper() {
+			// TODO Auto-generated constructor stub
+		}
+
 		@Override
 		public void initPreference(ListPreference preference, Boolean fieldValue)
 		{
@@ -1002,6 +1006,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			preference.setEntries(mEntries);
 			Util.populateListPreferenceEntryValues(preference);
 			preference.setValueIndex(fieldValue ? NOTIFY_SUPPLIES_ONLY : NOTIFY_ALL);
+			preference.setDialogTitle(preference.getTitle());
 		}
 
 		@Override

@@ -21,13 +21,15 @@
 
 package at.caspase.androidutils;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import android.os.Bundle;
 
 public class Extras
 {
-	private static WeakHashMap<Object, Bundle> sExtras = new WeakHashMap<Object, Bundle>();
+	private static Map<Object, Bundle> sExtras = Collections.synchronizedMap(new WeakHashMap<Object, Bundle>());
 
 	public static Bundle get(Object object)
 	{

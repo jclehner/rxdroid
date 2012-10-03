@@ -56,11 +56,14 @@ public class Rot13TextView extends TextView
 
 	public void setScrambled(boolean scrambled)
 	{
-		if(mText == null)
-			mText = getText().toString();
-
-		super.setText(scrambled ? Util.rot13(mText) : mText);
+		setText(scrambled ? Util.rot13(mText) : mText);
 		mIsCurrentlyScrambled = scrambled;
+	}
+
+	public void setUnscrambledText(String text)
+	{
+		mText = text;
+		setText(text);
 	}
 
 	public void setUnscrambledDuration(long millis) {

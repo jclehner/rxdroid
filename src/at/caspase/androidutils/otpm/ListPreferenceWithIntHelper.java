@@ -48,7 +48,7 @@ public abstract class ListPreferenceWithIntHelper extends PreferenceHelper<ListP
 		preference.setEntries(mEntries);
 		Util.populateListPreferenceEntryValues(preference);
 		preference.setValueIndex(fieldValue);
-		preference.setSummary(mEntries[fieldValue]);
+		preference.setDialogTitle(preference.getTitle());
 	}
 
 	/*@Override
