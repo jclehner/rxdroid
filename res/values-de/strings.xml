@@ -36,7 +36,6 @@
     -->
     
     <string name="_msg_new_notification">Neue Benachrichtigung</string>
-    <string name="_title_notifications">RxDroid</string>
     <string name="_msg_doses_fp">%2$d fällig, %1$d vergessen.</string>
     <string name="_msg_doses_f">%1$d vergessen.</string>
     <string name="_msg_doses_p">%1$d fällig.</string>

@@ -38,6 +38,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -62,6 +63,7 @@ import at.caspase.androidutils.otpm.CheckboxPreferenceHelper;
 import at.caspase.androidutils.otpm.ListPreferenceWithIntHelper;
 import at.caspase.androidutils.otpm.MyDialogPreferenceHelper;
 import at.caspase.androidutils.otpm.OTPM;
+import at.caspase.androidutils.otpm.PreferenceHelper;
 import at.caspase.androidutils.otpm.OTPM.AddPreference;
 import at.caspase.androidutils.otpm.OTPM.CreatePreference;
 import at.caspase.rxdroid.db.Database;
@@ -430,6 +432,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 //			type = CheckBoxPreference.class,
 //			helper = CheckboxPreferenceHelper.class
 //		)
+
+		@CreatePreference
+		(
+			titleResId = R.string._title_prefscreen_notifications,
+			order = 12,
+			type = ListPreference.class,
+			helper = NotificationsPreferenceHelper.class
+		)
 		private boolean autoAddIntakes;
 
 		@CreatePreference
@@ -972,6 +982,40 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				}
 			}
 		};
+	}
+
+	private static class NotificationsPreferenceHelper extends PreferenceHelper<ListPreference, Boolean>
+	{
+		private static final int NOTIFY_ALL = 0;
+		private static final int NOTIFY_SUPPLIES_ONLY = 1;
+		private String[] mEntries;
+
+		@Override
+		public void initPreference(ListPreference preference, Boolean fieldValue)
+		{
+			if(mEntries == null)
+			{
+				final Resources r = preference.getContext().getResources();
+				mEntries = r.getStringArray(R.array.drug_notifications);
+			}
+
+			preference.setEntries(mEntries);
+			Util.populateListPreferenceEntryValues(preference);
+			preference.setValueIndex(fieldValue ? NOTIFY_SUPPLIES_ONLY : NOTIFY_ALL);
+		}
+
+		@Override
+		public void updateSummary(ListPreference preference, Boolean newValue)
+		{
+			preference.setSummary(mEntries[newValue ? NOTIFY_SUPPLIES_ONLY : NOTIFY_ALL]);
+		}
+
+		@Override
+		public Boolean toFieldType(Object prefValue)
+		{
+			final int i = Integer.parseInt((String) prefValue);
+			return i == NOTIFY_SUPPLIES_ONLY;
+		}
 	}
 
 	private final OnPreferenceChangeListener mListener = new OnPreferenceChangeListener() {

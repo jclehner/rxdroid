@@ -32,10 +32,6 @@ public abstract class ListPreferenceWithStringHelper extends PreferenceHelper<Li
 	private int mEntriesResId;
 	private int mValuesResId;
 
-	public ListPreferenceWithStringHelper() {
-		throw new UnsupportedOperationException("You must extend this class to use it");
-	}
-
 	public ListPreferenceWithStringHelper(int entriesResId, int valuesResId)
 	{
 		mEntriesResId = entriesResId;

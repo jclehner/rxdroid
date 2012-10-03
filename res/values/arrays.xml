@@ -41,6 +41,11 @@
     	<item>@string/_title_21_days_on_7_days_off</item>
     </string-array>
     
+    <string-array name="drug_notifications">
+    	<item>@string/_title_doses_and_low_supplies</item>
+    	<item>@string/_title_low_supplies_only</item>    	
+    </string-array>
+    
     <string-array name="history_size">
     	<item>@string/_title_history_2_weeks</item>
     	<item>@string/_title_history_1_month</item>

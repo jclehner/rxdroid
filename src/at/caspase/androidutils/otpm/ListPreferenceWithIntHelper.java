@@ -29,10 +29,6 @@ public abstract class ListPreferenceWithIntHelper extends PreferenceHelper<ListP
 	private String[] mEntries;
 	private int mEntriesResId;
 
-	public ListPreferenceWithIntHelper() {
-		throw new UnsupportedOperationException("You must extend this class to use it");
-	}
-
 	public ListPreferenceWithIntHelper(int entriesResId) {
 		mEntriesResId = entriesResId;
 	}

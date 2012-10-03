@@ -287,6 +287,9 @@
 	
 	<string name="_title_notification_sound">Notification sound</string>
 	
+	<string name="_title_doses_and_low_supplies">All</string>
+	<string name="_title_low_supplies_only">Low supplies only</string>
+	
 				
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
