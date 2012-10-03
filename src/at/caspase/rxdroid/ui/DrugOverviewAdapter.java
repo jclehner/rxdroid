@@ -46,7 +46,7 @@ import at.caspase.rxdroid.widget.Rot13TextView;
 public class DrugOverviewAdapter extends AbsDrugAdapter
 {
 	private static final String TAG = DrugOverviewAdapter.class.getName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = true;
 
 	private final Timer mTimer;
 

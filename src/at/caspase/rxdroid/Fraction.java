@@ -391,6 +391,42 @@ public class Fraction extends Number implements Comparable<Number>
 			throw new UnsupportedOperationException("Fraction.ZERO is immutable");
 	}
 
+	private static void add(Fraction dest, Fraction other)
+	{
+		dest.requireNotZeroConstant();
+
+		int numerator, denominator;
+
+		//Log.d(TAG, "plus: this=" + this + ", other=" + other);
+
+		if(dest.mDenominator != other.mDenominator)
+		{
+			int lcm = findLCM(dest.mDenominator, other.mDenominator);
+
+			int multThis = lcm / dest.mDenominator;
+			int multOther = lcm / other.mDenominator;
+
+			denominator = lcm;
+			numerator = dest.mNumerator * multThis + other.mNumerator * multOther;
+		}
+		else
+		{
+			numerator = dest.mNumerator + other.mNumerator;
+			denominator = dest.mDenominator;
+		}
+
+		// this reduces the resulting fraction
+		dest.init(0, numerator, denominator);
+	}
+
+	private static void add(Fraction dest, int n)
+	{
+		dest.requireNotZeroConstant();
+
+		//init(0, mNumerator + n * mDenominator, mDenominator);
+		dest.mNumerator += n * dest.mDenominator;
+	}
+
 	/**
 	 * Finds the lowest common multiple of two integers.
 	 */

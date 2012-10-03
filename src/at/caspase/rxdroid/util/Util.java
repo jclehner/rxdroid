@@ -101,42 +101,24 @@ public final class Util
 
 	public static int getDrugIconDrawable(Context context, int icon)
 	{
-		final int[] attrs = { R.attr.drugIconTablet, R.attr.drugIconSyringe, R.attr.drugIconGlass, R.attr.drugIconTube };
-		final TypedArray a = context.obtainStyledAttributes(Theme.get(), attrs);
-
-		final int index;
-
 		switch(icon)
 		{
 			case Drug.ICON_SYRINGE:
-				index = 1;
-				break;
+				return Theme.getResourceAttribute(R.attr.drugIconSyringe);
 
 			case Drug.ICON_GLASS:
-				index = 2;
-				break;
+				return Theme.getResourceAttribute(R.attr.drugIconGlass);
+
 			case Drug.ICON_TUBE:
-				index = 3;
-				break;
+				return Theme.getResourceAttribute(R.attr.drugIconTube);
 
-			default: // includes ICON_TABLET for now
-				index = 0;
-				break;
+			case Drug.ICON_TABLET:
+				// fall through, for now
+
+			default:
+				return Theme.getResourceAttribute(R.attr.drugIconTablet);
 		}
-
-		final int resId = a.getResourceId(index, 0);
-
-		a.recycle();
-
-		return resId;
 	}
-
-
-
-
-
-
-
 
 	/**
 	 * Obtains a string attribute from an AttributeSet.

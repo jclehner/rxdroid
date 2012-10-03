@@ -422,14 +422,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		)
 		private Fraction currentSupply;
 
-		@CreatePreference
-		(
-			titleResId = R.string._title_supply_monitor,
-			summaryResId = R.string._summary_supply_monitor,
-			order = 12,
-			type = CheckBoxPreference.class,
-			helper = CheckboxPreferenceHelper.class
-		)
+//		@CreatePreference
+//		(
+//			titleResId = R.string._title_supply_monitor,
+//			summaryResId = R.string._summary_supply_monitor,
+//			order = 12,
+//			type = CheckBoxPreference.class,
+//			helper = CheckboxPreferenceHelper.class
+//		)
 		private boolean autoAddIntakes;
 
 		@CreatePreference

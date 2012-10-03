@@ -374,10 +374,8 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		mStatus = status;
 
-		int imageResId;
-
 		final int[] attrs = { R.attr.doseStatusTaken, R.attr.doseStatusMissed, R.attr.doseStatusIgnored };
-		final TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs);
+		final int imageResId;
 
 		if(status == STATUS_INDETERMINATE)
 			imageResId = 0;
@@ -386,13 +384,8 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			if(status == STATUS_IGNORED)
 				mStatus = STATUS_TAKEN; // this is intentional!
 
-			imageResId = a.getResourceId(status - 1, 0);
-
-			if(imageResId == 0)
-				Log.w(TAG, "Status image resource not found");
+			imageResId = Theme.getResourceAttribute(attrs[status - 1]);
 		}
-
-		a.recycle();
 
 		mIntakeStatus.setImageResource(imageResId);
 	}

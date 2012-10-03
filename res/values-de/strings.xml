@@ -241,8 +241,10 @@
 	<string name="_title_show_supply_monitors">@string/_title_supply_monitor</string>
 	<string name="_summary_show_supply_monitors">Show drugs that are marked as monitoring supplies only</string>
 	
-	<string name="_title_dark_theme">Dunkles Theme verwenden</string>
+	<string name="_title_dark_theme">Dunkles Theme</string>
 	<string name="_toast_theme_changed">App wird neu gestartet&#8230;</string>
+	
+	<string name="_toast_low_supplies">Vorrat dieses Medikaments ist niedrig</string>
 		
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

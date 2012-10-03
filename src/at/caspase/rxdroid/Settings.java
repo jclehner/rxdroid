@@ -341,26 +341,15 @@ public final class Settings
 
 	public static Date getActiveDate(Calendar time)
 	{
-		Log.d(TAG, "getActiveDate: time=" + DateTime.toString(time));
-
 		final Calendar activeDate = DateTime.getDatePartMutable(time);
 		final int activeDoseTime = getActiveDoseTime(time);
-
-		Log.d(TAG, "  date=" + DateTime.toString(activeDate));
 
 		if(activeDoseTime == Drug.TIME_NIGHT && hasWrappingDoseTimeNight())
 		{
 			final DumbTime end = new DumbTime(getDoseTimeEndOffset(Drug.TIME_NIGHT));
 			if(DateTime.isWithinRange(time, Constants.MIDNIGHT, end))
-			{
 				activeDate.add(Calendar.DAY_OF_MONTH, -1);
-				Log.d(TAG, "  adjusted activeDate");
-			}
 		}
-
-		Log.d(TAG, "  time=" + DateTime.toString(time));
-		Log.d(TAG, "  activeDoseTime=" + activeDoseTime);
-		Log.d(TAG, "  activeDate=" + DateTime.toString(activeDate));
 
 		return activeDate.getTime();
 	}
@@ -625,6 +614,8 @@ public final class Settings
 		{
 			if(Theme.KEY.equals(key))
 			{
+				Theme.clearAttributeCache();
+
 				Toast.makeText(sContext, R.string._toast_theme_changed, Toast.LENGTH_LONG).show();
 
 				final PackageManager pm = sContext.getPackageManager();
