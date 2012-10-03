@@ -42,6 +42,7 @@
     <attr name="drugIconTube" format="reference" />
     <attr name="drugIconSyringe" format="reference" />
     <attr name="drugIconGlass" format="reference" />
+    <attr name="drugIconRing" format="reference" />
     
     <attr name="doseStatusTaken" format="reference" />
     <attr name="doseStatusMissed" format="reference" />

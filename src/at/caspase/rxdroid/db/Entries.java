@@ -21,7 +21,6 @@
 
 package at.caspase.rxdroid.db;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import at.caspase.rxdroid.Fraction;
+import at.caspase.rxdroid.Fraction.MutableFraction;
 import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 
@@ -132,7 +132,7 @@ public final class Entries
 		if(date == null)
 			date = DateTime.today();
 
-		final Fraction doseLeftOnDate = new Fraction();
+		final MutableFraction doseLeftOnDate = new MutableFraction();
 
 		if(date.equals(DateTime.today()) && drug.hasDoseOnDate(date))
 		{
@@ -171,14 +171,8 @@ public final class Entries
 
 		for(Intake intake : Database.getCached(Intake.class))
 		{
-			if(intake.getDrugId() != drug.id)
-				continue;
-			if(date != null && !intake.getDate().equals(date))
-				continue;
-			if(doseTime != null && intake.getDoseTime() != doseTime)
-				continue;
-
-			intakes.add(intake);
+			if(Intake.has(intake, drug, date, doseTime))
+				intakes.add(intake);
 		}
 
 		return Collections.unmodifiableList(intakes);

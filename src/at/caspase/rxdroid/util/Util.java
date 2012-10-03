@@ -26,7 +26,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.util.AttributeSet;
@@ -37,9 +36,11 @@ import android.view.ViewParent;
 import android.widget.TimePicker;
 import at.caspase.androidutils.Reflect;
 import at.caspase.rxdroid.DumbTime;
+import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.Theme;
 import at.caspase.rxdroid.db.Drug;
+import at.caspase.rxdroid.db.Schedule;
 
 public final class Util
 {
@@ -99,6 +100,35 @@ public final class Util
 		throw new IllegalArgumentException();
 	}
 
+	public static String getDoseTimeName(int doseTime)
+	{
+		final int resId;
+
+		switch(doseTime)
+		{
+			case Schedule.TIME_MORNING:
+				resId = R.string._title_morning;
+				break;
+
+			case Schedule.TIME_NOON:
+				resId = R.string._title_noon;
+				break;
+
+			case Schedule.TIME_EVENING:
+				resId = R.string._title_evening;
+				break;
+
+			case Schedule.TIME_NIGHT:
+				resId = R.string._title_night;
+				break;
+
+			default:
+				throw new IllegalArgumentException();
+		}
+
+		return GlobalContext.getString(resId);
+	}
+
 	public static int getDrugIconDrawable(Context context, int icon)
 	{
 		switch(icon)
@@ -111,6 +141,9 @@ public final class Util
 
 			case Drug.ICON_TUBE:
 				return Theme.getResourceAttribute(R.attr.drugIconTube);
+
+			case Drug.ICON_RING:
+				return Theme.getResourceAttribute(R.attr.drugIconRing);
 
 			case Drug.ICON_TABLET:
 				// fall through, for now

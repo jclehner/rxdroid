@@ -37,7 +37,6 @@ import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
-import com.j256.ormlite.table.DatabaseTable;
 import com.j256.ormlite.table.TableUtils;
 
 /**
@@ -220,6 +219,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			DaoManager.clearDaoCache();
 
 			return updatedDataCount != 0;
+			//return true;
 		}
 		catch(SQLException e)
 		{
@@ -295,7 +295,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			newDao.create(entry);
 		}
 
-		return !oldData.isEmpty();
+		return true;
+		//return !oldData.isEmpty();
 	}
 
 	private boolean runHook(String packageName, String hookName, ConnectionSource cs)

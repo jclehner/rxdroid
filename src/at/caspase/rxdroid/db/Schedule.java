@@ -27,6 +27,7 @@ import java.util.Date;
 
 import android.app.Activity;
 import at.caspase.rxdroid.Fraction;
+import at.caspase.rxdroid.Fraction.MutableFraction;
 import at.caspase.rxdroid.db.schedules.ScheduleBase;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Util;
@@ -160,9 +161,9 @@ public final class Schedule extends Entry
 		return doses == null ? weeklySchedule[7] : doses;
 	}
 
-	private static Fraction sum(Fraction[] fractions)
+	private static MutableFraction sum(Fraction[] fractions)
 	{
-		final Fraction sum = new Fraction();
+		final MutableFraction sum = new MutableFraction();
 		for(Fraction f : fractions)
 			sum.add(f);
 

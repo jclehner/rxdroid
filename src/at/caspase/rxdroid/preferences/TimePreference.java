@@ -176,7 +176,7 @@ public class TimePreference extends MyDialogPreference<DumbTime>
 	}
 
 	@Override
-	protected void onCustomizeDialog(Dialog dialog)
+	protected void onPrepareDialog(Dialog dialog)
 	{
 		dialog.setOnShowListener(new OnShowListener() {
 

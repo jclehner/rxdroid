@@ -96,7 +96,7 @@ public class DrugNamePreference2 extends MyDialogPreference<String>
 	}
 
 	@Override
-	protected void onCustomizeDialog(Dialog dialog)
+	protected void onPrepareDialog(Dialog dialog)
 	{
 		dialog.setOnShowListener(new OnShowListener() {
 

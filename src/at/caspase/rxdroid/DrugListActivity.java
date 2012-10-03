@@ -61,6 +61,7 @@ import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import at.caspase.rxdroid.Fraction.MutableFraction;
 import at.caspase.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.caspase.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
 import at.caspase.rxdroid.db.Database;
@@ -293,7 +294,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 						doseView.performClick();
 					else
 					{
-						Fraction dose = new Fraction();
+						MutableFraction dose = new MutableFraction();
 						for(Intake intake : Entries.findIntakes(drug, mDate, doseTime))
 						{
 							dose.add(intake.getDose());

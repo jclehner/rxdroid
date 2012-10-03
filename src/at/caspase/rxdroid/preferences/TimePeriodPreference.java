@@ -189,7 +189,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 	}
 
 	@Override
-	protected void onCustomizeDialog(Dialog dialog) {
+	protected void onPrepareDialog(Dialog dialog) {
 		dialog.setOnShowListener(mOnShowListener);
 	}
 

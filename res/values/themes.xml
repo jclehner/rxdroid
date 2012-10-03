@@ -34,6 +34,7 @@
 		<item name="drugIconTube">@drawable/ic_drug_tube_black</item>
 		<item name="drugIconGlass">@drawable/ic_drug_glass_black</item>
 		<item name="drugIconSyringe">@drawable/ic_drug_syringe_black</item>
+		<item name="drugIconRing">@drawable/ic_drug_ring_black</item>
 		
 		<item name="doseStatusTaken">@drawable/ic_dose_taken_dark</item>
 		<item name="doseStatusMissed">@drawable/ic_dose_forgotten_dark</item>
@@ -50,6 +51,7 @@
 		<item name="drugIconTube">@drawable/ic_drug_tube_white</item>
 		<item name="drugIconGlass">@drawable/ic_drug_glass_white</item>
 		<item name="drugIconSyringe">@drawable/ic_drug_syringe_white</item>
+		<item name="drugIconRing">@drawable/ic_drug_ring_white</item>
 		
 		<item name="doseStatusTaken">@drawable/ic_dose_taken</item>
 		<item name="doseStatusMissed">@drawable/ic_dose_forgotten</item>

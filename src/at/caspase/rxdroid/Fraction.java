@@ -34,6 +34,51 @@ import at.caspase.rxdroid.util.Hasher;
  */
 public class Fraction extends Number implements Comparable<Number>
 {
+	public static class MutableFraction extends Fraction
+	{
+		private static final long serialVersionUID = -3830132386515948322L;
+
+		public MutableFraction(Fraction other) {
+			super(other);
+		}
+
+		public MutableFraction() {
+			super();
+		}
+
+		/**
+		 * Adds another fraction to this fraction.
+		 * @return a reference to this instance
+		 */
+		public MutableFraction add(Fraction other) {
+			return add(this, other);
+		}
+
+		/**
+		 * Adds an integer to this fraction.
+		 * @return a reference to this object
+		 */
+		public MutableFraction add(int n) {
+			return add(this, n);
+		}
+
+		/**
+		 * Subtracts another fraction from this fraction.
+		 * @return a reference to this instance
+		 */
+		public MutableFraction subtract(Fraction other) {
+			return add(this, other.negate());
+		}
+
+		/**
+		 * Subtracts an integer from this fraction.
+		 * @return a reference to this instance
+		 */
+		public MutableFraction subtract(int n) {
+			return add(this, -n);
+		}
+	}
+
 	private static final long serialVersionUID = 2050536341303052796L;
 
 	@SuppressWarnings("unused")
@@ -48,7 +93,7 @@ public class Fraction extends Number implements Comparable<Number>
 	/**
 	 * A zero value, just for convenience.
 	 */
-	public static final Fraction ZERO = new Fraction(0);
+	public static final Fraction ZERO = new Fraction();
 
 	/**
 	 * Default constructor.
@@ -106,74 +151,23 @@ public class Fraction extends Number implements Comparable<Number>
 	}
 
 	public boolean isZero() {
-		return isZero(this);
+		return mNumerator == 0;
 	}
 
-	/**
-	 * Adds another fraction to this object.
-	 * @return a reference to this object.
-	 */
-	public Fraction add(final Fraction other)
-	{
-		requireNotZeroConstant();
-
-		int numerator, denominator;
-
-		//Log.d(TAG, "plus: this=" + this + ", other=" + other);
-
-		if(this.mDenominator != other.mDenominator)
-		{
-			int lcm = findLCM(this.mDenominator, other.mDenominator);
-
-			int multThis = lcm / this.mDenominator;
-			int multOther = lcm / other.mDenominator;
-
-			denominator = lcm;
-			numerator = this.mNumerator * multThis + other.mNumerator * multOther;
-		}
-		else
-		{
-			numerator = this.mNumerator + other.mNumerator;
-			denominator = this.mDenominator;
-		}
-
-		// this reduces the resulting fraction
-		init(0, numerator, denominator);
-
-		return this;
-	}
-
-	/**
-	 * Adds an integer to this object.
-	 * @return a reference to this object.
-	 */
-	public Fraction add(int n)
-	{
-		requireNotZeroConstant();
-
-		//init(0, mNumerator + n * mDenominator, mDenominator);
-		mNumerator += n * mDenominator;
-		return this;
-	}
-
-	public Fraction subtract(final Fraction other) {
-		return add(other.negate());
-	}
-
-	public Fraction subtract(int n) {
-		return add(-n);
+	public MutableFraction mutate() {
+		return new MutableFraction(this);
 	}
 
 	public Fraction plus(final Fraction other)
 	{
 		Fraction result = new Fraction(this);
-		return result.add(other);
+		return add(result, other);
 	}
 
 	public Fraction plus(int n)
 	{
 		Fraction result = new Fraction(this);
-		return result.add(n);
+		return add(result, n);
 	}
 
 	public Fraction minus(final Fraction other) {
@@ -212,10 +206,10 @@ public class Fraction extends Number implements Comparable<Number>
 	@Override
 	public boolean equals(Object o)
 	{
-		if(!(o instanceof Number))
+		if(!(o instanceof Fraction))
 			return false;
 
-		return compareTo((Number) o) == 0;
+		return compareTo((Fraction) o) == 0;
 	}
 
 	@Override
@@ -302,10 +296,6 @@ public class Fraction extends Number implements Comparable<Number>
 		return Math.round(doubleValue());
 	}
 
-	public static boolean isZero(Fraction f) {
-		return f.mNumerator == 0;
-	}
-
 	/**
 	 * Parses the textual representation of a fraction.
 	 * <p>
@@ -385,16 +375,8 @@ public class Fraction extends Number implements Comparable<Number>
 		mDenominator = denominator / divisor;
 	}
 
-	private void requireNotZeroConstant()
+	private static <F extends Fraction> F add(F dest, Fraction other)
 	{
-		if(this == ZERO)
-			throw new UnsupportedOperationException("Fraction.ZERO is immutable");
-	}
-
-	private static void add(Fraction dest, Fraction other)
-	{
-		dest.requireNotZeroConstant();
-
 		int numerator, denominator;
 
 		//Log.d(TAG, "plus: this=" + this + ", other=" + other);
@@ -417,14 +399,15 @@ public class Fraction extends Number implements Comparable<Number>
 
 		// this reduces the resulting fraction
 		dest.init(0, numerator, denominator);
+
+		return dest;
 	}
 
-	private static void add(Fraction dest, int n)
+	private static <F extends Fraction> F add(F dest, int n)
 	{
-		dest.requireNotZeroConstant();
-
 		//init(0, mNumerator + n * mDenominator, mDenominator);
 		dest.mNumerator += n * dest.mDenominator;
+		return dest;
 	}
 
 	/**

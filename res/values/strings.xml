@@ -146,7 +146,8 @@
 	<string name="_title_injection">Syringe</string>
 	<string name="_title_spray">Spray</string>
 	<string name="_title_drop">Glass</string>
-	<string name="_title_gel">Tube</string>
+	<string name="_title_gel">Tube</string>	
+	<string name="_title_ring">Ring</string>
 	<string name="_title_other">Other</string>
 	
 	<string name="_title_daily">Daily</string>
@@ -283,7 +284,10 @@
 	<string name="_toast_theme_changed">Restarting app&#8230;</string>
 	
 	<string name="_toast_low_supplies">This drug\'s supplies are low</string>
-			
+	
+	<string name="_title_notification_sound">Notification sound</string>
+	
+				
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 

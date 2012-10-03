@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.text.SpannableStringBuilder;
 import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;
@@ -36,6 +35,7 @@ import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import at.caspase.rxdroid.Fraction.MutableFraction;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.Database.OnChangeListener;
 import at.caspase.rxdroid.db.Drug;
@@ -71,7 +71,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	private Date mDate;
 	private int mIntakeCount = 0;
 
-	private Fraction mDisplayDose;
+	private MutableFraction mDisplayDose;
 
 	private int mStatus = STATUS_INDETERMINATE;
 
@@ -112,7 +112,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	public void setDose(Fraction dose)
 	{
-		mDisplayDose = dose;
+		mDisplayDose = dose.mutate();
 		updateView();
 	}
 
@@ -171,7 +171,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		//mDose = getDose();
 
-		mDisplayDose = new Fraction();
+		mDisplayDose = new MutableFraction();
 
 		List<Intake> intakes = Entries.findIntakes(mDrug, mDate, mDoseTime);
 		for(Intake intake : intakes)

@@ -230,7 +230,7 @@ public final class Database
 		return t;
 	}
 
-	public static synchronized <T extends Entry> List<T> getAll(Class<T> clazz) {
+	public static <T extends Entry> List<T> getAll(Class<T> clazz) {
 		return new LinkedList<T>(getCached(clazz));
 	}
 

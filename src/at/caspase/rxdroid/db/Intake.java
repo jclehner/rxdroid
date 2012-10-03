@@ -114,11 +114,11 @@ public class Intake extends Entry
 	}
 
 	public Date getDate() {
-		return new Date(date.getTime());
+		return date;
 	}
 
 	public Date getTimestamp() {
-		return new Timestamp(timestamp.getTime());
+		return timestamp;
 	}
 
 	public int getDoseTime() {
@@ -183,5 +183,19 @@ public class Intake extends Entry
 		final String drugName = drug == null ? "<deleted>" : drug.getName();
 
 		return drugName + ": " + date + " " + Entries.getDoseTimeString(doseTime) + ", " + dose;
+	}
+
+	/* package */ static boolean has(Intake intake, Drug drug, Date date, Integer doseTime)
+	{
+		if(drug.id != intake.drug.id)
+			return false;
+
+		if(doseTime != null && doseTime != intake.doseTime)
+			return false;
+
+		if(date != null && !date.equals(intake.date))
+			return false;
+
+		return true;
 	}
 }

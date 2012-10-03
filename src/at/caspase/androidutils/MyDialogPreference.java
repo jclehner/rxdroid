@@ -35,10 +35,9 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.Window;
 import at.caspase.androidutils.InstanceState.SaveState;
+import at.caspase.rxdroid.util.Util;
 
 
 /**
@@ -136,7 +135,7 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 				mValue = fromPersistedString(persisted);
 			else
 			{
-				Log.w(TAG, "getValue: key=" + getKey() + " persisted string was null or not available");
+				//Log.w(TAG, "getValue: key=" + getKey() + " persisted string was null or not available");
 				return mDefaultValue;
 			}
 		}
@@ -152,6 +151,11 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	@Override
 	public void onClick(DialogInterface dialog, int which) {
 		onDialogClosed(which == Dialog.BUTTON_POSITIVE);
+	}
+
+	@Override
+	public CharSequence getDialogTitle() {
+		return getTitle();
 	}
 
 	protected abstract String toPersistedString(T value);
@@ -171,11 +175,7 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	protected void onBindDialogView(View view)
 	{
 		if(view != null)
-		{
-			final ViewParent parent = view.getParent();
-			if(parent != null && parent instanceof ViewGroup)
-				((ViewGroup) parent).removeView(view);
-		}
+			Util.detachFromParent(view);
 
 		super.onBindDialogView(view);
 	}
@@ -233,7 +233,7 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	 *
 	 * @param dialog
 	 */
-	protected void onCustomizeDialog(Dialog dialog) {
+	protected void onPrepareDialog(Dialog dialog) {
 		// do nothing
 	}
 
@@ -241,7 +241,7 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	 * Called when the dialog is dismissed.
 	 * <p>
 	 * Due to technical reasons, you cannot call {@link Dialog#setOnDismissListener(OnDismissListener)}
-	 * in {@link #onCustomizeDialog(Dialog)} or {@link #onGetCustomDialog()}. Use this function instead
+	 * in {@link #onPrepareDialog(Dialog)} or {@link #onGetCustomDialog()}. Use this function instead
 	 * do perform any additional cleanup.
 	 */
 	@Override
@@ -279,15 +279,15 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 			mDialog = builder.create();
 		}
 
-
-		int softInputMode = onGetSoftInputMode();
+		final int softInputMode = onGetSoftInputMode();
 		if(softInputMode != 0)
 		{
-			Window window = mDialog.getWindow();
-			window.setSoftInputMode(softInputMode);
+			final Window window = mDialog.getWindow();
+			if(window != null)
+				window.setSoftInputMode(softInputMode);
 		}
 
-		onCustomizeDialog(mDialog);
+		onPrepareDialog(mDialog);
 
 		mDialog.setOnDismissListener(mDismissListener);
 		mDialog.show();
@@ -321,8 +321,6 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		InstanceState.restoreTo(this, state);
 
 		Bundle extras = InstanceState.getExtras(state);
-
-		Log.d(TAG, "onRestoreInstanceState: key=" + getKey() + ", extras=" + extras);
 
 		if(extras != null)
 		{
