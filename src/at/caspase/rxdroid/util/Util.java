@@ -21,9 +21,12 @@
 
 package at.caspase.rxdroid.util;
 
+import java.io.Closeable;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Scanner;
 
 import android.content.Context;
 import android.preference.ListPreference;
@@ -335,5 +338,35 @@ public final class Util
 		}
 
 		return sb.append("]").toString();
+	}
+
+	public static String streamToString(InputStream is)
+	{
+		final StringBuilder sb = new StringBuilder();
+		final Scanner scanner = new Scanner(is);
+
+		try
+		{
+			while(scanner.hasNextLine())
+				sb.append(scanner.nextLine());
+		}
+		finally
+		{
+			scanner.close();
+		}
+
+		return sb.toString();
+	}
+
+	public static void closeQuietly(Closeable closeable)
+	{
+		try
+		{
+			closeable.close();
+		}
+		catch(Exception e)
+		{
+			// ignore
+		}
 	}
 }

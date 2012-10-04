@@ -114,6 +114,14 @@ public final class Settings
 		sSharedPrefs.edit().putBoolean(key, value).commit();
 	}
 
+	public static int getInt(String key, int defValue) {
+		return sSharedPrefs.getInt(key, defValue);
+	}
+
+	public static void putInt(String key, int value) {
+		sSharedPrefs.edit().putInt(key, value).commit();
+	}
+
 	private static int[] HISTORY_AGE_IN_DAYS = {
 		14,
 		28,
@@ -453,7 +461,7 @@ public final class Settings
 
 	public static int getListPreferenceValueIndex(String key, int defValue)
 	{
-		String valueStr = sSharedPrefs.getString(key, null);
+		String valueStr = getString(key, null);
 		return valueStr != null ? Integer.parseInt(valueStr, 10) : defValue;
 	}
 
@@ -461,13 +469,13 @@ public final class Settings
 	{
 		int mask = 0;
 
-		if(!sSharedPrefs.getBoolean("use_led", true))
+		if(!getBoolean("use_led", true))
 			mask |= Notification.DEFAULT_LIGHTS;
 
-		if(!sSharedPrefs.getBoolean("use_sound", true))
+		if(!getBoolean("use_sound", true))
 			mask |= Notification.DEFAULT_SOUND;
 
-		if(!sSharedPrefs.getBoolean("use_vibrator", true))
+		if(!getBoolean("use_vibrator", true))
 			mask |= Notification.DEFAULT_VIBRATE;
 
 		return mask;
@@ -480,7 +488,7 @@ public final class Settings
 		if(name == null || name.length() == 0)
 			return "<???>";
 
-		if(sSharedPrefs.getBoolean("privacy_scramble_names", false))
+		if(getBoolean("privacy_scramble_names", false))
 		{
 			// We rot13 word by word and ignore those beginning with
 			// a digit, so things like 10mg won't get converted to 10zt.
@@ -552,8 +560,6 @@ public final class Settings
 
 		if(str == null || str.length() == 0)
 			return stringSet;
-
-		Log.d(TAG, "stringToStringSet: str=" + str);
 
 		SizePrefix info = getSizePrefix(str, 0);
 		if(info.size == 0)

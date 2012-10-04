@@ -290,6 +290,9 @@
 	<string name="_title_doses_and_low_supplies">All</string>
 	<string name="_title_low_supplies_only">Low supplies only</string>
 	
+	<string name="_title_about">About</string>
+	<string name="_title_licenses">Licenses</string>
+	
 				
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

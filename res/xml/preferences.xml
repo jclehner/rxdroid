@@ -221,8 +221,9 @@
 		
 	</PreferenceScreen>
 	
+	<!--  
 	<PreferenceScreen android:key="prefscreen_debug"
-		android:title="Debugging options"
+		android:title="Debug"
 		android:icon="@android:drawable/ic_menu_preferences"	
 	>
 		<Preference android:key="debug_generate_db_source"
@@ -260,11 +261,23 @@
 		    rxdroid:after="14:00"		    
 		/>
 	
-	</PreferenceScreen>	
+	</PreferenceScreen>
+	-->
 	
-	<Preference android:key="version"
-		android:title="@string/_title_version"
-		android:icon="@drawable/android:ic_menu_help"
-		android:enabled="false"
-	/>
+	<PreferenceCategory 
+		android:title="@string/_title_about"		
+	>
+	
+		<Preference android:key="version"
+			android:title="@string/_title_version"
+			android:icon="@null"
+		/>
+		
+		<Preference android:key="licenses"
+			android:title="@string/_title_licenses"
+			android:icon="@null"
+		/>
+	
+	</PreferenceCategory>
+	
 </PreferenceScreen>

@@ -22,8 +22,9 @@
 package at.caspase.rxdroid;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
-import java.util.UUID;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -33,23 +34,22 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.Toast;
-import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
-import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.preferences.TimePreference;
 import at.caspase.rxdroid.util.Util;
 
 @SuppressWarnings("deprecation")
-public class PreferencesActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener
+public class PreferencesActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener, OnPreferenceClickListener
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = PreferencesActivity.class.getName();
@@ -57,6 +57,8 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	private static final int MENU_RESTORE_DEFAULTS = 0;
 
 	private static final String PREF_LOW_SUPPLY_THRESHOLD = "num_min_supply_days";
+	private static final String PREF_DB_HISTORY_MAX_AGE = "db_max_history_age";
+	private static final String PREF_LICENSES = "licenses";
 
 	SharedPreferences mSharedPreferences;
 
@@ -96,93 +98,14 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 			p.setSummary(summary);
 		}
 
-		p = findPreference("debug_sorter");
+		p = findPreference(PREF_DB_HISTORY_MAX_AGE);
 		if(p != null)
-		{
-			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-
-				@Override
-				public boolean onPreferenceClick(Preference preference)
-				{
-					//Intent intent = new Intent(PreferencesActivity.this, DrugSortActivity.class);
-					//Intent intent = new Intent(PreferencesActivity.this, ObjectToPreferenceTestActivity.class);
-					//Intent intent = new Intent(PreferencesActivity.this, FragmentTabActivity.class);
-					//Intent intent = new Intent(PreferencesActivity.this, HelpActivity.class);
-
-					//Set<Integer> helpIds = new HashSet<Integer>();
-					//helpIds.add(R.string._help_added_drug);
-					//intent.set
-
-					//HelpActivity.enqueue(R.string._help_added_drug);
-					//HelpActivity.showQueued();
-
-					//HelpDialog.enqueue(R.string._help_added_drug);
-					//HelpDialog.showIfNeccessary(this);
-
-					//FragmentManager.
-
-					//startActivity(intent);
-					return true;
-				}
-			});
-		}
-
-		p = findPreference("alarm_mode");
-		if(p != null)
-		{
-			p.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-
-				@Override
-				public boolean onPreferenceChange(Preference preference, Object newValue)
-				{
-					updateAlarmModePreferenceSummary(preference, newValue.toString());
-					return true;
-				}
-			});
-
-			updateAlarmModePreferenceSummary(p, null);
 			Util.populateListPreferenceEntryValues(p);
-		}
 
-		p = findPreference("debug_add_5_drugs");
+		p = findPreference(PREF_LICENSES);
 		if(p != null)
-		{
-			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			p.setOnPreferenceClickListener(this);
 
-				@Override
-				public boolean onPreferenceClick(Preference preference)
-				{
-					for(int i = 0; i != 5; ++i)
-					{
-						UUID uuid = UUID.randomUUID();
-						Drug drug = new Drug();
-						drug.setName(uuid.toString().substring(0, 16));
-						drug.setDose(Drug.TIME_NOON, new Fraction(1, 2));
-
-						Database.create(drug, i != 4 ? Database.FLAG_DONT_NOTIFY_LISTENERS : 0);
-					}
-
-					return true;
-				}
-			});
-		}
-
-		p = findPreference("db_max_history_age");
-		if(p != null)
-		{
-			Util.populateListPreferenceEntryValues(p);
-			p.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-
-				@Override
-				public boolean onPreferenceChange(Preference preference, Object newValue)
-				{
-					if("4".equals(newValue))
-						Toast.makeText(getApplicationContext(), R.string._toast_unlimited_history_size, Toast.LENGTH_LONG).show();
-
-					return true;
-				}
-			});
-		}
 
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
 		{
@@ -262,7 +185,52 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	{
 		if(PREF_LOW_SUPPLY_THRESHOLD.equals(key))
 			updateLowSupplyThresholdPreferenceSummary();
+		else if(PREF_DB_HISTORY_MAX_AGE.equals(key))
+		{
+			if("4".equals(Settings.getString(PREF_DB_HISTORY_MAX_AGE, null)))
+				Toast.makeText(getApplicationContext(), R.string._toast_unlimited_history_size, Toast.LENGTH_LONG).show();
+		}
+
 		NotificationReceiver.sendBroadcastToSelf(true);
+	}
+
+	@Override
+	public boolean onPreferenceClick(Preference preference)
+	{
+		if(PREF_LICENSES.equals(preference.getKey()))
+		{
+			String license;
+			InputStream is = null;
+
+			try
+			{
+				final AssetManager aMgr = getResources().getAssets();
+				is = aMgr.open("LICENSE-GPLv3.html", AssetManager.ACCESS_BUFFER);
+
+				license = Util.streamToString(is);
+			}
+			catch(IOException e)
+			{
+				license = "Licensed under the GNU GPLv3";
+			}
+			finally
+			{
+				Util.closeQuietly(is);
+			}
+
+			final WebView wv = new WebView(getApplicationContext());
+			wv.loadData(license, "text/html", null);
+
+			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
+			ab.setTitle(R.string._title_licenses);
+			ab.setView(wv);
+			ab.setPositiveButton(android.R.string.ok, null);
+			ab.show();
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private void updateLowSupplyThresholdPreferenceSummary()
