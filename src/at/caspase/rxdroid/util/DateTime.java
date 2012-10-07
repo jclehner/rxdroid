@@ -25,10 +25,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 import android.text.format.DateFormat;
+import android.util.SparseArray;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.GlobalContext;
 
@@ -43,6 +46,8 @@ public final class DateTime
 	private static final String TAG = DateTime.class.getName();
 
 	private static final int[] CALENDAR_TIME_FIELDS = { Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND };
+
+	private static SparseArray<Date> sDateCache = new SparseArray<Date>(16);
 
 	public static Calendar calendarFromDate(Date date)
 	{

@@ -642,8 +642,24 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 			mPage = page;
 
+			final int swipeDirection;
+
 			if(mLastPage == -1)
+			{
 				mLastPage = InfiniteViewPagerAdapter.CENTER;
+				swipeDirection = 0;
+			}
+			else
+				swipeDirection = mPage - mLastPage;
+
+			if(LOGV) Log.v(TAG, "  swipeDirection=" + swipeDirection);
+
+			if(swipeDirection != 0)
+			{
+				setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, swipeDirection), 0);
+			}
+
+			mLastPage = page;
 		}
 
 		@Override
@@ -652,28 +668,28 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public void onPageScrollStateChanged(int state)
 		{
-			if(LOGV)
-			{
-				final String[] states = { "IDLE", "DRAGGING", "SETTLING" };
-				Log.v(TAG, "onPageScrollStateChanged: page=" + mPage);
-				Log.v(TAG, "  state=" + states[state]);
-			}
-
-			if(state == ViewPager.SCROLL_STATE_IDLE)
-			{
-				mSwipeDirection = mLastPage != -1 ? mPage - mLastPage : 0;
-
-				if(LOGV) Log.v(TAG, "onPageScrollStateChanged: mPage=" + mPage +
-						", mLastPage=" + mLastPage + ", mSwipeDirection=" + mSwipeDirection);
-
-				if(mSwipeDirection != 0)
-				{
-					final int shiftBy = mSwipeDirection < 0 ? -1 : 1;
-					setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy), 0);
-				}
-
-				mLastPage = mPage;
-			}
+//			if(LOGV)
+//			{
+//				final String[] states = { "IDLE", "DRAGGING", "SETTLING" };
+//				Log.v(TAG, "onPageScrollStateChanged: page=" + mPage);
+//				Log.v(TAG, "  state=" + states[state]);
+//			}
+//
+//			if(state == ViewPager.SCROLL_STATE_IDLE)
+//			{
+//				mSwipeDirection = mLastPage != -1 ? mPage - mLastPage : 0;
+//
+//				if(LOGV) Log.v(TAG, "onPageScrollStateChanged: mPage=" + mPage +
+//						", mLastPage=" + mLastPage + ", mSwipeDirection=" + mSwipeDirection);
+//
+//				if(mSwipeDirection != 0)
+//				{
+//					//final int shiftBy = mSwipeDirection < 0 ? -1 : 1;
+//					//setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy), 0);
+//				}
+//
+//				//mLastPage = mPage;
+//			}
 		}
 	};
 

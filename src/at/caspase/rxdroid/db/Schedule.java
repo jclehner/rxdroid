@@ -111,7 +111,11 @@ public final class Schedule extends Entry
 		if(!hasDoseOnDate(date))
 			return Fraction.ZERO;
 
-		return getDoses(date)[doseTime];
+		Fraction[] doses = getDoses(date);
+		if(doses == null)
+			return Fraction.ZERO;
+
+		return doses[doseTime];
 	}
 
 	public boolean hasDoseOnDate(Date date)

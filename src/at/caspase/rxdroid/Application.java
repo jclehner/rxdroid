@@ -39,8 +39,6 @@ public class Application extends android.app.Application
 		Settings.init();
 		AutoIntakeCreator.registerSelf();
 
-		Log.d("[[[RxDroid]]]", "onCreate");
-
 		super.onCreate();
 	}
 
