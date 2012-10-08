@@ -59,6 +59,10 @@
 			</intent-filter>
 		</activity>
 		
+		<activity android:name=".LockscreenActivity"
+			android:exported="false"
+		/>
+		
 		<activity android:name=".HelpActivity"
 			android:exported="false"
 		/>

@@ -145,6 +145,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		super.onResume();
 
+		LockscreenActivity.startMaybe(this);
+
 		Database.init();
 		mIsShowing = true;
 		Application.setIsVisible(this, true);

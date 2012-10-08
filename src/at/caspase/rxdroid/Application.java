@@ -24,13 +24,14 @@ package at.caspase.rxdroid;
 import java.util.WeakHashMap;
 
 import android.app.Activity;
-import android.util.Log;
 
 
 public class Application extends android.app.Application
 {
 	private static WeakHashMap<Activity, Boolean> sActivityVisibility =
 			new WeakHashMap<Activity, Boolean>();
+
+	private static long sUnlockedTime = 0;
 
 	@Override
 	public void onCreate()
@@ -40,6 +41,24 @@ public class Application extends android.app.Application
 		AutoIntakeCreator.registerSelf();
 
 		super.onCreate();
+	}
+
+	public static boolean isLocked()
+	{
+		final int timeoutSeconds = Settings.getInt("lockscreen_timeout", 0);
+		if(timeoutSeconds == 0)
+			return sUnlockedTime == 0;
+
+		final long now = System.currentTimeMillis();
+		if(sUnlockedTime > now)
+			return true;
+
+		final long diffSeconds = (now - sUnlockedTime) / 1000;
+		return diffSeconds >= timeoutSeconds;
+	}
+
+	public static void unlock() {
+		sUnlockedTime = System.currentTimeMillis();
 	}
 
 	public static void setIsVisible(Activity activity, boolean isVisible) {
