@@ -4,14 +4,14 @@
 	android:layout_height="match_parent"
 	android:orientation="vertical"
 >
-	<LinearLayout 
+
+	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="0dip"
 		android:layout_weight="1"
-		
-		android:orientation="horizontal"		
 		android:gravity="center"
-	>
+		android:orientation="horizontal" >
+
 		<include android:id="@+id/pin_digit1"
 			layout="@layout/layout_lockscreen_digit"
 		/>
@@ -27,7 +27,18 @@
 		<include android:id="@+id/pin_digit4"
 			layout="@layout/layout_lockscreen_digit"
 		/>		
-	</LinearLayout>
+				
+	</LinearLayout>	
+
+	<include
+		android:id="@+id/keypad"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="20dip"
+		layout="@layout/layout_keypad" />
+	
+	<!-- 
+	
 	<LinearLayout 
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -53,4 +64,6 @@
 	/>
 	
 	</LinearLayout>
+	
+	 -->
 </LinearLayout>

@@ -2,12 +2,15 @@ package at.caspase.rxdroid;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
+import android.view.Window;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -35,11 +38,11 @@ public class LockscreenActivity extends Activity
 		setTheme(Theme.get());
 		setContentView(R.layout.activity_lockscreen);
 
-		mBtnExit = (Button) findViewById(R.id.btn_exit);
-		mBtnExit.setOnClickListener(mButtonHandler);
-
-		mBtnUnlock = (Button) findViewById(R.id.btn_unlock);
-		mBtnUnlock.setOnClickListener(mButtonHandler);
+//		mBtnExit = (Button) findViewById(R.id.btn_exit);
+//		mBtnExit.setOnClickListener(mButtonHandler);
+//
+//		mBtnUnlock = (Button) findViewById(R.id.btn_unlock);
+//		mBtnUnlock.setOnClickListener(mButtonHandler);
 
 		final int[] digitIds = { R.id.pin_digit1, R.id.pin_digit2, R.id.pin_digit3, R.id.pin_digit4 };
 		for(int i = 0; i != mDigits.length; ++i)
@@ -67,6 +70,16 @@ public class LockscreenActivity extends Activity
 			return;
 		}
 
+		final Configuration config = getResources().getConfiguration();
+
+		if(config.keyboard == Configuration.KEYBOARD_NOKEYS ||
+		   config.keyboard == Configuration.KEYBOARD_UNDEFINED)
+		{
+			final Window window = getWindow();
+			window.setSoftInputMode(LayoutParams.SOFT_INPUT_ADJUST_PAN |
+					LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+		}
+
 		mDigits[0].requestFocus();
 	}
 
@@ -77,10 +90,18 @@ public class LockscreenActivity extends Activity
 			return super.onKeyUp(keyCode, event);
 
 		final char ch = digitKeyCodeToChar(keyCode);
-		if(ch == DIGIT_INVALID)
+		if(ch == CHAR_INVALID)
 		{
 			mDigits[mFocusedIndex].setText("");
 			return super.onKeyUp(keyCode, event);
+		}
+		else if(ch == CHAR_CLEAR)
+		{
+			for(EditText digit : mDigits)
+				digit.setText("");
+
+			mDigits[0].requestFocus();
+			return true;
 		}
 
 		mDigits[mFocusedIndex].setText(Character.toString(ch));
@@ -89,6 +110,7 @@ public class LockscreenActivity extends Activity
 		else
 		{
 			//mBtnUnlock.requestFocus();
+			mDigits[mFocusedIndex].clearFocus();
 			mBtnUnlock.performClick();
 		}
 
@@ -167,14 +189,15 @@ public class LockscreenActivity extends Activity
 		@Override
 		public void onClick(View v)
 		{
-			if(v.getId() == R.id.btn_exit)
-				finish();
-			else if(v.getId() == R.id.btn_unlock)
-				checkPinAndLaunchActivityIfOk();
+//			if(v.getId() == R.id.btn_exit)
+//				finish();
+//			else if(v.getId() == R.id.btn_unlock)
+//				checkPinAndLaunchActivityIfOk();
 		}
 	};
 
-	private static final char DIGIT_INVALID = '?';
+	private static final char CHAR_INVALID = '?';
+	private static final char CHAR_CLEAR = 'X';
 
 	private static char digitKeyCodeToChar(int keycode)
 	{
@@ -210,8 +233,13 @@ public class LockscreenActivity extends Activity
 			case KeyEvent.KEYCODE_9:
 				return '9';
 
+			case KeyEvent.KEYCODE_CLEAR:
+			case KeyEvent.KEYCODE_ESCAPE:
+			case KeyEvent.KEYCODE_DEL:
+				return CHAR_CLEAR;
+
 			default:
-				return DIGIT_INVALID;
+				return CHAR_INVALID;
 		}
 	}
 }

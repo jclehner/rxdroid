@@ -585,6 +585,9 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			if(mFilterDate == null)
 				return true;
 
+			if(Entries.countIntakes(drug, mFilterDate, null) != 0)
+				return true;
+
 			if(!drug.isActive())
 				return false;
 
@@ -592,9 +595,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 				return false;
 
 			if(DateTime.isToday(mFilterDate) && Entries.hasMissingIntakesBeforeDate(drug, mFilterDate))
-				return true;
-
-			if(Entries.countIntakes(drug, mFilterDate, null) != 0)
 				return true;
 
 			if(mFilterDate != null && !drug.hasDoseOnDate(mFilterDate))
