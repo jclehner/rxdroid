@@ -5,37 +5,53 @@
 	android:orientation="vertical"
 >
 
-	<LinearLayout
+	<!-- <FrameLayout 
 		android:layout_width="match_parent"
-		android:layout_height="0dip"
-		android:layout_weight="1"
-		android:gravity="center"
-		android:orientation="horizontal" >
-
-		<include android:id="@+id/pin_digit1"
-			layout="@layout/layout_lockscreen_digit"
+		android:layout_height="wrap_content"
+		
+	>	 -->
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_margin="@dimen/pin_margin"
+			android:gravity="center"
+			android:orientation="horizontal" >
+	
+			<include android:id="@+id/pin_digit1"
+				layout="@layout/layout_lockscreen_digit"
+			/>
+			
+			<include android:id="@+id/pin_digit2"
+				layout="@layout/layout_lockscreen_digit"
+			/>
+			
+			<include android:id="@+id/pin_digit3"
+				layout="@layout/layout_lockscreen_digit"
+			/>
+			
+			<include android:id="@+id/pin_digit4"
+				layout="@layout/layout_lockscreen_digit"
+			/>		
+					
+		</LinearLayout>
+		
+		<!--  
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="0dip"
 		/>
 		
-		<include android:id="@+id/pin_digit2"
-			layout="@layout/layout_lockscreen_digit"
-		/>
-		
-		<include android:id="@+id/pin_digit3"
-			layout="@layout/layout_lockscreen_digit"
-		/>
-		
-		<include android:id="@+id/pin_digit4"
-			layout="@layout/layout_lockscreen_digit"
-		/>		
-				
-	</LinearLayout>	
+	</FrameLayout>
+	-->
 
 	<include
 		android:id="@+id/keypad"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginBottom="20dip"
-		layout="@layout/layout_keypad" />
+		android:layout_height="0dip"
+		android:layout_marginBottom="@dimen/keypad_margin_bottom"
+		android:layout_weight="1"
+		layout="@layout/layout_keypad"
+		android:gravity="center" />
 	
 	<!-- 
 	

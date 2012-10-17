@@ -25,28 +25,28 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
-import at.caspase.rxdroid.util.Util;
+import at.caspase.rxdroid.Settings;
+import at.caspase.rxdroid.db.Drug;
 
-public class Rot13TextView extends TextView
+public class DrugNameView extends TextView
 {
-	//private static final String TAG = Rot13TextView.class.getName();
-
 	private boolean mIsCurrentlyScrambled = false;
 	private long mUnscrambledDuration = 1000;
 	private OnClickListener mOnClickListener;
 	private OnLongClickListener mOnLongClickListener;
 
-	private String mText;
+	private String mName;
+	private Drug mDrug;
 
-	public Rot13TextView(Context context) {
+	public DrugNameView(Context context) {
 		this(context, null);
 	}
 
-	public Rot13TextView(Context context, AttributeSet attrs) {
+	public DrugNameView(Context context, AttributeSet attrs) {
 		this(context, attrs, android.R.attr.textViewStyle);
 	}
 
-	public Rot13TextView(Context context, AttributeSet attrs, int defStyle)
+	public DrugNameView(Context context, AttributeSet attrs, int defStyle)
 	{
 		super(context, attrs, defStyle);
 
@@ -54,16 +54,17 @@ public class Rot13TextView extends TextView
 		super.setOnLongClickListener(mLocalOnLongClickListener);
 	}
 
-	public void setScrambled(boolean scrambled)
+	public void setDrug(Drug drug)
 	{
-		setText(scrambled ? Util.rot13(mText) : mText);
-		mIsCurrentlyScrambled = scrambled;
+		mDrug = drug;
+		setName(drug.getName());
+		setScrambled(Settings.getBoolean("privacy_scramble_names", false));
 	}
 
-	public void setUnscrambledText(String text)
+	public void setScrambled(boolean scrambled)
 	{
-		mText = text;
-		setText(text);
+		setText(scrambled ? Settings.getDrugName(mDrug) : mName);
+		mIsCurrentlyScrambled = scrambled;
 	}
 
 	public void setUnscrambledDuration(long millis) {
@@ -78,6 +79,12 @@ public class Rot13TextView extends TextView
 	@Override
 	public void setOnLongClickListener(OnLongClickListener l) {
 		mOnLongClickListener = l;
+	}
+
+	private void setName(String text)
+	{
+		mName = text;
+		setText(text);
 	}
 
 	private final OnClickListener mLocalOnClickListener = new OnClickListener() {

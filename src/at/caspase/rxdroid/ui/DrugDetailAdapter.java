@@ -41,7 +41,7 @@ import at.caspase.rxdroid.util.CollectionUtils;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.Util;
-import at.caspase.rxdroid.widget.Rot13TextView;
+import at.caspase.rxdroid.widget.DrugNameView;
 
 public class DrugDetailAdapter extends AbsDrugAdapter
 {
@@ -81,7 +81,7 @@ public class DrugDetailAdapter extends AbsDrugAdapter
 
 			holder = new DoseViewHolder();
 
-			holder.name = (Rot13TextView) v.findViewById(R.id.drug_name);
+			holder.name = (DrugNameView) v.findViewById(R.id.drug_name);
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
 			//holder.notification = (ImageView) v.findViewById(R.id.drug_notification_icon);
 			//holder.notification.setTag(drug);

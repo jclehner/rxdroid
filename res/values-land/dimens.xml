@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen name="keypad_button_height">40dip</dimen>
+	<dimen name="keypad_button_width">70dip</dimen>
+	<dimen name="keypad_button_margin">1dip</dimen>
+	<dimen name="keypad_margin_bottom">0dip</dimen>
+	<dimen name="pin_margin">5dip</dimen>
+</resources>

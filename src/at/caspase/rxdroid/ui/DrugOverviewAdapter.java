@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
@@ -41,7 +42,7 @@ import at.caspase.rxdroid.util.Constants;
 import at.caspase.rxdroid.util.DateTime;
 import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.Util;
-import at.caspase.rxdroid.widget.Rot13TextView;
+import at.caspase.rxdroid.widget.DrugNameView;
 
 public class DrugOverviewAdapter extends AbsDrugAdapter
 {
@@ -73,7 +74,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 			holder = new DoseViewHolder();
 
-			holder.name = (Rot13TextView) v.findViewById(R.id.drug_name);
+			holder.name = (DrugNameView) v.findViewById(R.id.drug_name);
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
 			holder.missedDoseIndicator = v.findViewById(R.id.missed_dose_indicator);
 			holder.lowSupplyIndicator = v.findViewById(R.id.low_supply_indicator);
@@ -89,13 +90,24 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			for(int i = 0; i != holder.dividers.length; ++i)
 				holder.dividers[i] = v.findViewById(dividerIds[i]);
 
+			v.findViewById(R.id.dose_container).setOnFocusChangeListener(new OnFocusChangeListener() {
+
+				@Override
+				public void onFocusChange(View v, boolean hasFocus)
+				{
+					Log.d(TAG, "$.onFocusChange: hasFocus=" + hasFocus);
+					if(hasFocus)
+						holder.doseViews[0].requestFocus();
+				}
+			});
+
 			v.setTag(holder);
 		}
 		else
 			holder = (DoseViewHolder) v.getTag();
 
-		holder.name.setUnscrambledText(drug.getName());
-		holder.name.setScrambled(Settings.getBoolean("privacy_scramble_names", false));
+		//holder.name.setUnscrambledText(drug.getName());
+		holder.name.setDrug(drug);
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
 
 		//holder.icon.setImageResource(drug.getIconResourceId());

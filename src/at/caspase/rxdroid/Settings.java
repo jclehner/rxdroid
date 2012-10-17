@@ -178,11 +178,11 @@ public final class Settings
 	}
 
 	public static long getDoseTimeBeginOffset(int doseTime) {
-		return getDoseTimeBegin(doseTime).getTime();
+		return getDoseTimeBegin(doseTime).getMillisFromMidnight();
 	}
 
 	public static long getDoseTimeEndOffset(int doseTime) {
-		return getDoseTimeEnd(doseTime).getTime();
+		return getDoseTimeEnd(doseTime).getMillisFromMidnight();
 	}
 
 	public static long getTrueDoseTimeEndOffset(int doseTime)

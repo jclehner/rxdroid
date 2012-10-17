@@ -2,34 +2,29 @@ package at.caspase.rxdroid;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
-import android.view.Window;
-import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import at.caspase.rxdroid.util.CollectionUtils;
 
-public class LockscreenActivity extends Activity
+public class LockscreenActivity extends Activity implements OnClickListener
 {
 	private static final String TAG = LockscreenActivity.class.getName();
+
 	private static final int PIN_LENGTH = 4;
+	private static final String DIGITS = "0123456789";
 
 	public static final String EXTRA_UNLOCK_INTENT = TAG + ".EXTRA_UNLOCK_INTENT";
 
-	private Button mBtnExit;
-	private Button mBtnUnlock;
+	private Button[] mKeypadDigits = new Button[10];
+	private EditText[] mPinDigits = new EditText[PIN_LENGTH];
 
-	private EditText[] mDigits = new EditText[PIN_LENGTH];
-
-	private int mFocusedIndex = -1;
-
+	private int mDigitViewIndex = -1;
 	private Intent mUnlockIntent;
 
 	@Override
@@ -38,18 +33,22 @@ public class LockscreenActivity extends Activity
 		setTheme(Theme.get());
 		setContentView(R.layout.activity_lockscreen);
 
-//		mBtnExit = (Button) findViewById(R.id.btn_exit);
-//		mBtnExit.setOnClickListener(mButtonHandler);
-//
-//		mBtnUnlock = (Button) findViewById(R.id.btn_unlock);
-//		mBtnUnlock.setOnClickListener(mButtonHandler);
+		final int[] pinDigitIds = { R.id.pin_digit1, R.id.pin_digit2, R.id.pin_digit3, R.id.pin_digit4 };
+		for(int i = 0; i != pinDigitIds.length; ++i)
+			mPinDigits[i] = (EditText) findViewById(pinDigitIds[i]);
 
-		final int[] digitIds = { R.id.pin_digit1, R.id.pin_digit2, R.id.pin_digit3, R.id.pin_digit4 };
-		for(int i = 0; i != mDigits.length; ++i)
+		final int[] keypadDigitIds = { R.id.btn_0, R.id.btn_1, R.id.btn_2, R.id.btn_3, R.id.btn_4,
+				R.id.btn_5, R.id.btn_6, R.id.btn_7, R.id.btn_8, R.id.btn_9
+		};
+
+		for(int i = 0; i != keypadDigitIds.length; ++i)
 		{
-			mDigits[i] = (EditText) findViewById(digitIds[i]);
-			mDigits[i].setOnFocusChangeListener(mFocusListener);
+			mKeypadDigits[i] = (Button) findViewById(keypadDigitIds[i]);
+			mKeypadDigits[i].setOnClickListener(this);
 		}
+
+		findViewById(R.id.btn_clear).setOnClickListener(this);
+		findViewById(R.id.btn_delete).setOnClickListener(this);
 
 		mUnlockIntent = (Intent) getIntent().getParcelableExtra(EXTRA_UNLOCK_INTENT);
 		if(mUnlockIntent == null)
@@ -70,51 +69,86 @@ public class LockscreenActivity extends Activity
 			return;
 		}
 
-		final Configuration config = getResources().getConfiguration();
-
-		if(config.keyboard == Configuration.KEYBOARD_NOKEYS ||
-		   config.keyboard == Configuration.KEYBOARD_UNDEFINED)
-		{
-			final Window window = getWindow();
-			window.setSoftInputMode(LayoutParams.SOFT_INPUT_ADJUST_PAN |
-					LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		}
-
-		mDigits[0].requestFocus();
+		clearDigits();
 	}
 
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event)
 	{
-		if(mFocusedIndex == -1)
-			return super.onKeyUp(keyCode, event);
-
-		final char ch = digitKeyCodeToChar(keyCode);
-		if(ch == CHAR_INVALID)
+		switch(keyCode)
 		{
-			mDigits[mFocusedIndex].setText("");
-			return super.onKeyUp(keyCode, event);
-		}
-		else if(ch == CHAR_CLEAR)
-		{
-			for(EditText digit : mDigits)
-				digit.setText("");
+			case KeyEvent.KEYCODE_0:
+				onDigit(0);
+				break;
 
-			mDigits[0].requestFocus();
-			return true;
-		}
+			case KeyEvent.KEYCODE_1:
+				onDigit(1);
+				break;
 
-		mDigits[mFocusedIndex].setText(Character.toString(ch));
-		if(mFocusedIndex + 1 != PIN_LENGTH)
-			mDigits[mFocusedIndex + 1].requestFocus();
-		else
-		{
-			//mBtnUnlock.requestFocus();
-			mDigits[mFocusedIndex].clearFocus();
-			mBtnUnlock.performClick();
+			case KeyEvent.KEYCODE_2:
+				onDigit(2);
+				break;
+
+			case KeyEvent.KEYCODE_3:
+				onDigit(3);
+				break;
+
+			case KeyEvent.KEYCODE_4:
+				onDigit(4);
+				break;
+
+			case KeyEvent.KEYCODE_5:
+				onDigit(5);
+				break;
+
+			case KeyEvent.KEYCODE_6:
+				onDigit(6);
+				break;
+
+			case KeyEvent.KEYCODE_7:
+				onDigit(7);
+				break;
+
+			case KeyEvent.KEYCODE_8:
+				onDigit(8);
+				break;
+
+			case KeyEvent.KEYCODE_9:
+				onDigit(9);
+				break;
+
+			case KeyEvent.KEYCODE_DEL:
+				clearLastDigit();
+				break;
+
+			default:
+				return super.onKeyUp(keyCode, event);
+
 		}
 
 		return true;
+	}
+
+	@Override
+	public void onClick(View v)
+	{
+		final int digit = CollectionUtils.indexOfByReference(v, mKeypadDigits);
+		if(digit != -1)
+		{
+			onDigit(digit);
+			return;
+		}
+
+		switch(v.getId())
+		{
+			case R.id.btn_clear:
+				clearDigits();
+				return;
+
+			case R.id.btn_delete:
+				clearLastDigit();
+				return;
+		}
 	}
 
 	public static void startMaybe(Activity caller) {
@@ -123,7 +157,7 @@ public class LockscreenActivity extends Activity
 
 	public static void startMaybe(Activity caller, Intent unlockIntent)
 	{
-		if(/*Application.isLocked()*/ false)
+		if(Application.isLocked() || false)
 		{
 			if(unlockIntent == null)
 			{
@@ -141,15 +175,42 @@ public class LockscreenActivity extends Activity
 		}
 	}
 
+	private void onDigit(int digit)
+	{
+		if(mDigitViewIndex == -1 || mDigitViewIndex == PIN_LENGTH)
+			return;
+
+		mPinDigits[mDigitViewIndex].setText(DIGITS.substring(digit, digit + 1));
+		if(++mDigitViewIndex == PIN_LENGTH)
+			checkPinAndLaunchActivityIfOk();
+		else
+			mPinDigits[mDigitViewIndex].requestFocus();
+	}
+
+	private void clearDigits()
+	{
+		for(EditText digit : mPinDigits)
+			digit.setText("");
+
+		mDigitViewIndex = 0;
+	}
+
+	private void clearLastDigit()
+	{
+		if(mDigitViewIndex == 0)
+			return;
+
+		mPinDigits[--mDigitViewIndex].setText("");
+	}
+
 	private void checkPinAndLaunchActivityIfOk()
 	{
 		final StringBuilder sb = new StringBuilder();
-		for(EditText digit : mDigits)
+		for(EditText digit : mPinDigits)
 			sb.append(digit.getText().toString());
 
 		if(sb.length() > PIN_LENGTH)
 			throw new IllegalStateException("Pin has unexpected length: " + sb);
-
 
 		final String pin = Settings.getString("pin", null);
 		if(pin == null || pin.equals(sb.toString()))
@@ -159,7 +220,7 @@ public class LockscreenActivity extends Activity
 		}
 		else
 		{
-			for(EditText digit : mDigits)
+			for(EditText digit : mPinDigits)
 				digit.setText("");
 
 			Toast.makeText(this, "Invalid PIN", Toast.LENGTH_SHORT).show();
@@ -170,76 +231,5 @@ public class LockscreenActivity extends Activity
 	{
 		startActivity(mUnlockIntent);
 		finish();
-	}
-
-	private OnFocusChangeListener mFocusListener = new OnFocusChangeListener() {
-
-		@Override
-		public void onFocusChange(View v, boolean hasFocus)
-		{
-			if(hasFocus)
-				mFocusedIndex = CollectionUtils.indexOf(v, mDigits);
-			else
-				mFocusedIndex = -1;
-		}
-	};
-
-	private OnClickListener mButtonHandler = new OnClickListener() {
-
-		@Override
-		public void onClick(View v)
-		{
-//			if(v.getId() == R.id.btn_exit)
-//				finish();
-//			else if(v.getId() == R.id.btn_unlock)
-//				checkPinAndLaunchActivityIfOk();
-		}
-	};
-
-	private static final char CHAR_INVALID = '?';
-	private static final char CHAR_CLEAR = 'X';
-
-	private static char digitKeyCodeToChar(int keycode)
-	{
-		switch(keycode)
-		{
-			case KeyEvent.KEYCODE_0:
-				return '0';
-
-			case KeyEvent.KEYCODE_1:
-				return '1';
-
-			case KeyEvent.KEYCODE_2:
-				return '2';
-
-			case KeyEvent.KEYCODE_3:
-				return '3';
-
-			case KeyEvent.KEYCODE_4:
-				return '4';
-
-			case KeyEvent.KEYCODE_5:
-				return '5';
-
-			case KeyEvent.KEYCODE_6:
-				return '6';
-
-			case KeyEvent.KEYCODE_7:
-				return '7';
-
-			case KeyEvent.KEYCODE_8:
-				return '8';
-
-			case KeyEvent.KEYCODE_9:
-				return '9';
-
-			case KeyEvent.KEYCODE_CLEAR:
-			case KeyEvent.KEYCODE_ESCAPE:
-			case KeyEvent.KEYCODE_DEL:
-				return CHAR_CLEAR;
-
-			default:
-				return CHAR_INVALID;
-		}
 	}
 }

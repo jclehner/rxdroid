@@ -96,6 +96,17 @@ public final class CollectionUtils
 		return -1;
 	}
 
+	public static <T> int indexOfByReference(T e, T[] array)
+	{
+		for(int i = 0; i != array.length; ++i)
+		{
+			if(array[i] == e)
+				return i;
+		}
+
+		return -1;
+	}
+
 	public static int indexOf(int n, int[] array)
 	{
 		for(int i = 0; i != array.length; ++i)

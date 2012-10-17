@@ -92,7 +92,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
 
 	private static final String TAG = DrugEditActivity.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private DrugWrapper mWrapper;
 	private int mDrugHash;

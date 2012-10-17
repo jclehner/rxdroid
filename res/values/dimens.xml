@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen name="keypad_button_text_size">30sp</dimen>
+	<dimen name="keypad_button_height">60dip</dimen>
+	<dimen name="keypad_button_width">70dip</dimen>
+	<dimen name="keypad_button_margin">2dip</dimen>
+	<dimen name="keypad_margin_bottom">20dip</dimen>	
+	<dimen name="pin_margin">20dip</dimen>		
+</resources>

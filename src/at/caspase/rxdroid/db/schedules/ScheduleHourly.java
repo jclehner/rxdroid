@@ -62,7 +62,7 @@ public class ScheduleHourly extends ScheduleBase
 	public void setOffset(DumbTime offset)
 	{
 		final long max = 1000 * 3600 * (mIn8HourMode ? 8 : 6);
-		if(offset.getTime() >= max)
+		if(offset.getMillisFromMidnight() >= max)
 			throw new IllegalArgumentException();
 
 		mOffset = offset;
@@ -95,7 +95,7 @@ public class ScheduleHourly extends ScheduleBase
 		if(!mIn8HourMode && doseTime == mDoseTimeToSkip)
 			throw new IllegalArgumentException();
 
-		Date begin = DateTime.add(date, Calendar.MILLISECOND, (int) mOffset.getTime());
+		Date begin = DateTime.add(date, Calendar.MILLISECOND, (int) mOffset.getMillisFromMidnight());
 
 		return null;
 

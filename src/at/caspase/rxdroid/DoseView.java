@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.text.SpannableStringBuilder;
 import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;
@@ -296,6 +297,26 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		setPadding(0, 0, 0, 0);
 
 		Database.unregisterEventListener(this);
+	}
+
+	@Override
+	protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect)
+	{
+		super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+
+		if(gainFocus)
+			changeBackground(R.drawable.doseview_background_selected);
+		else
+			changeBackground(0);
+
+		Log.d(TAG, "onFocusChanged: gainFocus=" + gainFocus);
+		Log.d(TAG, "  drug=" + mDrug.getName() + ", doseTime=" + mDoseTime);
+	}
+
+	private void changeBackground(int resId)
+	{
+		setBackgroundResource(resId);
+		setPadding(0, 0, 0, 0);
 	}
 
 	private boolean isApplicableIntake(Intake intake)

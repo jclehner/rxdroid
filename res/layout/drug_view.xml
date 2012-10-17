@@ -29,8 +29,10 @@
 	android:paddingRight="5dip"
 	
 	android:orientation="vertical"
+	android:descendantFocusability="beforeDescendants"
+	android:focusable="true"
 	
-	android:nextFocusLeft="@+id/drug_name"	
+	android:nextFocusDown="@+id/drug_name"	
 >
 	<!-- first line: icon + name -->
 	
@@ -47,7 +49,7 @@
 	/>
 	
   
-  	<at.caspase.rxdroid.widget.Rot13TextView android:id="@id/drug_name"
+  	<at.caspase.rxdroid.widget.DrugNameView android:id="@id/drug_name"
   		android:layout_width="wrap_content"
   		android:layout_height="wrap_content"
   		  		
@@ -65,14 +67,18 @@
   		  		  		
   		style="@style/TextAppearance.Large.Clickable"
   		  		
-  		android:nextFocusDown="@+id/morning"
+  		android:nextFocusDown="@+id/dose_container"
 	/>
 	
 	<!-- second line: dose views android:layout_alignBottom="@id/drug_icon" -->
   	
-  	<LinearLayout android:id="@+id/dose_container"
+  	<LinearLayout android:id="@id/dose_container"
   		android:layout_height="wrap_content"
   		android:layout_width="match_parent"
+  		
+  		android:focusable="true"
+  		android:descendantFocusability="afterDescendants"
+  		android:nextFocusDown="@+id/morning"
   		
   		android:layout_toRightOf="@id/drug_icon"
   		android:layout_toLeftOf="@+id/indicators"
@@ -84,7 +90,7 @@
 	  		android:layout_width="0dip"
 	  		android:layout_weight="1"
 	  		
-	  		android:nextFocusLeft="@+id/noon"
+	  		android:nextFocusDown="@+id/noon"
 	  		
 	  		android:focusable="true"
 	  		android:onClick="onDoseViewClick"
@@ -99,6 +105,8 @@
 	  		android:layout_width="0dip"
 	  		android:layout_weight="1"
 	  		
+	  		android:nextFocusDown="@+id/evening"
+	  		
 	  		android:focusable="true"
 	  		android:onClick="onDoseViewClick"
 	  	/>
@@ -111,6 +119,8 @@
 	  		android:layout_height="wrap_content"
 	  		android:layout_width="0dip"
 	  		android:layout_weight="1"
+	  		
+	  		android:nextFocusDown="@+id/night"
 	  		
 	  		android:focusable="true"
 	  		android:onClick="onDoseViewClick"

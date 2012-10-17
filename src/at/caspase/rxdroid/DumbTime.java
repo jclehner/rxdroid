@@ -121,22 +121,22 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		return mSeconds;
 	}
 
-	public long getTime() {
+	public long getMillisFromMidnight() {
 		return mMillis + 1000 * (mHours * 3600 + mMinutes * 60 + mSeconds);
 	}
 
 	public boolean isLessThan(DumbTime time) {
-		return getTime() < time.getTime();
+		return getMillisFromMidnight() < time.getMillisFromMidnight();
 	}
 
 	public boolean isGreaterThan(DumbTime time) {
-		return getTime() > time.getTime();
+		return getMillisFromMidnight() > time.getMillisFromMidnight();
 	}
 
 	@Override
 	public int compareTo(DumbTime other)
 	{
-		if(this.getTime() == other.getTime())
+		if(this.getMillisFromMidnight() == other.getMillisFromMidnight())
 			return 0;
 		return this.isLessThan(other) ? -1 : 1;
 	}
@@ -147,7 +147,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		if(o == null || !(o instanceof DumbTime))
 			return false;
 
-		return getTime() == ((DumbTime) o).getTime();
+		return getMillisFromMidnight() == ((DumbTime) o).getMillisFromMidnight();
 	}
 
 	@Override
@@ -188,7 +188,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 		final SimpleDateFormat sdf = new SimpleDateFormat(pattern.toString());
 		sdf.setTimeZone(TimeZone.getTimeZone(("UTC")));
-		return sdf.format(new Date(getTime()));
+		return sdf.format(new Date(getMillisFromMidnight()));
 	}
 
 	public boolean isWithinRange(DumbTime begin, DumbTime end, boolean allowWrap)
