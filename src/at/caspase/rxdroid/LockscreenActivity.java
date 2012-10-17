@@ -157,7 +157,7 @@ public class LockscreenActivity extends Activity implements OnClickListener
 
 	public static void startMaybe(Activity caller, Intent unlockIntent)
 	{
-		if(Application.isLocked() || false)
+		if(Application.isLocked() && false)
 		{
 			if(unlockIntent == null)
 			{
