@@ -35,9 +35,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.AssetManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.RingtonePreference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
@@ -45,20 +49,16 @@ import android.view.MenuItem;
 import android.webkit.WebView;
 import android.widget.Toast;
 import at.caspase.rxdroid.db.DatabaseHelper;
-import at.caspase.rxdroid.preferences.TimePreference;
 import at.caspase.rxdroid.util.Util;
 
 @SuppressWarnings("deprecation")
-public class PreferencesActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener, OnPreferenceClickListener
+public class PreferencesActivity extends PreferenceActivity implements
+		OnSharedPreferenceChangeListener, OnPreferenceClickListener, OnPreferenceChangeListener
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = PreferencesActivity.class.getName();
 
 	private static final int MENU_RESTORE_DEFAULTS = 0;
-
-	private static final String PREF_LOW_SUPPLY_THRESHOLD = "num_min_supply_days";
-	private static final String PREF_DB_HISTORY_MAX_AGE = "db_max_history_age";
-	private static final String PREF_LICENSES = "licenses";
 
 	SharedPreferences mSharedPreferences;
 
@@ -80,7 +80,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		addPreferencesFromResource(R.xml.preferences);
 
-		Preference p = findPreference("version");
+		Preference p = findPreference(PreferenceKeys.KEY_VERSION);
 		if(p != null)
 		{
 			String summary = Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION;
@@ -98,14 +98,23 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 			p.setSummary(summary);
 		}
 
-		p = findPreference(PREF_DB_HISTORY_MAX_AGE);
+		p = findPreference(PreferenceKeys.KEY_HISTORY_SIZE);
 		if(p != null)
 			Util.populateListPreferenceEntryValues(p);
 
-		p = findPreference(PREF_LICENSES);
+		p = findPreference(PreferenceKeys.KEY_LICENSES);
 		if(p != null)
 			p.setOnPreferenceClickListener(this);
 
+		p = findPreference(PreferenceKeys.KEY_NOTIFICATION_SOUND);
+		if(p != null)
+		{
+			p.setOnPreferenceChangeListener(this);
+
+			final String key = PreferenceKeys.KEY_NOTIFICATION_SOUND;
+			final String defValue = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString();
+			onPreferenceChange(p, Settings.getString(key, defValue));
+		}
 
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
 		{
@@ -113,6 +122,8 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 			ab.setDisplayShowHomeEnabled(true);
 			ab.setDisplayHomeAsUpEnabled(true);
 		}
+
+
 	}
 
 	@Override
@@ -130,10 +141,15 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		Application.setIsVisible(this, false);
 	}
 
+	@TargetApi(11)
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		menu.add(0, MENU_RESTORE_DEFAULTS, 0, "Restore defaults").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		MenuItem item = menu.add(0, MENU_RESTORE_DEFAULTS, 0, R.string._title_restore_default_settings)
+				.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -183,11 +199,11 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
 	{
-		if(PREF_LOW_SUPPLY_THRESHOLD.equals(key))
+		if(PreferenceKeys.KEY_LOW_SUPPLY_THRESHOLD.equals(key))
 			updateLowSupplyThresholdPreferenceSummary();
-		else if(PREF_DB_HISTORY_MAX_AGE.equals(key))
+		else if(PreferenceKeys.KEY_HISTORY_SIZE.equals(key))
 		{
-			if("4".equals(Settings.getString(PREF_DB_HISTORY_MAX_AGE, null)))
+			if("4".equals(Settings.getString(PreferenceKeys.KEY_HISTORY_SIZE, null)))
 				Toast.makeText(getApplicationContext(), R.string._toast_unlimited_history_size, Toast.LENGTH_LONG).show();
 		}
 
@@ -197,7 +213,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	@Override
 	public boolean onPreferenceClick(Preference preference)
 	{
-		if(PREF_LICENSES.equals(preference.getKey()))
+		if(PreferenceKeys.KEY_LICENSES.equals(preference.getKey()))
 		{
 			String license;
 			InputStream is = null;
@@ -233,50 +249,68 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 		return false;
 	}
 
+	@Override
+	public boolean onPreferenceChange(Preference preference, Object newValue)
+	{
+		final String key = preference.getKey();
+
+		if(PreferenceKeys.KEY_NOTIFICATION_SOUND.equals(key))
+		{
+			final Uri uri = Uri.parse((String) newValue);
+			final Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
+
+			preference.setSummary(ringtone.getTitle(this));
+		}
+
+		return true;
+	}
+
+
+
 	private void updateLowSupplyThresholdPreferenceSummary()
 	{
-		Preference p = findPreference(PREF_LOW_SUPPLY_THRESHOLD);
+		Preference p = findPreference(PreferenceKeys.KEY_LOW_SUPPLY_THRESHOLD);
 		if(p != null)
 		{
-			String value = mSharedPreferences.getString(PREF_LOW_SUPPLY_THRESHOLD, "10");
+			String value = mSharedPreferences.getString(PreferenceKeys.KEY_LOW_SUPPLY_THRESHOLD, "10");
 			p.setSummary(getString(R.string._summary_min_supply_days, value));
 		}
 	}
 
-	private void updateAlarmModePreferenceSummary(Preference p, String value)
-	{
-		if(value == null)
-		{
-			if((value = ((ListPreference) p).getValue()) == null)
-				return;
-		}
-
-		int index = ((ListPreference) p).findIndexOfValue(value);
-
-		Preference alarmTimeout = findPreference("alarm_timeout");
-		alarmTimeout.setEnabled(index > 0);
-
-		switch(index)
-		{
-			case 1:
-				final DumbTime timeout = ((TimePreference) alarmTimeout).getValue();
-				final int minutes;
-
-				if(timeout != null)
-					minutes = 60 * timeout.getHours() + timeout.getMinutes();
-				else
-					minutes = 0;
-
-				p.setSummary(getString(R.string._summary_alarm_mode_repeat, minutes));
-				break;
-
-			case 0:
-				// fall through
-
-			default:
-				p.setSummary(R.string._summary_alarm_mode_normal);
-				break;
-
-		}
-	}
+//	private void updateAlarmModePreferenceSummary(Preference p, String value)
+//	{
+//		if(value == null)
+//		{
+//			if((value = ((ListPreference) p).getValue()) == null)
+//				return;
+//		}
+//
+//		int index = ((ListPreference) p).findIndexOfValue(value);
+//
+//		Preference alarmTimeout = findPreference("alarm_timeout");
+//		alarmTimeout.setEnabled(index > 0);
+//
+//		switch(index)
+//		{
+//			case 1:
+//				final DumbTime timeout = ((TimePreference) alarmTimeout).getValue();
+//				final int minutes;
+//
+//				if(timeout != null)
+//					minutes = 60 * timeout.getHours() + timeout.getMinutes();
+//				else
+//					minutes = 0;
+//
+//				p.setSummary(getString(R.string._summary_alarm_mode_repeat, minutes));
+//				break;
+//
+//			case 0:
+//				// fall through
+//
+//			default:
+//				p.setSummary(R.string._summary_alarm_mode_normal);
+//				break;
+//
+//		}
+//	}
 }

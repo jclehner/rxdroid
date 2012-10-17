@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# Primitive helper script, scanning for occurences of @string/_<foobar> and R.string._<foobar>, 
+# which are translatable strings in RxDroid. All values not defined in res/values/strings.xml will
+# be echoed in copy-'n-pastable XML. 
+#
+
+source "$(dirname $_)/shared.sh"
+
+require-grep-P
+
+PATTERNS="@string/key_\w* R.string.key_\w*"
+TEMP=$(mktempf)
+
+scan_file()
+{
+	for p in $PATTERNS; do
+		for t in $(grep -o -P $p $1 | grep -o -P 'key_\w*'); do
+			echo $t >> $TEMP
+		done
+	done
+
+}
+
+scan_dir()
+{
+	for f in $1/*.{java,xml}; do
+		if [[ -f "$f" ]]; then
+			scan_file $f
+		fi
+	done
+
+	for d in $1/*; do
+		if [[ -d "$d" ]]; then
+			scan_dir "$d"
+		fi
+	done
+}
+
+scan_string_xml()
+{
+	for f in res/values/prefkeys.xml; do
+		[[ -e $f ]] || continue
+
+		echo "-- $f:"
+
+		for t in $(cat $TEMP | sort | uniq); do
+
+
+			if ! grep -q $t $f; then
+					key=$(sed -e 's/key_//' <<< "$t")
+					echo "<string translatable=\"false\" name=\"$t\">$key</string>"
+			fi
+		done
+
+		echo
+	done
+}
+
+scan_dir src
+scan_dir res
+scan_file AndroidManifest.xml
+
+scan_string_xml
+
+rm $TEMP

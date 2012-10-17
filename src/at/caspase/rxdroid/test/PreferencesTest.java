@@ -36,7 +36,6 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import at.caspase.rxdroid.GlobalContext;
 import at.caspase.rxdroid.Settings;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Schedule;
@@ -359,7 +358,6 @@ public class PreferencesTest extends AndroidTestCase
 		if(mContext == null)
 			fail("mContext == null");
 
-		GlobalContext.set(mContext);
 		Settings.init();
 
 		backupPreferences();

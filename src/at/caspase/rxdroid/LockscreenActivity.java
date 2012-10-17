@@ -2,6 +2,7 @@ package at.caspase.rxdroid;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -24,7 +25,7 @@ public class LockscreenActivity extends Activity implements OnClickListener
 	private Button[] mKeypadDigits = new Button[10];
 	private EditText[] mPinDigits = new EditText[PIN_LENGTH];
 
-	private int mDigitViewIndex = -1;
+	private int mDigitFocusIndex = -1;
 	private Intent mUnlockIntent;
 
 	@Override
@@ -68,6 +69,21 @@ public class LockscreenActivity extends Activity implements OnClickListener
 			launchActivityAndFinishSelf();
 			return;
 		}
+
+		findViewById(R.id.keypad).setVisibility(View.VISIBLE);
+
+//		final Configuration config = getResources().getConfiguration();
+//		final int visibility;
+//
+//		if(config.keyboard == Configuration.KEYBOARD_NOKEYS ||
+//		   config.keyboard == Configuration.KEYBOARD_UNDEFINED)
+//			visibility = View.VISIBLE;
+//		else
+//			visibility = View.GONE;
+//
+//		if(true) Log.v(TAG, config.toString());
+//
+//		findViewById(R.id.keypad).setVisibility(visibility);
 
 		clearDigits();
 	}
@@ -123,7 +139,6 @@ public class LockscreenActivity extends Activity implements OnClickListener
 
 			default:
 				return super.onKeyUp(keyCode, event);
-
 		}
 
 		return true;
@@ -157,7 +172,7 @@ public class LockscreenActivity extends Activity implements OnClickListener
 
 	public static void startMaybe(Activity caller, Intent unlockIntent)
 	{
-		if(Application.isLocked() && false)
+		if(Application.isLocked() && false) // currently disabled
 		{
 			if(unlockIntent == null)
 			{
@@ -177,14 +192,16 @@ public class LockscreenActivity extends Activity implements OnClickListener
 
 	private void onDigit(int digit)
 	{
-		if(mDigitViewIndex == -1 || mDigitViewIndex == PIN_LENGTH)
+		if(mDigitFocusIndex == -1 || mDigitFocusIndex == PIN_LENGTH)
 			return;
 
-		mPinDigits[mDigitViewIndex].setText(DIGITS.substring(digit, digit + 1));
-		if(++mDigitViewIndex == PIN_LENGTH)
+		mPinDigits[mDigitFocusIndex].setText(DIGITS.substring(digit, digit + 1));
+		if(++mDigitFocusIndex == PIN_LENGTH)
+		{
 			checkPinAndLaunchActivityIfOk();
+		}
 		else
-			mPinDigits[mDigitViewIndex].requestFocus();
+			mPinDigits[mDigitFocusIndex].requestFocus();
 	}
 
 	private void clearDigits()
@@ -192,38 +209,58 @@ public class LockscreenActivity extends Activity implements OnClickListener
 		for(EditText digit : mPinDigits)
 			digit.setText("");
 
-		mDigitViewIndex = 0;
+		mDigitFocusIndex = 0;
+		mPinDigits[0].requestFocus();
 	}
 
 	private void clearLastDigit()
 	{
-		if(mDigitViewIndex == 0)
+		if(mDigitFocusIndex == 0)
 			return;
 
-		mPinDigits[--mDigitViewIndex].setText("");
+		--mDigitFocusIndex;
+
+		mPinDigits[mDigitFocusIndex].setText("");
+		mPinDigits[mDigitFocusIndex].requestFocus();
+	}
+
+	private void setKeypadEnabled(boolean enabled)
+	{
+		for(Button digit : mKeypadDigits)
+			digit.setEnabled(enabled);
+
+		findViewById(R.id.btn_delete).setEnabled(enabled);
+		findViewById(R.id.btn_clear).setEnabled(enabled);
 	}
 
 	private void checkPinAndLaunchActivityIfOk()
 	{
-		final StringBuilder sb = new StringBuilder();
-		for(EditText digit : mPinDigits)
-			sb.append(digit.getText().toString());
-
-		if(sb.length() > PIN_LENGTH)
-			throw new IllegalStateException("Pin has unexpected length: " + sb);
-
-		final String pin = Settings.getString("pin", null);
-		if(pin == null || pin.equals(sb.toString()))
+		try
 		{
-			Application.unlock();
-			launchActivityAndFinishSelf();
-		}
-		else
-		{
+			final StringBuilder sb = new StringBuilder();
 			for(EditText digit : mPinDigits)
-				digit.setText("");
+				sb.append(digit.getText().toString());
 
-			Toast.makeText(this, "Invalid PIN", Toast.LENGTH_SHORT).show();
+			if(sb.length() > PIN_LENGTH)
+				throw new IllegalStateException("Pin has unexpected length: " + sb);
+
+			final String pin = Settings.getString("pin", null);
+			if(pin == null || pin.equals(sb.toString()))
+			{
+				Application.unlock();
+				launchActivityAndFinishSelf();
+			}
+			else
+			{
+				for(EditText digit : mPinDigits)
+					digit.setText("");
+
+				Toast.makeText(this, "Invalid PIN", Toast.LENGTH_SHORT).show();
+			}
+		}
+		finally
+		{
+			setKeypadEnabled(true);
 		}
 	}
 

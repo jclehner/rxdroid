@@ -46,7 +46,7 @@ import at.caspase.rxdroid.util.Util;
 public class NotificationReceiver extends BroadcastReceiver
 {
 	private static final String TAG = NotificationReceiver.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private static final Class<?>[] EVENT_HANDLER_ARG_TYPES = { Date.class, Integer.TYPE };
 
@@ -56,16 +56,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		void onDoseTimeEnd(Date date, int doseTime);
 	}
 
-	static final String EXTRA_SILENT = TAG + ".silent";
-	//static final String EXTRA_SNOOZE = TAG + ".snooze";
-	//static final String EXTRA_CANCEL_SNOOZE = TAG + ".cancel_snooze";
-	//static final String EXTRA_SNOOZE_STATE = TAG + ".snooze_state";
-
+	static final String EXTRA_SILENT = "at.caspase.rxdroid.extra.SILENT";
 	static final String EXTRA_DATE = "at.caspase.rxdroid.extra.DATE";
 	static final String EXTRA_DOSE_TIME = "at.caspase.rxdroid.extra.DOSE_TIME";
 	static final String EXTRA_IS_DOSE_TIME_END = "at.caspase.rxdroid.extra.IS_DOSE_TIME_END";
 
-	private static final String EXTRA_IS_DELETE_INTENT = TAG + ".is_delete_intent";
+//	private static final String EXTRA_IS_DELETE_INTENT = TAG + ".is_delete_intent";
 
 	static final int ALARM_MODE_NORMAL = 0;
 	static final int ALARM_MODE_REPEAT = 1;
@@ -76,7 +72,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private int mAlarmRepeatMode;
 
-	private boolean mIsDeleteIntent = false;
+//	private boolean mIsDeleteIntent = false;
 	private boolean mDoPostSilent = false;
 
 	private static final EventDispatcher<OnDoseTimeChangeListener> sEventMgr =
@@ -113,7 +109,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		mAllDrugs = Database.getAll(Drug.class);
 		mAlarmRepeatMode = Settings.getListPreferenceValueIndex("alarm_mode", ALARM_MODE_NORMAL);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
-		mIsDeleteIntent = intent.getBooleanExtra(EXTRA_IS_DELETE_INTENT, false);
+//		mIsDeleteIntent = intent.getBooleanExtra(EXTRA_IS_DELETE_INTENT, false);
 
 		rescheduleAlarms();
 		updateCurrentNotifications();
@@ -173,7 +169,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		int dueCount = isActiveDoseTime ? getDueDoseCount(date, doseTime) : 0;
 		int missedCount = getMissedDoseCount(date, doseTime, isActiveDoseTime);
 
-		Log.d(TAG, "updateNotifications: date=" + date + ", doseTime=" + doseTime + " (" + (isActiveDoseTime ? "active" : "not active") + ")");
+		if(LOGV) Log.d(TAG, "updateNotifications: date=" + date + ", doseTime=" + doseTime + " (" + (isActiveDoseTime ? "active" : "not active") + ")");
 
 		if((dueCount + missedCount) == 0 && message2 == null)
 		{
@@ -293,7 +289,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private PendingIntent createDrugListIntent(Date date)
 	{
-		Intent intent = new Intent(mContext, DrugListActivity.class);
+		final Intent intent = new Intent(mContext, DrugListActivity.class);
 		intent.putExtra(DrugListActivity.EXTRA_STARTED_FROM_NOTIFICATION, true);
 		intent.putExtra(DrugListActivity.EXTRA_DATE, date);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -353,7 +349,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		if(!drugsWithLowSupply.isEmpty())
 		{
-			final String firstDrugName = drugsWithLowSupply.get(0).getName();
+			final String firstDrugName = Settings.getDrugName(drugsWithLowSupply.get(0));
 
 			if(drugsWithLowSupply.size() == 1)
 				message = getString(R.string._msg_low_supply_single, firstDrugName);
@@ -375,7 +371,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	/* package */ static void sendBroadcastToSelf(Context context, boolean silent)
 	{
 		if(context == null)
-			context = GlobalContext.get();
+			context = Application.getContext();
 		final Intent intent = new Intent(context, NotificationReceiver.class);
 		intent.setAction(Intent.ACTION_MAIN);
 		intent.putExtra(NotificationReceiver.EXTRA_SILENT, silent);

@@ -125,7 +125,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 				if(!mAttemptedDatabaseReload)
 				{
 					mAttemptedDatabaseReload = true;
-					Database.reload(GlobalContext.get());
+					Database.reload(Application.getContext());
 					return doInBackground(params);
 				}
 

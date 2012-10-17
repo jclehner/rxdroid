@@ -24,70 +24,71 @@ package at.caspase.rxdroid;
 import android.content.Context;
 import android.content.Intent;
 
-/**
- * Provides a globally available context.
- *
- * @author Joseph Lehner
- */
-public final class GlobalContext
-{
-	private static Context sContext;
-
-	/**
-	 * Set the globally available context.
-	 *
-	 * @param context a context to obtain the application context from.
-	 */
-	public static synchronized void set(Context context)
-	{
-		if(sContext == null)
-		{
-			sContext = context.getApplicationContext();
-			if(sContext == null)
-				sContext = context;
-		}
-	}
-
-	/**
-	 * Calls {@link #get(boolean)} with <code>allowNullContext=false</code>.
-	 */
-	public static synchronized Context get() {
-		return get(false);
-	}
-
-	/**
-	 * Gets the stored context.
-	 *
-	 * @param allowNullContext If set to <code>true</code>, the function will <em>not</em> throw
-	 *     an exception if the currently stored context is <code>null</code>
-	 * @return a reference to the stored context
-	 */
-	public static synchronized Context get(boolean allowNullContext)
-	{
-		if(sContext == null)
-		{
-			if(!allowNullContext)
-				throw new IllegalStateException("Context is null");
-		}
-
-		return sContext;
-	}
-
-	public static void startActivity(Intent intent) {
-		sContext.startActivity(intent);
-	}
-
-	public static void sendBroadcast(Intent intent) {
-		sContext.sendBroadcast(intent);
-	}
-
-	public static String getString(int resId) {
-		return sContext.getString(resId);
-	}
-
-	public static String getString(int resId, Object... formatArgs) {
-		return sContext.getString(resId, formatArgs);
-	}
-
-	private GlobalContext() {}
-}
+///**
+// * Provides a globally available context.
+// *
+// * @author Joseph Lehner
+// */
+//public final class GlobalContext
+//{
+//	private static Context sContext;
+//
+//	/**
+//	 * Set the globally available context.
+//	 *
+//	 * @param context a context to obtain the application context from.
+//	 */
+//	public static synchronized void set(Context context)
+//	{
+//		if(sContext == null)
+//		{
+//			sContext = context.getApplicationContext();
+//			if(sContext == null)
+//				sContext = context;
+//		}
+//	}
+//
+//	/**
+//	 * Calls {@link #get(boolean)} with <code>allowNullContext=false</code>.
+//	 * @deprecated Use {@link Application#getContext()} instead
+//	 */
+//	public static synchronized Context get() {
+//		return Application.getContext();
+//	}
+//
+//	/**
+//	 * Gets the stored context.
+//	 *
+//	 * @param allowNullContext If set to <code>true</code>, the function will <em>not</em> throw
+//	 *     an exception if the currently stored context is <code>null</code>
+//	 * @return a reference to the stored context
+//	 */
+//	public static synchronized Context get(boolean allowNullContext)
+//	{
+//		if(sContext == null)
+//		{
+//			if(!allowNullContext)
+//				throw new IllegalStateException("Context is null");
+//		}
+//
+//		return sContext;
+//	}
+//
+//	public static void startActivity(Intent intent) {
+//		sContext.startActivity(intent);
+//	}
+//
+//	public static void sendBroadcast(Intent intent) {
+//		sContext.sendBroadcast(intent);
+//	}
+//
+//	public static String getString(int resId) {
+//		return sContext.getString(resId);
+//	}
+//
+//	public static String getString(int resId, Object... formatArgs) {
+//		return sContext.getString(resId, formatArgs);
+//	}
+//
+//	private GlobalContext() {}
+//}

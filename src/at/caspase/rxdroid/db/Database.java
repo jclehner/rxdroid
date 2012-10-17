@@ -37,7 +37,7 @@ import android.util.Log;
 import at.caspase.androidutils.EventDispatcher;
 import at.caspase.androidutils.Extras;
 import at.caspase.androidutils.Reflect;
-import at.caspase.rxdroid.GlobalContext;
+import at.caspase.rxdroid.Application;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.WrappedCheckedException;
@@ -95,7 +95,7 @@ public final class Database
 	 * @throws IllegalArgumentException if GlobalContext was not initialized.
 	 */
 	public static void init() {
-		init(GlobalContext.get());
+		init(Application.getContext());
 	}
 
 	/**

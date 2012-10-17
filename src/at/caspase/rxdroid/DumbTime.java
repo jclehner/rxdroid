@@ -170,7 +170,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 	public String toString(boolean use24HourTime, boolean withMillis)
 	{
-		final boolean is24HourFormat = DateFormat.is24HourFormat(GlobalContext.get());
+		final boolean is24HourFormat = DateFormat.is24HourFormat(Application.getContext());
 		final StringBuilder pattern = new StringBuilder();
 
 		if(is24HourFormat)

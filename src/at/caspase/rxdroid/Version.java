@@ -92,7 +92,7 @@ public final class Version
 	{
 		if(sVersion == null)
 		{
-			final Context c = GlobalContext.get();
+			final Context c = Application.getContext();
 			sVersion = c.getString(R.string.version);
 			sRevision = c.getString(R.string.vcs_revision);
 			sAppName = c.getString(R.string.app_name);

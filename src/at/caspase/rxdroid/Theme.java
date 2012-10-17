@@ -13,8 +13,6 @@ public final class Theme
 	private static final String TAG = Theme.class.getName();
 	private static final boolean LOGV = false;
 
-	/* package */ static final String KEY = "theme_is_dark";
-
 	public static final int LIGHT = R.style.LightTheme;
 	public static final int DARK = R.style.DarkTheme;
 
@@ -29,11 +27,7 @@ public final class Theme
 //	};
 
 	public static boolean isDark() {
-		return Settings.getBoolean(KEY, Version.SDK_IS_PRE_HONEYCOMB);
-	}
-
-	public static void setDark(boolean dark) {
-		Settings.putBoolean(KEY, dark);
+		return Settings.getBoolean(PreferenceKeys.KEY_THEME_IS_DARK, Version.SDK_IS_PRE_HONEYCOMB);
 	}
 
 	public static int get() {
@@ -48,7 +42,7 @@ public final class Theme
 			{
 				final Timer t = LOGV ? new Timer() : null;
 
-				final Context c = GlobalContext.get();
+				final Context c = Application.getContext();
 				final int[] attrs = { attr };
 				final TypedArray a = c.obtainStyledAttributes(get(), attrs);
 				final int resId = a.getResourceId(0, 0);

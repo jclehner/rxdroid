@@ -25,6 +25,8 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 
 public class MyNotification
 {
@@ -228,25 +230,47 @@ public class MyNotification
 		final String message = getMessage();
 		notification.setLatestEventInfo(mContext, getTitle(), message, mContentIntent);
 
-		int lastHash = Settings.getLastNotificationMessageHash();
-		int thisHash = message.hashCode();
+		//int lastHash = Settings.getLastNotificationMessageHash();
+
+		final int lastHash = Settings.getInt(PreferenceKeys.KEY_LAST_MSG_HASH);
+		final int thisHash = message.hashCode();
 
 		if(lastHash != thisHash)
 		{
 			notification.flags ^= Notification.FLAG_ONLY_ALERT_ONCE;
-			Settings.setLastNotificationMessageHash(thisHash);
+			Settings.putInt(PreferenceKeys.KEY_LAST_MSG_HASH, thisHash);
 		}
 
-		int defaultsXorMask = Settings.getNotificationDefaultsXorMask();
+		final int defaultsXorMask = Settings.getNotificationDefaultsXorMask();
 		notification.defaults ^= defaultsXorMask;
 
 		if((notification.defaults & Notification.DEFAULT_LIGHTS) != 0)
 		{
 			notification.flags |= Notification.FLAG_SHOW_LIGHTS;
-			//notification.ledARGB = 0xff0000ff;
+			notification.ledARGB = 0xff0000ff;
+			notification.ledOnMS = 200;
+			notification.ledOffMS = 800;
+			notification.defaults ^= Notification.DEFAULT_LIGHTS;
 		}
 
-		NotificationManager notificationMgr = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
+		notification.ledARGB = 0xff0000ff;
+		notification.ledOnMS = 200;
+		notification.ledOffMS = 800;
+		notification.defaults ^= Notification.DEFAULT_LIGHTS;
+
+
+		if((notification.defaults & Notification.DEFAULT_SOUND) != 0)
+		{
+			final String ringtone = Settings.getString(PreferenceKeys.KEY_NOTIFICATION_SOUND);
+			if(ringtone != null)
+			{
+				notification.sound = Uri.parse(ringtone);
+				notification.defaults ^= Notification.DEFAULT_SOUND;
+			}
+		}
+
+		final NotificationManager notificationMgr = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationMgr.notify(R.id.notification, notification);
 	}
 

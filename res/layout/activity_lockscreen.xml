@@ -4,12 +4,6 @@
 	android:layout_height="match_parent"
 	android:orientation="vertical"
 >
-
-	<!-- <FrameLayout 
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		
-	>	 -->
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -34,15 +28,6 @@
 			/>		
 					
 		</LinearLayout>
-		
-		<!--  
-		<View
-			android:layout_width="match_parent"
-			android:layout_height="0dip"
-		/>
-		
-	</FrameLayout>
-	-->
 
 	<include
 		android:id="@+id/keypad"

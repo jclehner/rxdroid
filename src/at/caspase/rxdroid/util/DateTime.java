@@ -32,8 +32,8 @@ import java.util.TimeZone;
 
 import android.text.format.DateFormat;
 import android.util.SparseArray;
+import at.caspase.rxdroid.Application;
 import at.caspase.rxdroid.DumbTime;
-import at.caspase.rxdroid.GlobalContext;
 
 /**
  * Date/time utilities.
@@ -160,11 +160,11 @@ public final class DateTime
 	}
 
 	public static String toNativeDate(Date date) {
-		return DateFormat.getDateFormat(GlobalContext.get()).format(date);
+		return DateFormat.getDateFormat(Application.getContext()).format(date);
 	}
 
 	public static String toNativeTime(DumbTime time) {
-		return time.toString(DateFormat.is24HourFormat(GlobalContext.get()), false);
+		return time.toString(DateFormat.is24HourFormat(Application.getContext()), false);
 	}
 
 	public static long getOffsetFromMidnight(Calendar date)

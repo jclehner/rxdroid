@@ -21,9 +21,12 @@
 
 package at.caspase.rxdroid;
 
+import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 
 
 public class Application extends android.app.Application
@@ -32,20 +35,49 @@ public class Application extends android.app.Application
 			new WeakHashMap<Activity, Boolean>();
 
 	private static long sUnlockedTime = 0;
+	private static WeakReference<Context> sContextRef;
 
 	@Override
 	public void onCreate()
 	{
-		GlobalContext.set(getApplicationContext());
+		sContextRef = new WeakReference<Context>(getApplicationContext());
+
 		Settings.init();
 		AutoIntakeCreator.registerSelf();
 
 		super.onCreate();
 	}
 
+	/**
+	 * Calls {@link GlobalContext#get(boolean)} with <code>allowNullContext=false</code>.
+	 */
+	public static Context getContext() {
+		return getContext(false);
+	}
+
+	public static Context getContext(boolean allowNullContext)
+	{
+		final Context c = sContextRef.get();
+		if(c == null && !allowNullContext)
+			throw new IllegalStateException("Context is null");
+		return c;
+	}
+
+//	public static String getString(int resId) {
+//		return getContext().getString(resId);
+//	}
+//
+//	public static String getString(int resId, Object... args) {
+//		return getContext().getString(resId, args);
+//	}
+
+	public static void doStartActivity(Intent intent) {
+		getContext().startActivity(intent);
+	}
+
 	public static boolean isLocked()
 	{
-		final int timeoutSeconds = Settings.getInt("lockscreen_timeout", 0);
+		final int timeoutSeconds = Settings.getInt(PreferenceKeys.KEY_LOCKSCREEN_TIMEOUT, 0);
 		if(timeoutSeconds == 0)
 			return sUnlockedTime == 0;
 

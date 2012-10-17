@@ -32,7 +32,6 @@ import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
@@ -52,20 +51,18 @@ public final class Settings
 	private static final String TAG = Settings.class.getName();
 	private static final boolean LOGV = true;
 
-	private static final String KEY_LAST_MSG_HASH = "last_msg_hash";
+	//private static final String KEY_LAST_MSG_HASH = "last_msg_hash";
 	//private static final String KEY_LAST_MSG_COUNT = "_last_msg_count";
 
 	private static final String KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 
 	private static SharedPreferences sSharedPrefs = null;
-	private static Context sContext;
 
 	public static synchronized void init()
 	{
-		if(sContext == null)
+		if(sSharedPrefs == null)
 		{
-			sContext = GlobalContext.get();
-			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(GlobalContext.get());
+			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(Application.getContext());
 			sSharedPrefs.registerOnSharedPreferenceChangeListener(LISTENER);
 		}
 	}
@@ -80,6 +77,10 @@ public final class Settings
 
 	public static String getString(String key, String defValue) {
 		return sSharedPrefs.getString(key, defValue);
+	}
+
+	public static String getString(String key) {
+		return getString(key, null);
 	}
 
 	public static void putString(String key, String value) {
@@ -116,6 +117,10 @@ public final class Settings
 
 	public static int getInt(String key, int defValue) {
 		return sSharedPrefs.getInt(key, defValue);
+	}
+
+	public static int getInt(String key) {
+		return getInt(key, 0);
 	}
 
 	public static void putInt(String key, int value) {
@@ -237,10 +242,11 @@ public final class Settings
 		String value = sSharedPrefs.getString(key, null);
 		if(value == null)
 		{
-			int resId = sContext.getResources().
+			final Context context = Application.getContext();
+			int resId = context.getResources().
 				getIdentifier("at.caspase.rxdroid:string/pref_default_" + key, null, null);
 
-			if(resId == 0 || (value = sContext.getString(resId)) == null)
+			if(resId == 0 || (value = context.getString(resId)) == null)
 				throw new IllegalStateException("No default value for time preference " + key + " in strings.xml");
 
 			if(LOGV) Log.i(TAG, "Persisting preference: " + key + "=" + value);
@@ -434,17 +440,6 @@ public final class Settings
 		return retDoseTime;
 	}
 
-	public static int getLastNotificationMessageHash() {
-		return sSharedPrefs.getInt(KEY_LAST_MSG_HASH, 0);
-	}
-
-	public static void setLastNotificationMessageHash(int messageHash)
-	{
-		Editor editor = sSharedPrefs.edit();
-		editor.putInt(KEY_LAST_MSG_HASH, messageHash);
-		editor.commit();
-	}
-
 	/*public int getLastNotificationCount() {
 		return sSharedPrefs.getInt(KEY_LAST_MSG_COUNT, 0);
 	}
@@ -618,16 +613,18 @@ public final class Settings
 		@Override
 		public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
 		{
-			if(Theme.KEY.equals(key))
+			if(PreferenceKeys.KEY_THEME_IS_DARK.equals(key))
 			{
 				Theme.clearAttributeCache();
 
-				Toast.makeText(sContext, R.string._toast_theme_changed, Toast.LENGTH_LONG).show();
+				final Context context = Application.getContext();
 
-				final PackageManager pm = sContext.getPackageManager();
-				final Intent intent = pm.getLaunchIntentForPackage(sContext.getPackageName());
+				Toast.makeText(context, R.string._toast_theme_changed, Toast.LENGTH_LONG).show();
+
+				final PackageManager pm = context.getPackageManager();
+				final Intent intent = pm.getLaunchIntentForPackage(context.getPackageName());
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-				GlobalContext.startActivity(intent);
+				Application.doStartActivity(intent);
 			}
 		}
 	};

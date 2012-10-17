@@ -35,8 +35,7 @@
     
     <string name="pref_default_alarm_timeout" translatable="false">00:30</string>
     <string name="pref_default_theme_is_dark" translatable="false">true</string> 
-    
-    
+       
     <!-- 
     Translatable strings start here. The naming scheme is as follows:
     

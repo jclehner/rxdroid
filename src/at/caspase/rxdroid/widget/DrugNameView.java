@@ -25,6 +25,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
+import at.caspase.rxdroid.PreferenceKeys;
 import at.caspase.rxdroid.Settings;
 import at.caspase.rxdroid.db.Drug;
 
@@ -58,7 +59,7 @@ public class DrugNameView extends TextView
 	{
 		mDrug = drug;
 		setName(drug.getName());
-		setScrambled(Settings.getBoolean("privacy_scramble_names", false));
+		setScrambled(Settings.getBoolean(PreferenceKeys.KEY_SCRAMBLE_NAMES, false));
 	}
 
 	public void setScrambled(boolean scrambled)

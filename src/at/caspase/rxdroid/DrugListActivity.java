@@ -358,7 +358,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences preferences, String key)
 	{
-		if(Theme.KEY.equals(key))
+		if(PreferenceKeys.KEY_THEME_IS_DARK.equals(key))
 			finish(); // TODO fix this naughty hack
 		else if(mIsShowing)
 			setDate(mDate, PAGER_INIT);
@@ -373,7 +373,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			return new ViewStub(this);
 		}
 
-		Log.d(TAG, "makeView: offset=" + offset);
+		if(LOGV) Log.d(TAG, "makeView: offset=" + offset);
 
 		if(offset == 1)
 			setProgressBarIndeterminateVisibility(false);
@@ -443,6 +443,11 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	public void onLowSupplyIndicatorClicked(View view) {
 		Toast.makeText(this, R.string._toast_low_supplies, Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		setIntent(intent);
 	}
 
 	private static final int PAGER_SCROLL = 1;
@@ -571,7 +576,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		//final boolean mShowDoseless = mSharedPreferences.getBoolean("show_doseless", false);
 		//final boolean mShowInactive = mSharedPreferences.getBoolean("show_inactive", false);
 
-		final boolean mShowSupplyMonitors = Settings.getBoolean("show_supply_monitors", false);
+		final boolean mShowSupplyMonitors = Settings.getBoolean(PreferenceKeys.KEY_SHOW_SUPPLY_MONITORS, false);
 
 		private Date mFilterDate;
 

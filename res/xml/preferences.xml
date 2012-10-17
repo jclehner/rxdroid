@@ -89,13 +89,13 @@
 		android:icon="@drawable/android:ic_menu_view"
 	>
 	     
-		<CheckBoxPreference android:key="theme_is_dark" 
+		<CheckBoxPreference android:key="@string/key_theme_is_dark" 
 			android:title="@string/_title_dark_theme"
 			android:defaultValue="@string/pref_default_theme_is_dark"
 		/>
 		
 	     
-	    <CheckBoxPreference android:key="privacy_scramble_names"
+	    <CheckBoxPreference android:key="@string/key_scramble_names"
 		    android:title="@string/_title_scramble_names"
 		    android:summary="@string/_summary_scramble_names"
 		    android:defaultValue="false"
@@ -105,7 +105,7 @@
 	    	android:title="@string/_title_show_in_list" 
 	    >
 	    
-	        <CheckBoxPreference android:key="show_supply_monitors"
+	        <CheckBoxPreference android:key="@string/key_show_supply_monitors"
 	            android:title="@string/_title_show_supply_monitors"
 	            android:summary="@string/_summary_show_supply_monitors"
 	            android:defaultValue="false"
@@ -177,7 +177,7 @@
 		
 		-->
 		
-		<EditTextPreference android:key="num_min_supply_days"
+		<EditTextPreference android:key="@string/key_low_supply_threshold"
 			android:title="@string/_title_min_supply_days"
 			android:summary="@string/_summary_min_supply_days"
 			
@@ -189,21 +189,30 @@
 		<PreferenceCategory 
 			android:title="@string/_title_pref_notification_methods">
 		
-			<CheckBoxPreference android:key="use_led"
+			<CheckBoxPreference android:key="@string/key_use_led"
 				android:title="@string/_title_pref_use_led"
 				android:defaultValue="true" 
 			/>
 				
-			<CheckBoxPreference android:key="use_vibrator"
+			<CheckBoxPreference android:key="@string/key_use_vibrator"
 				android:title="@string/_title_pref_use_vibrator"
 				android:defaultValue="true" 
 			/>		
 				
-			<CheckBoxPreference android:key="use_sound"
+			<CheckBoxPreference android:key="@string/key_use_sound"
 				android:title="@string/_title_pref_use_sound"
 				android:defaultValue="true" 
 			/>
-		
+			
+			
+			<RingtonePreference android:key="@string/key_notification_sound"
+			    android:title="@string/_title_notification_sound"
+			    android:ringtoneType="notification"
+			    android:showDefault="true"
+			    android:showSilent="false"
+			    android:dependency="@string/key_use_sound"
+			/>			    
+			    		
 		</PreferenceCategory>
 	</PreferenceScreen>
 		
@@ -212,7 +221,7 @@
 		android:icon="@android:drawable/ic_menu_save"	
 	>
 		
-		<ListPreference android:key="db_max_history_age"
+		<ListPreference android:key="@string/key_history_size"
 			android:title="@string/_title_history_age"
 			android:summary="@string/_summary_history_age"
 			android:entries="@array/history_size"
@@ -268,12 +277,12 @@
 		android:title="@string/_title_about"		
 	>
 	
-		<Preference android:key="version"
+		<Preference android:key="@string/key_version"
 			android:title="@string/_title_version"
 			android:icon="@null"
 		/>
 		
-		<Preference android:key="licenses"
+		<Preference android:key="@string/key_licenses"
 			android:title="@string/_title_licenses"
 			android:icon="@null"
 		/>
