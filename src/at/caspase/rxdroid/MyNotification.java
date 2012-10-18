@@ -232,13 +232,13 @@ public class MyNotification
 
 		//int lastHash = Settings.getLastNotificationMessageHash();
 
-		final int lastHash = Settings.getInt(PreferenceKeys.KEY_LAST_MSG_HASH);
+		final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
 		final int thisHash = message.hashCode();
 
 		if(lastHash != thisHash)
 		{
 			notification.flags ^= Notification.FLAG_ONLY_ALERT_ONCE;
-			Settings.putInt(PreferenceKeys.KEY_LAST_MSG_HASH, thisHash);
+			Settings.putInt(Settings.Keys.LAST_MSG_HASH, thisHash);
 		}
 
 		final int defaultsXorMask = Settings.getNotificationDefaultsXorMask();
@@ -262,7 +262,7 @@ public class MyNotification
 
 		if((notification.defaults & Notification.DEFAULT_SOUND) != 0)
 		{
-			final String ringtone = Settings.getString(PreferenceKeys.KEY_NOTIFICATION_SOUND);
+			final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
 			if(ringtone != null)
 			{
 				notification.sound = Uri.parse(ringtone);

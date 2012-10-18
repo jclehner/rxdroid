@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string translatable="false" name="key_use_led">use_led</string>
+	<string translatable="false" name="key_use_sound">use_sound</string>
+	<string translatable="false" name="key_use_vibrator">use_vibrator</string>
+	<string translatable="false" name="key_lockscreen_timeout">lockscreen_timeout</string>
+	<string translatable="false" name="key_scramble_names">scramble_names</string>
+	<string translatable="false" name="key_pin">pin</string>
+	<string translatable="false" name="key_low_supply_threshold">low_supply_threshold</string>
+	<string translatable="false" name="key_alarm_mode">alarm_mode</string>
+	<string translatable="false" name="key_show_supply_monitors">show_supply_monitors</string>
+	<string translatable="false" name="key_last_msg_hash">last_msg_hash</string>
+	<string translatable="false" name="key_version">version</string>
+	<string translatable="false" name="key_licenses">licenses</string>
+	<string translatable="false" name="key_history_size">history_size</string>
+	<string translatable="false" name="key_theme_is_dark">theme_is_dark</string>
+	<string translatable="false" name="key_notification_sound">notification_sound</string>
+	<string translatable="false" name="key_use_extended_notifications">use_extended_notifications</string>
+</resources>

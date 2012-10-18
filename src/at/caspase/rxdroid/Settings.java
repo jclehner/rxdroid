@@ -48,11 +48,27 @@ import at.caspase.rxdroid.util.WrappedCheckedException;
 
 public final class Settings
 {
-	private static final String TAG = Settings.class.getName();
-	private static final boolean LOGV = true;
+	public static class Keys
+	{
+		public static final String USE_LED = key(R.string.key_use_led);
+		public static final String USE_SOUND = key(R.string.key_use_sound);
+		public static final String USE_VIBRATOR = key(R.string.key_use_vibrator);
+		public static final String LOCKSCREEN_TIMEOUT = key(R.string.key_lockscreen_timeout);
+		public static final String SCRAMBLE_NAMES = key(R.string.key_scramble_names);
+		public static final String PIN = key(R.string.key_pin);
+		public static final String LOW_SUPPLY_THRESHOLD = key(R.string.key_low_supply_threshold);
+		public static final String ALARM_MODE = key(R.string.key_alarm_mode);
+		public static final String SHOW_SUPPLY_MONITORS = key(R.string.key_show_supply_monitors);
+		public static final String LAST_MSG_HASH = key(R.string.key_last_msg_hash);
+		public static final String VERSION = key(R.string.key_version);
+		public static final String LICENSES = key(R.string.key_licenses);
+		public static final String HISTORY_SIZE = key(R.string.key_history_size);
+		public static final String THEME_IS_DARK = key(R.string.key_theme_is_dark);
+		public static final String NOTIFICATION_SOUND = key(R.string.key_notification_sound);
+	}
 
-	//private static final String KEY_LAST_MSG_HASH = "last_msg_hash";
-	//private static final String KEY_LAST_MSG_COUNT = "_last_msg_count";
+	private static final String TAG = Settings.class.getName();
+	private static final boolean LOGV = false;
 
 	private static final String KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 
@@ -505,6 +521,10 @@ public final class Settings
 		return name;
 	}
 
+	private static String key(int resId) {
+		return Application.getContext().getString(resId);
+	}
+
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;
 	private static final int FLAG_DONT_CORRECT_TIME = 2;
 
@@ -613,7 +633,7 @@ public final class Settings
 		@Override
 		public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
 		{
-			if(PreferenceKeys.KEY_THEME_IS_DARK.equals(key))
+			if(Settings.Keys.THEME_IS_DARK.equals(key))
 			{
 				Theme.clearAttributeCache();
 

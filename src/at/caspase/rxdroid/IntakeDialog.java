@@ -46,7 +46,7 @@ import at.caspase.rxdroid.db.Intake;
 public class IntakeDialog extends AlertDialog implements OnChangedListener, Database.OnChangeListener
 {
 	private static final String TAG = IntakeDialog.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private Drug mDrug;
 	private int mDoseTime;

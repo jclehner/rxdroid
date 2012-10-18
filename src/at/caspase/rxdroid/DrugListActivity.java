@@ -358,7 +358,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences preferences, String key)
 	{
-		if(PreferenceKeys.KEY_THEME_IS_DARK.equals(key))
+		if(Settings.Keys.THEME_IS_DARK.equals(key))
 			finish(); // TODO fix this naughty hack
 		else if(mIsShowing)
 			setDate(mDate, PAGER_INIT);
@@ -576,7 +576,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		//final boolean mShowDoseless = mSharedPreferences.getBoolean("show_doseless", false);
 		//final boolean mShowInactive = mSharedPreferences.getBoolean("show_inactive", false);
 
-		final boolean mShowSupplyMonitors = Settings.getBoolean(PreferenceKeys.KEY_SHOW_SUPPLY_MONITORS, false);
+		final boolean mShowSupplyMonitors = Settings.getBoolean(Settings.Keys.SHOW_SUPPLY_MONITORS, false);
 
 		private Date mFilterDate;
 

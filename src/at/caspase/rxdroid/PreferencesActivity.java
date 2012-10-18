@@ -80,7 +80,7 @@ public class PreferencesActivity extends PreferenceActivity implements
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		addPreferencesFromResource(R.xml.preferences);
 
-		Preference p = findPreference(PreferenceKeys.KEY_VERSION);
+		Preference p = findPreference(Settings.Keys.VERSION);
 		if(p != null)
 		{
 			String summary = Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION;
@@ -98,20 +98,20 @@ public class PreferencesActivity extends PreferenceActivity implements
 			p.setSummary(summary);
 		}
 
-		p = findPreference(PreferenceKeys.KEY_HISTORY_SIZE);
+		p = findPreference(Settings.Keys.HISTORY_SIZE);
 		if(p != null)
 			Util.populateListPreferenceEntryValues(p);
 
-		p = findPreference(PreferenceKeys.KEY_LICENSES);
+		p = findPreference(Settings.Keys.LICENSES);
 		if(p != null)
 			p.setOnPreferenceClickListener(this);
 
-		p = findPreference(PreferenceKeys.KEY_NOTIFICATION_SOUND);
+		p = findPreference(Settings.Keys.NOTIFICATION_SOUND);
 		if(p != null)
 		{
 			p.setOnPreferenceChangeListener(this);
 
-			final String key = PreferenceKeys.KEY_NOTIFICATION_SOUND;
+			final String key = Settings.Keys.NOTIFICATION_SOUND;
 			final String defValue = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString();
 			onPreferenceChange(p, Settings.getString(key, defValue));
 		}
@@ -199,11 +199,11 @@ public class PreferencesActivity extends PreferenceActivity implements
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
 	{
-		if(PreferenceKeys.KEY_LOW_SUPPLY_THRESHOLD.equals(key))
+		if(Settings.Keys.LOW_SUPPLY_THRESHOLD.equals(key))
 			updateLowSupplyThresholdPreferenceSummary();
-		else if(PreferenceKeys.KEY_HISTORY_SIZE.equals(key))
+		else if(Settings.Keys.HISTORY_SIZE.equals(key))
 		{
-			if("4".equals(Settings.getString(PreferenceKeys.KEY_HISTORY_SIZE, null)))
+			if("4".equals(Settings.getString(Settings.Keys.HISTORY_SIZE, null)))
 				Toast.makeText(getApplicationContext(), R.string._toast_unlimited_history_size, Toast.LENGTH_LONG).show();
 		}
 
@@ -213,7 +213,7 @@ public class PreferencesActivity extends PreferenceActivity implements
 	@Override
 	public boolean onPreferenceClick(Preference preference)
 	{
-		if(PreferenceKeys.KEY_LICENSES.equals(preference.getKey()))
+		if(Settings.Keys.LICENSES.equals(preference.getKey()))
 		{
 			String license;
 			InputStream is = null;
@@ -254,7 +254,7 @@ public class PreferencesActivity extends PreferenceActivity implements
 	{
 		final String key = preference.getKey();
 
-		if(PreferenceKeys.KEY_NOTIFICATION_SOUND.equals(key))
+		if(Settings.Keys.NOTIFICATION_SOUND.equals(key))
 		{
 			final Uri uri = Uri.parse((String) newValue);
 			final Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
@@ -269,10 +269,10 @@ public class PreferencesActivity extends PreferenceActivity implements
 
 	private void updateLowSupplyThresholdPreferenceSummary()
 	{
-		Preference p = findPreference(PreferenceKeys.KEY_LOW_SUPPLY_THRESHOLD);
+		Preference p = findPreference(Settings.Keys.LOW_SUPPLY_THRESHOLD);
 		if(p != null)
 		{
-			String value = mSharedPreferences.getString(PreferenceKeys.KEY_LOW_SUPPLY_THRESHOLD, "10");
+			String value = mSharedPreferences.getString(Settings.Keys.LOW_SUPPLY_THRESHOLD, "10");
 			p.setSummary(getString(R.string._summary_min_supply_days, value));
 		}
 	}

@@ -59,7 +59,7 @@ public class DrugNameView extends TextView
 	{
 		mDrug = drug;
 		setName(drug.getName());
-		setScrambled(Settings.getBoolean(PreferenceKeys.KEY_SCRAMBLE_NAMES, false));
+		setScrambled(Settings.getBoolean(Settings.Keys.SCRAMBLE_NAMES, false));
 	}
 
 	public void setScrambled(boolean scrambled)

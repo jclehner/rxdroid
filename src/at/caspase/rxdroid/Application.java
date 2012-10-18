@@ -77,7 +77,7 @@ public class Application extends android.app.Application
 
 	public static boolean isLocked()
 	{
-		final int timeoutSeconds = Settings.getInt(PreferenceKeys.KEY_LOCKSCREEN_TIMEOUT, 0);
+		final int timeoutSeconds = Settings.getInt(Settings.Keys.LOCKSCREEN_TIMEOUT, 0);
 		if(timeoutSeconds == 0)
 			return sUnlockedTime == 0;
 
