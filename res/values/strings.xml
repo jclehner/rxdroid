@@ -190,7 +190,7 @@
 	
 	<string name="_msg_db_loading">Loading database, please stand by.</string>
 	<string name="_msg_footer_insufficient_supplies">Insufficient supplies for this dose. 
-		Press %2$s to ignore, or touch this text to edit %3$s.</string>
+		Press %2$s to ignore, cancel to edit the dose, or touch this text to edit %3$s.</string>
 		
 	<string name="_title_weekdays">Weekdays</string>
 	

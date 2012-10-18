@@ -162,6 +162,12 @@
             fixed
         </comment>
     </note>
+    <note priority="veryhigh" time="1349737922" done="1350583464">
+        Always show a drug if it's active and has a recorded intake event
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1316529642" done="1318944915">
         Implement DoseView long click behaviour: remove intake, mark as taken, change dose, edit drug
         <comment>
@@ -252,6 +258,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1335393421" done="1350583479">
+        Remove PopupWindow in IntakeDialog. Move message to area of FractionInput?
+        <comment>
+            fixed
+        </comment>
+    </note>
     <note priority="high" time="1335393523" done="1349281575">
         Add some Dialog titles in DrugEditActivity
         <comment>
@@ -274,6 +286,12 @@
         Move functions accessing other Entry types to Entries.java
         <comment>
             done
+        </comment>
+    </note>
+    <note priority="high" time="1348963921" done="1350583487">
+        Add option to change notification sound
+        <comment>
+            fixed
         </comment>
     </note>
     <note priority="high" time="1348964002" done="1349281586">
@@ -480,9 +498,6 @@
     <note priority="veryhigh" time="1349641509">
         Use Activity.showDialog() or newer DialogFragment approach
     </note>
-    <note priority="veryhigh" time="1349737922">
-        Always show a drug if it's active and has a recorded intake event
-    </note>
     <note priority="high" time="1324308938">
         Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?
     </note>
@@ -492,17 +507,11 @@
     <note priority="high" time="1335391425">
         Support per doseTime listing in DrugListActivity
     </note>
-    <note priority="high" time="1335393421">
-        Remove PopupWindow in IntakeDialog. Move message to area of FractionInput?
-    </note>
     <note priority="high" time="1342730192">
         Move tests to separate test project
     </note>
     <note priority="high" time="1343595716">
         Don't play notification sound if UI is visible
-    </note>
-    <note priority="high" time="1348963921">
-        Add option to change notification sound
     </note>
     <note priority="high" time="1349866067">
         Cache results of findIntakes and countIntakes ?
@@ -518,6 +527,9 @@
     </note>
     <note priority="medium" time="1328223980">
         Add PIN protection
+    </note>
+    <note priority="medium" time="1350583452">
+        Use extended notifications for &gt;= JB + add preference for disabling
     </note>
     <note priority="low" time="1317226248">
         For Version, don't get the revision from strings.xml, as this requires faking a change in the file to update the revision tag.
@@ -543,8 +555,11 @@
     <note priority="verylow" time="1316548662">
         Consider keeping intake entries only for a certain number of days, before removing them from the DB. The user should be able to choose this history size, within reasonable bounds.
     </note>
-    <note priority="verylow" time="1316614566">
+    <note priority="verylow" time="1316614566" done="1350583500">
         Make it possible to navigate DrugListActivity using the trackball
+        <comment>
+            abandoned
+        </comment>
     </note>
     <note priority="verylow" time="1336603009">
         Consolidate Intake entries for most operations
