@@ -489,6 +489,12 @@
             done
         </comment>
     </note>
+    <note priority="verylow" time="1316614566" done="1350583500">
+        Make it possible to navigate DrugListActivity using the trackball
+        <comment>
+            abandoned
+        </comment>
+    </note>
     <note priority="veryhigh" time="1332514693">
         consider name change - rxdroid is already taken!
     </note>
@@ -549,17 +555,17 @@
     <note priority="low" time="1326753387">
         Move icon selection in DrugEditActivity to DrugNamePreference itself?
     </note>
+    <note priority="low" time="1350583720">
+        Implement multiple stashes?
+    </note>
+    <note priority="low" time="1350583779">
+        Allow multiple drug entries with the same name, as long as their dose definitions don't intersect. Use a shared supply pool and also share intake entries.
+    </note>
     <note priority="verylow" time="1316529783">
         Add icons for all drug forms.
     </note>
     <note priority="verylow" time="1316548662">
         Consider keeping intake entries only for a certain number of days, before removing them from the DB. The user should be able to choose this history size, within reasonable bounds.
-    </note>
-    <note priority="verylow" time="1316614566" done="1350583500">
-        Make it possible to navigate DrugListActivity using the trackball
-        <comment>
-            abandoned
-        </comment>
     </note>
     <note priority="verylow" time="1336603009">
         Consolidate Intake entries for most operations
