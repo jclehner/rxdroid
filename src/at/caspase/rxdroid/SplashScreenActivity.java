@@ -22,6 +22,8 @@
 package at.caspase.rxdroid;
 
 import java.io.File;
+
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,22 +33,38 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.widget.Toast;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
+import at.caspase.rxdroid.util.DateTime;
+import at.caspase.rxdroid.util.Util;
 import at.caspase.rxdroid.util.WrappedCheckedException;
 
 public class SplashScreenActivity extends Activity implements OnClickListener
 {
 	private static final String TAG = SplashScreenActivity.class.getName();
 
+	@TargetApi(11)
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		setTheme(Theme.get());
 		setContentView(R.layout.loader);
+
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+		{
+			final SpannableString dateString = new SpannableString(DateTime.toNativeDate(DateTime.today()));
+
+			Util.applyStyle(dateString, new RelativeSizeSpan(0.75f));
+			Util.applyStyle(dateString, new UnderlineSpan());
+
+			getActionBar().setSubtitle(dateString);
+		}
 
 		super.onCreate(savedInstanceState);
 

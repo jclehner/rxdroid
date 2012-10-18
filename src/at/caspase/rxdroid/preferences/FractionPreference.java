@@ -58,12 +58,12 @@ public class FractionPreference extends MyDialogPreference<Fraction> implements 
 	}
 
 	public FractionPreference(Context context, AttributeSet attrs) {
-		this(context, attrs, android.R.attr.dialogPreferenceStyle);
+		this(context, attrs, android.R.attr.preferenceStyle);
 	}
 
 	public FractionPreference(Context context, AttributeSet attrs, int defStyle)
 	{
-		super(context, attrs, defStyle);
+		super(context, attrs, android.R.attr.preferenceStyle);
 		mDialogValue = getValue();
 	}
 

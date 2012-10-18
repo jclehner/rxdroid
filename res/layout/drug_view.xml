@@ -37,8 +37,8 @@
 	<!-- first line: icon + name -->
 	
 	<ImageView android:id="@+id/drug_icon"
-		android:layout_width="30dp"
-		android:layout_height="30dp"
+		android:layout_width="30sp"
+		android:layout_height="30sp"
 		
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentTop="true"

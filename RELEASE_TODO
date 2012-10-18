@@ -1,0 +1,7 @@
+* Lockscreen
+* History size
+* Icons
+* Notification sound preference
+* Trackball navigation
+* Fix Activity dialogs (use showDialog()!)
+* Remove PopupWindow in IntakeDialog

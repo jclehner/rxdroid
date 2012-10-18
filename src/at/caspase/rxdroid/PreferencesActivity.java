@@ -41,7 +41,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.RingtonePreference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
@@ -259,7 +258,8 @@ public class PreferencesActivity extends PreferenceActivity implements
 			final Uri uri = Uri.parse((String) newValue);
 			final Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
 
-			preference.setSummary(ringtone.getTitle(this));
+			if(ringtone != null)
+				preference.setSummary(ringtone.getTitle(this));
 		}
 
 		return true;

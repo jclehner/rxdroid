@@ -25,8 +25,9 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:rxdroid="http://schemas.android.com/apk/res/at.caspase.rxdroid"
 >
-	<style name="NoBackground">
-		<item name="android:background">@null</item>
+	<style name="DefaultTheme" parent="@style/DarkTheme" />
+	<style name="DefaultTheme.NoAnimation" parent="@style/DefaultTheme">
+		<item name="android:windowAnimationStyle">@null</item>		
 	</style>
 	
 	<style name="LightTheme" parent="@style/_ApiSpecificLightTheme">

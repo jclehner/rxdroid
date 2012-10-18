@@ -23,6 +23,8 @@
 -->
 
 <resources>	
+	<style name="DefaultTheme" parent="@style/LightTheme" />
+	
 	<style name="_ApiSpecificLightTheme" parent="@android:style/Theme.Holo.Light" />
 	<style name="_ApiSpecificDarkTheme" parent="@android:style/Theme.Holo" />	
 </resources>

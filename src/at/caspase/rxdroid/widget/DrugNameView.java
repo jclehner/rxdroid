@@ -25,7 +25,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
-import at.caspase.rxdroid.PreferenceKeys;
 import at.caspase.rxdroid.Settings;
 import at.caspase.rxdroid.db.Drug;
 

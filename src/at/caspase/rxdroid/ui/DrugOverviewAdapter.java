@@ -28,7 +28,6 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
@@ -47,7 +46,7 @@ import at.caspase.rxdroid.widget.DrugNameView;
 public class DrugOverviewAdapter extends AbsDrugAdapter
 {
 	private static final String TAG = DrugOverviewAdapter.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private final Timer mTimer;
 
@@ -89,17 +88,6 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			final int[] dividerIds = { R.id.divider1, R.id.divider2, R.id.divider3 /*, R.id.divider4*/ };
 			for(int i = 0; i != holder.dividers.length; ++i)
 				holder.dividers[i] = v.findViewById(dividerIds[i]);
-
-			v.findViewById(R.id.dose_container).setOnFocusChangeListener(new OnFocusChangeListener() {
-
-				@Override
-				public void onFocusChange(View v, boolean hasFocus)
-				{
-					Log.d(TAG, "$.onFocusChange: hasFocus=" + hasFocus);
-					if(hasFocus)
-						holder.doseViews[0].requestFocus();
-				}
-			});
 
 			v.setTag(holder);
 		}

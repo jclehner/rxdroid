@@ -29,7 +29,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -48,6 +47,10 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	private static final String TAG = IntakeDialog.class.getName();
 	private static final boolean LOGV = false;
 
+	private static final int STATE_DOSE_DISPLAY = 0;
+	private static final int STATE_DOSE_EDIT = 1;
+	private static final int STATE_INSUFFICIENT_SUPPLIES = 2;
+
 	private Drug mDrug;
 	private int mDoseTime;
 	private Date mDate;
@@ -60,14 +63,18 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	private TextView mDoseText;
 	private TextView mHintText;
 	private FractionInput mDoseEdit;
+	private TextView mInsufficientSupplyText;
 
 	private PopupWindow mPopup;
+
+	private int mState;
+	private int mLastState = -1;
 
 	private OnShowListener mOnShowListener;
 
 	public static final int FLAG_ALLOW_DOSE_EDIT = 1;
 
-	public IntakeDialog(Context context, Drug drug, int doseTime, Date date)
+	public IntakeDialog(final Context context, Drug drug, int doseTime, Date date)
 	{
 		super(context);
 
@@ -91,19 +98,32 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 			@Override
 			public void onClick(View v)
 			{
-				setEditable(true);
+				setState(STATE_DOSE_EDIT);
 			}
 		});
 
 		mDoseText = (TextView) view.findViewById(R.id.dose_text);
 		mHintText = (TextView) view.findViewById(R.id.dose_hint);
 		mDoseEdit = (FractionInput) view.findViewById(R.id.dose_edit);
+		mInsufficientSupplyText = (TextView) view.findViewById(R.id.text_insufficient_supplies);
 
 		mDoseText.setText(mDose.toString());
-
 		mDoseEdit.setValue(mDose);
 		mDoseEdit.setAutoInputModeEnabled(true);
 		mDoseEdit.setOnChangeListener(this);
+		mInsufficientSupplyText.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v)
+			{
+				final Intent intent = new Intent(context, DrugEditActivity.class);
+				intent.setAction(Intent.ACTION_EDIT);
+				intent.putExtra(DrugEditActivity.EXTRA_DRUG, mDrug);
+				intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
+
+				context.startActivity(intent);
+			}
+		});
 
 		//setTitle(mDrug.getName());
 		setView(view);
@@ -118,16 +138,6 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		Database.registerEventListener(this);
 	}
 
-	public void setEditable(boolean editable)
-	{
-		int editVisibility = editable ? View.VISIBLE : View.INVISIBLE;
-		int textVisibility = editable ? View.INVISIBLE : View.VISIBLE;
-
-		mDoseText.setVisibility(textVisibility);
-		mHintText.setVisibility(textVisibility);
-		mDoseEdit.setVisibility(editVisibility);
-	}
-
 	@Override
 	public void setOnShowListener(android.content.DialogInterface.OnShowListener listener) {
 		mOnShowListener = listener;
@@ -136,7 +146,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	@Override
 	protected void onStop()
 	{
-		dismissPopup();
+		//dismissPopup();
 		Database.unregisterEventListener(this);
 	}
 
@@ -156,7 +166,8 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 			mDrug = (Drug) entry;
 
 			if(!hasInsufficientSupplies())
-				dismissPopup();
+				setState(STATE_DOSE_DISPLAY);
+//				dismissPopup();
 		}
 	}
 
@@ -168,8 +179,8 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	{
 		if(entry instanceof Drug && entry.getId() == mDrug.getId())
 		{
-			if(mPopup != null)
-				dismissPopup();
+//			if(mPopup != null)
+//				dismissPopup();
 
 			if(isShowing())
 				dismiss();
@@ -179,10 +190,15 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	@Override
 	public void onBackPressed()
 	{
-		if(!isPopupShowing())
-			super.onBackPressed();
+//		if(!isPopupShowing())
+//			super.onBackPressed();
+//		else
+//			dismissPopup();
+
+		if(mState == STATE_INSUFFICIENT_SUPPLIES)
+			setState(STATE_DOSE_EDIT);
 		else
-			dismissPopup();
+			super.onBackPressed();
 	}
 
 	private boolean hasInsufficientSupplies()
@@ -194,22 +210,22 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		return supplies.compareTo(mDose) == -1;
 	}
 
-	private void showPopup()
-	{
-		if(mPopup == null)
-			setupPopupWindow();
-		mPopup.showAtLocation(mDoseEdit, Gravity.CENTER, 0, 0);
-	}
-
-	private boolean isPopupShowing() {
-		return mPopup == null ? false : mPopup.isShowing();
-	}
-
-	private void dismissPopup()
-	{
-		if(mPopup != null)
-			mPopup.dismiss();
-	}
+//	private void showPopup()
+//	{
+//		if(mPopup == null)
+//			setupPopupWindow();
+//		mPopup.showAtLocation(mDoseEdit, Gravity.CENTER, 0, 0);
+//	}
+//
+//	private boolean isPopupShowing() {
+//		return mPopup == null ? false : mPopup.isShowing();
+//	}
+//
+//	private void dismissPopup()
+//	{
+//		if(mPopup != null)
+//			mPopup.dismiss();
+//	}
 
 	private void setupPopupWindow()
 	{
@@ -273,7 +289,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	{
 		boolean doseIsZero = mDose.isZero();
 
-		setEditable(doseIsZero);
+		setState(doseIsZero ? STATE_DOSE_EDIT : STATE_DOSE_DISPLAY);
 
 		getButton(BUTTON_POSITIVE).setText(getString(android.R.string.ok));
 		getButton(BUTTON_NEGATIVE).setText(getString(android.R.string.cancel));
@@ -303,6 +319,53 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		}
 	}
 
+	private void setState(int state)
+	{
+		if(mState == state)
+			return;
+
+		mLastState = mState;
+		mState = state;
+
+		// these could be booleans checking for state == STATE_<FOOBAR>, but
+		// we might need views that are visibile in more than one state.
+		int doseTextVisibility = View.INVISIBLE;
+		int doseEditVisibility = View.INVISIBLE;
+		@SuppressWarnings("unused")
+		int insufficientSupplyTextVisibility = View.INVISIBLE;
+
+		switch(mState)
+		{
+			case STATE_DOSE_DISPLAY:
+				doseTextVisibility = View.VISIBLE;
+				break;
+
+			case STATE_DOSE_EDIT:
+				doseEditVisibility = View.VISIBLE;
+				break;
+
+			case STATE_INSUFFICIENT_SUPPLIES:
+				insufficientSupplyTextVisibility = View.VISIBLE;
+				break;
+		}
+
+		mDoseText.setVisibility(doseTextVisibility);
+		mHintText.setVisibility(doseTextVisibility);
+
+		mDoseEdit.setVisibility(doseEditVisibility);
+		mInsufficientSupplyText.setVisibility(insufficientSupplyTextVisibility);
+
+		if(state == STATE_INSUFFICIENT_SUPPLIES)
+		{
+			final Context context = getContext();
+			final String okStr = context.getString(android.R.string.ok);
+			final String text = context.getString(R.string._msg_footer_insufficient_supplies,
+					mDrug.getCurrentSupply(), okStr, mDrug.getName());
+
+			mInsufficientSupplyText.setText(text);
+		}
+	}
+
 	private String getString(int resId) {
 		return getContext().getString(resId);
 	}
@@ -329,8 +392,8 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		{
 			if(which == BUTTON_POSITIVE)
 			{
-				if(hasInsufficientSupplies() && !isPopupShowing())
-					showPopup();
+				if(hasInsufficientSupplies() && mState != STATE_INSUFFICIENT_SUPPLIES)
+					setState(STATE_INSUFFICIENT_SUPPLIES);
 				else
 					addIntakeAndDismiss();
 			}

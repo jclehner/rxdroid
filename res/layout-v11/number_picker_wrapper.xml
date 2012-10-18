@@ -26,8 +26,8 @@
 	
 	<include layout="@layout/focus_grabber" />
 		
-	<android.widget.NumberPicker android:id="@+id/picker" 
-			android:layout_width="wrap_content"
+	<NumberPicker android:id="@+id/picker" 
+			android:layout_width="50sp"
 			android:layout_height="wrap_content"
 	/>	
 	

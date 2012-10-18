@@ -31,7 +31,9 @@ import java.util.Scanner;
 import android.content.Context;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.text.Spannable;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +64,18 @@ public final class Util
 			else
 				Log.w(TAG, "detachFromParent: parent is not a ViewGroup");
 		}
+	}
+
+	public static void applyStyle(Spannable spannable, Object style) {
+		spannable.setSpan(style, 0, spannable.length(), 0);
+	}
+
+	public static int pixelsFromSips(int sips) {
+		return Math.round(sips * getDisplayMetrics().scaledDensity);
+	}
+
+	public static int pixelsFromDips(int dips) {
+		return Math.round(dips * getDisplayMetrics().density);
 	}
 
 	public static int getDoseTimeDrawableFromDoseViewId(int doseViewId)
@@ -368,5 +382,9 @@ public final class Util
 		{
 			// ignore
 		}
+	}
+
+	private static DisplayMetrics getDisplayMetrics() {
+		return Application.getContext().getResources().getDisplayMetrics();
 	}
 }

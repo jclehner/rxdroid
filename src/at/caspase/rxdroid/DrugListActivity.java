@@ -375,9 +375,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		if(LOGV) Log.d(TAG, "makeView: offset=" + offset);
 
-		if(offset == 1)
-			setProgressBarIndeterminateVisibility(false);
-
 		final View v = getLayoutInflater().inflate(R.layout.drug_list_fragment, null);
 		final ListView listView = (ListView) v.findViewById(android.R.id.list);
 		final TextView emptyView = (TextView) v.findViewById(android.R.id.empty);
@@ -388,6 +385,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			cal.add(Calendar.DAY_OF_MONTH, offset);
 		else
 			cal.add(Calendar.DAY_OF_MONTH, mSwipeDirection < 0 ? -1 : 1);
+
+		if(LOGV) Log.v(TAG, "  cal=" + DateTime.toString(cal));
 
 		final List<Drug> drugs = Database.getAll(Drug.class);
 		Collections.sort(drugs);
@@ -565,7 +564,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			ActionBar ab = getActionBar();
 			dateString.setSpan(new RelativeSizeSpan(0.75f), 0, dateString.length(), 0);
 			ab.setSubtitle(dateString);
-
 		}
 		else
 			mTextDate.setText(dateString);
@@ -649,21 +647,22 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 			mPage = page;
 
-			final int swipeDirection;
+			//final int swipeDirection;
 
 			if(mLastPage == -1)
 			{
 				mLastPage = InfiniteViewPagerAdapter.CENTER;
-				swipeDirection = 0;
+				mSwipeDirection = 0;
 			}
 			else
-				swipeDirection = mPage - mLastPage;
+				mSwipeDirection = mPage - mLastPage;
 
-			if(LOGV) Log.v(TAG, "  swipeDirection=" + swipeDirection);
+			if(LOGV) Log.v(TAG, "  swipeDirection=" + mSwipeDirection);
 
-			if(swipeDirection != 0)
+			if(mSwipeDirection != 0)
 			{
-				setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, swipeDirection), 0);
+				if(LOGV) Log.v(TAG, "  mDate: " + mDate);
+				setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, mSwipeDirection), 0);
 			}
 
 			mLastPage = page;
