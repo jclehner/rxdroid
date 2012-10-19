@@ -40,7 +40,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.TimePicker;
 import at.caspase.androidutils.Reflect;
-import at.caspase.rxdroid.Application;
+import at.caspase.rxdroid.RxDroid;
 import at.caspase.rxdroid.DumbTime;
 import at.caspase.rxdroid.R;
 import at.caspase.rxdroid.Theme;
@@ -143,7 +143,7 @@ public final class Util
 				throw new IllegalArgumentException();
 		}
 
-		return Application.getContext().getString(resId);
+		return RxDroid.getContext().getString(resId);
 	}
 
 	public static int getDrugIconDrawable(Context context, int icon)
@@ -385,6 +385,6 @@ public final class Util
 	}
 
 	private static DisplayMetrics getDisplayMetrics() {
-		return Application.getContext().getResources().getDisplayMetrics();
+		return RxDroid.getContext().getResources().getDisplayMetrics();
 	}
 }

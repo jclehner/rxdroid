@@ -37,7 +37,9 @@ import android.util.Log;
 import at.caspase.androidutils.EventDispatcher;
 import at.caspase.androidutils.Extras;
 import at.caspase.androidutils.Reflect;
-import at.caspase.rxdroid.Application;
+import at.caspase.rxdroid.R;
+import at.caspase.rxdroid.RxDroid;
+import at.caspase.rxdroid.SplashScreenActivity;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.caspase.rxdroid.util.Timer;
 import at.caspase.rxdroid.util.WrappedCheckedException;
@@ -95,7 +97,7 @@ public final class Database
 	 * @throws IllegalArgumentException if GlobalContext was not initialized.
 	 */
 	public static void init() {
-		init(Application.getContext());
+		init(RxDroid.getContext());
 	}
 
 	/**
@@ -120,6 +122,8 @@ public final class Database
 
 		synchronized(LOCK_INIT)
 		{
+			SplashScreenActivity.setStatusMessage(R.string._title_db_status_loading);
+
 			sCache.clear();
 
 			if(sHelper != null)

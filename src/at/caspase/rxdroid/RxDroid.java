@@ -25,22 +25,25 @@ import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 
 
-public class Application extends android.app.Application
+public class RxDroid extends Application
 {
 	private static WeakHashMap<Activity, Boolean> sActivityVisibility =
 			new WeakHashMap<Activity, Boolean>();
 
 	private static long sUnlockedTime = 0;
-	private static WeakReference<Context> sContextRef;
+	private static volatile WeakReference<Context> sContextRef;
 
 	@Override
 	public void onCreate()
 	{
-		sContextRef = new WeakReference<Context>(getApplicationContext());
+		if(RxDroid.sContextRef == null)
+			RxDroid.sContextRef = new WeakReference<Context>(getApplicationContext());
 
 		Settings.init();
 		AutoIntakeCreator.registerSelf();
@@ -63,8 +66,16 @@ public class Application extends android.app.Application
 		return c;
 	}
 
+	public static LocalBroadcastManager getLocalBroadcastManager() {
+		return LocalBroadcastManager.getInstance(getContext());
+	}
+
 	public static void doStartActivity(Intent intent) {
 		getContext().startActivity(intent);
+	}
+
+	public static void doSendBroadcast(Intent intent) {
+		getContext().sendBroadcast(intent);
 	}
 
 	public static boolean isLocked()

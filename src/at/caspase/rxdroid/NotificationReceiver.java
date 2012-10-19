@@ -202,7 +202,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		/*int defaults = Notification.DEFAULT_ALL ^ Settings.getNotificationDefaultsXorMask();
 
-		if(mDoPostSilent || Application.isUiVisible())
+		if(mDoPostSilent || RxDroid.isUiVisible())
 			defaults ^= Notification.DEFAULT_SOUND;*/
 
 		if(!mDoPostSilent)
@@ -349,7 +349,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	/* package */ static void sendBroadcastToSelf(Context context, boolean silent)
 	{
 		if(context == null)
-			context = Application.getContext();
+			context = RxDroid.getContext();
 		final Intent intent = new Intent(context, NotificationReceiver.class);
 		intent.setAction(Intent.ACTION_MAIN);
 		intent.putExtra(NotificationReceiver.EXTRA_SILENT, silent);

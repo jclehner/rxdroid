@@ -87,29 +87,42 @@ public enum AutoIntakeCreator implements
 	@Override
 	public void onDatabaseInitialized()
 	{
+		SplashScreenActivity.setStatusMessage(R.string._title_db_status_creating_intakes);
+
 		for(Drug drug : Database.getAll(Drug.class))
 			createMissingIntakes(drug);
 
 		////////////////////////////////////
 
+		SplashScreenActivity.setStatusMessage(R.string._title_db_status_discarding_intakes);
+
 		final Date today = DateTime.today();
-		//final long maxHistoryAgeInDays = Settings.getMaxHistoryAgeInDays();
 
 		final List<Intake> intakes = Database.getAll(Intake.class);
 		final int oldIntakeCount = intakes.size();
 		int deleteCount = 0;
 
+		Date oldest = null;
+
 		for(Intake intake : intakes)
 		{
 //			long diffDays = DateTime.diffDays(today, intake.getDate());
 //			if(diffDays > maxHistoryAgeInDays)
-			if(Settings.isPastMaxHistoryAge(today, intake.getDate()))
+
+			final Date date = intake.getDate();
+
+			if(Settings.isPastMaxHistoryAge(today, date))
+			{
+				if(oldest == null || date.before(oldest))
+					oldest = date;
 				++deleteCount;
+			}
 		}
 
 		final int deletedPercentage = (int) (deleteCount == 0 ? 0 : (deleteCount * 100.0) / oldIntakeCount);
 
-		Log.i(TAG, "Would delete " + deleteCount + " entries (~" + deletedPercentage + "%)");
+		Log.i(TAG, "Would delete " + deleteCount + " entries (~" + deletedPercentage + "%); oldest entry: " +
+				(oldest == null ? "N/A" : DateTime.toDateString(oldest)));
 	}
 
 	public static void registerSelf()

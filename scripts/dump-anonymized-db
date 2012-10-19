@@ -1,0 +1,13 @@
+#!/bin/bash
+
+source "$(dirname $0)/shared.sh" || exit 1
+
+DB="anonymized.db"
+
+run "$(dirname $0)"/db-backup anonymized.db
+echo -n "Anonymizing drug names ... "
+for ID in $(run sqlite3 $DB 'SELECT id FROM drugs'); do
+   run sqlite3 $DB "UPDATE drugs SET name='Drug $ID' WHERE id='$ID'"
+done  
+echo "done"
+

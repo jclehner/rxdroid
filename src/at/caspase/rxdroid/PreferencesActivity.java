@@ -129,7 +129,7 @@ public class PreferencesActivity extends PreferenceActivity implements
 	protected void onResume()
 	{
 		super.onResume();
-		Application.setIsVisible(this, true);
+		RxDroid.setIsVisible(this, true);
 		updateLowSupplyThresholdPreferenceSummary();
 	}
 
@@ -137,7 +137,7 @@ public class PreferencesActivity extends PreferenceActivity implements
 	protected void onPause()
 	{
 		super.onPause();
-		Application.setIsVisible(this, false);
+		RxDroid.setIsVisible(this, false);
 	}
 
 	@TargetApi(11)

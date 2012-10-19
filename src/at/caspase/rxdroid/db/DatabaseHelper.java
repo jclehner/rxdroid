@@ -28,9 +28,13 @@ import java.sql.SQLException;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import at.caspase.androidutils.Reflect;
+import at.caspase.rxdroid.R;
+import at.caspase.rxdroid.RxDroid;
+import at.caspase.rxdroid.SplashScreenActivity;
 import at.caspase.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
@@ -138,6 +142,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	{
 		if(oldVersion == newVersion)
 			return;
+
+		SplashScreenActivity.setStatusMessage(R.string._title_db_status_upgrading);
 
 		db.beginTransaction();
 

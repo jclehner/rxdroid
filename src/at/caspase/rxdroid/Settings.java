@@ -70,6 +70,7 @@ public final class Settings
 	private static final String TAG = Settings.class.getName();
 	private static final boolean LOGV = false;
 
+	private static final String DATE_FORMAT = "yyyy-MM-dd";
 	private static final String KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 
 	private static SharedPreferences sSharedPrefs = null;
@@ -78,7 +79,7 @@ public final class Settings
 	{
 		if(sSharedPrefs == null)
 		{
-			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(Application.getContext());
+			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(RxDroid.getContext());
 			sSharedPrefs.registerOnSharedPreferenceChangeListener(LISTENER);
 		}
 	}
@@ -105,13 +106,14 @@ public final class Settings
 
 	public static Date getDate(String key)
 	{
-		String str = getString(key, null);
+		final String str = getString(key, null);
 		if(str == null)
 			return null;
 
 		try
 		{
-			return DATE_FORMAT.parse(str);
+			SimpleDateFormat sdf = PerThreadInstance.get(SimpleDateFormat.class, DATE_FORMAT);
+			return sdf.parse(str);
 		}
 		catch(ParseException e)
 		{
@@ -119,8 +121,10 @@ public final class Settings
 		}
 	}
 
-	public static void putDate(String key, Date date) {
-		putString(key, DATE_FORMAT.format(date));
+	public static void putDate(String key, Date date)
+	{
+		SimpleDateFormat sdf = PerThreadInstance.get(SimpleDateFormat.class, DATE_FORMAT);
+		putString(key, sdf.format(date));
 	}
 
 	public static boolean getBoolean(String key, boolean defaultValue) {
@@ -295,7 +299,7 @@ public final class Settings
 		String value = sSharedPrefs.getString(key, null);
 		if(value == null)
 		{
-			final Context context = Application.getContext();
+			final Context context = RxDroid.getContext();
 			int resId = context.getResources().
 				getIdentifier("at.caspase.rxdroid:string/pref_default_" + key, null, null);
 
@@ -387,8 +391,6 @@ public final class Settings
 		dtInfo.mActiveDoseTime = getActiveDoseTime(dtInfo.mCurrentTime);
 		dtInfo.mNextDoseTime = getNextDoseTime(dtInfo.mCurrentTime);
 		dtInfo.mNextDoseTimeDate = dtInfo.mActiveDate;
-
-		// FIXME major b0rkage!
 
 		if(dtInfo.mNextDoseTime == Schedule.TIME_MORNING)
 		{
@@ -581,7 +583,7 @@ public final class Settings
 	}
 
 	private static String key(int resId) {
-		return Application.getContext().getString(resId);
+		return RxDroid.getContext().getString(resId);
 	}
 
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;
@@ -685,8 +687,6 @@ public final class Settings
 		return prefix;
 	}
 
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
 	private static final OnSharedPreferenceChangeListener LISTENER = new OnSharedPreferenceChangeListener() {
 
 		@Override
@@ -696,14 +696,14 @@ public final class Settings
 			{
 				Theme.clearAttributeCache();
 
-				final Context context = Application.getContext();
+				final Context context = RxDroid.getContext();
 
 				Toast.makeText(context, R.string._toast_theme_changed, Toast.LENGTH_LONG).show();
 
 				final PackageManager pm = context.getPackageManager();
 				final Intent intent = pm.getLaunchIntentForPackage(context.getPackageName());
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-				Application.doStartActivity(intent);
+				RxDroid.doStartActivity(intent);
 			}
 		}
 	};

@@ -227,7 +227,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		super.onResume();
 
 		Database.init();
-		Application.setIsVisible(this, true);
+		RxDroid.setIsVisible(this, true);
 
 		Intent intent = getIntent();
 		String action = intent.getAction();
@@ -299,7 +299,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	protected void onPause()
 	{
 		super.onStop();
-		Application.setIsVisible(this, false);
+		RxDroid.setIsVisible(this, false);
 	}
 
 	@Override

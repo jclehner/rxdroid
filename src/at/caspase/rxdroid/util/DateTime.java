@@ -32,7 +32,8 @@ import java.util.TimeZone;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.SparseArray;
-import at.caspase.rxdroid.Application;
+import at.caspase.rxdroid.PerThreadInstance;
+import at.caspase.rxdroid.RxDroid;
 import at.caspase.rxdroid.DumbTime;
 
 /**
@@ -46,8 +47,9 @@ public final class DateTime
 	private static final boolean LOGV = false;
 
 	private static final int[] CALENDAR_TIME_FIELDS = { Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND };
-	private static final SimpleDateFormat DATE_AND_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+	private static final String DATE_AND_TIME_FORMAT = "yyyy-MM-dd, HH:mm:ss";
+	private static final String DATE_FORMAT = "yyyy-MM-dd";
 
 	private static final HashMap<Long, DateCacheData> DATE_CACHE = new HashMap<Long, DateCacheData>();
 	private static boolean sDateCacheEnabled = true;
@@ -162,23 +164,28 @@ public final class DateTime
 		if(calendar == null)
 			return "null";
 
-		return DATE_AND_TIME_FORMAT.format(calendar.getTime());
+		SimpleDateFormat sdf = PerThreadInstance.get(SimpleDateFormat.class, DATE_AND_TIME_FORMAT);
+		return sdf.format(calendar.getTime());
 	}
 
-	public static String toString(long timeInMillis) {
-		return DATE_AND_TIME_FORMAT.format(new Date(timeInMillis));
+	public static String toString(long timeInMillis)
+	{
+		SimpleDateFormat sdf = PerThreadInstance.get(SimpleDateFormat.class, DATE_AND_TIME_FORMAT);
+		return sdf.format(new Date(timeInMillis));
 	}
 
-	public static String toDateString(Date date) {
-		return DATE_FORMAT.format(date);
+	public static String toDateString(Date date)
+	{
+		SimpleDateFormat sdf = PerThreadInstance.get(SimpleDateFormat.class, DATE_FORMAT);
+		return sdf.format(date);
 	}
 
 	public static String toNativeDate(Date date) {
-		return DateFormat.getDateFormat(Application.getContext()).format(date);
+		return DateFormat.getDateFormat(RxDroid.getContext()).format(date);
 	}
 
 	public static String toNativeTime(DumbTime time) {
-		return time.toString(DateFormat.is24HourFormat(Application.getContext()), false);
+		return time.toString(DateFormat.is24HourFormat(RxDroid.getContext()), false);
 	}
 
 	public static long getOffsetFromMidnight(Calendar date)

@@ -27,16 +27,21 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
@@ -47,7 +52,40 @@ import at.caspase.rxdroid.util.WrappedCheckedException;
 
 public class SplashScreenActivity extends Activity implements OnClickListener
 {
+	public class DatabaseStatusReceiver extends BroadcastReceiver
+	{
+		/*public static final int STATUS_LOADING = 0;
+		public static final int STATUS_UPGRADING = 1;
+		public static final int STATUS_CREATING_INTAKES = 2;
+		public static final int STATUS_DISCARDING_INTAKES = 3;
+
+		public static final String EXTRA_STATUS = "at.caspase.rxdroid.extra.STATUS";
+		public static final String EXTRA_PROGRESS = "at.caspase.rxdroid.extra.PROGRESS";*/
+
+		public static final String EXTRA_MESSAGE = "at.caspase.rxdroid.extra.MESSAGE";
+		public static final String EXTRA_PROGRESS = "at.caspase.rxdroid.extra.PROGRESS";
+
+		@Override
+		public void onReceive(Context context, Intent intent)
+		{
+			Log.d(TAG + "$DatabaseStatusReceiver", "onReceive: intent=" + intent);
+
+			if(intent == null)
+				return;
+
+			final TextView msg = (TextView) SplashScreenActivity.this.findViewById(R.id.text_loading);
+			if(msg == null)
+				return;
+
+
+			final int msgResId = intent.getIntExtra(EXTRA_MESSAGE, R.string._msg_db_loading);
+			msg.setText(getString(R.string._title_database) + ": " + getString(msgResId));
+		}
+	}
+
 	private static final String TAG = SplashScreenActivity.class.getName();
+
+	private final BroadcastReceiver mReceiver = new DatabaseStatusReceiver();
 
 	@TargetApi(11)
 	@Override
@@ -67,8 +105,22 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		}
 
 		super.onCreate(savedInstanceState);
+	}
 
+	@Override
+	protected void onResume()
+	{
+		//registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_MAIN));
+		RxDroid.getLocalBroadcastManager().registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_MAIN));
 		loadDatabaseAndLaunchMainActivity();
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		RxDroid.getLocalBroadcastManager().unregisterReceiver(mReceiver);
 	}
 
 	@Override
@@ -88,6 +140,21 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			return;
 
 		finish();
+	}
+
+	public static void setStatusMessage(int msgResId)
+	{
+		Log.d(TAG, "setStatusMessage: msgResId=" + msgResId);
+
+		final Context context = RxDroid.getContext();
+		final Intent intent = new Intent(context, DatabaseStatusReceiver.class);
+		intent.setAction(Intent.ACTION_MAIN);
+		intent.putExtra(DatabaseStatusReceiver.EXTRA_MESSAGE, msgResId);
+
+		LocalBroadcastManager bm = RxDroid.getLocalBroadcastManager();
+		bm.sendBroadcast(intent);
+
+		//RxDroid.getContext().sendStickyBroadcast(intent);
 	}
 
 	private void loadDatabaseAndLaunchMainActivity() {
@@ -143,7 +210,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 				if(!mAttemptedDatabaseReload)
 				{
 					mAttemptedDatabaseReload = true;
-					Database.reload(Application.getContext());
+					Database.reload(RxDroid.getContext());
 					return doInBackground(params);
 				}
 

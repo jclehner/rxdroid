@@ -42,7 +42,7 @@ public final class Theme
 			{
 				final Timer t = LOGV ? new Timer() : null;
 
-				final Context c = Application.getContext();
+				final Context c = RxDroid.getContext();
 				final int[] attrs = { attr };
 				final TypedArray a = c.obtainStyledAttributes(get(), attrs);
 				final int resId = a.getResourceId(0, 0);

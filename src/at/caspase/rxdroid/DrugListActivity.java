@@ -149,7 +149,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 		Database.init();
 		mIsShowing = true;
-		Application.setIsVisible(this, true);
+		RxDroid.setIsVisible(this, true);
 
 		final Intent intent = getIntent();
 		if(intent != null)
@@ -167,7 +167,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		super.onPause();
 		mIsShowing = false;
-		Application.setIsVisible(this, false);
+		RxDroid.setIsVisible(this, false);
 		NotificationReceiver.unregisterOnDoseTimeChangeListener(mDoseTimeListener);
 	}
 
@@ -594,7 +594,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			if(DateTime.isToday(mFilterDate) && Entries.hasMissingIntakesBeforeDate(drug, mFilterDate))
 				return true;
 
-			if(mFilterDate != null && !drug.hasDoseOnDate(mFilterDate))
+			if(!drug.hasDoseOnDate(mFilterDate))
 				return false;
 
 			return true;

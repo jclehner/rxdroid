@@ -175,7 +175,7 @@ public final class Entries
 				intakes.add(intake);
 		}
 
-		return Collections.unmodifiableList(intakes);
+		return intakes;
 	}
 
 	public static int countIntakes(Drug drug, Date date, Integer doseTime) {

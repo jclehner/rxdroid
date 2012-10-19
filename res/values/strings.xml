@@ -293,7 +293,11 @@
 	<string name="_title_about">About</string>
 	<string name="_title_licenses">License</string>
 	
-				
+	<string name="_title_db_status_loading">Loading&#8230;</string>
+	<string name="_title_db_status_upgrading">Upgrading&#8230;</string>
+	<string name="_title_db_status_discarding_intakes">Discarding old data&#8230;</string>
+	<string name="_title_db_status_creating_intakes">Inserting missing data&#8230;</string>
+					
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 

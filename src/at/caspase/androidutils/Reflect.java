@@ -193,7 +193,12 @@ public final class Reflect
 	//@SuppressWarnings("unchecked")
 	public static <T> T newInstance(Class<T> clazz, Class<?>[] argTypes, Object... args)
 	{
-		if(argTypes.length != args.length)
+		if(argTypes == null || args == null)
+		{
+			argTypes = EMPTY_CLASS_ARRAY;
+			args = EMPTY_OBJECT_ARRAY;
+		}
+		else if(argTypes.length != args.length)
 			throw new IllegalArgumentException("argTypes.length != args.length");
 
 		//Log.d(TAG, "newInstance: clazz=" + clazz + ", args=" + args);

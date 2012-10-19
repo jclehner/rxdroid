@@ -61,7 +61,7 @@ public class ScheduleHourly extends ScheduleBase
 
 	public void setOffset(DumbTime offset)
 	{
-		final long max = 1000 * 3600 * (mIn8HourMode ? 8 : 6);
+		final long max = 1000L * 3600 * (mIn8HourMode ? 8 : 6);
 		if(offset.getMillisFromMidnight() >= max)
 			throw new IllegalArgumentException();
 

@@ -63,7 +63,7 @@ public class LockscreenActivity extends Activity implements OnClickListener
 	{
 		super.onResume();
 
-		if(!Application.isLocked())
+		if(!RxDroid.isLocked())
 		{
 			Log.w(TAG, "onResume: application is not locked; activity should not have been created");
 			launchActivityAndFinishSelf();
@@ -172,7 +172,7 @@ public class LockscreenActivity extends Activity implements OnClickListener
 
 	public static void startMaybe(Activity caller, Intent unlockIntent)
 	{
-		if(Application.isLocked() && false) // currently disabled
+		if(RxDroid.isLocked() && false) // currently disabled
 		{
 			if(unlockIntent == null)
 			{
@@ -247,7 +247,7 @@ public class LockscreenActivity extends Activity implements OnClickListener
 			final String pin = Settings.getString("pin", null);
 			if(pin == null || pin.equals(sb.toString()))
 			{
-				Application.unlock();
+				RxDroid.unlock();
 				launchActivityAndFinishSelf();
 			}
 			else

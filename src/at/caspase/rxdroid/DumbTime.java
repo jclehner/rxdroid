@@ -57,7 +57,9 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	private static final SimpleDateFormat FORMAT_SECONDS = new SimpleDateFormat("HH:mm:ss");
 	private static final SimpleDateFormat FORMAT_MILLIS = new SimpleDateFormat("HH:mm:ss.SSS");
 
-	private static final SimpleDateFormat[] FORMATS = { FORMAT_SECONDS, FORMAT_MINUTES, FORMAT_MILLIS };
+	//private static final SimpleDateFormat[] FORMATS = { FORMAT_SECONDS, FORMAT_MINUTES, FORMAT_MILLIS };
+
+	private static final String[] FORMATS = { "HH:mm", "HH:mm:ss", "HH:mm:ss.SSS" };
 
 	private static final int S_MILLIS = 1000;
 	private static final int M_MILLIS = 60 * S_MILLIS;
@@ -98,10 +100,10 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 			throw new IllegalArgumentException(offset + " is out of range");
 
 		mHours = (int) (offset / H_MILLIS);
-		offset -= mHours * H_MILLIS;
+		offset -= (long) mHours * H_MILLIS;
 
 		mMinutes = (int) (offset / M_MILLIS);
-		offset -= mMinutes * M_MILLIS;
+		offset -= (long) mMinutes * M_MILLIS;
 
 		mSeconds = (int) (offset / S_MILLIS);
 		offset -= mSeconds * S_MILLIS;
@@ -170,7 +172,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 	public String toString(boolean use24HourTime, boolean withMillis)
 	{
-		final boolean is24HourFormat = DateFormat.is24HourFormat(Application.getContext());
+		final boolean is24HourFormat = DateFormat.is24HourFormat(RxDroid.getContext());
 		final StringBuilder pattern = new StringBuilder();
 
 		if(is24HourFormat)
@@ -217,11 +219,14 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	{
 		if(timeString != null)
 		{
-			for(SimpleDateFormat format : FORMATS)
+			for(String format : FORMATS)
 			{
 				try
 				{
-					final Date date = format.parse(timeString);
+					final SimpleDateFormat sdf =
+						PerThreadInstance.get(SimpleDateFormat.class, format);
+
+					final Date date = sdf.parse(timeString);
 					return new DumbTime(date.getHours(), date.getMinutes(), date.getSeconds());
 				}
 				catch(ParseException e)
