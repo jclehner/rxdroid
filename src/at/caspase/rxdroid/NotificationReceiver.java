@@ -46,7 +46,7 @@ import at.caspase.rxdroid.util.Util;
 public class NotificationReceiver extends BroadcastReceiver
 {
 	private static final String TAG = NotificationReceiver.class.getName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = true;
 
 	private static final Class<?>[] EVENT_HANDLER_ARG_TYPES = { Date.class, Integer.TYPE };
 
@@ -150,15 +150,15 @@ public class NotificationReceiver extends BroadcastReceiver
 		final boolean isActiveDoseTime;
 
 		Date date = dtInfo.activeDate();
-
 		int doseTime = dtInfo.activeDoseTime();
+
 		if(doseTime == Schedule.TIME_INVALID)
 		{
-			if(dtInfo.nextDoseTime() == Schedule.TIME_MORNING && !Settings.hasWrappingDoseTimeNight())
-				date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
-
 			isActiveDoseTime = false;
 			doseTime = dtInfo.nextDoseTime();
+			date = dtInfo.nextDoseTimeDate();
+
+			Log.d(TAG, "date: " + date);
 		}
 		else
 			isActiveDoseTime = true;
@@ -240,7 +240,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		);
 
 		final Bundle extras = new Bundle();
-		extras.putSerializable(EXTRA_DATE, doseTimeDate.getTime());
+		extras.putSerializable(EXTRA_DATE, doseTimeDate);
 		extras.putInt(EXTRA_DOSE_TIME, doseTime);
 		extras.putBoolean(EXTRA_IS_DOSE_TIME_END, scheduleEnd);
 
@@ -300,6 +300,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
 		{
+			if(LOGV) Log.d(TAG, "getMissedDoseCount: adjusting date " + DateTime.toDateString(date));
 			final Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
 			count = getDueDoseCount(checkDate, Drug.TIME_NIGHT);
 		}

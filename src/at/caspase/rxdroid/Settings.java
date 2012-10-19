@@ -386,22 +386,36 @@ public final class Settings
 		dtInfo.mActiveDate = getActiveDate(dtInfo.mCurrentTime);
 		dtInfo.mActiveDoseTime = getActiveDoseTime(dtInfo.mCurrentTime);
 		dtInfo.mNextDoseTime = getNextDoseTime(dtInfo.mCurrentTime);
+		dtInfo.mNextDoseTimeDate = dtInfo.mActiveDate;
 
-		final Date currentDate = DateTime.getDatePartMutable(dtInfo.mCurrentTime).getTime();
+		// FIXME major b0rkage!
 
 		if(dtInfo.mNextDoseTime == Schedule.TIME_MORNING)
 		{
 			final boolean useNextDay;
 
 			if(dtInfo.mActiveDoseTime == Schedule.TIME_INVALID)
-				useNextDay = dtInfo.mActiveDate.equals(currentDate);
-			else if(dtInfo.mActiveDoseTime == Schedule.TIME_NIGHT)
 			{
-				if(dtInfo.mActiveDate.equals(currentDate))
-					useNextDay = isBeforeDoseTimeNightWrap(dtInfo);
+				// If we have a wrapping TIME_NIGHT and there is no active
+				// dose time, the time must be later than TIME_NIGHT's end,
+				// which will always be the date of the next TIME_MORNING.
+				//
+				// If TIME_NIGHT is not wrapping, we must check, whether we're
+				// after TIME_NIGHT's end but before midnight.
+
+				if(hasWrappingDoseTimeNight())
+					useNextDay = false;
 				else
-					useNextDay = true;
+				{
+					final long offsetFromMidnight = DateTime.getOffsetFromMidnight(currentTime);
+					final long endOfNightOffset = getDoseTimeEndOffset(Schedule.TIME_NIGHT);
+
+					useNextDay = offsetFromMidnight > endOfNightOffset;
+				}
 			}
+			else if(dtInfo.mActiveDoseTime == Schedule.TIME_NIGHT)
+				useNextDay = true;
+
 			else
 			{
 				Log.w(TAG, "W00t? This was unexpected...");
@@ -409,11 +423,8 @@ public final class Settings
 			}
 
 			if(useNextDay)
-				dtInfo.mNextDoseTimeDate = DateTime.add(dtInfo.mActiveDate, Calendar.DAY_OF_MONTH, 1);
+				dtInfo.mNextDoseTimeDate = DateTime.add(dtInfo.mNextDoseTimeDate, Calendar.DAY_OF_MONTH, 1);
 		}
-
-		if(dtInfo.mNextDoseTimeDate == null)
-			dtInfo.mNextDoseTimeDate = currentDate;
 
 		return dtInfo;
 	}

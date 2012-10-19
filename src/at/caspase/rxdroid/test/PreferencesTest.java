@@ -239,27 +239,59 @@ public class PreferencesTest extends AndroidTestCase
 		}
 	}
 
-	public void testGetDoseTimeInfo()
+	public void testGetDoseTimeInfoWithWrappingDoseTimeNight()
 	{
 		final int[][] testCases = {
 				//hours		mins	nextDoseTimeDate == currentDate
 				{ 22, 		00,		TRUE },
 				{ 23,		30,		FALSE },
 				{ 01,		00,		TRUE },
+				{ 03,       00,     TRUE },
 				{ 06,		30,		TRUE }
 		};
 
+		testGetDoseTimeInfoInternal(testCases);
+	}
+
+	public void testGetDoseTimeInfoWithNonWrappingDoseTimeNight()
+	{
+		final int[][] testCases = {
+				//hours		mins	nextDoseTimeDate == currentDate
+				{ 22, 		00,		TRUE },
+				{ 23,		31,		FALSE },
+				{ 23,       55,		FALSE },
+				{ 01,		00,		TRUE },
+				{ 03,       00,     TRUE },
+				{ 06,		30,		TRUE }
+		};
+
+		try
+		{
+			Settings.putString("time_night", "23:00-23:50");
+			testGetDoseTimeInfoInternal(testCases);
+		}
+		finally
+		{
+			Settings.putString("time_night", "23:00-01:30");
+		}
+	}
+
+	private void testGetDoseTimeInfoInternal(final int[][] testCases)
+	{
 		for(int testData[] : testCases)
 		{
 			final Calendar time = todayCalendarWithTime(testData[0], testData[1]);
 			final Date date = DateTime.getDatePart(time).getTime();
 
+			Log.d(TAG, "BEFORE");
 			final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo(time);
+			Log.d(TAG, "AFTER: " + dtInfo.nextDoseTimeDate());
 			final boolean wantSameDate = testData[2] == TRUE;
 
 			Log.d(TAG, "testGetDoseTimeInfo");
 			Log.d(TAG, "  time=" + DateTime.toString(time));
 			Log.d(TAG, "  date=" + date);
+			Log.d(TAG, "  activeDoseTime=" + dtInfo.activeDoseTime());
 			Log.d(TAG, "  nextDoseTime=" + dtInfo.nextDoseTime());
 			Log.d(TAG, "  wantSameDate=" + wantSameDate);
 			Log.d(TAG, "  nextDoseTimeDate=" + dtInfo.nextDoseTimeDate());
@@ -359,6 +391,7 @@ public class PreferencesTest extends AndroidTestCase
 			fail("mContext == null");
 
 		Settings.init();
+		DateTime.disableDateCache();
 
 		backupPreferences();
 	}

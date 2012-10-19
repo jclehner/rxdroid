@@ -50,6 +50,7 @@ public final class DateTime
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	private static final HashMap<Long, DateCacheData> DATE_CACHE = new HashMap<Long, DateCacheData>();
+	private static boolean sDateCacheEnabled = true;
 
 	public static Calendar calendarFromDate(Date date)
 	{
@@ -234,6 +235,12 @@ public final class DateTime
 		return (date1.getTime() - date2.getTime()) / Constants.MILLIS_PER_DAY;
 	}
 
+	public static void disableDateCache()
+	{
+		sDateCacheEnabled = false;
+		DATE_CACHE.clear();
+	}
+
 	private static ImmutableGregorianCalendar getImmutableInstance(Calendar cal)
 	{
 		final ImmutableGregorianCalendar r = new ImmutableGregorianCalendar(cal);
@@ -246,7 +253,7 @@ public final class DateTime
 		synchronized(DATE_CACHE)
 		{
 			//ImmutableGregorianCalendar instance = DATE_CACHE.get(timeInMillis);
-			DateCacheData data = DATE_CACHE.get(timeInMillis);
+			DateCacheData data = sDateCacheEnabled ? DATE_CACHE.get(timeInMillis) : null;
 
 			if(data == null)
 			{
@@ -256,9 +263,10 @@ public final class DateTime
 				for(int field : CALENDAR_TIME_FIELDS)
 					data.calendar.setInternal(field, 0);
 
-				data.date = data.calendar.getTime();
+				data.date = new ImmutableDate(data.calendar.getTimeInMillis());
 
-				DATE_CACHE.put(timeInMillis, data);
+				if(sDateCacheEnabled)
+					DATE_CACHE.put(timeInMillis, data);
 			}
 			else if(LOGV)
 			{
@@ -356,6 +364,52 @@ public final class DateTime
 			areFieldsSet = true;
 			isTimeSet = true;
 			complete();
+		}
+	}
+
+	private static final class ImmutableDate extends Date
+	{
+		public ImmutableDate(Date date) {
+			this(date.getTime());
+		}
+
+		public ImmutableDate(long timeInMillis) {
+			super.setTime(timeInMillis);
+		}
+
+		@Override
+		public void setTime(long milliseconds) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setSeconds(int second) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setMinutes(int minute) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setHours(int hour) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setDate(int date) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setMonth(int month) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setYear(int year) {
+			throw new UnsupportedOperationException();
 		}
 	}
 
