@@ -1,10 +1,15 @@
 * Lockscreen
-* History size
 * Icons
 * Fix Activity dialogs (use showDialog()!)
 * Reset DB version
+* Strings:
+	* "Show supply monitors" ?
+	* "History size/age" ?
+	* "Low supply threshold" ?
+* German translation!
 
 DONE:	
 + Remove PopupWindow in IntakeDialog
 + Notification sound preference
 + Trackball navigation (wont implement for now)
++ History size

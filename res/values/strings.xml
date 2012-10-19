@@ -97,7 +97,7 @@
     <string name="_title_pref_notification_methods">Notification methods</string>
     
     <string name="_title_min_supply_days">Low supply threshold</string>
-    <string name="_summary_min_supply_days">Display a warning if a drug\'s supply lasts less than the number of specified days (currently %1$s).</string>
+    <string name="_summary_min_supply_days">Minimum number of days of a drug\'s supply before displaying a notification &#8211; currently %1$s.</string>
     
     <string name="_title_pref_use_led">LED</string>
     <string name="_title_pref_use_sound">Sound</string>
@@ -164,7 +164,7 @@
 	<string name="_msg_save_drug_changes">Do you want to save changes made to this drug?</string>
 	<string name="_msg_every_n_days_distance">Days between each repetition.</string>
 	
-	<string name="_title_intake_schedule">Intake schedule</string>
+	<string name="_title_intake_schedule">Schedule</string>
 	<string name="_title_repeat">Repeat</string>
 	<string name="_title_misc">Miscellaneous</string>
 	<string name="_title_icon">Icon</string>
@@ -232,8 +232,8 @@
 	
 	<string name="_title_repetition_origin">Starting date</string>
 	
-	<string name="_title_history_age">History age</string>
-	<string name="_summary_history_age">The amount of time that intake information will be stored. Longer periods result in larger databases.</string>
+	<string name="_title_history_age">History size</string>
+	<string name="_summary_history_age">Data older than the given amount of time will be deleted</string>
 	<string name="_title_history_2_weeks">Two weeks</string>
 	<string name="_title_history_1_month">One Month</string>
 	<string name="_title_history_6_months">Six months</string>
@@ -242,7 +242,7 @@
 	
 	<string name="_title_database">Database</string>
 	
-	<string name="_toast_unlimited_history_size">Warning: this setting might cause very long loading times.</string>			
+	<string name="_toast_unlimited_history_size">Warning: this setting might cause very long loading times!</string>			
 	<string name="_toast_db_upgraded">Database upgrade successful. Restarting app&#8230;</string>
 	
 	<string name="_title_supply_monitor">Mark as taken</string>
@@ -265,10 +265,9 @@
 	<string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
 	<string name="_msg_restore_default_settings">This will reset all settings to their default values.</string>
 	
-	<string name="_title_show_supply_monitors">Supply monitors</string>
-	<string name="_summary_show_supply_monitors">Show drugs that are marked as monitoring supplies only.</string>
-	
-	
+	<string name="_title_show_supply_monitors">Show all</string>
+	<string name="_summary_show_supply_monitors">Display drugs with disabled dose notifications.</string>
+		
 	<string name="_title_show_in_list">Show in drug list</string>
 	
 	<string name="_title_help">Help</string>

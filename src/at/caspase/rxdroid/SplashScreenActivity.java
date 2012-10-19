@@ -238,7 +238,6 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 				}
 
 				return new WrappedCheckedException(e);
-
 			}
 
 			return null;
@@ -247,10 +246,10 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		@Override
 		protected void onPostExecute(WrappedCheckedException result)
 		{
+			setStatusMessage(R.string._title_db_status_loading);
+
 			if(result == null)
-			{
 				launchMainActivity();
-			}
 			else
 			{
 				Log.w(TAG, result.getRootCause());
