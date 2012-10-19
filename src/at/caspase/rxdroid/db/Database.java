@@ -26,6 +26,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,6 +87,8 @@ public final class Database
 
 	private static DatabaseHelper sHelper;
 	private static boolean sIsLoaded = false;
+
+	private static volatile int sPendingDaoOperations = 0;
 
 	private static EventDispatcher<Object> sEventMgr =
 			new EventDispatcher<Object>();
@@ -221,6 +225,20 @@ public final class Database
 		delete(entry, 0);
 	}
 
+	public static <E extends Entry> void deleteByIds(Class<? extends Entry> clazz, Collection<Integer> ids)
+	{
+		final Dao<? extends Entry, Integer> dao = getDaoChecked(clazz);
+
+		try
+		{
+			dao.deleteIds(ids);
+		}
+		catch(SQLException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
+	}
+
 	public static <T extends Entry> T find(Class<T> clazz, int id) {
 		return Entries.findInCollectionById(getCached(clazz), id);
 	}
@@ -240,6 +258,10 @@ public final class Database
 
 	public static <T extends Entry> int countAll(Class<T> clazz) {
 		return getCached(clazz).size();
+	}
+
+	public static boolean hasPendingOperations() {
+		return sPendingDaoOperations > 0;
 	}
 
 	/*public static <E extends Entry> void rebuild()
@@ -372,13 +394,15 @@ public final class Database
 
 	private static <E extends Entry, ID> void runDaoMethodInThread(final Dao<E, ID> dao, final String methodName, final E entry)
 	{
-		final Thread th = new Thread(new Runnable() {
+		++sPendingDaoOperations;
+
+		final Thread th = new Thread() {
 
 			@Override
 			public void run() {
 				runDaoMethod(dao, methodName, entry);
 			}
-		});
+		};
 
 		th.start();
 	}
@@ -390,9 +414,13 @@ public final class Database
 		try
 		{
 			final Method m = dao.getClass().getMethod(methodName, Object.class);
-			final Timer t = new Timer();
+			final Timer t = LOGV ? new Timer() : null;
 			m.invoke(dao, entry);
-			Log.i(TAG, "dao." + methodName + ": " + t);
+			--sPendingDaoOperations;
+			if(LOGV) Log.v(TAG, "dao." + methodName + ": " + t);
+
+			//dao.deleteBuilder().where().idEq(id)
+
 			return;
 		}
 		catch(IllegalArgumentException e)

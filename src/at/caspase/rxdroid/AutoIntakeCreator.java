@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -99,6 +100,7 @@ public enum AutoIntakeCreator implements
 		final Date today = DateTime.today();
 
 		final List<Intake> intakes = Database.getAll(Intake.class);
+//		final ArrayList<Integer> idsToDelete = new ArrayList<Integer>();
 		final int oldIntakeCount = intakes.size();
 		int deleteCount = 0;
 
@@ -106,22 +108,24 @@ public enum AutoIntakeCreator implements
 
 		for(Intake intake : intakes)
 		{
-//			long diffDays = DateTime.diffDays(today, intake.getDate());
-//			if(diffDays > maxHistoryAgeInDays)
-
 			final Date date = intake.getDate();
 
 			if(Settings.isPastMaxHistoryAge(today, date))
 			{
 				if(oldest == null || date.before(oldest))
 					oldest = date;
+
 				++deleteCount;
+				Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
+//				idsToDelete.add(intake.getId());
 			}
 		}
 
+//		Database.deleteByIds(Intake.class, idsToDelete);
+
 		final int deletedPercentage = (int) (deleteCount == 0 ? 0 : (deleteCount * 100.0) / oldIntakeCount);
 
-		Log.i(TAG, "Would delete " + deleteCount + " entries (~" + deletedPercentage + "%); oldest entry: " +
+		Log.i(TAG, "Deleted " + deleteCount + " entries (~" + deletedPercentage + "%); oldest entry: " +
 				(oldest == null ? "N/A" : DateTime.toDateString(oldest)));
 	}
 

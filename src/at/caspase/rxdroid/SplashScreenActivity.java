@@ -183,11 +183,34 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 
 	private void launchMainActivity()
 	{
-		Intent intent = new Intent(getApplicationContext(), DrugListActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-		startActivity(intent);
+		(new Thread() {
 
-		finish();
+			@Override
+			public void run()
+			{
+				while(Database.hasPendingOperations())
+				{
+					Log.d(TAG, "Waiting for database to settle");
+					try
+					{
+						Thread.sleep(50);
+					}
+					catch (InterruptedException e)
+					{
+						Log.w(TAG, e);
+						break;
+					}
+				}
+
+				Intent intent = new Intent(getApplicationContext(), DrugListActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+				startActivity(intent);
+
+				finish();
+
+
+			}
+		}).start();
 	}
 
 	private class DatabaseIntializerTask extends AsyncTask<Void, Void, WrappedCheckedException>
