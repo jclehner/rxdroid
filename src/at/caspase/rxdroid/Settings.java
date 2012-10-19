@@ -153,19 +153,56 @@ public final class Settings
 
 	public static int getMaxHistoryAgeInDays()
 	{
-		int index = getListPreferenceValueIndex("db_max_history_age", 2);
+		int index = getListPreferenceValueIndex(Keys.HISTORY_SIZE, 2);
 		return HISTORY_AGE_IN_DAYS[index];
+	}
+
+	public static boolean isPastMaxHistoryAge(Date reference, Date date)
+	{
+		final int index = getListPreferenceValueIndex(Keys.HISTORY_SIZE, 2);
+
+		final int field;
+		final int value;
+
+		switch(index)
+		{
+			case 0:
+				field = Calendar.DAY_OF_MONTH;
+				value = 14;
+				break;
+
+			case 1:
+				field = Calendar.MONTH;
+				value = 1;
+				break;
+
+			case 2:
+				field = Calendar.MONTH;
+				value = 6;
+				break;
+
+			case 3:
+				field = Calendar.YEAR;
+				value = 1;
+				break;
+
+			default:
+				return false;
+		}
+
+		reference = DateTime.add(reference, field, -value);
+		return date.before(reference);
 	}
 
 	public static int filterNotificationDefaults(int defaults)
 	{
-		if(!sSharedPrefs.getBoolean("use_led", true))
+		if(!sSharedPrefs.getBoolean(Keys.USE_LED, true))
 			defaults ^= Notification.DEFAULT_LIGHTS;
 
-		if(!sSharedPrefs.getBoolean("use_sound", true))
+		if(!sSharedPrefs.getBoolean(Keys.USE_SOUND, true))
 			defaults ^= Notification.DEFAULT_SOUND;
 
-		if(!sSharedPrefs.getBoolean("use_vibrator", true))
+		if(!sSharedPrefs.getBoolean(Keys.USE_VIBRATOR, true))
 			defaults ^= Notification.DEFAULT_VIBRATE;
 
 		return defaults;
@@ -176,7 +213,7 @@ public final class Settings
 		if(!drug.isActive() || drug.getRefillSize() == 0 || drug.hasNoDoses())
 			return false;
 
-		final int minSupplyDays = Integer.parseInt(sSharedPrefs.getString("num_min_supply_days", "10"), 10);
+		final int minSupplyDays = Integer.parseInt(sSharedPrefs.getString(Keys.LOW_SUPPLY_THRESHOLD, "10"), 10);
 		return Entries.getSupplyDaysLeftForDrug(drug, null) < minSupplyDays;
 	}
 
@@ -266,7 +303,7 @@ public final class Settings
 				throw new IllegalStateException("No default value for time preference " + key + " in strings.xml");
 
 			if(LOGV) Log.i(TAG, "Persisting preference: " + key + "=" + value);
-			sSharedPrefs.edit().putString(key, value).commit();
+			putString(key, value);
 		}
 
 		return TimePeriod.fromString(value);
@@ -292,9 +329,9 @@ public final class Settings
 			return mActiveDate;
 		}
 
-		/*public Date nextDoseTimeDate() {
+		public Date nextDoseTimeDate() {
 			return mNextDoseTimeDate;
-		}*/
+		}
 
 		public int activeDoseTime() {
 			return mActiveDoseTime;
@@ -306,7 +343,7 @@ public final class Settings
 
 		private Calendar mCurrentTime;
 		private Date mActiveDate;
-		private Date mNextDoseTimeDate = null;
+		private Date mNextDoseTimeDate;
 		private int mActiveDoseTime;
 		private int mNextDoseTime;
 
@@ -352,15 +389,27 @@ public final class Settings
 
 		final Date currentDate = DateTime.getDatePartMutable(dtInfo.mCurrentTime).getTime();
 
-		if(dtInfo.mActiveDoseTime == Schedule.TIME_INVALID && dtInfo.mNextDoseTime == Schedule.TIME_MORNING)
+		if(dtInfo.mNextDoseTime == Schedule.TIME_MORNING)
 		{
-			// FIXME problem lies here, as mActiveDoseTime could also be TIME_NIGHT
+			final boolean useNextDay;
 
-			// If active date is equal to the current date, we're somewhere before
-			// midnight on that date and thus need to adjust mNextDoseTimeDate.
+			if(dtInfo.mActiveDoseTime == Schedule.TIME_INVALID)
+				useNextDay = dtInfo.mActiveDate.equals(currentDate);
+			else if(dtInfo.mActiveDoseTime == Schedule.TIME_NIGHT)
+			{
+				if(dtInfo.mActiveDate.equals(currentDate))
+					useNextDay = isBeforeDoseTimeNightWrap(dtInfo);
+				else
+					useNextDay = true;
+			}
+			else
+			{
+				Log.w(TAG, "W00t? This was unexpected...");
+				useNextDay = false;
+			}
 
-			if(dtInfo.mActiveDate.equals(currentDate))
-				dtInfo.mNextDoseTimeDate = DateTime.add(currentDate, Calendar.DAY_OF_MONTH, 1);
+			if(useNextDay)
+				dtInfo.mNextDoseTimeDate = DateTime.add(dtInfo.mActiveDate, Calendar.DAY_OF_MONTH, 1);
 		}
 
 		if(dtInfo.mNextDoseTimeDate == null)
@@ -384,8 +433,6 @@ public final class Settings
 		return activeDate.getTime();
 	}
 
-
-
 	public static boolean isBeforeDoseTimeNightWrap(DoseTimeInfo dtInfo)
 	{
 		if(!hasWrappingDoseTimeNight())
@@ -397,10 +444,11 @@ public final class Settings
 		final long endOfNightOffset = getDoseTimeEndOffset(Schedule.TIME_NIGHT);
 		final long currentTimeOffset = DateTime.getOffsetFromMidnight(dtInfo.mCurrentTime);
 
+		Log.d(TAG, "endOfNightOffset=" + endOfNightOffset);
+		Log.d(TAG, "currentTimeOffset=" + currentTimeOffset);
+
 		return currentTimeOffset > endOfNightOffset;
 	}
-
-
 
 	@SuppressWarnings("deprecation")
 	public static Date getActiveDate() {
@@ -480,13 +528,13 @@ public final class Settings
 	{
 		int mask = 0;
 
-		if(!getBoolean("use_led", true))
+		if(!getBoolean(Keys.USE_LED, true))
 			mask |= Notification.DEFAULT_LIGHTS;
 
-		if(!getBoolean("use_sound", true))
+		if(!getBoolean(Keys.USE_SOUND, true))
 			mask |= Notification.DEFAULT_SOUND;
 
-		if(!getBoolean("use_vibrator", true))
+		if(!getBoolean(Keys.USE_VIBRATOR, true))
 			mask |= Notification.DEFAULT_VIBRATE;
 
 		return mask;
@@ -499,7 +547,7 @@ public final class Settings
 		if(name == null || name.length() == 0)
 			return "<???>";
 
-		if(getBoolean("privacy_scramble_names", false))
+		if(getBoolean(Keys.SCRAMBLE_NAMES, false))
 		{
 			// We rot13 word by word and ignore those beginning with
 			// a digit, so things like 10mg won't get converted to 10zt.

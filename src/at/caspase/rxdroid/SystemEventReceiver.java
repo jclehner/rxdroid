@@ -28,12 +28,13 @@ import android.util.Log;
 
 public class SystemEventReceiver extends BroadcastReceiver
 {
+	@SuppressWarnings("unused")
 	private static final String TAG = SystemEventReceiver.class.getName();
 
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
-		Log.d(TAG, "Received intent with action " + intent.getAction());
+		//Log.d(TAG, "Received intent with action " + intent.getAction());
 		NotificationReceiver.sendBroadcastToSelf(context, false);
 
 		//Intent service = new Intent();

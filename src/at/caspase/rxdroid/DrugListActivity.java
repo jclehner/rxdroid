@@ -369,7 +369,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	{
 		if(offset <= -(InfiniteViewPagerAdapter.MAX/2))
 		{
-			Log.i(TAG, "makeView: returning stub for offset=" + offset);
+			if(LOGV) Log.d(TAG, "makeView: returning stub for offset=" + offset);
 			return new ViewStub(this);
 		}
 
@@ -408,13 +408,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		final Date date = doseView.getDate();
 
 		if(!date.equals(mDate))
-			Log.w(TAG, "Activity date " + mDate + " differs from DoseView date " + date);
-
-		/*if(drug.isAutoAddIntakesEnabled())
-		{
-			Toast.makeText(this, R.string._toast_drug_is_supply_monitor, Toast.LENGTH_SHORT).show();
-			return;
-		}*/
+			throw new IllegalStateException("Activity date " + mDate + " differs from DoseView date " + date);
 
 		if(MultipleIntakeDialogsPreventer.INSTANCE.canShowDialog())
 		{

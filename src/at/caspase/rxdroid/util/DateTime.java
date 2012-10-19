@@ -27,10 +27,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.util.SparseArray;
 import at.caspase.rxdroid.Application;
 import at.caspase.rxdroid.DumbTime;
@@ -42,12 +42,14 @@ import at.caspase.rxdroid.DumbTime;
  */
 public final class DateTime
 {
-	@SuppressWarnings("unused")
 	private static final String TAG = DateTime.class.getName();
+	private static final boolean LOGV = false;
 
 	private static final int[] CALENDAR_TIME_FIELDS = { Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND };
+	private static final SimpleDateFormat DATE_AND_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-	private static SparseArray<Date> sDateCache = new SparseArray<Date>(16);
+	private static final HashMap<Long, DateCacheData> DATE_CACHE = new HashMap<Long, DateCacheData>();
 
 	public static Calendar calendarFromDate(Date date)
 	{
@@ -68,8 +70,12 @@ public final class DateTime
 		return getDatePartMutable(DateTime.nowCalendarMutable());
 	}
 
-	public static Date today() {
-		return todayCalendarMutable().getTime();
+	public static Date today()
+	{
+		final long now = System.currentTimeMillis();
+		final long today = now - (now % Constants.MILLIS_PER_DAY);
+
+		return obtainImmutableCachedDateInstance(today).date;
 	}
 
 	public static Date yesterday() {
@@ -88,11 +94,11 @@ public final class DateTime
 	}
 
 	public static Calendar nowCalendar() {
-		return ImmutableGregorianCalendar.getInstance();
+		return new ImmutableGregorianCalendar(System.currentTimeMillis());
 	}
 
 	public static Date now() {
-		return nowCalendarMutable().getTime();
+		return nowCalendar().getTime();
 	}
 
 	/**
@@ -155,8 +161,15 @@ public final class DateTime
 		if(calendar == null)
 			return "null";
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
-		return sdf.format(calendar.getTime());
+		return DATE_AND_TIME_FORMAT.format(calendar.getTime());
+	}
+
+	public static String toString(long timeInMillis) {
+		return DATE_AND_TIME_FORMAT.format(new Date(timeInMillis));
+	}
+
+	public static String toDateString(Date date) {
+		return DATE_FORMAT.format(date);
 	}
 
 	public static String toNativeDate(Date date) {
@@ -209,6 +222,13 @@ public final class DateTime
 		return calendarFromDate(date).get(field);
 	}
 
+	public static Calendar copy(Calendar cal)
+	{
+		final GregorianCalendar copy = new GregorianCalendar(cal.getTimeZone());
+		copy.setTimeInMillis(cal.getTimeInMillis());
+		return copy;
+	}
+
 	public static long diffDays(Date date1, Date date2)
 	{
 		return (date1.getTime() - date2.getTime()) / Constants.MILLIS_PER_DAY;
@@ -221,17 +241,62 @@ public final class DateTime
 		return r;
 	}
 
+	private static DateCacheData obtainImmutableCachedDateInstance(long timeInMillis)
+	{
+		synchronized(DATE_CACHE)
+		{
+			//ImmutableGregorianCalendar instance = DATE_CACHE.get(timeInMillis);
+			DateCacheData data = DATE_CACHE.get(timeInMillis);
+
+			if(data == null)
+			{
+				data = new DateCacheData();
+				data.calendar = new ImmutableGregorianCalendar(timeInMillis);
+
+				for(int field : CALENDAR_TIME_FIELDS)
+					data.calendar.setInternal(field, 0);
+
+				data.date = data.calendar.getTime();
+
+				DATE_CACHE.put(timeInMillis, data);
+			}
+			else if(LOGV)
+			{
+				if((++ImmutableGregorianCalendar.sCacheHits % 10) == 0)
+					Log.v(TAG, ImmutableGregorianCalendar.sCacheHits + " cache hits while obtaining current date");
+			}
+
+			return data;
+		}
+	}
+
 	private static final class ImmutableGregorianCalendar extends GregorianCalendar
 	{
 		private static final long serialVersionUID = -3883494047745731717L;
 
+//		private static final SparseArray<ImmutableGregorianCalendar> DATE_CACHE =
+//			new SparseArray<DateTime.ImmutableGregorianCalendar>();
+
+
+		private static int sCacheHits = 0;
+
 		private ImmutableGregorianCalendar(Calendar other)
 		{
 			super(other.getTimeZone(), Locale.getDefault());
-			time = other.getTimeInMillis();
-			areFieldsSet = true;
-			isTimeSet = true;
-			complete();
+			init(other.getTimeInMillis());
+		}
+
+		private ImmutableGregorianCalendar(long timeInMillis)
+		{
+			super(TimeZone.getDefault(), Locale.getDefault());
+			init(timeInMillis);
+		}
+
+		public Calendar mutate()
+		{
+			GregorianCalendar mutable = new GregorianCalendar(getTimeZone());
+			mutable.setTimeInMillis(getTimeInMillis());
+			return mutable;
 		}
 
 		@Override
@@ -284,5 +349,19 @@ public final class DateTime
 		private void setTimeInMillisInternal(long milliseconds) {
 			super.setTimeInMillis(milliseconds);
 		}
+
+		private void init(long timeInMillis)
+		{
+			time = timeInMillis;
+			areFieldsSet = true;
+			isTimeSet = true;
+			complete();
+		}
+	}
+
+	static final class DateCacheData
+	{
+		ImmutableGregorianCalendar calendar;
+		Date date;
 	}
 }

@@ -22,13 +22,12 @@
 package at.caspase.rxdroid.test;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-
-//import junit.framework.Assert;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -37,6 +36,7 @@ import android.preference.PreferenceManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import at.caspase.rxdroid.Settings;
+import at.caspase.rxdroid.Settings.DoseTimeInfo;
 import at.caspase.rxdroid.db.Drug;
 import at.caspase.rxdroid.db.Schedule;
 import at.caspase.rxdroid.util.DateTime;
@@ -239,7 +239,7 @@ public class PreferencesTest extends AndroidTestCase
 		}
 	}
 
-	/*public void testGetDoseTimeInfo()
+	public void testGetDoseTimeInfo()
 	{
 		final int[][] testCases = {
 				//hours		mins	nextDoseTimeDate == currentDate
@@ -275,7 +275,7 @@ public class PreferencesTest extends AndroidTestCase
 			Log.d(TAG, "[OK]");
 			Log.d(TAG,"-----------------------------------------");
 		}
-	}*/
+	}
 
 	public void testStringSetSharedPref()
 	{

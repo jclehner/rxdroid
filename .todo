@@ -537,6 +537,9 @@
     <note priority="medium" time="1350583452">
         Use extended notifications for &gt;= JB + add preference for disabling
     </note>
+    <note priority="medium" time="1350606880">
+        Send broadcasts for db upgrade/cleaning/loading for better progress indicator?
+    </note>
     <note priority="low" time="1317226248">
         For Version, don't get the revision from strings.xml, as this requires faking a change in the file to update the revision tag.
     </note>

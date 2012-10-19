@@ -43,7 +43,7 @@ public enum AutoIntakeCreator implements
 	INSTANCE;
 
 	private static final String TAG = AutoIntakeCreator.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	@Override
 	public void onDoseTimeBegin(Date date, int doseTime) {
@@ -93,7 +93,7 @@ public enum AutoIntakeCreator implements
 		////////////////////////////////////
 
 		final Date today = DateTime.today();
-		final long maxHistoryAgeInDays = Settings.getMaxHistoryAgeInDays();
+		//final long maxHistoryAgeInDays = Settings.getMaxHistoryAgeInDays();
 
 		final List<Intake> intakes = Database.getAll(Intake.class);
 		final int oldIntakeCount = intakes.size();
@@ -101,13 +101,15 @@ public enum AutoIntakeCreator implements
 
 		for(Intake intake : intakes)
 		{
-			long diffDays = DateTime.diffDays(today, intake.getDate());
-			if(diffDays > maxHistoryAgeInDays)
+//			long diffDays = DateTime.diffDays(today, intake.getDate());
+//			if(diffDays > maxHistoryAgeInDays)
+			if(Settings.isPastMaxHistoryAge(today, intake.getDate()))
 				++deleteCount;
 		}
+
 		final int deletedPercentage = (int) (deleteCount == 0 ? 0 : (deleteCount * 100.0) / oldIntakeCount);
 
-		Log.d(TAG, "Would have deleted " + deleteCount + " entries older than " + maxHistoryAgeInDays + " (~" + deletedPercentage + "%)");
+		Log.i(TAG, "Would delete " + deleteCount + " entries (~" + deletedPercentage + "%)");
 	}
 
 	public static void registerSelf()
@@ -167,7 +169,7 @@ public enum AutoIntakeCreator implements
 		if(Entries.countIntakes(drug, date, doseTime) != 0)
 			return;
 
-		Log.d(TAG, "createIntake: drug=" + drug + ", date=" + date + ", doseTime=" + doseTime);
+		if(LOGV) Log.v(TAG, "createIntake: drug=" + drug + ", date=" + date + ", doseTime=" + doseTime);
 
 		final Intake intake = new Intake(drug, date, doseTime, dose);
 		intake.setWasAutoCreated(true);

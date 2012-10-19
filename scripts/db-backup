@@ -10,6 +10,15 @@ fi
 
 [[ ! -e "$FILE" ]] || die "Refusing to overwrite $FILE"
 
-echo -n "Pulling database from device ... "
-adb pull $(adb-path /data/data/at.caspase.rxdroid/databases/db.sqlite) "$FILE"
+TEMPDB="$DTEMP/.rxdroid-db.sqlite"
 
+echo -n "Copying database to temporary location ... "
+run adb-shell "su -c 'cp /data/data/$PKG/databases/db.sqlite $TEMPDB'"
+echo "done"
+
+echo -n "Pulling database from device ... "
+run adb pull $TEMPDB "$FILE"
+
+echo -n "Removing database at temporary location ... "
+run adb-shell "su -c 'rm $TEMPDB'"
+echo "done"

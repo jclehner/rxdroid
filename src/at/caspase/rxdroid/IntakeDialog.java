@@ -65,10 +65,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	private FractionInput mDoseEdit;
 	private TextView mInsufficientSupplyText;
 
-	private PopupWindow mPopup;
-
 	private int mState;
-	private int mLastState = -1;
 
 	private OnShowListener mOnShowListener;
 
@@ -210,67 +207,6 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		return supplies.compareTo(mDose) == -1;
 	}
 
-//	private void showPopup()
-//	{
-//		if(mPopup == null)
-//			setupPopupWindow();
-//		mPopup.showAtLocation(mDoseEdit, Gravity.CENTER, 0, 0);
-//	}
-//
-//	private boolean isPopupShowing() {
-//		return mPopup == null ? false : mPopup.isShowing();
-//	}
-//
-//	private void dismissPopup()
-//	{
-//		if(mPopup != null)
-//			mPopup.dismiss();
-//	}
-
-	private void setupPopupWindow()
-	{
-		final Context context = getContext();
-
-		View view = getLayoutInflater().inflate(R.layout.intake_popup, null, false);
-		String okStr = context.getString(android.R.string.ok);
-		String text = context.getString(R.string._msg_footer_insufficient_supplies,
-				mDrug.getCurrentSupply(), okStr, mDrug.getName());
-
-		TextView tv = (TextView) view.findViewById(R.id.text);
-		tv.setText(text);
-		tv.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v)
-			{
-				Intent intent = new Intent(context, DrugEditActivity.class);
-				intent.setAction(Intent.ACTION_EDIT);
-				intent.putExtra(DrugEditActivity.EXTRA_DRUG, mDrug);
-				intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
-
-				context.startActivity(intent);
-			}
-		});
-
-		WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-		Display display = wm.getDefaultDisplay();
-
-		@SuppressWarnings("deprecation")
-		int width  = display.getWidth()  * 8 / 10;
-		@SuppressWarnings("deprecation")
-		int height = display.getHeight() * 1 / 3;
-
-		mPopup = new PopupWindow(
-				view,
-				width,
-				height,
-				false
-		);
-
-		mPopup.setOutsideTouchable(true);
-		mPopup.setTouchable(true);
-	}
-
 	private void addIntakeAndDismiss()
 	{
 		Intake intake = new Intake(mDrug, mDate, mDoseTime, mDose);
@@ -324,14 +260,12 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		if(mState == state)
 			return;
 
-		mLastState = mState;
 		mState = state;
 
 		// these could be booleans checking for state == STATE_<FOOBAR>, but
 		// we might need views that are visibile in more than one state.
 		int doseTextVisibility = View.INVISIBLE;
 		int doseEditVisibility = View.INVISIBLE;
-		@SuppressWarnings("unused")
 		int insufficientSupplyTextVisibility = View.INVISIBLE;
 
 		switch(mState)

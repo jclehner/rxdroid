@@ -63,14 +63,6 @@ public class Application extends android.app.Application
 		return c;
 	}
 
-//	public static String getString(int resId) {
-//		return getContext().getString(resId);
-//	}
-//
-//	public static String getString(int resId, Object... args) {
-//		return getContext().getString(resId, args);
-//	}
-
 	public static void doStartActivity(Intent intent) {
 		getContext().startActivity(intent);
 	}

@@ -129,14 +129,19 @@ public class NotificationReceiver extends BroadcastReceiver
 			return;
 		}
 
-		if(LOGV) Log.d(TAG, "Scheduling next alarms...");
+		if(LOGV) Log.i(TAG, "Scheduling next alarms...");
 
 		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
 
+//		if(dtInfo.activeDoseTime() != Schedule.TIME_INVALID)
+//			scheduleEndAlarm(dtInfo.currentTime(), dtInfo.activeDoseTime());
+//		else
+//			scheduleBeginAlarm(dtInfo.currentTime(), dtInfo.nextDoseTime());
+
 		if(dtInfo.activeDoseTime() != Schedule.TIME_INVALID)
-			scheduleEndAlarm(dtInfo.currentTime(), dtInfo.activeDoseTime());
+			scheduleNextBeginOrEndAlarm(dtInfo, true);
 		else
-			scheduleBeginAlarm(dtInfo.currentTime(), dtInfo.nextDoseTime());
+			scheduleNextBeginOrEndAlarm(dtInfo, false);
 	}
 
 	private void updateCurrentNotifications()
@@ -206,16 +211,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.post();
 	}
 
-	private void scheduleBeginAlarm(Calendar time, int doseTime) {
-		scheduleNextBeginOrEndAlarm(time, doseTime, false);
-	}
-
-	private void scheduleEndAlarm(Calendar time, int doseTime) {
-		scheduleNextBeginOrEndAlarm(time, doseTime, true);
-	}
-
-	private void scheduleNextBeginOrEndAlarm(Calendar time, int doseTime, boolean scheduleEnd)
+	private void scheduleNextBeginOrEndAlarm(DoseTimeInfo dtInfo, boolean scheduleEnd)
 	{
+		final int doseTime = scheduleEnd ? dtInfo.activeDoseTime() : dtInfo.nextDoseTime();
+		final Calendar time = dtInfo.currentTime();
+		final Date doseTimeDate = scheduleEnd ? dtInfo.activeDate() : dtInfo.nextDoseTimeDate();
+
 		long offset;
 
 		if(scheduleEnd)
@@ -228,51 +229,27 @@ public class NotificationReceiver extends BroadcastReceiver
 		else
 			offset = Settings.getMillisUntilDoseTimeBegin(time, doseTime);
 
-		time.add(Calendar.MILLISECOND, (int) offset);
+		final long triggerAtMillis = time.getTimeInMillis() + offset;
 
-		if(time.getTimeInMillis() < System.currentTimeMillis())
+		if(triggerAtMillis < System.currentTimeMillis())
 			throw new IllegalStateException("Alarm time is in the past: " + DateTime.toString(time));
 
-		// There are two cases where the current date is not the date of the scheduled
-		// dose-time alarm:
-		//
-		// 1) Wrapping TIME_NIGHT, scheduling end alarm of TIME_NIGHT, time is after midnight.
-		// 2) Non-wrapping TIME_NIGHT, scheduling begin alarm of TIME_MORNING, time is before midnight.
-		//
-		// In this case we must adjust the time accordingly, to provide a correct date to be used in the
-		// intent.
-
-		final Calendar doseTimeDate = DateTime.todayCalendarMutable();
-
-		if(doseTime == Schedule.TIME_NIGHT && scheduleEnd && Settings.hasWrappingDoseTimeNight())
-		{
-			if(offset >= Settings.getDoseTimeEndOffset(Schedule.TIME_NIGHT))
-				doseTimeDate.add(Calendar.DAY_OF_MONTH, -1);
-		}
-		else if(doseTime == Schedule.TIME_MORNING && !scheduleEnd && !Settings.hasWrappingDoseTimeNight())
-		{
-			if(offset < Settings.getDoseTimeBeginOffset(Schedule.TIME_MORNING))
-				doseTimeDate.add(Calendar.DAY_OF_MONTH, 1);
-		}
-
-		if(LOGV)
-		{
-			Log.v(TAG, "Scheduling " + (scheduleEnd ? mAlarmRepeatMode != ALARM_MODE_REPEAT ? "end" : "next alarm" : "begin") +
-					" of doseTime " + doseTime + " on date " + DateTime.toString(doseTimeDate) + " for " + DateTime.toString(time));
-			Log.v(TAG, "Alarm will fire in " + Util.millis(time.getTimeInMillis() - System.currentTimeMillis()));
-		}
+		Log.i(TAG, "Scheduling " + (scheduleEnd ? mAlarmRepeatMode != ALARM_MODE_REPEAT ? "end" : "next alarm" : "begin") +
+				" of doseTime " + doseTime + " on date " + DateTime.toDateString(doseTimeDate) + " for " + DateTime.toString(triggerAtMillis) + "\n" +
+				"Alarm will fire in " + Util.millis(triggerAtMillis - System.currentTimeMillis())
+		);
 
 		final Bundle extras = new Bundle();
 		extras.putSerializable(EXTRA_DATE, doseTimeDate.getTime());
 		extras.putInt(EXTRA_DOSE_TIME, doseTime);
 		extras.putBoolean(EXTRA_IS_DOSE_TIME_END, scheduleEnd);
 
-		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), createOperation(extras));
+		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, createOperation(extras));
 	}
 
 	private void cancelAllAlarms()
 	{
-		Log.d(TAG, "Cancelling all alarms...");
+		if(LOGV) Log.i(TAG, "Cancelling all alarms...");
 		mAlarmMgr.cancel(createOperation(null));
 	}
 
