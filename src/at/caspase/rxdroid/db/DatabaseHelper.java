@@ -52,11 +52,12 @@ import com.j256.ormlite.table.TableUtils;
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 {
 	private static final String TAG = DatabaseHelper.class.getName();
-	@SuppressWarnings("unused")
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	public static class DatabaseError extends RuntimeException
 	{
+		private static final long serialVersionUID = 4326067582393937172L;
+
 		public static final int E_GENERAL = 0;
 		public static final int E_UPGRADE = 1;
 		public static final int E_DOWNGRADE = 2;
@@ -112,8 +113,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 
 		private final int mType;
-
-		private static final long serialVersionUID = 4326067582393937172L;
 	}
 
 	public static final int DB_VERSION = 53;
@@ -283,7 +282,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			return false;
 		}
 
-		Log.i(TAG, "  Found " + oldDataClassName);
+		if(LOGV) Log.v(TAG, "  Found " + oldDataClassName);
 
 		final Class<?> newDataClass = Class.forName(newDataClassName);
 
@@ -310,7 +309,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		try
 		{
 			final Class<?> hook = Class.forName(packageName + "." + hookName);
-			Log.i(TAG, "  Found " + hookName + " in " + packageName);
+			if(LOGV) Log.v(TAG, "  Found " + hookName + " in " + packageName);
 
 			final Constructor<?> ctor = hook.getConstructor(cs.getClass());
 			Runnable r = (Runnable) ctor.newInstance(cs);

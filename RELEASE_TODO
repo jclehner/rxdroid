@@ -1,11 +1,3 @@
-* Lockscreen
-* Icons
-* Reset DB version
-* Strings:
-	* "Show supply monitors" ?
-	* "History size/age" ?
-	* "Low supply threshold" ?
-* German translation!
 
 DONE:	
 + Remove PopupWindow in IntakeDialog
@@ -13,3 +5,11 @@ DONE:
 + Trackball navigation (wont implement for now)
 + History size
 + Fix Activity dialogs (use showDialog()!)
++ Icons
++ Strings:
+	+ "Show supply monitors" ?
+	+ "History size/age" ?
+	+ "Low supply threshold" ?
++ German translation!
++ Reset DB version (really neccessary?)
++ Lockscreen

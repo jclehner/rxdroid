@@ -56,7 +56,7 @@ import at.caspase.rxdroid.util.CollectionUtils;
 public abstract class PreferenceHelper<P extends Preference, T>
 {
 	private static final String TAG = PreferenceHelper.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	protected Object mObject;
 	private Field mField;

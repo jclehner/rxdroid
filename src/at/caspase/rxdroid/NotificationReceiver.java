@@ -46,7 +46,7 @@ import at.caspase.rxdroid.util.Util;
 public class NotificationReceiver extends BroadcastReceiver
 {
 	private static final String TAG = NotificationReceiver.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private static final Class<?>[] EVENT_HANDLER_ARG_TYPES = { Date.class, Integer.TYPE };
 

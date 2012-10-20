@@ -68,7 +68,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		@Override
 		public void onReceive(Context context, Intent intent)
 		{
-			Log.d(TAG + "$DatabaseStatusReceiver", "onReceive: intent=" + intent);
+//			Log.d(TAG + "$DatabaseStatusReceiver", "onReceive: intent=" + intent);
 
 			if(intent == null)
 				return;
@@ -145,7 +145,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 
 	public static void setStatusMessage(int msgResId)
 	{
-		Log.d(TAG, "setStatusMessage: msgResId=" + msgResId);
+//		Log.d(TAG, "setStatusMessage: msgResId=" + msgResId);
 
 		final Context context = RxDroid.getContext();
 		final Intent intent = new Intent(context, DatabaseStatusReceiver.class);
