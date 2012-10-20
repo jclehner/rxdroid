@@ -22,15 +22,17 @@
  */
 -->
 
-<resources>
+<resources>   
     <string-array name="drug_forms">
     	<item>@string/_title_tablet</item>
     	<item>@string/_title_injection</item>
-    	<item>@string/_title_spray</item>
-    	<item>@string/_title_drop</item>
+    	<item>@string/_title_spray</item>    	
     	<item>@string/_title_gel</item>
     	<item>@string/_title_ring</item>
+    	<!-- 
+    	<item>@string/_title_drop</item>
     	<item>@string/_title_other</item>
+    	 -->
     </string-array>
     
     <string-array name="drug_repeat">

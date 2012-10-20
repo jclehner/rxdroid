@@ -77,7 +77,7 @@
     
     <string name="_title_min_supply_days">Vorrat niedrig</string>
     <string name="_summary_min_supply_days">Anzahl an Tagen die der Vorrat eines Medikaments hält, bevor eine Benachrichtigung
-        angezeigt wird - derzeit %1$s</string>
+        angezeigt wird – derzeit %1$s</string>
     
     <string name="_title_pref_use_led">LED</string>
     <string name="_title_pref_use_sound">Ton</string>
@@ -232,15 +232,15 @@
 	<string name="_title_show_in_list">In Medikamentenliste anzeigen</string>
 		
 	<string name="_title_dark_theme">Dunkles Theme</string>
-	<string name="_toast_theme_changed">App wird neu gestartet&#8230;</string>
+	<string name="_toast_theme_changed">App wird neu gestartet…</string>
 	
 	<string name="_toast_low_supplies">Vorrat dieses Medikaments ist niedrig</string>
 	
 	<string name="_title_about">Über</string>
-	<string name="_title_db_status_creating_intakes">Erstelle fehlende Daten&#8230;</string>
-	<string name="_title_db_status_discarding_intakes">Verwerfe alte Daten&#8230;</string>
-	<string name="_title_db_status_loading">Lade&#8230;</string>
-	<string name="_title_db_status_upgrading">Anpassen&#8230;</string>
+	<string name="_title_db_status_creating_intakes">Erstelle fehlende Daten…</string>
+	<string name="_title_db_status_discarding_intakes">Verwerfe alte Daten…</string>
+	<string name="_title_db_status_loading">Lade…</string>
+	<string name="_title_db_status_upgrading">Anpassen…</string>
 	<string name="_title_doses_and_low_supplies">Alle</string>
 	<string name="_title_licenses">Lizenz</string>
 	<string name="_title_low_supplies_only">Nur niedrige Vorräte</string>

@@ -97,7 +97,7 @@
     <string name="_title_pref_notification_methods">Notification methods</string>
     
     <string name="_title_min_supply_days">Low supply threshold</string>
-    <string name="_summary_min_supply_days">Minimum number of days of a drug\'s supply before displaying a notification &#8211; currently %1$s.</string>
+    <string name="_summary_min_supply_days">Minimum number of days of a drug\'s supply before displaying a notification – currently %1$s.</string>
     
     <string name="_title_pref_use_led">LED</string>
     <string name="_title_pref_use_sound">Sound</string>
@@ -159,7 +159,7 @@
 	<string name="_title_repeat_alarm">Repeat alarm</string>
 	<string name="_title_snooze">Snooze</string>
 	
-	<string name="_msg_supply">%1$s - lasts until %2$s</string>
+	<string name="_msg_supply">%1$s – lasts until %2$s</string>
 	<string name="_title_save_chanes">Save changes</string>
 	<string name="_msg_save_drug_changes">Do you want to save changes made to this drug?</string>
 	<string name="_msg_every_n_days_distance">Days between each repetition.</string>
@@ -226,7 +226,7 @@
 	<string name="_title_scramble_names">Scramble names</string>
 	<string name="_summary_scramble_names">Scrambles the names of your drugs to protect your privacy when using the app in public.</string>
     
-	<string name="_title_loading">Loading&#8230;</string>
+	<string name="_title_loading">Loading…</string>
 	
 	<string name="_title_select_date">Select date</string>
 	
@@ -243,7 +243,7 @@
 	<string name="_title_database">Database</string>
 	
 	<string name="_toast_unlimited_history_size">Warning: this setting might cause very long loading times!</string>			
-	<string name="_toast_db_upgraded">Database upgrade successful. Restarting app&#8230;</string>
+	<string name="_toast_db_upgraded">Database upgrade successful. Restarting app…</string>
 	
 	<string name="_title_supply_monitor">Mark as taken</string>
 	<string name="_summary_supply_monitor">Doses are automatically marked as taken. Notifications will only be
@@ -280,7 +280,7 @@
 	</string>
 	
 	<string name="_title_dark_theme">Use dark theme</string>
-	<string name="_toast_theme_changed">Restarting app&#8230;</string>
+	<string name="_toast_theme_changed">Restarting app…</string>
 	
 	<string name="_toast_low_supplies">This drug\'s supplies are low</string>
 	
@@ -292,10 +292,10 @@
 	<string name="_title_about">About</string>
 	<string name="_title_licenses">License</string>
 	
-	<string name="_title_db_status_loading">Loading&#8230;</string>
-	<string name="_title_db_status_upgrading">Upgrading&#8230;</string>
-	<string name="_title_db_status_discarding_intakes">Discarding old data&#8230;</string>
-	<string name="_title_db_status_creating_intakes">Inserting missing data&#8230;</string>
+	<string name="_title_db_status_loading">Loading…</string>
+	<string name="_title_db_status_upgrading">Upgrading…</string>
+	<string name="_title_db_status_discarding_intakes">Discarding old data…</string>
+	<string name="_title_db_status_creating_intakes">Inserting missing data…</string>
 					
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

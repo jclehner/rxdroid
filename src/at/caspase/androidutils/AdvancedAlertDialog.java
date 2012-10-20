@@ -28,6 +28,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Message;
+import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.View;
 import android.widget.Button;
 
@@ -40,7 +42,9 @@ public class AdvancedAlertDialog extends AlertDialog
 	private Button mBtnNeutral;
 	private Button mBtnNegative;
 
-	private Map<Integer, Object> mBtnActions = new HashMap<Integer, Object>(2);
+	// Cannot use a plain array here if we want the indexes to be
+	// BUTTON_<FOO> values.
+	private SparseArray<Object> mBtnActions = new SparseArray<Object>(3);
 
 	public AdvancedAlertDialog(Context context) {
 		this(context, true, null);
@@ -139,7 +143,7 @@ public class AdvancedAlertDialog extends AlertDialog
 		public void onClick(View v)
 		{
 			final int which = getButtonWhich((Button) v);
-			final Object action = mBtnActions.get(v);
+			final Object action = mBtnActions.get(which);
 			if(action == null)
 				return;
 
