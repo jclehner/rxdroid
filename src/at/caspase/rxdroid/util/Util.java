@@ -23,6 +23,7 @@ package at.caspase.rxdroid.util;
 
 import java.io.Closeable;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -65,6 +66,11 @@ public final class Util
 				Log.w(TAG, "detachFromParent: parent is not a ViewGroup");
 		}
 	}
+
+//	public static <T extends Serializable> T copy(T object)
+//	{
+//
+//	}
 
 	public static void applyStyle(Spannable spannable, Object style) {
 		spannable.setSpan(style, 0, spannable.length(), 0);

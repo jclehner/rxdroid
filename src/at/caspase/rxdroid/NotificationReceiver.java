@@ -205,8 +205,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		if(mDoPostSilent || RxDroid.isUiVisible())
 			defaults ^= Notification.DEFAULT_SOUND;*/
 
-		if(!mDoPostSilent)
-			builder.setDefaults(Notification.DEFAULT_ALL);
+		builder.setSilent(mDoPostSilent);
 
 		builder.post();
 	}

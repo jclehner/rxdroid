@@ -84,6 +84,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 	}
 
 	private static final String TAG = SplashScreenActivity.class.getName();
+	private static final String ARG_EXCEPTION = "exception";
 
 	private final BroadcastReceiver mReceiver = new DatabaseStatusReceiver();
 
@@ -155,6 +156,52 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		bm.sendBroadcast(intent);
 
 		//RxDroid.getContext().sendStickyBroadcast(intent);
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id, Bundle args)
+	{
+		if(id == R.id.db_error_dialog)
+		{
+			final WrappedCheckedException exception =
+				(WrappedCheckedException) args.getSerializable(ARG_EXCEPTION);
+
+			final AlertDialog.Builder ab = new AlertDialog.Builder(SplashScreenActivity.this);
+			ab.setTitle(R.string._title_error);
+			ab.setIcon(android.R.drawable.ic_dialog_alert);
+			ab.setCancelable(false);
+
+			StringBuilder sb = new StringBuilder();
+
+			if(exception.getCauseType() == DatabaseError.class)
+			{
+				switch(((DatabaseError) exception.getCause()).getType())
+				{
+					case DatabaseError.E_GENERAL:
+						sb.append(getString(R.string._msg_db_error_general));
+						break;
+
+					case DatabaseError.E_UPGRADE:
+						sb.append(getString(R.string._msg_db_error_upgrade));
+						break;
+
+					case DatabaseError.E_DOWNGRADE:
+						sb.append(getString(R.string._msg_db_error_downgrade));
+						break;
+				}
+			}
+			else
+				sb.append(getString(R.string._msg_db_error_general));
+
+			sb.append(getString(R.string._msg_db_error_footer));
+
+			ab.setMessage(sb.toString());
+			ab.setNegativeButton(R.string._btn_exit, SplashScreenActivity.this);
+			ab.setPositiveButton(R.string._btn_reset, SplashScreenActivity.this);
+
+			return ab.create();
+		}
+		return super.onCreateDialog(id, args);
 	}
 
 	private void loadDatabaseAndLaunchMainActivity() {
@@ -254,40 +301,9 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			{
 				Log.w(TAG, result.getRootCause());
 
-				AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreenActivity.this);
-				builder.setTitle(R.string._title_error);
-				builder.setIcon(android.R.drawable.ic_dialog_alert);
-				builder.setCancelable(false);
-
-				StringBuilder sb = new StringBuilder();
-
-				if(result.getCauseType() == DatabaseError.class)
-				{
-					switch(((DatabaseError) result.getCause()).getType())
-					{
-						case DatabaseError.E_GENERAL:
-							sb.append(getString(R.string._msg_db_error_general));
-							break;
-
-						case DatabaseError.E_UPGRADE:
-							sb.append(getString(R.string._msg_db_error_upgrade));
-							break;
-
-						case DatabaseError.E_DOWNGRADE:
-							sb.append(getString(R.string._msg_db_error_downgrade));
-							break;
-					}
-				}
-				else
-					sb.append(getString(R.string._msg_db_error_general));
-
-				sb.append(getString(R.string._msg_db_error_footer));
-
-				builder.setMessage(sb.toString());
-				builder.setNegativeButton(R.string._btn_exit, SplashScreenActivity.this);
-				builder.setPositiveButton(R.string._btn_reset, SplashScreenActivity.this);
-
-				builder.show();
+				Bundle args = new Bundle();
+				args.putSerializable(ARG_EXCEPTION, result);
+				showDialog(R.id.db_error_dialog, args);
 			}
 		}
 	}

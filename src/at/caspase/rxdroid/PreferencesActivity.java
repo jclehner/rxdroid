@@ -29,6 +29,7 @@ import java.util.Date;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -159,30 +160,14 @@ public class PreferencesActivity extends PreferenceActivity implements
 		switch(item.getItemId())
 		{
 			case MENU_RESTORE_DEFAULTS:
-			{
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setIcon(android.R.drawable.ic_dialog_alert);
-				builder.setTitle(R.string._title_restore_default_settings);
-				builder.setNegativeButton(android.R.string.cancel, null);
-				/////////////////////
-				builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which)
-					{
-						mSharedPreferences.edit().clear().commit();
-					}
-				});
-				/////////////////////
-				builder.show();
-				break;
-			}
+				showDialog(R.id.preference_reset_dialog);
+				return true;
 
 			default:
 				// ignore
 		}
 
-		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 		{
 			if(item.getItemId() == android.R.id.home)
 			{
@@ -214,6 +199,35 @@ public class PreferencesActivity extends PreferenceActivity implements
 	{
 		if(Settings.Keys.LICENSES.equals(preference.getKey()))
 		{
+			showDialog(R.id.licenses_dialog);
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean onPreferenceChange(Preference preference, Object newValue)
+	{
+		final String key = preference.getKey();
+
+		if(Settings.Keys.NOTIFICATION_SOUND.equals(key))
+		{
+			final Uri uri = Uri.parse((String) newValue);
+			final Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
+
+			if(ringtone != null)
+				preference.setSummary(ringtone.getTitle(this));
+		}
+
+		return true;
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id)
+	{
+		if(id == R.id.licenses_dialog)
+		{
 			String license;
 			InputStream is = null;
 
@@ -240,29 +254,29 @@ public class PreferencesActivity extends PreferenceActivity implements
 			ab.setTitle(R.string._title_licenses);
 			ab.setView(wv);
 			ab.setPositiveButton(android.R.string.ok, null);
-			ab.show();
 
-			return true;
+			return ab.create();
 		}
-
-		return false;
-	}
-
-	@Override
-	public boolean onPreferenceChange(Preference preference, Object newValue)
-	{
-		final String key = preference.getKey();
-
-		if(Settings.Keys.NOTIFICATION_SOUND.equals(key))
+		else if(id == R.id.preference_reset_dialog)
 		{
-			final Uri uri = Uri.parse((String) newValue);
-			final Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
+			final AlertDialog.Builder ab= new AlertDialog.Builder(this);
+			ab.setIcon(android.R.drawable.ic_dialog_alert);
+			ab.setTitle(R.string._title_restore_default_settings);
+			ab.setNegativeButton(android.R.string.cancel, null);
+			/////////////////////
+			ab.setPositiveButton(android.R.string.ok, new OnClickListener() {
 
-			if(ringtone != null)
-				preference.setSummary(ringtone.getTitle(this));
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					mSharedPreferences.edit().clear().commit();
+				}
+			});
+
+			return ab.create();
 		}
 
-		return true;
+		return super.onCreateDialog(id);
 	}
 
 
@@ -276,41 +290,4 @@ public class PreferencesActivity extends PreferenceActivity implements
 			p.setSummary(getString(R.string._summary_min_supply_days, value));
 		}
 	}
-
-//	private void updateAlarmModePreferenceSummary(Preference p, String value)
-//	{
-//		if(value == null)
-//		{
-//			if((value = ((ListPreference) p).getValue()) == null)
-//				return;
-//		}
-//
-//		int index = ((ListPreference) p).findIndexOfValue(value);
-//
-//		Preference alarmTimeout = findPreference("alarm_timeout");
-//		alarmTimeout.setEnabled(index > 0);
-//
-//		switch(index)
-//		{
-//			case 1:
-//				final DumbTime timeout = ((TimePreference) alarmTimeout).getValue();
-//				final int minutes;
-//
-//				if(timeout != null)
-//					minutes = 60 * timeout.getHours() + timeout.getMinutes();
-//				else
-//					minutes = 0;
-//
-//				p.setSummary(getString(R.string._summary_alarm_mode_repeat, minutes));
-//				break;
-//
-//			case 0:
-//				// fall through
-//
-//			default:
-//				p.setSummary(R.string._summary_alarm_mode_normal);
-//				break;
-//
-//		}
-//	}
 }

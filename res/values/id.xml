@@ -22,7 +22,7 @@
  */
 -->
 
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 	<item type="id" name="tag_drug_id"/>
 	<item type="id" name="tag_time"/>
 	<item type="id" name="tag_adapter_index"/>
@@ -31,4 +31,11 @@
 	<item type="id" name="notification_intake_forgotten"/>
 	<item type="id" name="notification_low_supplies"/>	
 	<item type="id" name="fraction_pref_input"/>
+	<item type="id" name="dose_dialog" />
+	<item type="id" name="preference_reset_dialog" />
+	<item type="id" name="drug_save_changes_dialog" />
+	<item type="id" name="drug_discard_dialog" />
+	<item type="id" name="drug_delete_dialog" />
+	<item type="id" name="db_error_dialog" />
+	<item type="id" name="licenses_dialog" />
 </resources>

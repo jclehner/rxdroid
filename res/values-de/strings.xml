@@ -38,8 +38,8 @@
     <string name="_msg_new_notification">Neue Benachrichtigung</string>
     <string name="_msg_doses_fp">%2$d fällig, %1$d vergessen.</string>
     <string name="_msg_doses_f">%1$d vergessen.</string>
-    <string name="_msg_doses_p">%1$d fällig.</string>
-    <string name="_msg_low_supply_single">%1$s</string>
+    <string name="_msg_doses_p">%1$d fällig.</string><string name="_msg_low_supply_single">%1$s</string>
+    
     <string name="_msg_low_supply_multiple">%1$s und %2$d andere(s).</string>
     
 	<string name="_msg_constraints_ab">Wähle eine Zeit zwischen %1$s und %2$s.</string>
@@ -73,11 +73,11 @@
     <string name="_title_prefscreen_notifications">Benachrichtigungen</string>
     <string name="_summary_prefscreen_notifications">Benachrichtigungsmethoden, etc.</string>
     
-    <string name="_title_pref_notification_methods">Benachrichtigungsmethoden</string>
+    <string name="_title_pref_notification_methods">Benachrichtigungsarten</string>
     
     <string name="_title_min_supply_days">Vorrat niedrig</string>
-    <string name="_summary_min_supply_days">Eine Benachrichtigung anzeigen, wenn der Vorrat eines Medikaments für weniger als %1$s
-    	Tag(e) ausreicht</string>
+    <string name="_summary_min_supply_days">Anzahl an Tagen die der Vorrat eines Medikaments hält, bevor eine Benachrichtigung
+        angezeigt wird - derzeit %1$s</string>
     
     <string name="_title_pref_use_led">LED</string>
     <string name="_title_pref_use_sound">Ton</string>
@@ -85,14 +85,8 @@
     
     <string name="_title_prefscreen_display">Ansicht</string>
     <string name="_summary_prefscreen_display"></string>
-    
-    <string name="_title_pref_show_days_without_intakes">Ohne Einnahme</string>
-	<string name="_summary_pref_show_days_without_intakes">Medikamente ohne Einnahmen am ausgewählten Tag anzeigen.</string>
 	
-	<string name="_title_pref_show_inactive">Zeige inaktive</string>
-	<string name="_summary_pref_show_inactive">Medikamente anzeigen, die als inaktiv gekennzeichnet sind.</string>
-	
-	<string name="_title_pref_restore_defaults">Einstellungen Zurücksetzen</string>
+	<string name="_title_pref_restore_defaults">Einstellungen zurücksetzen</string>
 		
 	<string name="_title_prefscreen_display_info">Information</string>
 	<string name="_summary_prefscreen_display_info">Dies Einstellungen können über MENÜ -&gt; Alle anzeigen 
@@ -110,8 +104,8 @@
 	<string name="_msg_intake_unscheduled">Dosis wählen und auf OK klicken.</string>
 	<string name="_title_change_dose">Dosis bearbeiten</string>
 	<string name="_title_edit_drug">Medikament bearbeiten</string>
-	<string name="_title_mark_not_taken">Als nicht eingenommen markieren</string>
-	<string name="_title_mark_taken">Als eingenommen markieren</string>
+	<string name="_title_mark_not_taken">Dosis nicht eingenommen</string>
+	<string name="_title_mark_taken">Dosis eingenommen</string>
 	
 	<string name="_msg_freq_every_n_days">Alle %1$s Tage, beginnend am %2$s</string>
 	
@@ -149,12 +143,12 @@
 	<string name="_title_current_supply">Vorrat</string>
 	<string name="_title_refill_size">Packungsgröße</string>
 	<string name="_title_active">Aktiv</string>
-	<string name="_title_ignore_dose">Als ignoriert markieren</string>
+	<string name="_title_ignore_dose">Dosis ignorieren</string>
 		    
-    <string name="_msg_touch_to_edit">(zum Bearbeiten berühren)</string>
+    <string name="_msg_touch_to_edit">(zum Ändern berühren)</string>
   
     
-    <string name="_msg_no_doses_on_this_day">Keine Einnahmen für diesen Tag vorgesehen.</string>
+    <string name="_msg_no_doses_on_this_day">Keine Dosen an diesem Tag vorgesehen.</string>
     
     <string name="_msg_db_error_general">Ein unbekannter Datenbankfehler ist aufgetreten.</string>
 	<string name="_msg_db_error_upgrade">Ein Fehler beim Datenbankupgrade ist aufgetreten.</string>
@@ -204,14 +198,14 @@
 	<string name="_title_morning">Morgen</string>
 	<string name="_title_night">Nacht</string>
 	<string name="_title_noon">Mittag</string>
-	<string name="_title_notification_doses">Einnahmen</string>
+	<string name="_title_notification_doses">Dosen</string>
 	<string name="_title_notification_low_supplies">Niedrige Vorräte</string>
 	<string name="_title_scramble_names">Unkenntliche Namen</string>
 	
 	<string name="_title_repetition_origin">Anfangsdatum</string>
 	<string name="_title_select_date">Datum auswählen</string>
 	
-	<string name="_summary_history_age">The amount of time that intake information will be stored. Longer periods result in larger databases.</string>
+	<string name="_summary_history_age">Daten älter als das angegebene Datum werden gelöscht</string>
 	
 	<string name="_title_supply_monitor">Nur Vorrat überwachen</string>
 	<string name="_summary_supply_monitor">Nur benachrichtigen, wenn Vorräte zur Neige gehen.</string>
@@ -225,7 +219,7 @@
 	<string name="_title_history_unlimited">Unbegrenzt</string>	
 	
 	
-	<string name="_toast_unlimited_history_size">Warnung: diese Einstellung kann zu langen Ladezeiten führen.</string>
+	<string name="_toast_unlimited_history_size">Warnung: diese Einstellung kann zu langen Ladezeiten führen!</string>
 	
 	<string name="_title_go_to_date">Datum wählen</string>
 	<string name="_title_today">Heute</string>

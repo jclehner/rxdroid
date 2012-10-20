@@ -43,14 +43,13 @@ public class MyNotification
 	private int mIcon1 = R.drawable.ic_stat_normal;
 	private int mIcon2;
 
-	private int mDefaults = Notification.DEFAULT_LIGHTS;
-
 	private boolean mDoAutoCancel = false;
 	private boolean mForceUpdate = false;
 	private boolean mShowTime = false;
 	private boolean mIsPersistent = false;
 
 	private int mFlags = 0;
+	private boolean mIsSilent = false;
 
 	private PendingIntent mContentIntent;
 	private PendingIntent mDeleteIntent;
@@ -130,12 +129,6 @@ public class MyNotification
 			return this;
 		}
 
-		public Builder setDefaults(int defaults)
-		{
-			mNotification.mDefaults = defaults;
-			return this;
-		}
-
 		public Builder setAutoCancel(boolean doAutoCancel)
 		{
 			mNotification.mDoAutoCancel = doAutoCancel;
@@ -177,6 +170,12 @@ public class MyNotification
 			return this;
 		}
 
+		public Builder setSilent(boolean silent)
+		{
+			mNotification.mIsSilent = silent;
+			return this;
+		}
+
 		public MyNotification build() {
 			return mNotification;
 		}
@@ -203,11 +202,6 @@ public class MyNotification
 			if(mDoAutoCancel)
 				notification.flags |= Notification.FLAG_AUTO_CANCEL;
 		}
-
-		if(mDefaults != 0)
-			notification.defaults |= mDefaults;
-		else
-			notification.defaults |= Notification.DEFAULT_ALL;
 
 		if(mShowTime)
 			notification.when = System.currentTimeMillis();
@@ -241,10 +235,9 @@ public class MyNotification
 			Settings.putInt(Settings.Keys.LAST_MSG_HASH, thisHash);
 		}
 
-		final int defaultsXorMask = Settings.getNotificationDefaultsXorMask();
-		notification.defaults ^= defaultsXorMask;
+		notification.defaults = 0;
 
-		if((notification.defaults & Notification.DEFAULT_LIGHTS) != 0)
+		if(Settings.getBoolean(Settings.Keys.USE_LED, true))
 		{
 			notification.flags |= Notification.FLAG_SHOW_LIGHTS;
 			notification.ledARGB = 0xff0000ff;
@@ -253,22 +246,17 @@ public class MyNotification
 			notification.defaults ^= Notification.DEFAULT_LIGHTS;
 		}
 
-		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
-		notification.ledARGB = 0xff0000ff;
-		notification.ledOnMS = 200;
-		notification.ledOffMS = 800;
-		notification.defaults ^= Notification.DEFAULT_LIGHTS;
-
-
-		if((notification.defaults & Notification.DEFAULT_SOUND) != 0)
+		if(Settings.getBoolean(Settings.Keys.USE_SOUND, true) && mIsSilent)
 		{
 			final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
 			if(ringtone != null)
-			{
 				notification.sound = Uri.parse(ringtone);
-				notification.defaults ^= Notification.DEFAULT_SOUND;
-			}
+			else
+				notification.defaults |= Notification.DEFAULT_SOUND;
 		}
+
+		if(Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true))
+			notification.defaults |= Notification.DEFAULT_VIBRATE;
 
 		final NotificationManager notificationMgr = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationMgr.notify(R.id.notification, notification);

@@ -114,7 +114,7 @@ public class DosePreference extends FractionPreference
 		int doseTime = CollectionUtils.indexOf(key, keys);
 
 		if(doseTime == -1)
-			throw new IllegalStateException("Illegal key '" + key + "' for DosePreference. Valid keys: " + keys);
+			throw new IllegalStateException("Illegal key '" + key + "' for DosePreference");
 
 		return doseTime;
 	}

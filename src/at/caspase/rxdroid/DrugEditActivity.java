@@ -91,6 +91,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	public static final String EXTRA_DRUG = "drug";
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
 
+	private static final String ARG_DRUG = "drug";
+
 	private static final String TAG = DrugEditActivity.class.getName();
 	private static final boolean LOGV = false;
 
@@ -113,21 +115,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		if(drugName == null || drugName.length() == 0)
 		{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			//builder.setTitle(R.string._title_warning);
-			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setTitle(R.string._msg_err_empty_drug_name);
-			builder.setNegativeButton(android.R.string.cancel, null);
-			builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					finish();
-				}
-			});
-			builder.show();
-
+			showDialog(R.id.drug_discard_dialog);
 			return;
 		}
 
@@ -137,38 +125,16 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			{
 				if(LOGV) Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, "drug 2");
 
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string._title_save_chanes);
-				builder.setIcon(android.R.drawable.ic_dialog_info);
-				builder.setMessage(R.string._msg_save_drug_changes);
+				Bundle args = new Bundle();
+				args.putSerializable(ARG_DRUG, drug);
 
-				final DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which)
-					{
-						if(which == DialogInterface.BUTTON_POSITIVE)
-						{
-							Database.update(drug);
-							setResult(RESULT_OK);
-							Toast.makeText(getApplicationContext(), R.string._toast_saved, Toast.LENGTH_SHORT).show();
-						}
-
-						finish();
-					}
-				};
-
-				builder.setPositiveButton(R.string._btn_save, onClickListener);
-				builder.setNegativeButton(R.string._btn_discard, onClickListener);
-
-				builder.show();
+				showDialog(R.id.drug_save_changes_dialog, args);
 				return;
 			}
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
 		{
 			Database.create(drug, 0);
-			setResult(RESULT_OK);
 			Toast.makeText(getApplicationContext(), getString(R.string._toast_saved), Toast.LENGTH_SHORT).show();
 		}
 
@@ -180,24 +146,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	{
 		if(preference.getKey().equals("delete"))
 		{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setTitle(getString(R.string._title_delete_drug, mWrapper.get().getName()));
-			builder.setMessage(R.string._msg_delete_drug);
-
-			builder.setPositiveButton(android.R.string.yes, new OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					Database.delete(mWrapper.get());
-					Toast.makeText(getApplicationContext(), R.string._toast_deleted, Toast.LENGTH_SHORT).show();
-					finish();
-				}
-			});
-
-			builder.setNegativeButton(android.R.string.no, null);
-			builder.show();
+			showDialog(R.id.drug_delete_dialog);
 
 			return true;
 		}
@@ -326,6 +275,84 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		// This activity will not be restarted when the screen orientation changes, otherwise
 		// the OTPM stuff in onCreate() would reinitialize the Preferences in the hierarchy,
 		// thus not restoring their original state.
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		return onCreateDialog(id, null);
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id, final Bundle args)
+	{
+		if(id == R.id.drug_delete_dialog)
+		{
+			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
+			ab.setIcon(android.R.drawable.ic_dialog_alert);
+			ab.setTitle(getString(R.string._title_delete_drug, mWrapper.get().getName()));
+			ab.setMessage(R.string._msg_delete_drug);
+
+			ab.setPositiveButton(android.R.string.yes, new OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					Database.delete(mWrapper.get());
+					Toast.makeText(getApplicationContext(), R.string._toast_deleted, Toast.LENGTH_SHORT).show();
+					finish();
+				}
+			});
+
+			ab.setNegativeButton(android.R.string.no, null);
+			return ab.create();
+		}
+		else if(id == R.id.drug_discard_dialog)
+		{
+			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
+			//builder.setTitle(R.string._title_warning);
+			ab.setIcon(android.R.drawable.ic_dialog_alert);
+			ab.setTitle(R.string._msg_err_empty_drug_name);
+			ab.setNegativeButton(android.R.string.cancel, null);
+			ab.setPositiveButton(android.R.string.ok, new OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					finish();
+				}
+			});
+
+			return ab.create();
+		}
+		else if(id == R.id.drug_save_changes_dialog)
+		{
+			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
+			ab.setTitle(R.string._title_save_chanes);
+			ab.setIcon(android.R.drawable.ic_dialog_info);
+			ab.setMessage(R.string._msg_save_drug_changes);
+
+			final DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					if(which == DialogInterface.BUTTON_POSITIVE)
+					{
+						Database.update((Drug) args.getSerializable(ARG_DRUG));
+						Toast.makeText(getApplicationContext(), R.string._toast_saved, Toast.LENGTH_SHORT).show();
+					}
+
+					finish();
+				}
+			};
+
+			ab.setPositiveButton(R.string._btn_save, onClickListener);
+			ab.setNegativeButton(R.string._btn_discard, onClickListener);
+
+			return ab.create();
+		}
+
+		return super.onCreateDialog(id, args);
 	}
 
 	private static class DrugWrapper

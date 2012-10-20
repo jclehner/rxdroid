@@ -307,13 +307,6 @@ public final class DateTime
 			init(timeInMillis);
 		}
 
-		public Calendar mutate()
-		{
-			GregorianCalendar mutable = new GregorianCalendar(getTimeZone());
-			mutable.setTimeInMillis(getTimeInMillis());
-			return mutable;
-		}
-
 		@Override
 		public void add(int field, int value) {
 			throw new UnsupportedOperationException();
@@ -376,6 +369,9 @@ public final class DateTime
 
 	private static final class ImmutableDate extends Date
 	{
+		private static final long serialVersionUID = -660796950979760891L;
+
+		@SuppressWarnings("unused")
 		public ImmutableDate(Date date) {
 			this(date.getTime());
 		}

@@ -1,6 +1,5 @@
 * Lockscreen
 * Icons
-* Fix Activity dialogs (use showDialog()!)
 * Reset DB version
 * Strings:
 	* "Show supply monitors" ?
@@ -13,3 +12,4 @@ DONE:
 + Notification sound preference
 + Trackball navigation (wont implement for now)
 + History size
++ Fix Activity dialogs (use showDialog()!)

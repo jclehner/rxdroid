@@ -30,6 +30,7 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -403,20 +404,17 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	public void onDoseViewClick(View view)
 	{
 		final DoseView doseView = (DoseView) view;
-		final Drug drug = doseView.getDrug();
-		final int doseTime = doseView.getDoseTime();
 		final Date date = doseView.getDate();
 
 		if(!date.equals(mDate))
 			throw new IllegalStateException("Activity date " + mDate + " differs from DoseView date " + date);
 
-		if(MultipleIntakeDialogsPreventer.INSTANCE.canShowDialog())
-		{
-			IntakeDialog dialog = new IntakeDialog(this, drug, doseTime, date);
-			dialog.setOnShowListener(MultipleIntakeDialogsPreventer.INSTANCE);
-			dialog.setOnDismissListener(MultipleIntakeDialogsPreventer.INSTANCE);
-			dialog.show();
-		}
+		final Bundle args = new Bundle();
+		args.putInt(IntakeDialog.ARG_DRUG_ID, doseView.getDrug().getId());
+		args.putInt(IntakeDialog.ARG_DOSE_TIME, doseView.getDoseTime());
+		args.putSerializable(IntakeDialog.ARG_DATE, date);
+
+		showDialog(R.id.dose_dialog, args);
 	}
 
 	public void onMissedIndicatorClicked(View view)
@@ -436,6 +434,16 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	public void onLowSupplyIndicatorClicked(View view) {
 		Toast.makeText(this, R.string._toast_low_supplies, Toast.LENGTH_SHORT).show();
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	protected Dialog onCreateDialog(int id, Bundle args)
+	{
+		if(id == R.id.dose_dialog)
+			return new IntakeDialog(this, args);
+
+		return super.onCreateDialog(id, args);
 	}
 
 	@Override
