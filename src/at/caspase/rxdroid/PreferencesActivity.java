@@ -83,17 +83,23 @@ public class PreferencesActivity extends PreferenceActivity implements
 		Preference p = findPreference(Settings.Keys.VERSION);
 		if(p != null)
 		{
-			String summary = Version.get(Version.FORMAT_FULL) + ", DB v" + DatabaseHelper.DB_VERSION;
+			final int format = BuildConfig.DEBUG ? Version.FORMAT_FULL : Version.FORMAT_SHORT;
+			String summary = Version.get(format) + ", DB v" + DatabaseHelper.DB_VERSION;
 
-			try
+			if(BuildConfig.DEBUG)
 			{
-				final String apkModDate = new Date(new File(getPackageCodePath()).lastModified()).toString();
-				summary = summary + "\n" + apkModDate;
+				try
+				{
+					final String apkModDate = new Date(new File(getPackageCodePath()).lastModified()).toString();
+					summary = summary + "\n" + apkModDate;
+				}
+				catch(NullPointerException e)
+				{
+					// eat
+				}
 			}
-			catch(NullPointerException e)
-			{
-				// eat
-			}
+			else
+				summary = getString(R.string.app_name) + " " + summary;
 
 			p.setSummary(summary);
 		}

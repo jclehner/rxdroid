@@ -116,10 +116,10 @@
 	<string name="_summary_not_available">Nicht verfügbar</string>
 	
 	<string name="_title_tablet">Tablette</string>
-	<string name="_title_injection">Injektion</string>
+	<string name="_title_injection">Spritze</string>
 	<string name="_title_spray">Spray</string>
-	<string name="_title_drop">Tropfen</string>
-	<string name="_title_gel">Gel</string>
+	<string name="_title_drop">Glas</string>
+	<string name="_title_gel">Tube</string>
 	<string name="_title_other">Andere</string>
 	
 	<string name="_title_daily">Täglich</string>

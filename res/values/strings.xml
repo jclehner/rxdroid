@@ -27,6 +27,7 @@
     <string name="version" translatable="false">0.9</string>
     <string name="vcs_revision" translatable="false">$Revision$</string>
     
+    
     <!--  WARNING: Do NOT replace - with an en dash as suggested by lint -->
     <string name="pref_default_time_morning" translatable="false">06:00-10:00</string>
     <string name="pref_default_time_noon" translatable="false">12:00-14:00</string>
