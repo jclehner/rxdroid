@@ -22,7 +22,7 @@
  */
 -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">RxDroid</string>
     <string name="version" translatable="false">0.9</string>
     <string name="vcs_revision" translatable="false">$Revision$</string>
@@ -106,14 +106,8 @@
     <string name="_title_prefscreen_display">Appearance</string>
     <string name="_summary_prefscreen_display"></string>
     
-    <string name="_title_pref_show_days_without_intakes">Show doseless</string>
-	<string name="_summary_pref_show_days_without_intakes">Show drugs having no doses on the currently displayed day.</string>
-	
-	<string name="_title_pref_show_inactive">Show inactive</string>
-	
-	<string name="_title_pref_restore_defaults">Restore defaults</string>
-	<string name="_summary_pref_restore_defaults">Resets all preferences to default values</string>
-	
+    <string name="_title_pref_restore_defaults">Restore defaults</string>
+		
 	<string name="_title_prefscreen_display_info">Note</string>
 	<string name="_summary_prefscreen_display_info">These settings may be overridden temporarily using MENU -&gt; Show all</string>		
 	
@@ -125,7 +119,6 @@
 	<string name="_title_add">Add</string>
 	<string name="_title_toggle_filtering">Toggle filtering</string>
 	
-	<string name="_msg_intake_already_taken">You have already taken this dose. Do you want to continue?</string>
 	<string name="_msg_intake_normal">Take this dose of &lt;b&gt;%1$s&lt;/b&gt;</string>
 	<string name="_msg_intake_unscheduled">Choose a dose of &lt;b&gt;%1$s&lt;/b&gt;</string>
 	<string name="_title_change_dose">Change dose</string>
@@ -211,11 +204,8 @@
 	
 	<string name="_title_alarm_timeout">Alarm timeout</string>
 	
-	<string name="_summary_pref_show_inactive">Show drugs marked as being inactive</string>
-    <string name="_toast_drug_notification_icon">The last dose of this drug was not taken.</string> 
-    
-    <string name="_title_add_drug">Add drug</string>
-    
+	<string name="_toast_drug_notification_icon">The last dose of this drug was not taken.</string> 
+        
     <string name="_title_notification_doses">Doses</string>
 	<string name="_title_notification_low_supplies">Low supplies</string>
 	
@@ -224,9 +214,7 @@
 	
 	<string name="_title_scramble_names">Scramble names</string>
 	<string name="_summary_scramble_names">Scrambles the names of your drugs. To reveal the real name, click on it.</string>
-    
-	<string name="_title_loading">Loading…</string>
-	
+    	
 	<string name="_title_select_date">Select date</string>
 	
 	<string name="_title_repetition_origin">Starting date</string>
@@ -242,7 +230,6 @@
 	<string name="_title_database">Database</string>
 	
 	<string name="_toast_unlimited_history_size">Warning: this setting might cause very long loading times!</string>			
-	<string name="_toast_db_upgraded">Database upgrade successful. Restarting app…</string>
 	
 	<string name="_title_supply_monitor">Mark as taken</string>
 	<string name="_summary_supply_monitor">Doses are automatically marked as taken. Notifications will only be
@@ -252,14 +239,6 @@
 	<string name="_title_go_to_date">Go to date</string>
 	<string name="_title_today">Today</string>
 	
-	<string name="_title_filter">Filter</string>
-	<string name="_summary_filter">Hide drugs in the main list based on the following criteria.</string>
-
-	<string name="_title_hide_doseless">Doseless</string>
-	<string name="_summary_hide_doseless">Drugs that have no dose on the displayed date.</string>
-	
-	<string name="_title_hide_supply_monitors">Supply monitors</string>
-	<string name="_title_hide_inactive">Inactive</string>
 	
 	<string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
 	<string name="_msg_restore_default_settings">This will reset all settings to their default values.</string>
@@ -271,13 +250,7 @@
 	
 	<string name="_title_help">Help</string>
 	<string name="_title_n_of_n">%1$d of %2$d</string>
-	
-	<string name="_help_added_drug">
-		You\'ve just added your first drug. If you want to edit it, simply click its name in the list.
-		To mark a dose as taken, touch the corresponding dose icon and follow the on-screen instructions. Touching
-		and holding the dose icon will allow you to select other options as well.
-	</string>
-	
+		
 	<string name="_title_dark_theme">Use dark theme</string>
 	<string name="_toast_theme_changed">Restarting app…</string>
 	
@@ -298,7 +271,8 @@
 	
 	<string name="_summary_enable_landscape_mode">Enables landscape mode (experimental)</string>
 	<string name="_title_enable_landscape_mode">Landscape mode</string>
-					
+	
+	<string name="_msg_repetition_origin">Choose starting date</string>				
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 
@@ -307,7 +281,7 @@
 	file. 
 	-->
 	
-	<string name="virtual_msg_no_drugs" translatable="false">@string/_msg_no_drugs_v8</string>
+	<string translatable="false" name="virtual_msg_no_drugs" tools:ignore="MissingTranslation">@string/_msg_no_drugs_v8</string>
 	
 	<!-- 
     Keep at the end of strings.xml!  
