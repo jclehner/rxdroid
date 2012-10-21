@@ -94,8 +94,8 @@
 	
 	<string name="_btn_discard">Verwerfen</string>
 	<string name="_btn_save">Speichern</string>
-	<string name="_toast_intake_noted">Notiert.</string>
-	<string name="_toast_saved">Gespeichert.</string>
+	<string name="_toast_intake_noted">Notiert…</string>
+	<string name="_toast_saved">Gespeichert…</string>
 	
 	<string name="_title_add">Hinzufügen</string>
 	<string name="_title_toggle_filtering">Alle anzeigen / filtern</string>
@@ -154,12 +154,11 @@
     
     <string name="_msg_no_doses_on_this_day">Keine Dosen an diesem Tag vorgesehen.</string>
     
-    <string name="_msg_db_error_general">Ein unbekannter Datenbankfehler ist aufgetreten.</string>
-	<string name="_msg_db_error_upgrade">Ein Fehler beim Datenbankupgrade ist aufgetreten.</string>
-	<string name="_msg_db_error_downgrade">Die lokalen Daten wurden von einer neueren Version dieser
-		App erstellt.</string>
+    <string name="_msg_db_error_general">Unbekannter Datenbankfehler.</string>
+	<string name="_msg_db_error_upgrade">Datenbankupgrade fehlgeschlagen.</string>
+	<string name="_msg_db_error_downgrade">Inkompatible Datenbankversion.</string>
 	
-	<string name="_msg_db_error_footer">Ein Zurücksetzen der Datenbank hat den Verlust aller Daten dieser App zur Folge.</string>	
+	<string name="_msg_db_error_footer">Auf %1$s klicken, um die Datenbank zurückzusetzen.</string>	
 	
 	<string name="_btn_reset">Zurücksetzen</string>
 	
@@ -170,7 +169,7 @@
 	<string name="_title_weekdays">Wochentage</string>
 	
 	<string name="_msg_snoozing">Schlummere. Klicke zum Abbrechen.</string>
-	<string name="_toast_snoozing">Schlummere.</string>
+	<string name="_toast_snoozing">Schlummere…</string>
 	<string name="_title_on_demand">Bei Bedarf</string>
 	
 	<string name="_title_delete_drug">%1$s wirklich löschen?</string>
@@ -187,7 +186,7 @@
 	
 	<string name="_title_alarm_timeout">Intervall</string>
 	
-	<string name="_toast_drug_notification_icon">Die letzte Dosis dieses Medikaments wurde nicht eingenommen.</string>   
+	<string name="_toast_drug_notification_icon">Die letzte Einnahme dieses Medikaments wurde ausgelassen.</string>   
 	
 	<string name="_btn_back">Zurück</string>
 	<string name="_btn_next">Weiter</string>
@@ -212,7 +211,7 @@
 	<string name="_summary_history_age">Daten älter als das angegebene Datum werden gelöscht</string>
 	
 	<string name="_title_supply_monitor">Nur Vorrat überwachen</string>
-	<string name="_summary_supply_monitor">Nur benachrichtigen, wenn Vorräte zur Neige gehen.</string>
+	<string name="_summary_supply_monitor">Nur benachrichtigen, wenn Vorräte zur Neige gehen</string>
 		
 	<string name="_title_database">Datenbank</string>
 	<string name="_title_history_1_month">Ein Monat</string>

@@ -87,6 +87,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 	private static final String ARG_EXCEPTION = "exception";
 
 	private final BroadcastReceiver mReceiver = new DatabaseStatusReceiver();
+	private WrappedCheckedException mException = null;
 
 	@TargetApi(11)
 	@Override
@@ -137,8 +138,8 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			else
 				Toast.makeText(this, R.string._toast_db_reset_failure, Toast.LENGTH_LONG).show();
 		}
-		else if(which != Dialog.BUTTON_NEGATIVE)
-			return;
+		else if(which == Dialog.BUTTON_NEGATIVE && mException != null)
+			throw mException;
 
 		finish();
 	}
@@ -169,6 +170,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			ab.setCancelable(false);
 			ab.setNegativeButton(R.string._btn_exit, SplashScreenActivity.this);
 			ab.setPositiveButton(R.string._btn_reset, SplashScreenActivity.this);
+			ab.setMessage("");
 
 			return ab.create();
 		}
@@ -180,14 +182,14 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 	{
 		if(id == R.id.db_error_dialog)
 		{
-			final WrappedCheckedException exception =
-				(WrappedCheckedException) args.getSerializable(ARG_EXCEPTION);
+//			final WrappedCheckedException exception =
+			mException = (WrappedCheckedException) args.getSerializable(ARG_EXCEPTION);
 
 			final StringBuilder sb = new StringBuilder();
 
-			if(exception.getCauseType() == DatabaseError.class)
+			if(mException.getCauseType() == DatabaseError.class)
 			{
-				switch(((DatabaseError) exception.getCause()).getType())
+				switch(((DatabaseError) mException.getCause()).getType())
 				{
 					case DatabaseError.E_GENERAL:
 						sb.append(getString(R.string._msg_db_error_general));
@@ -205,7 +207,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			else
 				sb.append(getString(R.string._msg_db_error_general));
 
-			sb.append(getString(R.string._msg_db_error_footer));
+			sb.append(getString(R.string._msg_db_error_footer, getString(R.string._btn_reset)));
 			((AlertDialog) dialog).setMessage(sb);
 		}
 		else
@@ -213,7 +215,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 	}
 
 	private void loadDatabaseAndLaunchMainActivity() {
-		new DatabaseIntializerTask().execute((Void) null);
+		new DatabaseIntializerTask().execute((Boolean) null);
 	}
 
 	private boolean deleteDatabase()
@@ -268,16 +270,19 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		}).start();
 	}
 
-	private class DatabaseIntializerTask extends AsyncTask<Void, Void, WrappedCheckedException>
+	private class DatabaseIntializerTask extends AsyncTask<Boolean, Void, WrappedCheckedException>
 	{
 		private boolean mAttemptedDatabaseReload = false;
 
 		@Override
-		protected WrappedCheckedException doInBackground(Void... params)
+		protected WrappedCheckedException doInBackground(Boolean... params)
 		{
 			try
 			{
-				Database.init();
+				if(params == null || params.length == 0 || params[0] == false)
+					Database.init();
+				else
+					Database.reload(RxDroid.getContext());
 			}
 			catch(Exception e)
 			{
@@ -288,8 +293,8 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 				if(!mAttemptedDatabaseReload)
 				{
 					mAttemptedDatabaseReload = true;
-					Database.reload(RxDroid.getContext());
-					return doInBackground(params);
+					//Database.reload(RxDroid.getContext());
+					return doInBackground(true);
 				}
 
 				return new WrappedCheckedException(e);
