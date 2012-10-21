@@ -144,7 +144,7 @@ public final class Entries
 		}
 
 		final double supply = drug.getCurrentSupply().doubleValue() - doseLeftOnDate.doubleValue();
-		return (int) Math.floor(supply / getDailyDose(drug) * getSupplyCorrectionFactor(drug));
+		return (int) (Math.floor(supply / getDailyDose(drug) * getSupplyCorrectionFactor(drug)));
 	}
 
 	public static<T extends Entry> T findInCollectionById(Collection<T> collection, int id)
