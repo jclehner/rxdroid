@@ -163,15 +163,27 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 	{
 		if(id == R.id.db_error_dialog)
 		{
-			final WrappedCheckedException exception =
-				(WrappedCheckedException) args.getSerializable(ARG_EXCEPTION);
-
 			final AlertDialog.Builder ab = new AlertDialog.Builder(SplashScreenActivity.this);
 			ab.setTitle(R.string._title_error);
 			ab.setIcon(android.R.drawable.ic_dialog_alert);
 			ab.setCancelable(false);
+			ab.setNegativeButton(R.string._btn_exit, SplashScreenActivity.this);
+			ab.setPositiveButton(R.string._btn_reset, SplashScreenActivity.this);
 
-			StringBuilder sb = new StringBuilder();
+			return ab.create();
+		}
+		return super.onCreateDialog(id, args);
+	}
+
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog, Bundle args)
+	{
+		if(id == R.id.db_error_dialog)
+		{
+			final WrappedCheckedException exception =
+				(WrappedCheckedException) args.getSerializable(ARG_EXCEPTION);
+
+			final StringBuilder sb = new StringBuilder();
 
 			if(exception.getCauseType() == DatabaseError.class)
 			{
@@ -194,14 +206,10 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 				sb.append(getString(R.string._msg_db_error_general));
 
 			sb.append(getString(R.string._msg_db_error_footer));
-
-			ab.setMessage(sb.toString());
-			ab.setNegativeButton(R.string._btn_exit, SplashScreenActivity.this);
-			ab.setPositiveButton(R.string._btn_reset, SplashScreenActivity.this);
-
-			return ab.create();
+			((AlertDialog) dialog).setMessage(sb);
 		}
-		return super.onCreateDialog(id, args);
+		else
+			super.onPrepareDialog(id, dialog, args);
 	}
 
 	private void loadDatabaseAndLaunchMainActivity() {

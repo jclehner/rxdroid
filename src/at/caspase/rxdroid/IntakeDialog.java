@@ -74,10 +74,44 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 	public static final int FLAG_ALLOW_DOSE_EDIT = 1;
 
-	public IntakeDialog(Context context, Bundle args)
+	public IntakeDialog(Context context)
 	{
 		super(context);
 
+		View view = getLayoutInflater().inflate(R.layout.intake, null);
+
+		view.findViewById(R.id.dose_container).setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v)
+			{
+				setState(STATE_DOSE_EDIT);
+			}
+		});
+
+		mDoseText = (TextView) view.findViewById(R.id.dose_text);
+		mHintText = (TextView) view.findViewById(R.id.dose_hint);
+		mDoseEdit = (FractionInput) view.findViewById(R.id.dose_edit);
+		mInsufficientSupplyText = (TextView) view.findViewById(R.id.text_insufficient_supplies);
+
+		setView(view);
+
+		setButton(BUTTON_NEGATIVE, getString(android.R.string.cancel), mLocalOnClickListener);
+		// The actual listener for this button is added in mLocalOnShowListener!
+		setButton(BUTTON_POSITIVE, getString(android.R.string.ok), (OnClickListener) null);
+
+		super.setOnShowListener(mLocalOnShowListener);
+		Database.registerEventListener(this);
+	}
+
+	public IntakeDialog(final Context context, Drug drug, int doseTime, Date date)
+	{
+		this(context);
+		update(drug, doseTime, date);
+	}
+
+	public void setArgs(Bundle args)
+	{
 		final Drug drug;
 		final int drugId = args.getInt(ARG_DRUG_ID, -1);
 		if(drugId == -1 || (drug = Drug.find(drugId)) == null)
@@ -89,13 +123,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		if(doseTime == Schedule.TIME_INVALID || date == null)
 			throw new IllegalArgumentException();
 
-		init(drug, doseTime, date);
-	}
-
-	public IntakeDialog(final Context context, Drug drug, int doseTime, Date date)
-	{
-		super(context);
-		init(drug, doseTime, date);
+		update(drug, doseTime, date);
 	}
 
 	@Override
@@ -161,13 +189,13 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 			super.onBackPressed();
 	}
 
-	private void init(Drug drug, int doseTime, Date date)
+	private void update(Drug drug, int doseTime, Date date)
 	{
 		mDrug = drug;
 		mDoseTime = doseTime;
 		mDate = date;
 
-		if(LOGV) Log.v(TAG, "<init>: doseTime=" + doseTime + ", date=" + date + ", drug=" + drug);
+		if(LOGV) Log.v(TAG, "init: doseTime=" + doseTime + ", date=" + date + ", drug=" + drug);
 
 		mIntakeCount = Entries.countIntakes(drug, date, doseTime);
 
@@ -176,52 +204,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		else
 			mDose = new Fraction();
 
-		View view = getLayoutInflater().inflate(R.layout.intake, null);
-
-		view.findViewById(R.id.dose_container).setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v)
-			{
-				setState(STATE_DOSE_EDIT);
-			}
-		});
-
-		mDoseText = (TextView) view.findViewById(R.id.dose_text);
-		mHintText = (TextView) view.findViewById(R.id.dose_hint);
-		mDoseEdit = (FractionInput) view.findViewById(R.id.dose_edit);
-		mInsufficientSupplyText = (TextView) view.findViewById(R.id.text_insufficient_supplies);
-
-		mDoseText.setText(mDose.toString());
-		mDoseEdit.setValue(mDose);
-		mDoseEdit.setAutoInputModeEnabled(true);
-		mDoseEdit.setOnChangeListener(this);
-		mInsufficientSupplyText.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v)
-			{
-				final Context context = IntakeDialog.this.getContext();
-				final Intent intent = new Intent(context, DrugEditActivity.class);
-				intent.setAction(Intent.ACTION_EDIT);
-				intent.putExtra(DrugEditActivity.EXTRA_DRUG, mDrug);
-				intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
-
-				context.startActivity(intent);
-			}
-		});
-
-		//setTitle(mDrug.getName());
-		setView(view);
-
-		setButton(BUTTON_NEGATIVE, getString(android.R.string.cancel), mLocalOnClickListener);
-		// The actual listener for this button is added in mLocalOnShowListener!
-		setButton(BUTTON_POSITIVE, getString(android.R.string.ok), (OnClickListener) null);
-
-		setupMessages();
-
-		super.setOnShowListener(mLocalOnShowListener);
-		Database.registerEventListener(this);
+		updateMessage();
 	}
 
 	private boolean hasInsufficientSupplies()
@@ -259,7 +242,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		Button b = getButton(BUTTON_POSITIVE);
 		b.setEnabled(!doseIsZero);
 
-		setupMessages();
+		updateMessage();
 	}
 
 	private void setNonDismissingListener(int button)
@@ -269,7 +252,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 			b.setOnClickListener(new NonDismissingListener(button));
 	}
 
-	private void setupMessages()
+	private void updateMessage()
 	{
 		if(mDose.isZero() || (mFlags & FLAG_ALLOW_DOSE_EDIT) != 0)
 		{

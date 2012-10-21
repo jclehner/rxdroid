@@ -436,14 +436,22 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		Toast.makeText(this, R.string._toast_low_supplies, Toast.LENGTH_SHORT).show();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected Dialog onCreateDialog(int id, Bundle args)
 	{
 		if(id == R.id.dose_dialog)
-			return new IntakeDialog(this, args);
+			return new IntakeDialog(this);
 
 		return super.onCreateDialog(id, args);
+	}
+
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog, Bundle args)
+	{
+		if(id == R.id.dose_dialog)
+			((IntakeDialog) dialog).setArgs(args);
+		else
+			super.onPrepareDialog(id, dialog, args);
 	}
 
 	@Override
