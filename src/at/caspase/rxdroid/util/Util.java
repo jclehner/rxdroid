@@ -29,7 +29,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Scanner;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.text.Spannable;
@@ -65,6 +67,12 @@ public final class Util
 			else
 				Log.w(TAG, "detachFromParent: parent is not a ViewGroup");
 		}
+	}
+
+	public static void lockActivityOrientation(Activity activity, int orientation)
+	{
+		activity.setRequestedOrientation(orientation);
+		activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 	}
 
 //	public static <T extends Serializable> T copy(T object)

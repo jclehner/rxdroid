@@ -177,6 +177,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	{
 		super.onResume();
 
+		LockscreenActivity.startMaybe(this);
+		Settings.maybeLockInPortraitMode(this);
+
 		Database.init();
 		RxDroid.setIsVisible(this, true);
 
@@ -691,10 +694,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			}
 
 			final NumberPickerWrapper picker = new NumberPickerWrapper(mContext);
-			picker.setValue((int) repeatArg);
 			picker.setMinValue(2);
 			picker.setWrapSelectorWheel(false);
+			picker.setValue((int) repeatArg);
 			picker.setGravity(Gravity.CENTER_HORIZONTAL);
+
+			picker.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
+					LayoutParams.WRAP_CONTENT));
 
 
 			final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);

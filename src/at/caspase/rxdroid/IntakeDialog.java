@@ -198,6 +198,10 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 			super.onBackPressed();
 	}
 
+	public void setHtmlMessage(String message) {
+		super.setMessage(Html.fromHtml(message));
+	}
+
 	@Override
 	protected void onStart()
 	{
@@ -308,7 +312,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		final String drugName = mDrug.getName();
 		final String okStr = getContext().getString(android.R.string.ok);
 
-		setMessage(Html.fromHtml(getContext().getString(msgResId, drugName, okStr)));
+		setHtmlMessage(getContext().getString(msgResId, drugName, okStr));
 	}
 
 	private void setState(int state)
@@ -352,7 +356,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 			final String text = context.getString(R.string._msg_footer_insufficient_supplies,
 					mDrug.getCurrentSupply(), okStr, mDrug.getName());
 
-			mInsufficientSupplyText.setText(text);
+			mInsufficientSupplyText.setText(Html.fromHtml(text));
 		}
 	}
 

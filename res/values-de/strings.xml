@@ -137,8 +137,8 @@
 	<string name="_msg_supply">%1$s - hält bis %2$s</string>
 	<string name="_title_save_chanes">Änderungen speichern</string>
 	<string name="_msg_save_drug_changes">Änderungen an diesem Medikament speichern?</string>
-	<string name="_msg_every_n_days_distance">Tage zwischen jeder Einnahme.</string>
-	<string name="_msg_repetition_origin">Wähle ein Anfangsdatum.</string>
+	<string name="_msg_every_n_days_distance">Tage zwischen jeder Einnahme</string>
+	<string name="_msg_repetition_origin">Anfangsdatum wählen</string>
 	
 	<string name="_title_intake_schedule">Einnahmeplan</string>
 	<string name="_title_repeat">Wiederholung</string>
@@ -152,7 +152,7 @@
     <string name="_msg_touch_to_edit">(zum Ändern berühren)</string>
   
     
-    <string name="_msg_no_doses_on_this_day">Keine Dosen an diesem Tag vorgesehen.</string>
+    <string name="_msg_no_doses_on_this_day">Keine Einnahmen an diesem Tag vorgesehen.</string>
     
     <string name="_msg_db_error_general">Unbekannter Datenbankfehler.</string>
 	<string name="_msg_db_error_upgrade">Datenbankupgrade fehlgeschlagen.</string>
@@ -163,8 +163,8 @@
 	<string name="_btn_reset">Zurücksetzen</string>
 	
 	<string name="_msg_db_loading">Lade Datenbank, bitte warten.</string>
-	<string name="_msg_footer_insufficient_supplies">Ungenügender Vorrat für diese Dosis. Klicke %2$s um
-		dies zu ignorieren, oder berühre diesen Text um %3$s zu bearbeiten.</string>
+	<string name="_msg_footer_insufficient_supplies">Ungenügender Vorrat für diese Dosis. %2$s klicken, um
+		zu ignorieren, oder diesen Text berühren, um &lt;b&gt;%3$s&lt;/b&gt; zu bearbeiten.</string>
 		
 	<string name="_title_weekdays">Wochentage</string>
 	
@@ -191,8 +191,8 @@
 	<string name="_btn_back">Zurück</string>
 	<string name="_btn_next">Weiter</string>
 	<string name="_msg_freq_21days_on_7days_off">21 Tage beginnend am %1$s, gefolgt von 7-tägiger Pause.</string>
-	<string name="_msg_no_drugs_v8">Drücke MENÜ and wähle "%1$s" um ein Medikament hinzuzufügen.</string>
-	<string name="_msg_no_drugs_v11">Drücke den +-Button in der Aktionsleiste, um ein Medikament hinzuzufügen.</string>
+	<string name="_msg_no_drugs_v8">MENÜ drücken und %1$s auswählen, um ein Medikament hinzuzufügen.</string>
+	<string name="_msg_no_drugs_v11">Den +-Button in der Aktionsleiste klicken, um ein Medikament hinzuzufügen.</string>
 	<string name="_summary_scramble_names">Namen von Medikamenten unkenntlich machen. Den Namen anklicken, um ihn zu zeigen.</string>
 	<string name="_title_21_days_on_7_days_off">7-tägige Pause alle 21 Tage</string>
 	<string name="_title_begin">Beginn</string>
@@ -252,6 +252,9 @@
 	
 	<string name="_summary_show_supply_monitors">Medikamente mit deaktivierten Dosis-Benachrichtigungen anzeigen</string>
 	<string name="_title_show_supply_monitors">Alle anzeigen</string>
+	
+	<string name="_summary_enable_landscape_mode">Landschaftsmodus aktivieren (experimentell)</string>
+	<string name="_title_enable_landscape_mode">Landschaftsmodus</string>
 		
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

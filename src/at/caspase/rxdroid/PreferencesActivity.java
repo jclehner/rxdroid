@@ -136,6 +136,8 @@ public class PreferencesActivity extends PreferenceActivity implements
 	protected void onResume()
 	{
 		super.onResume();
+		LockscreenActivity.startMaybe(this);
+		Settings.maybeLockInPortraitMode(this);
 		RxDroid.setIsVisible(this, true);
 		updateLowSupplyThresholdPreferenceSummary();
 	}

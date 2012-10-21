@@ -189,7 +189,7 @@
 	
 	<string name="_msg_db_loading">Loading database, please stand by.</string>
 	<string name="_msg_footer_insufficient_supplies">Insufficient supplies for this dose. 
-		Press %2$s to ignore, cancel to edit the dose, or touch this text to edit %3$s.</string>
+		Press %2$s to ignore, cancel to edit the dose, or touch this text to edit &lt;b&gt;%3$s&lt;/b&gt;.</string>
 		
 	<string name="_title_weekdays">Weekdays</string>
 	
@@ -295,6 +295,9 @@
 	<string name="_title_db_status_upgrading">Upgrading…</string>
 	<string name="_title_db_status_discarding_intakes">Discarding old data…</string>
 	<string name="_title_db_status_creating_intakes">Inserting missing data…</string>
+	
+	<string name="_summary_enable_landscape_mode">Enables landscape mode (experimental)</string>
+	<string name="_title_enable_landscape_mode">Landscape mode</string>
 					
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

@@ -28,11 +28,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import android.app.Notification;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -65,6 +66,7 @@ public final class Settings
 		public static final String HISTORY_SIZE = key(R.string.key_history_size);
 		public static final String THEME_IS_DARK = key(R.string.key_theme_is_dark);
 		public static final String NOTIFICATION_SOUND = key(R.string.key_notification_sound);
+		public static final String ENABLE_LANDSCAPE = key(R.string.key_enable_landscape_mode);
 	}
 
 	private static final String TAG = Settings.class.getName();
@@ -155,12 +157,6 @@ public final class Settings
 		0
 	};
 
-	public static int getMaxHistoryAgeInDays()
-	{
-		int index = getListPreferenceValueIndex(Keys.HISTORY_SIZE, 2);
-		return HISTORY_AGE_IN_DAYS[index];
-	}
-
 	public static boolean isPastMaxHistoryAge(Date reference, Date date)
 	{
 		final int index = getListPreferenceValueIndex(Keys.HISTORY_SIZE, 2);
@@ -196,20 +192,6 @@ public final class Settings
 
 		reference = DateTime.add(reference, field, -value);
 		return date.before(reference);
-	}
-
-	public static int filterNotificationDefaults(int defaults)
-	{
-		if(!sSharedPrefs.getBoolean(Keys.USE_LED, true))
-			defaults ^= Notification.DEFAULT_LIGHTS;
-
-		if(!sSharedPrefs.getBoolean(Keys.USE_SOUND, true))
-			defaults ^= Notification.DEFAULT_SOUND;
-
-		if(!sSharedPrefs.getBoolean(Keys.USE_VIBRATOR, true))
-			defaults ^= Notification.DEFAULT_VIBRATE;
-
-		return defaults;
 	}
 
 	public static boolean hasLowSupplies(Drug drug)
@@ -537,20 +519,15 @@ public final class Settings
 		return valueStr != null ? Integer.parseInt(valueStr, 10) : defValue;
 	}
 
-	public static int getNotificationDefaultsXorMask()
+	public static void maybeLockInPortraitMode(Activity activity)
 	{
-		int mask = 0;
-
-		if(!getBoolean(Keys.USE_LED, true))
-			mask |= Notification.DEFAULT_LIGHTS;
-
-		if(!getBoolean(Keys.USE_SOUND, true))
-			mask |= Notification.DEFAULT_SOUND;
-
-		if(!getBoolean(Keys.USE_VIBRATOR, true))
-			mask |= Notification.DEFAULT_VIBRATE;
-
-		return mask;
+		if(!Settings.getBoolean(Keys.ENABLE_LANDSCAPE, false))
+		{
+			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+		else
+			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 	}
 
 	public static String getDrugName(Drug drug)

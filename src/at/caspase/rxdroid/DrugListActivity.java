@@ -147,6 +147,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		super.onResume();
 
 		LockscreenActivity.startMaybe(this);
+		Settings.maybeLockInPortraitMode(this);
 
 		Database.init();
 		mIsShowing = true;
