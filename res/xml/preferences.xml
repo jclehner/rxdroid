@@ -93,13 +93,6 @@
 			android:title="@string/_title_dark_theme"
 			android:defaultValue="@string/pref_default_theme_is_dark"
 		/>
-		
-	     
-	    <CheckBoxPreference android:key="@string/key_scramble_names"
-		    android:title="@string/_title_scramble_names"
-		    android:summary="@string/_summary_scramble_names"
-		    android:defaultValue="false"
-		/>
 	     
 	    <PreferenceCategory 
 	    	android:title="@string/_title_show_in_list" 
@@ -109,9 +102,13 @@
 	            android:title="@string/_title_show_supply_monitors"
 	            android:summary="@string/_summary_show_supply_monitors"
 	            android:defaultValue="false"
-	        />
-	            
-	        
+	        />	
+	     
+		    <CheckBoxPreference android:key="@string/key_scramble_names"
+			    android:title="@string/_title_scramble_names"
+			    android:summary="@string/_summary_scramble_names"
+			    android:defaultValue="false"
+			/>
 	   
 	    </PreferenceCategory>	    	
 	 <!-- 

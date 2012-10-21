@@ -26,8 +26,7 @@
     <string name="app_name" translatable="false">RxDroid</string>
     <string name="version" translatable="false">0.9</string>
     <string name="vcs_revision" translatable="false">$Revision$</string>
-    
-    
+        
     <!--  WARNING: Do NOT replace - with an en dash as suggested by lint -->
     <string name="pref_default_time_morning" translatable="false">06:00-10:00</string>
     <string name="pref_default_time_noon" translatable="false">12:00-14:00</string>
@@ -127,8 +126,8 @@
 	<string name="_title_toggle_filtering">Toggle filtering</string>
 	
 	<string name="_msg_intake_already_taken">You have already taken this dose. Do you want to continue?</string>
-	<string name="_msg_intake_normal">Take this dose and press OK.</string>
-	<string name="_msg_intake_unscheduled">Enter a dose and press OK.</string>
+	<string name="_msg_intake_normal">Take this dose of &lt;b&gt;%1$s&lt;/b&gt;</string>
+	<string name="_msg_intake_unscheduled">Choose a dose of &lt;b&gt;%1$s&lt;/b&gt;</string>
 	<string name="_title_change_dose">Change dose</string>
 	<string name="_title_edit_drug">Edit drug</string>
 	<string name="_title_mark_not_taken">Remove taken dose</string>
@@ -166,7 +165,7 @@
 	<string name="_msg_every_n_days_distance">Days between each repetition.</string>
 	
 	<string name="_title_intake_schedule">Schedule</string>
-	<string name="_title_repeat">Repeat</string>
+	<string name="_title_repeat">Repetition</string>
 	<string name="_title_misc">Miscellaneous</string>
 	<string name="_title_icon">Icon</string>
 	<string name="_title_current_supply">Current supply</string>
@@ -225,7 +224,7 @@
 	<string name="_btn_back">Back</string>
 	
 	<string name="_title_scramble_names">Scramble names</string>
-	<string name="_summary_scramble_names">Scrambles the names of your drugs to protect your privacy when using the app in public.</string>
+	<string name="_summary_scramble_names">Scrambles the names of your drugs. To reveal the real name, click on it.</string>
     
 	<string name="_title_loading">Loading…</string>
 	
@@ -269,7 +268,7 @@
 	<string name="_title_show_supply_monitors">Show all</string>
 	<string name="_summary_show_supply_monitors">Display drugs with disabled dose notifications.</string>
 		
-	<string name="_title_show_in_list">Show in drug list</string>
+	<string name="_title_show_in_list">Drug list</string>
 	
 	<string name="_title_help">Help</string>
 	<string name="_title_n_of_n">%1$d of %2$d</string>

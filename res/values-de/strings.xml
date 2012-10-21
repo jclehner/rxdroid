@@ -40,7 +40,7 @@
     <string name="_msg_doses_f">%1$d vergessen.</string>
     <string name="_msg_doses_p">%1$d fällig.</string><string name="_msg_low_supply_single">%1$s</string>
     
-    <string name="_msg_low_supply_multiple">%1$s und %2$d andere(s).</string>
+    <string name="_msg_low_supply_multiple">%1$s und %2$d weitere(s).</string>
     
 	<string name="_msg_constraints_ab">Wähle eine Zeit zwischen %1$s und %2$s.</string>
 	<string name="_msg_constraints_a">Wähle eine Zeit nach %1$s.</string>
@@ -102,6 +102,10 @@
 	
 	<string name="_msg_intake_normal">Dosis einnehmen und auf OK klicken.</string>
 	<string name="_msg_intake_unscheduled">Dosis wählen und auf OK klicken.</string>
+	
+	<string name="_msg_intake_normal">Angegebene Dosis &lt;b&gt;%1$s&lt;/b&gt; einnehmen</string>
+	<string name="_msg_intake_unscheduled">Dosis &lt;b&gt;%1$s&lt;/b&gt; auswählen</string>
+	
 	<string name="_title_change_dose">Dosis bearbeiten</string>
 	<string name="_title_edit_drug">Medikament bearbeiten</string>
 	<string name="_title_mark_not_taken">Dosis nicht eingenommen</string>
@@ -190,14 +194,14 @@
 	<string name="_msg_freq_21days_on_7days_off">21 Tage beginnend am %1$s, gefolgt von 7-tägiger Pause.</string>
 	<string name="_msg_no_drugs_v8">Drücke MENÜ and wähle "%1$s" um ein Medikament hinzuzufügen.</string>
 	<string name="_msg_no_drugs_v11">Drücke den +-Button in der Aktionsleiste, um ein Medikament hinzuzufügen.</string>
-	<string name="_summary_scramble_names">Namen von Medikamenten unkenntlich machen, um die Privatsphäre zu schützen.</string>
+	<string name="_summary_scramble_names">Namen von Medikamenten unkenntlich machen. Den Namen anklicken, um ihn zu zeigen.</string>
 	<string name="_title_21_days_on_7_days_off">7-tägige Pause alle 21 Tage</string>
 	<string name="_title_begin">Beginn</string>
 	<string name="_title_end">Ende</string>
-	<string name="_title_evening">Abend</string>
-	<string name="_title_morning">Morgen</string>
-	<string name="_title_night">Nacht</string>
-	<string name="_title_noon">Mittag</string>
+	<string name="_title_evening">Abends</string>
+	<string name="_title_morning">Morgens</string>
+	<string name="_title_night">Nachts</string>
+	<string name="_title_noon">Mittags</string>
 	<string name="_title_notification_doses">Dosen</string>
 	<string name="_title_notification_low_supplies">Niedrige Vorräte</string>
 	<string name="_title_scramble_names">Unkenntliche Namen</string>

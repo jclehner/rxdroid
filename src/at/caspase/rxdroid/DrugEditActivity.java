@@ -51,8 +51,11 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -90,6 +93,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 {
 	public static final String EXTRA_DRUG = "drug";
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
+
+	private static final int MENU_DELETE = 0;
 
 	//private static final String ARG_DRUG = "drug";
 
@@ -217,10 +222,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		Preference deletePref = findPreference("delete");
 		if(deletePref != null)
 		{
-			if(mIsEditing)
-				deletePref.setOnPreferenceClickListener(this);
-			else if(deletePref != null)
+			if(Version.SDK_IS_HONEYCOMB_OR_NEWER || !mIsEditing)
 				getPreferenceScreen().removePreference(deletePref);
+			else
+				deletePref.setOnPreferenceClickListener(this);
 		}
 
 		if(mFocusOnCurrentSupply)
@@ -248,18 +253,41 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		RxDroid.setIsVisible(this, false);
 	}
 
+	@TargetApi(11)
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		MenuItem item = menu.add(0, MENU_DELETE, 0, R.string._title_delete)
+				.setIcon(android.R.drawable.ic_menu_delete);
+
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		final int itemId = item.getItemId();
+
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 		{
-			if(item.getItemId() == android.R.id.home)
+			if(itemId == android.R.id.home)
 			{
 				// We can do this since this Activity can only be launched from
 				// DrugListActivity at the moment.
 				onBackPressed();
 				return true;
 			}
+		}
+
+		if(itemId == MENU_DELETE)
+		{
+			showDialog(R.id.drug_delete_dialog);
+			return true;
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -287,8 +315,11 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
 			ab.setIcon(android.R.drawable.ic_dialog_alert);
 			ab.setMessage(R.string._msg_delete_drug);
+			ab.setTitle("Foo");
 
 			ab.setNegativeButton(android.R.string.no, null);
+			ab.setPositiveButton(android.R.string.yes, null);
+
 			return ab.create();
 		}
 		else if(id == R.id.drug_discard_dialog)
@@ -316,6 +347,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			ab.setIcon(android.R.drawable.ic_dialog_info);
 			ab.setMessage(R.string._msg_save_drug_changes);
 
+			ab.setNegativeButton(R.string._btn_discard, null);
+			ab.setPositiveButton(R.string._btn_save, null);
 			return ab.create();
 		}
 
@@ -458,15 +491,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			fieldDependencies = { "repeatArg", "repeatOrigin" }
 		)
 		private Fraction currentSupply;
-
-//		@CreatePreference
-//		(
-//			titleResId = R.string._title_supply_monitor,
-//			summaryResId = R.string._summary_supply_monitor,
-//			order = 12,
-//			type = CheckBoxPreference.class,
-//			helper = CheckboxPreferenceHelper.class
-//		)
 
 		@CreatePreference
 		(
@@ -666,17 +690,17 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				repeatArg = (Long) getFieldValue("repeatArg");
 			}
 
-			final EditText editText = new EditText(mContext);
-			editText.setText(Long.toString(repeatArg));
-			editText.setEms(20);
-			editText.setMaxLines(1);
-			editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-			editText.setSelectAllOnFocus(true);
+			final NumberPickerWrapper picker = new NumberPickerWrapper(mContext);
+			picker.setValue((int) repeatArg);
+			picker.setMinValue(2);
+			picker.setWrapSelectorWheel(false);
+			picker.setGravity(Gravity.CENTER_HORIZONTAL);
+
 
 			final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 			builder.setTitle(R.string._title_every_n_days);
 			builder.setMessage(R.string._msg_every_n_days_distance);
-			builder.setView(editText);
+			builder.setView(picker);
 			builder.setCancelable(true);
 			builder.setNegativeButton(android.R.string.cancel, null);
 			builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
@@ -684,43 +708,12 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					final long repeatArg = Long.valueOf(editText.getText().toString());
+					final long repeatArg = picker.getValue();
 					showRepeatOriginDateDialog(Drug.REPEAT_EVERY_N_DAYS, repeatOrigin, repeatArg);
 				}
 			});
 
-			final AlertDialog dialog = builder.create();
-
-			editText.addTextChangedListener(new TextWatcher() {
-
-				@Override
-				public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-				@Override
-				public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-				@Override
-				public void afterTextChanged(Editable s)
-				{
-					final long value;
-
-					if(s.length() == 0)
-						value = 0;
-					else
-						value = Long.valueOf(s.toString());
-
-					final boolean enabled = value >= 2;
-					dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(enabled);
-
-					if(!enabled)
-						editText.setError(mContext.getString(R.string._msg_drug_repeat_ge_2));
-					else
-						editText.setError(null);
-				}
-			});
-
-			dialog.show();
-			editText.performClick();
+			builder.show();
 		}
 
 		private void handleWeekdaysRepeatMode()

@@ -28,7 +28,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -40,11 +42,12 @@ import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.db.Schedule;
+import at.caspase.rxdroid.util.Util;
 
 public class IntakeDialog extends AlertDialog implements OnChangedListener, Database.OnChangeListener
 {
 	private static final String TAG = IntakeDialog.class.getName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = true;
 
 	public static final String ARG_DRUG_ID = "drug_id";
 	public static final String ARG_DOSE_TIME = "dose_time";
@@ -67,6 +70,8 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	private TextView mHintText;
 	private FractionInput mDoseEdit;
 	private TextView mInsufficientSupplyText;
+
+	private TextView mMessageText;
 
 	private int mState;
 
@@ -102,6 +107,10 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 		super.setOnShowListener(mLocalOnShowListener);
 		Database.registerEventListener(this);
+
+		// Without this, the setMessage() calls in updateMessage() would be ignored; same
+		// goes for title and icon, but we don't set one for now.
+		setMessage("");
 	}
 
 	public IntakeDialog(final Context context, Drug drug, int doseTime, Date date)
@@ -189,13 +198,26 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 			super.onBackPressed();
 	}
 
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
+
+		mMessageText = (TextView) findViewById(android.R.id.message);
+		if(mMessageText != null)
+		{
+			mMessageText.setGravity(Gravity.CENTER);
+			mMessageText.setTextAppearance(getContext(), android.R.attr.textAppearanceSmall);
+		}
+	}
+
 	private void update(Drug drug, int doseTime, Date date)
 	{
 		mDrug = drug;
 		mDoseTime = doseTime;
 		mDate = date;
 
-		if(LOGV) Log.v(TAG, "init: doseTime=" + doseTime + ", date=" + date + ", drug=" + drug);
+		if(LOGV) Log.v(TAG, "update: doseTime=" + doseTime + ", date=" + date + ", drug=" + drug);
 
 		mIntakeCount = Entries.countIntakes(drug, date, doseTime);
 
@@ -204,7 +226,29 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		else
 			mDose = new Fraction();
 
-		updateMessage();
+		 mDoseText.setText(mDose.toString());
+         mDoseEdit.setValue(mDose);
+         mDoseEdit.setAutoInputModeEnabled(true);
+         mDoseEdit.setOnChangeListener(this);
+         mInsufficientSupplyText.setOnClickListener(new View.OnClickListener() {
+
+                 @Override
+                 public void onClick(View v)
+                 {
+                         final Context context = IntakeDialog.this.getContext();
+                         final Intent intent = new Intent(context, DrugEditActivity.class);
+                         intent.setAction(Intent.ACTION_EDIT);
+                         intent.putExtra(DrugEditActivity.EXTRA_DRUG, mDrug);
+                         intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
+
+                         context.startActivity(intent);
+                 }
+         });
+
+         //setTitle(mDrug.getName());
+         //setIcon(Util.getDrugIconDrawable(getContext(), mDrug.getIcon()));
+
+         //updateMessage();
 	}
 
 	private boolean hasInsufficientSupplies()
@@ -254,14 +298,17 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 	private void updateMessage()
 	{
+		final int msgResId;
+
 		if(mDose.isZero() || (mFlags & FLAG_ALLOW_DOSE_EDIT) != 0)
-		{
-			setMessage(getString(R.string._msg_intake_unscheduled));
-		}
+			msgResId = R.string._msg_intake_unscheduled;
 		else
-		{
-			setMessage(getString(R.string._msg_intake_normal));
-		}
+			msgResId = R.string._msg_intake_normal;
+
+		final String drugName = mDrug.getName();
+		final String okStr = getContext().getString(android.R.string.ok);
+
+		setMessage(Html.fromHtml(getContext().getString(msgResId, drugName, okStr)));
 	}
 
 	private void setState(int state)
@@ -319,7 +366,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		public void onShow(final DialogInterface dialog)
 		{
 			setNonDismissingListener(BUTTON_POSITIVE);
-			setNonDismissingListener(BUTTON_NEUTRAL);
+			//setNonDismissingListener(BUTTON_NEUTRAL);
 
 			setupViews();
 
