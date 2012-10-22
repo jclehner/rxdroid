@@ -120,7 +120,7 @@
 	<string name="_title_toggle_filtering">Toggle filtering</string>
 	
 	<string name="_msg_intake_normal">Take this dose of &lt;b&gt;%1$s&lt;/b&gt;</string>
-	<string name="_msg_intake_unscheduled">Choose a dose of &lt;b&gt;%1$s&lt;/b&gt;</string>
+	<string name="_msg_intake_unscheduled">Specify a dose of &lt;b&gt;%1$s&lt;/b&gt;</string>
 	<string name="_title_change_dose">Change dose</string>
 	<string name="_title_edit_drug">Edit drug</string>
 	<string name="_title_mark_not_taken">Remove taken dose</string>

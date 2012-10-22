@@ -1,13 +1,13 @@
 -injars      bin/classes
 -injars      libs
 -outjars     bin/classes-processed.jar
-#-libraryjars /usr/local/java/android-sdk/platforms/android-9/android.jar
 -libraryjars @@ANDROID_SDK_JAR@@
 
 -dontwarn android.support.**
 
 -dontpreverify
 -dontobfuscate
+-dontshrink
 -repackageclasses ''
 -allowaccessmodification
 -optimizations !code/simplification/arithmetic
@@ -47,6 +47,11 @@
     public static <fields>;
 }
 
--keep public class * extends at.caspase.rxdroid.db.Entry
--keep public class * extends at.caspase.androidutils.PreferenceHelper
+-keep public class ** extends at.caspase.rxdroid.db.Entry
+-keep public class ** extends at.caspase.androidutils.PreferenceHelper
+
+-keep public class at.caspase.androidutils.** {
+	public protected *;
+}
+
 

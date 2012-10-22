@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry excluding="*/.svn/" kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="libs/ormlite-android-4.41.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:platform:/resource/RxDroid/doc/ormlite-android-4.41-javadoc.jar!/"/>

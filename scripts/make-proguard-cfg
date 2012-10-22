@@ -1,0 +1,21 @@
+#!/bin/bash
+
+source "$(dirname $0)/shared.sh" || exit 1
+
+ADB=$(which adb)
+SDK_PATH=${ADB/\/platform-tools\/adb/}
+
+if [[ ! -d "${SDK_PATH}" ]]; then
+	die "SDK path is invalid: ${SDK_PATH}"
+fi
+
+TARGET=$(grep 'target=' project.properties)
+JAR=${SDK_PATH}/platforms/${TARGET/target=/}/android.jar
+
+if [[ ! -f "${JAR}" ]]; then
+	die "Jar path is invalid: ${JAR}"
+fi
+
+echo "Using ${JAR}"
+
+sed -e "s:@@ANDROID_SDK_JAR@@:${JAR}:" proguard.cfg.in > proguard.cfg
