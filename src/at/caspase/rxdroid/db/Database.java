@@ -128,6 +128,7 @@ public final class Database
 		{
 			SplashScreenActivity.setStatusMessage(R.string._title_db_status_loading);
 
+			sIsLoaded = false;
 			sCache.clear();
 
 			if(sHelper != null)

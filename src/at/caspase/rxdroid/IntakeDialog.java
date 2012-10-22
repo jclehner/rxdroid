@@ -217,6 +217,8 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 	private void update(Drug drug, int doseTime, Date date)
 	{
+		Database.init();
+
 		mDrug = drug;
 		mDoseTime = doseTime;
 		mDate = date;
