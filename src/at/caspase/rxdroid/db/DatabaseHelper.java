@@ -211,7 +211,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 		try
 		{
-			if(runHook(oldPackageName, "BeforeDatabaseUpdateHook", cs))
+			final String callbackName;
+
+			if(oldVersion < 54)
+				callbackName = "BeforeDatabaseUpgradeHook";
+			else
+				callbackName = "BeforeDatabaseUpgradeCallback";
+
+			if(runCallback(oldPackageName, callbackName, cs))
 				++updatedDataCount;
 
 			for(Class<?> clazz : Database.CLASSES)
@@ -304,7 +311,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		//return !oldData.isEmpty();
 	}
 
-	private boolean runHook(String packageName, String hookName, ConnectionSource cs)
+	private boolean runCallback(String packageName, String hookName, ConnectionSource cs)
 	{
 		try
 		{

@@ -39,8 +39,10 @@
   	android:layout_height="30dp"
   	android:layout_gravity="left"
   	android:scaleType="fitCenter"
-  	android:src="@drawable/ic_morning"
+  	
   />  
+  
+  <!-- android:src="@drawable/ic_morning"  -->
   
   <TextView android:id="@+id/text_dose"
   	android:layout_width="60dip"

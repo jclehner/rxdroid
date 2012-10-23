@@ -32,12 +32,13 @@ import at.caspase.androidutils.Reflect;
  * based on specified constructor arguments.
  *
  * Usage example:
- * <code>
+ * <pre>
  * // If PerThreadInstance.get() was called with ctor args of "yyyy-MM-dd" before
  * // in the calling thread, this instance will be returned. Otherwise, a new
  * // object will be instantiated using new SimpleDateFormat("yyyy-MM-dd");
+ *
  * SimpleDateFormat sdf = PerThreadInstance.get(SimpleDateFormat.class, "yyyy-MM-dd");
- * </code>
+ * </pre>
  *
  * @author Joseph Lehner
  *
