@@ -2,9 +2,11 @@
 
 source "$(dirname $_)/shared.sh"
 
+readonly MISCDIR="$(dirname $0)/misc"
+
 GIT_REPOS=( 
 	"NumberPicker git://github.com/mrn/numberpicker.git lib" 
-	"ActionBarSherlock git://github.com/JakeWharton/ActionBarSherlock.git library" 
+#	"ActionBarSherlock git://github.com/JakeWharton/ActionBarSherlock.git library" 
 )
 
 DEFAULT_BUILDCOMMANDS=(
@@ -106,13 +108,7 @@ create_lint_xml()
 		echo "INFO: creating $file"
 	fi
 
-	cat > "$file" <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<lint>
-<!-- Created by $0 -->
-</lint>
-EOF
-
+	cp "../${MISCDIR}/lint-ignoreall.xml" "$file"
 }
 
 create_project_files()
@@ -126,8 +122,7 @@ create_project_files()
 
 fix_project_properties()
 {
-	sed -i -e 's/target=Google Inc.:Google APIs\(\d+\)/target=android-\1/g' "$1/project.properties"
-	sed -i -e 's/-:/-/g' "$1/project.properties"
+	sed -E -i -e 's/target=Google Inc.:Google APIs:([[:digit:]]+)/target=android-\1/g' "$1/project.properties"
 }
 
 link_or_copy()
