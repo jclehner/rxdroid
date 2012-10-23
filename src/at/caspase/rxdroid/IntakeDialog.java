@@ -42,7 +42,6 @@ import at.caspase.rxdroid.db.Entries;
 import at.caspase.rxdroid.db.Entry;
 import at.caspase.rxdroid.db.Intake;
 import at.caspase.rxdroid.db.Schedule;
-import at.caspase.rxdroid.util.Util;
 
 public class IntakeDialog extends AlertDialog implements OnChangedListener, Database.OnChangeListener
 {
@@ -141,9 +140,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	}
 
 	@Override
-	protected void onStop()
-	{
-		//dismissPopup();
+	protected void onStop() {
 		Database.unregisterEventListener(this);
 	}
 
@@ -164,7 +161,9 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 			if(!hasInsufficientSupplies())
 				setState(STATE_DOSE_DISPLAY);
-//				dismissPopup();
+
+			Log.d(TAG, "onEntryUpdated: " + entry + "\n  mState=" + mState);
+
 		}
 	}
 
@@ -176,9 +175,6 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	{
 		if(entry instanceof Drug && entry.getId() == mDrug.getId())
 		{
-//			if(mPopup != null)
-//				dismissPopup();
-
 			if(isShowing())
 				dismiss();
 		}
@@ -187,11 +183,6 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 	@Override
 	public void onBackPressed()
 	{
-//		if(!isPopupShowing())
-//			super.onBackPressed();
-//		else
-//			dismissPopup();
-
 		if(mState == STATE_INSUFFICIENT_SUPPLIES)
 			setState(STATE_DOSE_EDIT);
 		else
@@ -253,8 +244,6 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
          //setTitle(mDrug.getName());
          //setIcon(Util.getDrugIconDrawable(getContext(), mDrug.getIcon()));
-
-         //updateMessage();
 	}
 
 	private boolean hasInsufficientSupplies()
@@ -371,8 +360,8 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		@Override
 		public void onShow(final DialogInterface dialog)
 		{
+			Database.registerEventListener(IntakeDialog.this);
 			setNonDismissingListener(BUTTON_POSITIVE);
-			//setNonDismissingListener(BUTTON_NEUTRAL);
 
 			setupViews();
 

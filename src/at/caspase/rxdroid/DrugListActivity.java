@@ -32,9 +32,6 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DatePickerDialog.OnDateSetListener;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
-import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -599,8 +596,13 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			if(mFilterDate == null)
 				return true;
 
-			if(!mShowSupplyMonitors && drug.isAutoAddIntakesEnabled())
-				return false;
+			if(drug.isAutoAddIntakesEnabled())
+			{
+				if(Settings.hasLowSupplies(drug))
+					return true;
+
+				return mShowSupplyMonitors;
+			}
 
 			if(Entries.countIntakes(drug, mFilterDate, null) != 0)
 				return true;
@@ -744,29 +746,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			setDate(mDate, PAGER_INIT);
 		}
 	};
-
-	private static enum MultipleIntakeDialogsPreventer implements OnShowListener, OnDismissListener
-	{
-		INSTANCE;
-
-		private static final int TIMEOUT_MILLIS = 300;
-
-		private long mTime = 0;
-
-		public boolean canShowDialog() {
-			return Math.abs(System.currentTimeMillis() - mTime) > TIMEOUT_MILLIS;
-		}
-
-		@Override
-		public void onDismiss(DialogInterface dialog) {
-			mTime = 0;
-		}
-
-		@Override
-		public void onShow(DialogInterface dialog) {
-			mTime = System.currentTimeMillis();
-		}
-	}
 
 	private static final Database.OnChangeListener DATABASE_WATCHER = new Database.OnChangeListener() {
 

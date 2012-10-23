@@ -54,22 +54,12 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 {
 	public class DatabaseStatusReceiver extends BroadcastReceiver
 	{
-		/*public static final int STATUS_LOADING = 0;
-		public static final int STATUS_UPGRADING = 1;
-		public static final int STATUS_CREATING_INTAKES = 2;
-		public static final int STATUS_DISCARDING_INTAKES = 3;
-
-		public static final String EXTRA_STATUS = "at.caspase.rxdroid.extra.STATUS";
-		public static final String EXTRA_PROGRESS = "at.caspase.rxdroid.extra.PROGRESS";*/
-
 		public static final String EXTRA_MESSAGE = "at.caspase.rxdroid.extra.MESSAGE";
 		public static final String EXTRA_PROGRESS = "at.caspase.rxdroid.extra.PROGRESS";
 
 		@Override
 		public void onReceive(Context context, Intent intent)
 		{
-//			Log.d(TAG + "$DatabaseStatusReceiver", "onReceive: intent=" + intent);
-
 			if(intent == null)
 				return;
 
@@ -146,8 +136,6 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 
 	public static void setStatusMessage(int msgResId)
 	{
-//		Log.d(TAG, "setStatusMessage: msgResId=" + msgResId);
-
 		final Context context = RxDroid.getContext();
 		final Intent intent = new Intent(context, DatabaseStatusReceiver.class);
 		intent.setAction(Intent.ACTION_MAIN);
@@ -155,8 +143,6 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 
 		LocalBroadcastManager bm = RxDroid.getLocalBroadcastManager();
 		bm.sendBroadcast(intent);
-
-		//RxDroid.getContext().sendStickyBroadcast(intent);
 	}
 
 	@Override

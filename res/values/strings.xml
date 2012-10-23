@@ -204,7 +204,7 @@
 	
 	<string name="_title_alarm_timeout">Alarm timeout</string>
 	
-	<string name="_toast_drug_notification_icon">The last dose of this drug was not taken.</string> 
+	<string name="_toast_drug_notification_icon">This drug has at least one missed dose in the past.</string> 
         
     <string name="_title_notification_doses">Doses</string>
 	<string name="_title_notification_low_supplies">Low supplies</string>
