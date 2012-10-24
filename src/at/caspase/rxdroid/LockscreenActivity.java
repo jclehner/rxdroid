@@ -93,19 +93,6 @@ public class LockscreenActivity extends Activity implements OnClickListener
 
 		findViewById(R.id.keypad).setVisibility(View.VISIBLE);
 
-//		final Configuration config = getResources().getConfiguration();
-//		final int visibility;
-//
-//		if(config.keyboard == Configuration.KEYBOARD_NOKEYS ||
-//		   config.keyboard == Configuration.KEYBOARD_UNDEFINED)
-//			visibility = View.VISIBLE;
-//		else
-//			visibility = View.GONE;
-//
-//		if(true) Log.v(TAG, config.toString());
-//
-//		findViewById(R.id.keypad).setVisibility(visibility);
-
 		clearDigits();
 	}
 
@@ -276,6 +263,7 @@ public class LockscreenActivity extends Activity implements OnClickListener
 				for(EditText digit : mPinDigits)
 					digit.setText("");
 
+				// FIXME i18n
 				Toast.makeText(this, "Invalid PIN", Toast.LENGTH_SHORT).show();
 			}
 		}

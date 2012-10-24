@@ -103,11 +103,11 @@ public class RxDroid extends Application
 
 	public static boolean isUiVisible()
 	{
-		for(Activity activity : sActivityVisibility.keySet())
-		{
-			if(sActivityVisibility.get(activity))
-				return true;
-		}
+//		for(Activity activity : sActivityVisibility.keySet())
+//		{
+//			if(sActivityVisibility.get(activity))
+//				return true;
+//		}
 
 		return false;
 	}

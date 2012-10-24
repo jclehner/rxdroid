@@ -53,12 +53,6 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	@SuppressWarnings("unused")
 	private static final String TAG = DumbTime.class.getName();
 
-	private static final SimpleDateFormat FORMAT_MINUTES = new SimpleDateFormat("HH:mm");
-	private static final SimpleDateFormat FORMAT_SECONDS = new SimpleDateFormat("HH:mm:ss");
-	private static final SimpleDateFormat FORMAT_MILLIS = new SimpleDateFormat("HH:mm:ss.SSS");
-
-	//private static final SimpleDateFormat[] FORMATS = { FORMAT_SECONDS, FORMAT_MINUTES, FORMAT_MILLIS };
-
 	private static final String[] FORMATS = { "HH:mm", "HH:mm:ss", "HH:mm:ss.SSS" };
 
 	private static final int S_MILLIS = 1000;

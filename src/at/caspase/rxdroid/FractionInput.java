@@ -21,6 +21,7 @@
 
 package at.caspase.rxdroid;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Parcelable;
 import android.util.AttributeSet;
