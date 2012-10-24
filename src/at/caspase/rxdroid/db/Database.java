@@ -26,7 +26,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -455,6 +454,12 @@ public final class Database
 
 	private static<T> List<T> queryForAll(Class<T> clazz)
 	{
+		if(sHelper == null)
+		{
+			Log.w(TAG, "Database not initialized - initializing it now...");
+			Database.init();
+		}
+
 		try
 		{
 			return sHelper.getDao(clazz).queryForAll();
