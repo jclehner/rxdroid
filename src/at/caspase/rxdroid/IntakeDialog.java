@@ -120,6 +120,9 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 	public void setArgs(Bundle args)
 	{
+		// FIXME remove once we have specialized activities
+		Database.init();
+
 		final Drug drug;
 		final int drugId = args.getInt(ARG_DRUG_ID, -1);
 		if(drugId == -1 || (drug = Drug.find(drugId)) == null)
