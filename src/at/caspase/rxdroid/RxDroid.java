@@ -79,6 +79,14 @@ public class RxDroid extends Application
 		getContext().sendBroadcast(intent);
 	}
 
+	public static String getQuantityString(int id, int quantity, Object... formatArgs) {
+		return getContext().getResources().getQuantityString(id, quantity, formatArgs);
+	}
+
+	public static String getQuantityString(int id, int quantity) {
+		return getContext().getResources().getQuantityString(id, quantity);
+	}
+
 	public static boolean isLocked()
 	{
 		final int timeoutSeconds = Settings.getInt(Settings.Keys.LOCKSCREEN_TIMEOUT, 0);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	android:versionCode="3" package="at.caspase.rxdroid" android:installLocation="internalOnly" android:versionName="@string/version">
+	android:versionCode="4" package="at.caspase.rxdroid" android:installLocation="internalOnly" android:versionName="@string/version">
 
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -18,6 +18,7 @@
 			android:label="@string/app_name"
 			android:configChanges="orientation|screenSize|keyboardHidden"
 			android:theme="@style/DefaultTheme.NoAnimation"
+			android:launchMode="singleTop"
 		>
 		
 			<intent-filter>
@@ -34,7 +35,6 @@
 				
 		<activity android:name=".DrugListActivity"
 		    android:exported="false"
-		    android:screenOrientation="sensor"
 		    android:uiOptions="none"
 		    android:launchMode="singleTop"
 		    android:configChanges="orientation|screenSize|keyboardHidden"
@@ -42,7 +42,8 @@
 
 		<activity android:name=".DrugEditActivity"
 		    android:exported="false"
-		    android:windowSoftInputMode="adjustResize"
+		    android:windowSoftInputMode="adjustResize"		    
+			android:launchMode="singleTop"
 		    android:configChanges="orientation|screenSize|keyboardHidden"
 		>	    
 			<intent-filter>

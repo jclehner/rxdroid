@@ -24,7 +24,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">RxDroid</string>
-    <string name="version" translatable="false">0.9 RC3</string>
+    <string name="version" translatable="false">0.9 RC4</string>
     <string name="vcs_revision" translatable="false">$Revision$</string>
         
     <!--  WARNING: Do NOT replace - with an en dash as suggested by lint -->
@@ -57,15 +57,19 @@
     <string name="_title_end">End</string>
         
     <string name="_msg_new_notification">New notification</string>
-    <string name="_msg_doses_fp">%2$d due, %1$d missed.</string>
-    <string name="_msg_doses_f">%1$d missed.</string>
-    <string name="_msg_doses_p">%1$d due.</string>
-    <string name="_msg_low_supply_single">%1$s</string>
-    <string name="_msg_low_supply_multiple">%1$s and %2$d other(s).</string>
+    <string name="_msg_doses_fp">%2$d due, %1$d missed</string>
+    <string name="_msg_doses_f">%1$d missed</string>
+    <string name="_msg_doses_p">%1$d due</string>
     
-	<string name="_msg_constraints_ab">Pick a time between %1$s and %2$s.</string>
-	<string name="_msg_constraints_a">Pick a time after %1$s.</string>
-	<string name="_msg_constraints_b">Pick a time before %2$s.</string>
+    <string name="_qmsg_low_supply_single">%1$s</string>        
+	<plurals name="_qmsg_low_supply_multiple">
+        <item quantity="one">%2$s and %3$s</item>
+        <item quantity="other">%2$s and %1$d others</item>       
+    </plurals>
+    
+	<string name="_msg_constraints_ab">Pick a time between %1$s and %2$s</string>
+	<string name="_msg_constraints_a">Pick a time after %1$s</string>
+	<string name="_msg_constraints_b">Pick a time before %2$s</string>
 	
 	<string name="_btn_set">Set</string>
     
@@ -117,7 +121,6 @@
 	<string name="_toast_saved">Saved</string>
 	
 	<string name="_title_add">Add</string>
-	<string name="_title_toggle_filtering">Toggle filtering</string>
 	
 	<string name="_msg_intake_normal">Take this dose of &lt;b&gt;%1$s&lt;/b&gt;</string>
 	<string name="_msg_intake_unscheduled">Specify a dose of &lt;b&gt;%1$s&lt;/b&gt;</string>
@@ -272,7 +275,11 @@
 	<string name="_summary_enable_landscape_mode">Enables landscape mode (experimental)</string>
 	<string name="_title_enable_landscape_mode">Landscape mode</string>
 	
-	<string name="_msg_repetition_origin">Choose starting date</string>				
+	<string name="_msg_repetition_origin">Choose starting date</string>
+	
+	<string name="_title_filter">Filter</string>
+	<string name="_title_show_all">Show all</string>
+			
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 

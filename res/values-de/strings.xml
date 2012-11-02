@@ -36,11 +36,15 @@
     -->
     
     <string name="_msg_new_notification">Neue Benachrichtigung</string>
-    <string name="_msg_doses_fp">%2$d fällig, %1$d vergessen.</string>
-    <string name="_msg_doses_f">%1$d vergessen.</string>
-    <string name="_msg_doses_p">%1$d fällig.</string><string name="_msg_low_supply_single">%1$s</string>
-    
-    <string name="_msg_low_supply_multiple">%1$s und %2$d weitere(s).</string>
+    <string name="_msg_doses_fp">%2$d fällig, %1$d vergessen</string>
+    <string name="_msg_doses_f">%1$d vergessen</string>
+    <string name="_msg_doses_p">%1$d fällig</string>
+        
+ 	<string name="_qmsg_low_supply_single">%1$s</string>        
+    <plurals name="_qmsg_low_supply_multiple">
+        <item quantity="one">%2$s und %3$s</item>
+        <item quantity="other">%2$s und %1$d andere</item>       
+    </plurals>
     
 	<string name="_msg_constraints_ab">Wähle eine Zeit zwischen %1$s und %2$s.</string>
 	<string name="_msg_constraints_a">Wähle eine Zeit nach %1$s.</string>
@@ -98,7 +102,6 @@
 	<string name="_toast_saved">Gespeichert…</string>
 	
 	<string name="_title_add">Hinzufügen</string>
-	<string name="_title_toggle_filtering">Alle anzeigen / filtern</string>
 	
 	<string name="_msg_intake_normal">Dosis einnehmen und auf OK klicken.</string>
 	<string name="_msg_intake_unscheduled">Dosis wählen und auf OK klicken.</string>
@@ -220,8 +223,7 @@
 	<string name="_title_history_6_months">Sechs Wochen</string>
 	<string name="_title_history_age">Verlaufsgröße</string>
 	<string name="_title_history_unlimited">Unbegrenzt</string>	
-	
-	
+		
 	<string name="_toast_unlimited_history_size">Warnung: diese Einstellung kann zu langen Ladezeiten führen!</string>
 	
 	<string name="_title_go_to_date">Datum wählen</string>
@@ -256,6 +258,9 @@
 	<string name="_summary_enable_landscape_mode">Landschaftsmodus aktivieren (experimentell)</string>
 	<string name="_title_enable_landscape_mode">Landschaftsmodus</string>
 		
+	<string name="_title_filter">Filtern</string>
+	<string name="_title_show_all">Alle zeigen</string>
+	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.

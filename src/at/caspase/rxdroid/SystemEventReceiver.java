@@ -25,21 +25,21 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import at.caspase.rxdroid.util.DateTime;
 
 public class SystemEventReceiver extends BroadcastReceiver
 {
-	@SuppressWarnings("unused")
 	private static final String TAG = SystemEventReceiver.class.getName();
 
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
-		//Log.d(TAG, "Received intent with action " + intent.getAction());
-		NotificationReceiver.sendBroadcastToSelf(context, false);
+		if(Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()))
+		{
+			Log.i(TAG, "Timezone changed, clearing date cache");
+			DateTime.clearDateCache();
+		}
 
-		//Intent service = new Intent();
-		//service.setClass(context.getApplicationContext(), NotificationService.class);
-		//service.putExtra(NotificationService.EXTRA_RESTART_FLAGS, NotificationService.RESTART_FORCE);
-		//context.startService(service);
+		NotificationReceiver.sendBroadcastToSelf(context, false);
 	}
 }

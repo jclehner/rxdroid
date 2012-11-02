@@ -197,7 +197,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 
 		menu.add(0, MENU_PREFERENCES, 0, R.string._title_preferences).setIcon(android.R.drawable.ic_menu_preferences);
-		menu.add(0, MENU_TOGGLE_FILTERING, 0, R.string._title_toggle_filtering).setIcon(android.R.drawable.ic_menu_view);
+		menu.add(0, MENU_TOGGLE_FILTERING, 0, R.string._title_show_all).setIcon(android.R.drawable.ic_menu_view);
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 		{
@@ -217,6 +217,8 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 			final int titleResId = DateTime.isToday(mDate) ? R.string._title_go_to_date : R.string._title_today;
 			menu.findItem(MENU_SELECT_DATE).setTitle(titleResId);
 		}
+
+		menu.findItem(MENU_TOGGLE_FILTERING).setTitle(mShowingAll ? R.string._title_filter : R.string._title_show_all);
 
 		return true;
 	}
@@ -447,7 +449,17 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	protected void onPrepareDialog(int id, Dialog dialog, Bundle args)
 	{
 		if(id == R.id.dose_dialog)
+		{
+			if(!Database.exists(Drug.class, args.getInt(IntakeDialog.ARG_DRUG_ID, -1)))
+			{
+				// If the drug currently associated with the dialog is deleted,
+				// setArgs() throws when attempting to restore from the non-existent
+				// drug id.
+				return;
+			}
+
 			((IntakeDialog) dialog).setArgs(args);
+		}
 		else
 			super.onPrepareDialog(id, dialog, args);
 	}
@@ -561,17 +573,15 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		if(mDate == null)
 			return;
 
-		//final Date date = DateTime.add(mDate, Calendar.DAY_OF_MONTH, shiftBy);
 		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
 
-		if(mDate.equals(DateTime.today()))
-			dateString.setSpan(new UnderlineSpan(), 0, dateString.length(), 0);
+		if(DateTime.isToday(mDate))
+			Util.applyStyle(dateString, new UnderlineSpan());
 
-		if(!Version.SDK_IS_PRE_HONEYCOMB)
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 		{
-			ActionBar ab = getActionBar();
-			dateString.setSpan(new RelativeSizeSpan(0.75f), 0, dateString.length(), 0);
-			ab.setSubtitle(dateString);
+			Util.applyStyle(dateString, new RelativeSizeSpan(0.75f));
+			getActionBar().setSubtitle(dateString);
 		}
 		else
 			mTextDate.setText(dateString);
@@ -579,9 +589,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 
 	static class DrugFilter implements CollectionUtils.Filter<Drug>
 	{
-		//final boolean mShowDoseless = mSharedPreferences.getBoolean("show_doseless", false);
-		//final boolean mShowInactive = mSharedPreferences.getBoolean("show_inactive", false);
-
 		final boolean mShowSupplyMonitors = Settings.getBoolean(Settings.Keys.SHOW_SUPPLY_MONITORS, false);
 
 		private Date mFilterDate;
@@ -627,9 +634,6 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public boolean onLongClick(View v)
 		{
-			//Calendar cal = Calendar.getInstance();
-			//cal.setTime(mDate);
-
 			Calendar cal = DateTime.calendarFromDate(mDate);
 
 			final int year = cal.get(Calendar.YEAR);
@@ -747,7 +751,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 	};
 
-	private static final Database.OnChangeListener DATABASE_WATCHER = new Database.OnChangeListener() {
+	private final Database.OnChangeListener DATABASE_WATCHER = new Database.OnChangeListener() {
 
 		@Override
 		public void onEntryUpdated(Entry entry, int flags) {
@@ -755,8 +759,17 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		}
 
 		@Override
-		public void onEntryDeleted(Entry entry, int flags) {
+		public void onEntryDeleted(Entry entry, int flags)
+		{
 			NotificationReceiver.sendBroadcastToSelf(false);
+			try
+			{
+				DrugListActivity.this.removeDialog(R.id.dose_dialog);
+			}
+			catch(Exception e)
+			{
+
+			}
 		}
 
 		@Override

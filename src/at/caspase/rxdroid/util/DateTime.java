@@ -245,6 +245,10 @@ public final class DateTime
 	public static void disableDateCache()
 	{
 		sDateCacheEnabled = false;
+		clearDateCache();
+	}
+
+	public static void clearDateCache() {
 		DATE_CACHE.clear();
 	}
 
@@ -416,7 +420,7 @@ public final class DateTime
 		}
 	}
 
-	static final class DateCacheData
+	private static final class DateCacheData
 	{
 		ImmutableGregorianCalendar calendar;
 		Date date;

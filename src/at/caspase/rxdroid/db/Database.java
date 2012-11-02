@@ -252,6 +252,11 @@ public final class Database
 		return t;
 	}
 
+	public static <T extends Entry> boolean exists(Class<T> clazz, int id) {
+		return find(clazz, id) != null;
+	}
+
+
 	public static <T extends Entry> List<T> getAll(Class<T> clazz) {
 		return new LinkedList<T>(getCached(clazz));
 	}

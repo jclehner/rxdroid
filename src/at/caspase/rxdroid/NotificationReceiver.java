@@ -157,8 +157,6 @@ public class NotificationReceiver extends BroadcastReceiver
 			isActiveDoseTime = false;
 			doseTime = dtInfo.nextDoseTime();
 			date = dtInfo.nextDoseTimeDate();
-
-			Log.d(TAG, "date: " + date);
 		}
 		else
 			isActiveDoseTime = true;
@@ -329,9 +327,15 @@ public class NotificationReceiver extends BroadcastReceiver
 			final String firstDrugName = Settings.getDrugName(drugsWithLowSupply.get(0));
 
 			if(drugsWithLowSupply.size() == 1)
-				message = getString(R.string._msg_low_supply_single, firstDrugName);
+				message = getString(R.string._qmsg_low_supply_single, firstDrugName);
 			else
-				message = getString(R.string._msg_low_supply_multiple, firstDrugName, drugsWithLowSupply.size() - 1);
+			{
+				final int quantity = drugsWithLowSupply.size() - 1;
+				final String secondDrugName = Settings.getDrugName(drugsWithLowSupply.get(1));
+
+				message = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, quantity,
+						quantity, firstDrugName, secondDrugName);
+			}
 		}
 
 		return message;
