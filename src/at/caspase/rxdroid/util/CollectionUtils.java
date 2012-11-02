@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import at.caspase.androidutils.Reflect;
+
 /**
  * Utility functions for dealing with java <code>Collections</code>.
  *
@@ -75,14 +77,7 @@ public final class CollectionUtils
 		if(collection == null)
 			throw new NullPointerException();
 
-		try
-		{
-			return collection.getClass().newInstance();
-		}
-		catch(Exception e)
-		{
-			throw new IllegalArgumentException(collection.getClass().getName() + " lacks a visible default constructor", e);
-		}
+		return Reflect.newInstance(collection.getClass());
 	}
 
 	public static <T> int indexOf(T e, T[] array)

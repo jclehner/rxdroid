@@ -188,7 +188,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		Drug drug = null;
 
-		mWrapper = new DrugWrapper(this);
+		mWrapper = new DrugWrapper();
 		mFocusOnCurrentSupply = false;
 
 		if(Intent.ACTION_EDIT.equals(action))
@@ -410,9 +410,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		)
 		private String name;
 
-		@AddPreference(order = 2)
-		private final Preference mDeletePreference;
-
 		@CreatePreference
 		(
 			titleResId = R.string._title_morning,
@@ -531,13 +528,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			reverseDependencies = "autoAddIntakes"
 		)*/
 		private Date lastAutoIntakeCreationDate;
-
-		public DrugWrapper(Context context)
-		{
-			mDeletePreference = new Preference(context);
-			mDeletePreference.setKey("delete");
-			mDeletePreference.setTitle(context.getString(R.string._title_delete));
-		}
 
 		public void set(Drug drug)
 		{
