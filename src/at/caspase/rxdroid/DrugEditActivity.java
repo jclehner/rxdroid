@@ -234,18 +234,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		if(mFocusOnCurrentSupply)
 		{
 			Log.i(TAG, "Will focus on current supply preference");
-
-			final PreferenceScreen ps = getPreferenceScreen();
-			final Preference p = ps.findPreference("currentSupply");
-
-
-			if(p != null)
-			{
-				final int index = p.getOrder();
-				ps.onItemClick(null, null, index, 0);
-			}
-			else
-				Log.w(TAG, "Couldn't focus on current supply preference");
+			performPreferenceClick("currentSupply");
 		}
 	}
 
@@ -268,8 +257,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		return super.onCreateOptionsMenu(menu);
 	}
-
-
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
@@ -396,6 +383,19 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			final AlertDialog alert = (AlertDialog) dialog;
 			alert.setButton(Dialog.BUTTON_POSITIVE, getString(R.string._btn_save), onClickListener);
 			alert.setButton(Dialog.BUTTON_NEGATIVE, getString(R.string._btn_discard), onClickListener);
+		}
+	}
+
+	private void performPreferenceClick(String key)
+	{
+		final PreferenceScreen ps = getPreferenceScreen();
+		for(int i = 0; i != ps.getPreferenceCount(); ++i)
+		{
+			if(key.equals(ps.getPreference(i).getKey()))
+			{
+				ps.onItemClick(getListView(), null, i, 0);
+				break;
+			}
 		}
 	}
 
