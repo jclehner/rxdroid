@@ -111,7 +111,7 @@
 	
 	<string name="_title_change_dose">Dosis bearbeiten</string>
 	<string name="_title_edit_drug">Medikament bearbeiten</string>
-	<string name="_title_mark_not_taken">Dosis nicht eingenommen</string>
+	<string name="_title_mark_not_taken">Einnahme löschen</string>
 	<string name="_title_mark_taken">Dosis eingenommen</string>
 	
 	<string name="_msg_freq_every_n_days">Alle %1$s Tage, beginnend am %2$s</string>
@@ -204,7 +204,7 @@
 	<string name="_title_morning">Morgens</string>
 	<string name="_title_night">Nachts</string>
 	<string name="_title_noon">Mittags</string>
-	<string name="_title_notification_doses">Dosen</string>
+	<string name="_title_notification_doses">Einnahmen</string>
 	<string name="_title_notification_low_supplies">Niedrige Vorräte</string>
 	<string name="_title_scramble_names">Unkenntliche Namen</string>
 	

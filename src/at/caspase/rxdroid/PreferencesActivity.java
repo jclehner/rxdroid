@@ -44,6 +44,7 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -55,7 +56,6 @@ import at.caspase.rxdroid.util.Util;
 public class PreferencesActivity extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener, OnPreferenceClickListener, OnPreferenceChangeListener
 {
-	@SuppressWarnings("unused")
 	private static final String TAG = PreferencesActivity.class.getName();
 
 	private static final int MENU_RESTORE_DEFAULTS = 0;
@@ -248,6 +248,7 @@ public class PreferencesActivity extends PreferenceActivity implements
 			}
 			catch(IOException e)
 			{
+				Log.w(TAG, e);
 				license = "Licensed under the GNU GPLv3";
 			}
 			finally

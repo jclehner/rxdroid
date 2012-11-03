@@ -259,6 +259,11 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	}
 
 	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		return mIsEditing;
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		final int itemId = item.getItemId();

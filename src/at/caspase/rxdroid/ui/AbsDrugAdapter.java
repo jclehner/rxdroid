@@ -50,7 +50,7 @@ public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 
 		mActivity = activity;
 		mAllItems = mItems = new ArrayList<Drug>(items);
-		mAdapterDate = date;
+		mAdapterDate = new Date(date.getTime());
 	}
 
 	public void setFilter(CollectionUtils.Filter<Drug> filter)
