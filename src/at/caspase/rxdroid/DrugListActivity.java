@@ -84,9 +84,7 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 	private static final int MENU_TOGGLE_FILTERING = 3;
 
 	private static final int CMENU_TOGGLE_INTAKE = 0;
-	// public static final int CMENU_CHANGE_DOSE = 1;
 	private static final int CMENU_EDIT_DRUG = 2;
-	// public static final int CMENU_SHOW_SUPPLY_STATUS = 3;
 	private static final int CMENU_IGNORE_DOSE = 4;
 
 	public static final String EXTRA_DATE = "date";

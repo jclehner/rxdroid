@@ -254,7 +254,7 @@ public final class Util
 		{
 			char c = string.charAt(i);
 
-			if(Character.isJavaIdentifierStart(c) && c != '_') // this can only be an ASCII letter
+			if(isAsciiLetter(c))
 			{
 				final int start = Character.isUpperCase(c) ? 65 : 97;
 				if(c - start < 26)
@@ -267,6 +267,16 @@ public final class Util
 		}
 
 		return sb.toString();
+	}
+
+	public static boolean isAsciiLetter(char c)
+	{
+		if(c >= 97 /* a */)
+			return c <= 'z';
+		else if(c >= 65 /* A */)
+			return c <= 'Z';
+
+		return false;
 	}
 
 	public static void dumpObjectMembers(String tag, int priority, Object object, String name)
