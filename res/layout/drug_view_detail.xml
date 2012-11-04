@@ -44,7 +44,7 @@
 		android:scaleType="fitCenter"
 		android:src="?attr/drugIconTablet" />
 
-	<at.caspase.rxdroid.DoseView
+	<at.jclehner.rxdroid.DoseView
 		android:id="@+id/dose_view"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -52,9 +52,9 @@
 		android:focusable="true"
 		android:nextFocusLeft="@+id/noon"
 		android:onClick="onDoseViewClick" >
-	</at.caspase.rxdroid.DoseView>
+	</at.jclehner.rxdroid.DoseView>
 
-	<at.caspase.rxdroid.widget.Rot13TextView
+	<at.jclehner.rxdroid.widget.Rot13TextView
 		android:id="@id/drug_name"
 		style="@android:style/TextAppearance.Medium"
 		android:layout_width="wrap_content"

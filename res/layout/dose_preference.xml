@@ -61,7 +61,7 @@
   	
   	 -->
   		
-  	<at.caspase.rxdroid.DoseView android:id="@+id/dose_view" 
+  	<at.jclehner.rxdroid.DoseView android:id="@+id/dose_view" 
   		android:layout_width="wrap_content"
   		android:layout_height="wrap_content"
   		

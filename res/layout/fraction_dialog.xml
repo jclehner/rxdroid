@@ -27,7 +27,7 @@
 	android:layout_height="match_parent"
 	android:orientation="vertical" 
 >	
-	<at.caspase.rxdroid.FractionInput android:id="@+id/input"
+	<at.jclehner.rxdroid.FractionInput android:id="@+id/input"
 		android:layout_width="match_parent"
 		android:layout_height="0dip"
 		android:layout_weight="1"

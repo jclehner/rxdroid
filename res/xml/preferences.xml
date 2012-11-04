@@ -24,7 +24,7 @@
 
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:rxdroid="http://schemas.android.com/apk/res/at.caspase.rxdroid"
+  xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
   android:title="@string/_title_preferences"
   android:orderingFromXml="true"  
 >
@@ -35,7 +35,7 @@
 		android:title="@string/_title_prefscreen_times"
 		android:icon="@drawable/android:ic_menu_recent_history">
 		
-	    <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_morning"
+	    <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_morning"
 	        android:title="@string/_title_morning"
 	        android:dialogIcon="@drawable/ic_morning"
 	        android:persistent="true"
@@ -46,7 +46,7 @@
 	        android:defaultValue="@string/pref_default_time_morning"
 	    />
 	    
-	    <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_noon"
+	    <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_noon"
 	        android:title="@string/_title_noon"
 	        android:dialogIcon="@drawable/ic_noon"
 	        android:persistent="true"
@@ -57,7 +57,7 @@
 	        android:defaultValue="@string/pref_default_time_noon"
 	    />
 	    
-	     <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_evening"
+	     <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_evening"
 	        android:title="@string/_title_evening"
 	        android:dialogIcon="@drawable/ic_evening"
 	        android:persistent="true"
@@ -68,7 +68,7 @@
 	        android:defaultValue="@string/pref_default_time_evening"
 	    />
 	     
-	     <at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_night"
+	     <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_night"
 	        android:title="@string/_title_night"
 	        android:dialogIcon="@drawable/ic_night"
 	        android:persistent="true"
@@ -172,7 +172,7 @@
 			android:enabled="false"
 		/>		
 		
-		<at.caspase.rxdroid.preferences.TimePreference android:key="alarm_timeout"
+		<at.jclehner.rxdroid.preferences.TimePreference android:key="alarm_timeout"
 			android:title="@string/_title_alarm_timeout"
 			android:defaultValue="@string/pref_default_alarm_timeout"
 			android:enabled="false"
@@ -263,7 +263,7 @@
 		    android:title="Add 5 random drugs"
 		/>
 		
-		<at.caspase.rxdroid.preferences.TimePeriodPreference android:key="time_period"
+		<at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_period"
 		    android:title="TimePeriodPreference"
 		    android:defaultValue="07:00-13:00"
 		    android:persistent="true"

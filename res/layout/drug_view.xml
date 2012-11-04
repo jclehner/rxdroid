@@ -49,7 +49,7 @@
 	/>
 	
   
-  	<at.caspase.rxdroid.widget.DrugNameView android:id="@id/drug_name"
+  	<at.jclehner.rxdroid.widget.DrugNameView android:id="@id/drug_name"
   		android:layout_width="wrap_content"
   		android:layout_height="wrap_content"
   		  		
@@ -86,7 +86,7 @@
   		android:layout_below="@id/drug_name"  		
   	>  	
   	
-	  	<at.caspase.rxdroid.DoseView android:id="@id/morning"
+	  	<at.jclehner.rxdroid.DoseView android:id="@id/morning"
 	  		android:layout_height="wrap_content"
 	  		android:layout_width="0dip"
 	  		android:layout_weight="1"
@@ -101,7 +101,7 @@
 	  		layout="@layout/divider" 
 	  	/>
 	  	
-	  	<at.caspase.rxdroid.DoseView android:id="@id/noon"
+	  	<at.jclehner.rxdroid.DoseView android:id="@id/noon"
 	  		android:layout_height="wrap_content"
 	  		android:layout_width="0dip"
 	  		android:layout_weight="1"
@@ -116,7 +116,7 @@
 	  		layout="@layout/divider" 
 	  	/>
 	  	
-	  	<at.caspase.rxdroid.DoseView android:id="@+id/evening"
+	  	<at.jclehner.rxdroid.DoseView android:id="@+id/evening"
 	  		android:layout_height="wrap_content"
 	  		android:layout_width="0dip"
 	  		android:layout_weight="1"
@@ -131,7 +131,7 @@
 	  		layout="@layout/divider" 
 	  	/>
 	  	
-	  	<at.caspase.rxdroid.DoseView android:id="@+id/night"
+	  	<at.jclehner.rxdroid.DoseView android:id="@+id/night"
 	  		android:layout_height="wrap_content"
 	  		android:layout_width="0dip"
 	  		android:layout_weight="1"

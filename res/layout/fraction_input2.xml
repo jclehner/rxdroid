@@ -44,13 +44,13 @@
 		
 		style="@style/FractionInputBottomPadding"
 	>	
-		<at.caspase.rxdroid.NumberPickerWrapper android:id="@+id/integer" 
+		<at.jclehner.rxdroid.NumberPickerWrapper android:id="@+id/integer" 
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:visibility="gone"
 		/>
 	    
-		<at.caspase.rxdroid.NumberPickerWrapper android:id="@+id/numerator" 
+		<at.jclehner.rxdroid.NumberPickerWrapper android:id="@+id/numerator" 
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 		/>
@@ -65,7 +65,7 @@
 			android:text="/"
 		/>
 		
-		<at.caspase.rxdroid.NumberPickerWrapper android:id="@+id/denominator" 
+		<at.jclehner.rxdroid.NumberPickerWrapper android:id="@+id/denominator" 
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 		/>   

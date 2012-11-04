@@ -23,7 +23,7 @@
 -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:rxdroid="http://schemas.android.com/apk/res/at.caspase.rxdroid"
+	xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
 >
 	<style name="DefaultTheme" parent="@style/DarkTheme" />
 	<style name="DefaultTheme.NoAnimation" parent="@style/DefaultTheme">

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-readonly PKG="at.caspase.rxdroid"
+readonly PKG="at.jclehner.rxdroid"
 readonly DTEMP="/sdcard/"
 readonly MISC="scripts/misc/"
 
