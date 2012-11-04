@@ -57,7 +57,7 @@
     
     <string name="_msg_freq_daily">Täglich</string>
 
-	<string name="_toast_deleted">Gelöscht</string>
+	<string name="_toast_deleted">Gelöscht.</string>
 	  
     <!--  Dialogs: Errors -->    
     <string name="_title_error">Fehler</string>    
@@ -98,8 +98,8 @@
 	
 	<string name="_btn_discard">Verwerfen</string>
 	<string name="_btn_save">Speichern</string>
-	<string name="_toast_intake_noted">Notiert…</string>
-	<string name="_toast_saved">Gespeichert…</string>
+	<string name="_toast_intake_noted">Notiert.</string>
+	<string name="_toast_saved">Gespeichert.</string>
 	
 	<string name="_title_add">Hinzufügen</string>
 	
@@ -227,7 +227,7 @@
 	<string name="_title_dark_theme">Dunkles Theme</string>
 	<string name="_toast_theme_changed">App wird neu gestartet…</string>
 	
-	<string name="_toast_low_supplies">Vorrat dieses Medikaments ist niedrig</string>
+	<string name="_toast_low_supplies">Vorrat dieses Medikaments ist niedrig.</string>
 	
 	<string name="_title_about">Über</string>
 	<string name="_title_db_status_creating_intakes">Erstelle fehlende Daten…</string>
