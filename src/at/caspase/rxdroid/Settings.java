@@ -67,6 +67,7 @@ public final class Settings
 		public static final String THEME_IS_DARK = key(R.string.key_theme_is_dark);
 		public static final String NOTIFICATION_SOUND = key(R.string.key_notification_sound);
 		public static final String ENABLE_LANDSCAPE = key(R.string.key_enable_landscape_mode);
+		public static final String DONATE = key(R.string.key_donate);
 	}
 
 	private static final String TAG = Settings.class.getName();

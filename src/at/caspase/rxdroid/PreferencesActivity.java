@@ -128,6 +128,15 @@ public class PreferencesActivity extends PreferenceActivity implements
 			onPreferenceChange(p, Settings.getString(key, defValue));
 		}
 
+		p = findPreference(Settings.Keys.DONATE);
+		if(p != null)
+		{
+			final Uri uri = Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QTBC4AVEYASYU");
+			final Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setData(uri);
+			p.setIntent(intent);
+		}
+
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
 		{
 			ActionBar ab = getActionBar();

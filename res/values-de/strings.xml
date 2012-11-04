@@ -248,6 +248,8 @@
 		
 	<string name="_title_filter">Filtern</string>
 	<string name="_title_show_all">Alle zeigen</string>
+		
+	<string name="_title_donate">Spenden!</string>
 	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

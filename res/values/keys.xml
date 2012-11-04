@@ -40,4 +40,5 @@
 	<string translatable="false" name="key_notification_sound">notification_sound</string>
 	<string translatable="false" name="key_use_extended_notifications">use_extended_notifications</string>
 	<string translatable="false" name="key_enable_landscape_mode">enable_landscape_mode</string>
+	<string translatable="false" name="key_donate">donate</string>	
 </resources>
