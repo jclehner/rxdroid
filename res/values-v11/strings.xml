@@ -25,5 +25,5 @@
 <resources>
 	<string name="pref_default_theme_is_dark" translatable="false">false</string>
 	<!-- virtual strings -->
-	<string name="virtual_msg_no_drugs">@string/_msg_no_drugs_v11</string>
+	<string translatable="false" name="virtual_msg_no_drugs">@string/_msg_no_drugs_v11</string>
 </resources>
