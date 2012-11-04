@@ -27,6 +27,7 @@ import java.util.NoSuchElementException;
 
 import android.util.Log;
 import at.caspase.rxdroid.Fraction;
+import at.jclehner.rxdroid.preferences.FractionPreference;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
@@ -124,7 +125,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField(unique = true)
 	private String name;
 
-	@DatabaseField(columnName = "form")
+	@DatabaseField
 	private int icon;
 
 	@DatabaseField
@@ -134,22 +135,22 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField
 	private int refillSize;
 
-	@DatabaseField(dataType = DataType.SERIALIZABLE)
+	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction currentSupply = new Fraction();
 
-	@DatabaseField(dataType = DataType.SERIALIZABLE)
+	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction doseMorning = new Fraction();
 
-	@DatabaseField(dataType = DataType.SERIALIZABLE)
+	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction doseNoon = new Fraction();
 
-	@DatabaseField(dataType = DataType.SERIALIZABLE)
+	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction doseEvening = new Fraction();
 
-	@DatabaseField(dataType = DataType.SERIALIZABLE)
+	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction doseNight = new Fraction();
 
-	@DatabaseField(columnName = "repeat")
+	@DatabaseField
 	private int repeatMode= REPEAT_DAILY;
 
 	/**
@@ -176,8 +177,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	private boolean autoAddIntakes = false;
 
 	@DatabaseField
-	private
-	/* package */ Date lastAutoIntakeCreationDate;
+	private Date lastAutoIntakeCreationDate;
 
 	@DatabaseField
 	private int sortRank = 0;

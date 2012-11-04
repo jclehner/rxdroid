@@ -212,7 +212,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 	}
 
 	private void loadDatabaseAndLaunchMainActivity() {
-		new DatabaseIntializerTask().execute((Boolean) null);
+		new DatabaseIntializerTask().execute(0);
 	}
 
 	private boolean deleteDatabase()
@@ -244,7 +244,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			{
 				while(Database.hasPendingOperations())
 				{
-					Log.d(TAG, "Waiting for database to settle");
+					Log.i(TAG, "Waiting for database to settle");
 					try
 					{
 						Thread.sleep(50);
@@ -267,32 +267,26 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		}).start();
 	}
 
-	private class DatabaseIntializerTask extends AsyncTask<Boolean, Void, WrappedCheckedException>
+	private class DatabaseIntializerTask extends AsyncTask<Integer, Void, WrappedCheckedException>
 	{
-		private boolean mAttemptedDatabaseReload = false;
+		//private boolean mAttemptedDatabaseReload = false;
 
 		@Override
-		protected WrappedCheckedException doInBackground(Boolean... params)
+		protected WrappedCheckedException doInBackground(Integer... params)
 		{
+			int count = (params == null || params.length == 0) ? 0 : params[0];
+
 			try
 			{
-				if(params == null || params.length == 0 || params[0] == false)
+				if(count == 0)
 					Database.init();
 				else
 					Database.reload(RxDroid.getContext());
 			}
 			catch(Exception e)
 			{
-				// Database.getCached() will throw after a database
-				// upgrade. This is a dirty hack to work around this
-				// issue, since I'm pretty sure there's a sane way
-				// to do it - but hey, it works ;)
-				if(!mAttemptedDatabaseReload)
-				{
-					mAttemptedDatabaseReload = true;
-					//Database.reload(RxDroid.getContext());
-					return doInBackground(true);
-				}
+				if(count < Database.TABLE_COUNT)
+					return doInBackground(++count);
 
 				return new WrappedCheckedException(e);
 			}

@@ -27,7 +27,7 @@ for c in $CLASSES; do
 	echo "public class Old$c extends Entry" >> ${f}
 	echo "{" >> ${f}
 
-	grep @DatabaseField -A1 src/${PKGPATH}/db/$c.java | sed -r -e 's/^--//' -e 's/useGetSet = true/useGetSet = false/g' >> ${f}
+	grep @DatabaseField -A1 src/${PKGPATH}/db/$c.java | sed -E -e 's/^--//' -e 's/useGetSet = true/useGetSet = false/g' >> ${f}
 
 	cat >> ${f} <<EOF
 		

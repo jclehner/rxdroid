@@ -77,6 +77,8 @@ public final class Database
 
 	public static final int FLAG_DONT_NOTIFY_LISTENERS = 1;
 
+	public static final int TABLE_COUNT = CLASSES.length;
+
 	private static final HashMap<Class<?>, List<? extends Entry>> sCache =
 			new HashMap<Class<?>, List<? extends Entry>>();
 

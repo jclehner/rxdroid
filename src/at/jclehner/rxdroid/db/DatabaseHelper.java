@@ -115,7 +115,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		private final int mType;
 	}
 
-	public static final int DB_VERSION = 53;
+	public static final int DB_VERSION = 54;
 	public static final String DB_NAME = "db.sqlite";
 
 	DatabaseHelper(Context context) {

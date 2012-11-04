@@ -71,7 +71,7 @@ public class Intake extends Entry
 	@DatabaseField
 	private int doseTime;
 
-	@DatabaseField(dataType = DataType.SERIALIZABLE)
+	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction dose;
 
 	@DatabaseField
