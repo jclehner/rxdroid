@@ -24,7 +24,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">RxDroid</string>
-    <string name="version" translatable="false">0.9 RC4</string>
+    <string name="version" translatable="false">0.9 RC5</string>
     <string name="vcs_revision" translatable="false">$Revision$</string>
         
     <!--  WARNING: Do NOT replace - with an en dash as suggested by lint -->
