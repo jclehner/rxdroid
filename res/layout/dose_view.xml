@@ -24,7 +24,7 @@
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_margin="0dip"
-	>
+>
 
   <ImageView android:id="@+id/icon_intake_status"
   	android:layout_width="40dp"

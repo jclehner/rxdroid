@@ -84,8 +84,8 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	{
 		super(context, attrs);
 
-		LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		li.inflate(R.layout.dose_view, this, true);
+		LayoutInflater.from(context).inflate(R.layout.dose_view, this, true);
+		//setBackgroundResource(R.drawable.generic_background);
 
 		mIntakeStatus = (ImageView) findViewById(R.id.icon_intake_status);
 		mDoseText = (TextView) findViewById(R.id.text_dose);
@@ -206,24 +206,22 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	{
 		if(isClickable())
 		{
-			// A bit of a hack, but it makes the DoseView's background change much more
-			// responsive.
+			// This background change could of course be handled more elegantly
+			// using a drawable selector, but state_pressed is much less responsive
+			// than this method here.
 
 			final int action = event.getAction() & MotionEvent.ACTION_MASK;
 
 			switch(action)
 			{
 				case MotionEvent.ACTION_DOWN:
-					setBackgroundResource(R.drawable.doseview_background_selected);
-					//setBackgroundResource(android.R.drawable.list_selector_background);
-					setPadding(0, 0, 0, 0);
+					changeBackground(R.drawable.doseview_background_selected);
 					break;
 
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_CANCEL:
 				case MotionEvent.ACTION_OUTSIDE:
-					setBackgroundResource(R.drawable.doseview_background);
-					setPadding(0, 0, 0, 0);
+					changeBackground(0);
 					break;
 			}
 		}
@@ -281,20 +279,19 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	{
 		super.onAttachedToWindow();
 
-		setBackgroundResource(R.drawable.doseview_background);
-		setPadding(0, 0, 0, 0);
+		changeBackground(0);
 
 		if(mDrug != null)
 			Database.registerEventListener(this);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onDetachedFromWindow()
 	{
 		super.onDetachedFromWindow();
 
-		setBackgroundDrawable(null);
-		setPadding(0, 0, 0, 0);
+		changeBackground(0);
 
 		Database.unregisterEventListener(this);
 	}

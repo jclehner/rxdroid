@@ -117,7 +117,7 @@
 	<string name="_msg_freq_every_n_days">Alle %1$s Tage, beginnend am %2$s</string>
 	
 	<string name="_summary_intake_never">Nie</string>
-	<string name="_msg_drug_repeat_ge_2">Wert muss größer oder gleich 2 sein.</string>
+	<string name="_msg_drug_repeat_ge_2">Wert muss größer oder gleich 2 sein</string>
 	<string name="_title_version">Version</string>
 	
 	<string name="_summary_not_available">Nicht verfügbar</string>
@@ -132,11 +132,7 @@
 	<string name="_title_daily">Täglich</string>
 	<string name="_title_every_n_days">Alle N Tage</string>
 	<string name="_title_pick_days">Wochentage auswählen</string>
-	
-	<string name="_title_dont_snooze">Einmalige Alarme</string>
-	<string name="_title_repeat_alarm">Alarme wiederholen</string>
-	<string name="_title_snooze">Schlummerfunktion</string>
-	
+		
 	<string name="_msg_supply">%1$s - hält bis %2$s</string>
 	<string name="_title_save_chanes">Änderungen speichern</string>
 	<string name="_msg_save_drug_changes">Änderungen an diesem Medikament speichern?</string>
@@ -155,7 +151,7 @@
     <string name="_msg_touch_to_edit">(zum Ändern berühren)</string>
   
     
-    <string name="_msg_no_doses_on_this_day">Keine Einnahmen an diesem Tag vorgesehen.</string>
+    <string name="_msg_no_doses_on_this_day">Keine Einnahmen an diesem Tag vorgesehen</string>
     
     <string name="_msg_db_error_general">Unbekannter Datenbankfehler.</string>
 	<string name="_msg_db_error_upgrade">Datenbankupgrade fehlgeschlagen.</string>
@@ -171,8 +167,6 @@
 		
 	<string name="_title_weekdays">Wochentage</string>
 	
-	<string name="_msg_snoozing">Schlummere. Klicke zum Abbrechen.</string>
-	<string name="_toast_snoozing">Schlummere…</string>
 	<string name="_title_on_demand">Bei Bedarf</string>
 	
 	<string name="_title_delete_drug">%1$s wirklich löschen?</string>
@@ -183,20 +177,14 @@
 	
 	<string name="_btn_exit">Verlassen</string>
 	
-	<string name="_title_alarm_mode">Wiederholung</string>
-	<string name="_summary_alarm_mode_normal">Benachrichtigungen werden nicht wiederholt.</string>
-	<string name="_summary_alarm_mode_repeat">Benachrichtigungen werden alle %1$d Minute(n) wiederholt.</string>
-	
-	<string name="_title_alarm_timeout">Intervall</string>
-	
 	<string name="_toast_drug_notification_icon">Die letzte Einnahme dieses Medikaments wurde ausgelassen.</string>   
 	
 	<string name="_btn_back">Zurück</string>
 	<string name="_btn_next">Weiter</string>
-	<string name="_msg_freq_21days_on_7days_off">21 Tage beginnend am %1$s, gefolgt von 7-tägiger Pause.</string>
-	<string name="_msg_no_drugs_v8">MENÜ drücken und %1$s auswählen, um ein Medikament hinzuzufügen.</string>
-	<string name="_msg_no_drugs_v11">Den +-Button in der Aktionsleiste klicken, um ein Medikament hinzuzufügen.</string>
-	<string name="_summary_scramble_names">Namen von Medikamenten unkenntlich machen. Den Namen anklicken, um ihn zu zeigen.</string>
+	<string name="_msg_freq_21days_on_7days_off">21 Tage ab %1$s, danach 7-tägige Pause</string>
+	<string name="_msg_no_drugs_v8">MENÜ drücken und %1$s auswählen, um ein Medikament hinzuzufügen</string>
+	<string name="_msg_no_drugs_v11">Den +-Button in der Aktionsleiste klicken, um ein Medikament hinzuzufügen</string>
+	<string name="_summary_scramble_names">Namen von Medikamenten unkenntlich machen. Den Namen anklicken, um ihn zu zeigen</string>
 	<string name="_title_21_days_on_7_days_off">7-tägige Pause alle 21 Tage</string>
 	<string name="_title_begin">Beginn</string>
 	<string name="_title_end">Ende</string>

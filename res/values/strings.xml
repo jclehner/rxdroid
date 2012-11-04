@@ -39,12 +39,18 @@
     <!-- 
     Translatable strings start here. The naming scheme is as follows:
     
-    _title_<foobar>		Titles for Dialogs, Preferences, Activities, etc. (w/o trailing dot)
-    _summary_<foobar>	Preference summaries (w/ trailing dot)
+    _title_<foobar>		Titles for Dialogs, Preferences, Activities, etc. (as short as possible)
+    _summary_<foobar>	Preference summaries (w/o trailing dot*)
     _toast_<foobar>		Message for Toast notifications (w/ trailing dot)
     _btn_<foobar>		Button label. Should be as short as possible. (w/o trailing dot)
-    _msg_<foobar>		Everything that does not fit into the categories above (w/ trailing dot)   
+    _msg_<foobar>		Everything that does not fit into the categories above (w/o trailing dot*) 
     _help_<foobar>		Very long text for HelpActivity.
+    
+    If the first part is prefixed with a q (_qtitle_<foobar>, qmsg_<foobar>, etc.) the string is a
+    quantity-specific string. The first format argument (%1$d) will always be the quantity used for
+    selecting the string. 
+    
+    *) Use trailing dots if more than one sentence or if original text includes a trailing dot.
     
     -->
     
@@ -78,14 +84,14 @@
     
     <string name="_msg_freq_daily">Daily</string>
 
-	<string name="_toast_deleted">Deleted</string>
+	<string name="_toast_deleted">Deleted.</string>
 	  
      
     <string name="_title_error">Error</string>    
 	
-	<string name="_msg_timepreference_constraint_failed">Time is not within specified bounds.</string>
-	<string name="_msg_err_empty_drug_name">This drug has no name and will be discarded.</string>
-	<string name="_msg_err_non_unique_drug_name">This name is already taken.</string>
+	<string name="_msg_timepreference_constraint_failed">Time is not within specified bounds/string>
+	<string name="_msg_err_empty_drug_name">This drug has no name and will be discarded/string>
+	<string name="_msg_err_non_unique_drug_name">This name is already taken/string>
     
     
 	<string name="_title_warning">Warning</string> 
@@ -101,7 +107,7 @@
     <string name="_title_pref_notification_methods">Notification methods</string>
     
     <string name="_title_min_supply_days">Low supply threshold</string>
-    <string name="_summary_min_supply_days">Minimum number of days of a drug\'s supply before displaying a notification – currently %1$s.</string>
+    <string name="_summary_min_supply_days">Minimum number of days of a drug\'s supply before displaying a notification – currently %1$s/string>
     
     <string name="_title_pref_use_led">LED</string>
     <string name="_title_pref_use_sound">Sound</string>
@@ -117,8 +123,8 @@
 	
 	<string name="_btn_discard">Discard</string>
 	<string name="_btn_save">Save</string>
-	<string name="_toast_intake_noted">Noted</string>
-	<string name="_toast_saved">Saved</string>
+	<string name="_toast_intake_noted">Noted.</string>
+	<string name="_toast_saved">Saved.</string>
 	
 	<string name="_title_add">Add</string>
 	
@@ -130,7 +136,7 @@
 	<string name="_title_mark_taken">Take dose</string>
 	
 	<string name="_msg_freq_every_n_days">Every %1$s days, beginning on %2$s</string>
-	<string name="_msg_freq_21days_on_7days_off">21 days beginning on %1$s, followed by a 7 day pause.</string>
+	<string name="_msg_freq_21days_on_7days_off">21 days beginning on %1$s, followed by a 7 day pause</string>
 	
 	<string name="_summary_intake_never">Never</string>
 	<string name="_msg_drug_repeat_ge_2">Must be greater than or equal to 2</string>
@@ -158,7 +164,7 @@
 	<string name="_msg_supply">%1$s – lasts until %2$s</string>
 	<string name="_title_save_chanes">Save changes</string>
 	<string name="_msg_save_drug_changes">Do you want to save changes made to this drug?</string>
-	<string name="_msg_every_n_days_distance">Days between each repetition.</string>
+	<string name="_msg_every_n_days_distance">Days between each repetition/string>
 	
 	<string name="_title_intake_schedule">Schedule</string>
 	<string name="_title_repeat">Repetition</string>
@@ -171,9 +177,9 @@
 	
     <string name="_msg_touch_to_edit">(touch to edit)</string>
    
-    <string name="_msg_no_drugs_v8">Press MENU and select "%1$s" to add a drug.</string>
-    <string name="_msg_no_drugs_v11">Press the + button in the action bar to add a drug.</string>
-    <string name="_msg_no_doses_on_this_day">There are no doses to be taken on this date.</string>
+    <string name="_msg_no_drugs_v8">Press MENU and select "%1$s" to add a drug/string>
+    <string name="_msg_no_drugs_v11">Press the + button in the action bar to add a drug/string>
+    <string name="_msg_no_doses_on_this_day">There are no doses to be taken on this date/string>
     
     <string name="_msg_db_error_general">Unknown database error.</string>
 	<string name="_msg_db_error_upgrade">Database upgrade error.</string>
@@ -183,14 +189,11 @@
 	
 	<string name="_btn_reset">Reset</string>
 	
-	<string name="_msg_db_loading">Loading database, please stand by.</string>
 	<string name="_msg_footer_insufficient_supplies">Insufficient supplies for this dose. 
 		Press %2$s to ignore, cancel to edit the dose, or touch this text to edit &lt;b&gt;%3$s&lt;/b&gt;.</string>
 		
 	<string name="_title_weekdays">Weekdays</string>
 	
-	<string name="_msg_snoozing">Snoozing. Click to cancel.</string>
-	<string name="_toast_snoozing">Snoozing</string>
 	<string name="_title_on_demand">On demand</string>
 	
 	<string name="_title_delete_drug">Really delete %1$s?</string>
@@ -200,12 +203,6 @@
 	<string name="_toast_db_reset_failure">Database reset failed. Please reinstall.</string>
 	
 	<string name="_btn_exit">Exit</string>
-	
-	<string name="_title_alarm_mode">Alarm mode</string>
-	<string name="_summary_alarm_mode_normal">Alarms will not be repeated.</string>
-	<string name="_summary_alarm_mode_repeat">Repeat alarm every %1$d minute(s).</string>
-	
-	<string name="_title_alarm_timeout">Alarm timeout</string>
 	
 	<string name="_toast_drug_notification_icon">This drug has at least one missed dose in the past.</string> 
         
@@ -244,10 +241,10 @@
 	
 	
 	<string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
-	<string name="_msg_restore_default_settings">This will reset all settings to their default values.</string>
+	<string name="_msg_restore_default_settings">This will reset all settings to their default values/string>
 	
 	<string name="_title_show_supply_monitors">Show all</string>
-	<string name="_summary_show_supply_monitors">Display drugs with disabled dose notifications.</string>
+	<string name="_summary_show_supply_monitors">Display drugs with disabled dose notifications/string>
 		
 	<string name="_title_show_in_list">Drug list</string>
 	
@@ -257,7 +254,7 @@
 	<string name="_title_dark_theme">Use dark theme</string>
 	<string name="_toast_theme_changed">Restarting app…</string>
 	
-	<string name="_toast_low_supplies">This drug\'s supplies are low</string>
+	<string name="_toast_low_supplies">This drug\'s supplies are low.</string>
 	
 	<string name="_title_notification_sound">Notification sound</string>
 	

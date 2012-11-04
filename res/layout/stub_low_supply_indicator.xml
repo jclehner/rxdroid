@@ -34,4 +34,6 @@
 		 		
   	android:clickable="false"
   	android:onClick="onLowSupplyIndicatorClicked"
+  	
+  	android:background="@drawable/generic_background"
 />
