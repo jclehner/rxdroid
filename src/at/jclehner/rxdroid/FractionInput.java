@@ -32,6 +32,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import at.caspase.rxdroid.Fraction;
 import at.jclehner.androidutils.InstanceState;
 import at.jclehner.androidutils.InstanceState.SaveState;
 import at.jclehner.rxdroid.NumberPickerWrapper.OnValueChangeListener;

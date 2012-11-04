@@ -59,7 +59,7 @@ import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import at.jclehner.rxdroid.Fraction.MutableFraction;
+import at.caspase.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.jclehner.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
 import at.jclehner.rxdroid.db.Database;

@@ -24,7 +24,7 @@ package at.jclehner.rxdroid.db;
 import java.sql.Timestamp;
 import java.util.Date;
 
-import at.jclehner.rxdroid.Fraction;
+import at.caspase.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.Hasher;
 import at.jclehner.rxdroid.util.Util;
 

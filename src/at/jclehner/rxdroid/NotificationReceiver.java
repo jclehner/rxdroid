@@ -34,6 +34,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import at.caspase.rxdroid.Fraction;
 import at.jclehner.androidutils.EventDispatcher;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.db.Database;

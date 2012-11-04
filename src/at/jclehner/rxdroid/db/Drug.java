@@ -26,7 +26,7 @@ import java.util.Date;
 import java.util.NoSuchElementException;
 
 import android.util.Log;
-import at.jclehner.rxdroid.Fraction;
+import at.caspase.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;

@@ -19,7 +19,7 @@
  *
  */
 
-package at.jclehner.rxdroid;
+package at.caspase.rxdroid;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

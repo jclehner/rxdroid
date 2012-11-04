@@ -24,7 +24,7 @@ package at.jclehner.rxdroid.db.schedules;
 import java.io.Serializable;
 import java.util.Date;
 
-import at.jclehner.rxdroid.Fraction;
+import at.caspase.rxdroid.Fraction;
 
 /**
  * Abstract base class for all advanced schedules.

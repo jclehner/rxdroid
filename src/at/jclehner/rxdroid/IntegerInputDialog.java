@@ -22,6 +22,7 @@
 package at.jclehner.rxdroid;
 
 import android.content.Context;
+import at.caspase.rxdroid.Fraction;
 
 public class IntegerInputDialog extends FractionInputDialog
 {

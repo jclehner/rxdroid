@@ -27,7 +27,7 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import at.jclehner.rxdroid.Fraction;
+import at.caspase.rxdroid.Fraction;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
 

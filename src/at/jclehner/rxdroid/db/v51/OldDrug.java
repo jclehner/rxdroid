@@ -23,7 +23,7 @@ package at.jclehner.rxdroid.db.v51;
 
 import java.util.Date;
 
-import at.jclehner.rxdroid.Fraction;
+import at.caspase.rxdroid.Fraction;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Schedule;
