@@ -82,7 +82,7 @@ public final class Settings
 		if(sSharedPrefs == null)
 		{
 			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(RxDroid.getContext());
-			sSharedPrefs.registerOnSharedPreferenceChangeListener(LISTENER);
+//			sSharedPrefs.registerOnSharedPreferenceChangeListener(LISTENER);
 		}
 	}
 
@@ -663,28 +663,6 @@ public final class Settings
 		prefix.firstCharPos = i + 1;
 		return prefix;
 	}
-
-	private static final OnSharedPreferenceChangeListener LISTENER = new OnSharedPreferenceChangeListener() {
-
-		@Override
-		public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
-		{
-			if(Settings.Keys.THEME_IS_DARK.equals(key))
-			{
-				Theme.clearAttributeCache();
-
-				final Context context = RxDroid.getContext();
-
-				Toast.makeText(context, R.string._toast_theme_changed, Toast.LENGTH_LONG).show();
-
-				final PackageManager pm = context.getPackageManager();
-				final Intent intent = pm.getLaunchIntentForPackage(context.getPackageName());
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-				RxDroid.doStartActivity(intent);
-			}
-		}
-	};
-
 
 	private Settings() {}
 }

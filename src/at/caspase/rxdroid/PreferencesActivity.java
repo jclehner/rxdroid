@@ -32,9 +32,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -112,6 +114,10 @@ public class PreferencesActivity extends PreferenceActivity implements
 		if(p != null)
 			p.setOnPreferenceClickListener(this);
 
+		p = findPreference(Settings.Keys.THEME_IS_DARK);
+		if(p != null)
+			p.setOnPreferenceChangeListener(this);
+
 		p = findPreference(Settings.Keys.NOTIFICATION_SOUND);
 		if(p != null)
 		{
@@ -128,8 +134,6 @@ public class PreferencesActivity extends PreferenceActivity implements
 			ab.setDisplayShowHomeEnabled(true);
 			ab.setDisplayHomeAsUpEnabled(true);
 		}
-
-
 	}
 
 	@Override
@@ -226,6 +230,21 @@ public class PreferencesActivity extends PreferenceActivity implements
 
 			if(ringtone != null)
 				preference.setSummary(ringtone.getTitle(this));
+		}
+		else if(Settings.Keys.THEME_IS_DARK.equals(key))
+		{
+			Theme.clearAttributeCache();
+
+			final Context context = RxDroid.getContext();
+
+			Toast.makeText(context, R.string._toast_theme_changed, Toast.LENGTH_LONG).show();
+
+			final PackageManager pm = context.getPackageManager();
+			final Intent intent = pm.getLaunchIntentForPackage(context.getPackageName());
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+			RxDroid.doStartActivity(intent);
+
+			finish();
 		}
 
 		return true;
