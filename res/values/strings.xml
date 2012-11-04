@@ -156,11 +156,7 @@
 	<string name="_title_every_n_days">Every N days</string>
 	<string name="_title_pick_days">Pick days</string>
 	<string name="_title_21_days_on_7_days_off">7 day pause every 21 days</string>
-	
-	<string name="_title_dont_snooze">Notify once</string>
-	<string name="_title_repeat_alarm">Repeat alarm</string>
-	<string name="_title_snooze">Snooze</string>
-	
+		
 	<string name="_msg_supply">%1$s – lasts until %2$s</string>
 	<string name="_title_save_chanes">Save changes</string>
 	<string name="_msg_save_drug_changes">Do you want to save changes made to this drug?</string>
