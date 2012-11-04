@@ -45,6 +45,8 @@
 		
 		<item name="iconLowSupplies">@drawable/ic_low_supply_warning</item>
 		<item name="iconMissedDose">@drawable/ic_warning</item>
+		
+		<item name="dividerColor">@color/list_divider_light</item>
 	</style>
 	
 	<style name="DarkTheme" parent="@style/_ApiSpecificDarkTheme">
@@ -62,6 +64,8 @@
 		
 		<item name="iconLowSupplies">@drawable/ic_low_supply_warning_white</item>
 		<item name="iconMissedDose">@drawable/ic_warning_white</item>
+		
+		<item name="dividerColor">@color/list_divider_dark</item>
 	</style>
 	
 	<style name="TextAppearance.Large.Clickable" parent="@android:style/TextAppearance.Large">

@@ -52,4 +52,6 @@
     <attr name="iconMissedDose" format="reference" />
     
     <attr name="textColorClickable" format="color|reference" />
+    
+    <attr name="dividerColor" format="color|reference" />
 </resources>
