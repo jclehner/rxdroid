@@ -67,8 +67,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			if(msg == null)
 				return;
 
-
-			final int msgResId = intent.getIntExtra(EXTRA_MESSAGE, R.string._msg_db_loading);
+			final int msgResId = intent.getIntExtra(EXTRA_MESSAGE, R.string._title_db_status_loading);
 			msg.setText(getString(R.string._title_database) + ": " + getString(msgResId));
 		}
 	}

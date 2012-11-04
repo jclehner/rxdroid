@@ -55,10 +55,4 @@
     	<item>@string/_title_history_1_year</item>
     	<item>@string/_title_history_unlimited</item>    	
     </string-array>
-       
-	<string-array name="alarm_modes">
-		<item>@string/_title_dont_snooze</item>
-		<item>@string/_title_repeat_alarm</item>
-		<!-- <item>@string/_title_snooze</item>  -->
-	</string-array>
 </resources>
