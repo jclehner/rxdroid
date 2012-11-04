@@ -182,7 +182,10 @@ for REPO in "${GIT_REPOS[@]}"; do
 		clone_or_fetch "${URL}" "${CLONEDIR}"
 		link_or_copy "${CLONEDIR}/${LIBDIR}" "${TARGET}"
 		fix_project_properties "${TARGET}"
-		create_project_files "${TARGET}"
+		#create_project_files "${TARGET}"
 	fi
 done
+
+echo
+echo "YOU NEED TO MANUALLY IMPORT THE DOWNLOADED SOURCES INTO AN ECLIPSE PROJECT"
 
