@@ -43,6 +43,7 @@ import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+import at.caspase.androidutils.Reflect;
 import at.caspase.rxdroid.db.Database;
 import at.caspase.rxdroid.db.DatabaseHelper;
 import at.caspase.rxdroid.db.DatabaseHelper.DatabaseError;
@@ -93,6 +94,17 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			Util.applyStyle(dateString, new UnderlineSpan());
 
 			getActionBar().setSubtitle(dateString);
+		}
+		else
+		{
+			try
+			{
+				Class.forName("com.michaelnovakjr.numberpicker.NumberPicker");
+			}
+			catch(ClassNotFoundException e)
+			{
+				throw new WrappedCheckedException("NumberPicker library is missing", e);
+			}
 		}
 
 		super.onCreate(savedInstanceState);
