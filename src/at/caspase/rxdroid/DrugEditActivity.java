@@ -482,7 +482,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			titleResId = R.string._title_refill_size,
 			order = 10,
 			type = FractionPreference.class,
-			helper = FractionAsIntegerPreferenceHelper.class
+			helper = RefillSizePreferenceHelper.class
 		)
 		private int refillSize;
 
@@ -934,10 +934,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static class FractionAsIntegerPreferenceHelper extends MyDialogPreferenceHelper
+	private static class RefillSizePreferenceHelper extends MyDialogPreferenceHelper
 	{
 		@SuppressWarnings("unused")
-		public FractionAsIntegerPreferenceHelper() {
+		public RefillSizePreferenceHelper() {
 			// TODO Auto-generated constructor stub
 		}
 
@@ -949,11 +949,19 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		@Override
-		public boolean updatePreference(MyDialogPreference preference, Object newPrefValue)
+		public void updateSummary(MyDialogPreference preference, Object newValue)
 		{
-			setFieldValue(((Fraction) newPrefValue).intValue());
-			preference.setSummary(newPrefValue.toString());
-			return true;
+			final int value = (Integer) newValue;
+
+			if(value != 0)
+				preference.setSummary(Integer.toString(value));
+			else
+				preference.setSummary(R.string._summary_not_available);
+		}
+
+		@Override
+		public Object toFieldType(Object prefValue) {
+			return ((Fraction) prefValue).intValue();
 		}
 	}
 
