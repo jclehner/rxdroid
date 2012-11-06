@@ -37,6 +37,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -72,7 +73,7 @@ import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
-public class DrugListActivity extends Activity implements OnLongClickListener,
+public class DrugListActivity extends FragmentActivity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
 {
 	private static final String TAG = DrugListActivity.class.getName();
@@ -632,14 +633,19 @@ public class DrugListActivity extends Activity implements OnLongClickListener,
 		@Override
 		public boolean onLongClick(View v)
 		{
-			Calendar cal = DateTime.calendarFromDate(mDate);
+			/*Calendar cal = DateTime.calendarFromDate(mDate);
 
 			final int year = cal.get(Calendar.YEAR);
 			final int month = cal.get(Calendar.MONTH);
 			final int day = cal.get(Calendar.DAY_OF_MONTH);
 
 			DatePickerDialog dialog = new DatePickerDialog(DrugListActivity.this, DrugListActivity.this, year, month, day);
+			dialog.setCancelable(true);
 			dialog.show();
+			return true;*/
+
+			DatePickerFragment datePicker = DatePickerFragment.newInstance(mDate, DrugListActivity.this);
+			datePicker.show(getSupportFragmentManager(), "datePicker");
 			return true;
 		}
 

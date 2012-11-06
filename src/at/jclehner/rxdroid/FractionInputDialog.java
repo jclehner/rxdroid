@@ -104,6 +104,8 @@ public class FractionInputDialog extends AlertDialog implements OnClickListener,
 	@Override
 	public void onClick(DialogInterface dialog, int which)
 	{
+		mInput.clearFocus();
+
 		if(which == BUTTON_POSITIVE)
 		{
 			if(mListener != null)

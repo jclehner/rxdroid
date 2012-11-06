@@ -39,7 +39,11 @@ public class FractionPersister extends StringType
 		return parse(stringValue);
 	}
 
-	private static Fraction parse(Object object) {
+	private static Fraction parse(Object object)
+	{
+		if(object == null)
+			return Fraction.ZERO;
+
 		return Fraction.decode((String) object);
 	}
 }

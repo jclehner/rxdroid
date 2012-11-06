@@ -136,19 +136,19 @@ public class Drug extends Entry implements Comparable<Drug>
 	private int refillSize;
 
 	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction currentSupply = new Fraction();
+	private Fraction currentSupply = Fraction.ZERO;
 
 	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseMorning = new Fraction();
+	private Fraction doseMorning = Fraction.ZERO;
 
 	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseNoon = new Fraction();
+	private Fraction doseNoon = Fraction.ZERO;
 
 	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseEvening = new Fraction();
+	private Fraction doseEvening = Fraction.ZERO;
 
 	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseNight = new Fraction();
+	private Fraction doseNight = Fraction.ZERO;
 
 	@DatabaseField
 	private int repeatMode= REPEAT_DAILY;
