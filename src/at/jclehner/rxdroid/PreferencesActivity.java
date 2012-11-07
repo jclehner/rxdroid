@@ -166,7 +166,7 @@ public class PreferencesActivity extends PreferenceActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		MenuItem item = menu.add(0, MENU_RESTORE_DEFAULTS, 0, R.string._title_restore_default_settings)
+		MenuItem item = menu.add(0, MENU_RESTORE_DEFAULTS, 0, R.string._title_factory_reset)
 				.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
@@ -315,8 +315,6 @@ public class PreferencesActivity extends PreferenceActivity implements
 
 		return super.onCreateDialog(id);
 	}
-
-
 
 	private void updateLowSupplyThresholdPreferenceSummary()
 	{

@@ -274,6 +274,8 @@
 	<string name="_title_show_all">Show all</string>
 	
 	<string name="_title_donate">Donate!</string>
+	
+	<string name="_title_factory_reset">Factory reset</string>	
 			
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

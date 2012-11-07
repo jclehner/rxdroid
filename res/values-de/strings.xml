@@ -251,6 +251,8 @@
 		
 	<string name="_title_donate">Spenden!</string>
 	
+	<string name="_title_factory_reset">Einstellungen zurücksetzen</string>	
+	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.
