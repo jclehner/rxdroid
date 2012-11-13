@@ -440,6 +440,8 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		@Override
 		public void onClick(View v)
 		{
+			mTimePicker.clearFocus();
+
 			if(v == mBackButton)
 			{
 				if(mCurrentPage == 0)

@@ -63,9 +63,17 @@
     <string name="_title_end">End</string>
         
     <string name="_msg_new_notification">New notification</string>
-    <string name="_msg_doses_fp">%2$d due, %1$d missed</string>
+    <!-- <string name="_msg_doses_fp">%2$d due, %1$d missed</string>
     <string name="_msg_doses_f">%1$d missed</string>
-    <string name="_msg_doses_p">%1$d due</string>
+    <string name="_msg_doses_p">%1$d due</string> -->
+    
+    <plurals name="_qmsg_missed">
+        <item quantity="other">%1$d missed</item>
+    </plurals>
+    
+    <plurals name="_qmsg_due">
+        <item quantity="other">%1$d due</item>
+    </plurals>    
     
     <string name="_qmsg_low_supply_single">%1$s</string>        
 	<plurals name="_qmsg_low_supply_multiple">
@@ -276,6 +284,15 @@
 	<string name="_title_donate">Donate!</string>
 	
 	<string name="_title_factory_reset">Factory reset</string>	
+	
+	<string name="_title_dont_repeat">Don\'t repeat</string>
+	<string name="_title_15_minutes">15 minutes</string>
+	<string name="_title_30_minutes">30 minutes</string>
+	<string name="_title_1_hour">1 hour</string>
+	<string name="_title_2_hour">2 hours</string>
+	
+	<string name="_title_repeat_alarm">Repeat alarms</string>
+	<string name="_summary_repeat_alarm">Repeat notifications for pending or missed doses after a certain amount of time</string>
 			
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

@@ -1,9 +1,4 @@
 #!/bin/bash
-#
-# Primitive helper script, scanning for occurences of @string/_<foobar> and R.string._<foobar>, 
-# which are translatable strings in RxDroid. All values not defined in res/values/strings.xml will
-# be echoed in copy-'n-pastable XML. 
-#
 
 source "$(dirname $_)/shared.sh"
 
@@ -39,7 +34,7 @@ scan_dir()
 
 scan_string_xml()
 {
-	for f in res/values/prefkeys.xml; do
+	for f in res/values/keys.xml; do
 		[[ -e $f ]] || continue
 
 		echo "-- $f:"

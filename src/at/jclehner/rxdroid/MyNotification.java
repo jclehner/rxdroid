@@ -208,8 +208,6 @@ public class MyNotification
 		else
 			notification.when = 0;
 
-		//notification.flags |= Notification.FLAG_SHOW_LIGHTS;
-
 		notification.flags = mFlags;
 
 		if(mIsPersistent)
@@ -229,9 +227,11 @@ public class MyNotification
 		final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
 		final int thisHash = message.hashCode();
 
-		if(lastHash != thisHash)
+		if(mForceUpdate || lastHash != thisHash)
 		{
 			notification.flags ^= Notification.FLAG_ONLY_ALERT_ONCE;
+			Log.d("myNotification", "Removing FLAG_ONLY_ALERT_ONCE");
+			//notification.flags |= Notification.FLAG
 			Settings.putInt(Settings.Keys.LAST_MSG_HASH, thisHash);
 		}
 
@@ -246,7 +246,7 @@ public class MyNotification
 			notification.defaults ^= Notification.DEFAULT_LIGHTS;
 		}
 
-		if(Settings.getBoolean(Settings.Keys.USE_SOUND, true) && mIsSilent)
+		if(Settings.getBoolean(Settings.Keys.USE_SOUND, true) && !mIsSilent)
 		{
 			final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
 			if(ringtone != null)

@@ -58,7 +58,7 @@ public final class Settings
 		public static final String SCRAMBLE_NAMES = key(R.string.key_scramble_names);
 		public static final String PIN = key(R.string.key_pin);
 		public static final String LOW_SUPPLY_THRESHOLD = key(R.string.key_low_supply_threshold);
-		public static final String ALARM_MODE = key(R.string.key_alarm_mode);
+		public static final String ALARM_REPEAT = key(R.string.key_alarm_mode);
 		public static final String SHOW_SUPPLY_MONITORS = key(R.string.key_show_supply_monitors);
 		public static final String LAST_MSG_HASH = key(R.string.key_last_msg_hash);
 		public static final String VERSION = key(R.string.key_version);
@@ -68,6 +68,7 @@ public final class Settings
 		public static final String NOTIFICATION_SOUND = key(R.string.key_notification_sound);
 		public static final String ENABLE_LANDSCAPE = key(R.string.key_enable_landscape_mode);
 		public static final String DONATE = key(R.string.key_donate);
+		public static final String REPEAT_ALARM = key(R.string.key_repeat_alarm);
 	}
 
 	private static final String TAG = Settings.class.getName();
@@ -160,7 +161,7 @@ public final class Settings
 
 	public static boolean isPastMaxHistoryAge(Date reference, Date date)
 	{
-		final int index = getListPreferenceValueIndex(Keys.HISTORY_SIZE, 2);
+		final int index = getIntFromList(Keys.HISTORY_SIZE, 2);
 
 		final int field;
 		final int value;
@@ -514,10 +515,19 @@ public final class Settings
 		editor.commit();
 	}*/
 
-	public static int getListPreferenceValueIndex(String key, int defValue)
+	public static int getIntFromList(String key, int defValue)
 	{
 		String valueStr = getString(key, null);
 		return valueStr != null ? Integer.parseInt(valueStr, 10) : defValue;
+	}
+
+	public static int getStringAsInt(String key, int defValue)
+	{
+		final String value = getString(key);
+		if(value != null)
+			return Integer.parseInt(value);
+
+		return defValue;
 	}
 
 	public static void maybeLockInPortraitMode(Activity activity)

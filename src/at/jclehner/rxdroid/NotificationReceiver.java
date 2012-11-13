@@ -61,6 +61,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final String EXTRA_DATE = "at.jclehner.rxdroid.extra.DATE";
 	static final String EXTRA_DOSE_TIME = "at.jclehner.rxdroid.extra.DOSE_TIME";
 	static final String EXTRA_IS_DOSE_TIME_END = "at.jclehner.rxdroid.extra.IS_DOSE_TIME_END";
+	static final String EXTRA_FORCE_UPDATE = "at.jclehner.rxdroid.extra.FORCE_UPDATE";
 
 //	private static final String EXTRA_IS_DELETE_INTENT = TAG + ".is_delete_intent";
 
@@ -75,6 +76,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 //	private boolean mIsDeleteIntent = false;
 	private boolean mDoPostSilent = false;
+	private boolean mForceUpdate = false;
 
 	private static final EventDispatcher<OnDoseTimeChangeListener> sEventMgr =
 			new EventDispatcher<OnDoseTimeChangeListener>();
@@ -108,8 +110,9 @@ public class NotificationReceiver extends BroadcastReceiver
 		mContext = context;
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mAllDrugs = Database.getAll(Drug.class);
-		mAlarmRepeatMode = Settings.getListPreferenceValueIndex("alarm_mode", ALARM_MODE_NORMAL);
+		mAlarmRepeatMode = Settings.getIntFromList("alarm_mode", ALARM_MODE_NORMAL);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
+		mForceUpdate = intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
 //		mIsDeleteIntent = intent.getBooleanExtra(EXTRA_IS_DELETE_INTENT, false);
 
 		rescheduleAlarms();
@@ -195,16 +198,30 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.setMessage1(R.string._msg_doses_f, missedCount);
 
 		builder.setMessage2(message2);
-		builder.setForceUpdate(mAlarmRepeatMode == ALARM_MODE_REPEAT);
+		builder.setForceUpdate(mForceUpdate);
 		builder.setContentIntent(createDrugListIntent(date));
 		builder.setPersistent(true);
+
+		final NotificationHelper helper = new NotificationHelper(mContext);
+		helper.lowSupplies(find)
+
+
+
+
+
+
+
+
+
+
 
 		/*int defaults = Notification.DEFAULT_ALL ^ Settings.getNotificationDefaultsXorMask();
 
 		if(mDoPostSilent || RxDroid.isUiVisible())
 			defaults ^= Notification.DEFAULT_SOUND;*/
 
-		builder.setSilent(mDoPostSilent);
+		if(!mForceUpdate)
+			builder.setSilent(mDoPostSilent);
 
 		builder.post();
 	}
@@ -218,21 +235,22 @@ public class NotificationReceiver extends BroadcastReceiver
 		long offset;
 
 		if(scheduleEnd)
-		{
 			offset = Settings.getMillisUntilDoseTimeEnd(time, doseTime);
-
-			if(mAlarmRepeatMode == ALARM_MODE_REPEAT)
-				offset = Math.min(offset, Settings.getAlarmTimeout());
-		}
 		else
 			offset = Settings.getMillisUntilDoseTimeBegin(time, doseTime);
+
+		final int alarmRepeatMins = Settings.getStringAsInt(Settings.Keys.ALARM_REPEAT, 0);
+		if(alarmRepeatMins > 0)
+			offset = Math.min(offset, alarmRepeatMins * 60000);
+		else if(BuildConfig.DEBUG && alarmRepeatMins == -1)
+			offset = Math.min(offset, 10000);
 
 		final long triggerAtMillis = time.getTimeInMillis() + offset;
 
 		if(triggerAtMillis < System.currentTimeMillis())
 			throw new IllegalStateException("Alarm time is in the past: " + DateTime.toString(time));
 
-		Log.i(TAG, "Scheduling " + (scheduleEnd ? mAlarmRepeatMode != ALARM_MODE_REPEAT ? "end" : "next alarm" : "begin") +
+		Log.i(TAG, "Scheduling " + (scheduleEnd ? alarmRepeatMins == 0 ? "end" : "next alarm" : "begin") +
 				" of doseTime " + doseTime + " on date " + DateTime.toDateString(doseTimeDate) + " for " + DateTime.toString(triggerAtMillis) + "\n" +
 				"Alarm will fire in " + Util.millis(triggerAtMillis - System.currentTimeMillis())
 		);
@@ -241,6 +259,8 @@ public class NotificationReceiver extends BroadcastReceiver
 		extras.putSerializable(EXTRA_DATE, doseTimeDate);
 		extras.putInt(EXTRA_DOSE_TIME, doseTime);
 		extras.putBoolean(EXTRA_IS_DOSE_TIME_END, scheduleEnd);
+		extras.putBoolean(EXTRA_SILENT, false);
+		extras.putBoolean(EXTRA_FORCE_UPDATE, alarmRepeatMins > 0 || alarmRepeatMins == -1);
 
 		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, createOperation(extras));
 	}

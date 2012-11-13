@@ -180,6 +180,14 @@
 		
 		-->
 		
+		<ListPreference android:key="@string/key_alarm_mode"
+		    android:title="@string/_title_repeat_alarm"
+		    android:summary="@string/_summary_repeat_alarm"
+		    android:defaultValue="0"
+		    android:entries="@array/alarm_repeat_times"
+		    android:entryValues="@array/alarm_repeat_times_values"
+		/>	
+		
 		<EditTextPreference android:key="@string/key_low_supply_threshold"
 			android:title="@string/_title_min_supply_days"
 			android:summary="@string/_summary_min_supply_days"
