@@ -68,7 +68,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 	private TextView mDoseText;
 	private TextView mHintText;
-	private FractionInput mDoseEdit;
+	private FractionInput mDoseInput;
 	private TextView mInsufficientSupplyText;
 
 	private TextView mMessageText;
@@ -96,7 +96,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 		mDoseText = (TextView) view.findViewById(R.id.dose_text);
 		mHintText = (TextView) view.findViewById(R.id.dose_hint);
-		mDoseEdit = (FractionInput) view.findViewById(R.id.dose_edit);
+		mDoseInput = (FractionInput) view.findViewById(R.id.dose_edit);
 		mInsufficientSupplyText = (TextView) view.findViewById(R.id.text_insufficient_supplies);
 
 		setView(view);
@@ -228,9 +228,9 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 			mDose = new Fraction();
 
 		 mDoseText.setText(mDose.toString());
-         mDoseEdit.setValue(mDose);
-         mDoseEdit.setAutoInputModeEnabled(true);
-         mDoseEdit.setOnChangeListener(this);
+         mDoseInput.setValue(mDose);
+         mDoseInput.setAutoInputModeEnabled(true);
+         mDoseInput.setOnChangeListener(this);
          mInsufficientSupplyText.setOnClickListener(new View.OnClickListener() {
 
                  @Override
@@ -341,7 +341,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		mDoseText.setVisibility(doseTextVisibility);
 		mHintText.setVisibility(doseTextVisibility);
 
-		mDoseEdit.setVisibility(doseEditVisibility);
+		mDoseInput.setVisibility(doseEditVisibility);
 		mInsufficientSupplyText.setVisibility(insufficientSupplyTextVisibility);
 
 		if(state == STATE_INSUFFICIENT_SUPPLIES)
@@ -381,6 +381,8 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		{
 			if(which == BUTTON_POSITIVE)
 			{
+				mDoseInput.clearFocus();
+
 				if(hasInsufficientSupplies() && mState != STATE_INSUFFICIENT_SUPPLIES)
 					setState(STATE_INSUFFICIENT_SUPPLIES);
 				else

@@ -254,6 +254,14 @@ public class FractionInput extends LinearLayout
 	}
 
 	@Override
+	public void clearFocus()
+	{
+		mIntegerPicker.clearFocus();
+		mNumeratorPicker.clearFocus();
+		mDenominatorPicker.clearFocus();
+	}
+
+	@Override
 	protected Parcelable onSaveInstanceState()
 	{
 		Parcelable superState = super.onSaveInstanceState();
