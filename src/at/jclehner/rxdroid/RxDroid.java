@@ -80,11 +80,11 @@ public class RxDroid extends Application
 	}
 
 	public static String getQuantityString(int id, int quantity, Object... formatArgs) {
-		return getContext().getResources().getQuantityString(id, quantity, formatArgs);
+		return getContext().getResources().getQuantityString(id, quantity, quantity, formatArgs);
 	}
 
 	public static String getQuantityString(int id, int quantity) {
-		return getContext().getResources().getQuantityString(id, quantity);
+		return getContext().getResources().getQuantityString(id, quantity, quantity);
 	}
 
 	public static boolean isLocked()

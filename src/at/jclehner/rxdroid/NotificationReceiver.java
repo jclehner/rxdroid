@@ -28,11 +28,14 @@ import java.util.List;
 
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import at.caspase.rxdroid.Fraction;
 import at.jclehner.androidutils.EventDispatcher;
@@ -41,6 +44,7 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
@@ -67,6 +71,10 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	static final int ALARM_MODE_NORMAL = 0;
 	static final int ALARM_MODE_REPEAT = 1;
+
+	private static int NOTIFICATION_NORMAL = 0;
+	private static int NOTIFICATION_FORCE_UPDATE = 1;
+	private static int NOTIFICATION_FORCE_SILENT = 2;
 
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
@@ -137,11 +145,6 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
 
-//		if(dtInfo.activeDoseTime() != Schedule.TIME_INVALID)
-//			scheduleEndAlarm(dtInfo.currentTime(), dtInfo.activeDoseTime());
-//		else
-//			scheduleBeginAlarm(dtInfo.currentTime(), dtInfo.nextDoseTime());
-
 		if(dtInfo.activeDoseTime() != Schedule.TIME_INVALID)
 			scheduleNextBeginOrEndAlarm(dtInfo, true);
 		else
@@ -165,65 +168,16 @@ public class NotificationReceiver extends BroadcastReceiver
 		else
 			isActiveDoseTime = true;
 
-		updateNotifications(/*dtInfo.activeDate()*/ date, doseTime, isActiveDoseTime);
-	}
+		final int mode;
 
-	private void updateNotifications(Date date, int doseTime, boolean isActiveDoseTime)
-	{
-		final MyNotification.Builder builder = new MyNotification.Builder(mContext);
+		if(mForceUpdate)
+			mode = NOTIFICATION_FORCE_UPDATE;
+		else if(mDoPostSilent)
+			mode = NOTIFICATION_FORCE_SILENT;
+		else
+			mode = NOTIFICATION_NORMAL;
 
-		final String message2 = getLowSupplyMessage(date, doseTime);
-		int dueCount = isActiveDoseTime ? getDueDoseCount(date, doseTime) : 0;
-		int missedCount = getMissedDoseCount(date, doseTime, isActiveDoseTime);
-
-		if(LOGV) Log.d(TAG, "updateNotifications: date=" + date + ", doseTime=" + doseTime + " (" + (isActiveDoseTime ? "active" : "not active") + ")");
-
-		if((dueCount + missedCount) == 0 && message2 == null)
-		{
-			builder.cancel();
-			return;
-		}
-
-		builder.setTitle1(R.string._title_notification_doses);
-		builder.setTitle2(R.string._title_notification_low_supplies);
-
-		builder.setIcon1(R.drawable.ic_stat_normal);
-		builder.setIcon2(R.drawable.ic_stat_exclamation);
-
-		if(dueCount != 0 && missedCount != 0)
-			builder.setMessage1(R.string._msg_doses_fp, missedCount, dueCount);
-		else if(dueCount != 0)
-			builder.setMessage1(R.string._msg_doses_p, dueCount);
-		else if(missedCount != 0)
-			builder.setMessage1(R.string._msg_doses_f, missedCount);
-
-		builder.setMessage2(message2);
-		builder.setForceUpdate(mForceUpdate);
-		builder.setContentIntent(createDrugListIntent(date));
-		builder.setPersistent(true);
-
-		final NotificationHelper helper = new NotificationHelper(mContext);
-		helper.lowSupplies(find)
-
-
-
-
-
-
-
-
-
-
-
-		/*int defaults = Notification.DEFAULT_ALL ^ Settings.getNotificationDefaultsXorMask();
-
-		if(mDoPostSilent || RxDroid.isUiVisible())
-			defaults ^= Notification.DEFAULT_SOUND;*/
-
-		if(!mForceUpdate)
-			builder.setSilent(mDoPostSilent);
-
-		builder.post();
+		updateNotification(date, doseTime, isActiveDoseTime, mode);
 	}
 
 	private void scheduleNextBeginOrEndAlarm(DoseTimeInfo dtInfo, boolean scheduleEnd)
@@ -292,74 +246,169 @@ public class NotificationReceiver extends BroadcastReceiver
 		return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	}
 
-	private int getDueDoseCount(Date date, int doseTime)
+	public void updateNotification(Date date, int doseTime, boolean isActiveDoseTime, int mode)
 	{
-		int count = 0;
+		final List<Drug> drugsWithLowSupplies = new ArrayList<Drug>();
+		final int lowSupplyDrugCount = getDrugsWithLowSupplies(date, doseTime, drugsWithLowSupplies);
+		final int missedDoseCount = getDrugsWithMissedDoses(date, doseTime, isActiveDoseTime, null);
+		final int dueDoseCount = getDrugsWithDueDoses(date, doseTime, null);
 
-		for(Drug drug : mAllDrugs)
+		int titleResId = R.string._title_notification_doses;
+		int icon = R.drawable.ic_stat_normal;
+
+		final StringBuilder sb = new StringBuilder();
+
+		if(missedDoseCount != 0 || dueDoseCount != 0)
 		{
-			final Fraction dose = drug.getDose(doseTime, date);
+			if(dueDoseCount != 0)
+				sb.append(RxDroid.getQuantityString(R.plurals._qmsg_due, dueDoseCount));
 
-			if(!drug.isActive() || dose.isZero() || !drug.hasDoseOnDate(date)
-					|| drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND || drug.isAutoAddIntakesEnabled())
-				continue;
-
-			if(Entries.countIntakes(drug, date, doseTime) == 0)
-				++count;
-		}
-
-		return count;
-
-	}
-
-	private int getMissedDoseCount(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime)
-	{
-		int count = 0;
-
-		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
-		{
-			if(LOGV) Log.d(TAG, "getMissedDoseCount: adjusting date " + DateTime.toDateString(date));
-			final Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
-			count = getDueDoseCount(checkDate, Drug.TIME_NIGHT);
-		}
-		else
-		{
-			for(int doseTime = Drug.TIME_MORNING; doseTime != activeOrNextDoseTime; ++doseTime)
-				count += getDueDoseCount(date, doseTime);
-		}
-
-		return count;
-	}
-
-	private String getLowSupplyMessage(Date date, int activeDoseTime)
-	{
-		final List<Drug> drugsWithLowSupply = new ArrayList<Drug>();
-
-		for(Drug drug : mAllDrugs)
-		{
-			if(Settings.hasLowSupplies(drug))
-				drugsWithLowSupply.add(drug);
-		}
-
-		String message = null;
-
-		if(!drugsWithLowSupply.isEmpty())
-		{
-			final String firstDrugName = Settings.getDrugName(drugsWithLowSupply.get(0));
-
-			if(drugsWithLowSupply.size() == 1)
-				message = getString(R.string._qmsg_low_supply_single, firstDrugName);
-			else
+			if(missedDoseCount != 0)
 			{
-				final int quantity = drugsWithLowSupply.size() - 1;
-				final String secondDrugName = Settings.getDrugName(drugsWithLowSupply.get(1));
+				if(sb.length() != 0)
+					sb.append(", ");
 
-				message = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, quantity,
-						quantity, firstDrugName, secondDrugName);
+				sb.append(RxDroid.getQuantityString(R.plurals._qmsg_missed, missedDoseCount));
 			}
 		}
 
-		return message;
+		boolean showingLowSupplyCountMessage = false;
+
+		if(lowSupplyDrugCount != 0)
+		{
+			icon = R.drawable.ic_stat_exclamation;
+
+			if(sb.length() == 0)
+			{
+				titleResId = R.string._title_notification_low_supplies;
+				showingLowSupplyCountMessage = true;
+
+				final String first = drugsWithLowSupplies.get(0).getName();
+
+				if(lowSupplyDrugCount == 1)
+					sb.append(getString(R.string._qmsg_low_supply_single, first));
+				else
+				{
+					final String second = drugsWithLowSupplies.get(1).getName();
+
+					sb.append(RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount, first, second));
+				}
+			}
+		}
+
+		final String message = sb.toString();
+
+		final int currentHash = message.hashCode();
+		final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
+
+		final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+		builder.setContentTitle(getString(titleResId));
+		builder.setContentIntent(createDrugListIntent(date));
+		builder.setContentText(message);
+		builder.setTicker(getString(R.string._msg_new_notification));
+		builder.setSmallIcon(icon);
+		builder.setOngoing(true);
+		builder.setUsesChronometer(false);
+		builder.setWhen(0);
+
+//		final long offset;
+//
+//		if(isActiveDoseTime)
+//			offset = Settings.getDoseTimeBeginOffset(doseTime);
+//		else
+//			offset = Settings.getTrueDoseTimeEndOffset(doseTime);
+//
+//		builder.setWhen(date.getTime() + offset);
+
+		if(mode == NOTIFICATION_FORCE_UPDATE || currentHash != lastHash)
+		{
+			builder.setOnlyAlertOnce(false);
+			Settings.putInt(Settings.Keys.LAST_MSG_HASH, currentHash);
+		}
+		else
+			builder.setOnlyAlertOnce(true);
+
+		if(Settings.getBoolean(Settings.Keys.USE_LED, true))
+			builder.setLights(0xff0000ff, 200, 800);
+
+		int defaults = 0;
+
+		if(mode != NOTIFICATION_FORCE_SILENT && Settings.getBoolean(Settings.Keys.USE_SOUND, true))
+		{
+			if(!showingLowSupplyCountMessage)
+			{
+				final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
+				if(ringtone != null)
+					builder.setSound(Uri.parse(ringtone));
+				else
+					defaults |= Notification.DEFAULT_SOUND;
+			}
+		}
+
+		if(Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true))
+			defaults |= Notification.DEFAULT_VIBRATE;
+
+		builder.setDefaults(defaults);
+
+		final NotificationManager nm = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.notify(R.id.notification, builder.build());
+	}
+
+	private int getDrugsWithDueDoses(Date date, int doseTime, List<Drug> outDrugs)
+	{
+		int count = 0;
+
+		for(Drug drug: Database.getAll(Drug.class))
+		{
+			final Fraction dose = drug.getDose(doseTime, date);
+
+			if(!drug.isActive() || dose.isZero() || drug.isAutoAddIntakesEnabled() || drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND)
+				continue;
+
+			if(Entries.countIntakes(drug, date, doseTime) == 0)
+			{
+				++count;
+
+				if(outDrugs != null)
+					outDrugs.add(drug);
+			}
+		}
+
+		return count;
+	}
+
+	private int getDrugsWithMissedDoses(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime, List<Drug> outDrugs)
+	{
+		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
+		{
+			date = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
+			return getDrugsWithDueDoses(date, activeOrNextDoseTime, outDrugs);
+		}
+
+		int count = 0;
+
+		for(int doseTime = Schedule.TIME_MORNING; doseTime != activeOrNextDoseTime; ++doseTime)
+			count += getDrugsWithDueDoses(date, doseTime, outDrugs);
+
+		return count;
+	}
+
+	private int getDrugsWithLowSupplies(Date date, int doseTime, List<Drug> outDrugs)
+	{
+		int count = 0;
+
+		for(Drug drug : Database.getAll(Drug.class))
+		{
+			if(Settings.hasLowSupplies(drug))
+			{
+				++count;
+
+				if(outDrugs != null)
+					outDrugs.add(drug);
+			}
+		}
+
+		return count;
 	}
 
 	private String getString(int resId, Object... formatArgs) {
