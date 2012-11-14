@@ -297,7 +297,6 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 
 		final String message = sb.toString();
-
 		final int currentHash = message.hashCode();
 		final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
 
@@ -351,7 +350,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setDefaults(defaults);
 
 		final NotificationManager nm = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-		nm.notify(R.id.notification, builder.build());
+
+		if(message.length() != 0)
+			nm.notify(R.id.notification, builder.build());
+		else
+			nm.cancel(R.id.notification);
 	}
 
 	private int getDrugsWithDueDoses(Date date, int doseTime, List<Drug> outDrugs)
