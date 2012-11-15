@@ -46,6 +46,14 @@
         <item quantity="other">%2$s und %1$d andere</item>       
     </plurals>
     
+    <plurals name="_qmsg_missed">
+        <item quantity="other">%1$d vergessen</item>
+    </plurals>
+    
+    <plurals name="_qmsg_due">
+        <item quantity="other">%1$d fällig</item>
+    </plurals>
+    
 	<string name="_msg_constraints_ab">Wähle eine Zeit zwischen %1$s und %2$s.</string>
 	<string name="_msg_constraints_a">Wähle eine Zeit nach %1$s.</string>
 	<string name="_msg_constraints_b">Wähle eine Zeit vor %2$s.</string>
