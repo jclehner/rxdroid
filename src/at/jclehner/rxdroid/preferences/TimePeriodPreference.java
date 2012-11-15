@@ -457,7 +457,9 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			{
 				if(++mCurrentPage == mPageCount)
 				{
-					onDialogClosed(true);
+					// We check the value again because it might have
+					// changed by the call to clearFocus()
+					onDialogClosed(isCurrentlyVisibleTimePickerValueValid());
 					getDialog().dismiss();
 					return;
 				}

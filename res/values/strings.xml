@@ -63,9 +63,6 @@
     <string name="_title_end">End</string>
         
     <string name="_msg_new_notification">New notification</string>
-    <!-- <string name="_msg_doses_fp">%2$d due, %1$d missed</string>
-    <string name="_msg_doses_f">%1$d missed</string>
-    <string name="_msg_doses_p">%1$d due</string> -->
     
     <plurals name="_qmsg_missed">
         <item quantity="other">%1$d missed</item>
