@@ -441,7 +441,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		public void onClick(View v)
 		{
 			mTimePicker.clearFocus();
-
+			
 			if(v == mBackButton)
 			{
 				if(mCurrentPage == 0)
@@ -455,11 +455,14 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			}
 			else if(v == mNextButton)
 			{
+				// must be called before incrementing mCurrentPage
+				final boolean positiveResult = isCurrentlyVisibleTimePickerValueValid();
+				
 				if(++mCurrentPage == mPageCount)
 				{
 					// We check the value again because it might have
 					// changed by the call to clearFocus()
-					onDialogClosed(isCurrentlyVisibleTimePickerValueValid());
+					onDialogClosed(positiveResult);
 					getDialog().dismiss();
 					return;
 				}

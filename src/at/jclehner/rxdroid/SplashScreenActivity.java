@@ -95,16 +95,14 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 
 			getActionBar().setSubtitle(dateString);
 		}
-		else
+
+		try
 		{
-			try
-			{
-				Class.forName("com.michaelnovakjr.numberpicker.NumberPicker");
-			}
-			catch(ClassNotFoundException e)
-			{
-				throw new WrappedCheckedException("NumberPicker library is missing", e);
-			}
+			Class.forName(com.michaelnovakjr.numberpicker.NumberPicker.class.getName());
+		}
+		catch(ClassNotFoundException e)
+		{
+			throw new WrappedCheckedException("NumberPicker library is missing", e);
 		}
 
 		super.onCreate(savedInstanceState);

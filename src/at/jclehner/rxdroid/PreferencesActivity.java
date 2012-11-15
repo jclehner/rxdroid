@@ -211,6 +211,8 @@ public class PreferencesActivity extends PreferenceActivity implements
 			if("4".equals(Settings.getString(Settings.Keys.HISTORY_SIZE, null)))
 				Toast.makeText(getApplicationContext(), R.string._toast_unlimited_history_size, Toast.LENGTH_LONG).show();
 		}
+		else if(Settings.Keys.LAST_MSG_HASH.equals(key))
+			return;
 
 		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true);
 	}
