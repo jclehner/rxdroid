@@ -30,6 +30,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v4.content.LocalBroadcastManager;
+import at.jclehner.rxdroid.db.Database;
+import at.jclehner.rxdroid.db.Entry;
+import at.jclehner.rxdroid.db.Intake;
 
 
 public class RxDroid extends Application
@@ -48,6 +51,7 @@ public class RxDroid extends Application
 
 		Settings.init();
 		AutoIntakeCreator.registerSelf();
+		Database.registerEventListener(sNotificationUpdater);
 
 		super.onCreate();
 	}
@@ -119,4 +123,23 @@ public class RxDroid extends Application
 
 		return false;
 	}
+
+	private static final Database.OnChangeListener sNotificationUpdater = new Database.OnChangeListener() {
+
+		@Override
+		public void onEntryUpdated(Entry entry, int flags) {
+			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(entry instanceof Intake);
+		}
+
+		@Override
+		public void onEntryDeleted(Entry entry, int flags)
+		{
+			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
+		}
+
+		@Override
+		public void onEntryCreated(Entry entry, int flags) {
+			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(entry instanceof Intake);
+		}
+	};
 }

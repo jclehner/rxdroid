@@ -75,6 +75,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
 
+	private List<Drug> mAllDrugs;
+
 	private boolean mDoPostSilent = false;
 	private boolean mForceUpdate = false;
 
@@ -114,7 +116,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
 		mForceUpdate = intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
-//		mIsDeleteIntent = intent.getBooleanExtra(EXTRA_IS_DELETE_INTENT, false);
+		mAllDrugs = Database.getAll(Drug.class);
 
 		rescheduleAlarms();
 		updateCurrentNotifications();
@@ -232,8 +234,6 @@ public class NotificationReceiver extends BroadcastReceiver
 			Log.w(TAG, "Alarm time is in the past by less than 5 seconds. Ignoring...");
 		}
 
-		final String str;
-
 		if(alarmExtras.getBoolean(EXTRA_IS_ALARM_REPETITION))
 			Log.i(TAG, "Scheduling next alarm for " + DateTime.toString(triggerAtMillis));
 		else
@@ -301,8 +301,6 @@ public class NotificationReceiver extends BroadcastReceiver
 			}
 		}
 
-		boolean showingLowSupplyCountMessage = false;
-
 		if(lowSupplyDrugCount != 0)
 		{
 			icon = R.drawable.ic_stat_exclamation;
@@ -310,7 +308,6 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(sb.length() == 0)
 			{
 				titleResId = R.string._title_notification_low_supplies;
-				showingLowSupplyCountMessage = true;
 
 				final String first = drugsWithLowSupplies.get(0).getName();
 
@@ -319,7 +316,6 @@ public class NotificationReceiver extends BroadcastReceiver
 				else
 				{
 					final String second = drugsWithLowSupplies.get(1).getName();
-
 					sb.append(RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount, first, second));
 				}
 			}
@@ -356,21 +352,21 @@ public class NotificationReceiver extends BroadcastReceiver
 		else
 			builder.setOnlyAlertOnce(true);
 
-		if(Settings.getBoolean(Settings.Keys.USE_LED, true))
-			builder.setLights(0xff0000ff, 200, 800);
-
 		int defaults = 0;
+
+		if(Settings.getBoolean(Settings.Keys.USE_LED, true))
+		{
+//			builder.setLights(0xff0000ff, 200, 800);
+			defaults |= Notification.DEFAULT_LIGHTS;
+		}
 
 		if(mode != NOTIFICATION_FORCE_SILENT && Settings.getBoolean(Settings.Keys.USE_SOUND, true))
 		{
-			if(!showingLowSupplyCountMessage)
-			{
-				final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
-				if(ringtone != null)
-					builder.setSound(Uri.parse(ringtone));
-				else
-					defaults |= Notification.DEFAULT_SOUND;
-			}
+			final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
+			if(ringtone != null)
+				builder.setSound(Uri.parse(ringtone));
+			else
+				defaults |= Notification.DEFAULT_SOUND;
 		}
 
 		if(Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true))
@@ -390,7 +386,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		int count = 0;
 
-		for(Drug drug: Database.getAll(Drug.class))
+		for(Drug drug: mAllDrugs)
 		{
 			final Fraction dose = drug.getDose(doseTime, date);
 
@@ -429,7 +425,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		int count = 0;
 
-		for(Drug drug : Database.getAll(Drug.class))
+		for(Drug drug : mAllDrugs)
 		{
 			if(Settings.hasLowSupplies(drug))
 			{
@@ -447,11 +443,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		return mContext.getString(resId, formatArgs);
 	}
 
-	/* package */ static void sendBroadcastToSelf(boolean silent) {
-		sendBroadcastToSelf(null, silent);
+	/* package */ static void rescheduleAlarmsAndUpdateNotification(boolean silent) {
+		rescheduleAlarmsAndUpdateNotification(null, silent);
 	}
 
-	/* package */ static void sendBroadcastToSelf(Context context, boolean silent)
+	/* package */ static void rescheduleAlarmsAndUpdateNotification(Context context, boolean silent)
 	{
 		if(context == null)
 			context = RxDroid.getContext();

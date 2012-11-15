@@ -212,7 +212,7 @@ public class PreferencesActivity extends PreferenceActivity implements
 				Toast.makeText(getApplicationContext(), R.string._toast_unlimited_history_size, Toast.LENGTH_LONG).show();
 		}
 
-		NotificationReceiver.sendBroadcastToSelf(true);
+		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true);
 	}
 
 	@Override

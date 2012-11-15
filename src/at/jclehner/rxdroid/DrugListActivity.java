@@ -130,7 +130,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		mPager.setOnPageChangeListener(mPageListener);
 		mPager.setOffscreenPageLimit(1);
 
-		startNotificationService();
+		//startNotificationService();
+		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true);
 
 		Database.registerEventListener(mDatabaseListener);
 
@@ -562,12 +563,12 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 		listView.setAdapter(adapter);
 	}
-
-	private void startNotificationService()
-	{
-		NotificationReceiver.sendBroadcastToSelf(false);
-		Database.registerEventListener(DATABASE_WATCHER);
-	}
+//
+//	private void startNotificationService()
+//	{
+//		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
+//		Database.registerEventListener(mDatabaseWatcher);
+//	}
 
 	@TargetApi(11)
 	private void updateDateString()
@@ -723,14 +724,20 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		}
 	};
 
-	private final Database.OnChangeListener mDatabaseListener = new Database.OnChangeListener() {
-
-		@Override
-		public void onEntryUpdated(Entry entry, int flags) {}
+	private final Database.OnChangeListener mDatabaseListener = new Database.EmptyOnChangeListener() {
 
 		@Override
 		public void onEntryDeleted(Entry entry, int flags)
 		{
+			try
+			{
+				DrugListActivity.this.removeDialog(R.id.dose_dialog);
+			}
+			catch(Exception e)
+			{
+
+			}
+
 			if(entry instanceof Drug)
 				setDate(mDate, PAGER_INIT);
 		}
@@ -755,33 +762,6 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		public void onDoseTimeEnd(Date date, int doseTime)
 		{
 			setDate(mDate, PAGER_INIT);
-		}
-	};
-
-	private final Database.OnChangeListener DATABASE_WATCHER = new Database.OnChangeListener() {
-
-		@Override
-		public void onEntryUpdated(Entry entry, int flags) {
-			NotificationReceiver.sendBroadcastToSelf(entry instanceof Intake);
-		}
-
-		@Override
-		public void onEntryDeleted(Entry entry, int flags)
-		{
-			NotificationReceiver.sendBroadcastToSelf(false);
-			try
-			{
-				DrugListActivity.this.removeDialog(R.id.dose_dialog);
-			}
-			catch(Exception e)
-			{
-
-			}
-		}
-
-		@Override
-		public void onEntryCreated(Entry entry, int flags) {
-			NotificationReceiver.sendBroadcastToSelf(false);
 		}
 	};
 }

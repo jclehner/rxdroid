@@ -535,6 +535,21 @@ public final class Database
 		public void onEntryDeleted(Entry entry, int flags);
 	}
 
+	/**
+	 * {@link OnChangeListener} with method stubs.
+	 */
+	public static class EmptyOnChangeListener implements OnChangeListener
+	{
+		@Override
+		public void onEntryCreated(Entry entry, int flags) {}
+
+		@Override
+		public void onEntryUpdated(Entry entry, int flags) {}
+
+		@Override
+		public void onEntryDeleted(Entry entry, int flags) {}
+	}
+
 	public interface OnInitializedListener
 	{
 		void onDatabaseInitialized();

@@ -40,6 +40,6 @@ public class SystemEventReceiver extends BroadcastReceiver
 			DateTime.clearDateCache();
 		}
 
-		NotificationReceiver.sendBroadcastToSelf(context, false);
+		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(context, false);
 	}
 }
