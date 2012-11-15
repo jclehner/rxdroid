@@ -287,8 +287,8 @@
 	<string name="_title_1_hour">1 hour</string>
 	<string name="_title_2_hour">2 hours</string>
 	
-	<string name="_title_repeat_alarm">Repeat alarms</string>
-	<string name="_summary_repeat_alarm">Repeat notifications for pending or missed doses after a certain amount of time</string>
+	<string name="_title_repeat_alarm">Repeat</string>
+	<string name="_summary_repeat_alarm">Repeat notifications after a certain amount of time</string>
 			
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

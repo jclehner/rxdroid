@@ -253,6 +253,15 @@
 	
 	<string name="_title_factory_reset">Einstellungen zurücksetzen</string>	
 	
+	<string name="_title_dont_repeat">Nicht wiederholen</string>
+	<string name="_title_15_minutes">15 Minuten</string>
+	<string name="_title_30_minutes">30 Minuten</string>
+	<string name="_title_1_hour">1 Stunde</string>
+	<string name="_title_2_hour">2 Stunden</string>
+	
+	<string name="_title_repeat_alarm">Wiederholung</string>
+	<string name="_summary_repeat_alarm">Benachrichtigungen nach angegebener Zeit nochmals anzeigen</string>
+	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.
