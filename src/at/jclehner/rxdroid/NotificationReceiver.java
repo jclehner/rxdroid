@@ -280,7 +280,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		final List<Drug> drugsWithLowSupplies = new ArrayList<Drug>();
 		final int lowSupplyDrugCount = getDrugsWithLowSupplies(date, doseTime, drugsWithLowSupplies);
 		final int missedDoseCount = getDrugsWithMissedDoses(date, doseTime, isActiveDoseTime, null);
-		final int dueDoseCount = getDrugsWithDueDoses(date, doseTime, null);
+		final int dueDoseCount = isActiveDoseTime ? getDrugsWithDueDoses(date, doseTime, null) : 0;
 
 		int titleResId = R.string._title_notification_doses;
 		int icon = R.drawable.ic_stat_normal;
@@ -369,7 +369,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				defaults |= Notification.DEFAULT_SOUND;
 		}
 
-		if(Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true))
+		if(mode != NOTIFICATION_FORCE_SILENT && Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true))
 			defaults |= Notification.DEFAULT_VIBRATE;
 
 		builder.setDefaults(defaults);
