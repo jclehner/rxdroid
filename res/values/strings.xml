@@ -82,8 +82,7 @@
 	<string name="_msg_constraints_a">Pick a time after %1$s</string>
 	<string name="_msg_constraints_b">Pick a time before %2$s</string>
 	
-	<string name="_btn_set">Set</string>
-    
+	<string name="_btn_set">Set</string>    
     <string name="_title_drug_name">Drug name</string>
     <string name="_title_delete">Delete</string>
     

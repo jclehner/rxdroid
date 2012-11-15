@@ -132,8 +132,7 @@ public class RxDroid extends Application
 		}
 
 		@Override
-		public void onEntryDeleted(Entry entry, int flags)
-		{
+		public void onEntryDeleted(Entry entry, int flags) {
 			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
 		}
 

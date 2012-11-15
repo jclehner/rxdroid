@@ -77,7 +77,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
 {
 	private static final String TAG = DrugListActivity.class.getName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private static final int MENU_SELECT_DATE = 1;
 	private static final int MENU_ADD = 0;
