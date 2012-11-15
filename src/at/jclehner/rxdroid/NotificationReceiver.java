@@ -65,12 +65,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final String EXTRA_DATE = "at.jclehner.rxdroid.extra.DATE";
 	static final String EXTRA_DOSE_TIME = "at.jclehner.rxdroid.extra.DOSE_TIME";
 	static final String EXTRA_IS_DOSE_TIME_END = "at.jclehner.rxdroid.extra.IS_DOSE_TIME_END";
+	static final String EXTRA_IS_ALARM_REPETITION = "at.jclehner.rxdroid.extra.IS_ALARM_REPETITION";
 	static final String EXTRA_FORCE_UPDATE = "at.jclehner.rxdroid.extra.FORCE_UPDATE";
-
-//	private static final String EXTRA_IS_DELETE_INTENT = TAG + ".is_delete_intent";
-
-	static final int ALARM_MODE_NORMAL = 0;
-	static final int ALARM_MODE_REPEAT = 1;
 
 	private static int NOTIFICATION_NORMAL = 0;
 	private static int NOTIFICATION_FORCE_UPDATE = 1;
@@ -78,11 +74,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
-	private List<Drug> mAllDrugs;
 
-	private int mAlarmRepeatMode;
-
-//	private boolean mIsDeleteIntent = false;
 	private boolean mDoPostSilent = false;
 	private boolean mForceUpdate = false;
 
@@ -108,17 +100,18 @@ public class NotificationReceiver extends BroadcastReceiver
 		final int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Schedule.TIME_INVALID);
 		if(doseTime != Schedule.TIME_INVALID)
 		{
-			final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
-			final boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_DOSE_TIME_END, false);
-			final String eventName = isDoseTimeEnd ? "onDoseTimeEnd" : "onDoseTimeBegin";
+			if(!intent.getBooleanExtra(EXTRA_IS_ALARM_REPETITION, false))
+			{
+				final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
+				final boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_DOSE_TIME_END, false);
+				final String eventName = isDoseTimeEnd ? "onDoseTimeEnd" : "onDoseTimeBegin";
 
-			sEventMgr.post(eventName, EVENT_HANDLER_ARG_TYPES, date, doseTime);
+				sEventMgr.post(eventName, EVENT_HANDLER_ARG_TYPES, date, doseTime);
+			}
 		}
 
 		mContext = context;
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		mAllDrugs = Database.getAll(Drug.class);
-		mAlarmRepeatMode = Settings.getIntFromList("alarm_mode", ALARM_MODE_NORMAL);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
 		mForceUpdate = intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
 //		mIsDeleteIntent = intent.getBooleanExtra(EXTRA_IS_DELETE_INTENT, false);
@@ -186,6 +179,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		final Calendar time = dtInfo.currentTime();
 		final Date doseTimeDate = scheduleEnd ? dtInfo.activeDate() : dtInfo.nextDoseTimeDate();
 
+		final Bundle alarmExtras = new Bundle();
+		alarmExtras.putSerializable(EXTRA_DATE, doseTimeDate);
+		alarmExtras.putInt(EXTRA_DOSE_TIME, doseTime);
+		alarmExtras.putBoolean(EXTRA_IS_DOSE_TIME_END, scheduleEnd);
+		alarmExtras.putBoolean(EXTRA_SILENT, false);
+
 		long offset;
 
 		if(scheduleEnd)
@@ -193,30 +192,60 @@ public class NotificationReceiver extends BroadcastReceiver
 		else
 			offset = Settings.getMillisUntilDoseTimeBegin(time, doseTime);
 
-		final int alarmRepeatMins = Settings.getStringAsInt(Settings.Keys.ALARM_REPEAT, 0);
-		if(alarmRepeatMins > 0)
-			offset = Math.min(offset, alarmRepeatMins * 60000);
-		else if(BuildConfig.DEBUG && alarmRepeatMins == -1)
-			offset = Math.min(offset, 10000);
+		long triggerAtMillis = time.getTimeInMillis() + offset;
 
-		final long triggerAtMillis = time.getTimeInMillis() + offset;
+		final long alarmRepeatMins = Settings.getStringAsInt(Settings.Keys.ALARM_REPEAT, 0);
+		final long alarmRepeatMillis = alarmRepeatMins == -1 ? 10000 : alarmRepeatMins * 60000;
 
-		if(triggerAtMillis < System.currentTimeMillis())
-			throw new IllegalStateException("Alarm time is in the past: " + DateTime.toString(time));
+		if(alarmRepeatMillis > 0)
+		{
+			alarmExtras.putBoolean(EXTRA_FORCE_UPDATE, true);
 
-		Log.i(TAG, "Scheduling " + (scheduleEnd ? alarmRepeatMins == 0 ? "end" : "next alarm" : "begin") +
-				" of doseTime " + doseTime + " on date " + DateTime.toDateString(doseTimeDate) + " for " + DateTime.toString(triggerAtMillis) + "\n" +
-				"Alarm will fire in " + Util.millis(triggerAtMillis - System.currentTimeMillis())
-		);
+			final long base = dtInfo.activeDate().getTime();
+			int i = 0;
 
-		final Bundle extras = new Bundle();
-		extras.putSerializable(EXTRA_DATE, doseTimeDate);
-		extras.putInt(EXTRA_DOSE_TIME, doseTime);
-		extras.putBoolean(EXTRA_IS_DOSE_TIME_END, scheduleEnd);
-		extras.putBoolean(EXTRA_SILENT, false);
-		extras.putBoolean(EXTRA_FORCE_UPDATE, alarmRepeatMins > 0 || alarmRepeatMins == -1);
+			while(base + (i * alarmRepeatMillis) < time.getTimeInMillis())
+				++i;
 
-		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, createOperation(extras));
+			// We must tell the receiver whether the alarm is an actual dose time's
+			// end or begin, or merely a repetition.
+
+			final long triggerAtMillisWithRepeatedAlarm = base + i * alarmRepeatMillis;
+			if(triggerAtMillisWithRepeatedAlarm < triggerAtMillis)
+			{
+				triggerAtMillis = triggerAtMillisWithRepeatedAlarm;
+				alarmExtras.putBoolean(EXTRA_IS_ALARM_REPETITION, true);
+			}
+
+			triggerAtMillis = base + (i * alarmRepeatMillis);
+		}
+
+		final long triggerDiffFromNow = triggerAtMillis - System.currentTimeMillis();
+		if(triggerDiffFromNow < 0)
+		{
+			// 5 seconds should be more than enough to prevent FCs if this function is run
+			// just milliseconds before a dose time's begin or end.
+
+			if(triggerDiffFromNow < -50000)
+				throw new IllegalStateException("Alarm time is in the past: " + DateTime.toString(time));
+
+			Log.w(TAG, "Alarm time is in the past by less than 5 seconds. Ignoring...");
+		}
+
+		final String str;
+
+		if(alarmExtras.getBoolean(EXTRA_IS_ALARM_REPETITION))
+			Log.i(TAG, "Scheduling next alarm for " + DateTime.toString(triggerAtMillis));
+		else
+		{
+			Log.i(TAG, "Scheduling " + (scheduleEnd ? "end" : "begin") + " of doseTime " +
+					doseTime + " on date " + DateTime.toDateString(doseTimeDate) + " for " +
+					DateTime.toString(triggerAtMillis));
+		}
+
+		Log.i(TAG, "Alarm will go off in " + Util.millis(triggerDiffFromNow));
+
+		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, createOperation(alarmExtras));
 	}
 
 	private void cancelAllAlarms()
