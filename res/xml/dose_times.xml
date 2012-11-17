@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
+  android:title="@string/_title_prefscreen_times"
+  android:orderingFromXml="true"  
+>
+	<at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_morning"
+	        android:title="@string/_title_morning"
+	        android:dialogIcon="@drawable/ic_morning"
+	        android:persistent="true"
+	        
+	        rxdroid:after="time_night"
+	        rxdroid:before="time_noon"        
+	        
+	        android:defaultValue="@string/pref_default_time_morning"
+	    />
+	    
+	    <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_noon"
+	        android:title="@string/_title_noon"
+	        android:dialogIcon="@drawable/ic_noon"
+	        android:persistent="true"
+	        
+	        rxdroid:after="time_morning"
+	        rxdroid:before="time_evening"
+	        	        
+	        android:defaultValue="@string/pref_default_time_noon"
+	    />
+	    
+	     <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_evening"
+	        android:title="@string/_title_evening"
+	        android:dialogIcon="@drawable/ic_evening"
+	        android:persistent="true"
+	        
+	        rxdroid:after="time_noon"
+	        rxdroid:before="time_night"
+	        
+	        android:defaultValue="@string/pref_default_time_evening"
+	    />
+	     
+	     <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_night"
+	        android:title="@string/_title_night"
+	        android:dialogIcon="@drawable/ic_night"
+	        android:persistent="true"
+	        
+	        rxdroid:after="time_evening"
+	        rxdroid:before="time_morning"
+	        rxdroid:allowEndWrap="true"
+	        
+	        android:defaultValue="@string/pref_default_time_night"
+	    />
+</PreferenceScreen>

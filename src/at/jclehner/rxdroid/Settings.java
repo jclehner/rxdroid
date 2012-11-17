@@ -30,14 +30,10 @@ import java.util.Set;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Schedule;
@@ -69,6 +65,9 @@ public final class Settings
 		public static final String ENABLE_LANDSCAPE = key(R.string.key_enable_landscape_mode);
 		public static final String DONATE = key(R.string.key_donate);
 		public static final String REPEAT_ALARM = key(R.string.key_repeat_alarm);
+
+		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
+		public static final String IS_FIRST_LAUNCH = "is_first_launch";
 	}
 
 	private static final String TAG = Settings.class.getName();

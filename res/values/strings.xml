@@ -290,6 +290,12 @@
 	
 	<string name="_title_repeat_alarm">Repeat</string>
 	<string name="_summary_repeat_alarm">Repeat notifications after a certain amount of time</string>
+	
+	<string name="_help_drug_name">If you want to make changes to this drug, tap its name.</string>
+	<string name="_help_dose_view">To take a dose, simply tap it. Long pressing will show more options.</string>
+	
+	<string name="_help_dose_times">You\'ve started RxDroid for the first time. Please define the following
+		four time intervals, which you will use later when specifying a drug\'s schedule.</string>
 			
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

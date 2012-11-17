@@ -32,7 +32,7 @@ import android.widget.LinearLayout;
  * <p>
  * If using this class on a pre-Honeycomb device, a custom implementation
  * by <a href="https://github.com/mrn/numberpicker">Mike Novak</a> is used. This
- * class implements only a very limited subset of the functions
+ * wrapper implements only a very limited subset of the functions
  * provided by the <code>android.widget.NumberPicker</code> widget introduced in Honeycomb.
  * In theory, this class should be replaceable with said widget,
  * requiring no changes to the source (other than the type specifications of course).

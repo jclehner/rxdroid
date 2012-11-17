@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.util.Date;
 
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -45,7 +44,6 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,7 +53,7 @@ import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.util.Util;
 
 @SuppressWarnings("deprecation")
-public class PreferencesActivity extends PreferenceActivity implements
+public class PreferencesActivity extends PreferenceActivityBase implements
 		OnSharedPreferenceChangeListener, OnPreferenceClickListener, OnPreferenceChangeListener
 {
 	private static final String TAG = PreferencesActivity.class.getName();
@@ -68,14 +66,6 @@ public class PreferencesActivity extends PreferenceActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		if(Version.SDK_IS_PRE_HONEYCOMB)
-		{
-			// See android issue #4611
-			setTheme(android.R.style.Theme);
-		}
-		else
-			setTheme(Theme.get());
-
 		super.onCreate(savedInstanceState);
 
 		mSharedPreferences = getPreferenceManager().getSharedPreferences();
@@ -136,30 +126,13 @@ public class PreferencesActivity extends PreferenceActivity implements
 			intent.setData(uri);
 			p.setIntent(intent);
 		}
-
-		if(!Version.SDK_IS_PRE_HONEYCOMB)
-		{
-			ActionBar ab = getActionBar();
-			ab.setDisplayShowHomeEnabled(true);
-			ab.setDisplayHomeAsUpEnabled(true);
-		}
 	}
 
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		LockscreenActivity.startMaybe(this);
-		Settings.maybeLockInPortraitMode(this);
-		RxDroid.setIsVisible(this, true);
 		updateLowSupplyThresholdPreferenceSummary();
-	}
-
-	@Override
-	protected void onPause()
-	{
-		super.onPause();
-		RxDroid.setIsVisible(this, false);
 	}
 
 	@TargetApi(11)
@@ -186,16 +159,6 @@ public class PreferencesActivity extends PreferenceActivity implements
 
 			default:
 				// ignore
-		}
-
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-		{
-			if(item.getItemId() == android.R.id.home)
-			{
-				Intent intent = new Intent(this, DrugListActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-			}
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -316,6 +279,14 @@ public class PreferencesActivity extends PreferenceActivity implements
 		}
 
 		return super.onCreateDialog(id);
+	}
+
+	@Override
+	protected Intent getHomeButtonIntent()
+	{
+		Intent intent = new Intent(getBaseContext(), DrugListActivity.class);
+		intent.setAction(Intent.ACTION_MAIN);
+		return intent;
 	}
 
 	private void updateLowSupplyThresholdPreferenceSummary()

@@ -47,6 +47,8 @@
 		<item name="iconMissedDose">@drawable/ic_warning</item>
 		
 		<item name="dividerColor">@color/list_divider_light</item>
+		
+		<item name="android:windowAnimationStyle">@null</item>
 	</style>
 	
 	<style name="DarkTheme" parent="@style/_ApiSpecificDarkTheme">
@@ -66,6 +68,8 @@
 		<item name="iconMissedDose">@drawable/ic_warning_white</item>
 		
 		<item name="dividerColor">@color/list_divider_dark</item>
+		
+		<item name="android:windowAnimationStyle">@null</item>
 	</style>
 	
 	<style name="TextAppearance.Large.Clickable" parent="@android:style/TextAppearance.Large">
@@ -73,5 +77,9 @@
 	</style>	
 	
 	<style name="_ApiSpecificLightTheme" parent="@android:style/Theme.Light" />
-	<style name="_ApiSpecificDarkTheme" parent="@android:style/Theme" />		
+	<style name="_ApiSpecificDarkTheme" parent="@android:style/Theme" />
+	
+	<style name="BottomBar">
+		<item name="android:background">@android:drawable/bottom_bar</item>
+	</style>
 </resources>

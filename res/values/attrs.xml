@@ -38,6 +38,12 @@
         <attr name="allowEndWrap" format="boolean" />
     </declare-styleable>
     
+    <declare-styleable name="SpotlightView">
+    	<attr name="backgroundDim" format="fraction" />
+    	<attr name="spotOnView" format="reference" />
+    	<attr name="spotBorderColor" format="reference|color" />
+    </declare-styleable>
+    
     <attr name="drugIconTablet" format="reference" />
     <attr name="drugIconTube" format="reference" />
     <attr name="drugIconSyringe" format="reference" />
@@ -54,4 +60,6 @@
     <attr name="textColorClickable" format="color|reference" />
     
     <attr name="dividerColor" format="color|reference" />
+    
+    <attr name="actionBarOrTitleBarStyle" format="reference" />
 </resources>

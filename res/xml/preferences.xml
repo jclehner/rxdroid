@@ -31,10 +31,21 @@
 	
 	<!-- TIMES -->
 
-	<PreferenceScreen android:key="prefscreen_times"
+	<Preference android:key="prefscreen_times"
 		android:title="@string/_title_prefscreen_times"
-		android:icon="@drawable/android:ic_menu_recent_history">
+		android:icon="@drawable/android:ic_menu_recent_history"
+	>
+		<intent 
+			android:action="android.intent.action.VIEW"
+			android:targetPackage="at.jclehner.rxdroid"
+			android:targetClass="at.jclehner.rxdroid.DoseTimePreferenceActivity"
+		>
+			<!-- <extra android:name="at.jclehner.rxroid.extras.IS_FIRST_LAUNCH" android:value="true" />  -->
+		</intent>		
 		
+	</Preference>
+		
+		<!--  
 	    <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_morning"
 	        android:title="@string/_title_morning"
 	        android:dialogIcon="@drawable/ic_morning"
@@ -79,7 +90,10 @@
 	        
 	        android:defaultValue="@string/pref_default_time_night"
 	    />
+	    
+	   
 	</PreferenceScreen>
+	 -->
 	
 	<!-- DISPLAY -->
 	

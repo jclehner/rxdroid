@@ -26,5 +26,9 @@
 	<style name="DefaultTheme" parent="@style/LightTheme" />
 	
 	<style name="_ApiSpecificLightTheme" parent="@android:style/Theme.Holo.Light" />
-	<style name="_ApiSpecificDarkTheme" parent="@android:style/Theme.Holo" />	
+	<style name="_ApiSpecificDarkTheme" parent="@android:style/Theme.Holo" />
+	
+	<style name="BottomBar">
+		<item name="android:background">@null</item>
+	</style>
 </resources>

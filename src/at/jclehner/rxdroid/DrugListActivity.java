@@ -27,9 +27,6 @@ import java.util.Date;
 import java.util.List;
 
 import android.annotation.TargetApi;
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Intent;
@@ -87,6 +84,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	private static final int CMENU_TOGGLE_INTAKE = 0;
 	private static final int CMENU_EDIT_DRUG = 2;
 	private static final int CMENU_IGNORE_DOSE = 4;
+	private static final int CMENU_HIGHLIGHT = 6;
 
 	public static final String EXTRA_DATE = "date";
 	public static final String EXTRA_STARTED_FROM_NOTIFICATION = "started_from_notification";
@@ -155,10 +153,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			mDate = (Date) intent.getSerializableExtra(EXTRA_DATE);
 
 		if(mDate == null)
-		{
-
 			mDate = Settings.getActiveDate();
-		}
 
 		setDate(mDate, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
@@ -266,7 +261,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	}
 
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+	public void onCreateContextMenu(ContextMenu menu, final View v, ContextMenuInfo menuInfo)
 	{
 		final DoseView doseView = (DoseView) v;
 		final Drug drug = doseView.getDrug();

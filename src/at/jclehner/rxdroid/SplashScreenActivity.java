@@ -43,10 +43,10 @@ import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
-import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
+import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
@@ -254,8 +254,25 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 					}
 				}
 
-				Intent intent = new Intent(getApplicationContext(), DrugListActivity.class);
+				final Class<?> intentClass;
+				final boolean isFirstLaunch;
+
+				if(!BuildConfig.DEBUG && Database.countAll(Drug.class) != 0)
+				{
+					isFirstLaunch = false;
+					Settings.putBoolean(Settings.Keys.IS_FIRST_LAUNCH, false);
+				}
+				else
+					isFirstLaunch = Settings.getBoolean(Settings.Keys.IS_FIRST_LAUNCH, true);
+
+				if(isFirstLaunch)
+					intentClass = DoseTimePreferenceActivity.class;
+				else
+					intentClass = DrugListActivity.class;
+
+				Intent intent = new Intent(getBaseContext(), intentClass);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+				intent.putExtra(DoseTimePreferenceActivity.EXTRA_IS_FIRST_LAUNCH, isFirstLaunch);
 				startActivity(intent);
 
 				finish();

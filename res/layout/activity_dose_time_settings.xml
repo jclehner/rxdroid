@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical" 
+>	
+	<TextView android:id="@+id/help"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		
+		android:gravity="center_vertical"
+		android:padding="16dip"
+		
+		android:text="@string/_help_dose_times"
+	/>
+
+	<ListView android:id="@android:id/list"
+		android:layout_width="match_parent"
+		android:layout_height="0dip"
+		android:layout_weight="1"		
+	/>
+	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:gravity="center"
+		style="@style/BottomBar"
+	>		
+		<Button android:id="@+id/btn_ok"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			
+			android:paddingLeft="96dip"
+			android:paddingRight="96dip"
+			
+			android:text="@android:string/ok"
+			
+			android:onClick="onSaveButtonClicked"
+			
+			android:visibility="visible"
+		/>				
+		
+	</LinearLayout>
+
+</LinearLayout>
