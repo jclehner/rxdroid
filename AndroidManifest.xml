@@ -39,6 +39,13 @@
 		    android:launchMode="singleTop"
 		    android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
+		
+		<activity android:name=".DoseHistoryActivity"
+		    android:exported="false"
+		    android:uiOptions="none"
+		    android:launchMode="singleTop"
+		    android:configChanges="orientation|screenSize|keyboardHidden"
+		/>
 
 		<activity android:name=".DrugEditActivity"
 		    android:exported="false"

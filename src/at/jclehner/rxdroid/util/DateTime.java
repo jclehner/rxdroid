@@ -184,6 +184,12 @@ public final class DateTime
 		return DateFormat.getDateFormat(RxDroid.getContext()).format(date);
 	}
 
+	public static String toNativeDateAndTime(Date date)
+	{
+		return DateFormat.getDateFormat(RxDroid.getContext()).format(date) + ", " +
+			DateFormat.getTimeFormat(RxDroid.getContext()).format(date);
+	}
+
 	public static String toNativeTime(DumbTime time) {
 		return time.toString(DateFormat.is24HourFormat(RxDroid.getContext()), false);
 	}

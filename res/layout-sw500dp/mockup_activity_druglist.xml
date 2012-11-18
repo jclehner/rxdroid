@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:orientation="horizontal"
+
+		android:background="@null"
+        
+    >    
+   		<TextView 
+   			android:layout_width="@dimen/mockup_width_firstcolumn"
+   			android:layout_height="match_parent"
+   			
+   			android:gravity="center"
+   			android:textAppearance="?android:attr/textAppearanceLarge"
+   			android:text="2013-01-01"
+   		/>
+   		
+   		<include layout="@layout/divider"/>
+   		
+   		<ImageView 
+   		    android:layout_width="?android:attr/listPreferredItemHeight"
+   		    android:layout_height="match_parent"
+   		    
+   		    android:padding="10dip"
+   		    android:scaleType="fitCenter"
+   		    android:src="@drawable/ic_morning"
+   		/>
+   		
+   		<TextView 
+   			android:layout_width="match_parent"
+   			android:layout_height="match_parent"
+   			android:layout_weight="1"
+   			
+   			android:gravity="center"
+   			android:textAppearance="?android:attr/textAppearanceLarge"
+   			android:textAllCaps="false"
+   			android:text="@string/_title_morning"
+   		/>
+   		
+   		<include layout="@layout/divider"/>
+   		
+   		<ImageView 
+   		    android:layout_width="?android:attr/listPreferredItemHeight"
+   		    android:layout_height="match_parent"
+   		    
+   		    android:padding="10dip"
+   		    android:scaleType="fitCenter"
+   		    android:src="@drawable/ic_noon"
+   		/>
+   		
+   		<TextView 
+   			android:layout_width="match_parent"
+   			android:layout_height="match_parent"
+   			android:layout_weight="1"
+   			
+   			android:gravity="center"
+   			android:textAppearance="?android:attr/textAppearanceLarge"
+   			android:textAllCaps="false"
+   			android:text="@string/_title_noon"
+   		/>
+        
+        <include layout="@layout/divider"/>
+   		
+   		<ImageView 
+   		    android:layout_width="?android:attr/listPreferredItemHeight"
+   		    android:layout_height="match_parent"
+   		    
+   		    android:padding="10dip"
+   		    android:scaleType="fitCenter"
+   		    android:src="@drawable/ic_evening"
+   		/>
+   		
+   		<TextView 
+   			android:layout_width="match_parent"
+   			android:layout_height="match_parent"
+   			android:layout_weight="1"
+   			
+   			android:gravity="center"
+   			android:textAppearance="?android:attr/textAppearanceLarge"
+   			android:textAllCaps="false"
+   			android:text="@string/_title_evening"
+   		/>
+        
+   		<include layout="@layout/divider"/>
+   		
+   		<ImageView 
+   		    android:layout_width="?android:attr/listPreferredItemHeight"
+   		    android:layout_height="match_parent"
+   		    
+   		    android:padding="10dip"
+   		    android:scaleType="fitCenter"
+   		    android:src="@drawable/ic_night"
+   		/>
+   		
+   		<TextView 
+   			android:layout_width="match_parent"
+   			android:layout_height="match_parent"
+   			android:layout_weight="1"
+   			
+   			android:gravity="center"
+   			android:textAppearance="?android:attr/textAppearanceLarge"
+   			android:textAllCaps="false"
+   			android:text="@string/_title_night"
+   		/>
+        
+    </LinearLayout>
+    
+     <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@null"
+     >
+   		
+        <RelativeLayout 
+            android:layout_width="@dimen/mockup_width_firstcolumn"
+        	android:layout_height="match_parent"           
+        >
+            
+            <ImageView android:id="@+id/drug_icon"
+	   		    android:layout_width="40dip"
+	   		    android:layout_height="0dip"
+	   		    
+	   		    android:layout_alignParentLeft="true"
+	   		    android:layout_alignParentTop="true"
+	   		    android:layout_alignParentBottom="true"
+	   		    
+	   		    android:scaleType="fitCenter"
+	   		    android:src="?attr/drugIconTablet"
+   			/>  
+   			
+	     	<TextView android:id="@+id/drug_name"
+	   			android:layout_width="0dip"
+	   			android:layout_height="match_parent"
+	   			android:layout_toRightOf="@id/drug_icon"
+	   			android:layout_alignParentRight="true"
+	   			android:layout_alignParentTop="true"
+	   			
+	   			android:gravity="center"
+	   			android:textAppearance="?android:attr/textAppearanceMedium"
+	   			android:text="Wellbutrin XR 300"
+	   		/>
+	     	
+	     	<ProgressBar
+	     	    android:layout_width="0dip"
+	     	    android:layout_height="wrap_content"
+	     	    android:layout_alignLeft="@id/drug_name"
+	     	    android:layout_alignParentBottom="true"
+	     	    android:layout_alignRight="@id/drug_name"
+	     	    
+	     	    android:indeterminate="false"
+	     	    android:max="100"
+	     	    android:progress="16"
+	     	    
+	     	    style="?android:attr/progressBarStyleHorizontal"
+	     	/>
+	     	
+	     	<!-- 
+	     	<TextView
+	     	    android:layout_height="wrap_content"
+	     	    android:layout_width="0dip"
+	     	    android:layout_alignRight="@id/drug_name"
+	     	    android:layout_alignLeft="@id/drug_name"
+	     	    android:layout_alignParentBottom="true"
+	     	    
+	     	    android:textAppearance="?android:attr/textAppearanceSmall"
+	     	    android:text="Low supply"
+	     	/>
+	     	 -->
+    
+	 </RelativeLayout> 
+	 
+     <include layout="@layout/divider"/>   
+     
+     <at.jclehner.rxdroid.DoseView
+         android:layout_width="?android:attr/listPreferredItemHeight"
+	   	 android:layout_height="match_parent"
+	 />
+     
+     <TextView 
+   			android:layout_width="0dip"
+   			android:layout_height="match_parent"
+   			android:layout_weight="1"
+   			
+   			android:gravity="center"
+   			android:textAppearance="?android:attr/textAppearanceSmall"
+   			android:text="taken: 15:10 (+1)"
+   	 />
+     
+     <include layout="@layout/divider"/>   
+     
+     <at.jclehner.rxdroid.DoseView
+         android:layout_width="?android:attr/listPreferredItemHeight"
+	   	 android:layout_height="match_parent"
+	 />
+     
+     <TextView 
+   			android:layout_width="0dip"
+   			android:layout_height="match_parent"
+   			android:layout_weight="1"
+   			
+   			android:gravity="left|center_vertical"
+   			android:textAppearance="?android:attr/textAppearanceSmall"
+   			android:text="taken: 15:10 (+1)"
+   	 />
+     
+     <include layout="@layout/divider"/>   
+     
+     <at.jclehner.rxdroid.DoseView
+         android:layout_width="?android:attr/listPreferredItemHeight"
+	   	 android:layout_height="match_parent"
+	 />
+     
+     <TextView 
+   			android:layout_width="0dip"
+   			android:layout_height="match_parent"
+   			android:layout_weight="1"
+   			
+   			android:gravity="left|center_vertical"
+   			android:textAppearance="?android:attr/textAppearanceSmall"
+   			android:text="taken: 15:10 (+1)"
+   	 />
+     
+     <include layout="@layout/divider"/>   
+     
+     <at.jclehner.rxdroid.DoseView
+         android:layout_width="?android:attr/listPreferredItemHeight"
+	   	 android:layout_height="match_parent"
+	 />
+     
+     <TextView 
+   			android:layout_width="0dip"
+   			android:layout_height="match_parent"
+   			android:layout_weight="1"
+   			
+   			android:gravity="left|center_vertical"
+   			android:textAppearance="?android:attr/textAppearanceSmall"
+   			android:text="taken: 15:10 (+1)"
+   	 />
+        
+   		  
+     </LinearLayout>        
+</LinearLayout>

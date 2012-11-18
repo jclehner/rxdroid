@@ -165,7 +165,7 @@ public final class Entries
 	 * @param date The Intake's date. Can be <code>null</code>.
 	 * @param doseTime The Intake's doseTime. Can be <code>null</code>.
 	 */
-	public static synchronized List<Intake> findIntakes(Drug drug, Date date, Integer doseTime)
+	public static List<Intake> findIntakes(Drug drug, Date date, Integer doseTime)
 	{
 		final List<Intake> intakes = new LinkedList<Intake>();
 

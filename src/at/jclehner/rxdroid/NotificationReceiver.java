@@ -409,8 +409,10 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
 		{
+			Log.d(TAG, "Next dose time is morning on " + DateTime.toDateString(date));
+
 			date = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
-			return getDrugsWithDueDoses(date, activeOrNextDoseTime, outDrugs);
+			return getDrugsWithDueDoses(date, Drug.TIME_NIGHT, outDrugs);
 		}
 
 		int count = 0;
