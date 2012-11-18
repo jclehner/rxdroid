@@ -256,9 +256,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 
 				final boolean isFirstLaunch;
 
-				if(BuildConfig.DEBUG)
-					isFirstLaunch = true;
-				else if(Database.countAll(Drug.class) != 0)
+				if(!BuildConfig.DEBUG && Database.countAll(Drug.class) != 0)
 				{
 					isFirstLaunch = false;
 					Settings.putBoolean(Settings.Keys.IS_FIRST_LAUNCH, false);

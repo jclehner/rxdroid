@@ -249,7 +249,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				Util.closeQuietly(is);
 			}
 
-			final WebView wv = new WebView(getApplicationContext());
+			final WebView wv = new WebView(this);
 			wv.loadDataWithBaseURL("file", license, "text/html", null, null);
 
 			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
