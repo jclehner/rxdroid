@@ -213,13 +213,13 @@
 	<string name="_summary_supply_monitor">Nur benachrichtigen, wenn Vorräte zur Neige gehen</string>
 		
 	<string name="_title_database">Datenbank</string>
-	<string name="_title_history_1_month">Ein Monat</string>
-	<string name="_title_history_1_year">Ein Jahr</string>
-	<string name="_title_history_2_weeks">Zwei Wochen</string>
-	<string name="_title_history_6_months">Sechs Monate</string>
+	
 	<string name="_title_history_age">Verlaufsgröße</string>
+	<string name="_title_history_2_months">Zwei Monate</string>
+	<string name="_title_history_1_month">Ein Monat</string>
+	<string name="_title_history_6_months">Sechs Monate</string>
+	<string name="_title_history_1_year">Ein Jahr</string>
 	<string name="_title_history_unlimited">Unbegrenzt</string>	
-		
 	<string name="_toast_unlimited_history_size">Warnung: diese Einstellung kann zu langen Ladezeiten führen!</string>
 	
 	<string name="_title_go_to_date">Datum wählen</string>
@@ -243,7 +243,7 @@
 	<string name="_title_db_status_loading">Lade…</string>
 	<string name="_title_db_status_upgrading">Anpassen…</string>
 	<string name="_title_doses_and_low_supplies">Alle</string>
-	<string name="_title_licenses">Lizenz</string>
+	<string name="_title_licenses">Lizenzen</string>
 	<string name="_title_low_supplies_only">Nur niedrige Vorräte</string>
 	<string name="_title_notification_sound">Benachrichtigungston</string>
 	<string name="_title_ring">Ring</string>
@@ -269,6 +269,14 @@
 	
 	<string name="_title_repeat_alarm">Wiederholung</string>
 	<string name="_summary_repeat_alarm">Benachrichtigungen nach angegebener Zeit nochmals anzeigen</string>
+	
+	<string name="_help_dose_times">RxDroid wurde zum ersten Mal gestartet. Die folgenden vier Zeitintervalle
+	    werden später verwendet um den Einnahmeplan eines Medikaments festzulegen.</string>
+	
+	<string name="_toast_past_max_history_age">Dieses Datum liegt vor dem eingestellten Limit der Verlaufsgröße.</string>
+	<string name="_title_info">Information</string>
+	<string name="_msg_drag_drop_sorting">Die Reihenfolge der Medikamente kann nun durch klicken und verschieben 
+	    des jeweiligen Icons verändert werden.</string>
 	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

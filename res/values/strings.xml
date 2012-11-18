@@ -222,8 +222,8 @@
 	
 	<string name="_title_history_age">History size</string>
 	<string name="_summary_history_age">Data older than the given amount of time will be deleted</string>
-	<string name="_title_history_2_weeks">Two weeks</string>
 	<string name="_title_history_1_month">One Month</string>
+	<string name="_title_history_2_months">Two Months</string>
 	<string name="_title_history_6_months">Six months</string>
 	<string name="_title_history_1_year">One year</string>
 	<string name="_title_history_unlimited">Unlimited</string>	
@@ -263,7 +263,7 @@
 	<string name="_title_low_supplies_only">Low supplies only</string>
 	
 	<string name="_title_about">About</string>
-	<string name="_title_licenses">License</string>
+	<string name="_title_licenses">Licenses</string>
 	
 	<string name="_title_db_status_loading">Loading…</string>
 	<string name="_title_db_status_upgrading">Upgrading…</string>
@@ -290,13 +290,18 @@
 	
 	<string name="_title_repeat_alarm">Repeat</string>
 	<string name="_summary_repeat_alarm">Repeat notifications after a certain amount of time</string>
-	
+		
 	<string name="_help_drug_name">If you want to make changes to this drug, tap its name.</string>
 	<string name="_help_dose_view">To take a dose, simply tap it. Long pressing will show more options.</string>
 	
 	<string name="_help_dose_times">You\'ve started RxDroid for the first time. Please define the following
 		four time intervals, which you will use later when specifying a drug\'s schedule.</string>
-			
+	
+	<string name="_title_info">Information</string>
+	<string name="_toast_past_max_history_age">This date is beyond the selected history size limit.</string>
+	<string name="_msg_drag_drop_sorting">You can now change the display order by clicking
+	    a drug\'s icon and then dragging it to the desired position.</string>
+				
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 

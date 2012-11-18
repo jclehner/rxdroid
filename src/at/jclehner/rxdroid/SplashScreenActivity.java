@@ -254,10 +254,11 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 					}
 				}
 
-				final Class<?> intentClass;
 				final boolean isFirstLaunch;
 
-				if(!BuildConfig.DEBUG && Database.countAll(Drug.class) != 0)
+				if(BuildConfig.DEBUG)
+					isFirstLaunch = true;
+				else if(Database.countAll(Drug.class) != 0)
 				{
 					isFirstLaunch = false;
 					Settings.putBoolean(Settings.Keys.IS_FIRST_LAUNCH, false);
@@ -265,10 +266,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 				else
 					isFirstLaunch = Settings.getBoolean(Settings.Keys.IS_FIRST_LAUNCH, true);
 
-				if(isFirstLaunch)
-					intentClass = DoseTimePreferenceActivity.class;
-				else
-					intentClass = DrugListActivity.class;
+				final Class<?> intentClass = isFirstLaunch ? DoseTimePreferenceActivity.class : DrugListActivity.class;
 
 				Intent intent = new Intent(getBaseContext(), intentClass);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -276,8 +274,6 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 				startActivity(intent);
 
 				finish();
-
-
 			}
 		}).start();
 	}

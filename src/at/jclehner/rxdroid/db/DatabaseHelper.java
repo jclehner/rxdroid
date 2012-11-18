@@ -115,7 +115,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		private final int mType;
 	}
 
-	public static final int DB_VERSION = 54;
+	public static final int DB_VERSION = 55;
 	public static final String DB_NAME = "db.sqlite";
 
 	DatabaseHelper(Context context) {
@@ -197,7 +197,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	@SuppressWarnings("unchecked")
 	private boolean upgrade(ConnectionSource cs, int oldVersion, int newVersion)
 	{
-		if(oldVersion >= newVersion)
+		if(oldVersion > newVersion)
+			return false;
+		else if(oldVersion == newVersion)
 			return true;
 
 		Log.i(TAG, "Upgrading DB v" + oldVersion + " -> v" + newVersion);
@@ -224,6 +226,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			for(Class<?> clazz : Database.CLASSES)
 			{
 				if(upgradeTable(cs, oldVersion, newVersion, clazz))
+					++updatedDataCount;
+
+				if(updateTableData(oldVersion, newVersion, clazz))
 					++updatedDataCount;
 			}
 
@@ -300,15 +305,44 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		TableUtils.dropTable(cs, oldDataClass, true);
 		TableUtils.createTableIfNotExists(cs, newDataClass);
 
+		final Method convertMethod = oldDataClass.getMethod("convertToCurrentDatabaseFormat");
+
 		for(Object data : oldData)
 		{
-			final Method convertMethod = oldDataClass.getMethod("convertToCurrentDatabaseFormat");
 			final Entry entry = (Entry) convertMethod.invoke(data);
 			newDao.create(entry);
 		}
 
 		return true;
 		//return !oldData.isEmpty();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public boolean updateTableData(int oldVersion, int newVersion, Class<?> clazz)
+			throws ClassNotFoundException, SQLException, NoSuchMethodException, IllegalArgumentException,
+			IllegalAccessException, InvocationTargetException
+	{
+		final String packageName = Database.class.getPackage().getName() + ".v" + oldVersion;
+		final String updaterClassName = packageName + ".TableUpdater";
+
+		final Class<?> updaterClass = Reflect.classForName(updaterClassName);
+		if(updaterClass == null)
+			return false;
+
+		final Method updateMethod = Reflect.getMethod(updaterClass, "update" + clazz.getSimpleName(), Entry.class);
+		if(updateMethod == null)
+			return false;
+
+		final Dao dao = getDao(clazz);
+		final List<?> entries = dao.queryForAll();
+
+		for(Object entry : entries)
+		{
+			updateMethod.invoke(null, entry);
+			dao.update(entry);
+		}
+
+		return true;
 	}
 
 	private boolean runCallback(String packageName, String hookName, ConnectionSource cs)

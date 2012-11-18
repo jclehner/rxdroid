@@ -32,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import at.jclehner.rxdroid.DoseView;
+import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.widget.DrugNameView;
@@ -60,6 +61,8 @@ public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 		else
 			mItems = mAllItems;
 
+
+
 		notifyDataSetChanged();
 	}
 
@@ -84,6 +87,24 @@ public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 	@Override
 	public boolean isEmpty() {
 		return mItems.isEmpty();
+	}
+
+	@Override
+	public void remove(Drug drug) {
+		mItems.remove(drug);
+	}
+
+	@Override
+	public void insert(Drug drug, int index)
+	{
+		mItems.add(index, drug);
+
+		for(int i = 0; i != mItems.size(); ++i)
+		{
+			drug = mItems.get(i);
+			drug.setSortRank(i);
+			Database.update(drug, Database.FLAG_DONT_NOTIFY_LISTENERS);
+		}
 	}
 
 	static class DoseViewHolder

@@ -67,7 +67,13 @@ public final class Settings
 		public static final String REPEAT_ALARM = key(R.string.key_repeat_alarm);
 
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
+		public static final String DISPLAYED_INFO_IDS = "displayed_info_ids";
 		public static final String IS_FIRST_LAUNCH = "is_first_launch";
+	}
+
+	public static class InfoIds
+	{
+		public static final String DRAG_DROP_SORTING = "drag_drop_sorting";
 	}
 
 	private static final String TAG = Settings.class.getName();
@@ -93,6 +99,17 @@ public final class Settings
 
 	public static void putStringSet(String key, Set<String> set) {
 		sSharedPrefs.edit().putString(key, stringSetToString(set)).commit();
+	}
+
+	public static void putStringSetEntry(String key, String entry)
+	{
+		final Set<String> set = getStringSet(key);
+		set.add(entry);
+		putStringSet(key, set);
+	}
+
+	public static boolean containsStringSetEntry(String key, String entry) {
+		return getStringSet(key).contains(entry);
 	}
 
 	public static String getString(String key, String defValue) {
@@ -150,14 +167,6 @@ public final class Settings
 		sSharedPrefs.edit().putInt(key, value).commit();
 	}
 
-	private static int[] HISTORY_AGE_IN_DAYS = {
-		14,
-		28,
-		28 * 6,
-		365,
-		0
-	};
-
 	public static boolean isPastMaxHistoryAge(Date reference, Date date)
 	{
 		final int index = getIntFromList(Keys.HISTORY_SIZE, 2);
@@ -168,13 +177,13 @@ public final class Settings
 		switch(index)
 		{
 			case 0:
-				field = Calendar.DAY_OF_MONTH;
-				value = 14;
+				field = Calendar.MONTH;
+				value = 1;
 				break;
 
 			case 1:
 				field = Calendar.MONTH;
-				value = 1;
+				value = 2;
 				break;
 
 			case 2:

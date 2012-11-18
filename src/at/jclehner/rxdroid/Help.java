@@ -294,7 +294,7 @@ public final class Help
 		}
 	}
 
-	private static void spotOn(View view, int helpTextResId)
+	public static void spotOn(View view, int helpTextResId)
 	{
 		Help.sSpotlightOn = true;
 

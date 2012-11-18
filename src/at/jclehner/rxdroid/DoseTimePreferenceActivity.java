@@ -34,7 +34,7 @@ public class DoseTimePreferenceActivity extends PreferenceActivityBase
 			fistLaunchStuffVisibility = View.GONE;
 		}
 
-		findViewById(R.id.btn_ok).setVisibility(fistLaunchStuffVisibility);
+		findViewById(R.id.bottom_bar).setVisibility(fistLaunchStuffVisibility);
 		findViewById(R.id.help).setVisibility(fistLaunchStuffVisibility);
 
 		mHomeBtnIntent.setClass(getBaseContext(), intentClass);

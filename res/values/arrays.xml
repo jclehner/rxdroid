@@ -61,8 +61,8 @@
         <item>120</item>
     </string-array>
     <string-array name="history_size">
-        <item>@string/_title_history_2_weeks</item>
         <item>@string/_title_history_1_month</item>
+        <item>@string/_title_history_2_months</item>
         <item>@string/_title_history_6_months</item>
         <item>@string/_title_history_1_year</item>
         <item>@string/_title_history_unlimited</item>

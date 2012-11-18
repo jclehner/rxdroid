@@ -26,13 +26,20 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import com.mobeta.android.dslv.DragSortController;
+import com.mobeta.android.dslv.DragSortListView;
+
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
@@ -51,16 +58,21 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.Window;
 import android.widget.DatePicker;
+import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import at.caspase.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.jclehner.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
 import at.jclehner.rxdroid.db.Database;
+import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
@@ -69,6 +81,8 @@ import at.jclehner.rxdroid.ui.DrugOverviewAdapter;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
+import at.jclehner.rxdroid.widget.AutoDragSortListView;
+import at.jclehner.rxdroid.widget.AutoDragSortListView.OnOrderChangedListener;
 
 public class DrugListActivity extends FragmentActivity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
@@ -80,11 +94,14 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	private static final int MENU_ADD = 0;
 	private static final int MENU_PREFERENCES = 2;
 	private static final int MENU_TOGGLE_FILTERING = 3;
+	private static final int MENU_REORDER = 4;
 
 	private static final int CMENU_TOGGLE_INTAKE = 0;
 	private static final int CMENU_EDIT_DRUG = 2;
 	private static final int CMENU_IGNORE_DOSE = 4;
 	private static final int CMENU_HIGHLIGHT = 6;
+
+	private static final int DIALOG_INFO_SORTING = 0;
 
 	public static final String EXTRA_DATE = "date";
 	public static final String EXTRA_STARTED_FROM_NOTIFICATION = "started_from_notification";
@@ -109,8 +126,11 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setTheme(Theme.get());
 		setContentView(R.layout.drug_list);
+
+		setProgressBarIndeterminateVisibility(false);
 
 		mPager = (ViewPager) findViewById(R.id.drug_list_pager);
 		mTextDate = (TextView) findViewById(R.id.text_date);
@@ -256,6 +276,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 				setDate(mDate, PAGER_INIT);
 				return true;
 			}
+
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -264,6 +285,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	public void onCreateContextMenu(ContextMenu menu, final View v, ContextMenuInfo menuInfo)
 	{
 		final DoseView doseView = (DoseView) v;
+
+		if(toastIfPastMaxHistoryAge(doseView.getDate()))
+			return;
+
 		final Drug drug = doseView.getDrug();
 		final int doseTime = doseView.getDoseTime();
 
@@ -375,7 +400,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(LOGV) Log.d(TAG, "makeView: offset=" + offset);
 
 		final View v = getLayoutInflater().inflate(R.layout.drug_list_fragment, null);
-		final ListView listView = (ListView) v.findViewById(android.R.id.list);
+		final AutoDragSortListView listView = (AutoDragSortListView) v.findViewById(android.R.id.list);
 		final TextView emptyView = (TextView) v.findViewById(android.R.id.empty);
 
 		final Calendar cal = DateTime.calendarFromDate(mDate);
@@ -395,6 +420,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		emptyView.setText(getString(emptyResId, getString(R.string._title_add)));
 
 		listView.setEmptyView(emptyView);
+		listView.setDragHandleId(R.id.drug_icon);
 
 		return v;
 	}
@@ -404,7 +430,9 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		final DoseView doseView = (DoseView) view;
 		final Date date = doseView.getDate();
 
-		if(!date.equals(mDate))
+		if(toastIfPastMaxHistoryAge(date))
+			return;
+		else if(!date.equals(mDate))
 			throw new IllegalStateException("Activity date " + mDate + " differs from DoseView date " + date);
 
 		final Bundle args = new Bundle();
@@ -439,6 +467,24 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	{
 		if(id == R.id.dose_dialog)
 			return new IntakeDialog(this);
+		else if(id == DIALOG_INFO_SORTING)
+		{
+			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
+			ab.setIcon(android.R.drawable.ic_dialog_info);
+			ab.setTitle(R.string._title_info);
+			ab.setMessage(R.string._msg_drag_drop_sorting);
+			ab.setCancelable(false);
+			ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					Settings.putStringSetEntry(Settings.Keys.DISPLAYED_INFO_IDS, Settings.InfoIds.DRAG_DROP_SORTING);
+				}
+			});
+
+			return ab.create();
+		}
 
 		return super.onCreateDialog(id, args);
 	}
@@ -481,6 +527,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			return;
 		}
 
+		if(toastIfPastMaxHistoryAge(date))
+			return;
+
+
 		mDate = date;
 		getIntent().putExtra(EXTRA_DATE, mDate);
 
@@ -496,8 +546,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			if(Database.countAll(Drug.class) != 0)
 			{
 				mPager.setAdapter(new InfiniteViewPagerAdapter(this));
-				//mPager.setCurrentItem(1);
 				mPager.setCurrentItem(InfiniteViewPagerAdapter.CENTER, smoothScroll);
+
+				if(!Settings.containsStringSetEntry(Settings.Keys.DISPLAYED_INFO_IDS, Settings.InfoIds.DRAG_DROP_SORTING))
+					showDialog(DIALOG_INFO_SORTING);
 			}
 			else
 			{
@@ -539,7 +591,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		updateDateString();
 	}
 
-	private void updateListAdapter(ListView listView, Date date, List<Drug> drugs)
+	private void updateListAdapter(DragSortListView listView, Date date, List<Drug> drugs)
 	{
 		if(listView == null)
 		{
@@ -583,6 +635,19 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		}
 		else
 			mTextDate.setText(dateString);
+	}
+
+	private boolean toastIfPastMaxHistoryAge(Date date)
+	{
+		if(Settings.isPastMaxHistoryAge(DateTime.today(), date))
+		{
+			Toast.makeText(this, R.string._toast_past_max_history_age, Toast.LENGTH_LONG).show();
+			//mPager.setCurrentItem(mLastPage);
+			//setDate(mDate, PAGER_INIT | PAGER_SCROLL);
+			return true;
+		}
+
+		return false;
 	}
 
 	static class DrugFilter implements CollectionUtils.Filter<Drug>

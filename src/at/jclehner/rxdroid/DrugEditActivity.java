@@ -70,6 +70,7 @@ import at.jclehner.androidutils.otpm.OTPM;
 import at.jclehner.androidutils.otpm.PreferenceHelper;
 import at.jclehner.androidutils.otpm.OTPM.AddPreference;
 import at.jclehner.androidutils.otpm.OTPM.CreatePreference;
+import at.jclehner.androidutils.otpm.ReadonlyPreferenceHelper;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;

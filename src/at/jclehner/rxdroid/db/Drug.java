@@ -180,7 +180,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	private Date lastAutoIntakeCreationDate;
 
 	@DatabaseField
-	private int sortRank = 0;
+	private int sortRank = Integer.MAX_VALUE;
 
 	@DatabaseField(foreign = true)
 	private Schedule schedule;

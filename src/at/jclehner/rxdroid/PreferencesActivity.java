@@ -235,7 +235,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			try
 			{
 				final AssetManager aMgr = getResources().getAssets();
-				is = aMgr.open("LICENSE-GPLv3.html", AssetManager.ACCESS_BUFFER);
+				is = aMgr.open("licenses.html", AssetManager.ACCESS_BUFFER);
 
 				license = Util.streamToString(is);
 			}
@@ -250,7 +250,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			}
 
 			final WebView wv = new WebView(getApplicationContext());
-			wv.loadData(license, "text/html", null);
+			wv.loadDataWithBaseURL("file", license, "text/html", null, null);
 
 			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
 			ab.setTitle(R.string._title_licenses);

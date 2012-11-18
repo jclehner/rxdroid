@@ -35,6 +35,7 @@ public class InfiniteViewPagerAdapter extends PagerAdapter
 	public static final int MAX = ITEM_COUNT - 1;
 
 	private ViewFactory mFactory;
+	private int mCurrentItemIndex = -1;
 
 	public interface ViewFactory
 	{
@@ -43,6 +44,10 @@ public class InfiniteViewPagerAdapter extends PagerAdapter
 
 	public InfiniteViewPagerAdapter(ViewFactory viewFactory) {
 		mFactory = viewFactory;
+	}
+
+	public int getCurrentItemIndex() {
+		return mCurrentItemIndex;
 	}
 
 	@Override
@@ -75,6 +80,13 @@ public class InfiniteViewPagerAdapter extends PagerAdapter
 	@Override
 	public void destroyItem(ViewGroup container, int position, Object item) {
 		container.removeView((View) item);
+	}
+
+	@Override
+	public void setPrimaryItem(ViewGroup container, int position, Object object)
+	{
+		super.setPrimaryItem(container, position, object);
+		mCurrentItemIndex = position;
 	}
 
 	/*public static int getPagerOffset(ViewPager pager) {

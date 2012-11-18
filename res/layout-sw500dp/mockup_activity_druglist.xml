@@ -154,6 +154,7 @@
 	     	    android:layout_alignLeft="@id/drug_name"
 	     	    android:layout_alignParentBottom="true"
 	     	    android:layout_alignRight="@id/drug_name"
+	     	    android:layout_marginBottom="2dip"
 	     	    
 	     	    android:indeterminate="false"
 	     	    android:max="100"

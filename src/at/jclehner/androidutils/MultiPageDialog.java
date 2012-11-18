@@ -100,7 +100,7 @@ public abstract class MultiPageDialog extends AdvancedAlertDialog implements OnC
 	}
 
 	@Override
-	protected void onShow() {
+	protected final void onShow() {
 		setPage(mCurrentPage);
 	}
 

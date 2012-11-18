@@ -72,7 +72,7 @@ public class OldDrug extends Entry
 	private Date lastAutoIntakeCreationDate;
 
 	@DatabaseField
-	private int sortRank = 0;
+	protected int sortRank = 0;
 
 	@DatabaseField(foreign = true)
 	private Schedule schedule;
