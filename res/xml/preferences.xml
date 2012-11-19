@@ -111,7 +111,8 @@
 		<CheckBoxPreference android:key="@string/key_enable_landscape_mode"
 		    android:title="@string/_title_enable_landscape_mode"
 		    android:summary="@string/_summary_enable_landscape_mode"
-		    android:defaultValue="false"	    
+		    android:defaultValue="@bool/pref_default_landscape_enabled"
+		    android:enabled="@bool/pref_visibility_landscape_enabled"  
 		/>
 	     
 	    <PreferenceCategory 
@@ -250,7 +251,13 @@
 			android:title="@string/_title_history_age"
 			android:summary="@string/_summary_history_age"
 			android:entries="@array/history_size"
-			android:defaultValue="2"
+			android:defaultValue="1"
+		/>
+		
+		<Preference android:key="@string/key_db_stats"
+			android:title="@string/_title_db_stats"
+			android:summary="@string/_msg_db_stats"
+			android:enabled="false"
 		/>
 		
 	</PreferenceScreen>

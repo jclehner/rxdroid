@@ -28,8 +28,9 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
+import android.content.res.Configuration;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Intake;
@@ -37,6 +38,8 @@ import at.jclehner.rxdroid.db.Intake;
 
 public class RxDroid extends Application
 {
+	private static final String TAG = RxDroid.class.getName();
+
 	private static WeakHashMap<Activity, Boolean> sActivityVisibility =
 			new WeakHashMap<Activity, Boolean>();
 
@@ -52,6 +55,18 @@ public class RxDroid extends Application
 		Settings.init();
 		AutoIntakeCreator.registerSelf();
 		Database.registerEventListener(sNotificationUpdater);
+
+		final Configuration config = getResources().getConfiguration();
+		final int screenSize = config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+
+		if(screenSize == Configuration.SCREENLAYOUT_SIZE_SMALL)
+		{
+			if(Settings.getBoolean(Settings.Keys.ENABLE_LANDSCAPE, Settings.Defaults.ENABLE_LANDSCAPE))
+			{
+				Log.i(TAG, "Small screen detected - disabling landscape mode");
+				Settings.putBoolean(Settings.Keys.ENABLE_LANDSCAPE, false);
+			}
+		}
 
 		super.onCreate();
 	}

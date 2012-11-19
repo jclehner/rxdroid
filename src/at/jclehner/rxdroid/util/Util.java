@@ -23,7 +23,6 @@ package at.jclehner.rxdroid.util;
 
 import java.io.Closeable;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -281,6 +280,12 @@ public final class Util
 
 	public static void dumpObjectMembers(String tag, int priority, Object object, String name)
 	{
+		if(object == null)
+		{
+			Log.println(priority, tag, "dumpObjectMembers: (null) " + name);
+			return;
+		}
+
 		final Class<?> clazz = object.getClass();
 		final StringBuilder sb = new StringBuilder();
 		sb.append("dumpObjectMembers: (" + clazz.getSimpleName() + ") " + name + "\n");

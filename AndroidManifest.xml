@@ -106,6 +106,10 @@
 
 				<action android:name="android.intent.action.TIMEZONE_CHANGED" />
 				<category android:name="android.intent.category.PREFERENCE" />
+				
+				<action android:name="android.intent.action.LOCALE_CHANGED" />
+				<category android:name="android.intent.category.PREFERENCE" />
+				
 			</intent-filter>
 		</receiver>
 		

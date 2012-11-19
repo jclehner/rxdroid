@@ -65,15 +65,30 @@ public final class Settings
 		public static final String ENABLE_LANDSCAPE = key(R.string.key_enable_landscape_mode);
 		public static final String DONATE = key(R.string.key_donate);
 		public static final String REPEAT_ALARM = key(R.string.key_repeat_alarm);
+		public static final String DB_STATS = key(R.string.key_db_stats);
 
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
 		public static final String DISPLAYED_INFO_IDS = "displayed_info_ids";
 		public static final String IS_FIRST_LAUNCH = "is_first_launch";
 	}
 
+	public static class Enums
+	{
+		public static final int HISTORY_SIZE_1M = 0;
+		public static final int HISTORY_SIZE_2M = 1;
+		public static final int HISTORY_SIZE_6M = 2;
+		public static final int HISTORY_SIZE_1Y = 3;
+		public static final int HISTORY_SIZE_UNLIMITED = 4;
+	}
+
 	public static class InfoIds
 	{
 		public static final String DRAG_DROP_SORTING = "drag_drop_sorting";
+	}
+
+	public static class Defaults
+	{
+		public static final boolean ENABLE_LANDSCAPE = booleanResource(R.bool.pref_default_landscape_enabled);
 	}
 
 	private static final String TAG = Settings.class.getName();
@@ -543,7 +558,7 @@ public final class Settings
 
 	public static void maybeLockInPortraitMode(Activity activity)
 	{
-		if(!Settings.getBoolean(Keys.ENABLE_LANDSCAPE, false))
+		if(!Settings.getBoolean(Keys.ENABLE_LANDSCAPE, Defaults.ENABLE_LANDSCAPE))
 		{
 			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -583,6 +598,10 @@ public final class Settings
 
 	private static String key(int resId) {
 		return RxDroid.getContext().getString(resId);
+	}
+
+	private static boolean booleanResource(int resId) {
+		return RxDroid.getContext().getResources().getBoolean(resId);
 	}
 
 	private static final int FLAG_GET_MILLIS_UNTIL_BEGIN = 1;

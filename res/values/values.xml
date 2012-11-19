@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+	<item name="pref_default_landscape_enabled" type="bool">false</item>
+	<item name="pref_visibility_landscape_enabled" type="bool">true</item>	
+	<item name="is_drug_list_activity_date_menu_item_visible" type="bool">false</item>
+</resources>

@@ -24,7 +24,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">RxDroid</string>
-    <string name="version" translatable="false">0.9.3 RC1</string>
+    <string name="version" translatable="false">0.9.3 RC2</string>
     <string name="vcs_revision" translatable="false">$Revision$</string>
         
     <!--  WARNING: Do NOT replace - with an en dash as suggested by lint -->
@@ -230,7 +230,7 @@
 	
 	<string name="_title_database">Database</string>
 	
-	<string name="_toast_unlimited_history_size">Warning: this setting might cause very long loading times!</string>			
+	<string name="_toast_large_history_size">Warning: this setting might cause very long loading times!</string>			
 	
 	<string name="_title_supply_monitor">Mark as taken</string>
 	<string name="_summary_supply_monitor">Doses are automatically marked as taken. Notifications will only be
@@ -269,6 +269,7 @@
 	<string name="_title_db_status_upgrading">Upgrading…</string>
 	<string name="_title_db_status_discarding_intakes">Discarding old data…</string>
 	<string name="_title_db_status_creating_intakes">Inserting missing data…</string>
+	<string name="_title_db_status_initializing">Initializing…</string>
 	
 	<string name="_summary_enable_landscape_mode">Enables landscape mode (experimental)</string>
 	<string name="_title_enable_landscape_mode">Landscape mode</string>
@@ -298,6 +299,12 @@
 	<string name="_toast_past_max_history_age">This date is beyond the selected history size limit.</string>
 	<string name="_msg_drag_drop_sorting">You can now change the display order by clicking
 	    a drug\'s icon and then dragging it to the desired position.</string>
+	
+	<string name="_title_new_drug">New drug</string>
+	
+	<string name="_title_db_stats">Statistics</string>
+	<string name="_msg_db_stats">Database was loaded in %1$s. You may be able to reduce 
+		this time by reducing the history size.</string>
 				
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

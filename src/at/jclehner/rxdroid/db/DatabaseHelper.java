@@ -127,6 +127,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	{
 		try
 		{
+			SplashScreenActivity.setStatusMessage(R.string._title_db_status_initializing);
 			for(Class<?> clazz : Database.CLASSES)
 				TableUtils.createTableIfNotExists(cs, clazz);
 		}

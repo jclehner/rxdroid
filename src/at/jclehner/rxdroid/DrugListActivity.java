@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 
 import android.annotation.TargetApi;
@@ -37,9 +36,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
@@ -58,21 +55,17 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.view.MotionEvent;
+import android.view.MenuInflater;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.Window;
 import android.widget.DatePicker;
-import android.widget.FrameLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import at.caspase.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.jclehner.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
 import at.jclehner.rxdroid.db.Database;
-import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
@@ -82,19 +75,12 @@ import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.AutoDragSortListView;
-import at.jclehner.rxdroid.widget.AutoDragSortListView.OnOrderChangedListener;
 
 public class DrugListActivity extends FragmentActivity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
 {
 	private static final String TAG = DrugListActivity.class.getName();
 	private static final boolean LOGV = false;
-
-	private static final int MENU_SELECT_DATE = 1;
-	private static final int MENU_ADD = 0;
-	private static final int MENU_PREFERENCES = 2;
-	private static final int MENU_TOGGLE_FILTERING = 3;
-	private static final int MENU_REORDER = 4;
 
 	private static final int CMENU_TOGGLE_INTAKE = 0;
 	private static final int CMENU_EDIT_DRUG = 2;
@@ -202,7 +188,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		menu.add(0, MENU_ADD, 0, R.string._title_add).setIcon(android.R.drawable.ic_menu_add);
+		/*menu.add(0, MENU_ADD, 0, R.string._title_add).setIcon(android.R.drawable.ic_menu_add);
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 		{
@@ -221,10 +207,12 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		{
 			//menu.getItem(MENU_ADD).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 			//menu.getItem(MENU_PREFERENCES).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			//menu.getItem(MENU_TOGGLE_FILTERING).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		}
+			//menu.getItem(MENU_TOGGLE_FILTERING).setShowAsAction(MenuItem.SHOW_AS_ACTION_);
+		}*/
 
-		return super.onCreateOptionsMenu(menu);
+		new MenuInflater(this).inflate(R.menu.activity_drug_list, menu);
+
+		return true;
 	}
 
 	@Override
@@ -233,10 +221,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 		{
 			final int titleResId = DateTime.isToday(mDate) ? R.string._title_go_to_date : R.string._title_today;
-			menu.findItem(MENU_SELECT_DATE).setTitle(titleResId);
+			menu.findItem(R.id.menuitem_date).setTitle(titleResId);
 		}
 
-		menu.findItem(MENU_TOGGLE_FILTERING).setTitle(mShowingAll ? R.string._title_filter : R.string._title_show_all);
+		menu.findItem(R.id.menuitem_toggle_filtering).setTitle(mShowingAll ? R.string._title_filter : R.string._title_show_all);
 
 		return true;
 	}
@@ -246,7 +234,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	{
 		switch(item.getItemId())
 		{
-			case MENU_SELECT_DATE:
+			case R.id.menuitem_date:
 			{
 				if(mDate.equals(Settings.getActiveDate()))
 					mDateClickListener.onLongClick(null);
@@ -256,21 +244,21 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 				return true;
 			}
 
-			case MENU_ADD:
+			case R.id.menuitem_add:
 			{
 				Intent intent = new Intent(Intent.ACTION_INSERT);
 				intent.setClass(this, DrugEditActivity.class);
 				startActivity(intent);
 				return true;
 			}
-			case MENU_PREFERENCES:
+			case R.id.menuitem_preferences:
 			{
 				Intent intent = new Intent();
 				intent.setClass(this, PreferencesActivity.class);
 				startActivity(intent);
 				return true;
 			}
-			case MENU_TOGGLE_FILTERING:
+			case R.id.menuitem_toggle_filtering:
 			{
 				mShowingAll = !mShowingAll;
 				setDate(mDate, PAGER_INIT);

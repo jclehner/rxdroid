@@ -47,9 +47,6 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -59,7 +56,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.Toast;
 import at.caspase.rxdroid.Fraction;
 import at.jclehner.androidutils.MyDialogPreference;
@@ -68,9 +64,7 @@ import at.jclehner.androidutils.otpm.ListPreferenceWithIntHelper;
 import at.jclehner.androidutils.otpm.MyDialogPreferenceHelper;
 import at.jclehner.androidutils.otpm.OTPM;
 import at.jclehner.androidutils.otpm.PreferenceHelper;
-import at.jclehner.androidutils.otpm.OTPM.AddPreference;
 import at.jclehner.androidutils.otpm.OTPM.CreatePreference;
-import at.jclehner.androidutils.otpm.ReadonlyPreferenceHelper;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -216,10 +210,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		{
 			mIsEditing = false;
 			mWrapper.set(new Drug());
+			setTitle(R.string._title_new_drug);
 		}
 		else
 			throw new IllegalArgumentException("Unhandled action " + action);
-
 
 		OTPM.mapToPreferenceHierarchy(getPreferenceScreen(), mWrapper);
 		getPreferenceScreen().setOnPreferenceChangeListener(mListener);

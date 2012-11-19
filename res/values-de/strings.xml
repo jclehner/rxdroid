@@ -216,7 +216,7 @@
 	<string name="_title_history_6_months">Sechs Monate</string>
 	<string name="_title_history_1_year">Ein Jahr</string>
 	<string name="_title_history_unlimited">Unbegrenzt</string>	
-	<string name="_toast_unlimited_history_size">Warnung: diese Einstellung kann zu langen Ladezeiten führen!</string>
+	<string name="_toast_large_history_size">Warnung: diese Einstellung kann zu langen Ladezeiten führen!</string>
 	
 	<string name="_title_go_to_date">Datum wählen</string>
 	<string name="_title_today">Heute</string>
@@ -226,7 +226,7 @@
 	<string name="_title_help">Hilfe</string>
 	<string name="_title_n_of_n">%1$d von %2$d</string>
 	<string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
-	<string name="_title_show_in_list">In Medikamentenliste anzeigen</string>
+	<string name="_title_show_in_list">Medikamentenliste</string>
 		
 	<string name="_title_dark_theme">Dunkles Theme</string>
 	<string name="_toast_theme_changed">App wird neu gestartet…</string>
@@ -234,10 +234,11 @@
 	<string name="_toast_low_supplies">Vorrat dieses Medikaments ist niedrig.</string>
 	
 	<string name="_title_about">Über</string>
-	<string name="_title_db_status_creating_intakes">Erstelle fehlende Daten…</string>
-	<string name="_title_db_status_discarding_intakes">Verwerfe alte Daten…</string>
-	<string name="_title_db_status_loading">Lade…</string>
+	<string name="_title_db_status_creating_intakes">Fehlende Einträge erstellen…</string>
+	<string name="_title_db_status_discarding_intakes">Alte Einträge verwerfen…</string>
+	<string name="_title_db_status_loading">Laden…</string>
 	<string name="_title_db_status_upgrading">Anpassen…</string>
+	<string name="_title_db_status_initializing">Initialisieren…</string>
 	<string name="_title_doses_and_low_supplies">Alle</string>
 	<string name="_title_licenses">Lizenzen</string>
 	<string name="_title_low_supplies_only">Nur niedrige Vorräte</string>
@@ -273,6 +274,12 @@
 	<string name="_title_info">Information</string>
 	<string name="_msg_drag_drop_sorting">Die Reihenfolge der Medikamente kann nun durch klicken und verschieben 
 	    des jeweiligen Icons verändert werden.</string>
+	    
+	<string name="_title_new_drug">Neues Medikament</string>
+	
+	<string name="_title_db_stats">Statistiken</string>
+	<string name="_msg_db_stats">Datenbank wurde in %1$s geladen. Durch eine geringere Verlaufsgröße kann diese
+		Zeit eventuell reduziert werden.</string>
 	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

@@ -25,13 +25,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Formatter;
+import java.util.Locale;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -49,6 +51,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.widget.Toast;
+import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.util.Util;
 
@@ -126,6 +129,14 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			intent.setData(uri);
 			p.setIntent(intent);
 		}
+
+		p = findPreference(Settings.Keys.DB_STATS);
+		if(p != null)
+		{
+			final long millis = Database.getLoadingTimeMillis();
+			final String str = new Formatter((Locale) null).format("%1.3fs", millis / 1000f).toString();
+			p.setSummary(getString(R.string._msg_db_stats, str));
+		}
 	}
 
 	@Override
@@ -171,8 +182,8 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			updateLowSupplyThresholdPreferenceSummary();
 		else if(Settings.Keys.HISTORY_SIZE.equals(key))
 		{
-			if("4".equals(Settings.getString(Settings.Keys.HISTORY_SIZE, null)))
-				Toast.makeText(getApplicationContext(), R.string._toast_unlimited_history_size, Toast.LENGTH_LONG).show();
+			if(Settings.getStringAsInt(Settings.Keys.HISTORY_SIZE, -1) >= Settings.Enums.HISTORY_SIZE_6M)
+				Toast.makeText(getApplicationContext(), R.string._toast_large_history_size, Toast.LENGTH_LONG).show();
 		}
 		else if(Settings.Keys.LAST_MSG_HASH.equals(key))
 			return;

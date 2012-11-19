@@ -44,6 +44,7 @@ public class DoseTimePreferenceActivity extends PreferenceActivityBase
 	{
 		Settings.putBoolean(Settings.Keys.IS_FIRST_LAUNCH, false);
 		startActivity(mHomeBtnIntent);
+		finish();
 	}
 
 	@Override

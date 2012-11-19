@@ -89,6 +89,8 @@ public final class Database
 	private static DatabaseHelper sHelper;
 	private static boolean sIsLoaded = false;
 
+	private static long sDbLoadingTimeMillis = 0;
+
 	private static volatile int sPendingDaoOperations = 0;
 
 	private static EventDispatcher<Object> sEventMgr =
@@ -139,6 +141,7 @@ public final class Database
 			}
 
 			sHelper = new DatabaseHelper(context);
+			sDbLoadingTimeMillis = 0;
 
 			// precache entries
 			for(Class clazz : CLASSES)
@@ -183,6 +186,10 @@ public final class Database
 
 	public static synchronized void registerOnInitializedListener(OnInitializedListener l) {
 		sEventMgr.register(l);
+	}
+
+	public static long getLoadingTimeMillis() {
+		return sDbLoadingTimeMillis;
 	}
 
 	/**
@@ -323,6 +330,8 @@ public final class Database
 					for(T t : entries)
 						Log.v(TAG, "  " + t);
 				}
+
+				sDbLoadingTimeMillis += timer.elapsed();
 
 				Log.i(TAG, "Cached " + entries.size() + " entries of type " + clazz.getSimpleName() + ": " + timer);
 			}

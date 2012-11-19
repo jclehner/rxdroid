@@ -1,13 +1,15 @@
 package at.jclehner.rxdroid.widget;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Theme;
-
+import at.jclehner.rxdroid.Version;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 
@@ -23,6 +25,9 @@ public class AutoDragSortListView extends DragSortListView
 	private DragSortController mController;
 	private OnOrderChangedListener mOnOrderChangedListener;
 
+	private View mDraggedChild;
+	private Drawable mDraggedChildBackground;
+
 	public AutoDragSortListView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
@@ -30,15 +35,51 @@ public class AutoDragSortListView extends DragSortListView
 		if(isInEditMode())
 			return;
 
-		mController = new DragSortController(this);
+		final int alpha = (Theme.isDark() ? 0xc0 : 0x40) << 24;
+		final int colorId = Theme.isDark() ? R.color.active_text_light : R.color.active_text_dark;
+		// first remove the alpha via XOR, then OR the new alpha back in
+		final int color = (getResources().getColor(colorId) ^ 0xff000000) | alpha;
+
+		mController = new DragSortController(this) {
+
+			@Override
+			public View onCreateFloatView(int position)
+			{
+				if(Version.SDK_IS_PRE_HONEYCOMB)
+				{
+					mDraggedChild = getChildAt(position + getHeaderViewsCount() - getFirstVisiblePosition());
+
+			        if(mDraggedChild != null)
+			        {
+			        	// On pre-Honeycomb, the ListView items appear to have a background set
+			        	//v.setBackgroundResource(0);
+			        	mDraggedChildBackground = mDraggedChild.getBackground();
+			        	mDraggedChild.setBackgroundColor(color);
+			        }
+				}
+
+		        return super.onCreateFloatView(position);
+			}
+
+			@Override
+			public void onDestroyFloatView(View floatView)
+			{
+				if(Version.SDK_IS_PRE_HONEYCOMB)
+				{
+					mDraggedChild.setBackgroundDrawable(mDraggedChildBackground);
+					mDraggedChildBackground = null;
+					mDraggedChild = null;
+				}
+
+				super.onDestroyFloatView(floatView);
+			}
+
+		};
+
 		mController.setDragInitMode(DragSortController.ON_DOWN);
 		mController.setSortEnabled(true);
 
-		final int alpha = (Theme.isDark() ? 0xc0 : 0x40) << 24;
-		final int colorId = Theme.isDark() ? R.color.active_text_dark : R.color.active_text_light;
-
-		// first remove the alpha via XOR, then OR the new alpha back in
-		mController.setBackgroundColor((getResources().getColor(colorId) ^ 0xff000000) | alpha);
+		mController.setBackgroundColor(color);
 
 		setOnTouchListener(mController);
 		setFloatViewManager(mController);
