@@ -36,10 +36,7 @@
     -->
     
     <string name="_msg_new_notification">Neue Benachrichtigung</string>
-    <string name="_msg_doses_fp">%2$d fällig, %1$d vergessen</string>
-    <string name="_msg_doses_f">%1$d vergessen</string>
-    <string name="_msg_doses_p">%1$d fällig</string>
-        
+           
  	<string name="_qmsg_low_supply_single">%1$s</string>        
     <plurals name="_qmsg_low_supply_multiple">
         <item quantity="one">%2$s und %3$s</item>
@@ -169,7 +166,6 @@
 	
 	<string name="_btn_reset">Zurücksetzen</string>
 	
-	<string name="_msg_db_loading">Lade Datenbank, bitte warten.</string>
 	<string name="_msg_footer_insufficient_supplies">Ungenügender Vorrat für diese Dosis. %2$s klicken, um
 		zu ignorieren, oder diesen Text berühren, um &lt;b&gt;%3$s&lt;/b&gt; zu bearbeiten.</string>
 		
