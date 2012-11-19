@@ -169,6 +169,9 @@ public final class Settings
 
 	public static boolean isPastMaxHistoryAge(Date reference, Date date)
 	{
+		if(date == null)
+			return false;
+
 		final int index = getIntFromList(Keys.HISTORY_SIZE, 2);
 
 		final int field;
