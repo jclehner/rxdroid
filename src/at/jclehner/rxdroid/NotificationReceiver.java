@@ -98,10 +98,12 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		Database.init();
 
+		final boolean isAlarmRepetition = intent.getBooleanExtra(EXTRA_IS_ALARM_REPETITION, false);
+
 		final int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Schedule.TIME_INVALID);
 		if(doseTime != Schedule.TIME_INVALID)
 		{
-			if(!intent.getBooleanExtra(EXTRA_IS_ALARM_REPETITION, false))
+			if(!isAlarmRepetition)
 			{
 				final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
 				final boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_DOSE_TIME_END, false);
@@ -114,7 +116,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		mContext = context;
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
-		mForceUpdate = intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
+		mForceUpdate = isAlarmRepetition ? true : intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
 		mAllDrugs = Database.getAll(Drug.class);
 
 		rescheduleAlarms();
