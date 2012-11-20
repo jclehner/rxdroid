@@ -188,7 +188,7 @@
 	<string name="_msg_freq_21days_on_7days_off">21 Tage ab %1$s, danach 7-tägige Pause</string>
 	<string name="_msg_no_drugs_v8">MENÜ drücken und %1$s auswählen, um ein Medikament hinzuzufügen</string>
 	<string name="_msg_no_drugs_v11">Den +-Button in der Aktionsleiste klicken, um ein Medikament hinzuzufügen</string>
-	<string name="_summary_scramble_names">Namen von Medikamenten unkenntlich machen. Den Namen anklicken, um ihn zu zeigen</string>
+	<string name="_summary_scramble_names">Namen von Medikamenten unkenntlich machen. Den Namen anklicken, um ihn zu zeigen.</string>
 	<string name="_title_21_days_on_7_days_off">7-tägige Pause alle 21 Tage</string>
 	<string name="_title_begin">Beginn</string>
 	<string name="_title_end">Ende</string>
