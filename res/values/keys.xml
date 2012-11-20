@@ -43,4 +43,5 @@
 	<string translatable="false" name="key_donate">donate</string>
 	<string translatable="false" name="key_repeat_alarm">repeat_alarm</string>
 	<string translatable="false" name="key_db_stats">stats</string>
+	<string translatable="false" name="key_compact_action_bar">compact_action_bar</string>	
 </resources>

@@ -26,12 +26,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.mobeta.android.dslv.DragSortListView;
-
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -50,12 +48,13 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.view.MenuInflater;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.Window;
@@ -75,6 +74,8 @@ import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.AutoDragSortListView;
+
+import com.mobeta.android.dslv.DragSortListView;
 
 public class DrugListActivity extends FragmentActivity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
@@ -184,6 +185,15 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		Database.unregisterEventListener(mDatabaseListener);
 	}
 
+	@Override
+	public boolean onTrackballEvent(MotionEvent event)
+	{
+		// Using the trackball to navigate the ViewPager is very likely to cause a
+		// problem with Activity date / DoseView date mismatch. Until this is fixed,
+		// we eat all trackball events.
+		return true;
+	}
+
 	@TargetApi(11)
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -210,7 +220,14 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			//menu.getItem(MENU_TOGGLE_FILTERING).setShowAsAction(MenuItem.SHOW_AS_ACTION_);
 		}*/
 
-		new MenuInflater(this).inflate(R.menu.activity_drug_list, menu);
+		final int menuResId;
+
+		if(Settings.getBoolean(Settings.Keys.COMPACT_ACTION_BAR, false))
+			menuResId = R.menu.activity_drug_list_compact;
+		else
+			menuResId = R.id.menu_default_drug_list_activity;
+
+		new MenuInflater(this).inflate(menuResId, menu);
 
 		return true;
 	}

@@ -66,6 +66,7 @@ public final class Settings
 		public static final String DONATE = key(R.string.key_donate);
 		public static final String REPEAT_ALARM = key(R.string.key_repeat_alarm);
 		public static final String DB_STATS = key(R.string.key_db_stats);
+		public static final String COMPACT_ACTION_BAR = key(R.string.key_compact_action_bar);
 
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
 		public static final String DISPLAYED_INFO_IDS = "displayed_info_ids";

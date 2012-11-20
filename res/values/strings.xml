@@ -305,7 +305,9 @@
 	<string name="_title_db_stats">Statistics</string>
 	<string name="_msg_db_stats">Database was loaded in %1$s. You may be able to reduce 
 		this time by reducing the history size.</string>
-
+		
+	<string name="_title_compact_action_bar">Compact action bar</string>
+	<string name="_summary_compact_action_bar">Show less icons in the action bar</string>	
 				
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

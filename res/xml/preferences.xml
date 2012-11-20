@@ -114,6 +114,13 @@
 		    android:defaultValue="@bool/pref_default_landscape_enabled"
 		    android:enabled="@bool/pref_visibility_landscape_enabled"  
 		/>
+		
+		<CheckBoxPreference android:key="@string/key_compact_action_bar" 
+			android:title="@string/_title_compact_action_bar"
+			android:summary="@string/_summary_compact_action_bar"
+			android:defaultValue="@bool/pref_default_compact_action_bar"
+			android:enabled="@bool/pref_visibility_compact_action_bar"
+		/>
 	     
 	    <PreferenceCategory 
 	    	android:title="@string/_title_show_in_list" 
