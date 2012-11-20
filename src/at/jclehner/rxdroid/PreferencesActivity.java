@@ -56,6 +56,7 @@ import android.webkit.WebView;
 import android.widget.Toast;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
+import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Util;
 
 @SuppressWarnings("deprecation")
@@ -319,13 +320,17 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		}
 	}
 
-	private static void removeDisabledPreferences(PreferenceGroup root)
+	private void removeDisabledPreferences(PreferenceGroup root)
 	{
 		final List<Preference> toRemove = new ArrayList<Preference>();
 
 		for(int i = 0; i != root.getPreferenceCount(); ++i)
 		{
 			final Preference p = root.getPreference(i);
+
+			if(CollectionUtils.contains(KEEP_DISABLED, p.getKey()))
+				continue;
+
 			if(p instanceof PreferenceGroup)
 				removeDisabledPreferences((PreferenceGroup) p);
 			else if(!p.isEnabled())
