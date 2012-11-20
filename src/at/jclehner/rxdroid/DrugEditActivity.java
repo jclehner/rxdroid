@@ -560,7 +560,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			Drug drug = new Drug();
 			drug.setId(id);
 			drug.setName(name);
-			drug.setForm(form);
+			drug.setIcon(form);
 			drug.setActive(active);
 			drug.setComment(comment);
 			drug.setCurrentSupply(currentSupply);

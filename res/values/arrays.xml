@@ -22,7 +22,7 @@
  */
 -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string-array name="drug_forms">
         <item>@string/_title_tablet</item>
@@ -53,7 +53,7 @@
         <item>@string/_title_1_hour</item>
         <item>@string/_title_2_hour</item>
     </string-array>
-    <string-array name="alarm_repeat_times_values">
+    <string-array name="alarm_repeat_times_values" tools:ignore="MissingTranslation">
         <item>0</item>
         <item>15</item>
         <item>30</item>

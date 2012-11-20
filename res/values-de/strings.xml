@@ -84,7 +84,7 @@
     
     <string name="_title_pref_notification_methods">Benachrichtigungsarten</string>
     
-    <string name="_title_min_supply_days">Vorrat niedrig</string>
+    <string name="_title_min_supply_days">Vorratserinnerung</string>
     <string name="_summary_min_supply_days">Anzahl an Tagen die der Vorrat eines Medikaments hält, bevor eine Benachrichtigung
         angezeigt wird – derzeit %1$s</string>
     

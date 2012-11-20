@@ -366,11 +366,11 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.name = name;
 	}
 
-	public void setForm(int form)
+	public void setIcon(int icon)
 	{
-		if(form > ICON_OTHER)
+		if(icon > ICON_OTHER)
 			throw new IllegalArgumentException();
-		this.icon = form;
+		this.icon = icon;
 	}
 
 	public void setRepeatMode(int repeatMode)
