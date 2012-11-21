@@ -21,6 +21,18 @@ if [[ ! -f "scripts/shared.sh" ]]; then
 	die "Script must be run from the project's root directory"
 fi
 
+readonly KERNEL=$(uname -s)
+
+if [[ $KERNEL == "Linux" ]]; then
+	ised() {
+		command sed -i -r "$@"
+	}
+elif [[ $KERNEL == "Darwin" ]]; then
+	ised() {
+		command sed -i '' -E "$@"
+	}
+fi
+
 MKTEMP_CMDLINE="-t fooXXXXXX"
 
 mktempf() {
