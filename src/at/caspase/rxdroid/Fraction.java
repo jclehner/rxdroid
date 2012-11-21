@@ -304,7 +304,7 @@ public class Fraction extends Number implements Comparable<Number>
 	 *
 	 * @throws NumberFormatException
 	 */
-	public static Fraction decode(String string)
+	public static Fraction valueOf(String string)
 	{
 		int wholeNum = 0, numerator = 0, denominator = 1;
 

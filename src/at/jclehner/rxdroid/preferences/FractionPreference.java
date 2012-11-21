@@ -94,7 +94,7 @@ public class FractionPreference extends MyDialogPreference<Fraction> implements 
 
 	@Override
 	protected Fraction fromPersistedString(String string) {
-		return Fraction.decode(string);
+		return Fraction.valueOf(string);
 	}
 
 	@Override

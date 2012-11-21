@@ -50,7 +50,7 @@ import at.jclehner.rxdroid.util.Util;
 public class NotificationReceiver extends BroadcastReceiver
 {
 	private static final String TAG = NotificationReceiver.class.getName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = BuildConfig.DEBUG;
 
 	private static final Class<?>[] EVENT_HANDLER_ARG_TYPES = { Date.class, Integer.TYPE };
 
@@ -67,9 +67,9 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final String EXTRA_IS_ALARM_REPETITION = "at.jclehner.rxdroid.extra.IS_ALARM_REPETITION";
 	static final String EXTRA_FORCE_UPDATE = "at.jclehner.rxdroid.extra.FORCE_UPDATE";
 
-	private static int NOTIFICATION_NORMAL = 0;
-	private static int NOTIFICATION_FORCE_UPDATE = 1;
-	private static int NOTIFICATION_FORCE_SILENT = 2;
+	private static final int NOTIFICATION_NORMAL = 0;
+	private static final int NOTIFICATION_FORCE_UPDATE = 1;
+	private static final int NOTIFICATION_FORCE_SILENT = 2;
 
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
@@ -249,9 +249,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, createOperation(alarmExtras));
 	}
 
-	private void cancelAllAlarms()
-	{
-		if(LOGV) Log.i(TAG, "Cancelling all alarms...");
+	private void cancelAllAlarms() {
 		mAlarmMgr.cancel(createOperation(null));
 	}
 
@@ -368,6 +366,33 @@ public class NotificationReceiver extends BroadcastReceiver
 				builder.setSound(Uri.parse(ringtone));
 			else
 				defaults |= Notification.DEFAULT_SOUND;
+
+			if(LOGV) Log.i(TAG, "Sound: " + (ringtone != null ? ringtone.toString() : "DEFAULT_SOUND"));
+		}
+		else if(LOGV)
+		{
+			final String modeName;
+
+			switch(mode)
+			{
+				case NOTIFICATION_NORMAL:
+					modeName = "NORMAL";
+					break;
+
+				case NOTIFICATION_FORCE_SILENT:
+					modeName = "FORCE_SILENT";
+					break;
+
+				case NOTIFICATION_FORCE_UPDATE:
+					modeName = "FORCE_UPDATE";
+					break;
+
+				default:
+					modeName = "(UNKNOWN)";
+			}
+
+			final boolean soundEnabled = Settings.getBoolean(Settings.Keys.USE_SOUND, true);
+			Log.i(TAG, "No sound: mode=" + modeName + ", soundEnabled=" + soundEnabled);
 		}
 
 		if(mode != NOTIFICATION_FORCE_SILENT && Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true))

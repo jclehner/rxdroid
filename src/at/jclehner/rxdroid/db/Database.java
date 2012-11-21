@@ -22,6 +22,7 @@
 package at.jclehner.rxdroid.db;
 
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -32,6 +33,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.util.Log;
@@ -46,6 +51,7 @@ import at.jclehner.rxdroid.util.Timer;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.table.DatabaseTable;
 
 /**
  * All DB access goes here.
@@ -188,10 +194,6 @@ public final class Database
 		sEventMgr.register(l);
 	}
 
-	public static long getLoadingTimeMillis() {
-		return sDbLoadingTimeMillis;
-	}
-
 	/**
 	 * Creates a new database entry and notifies listeners.
 	 */
@@ -278,42 +280,28 @@ public final class Database
 		return sPendingDaoOperations > 0;
 	}
 
-	/*public static <E extends Entry> void rebuild()
+	public static long getLoadingTimeMillis() {
+		return sDbLoadingTimeMillis;
+	}
+
+	public static JSONArray exportDatabaseToJson()
 	{
-		final Timer t = new Timer();
-		final ConnectionSource cs = sHelper.getConnectionSource();
+		final JSONArray array = new JSONArray();
 
-		int entryCount = 0;
-
-		try
+		for(Class<?> clazz : new Class<?>[] { Drug.class, Intake.class })
 		{
-			for(Class<?> clazz : CLASSES)
+			try
 			{
-				TableUtils.dropTable(cs, clazz, false);
-				TableUtils.createTable(cs, clazz);
-
-				for(Entry entry : sCache.get(clazz))
-				{
-					final Entry tmp = (Entry) Reflect.newInstance(clazz);
-					Entry.copy(tmp, entry);
-					tmp.id = 0;
-					createWithoutMagic(entry);
-
-					++entryCount;
-				}
+				array.put(ImportExport.tableToJsonObject(clazz, sCache.get(clazz)));
+			}
+			catch(JSONException e)
+			{
+				throw new WrappedCheckedException(e);
 			}
 		}
-		catch(SQLException e)
-		{
-			throw new DatabaseError(DatabaseError.E_GENERAL, e);
-		}
 
-		sCache.clear();
-		sIsLoaded = false;
-		init();
-
-		Log.i(TAG, "Database rebuilt (" + entryCount + " entries in " + CLASSES.length + " tables): " + t);
-	}*/
+		return array;
+	}
 
 	static synchronized <T extends Entry> List<T> getCached(Class<T> clazz)
 	{

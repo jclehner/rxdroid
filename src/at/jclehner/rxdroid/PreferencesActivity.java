@@ -30,6 +30,8 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 
+import org.json.JSONException;
+
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -56,6 +58,7 @@ import android.webkit.WebView;
 import android.widget.Toast;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
+import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Util;
 
@@ -147,6 +150,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		}
 
 		removeDisabledPreferences(getPreferenceScreen());
+		maybeAddDebugPreferences();
 	}
 
 	@Override
@@ -339,5 +343,38 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 
 		for(Preference p : toRemove)
 			root.removePreference(p);
+	}
+
+	private void maybeAddDebugPreferences()
+	{
+		if(!BuildConfig.DEBUG)
+			return;
+
+		addPreferencesFromResource(R.xml.debug_preferences);
+
+		Preference p = findPreference("debug_dump_db");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					try
+					{
+						Log.d(TAG, Database.exportDatabaseToJson().toString());
+					}
+//					catch(JSONException e)
+//					{
+//						Log.w(TAG, e);
+//					}
+					finally
+					{
+
+					}
+					return true;
+				}
+			});
+		}
 	}
 }

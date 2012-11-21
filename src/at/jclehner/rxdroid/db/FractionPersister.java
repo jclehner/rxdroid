@@ -3,6 +3,7 @@ package at.jclehner.rxdroid.db;
 import java.sql.SQLException;
 
 import at.caspase.rxdroid.Fraction;
+import at.jclehner.rxdroid.db.ImportExport.JsonPersister;
 
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
@@ -31,19 +32,19 @@ public class FractionPersister extends StringType
 
 	@Override
 	public Object sqlArgToJava(FieldType fieldType, Object sqlArg, int columnPos) throws SQLException {
-		return parse(sqlArg);
+		return valueOf(sqlArg);
 	}
 
 	@Override
 	public Object resultStringToJava(FieldType fieldType, String stringValue, int columnPos) throws SQLException {
-		return parse(stringValue);
+		return valueOf(stringValue);
 	}
 
-	private static Fraction parse(Object object)
+	private static Fraction valueOf(Object object)
 	{
 		if(object == null)
 			return Fraction.ZERO;
 
-		return Fraction.decode((String) object);
+		return Fraction.valueOf((String) object);
 	}
 }

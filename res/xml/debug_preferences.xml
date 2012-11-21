@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceCategory xmlns:android="http://schemas.android.com/apk/res/android"
+	android:title="Debugging stuff"
+>	
+	
+	<Preference android:key="debug_dump_db"
+		android:title="Dump database"
+		android:summary="Dumps the database to JSON arrays"
+	/>
+</PreferenceCategory>
