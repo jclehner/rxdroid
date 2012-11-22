@@ -326,9 +326,11 @@
 			android:icon="@null"
 		/>
 		
+		<!-- 
 		<Preference android:key="@string/key_donate"
 		    android:title="@string/_title_donate"
 		/>
+		-->
 	
 	</PreferenceCategory>
 	
