@@ -292,7 +292,9 @@ public final class Database
 		{
 			try
 			{
-				array.put(ImportExport.tableToJsonObject(clazz, sCache.get(clazz)));
+				JSONObject obj = ImportExport.tableToJsonObject(clazz, sCache.get(clazz));
+				Log.d(TAG, obj.toString(2));
+				array.put(obj);
 			}
 			catch(JSONException e)
 			{

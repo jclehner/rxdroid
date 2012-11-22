@@ -15,7 +15,9 @@ import at.caspase.rxdroid.Fraction;
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.util.CollectionUtils;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.DatabaseFieldConfig;
 import com.j256.ormlite.table.DatabaseTable;
 import com.j256.ormlite.table.DatabaseTableConfig;
 
@@ -29,6 +31,16 @@ public final class ImportExport
 
 		public String toJsonString(T object) throws JSONException;
 		public T fromJsonString(String data) throws JSONException;
+
+		public String nullString();
+	}
+
+	public abstract class AbsJsonPersister<T> implements JsonPersister<T>
+	{
+		@Override
+		public String nullString() {
+			return null;
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -60,15 +72,19 @@ public final class ImportExport
 		final Class<?> clazz = object.getClass();
 		final JSONObject json = new JSONObject();
 
+		Log.d(TAG, "entryToJsonObject");
+
 		for(Field f : clazz.getDeclaredFields())
 		{
 			Annotation a = f.getAnnotation(DatabaseField.class);
 			if(a == null)
 				continue;
 
-			final Class<?> type = !isForeignField(f, a) ? f.getType() : long.class;
+			final Class<?> type = !isForeignField(f, a) ? f.getType() : Long.class;
 			final String name = getColumnName(f, a);
 			final Object value = Reflect.getFieldValue(f, object);
+
+			Log.d(TAG, "  " + name + "=" + value);
 
 			if(isJsonable(type))
 				json.put(name, value);
@@ -76,6 +92,8 @@ public final class ImportExport
 				json.put(name, (Double) value);
 			else
 				json.put(name, toJsonStringInternal(value, type));
+
+			Log.d(TAG, "  " + name + ": " + json.get(name));
 		}
 
 		return json;
@@ -129,11 +147,14 @@ public final class ImportExport
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static String toJsonStringInternal(Object object, Class<?> clazz) throws JSONException
 	{
-		if(object == null)
-			return "";
+		Log.d(TAG, "toJsonStringInternal(" + object + ", " + clazz + ")");
 
 		final JsonPersister persister = getPersister(clazz);
-		return persister.toJsonString(object);
+		final String string = object != null ? persister.toJsonString(object) : persister.nullString();
+
+		Log.d(TAG, "  string=" + string);
+
+		return string;
 	}
 
 	private static Object fromJsonStringInternal(String string, Class<?> clazz) throws JSONException
@@ -152,10 +173,40 @@ public final class ImportExport
 
 	private static String getColumnName(Field f, Annotation a)
 	{
-		final String columnName = Reflect.getAnnotationParameter(a, "columnName");
-		if(columnName == null || columnName.length() == 0 || DatabaseField.DEFAULT_STRING.equals(columnName))
-			return f.getName();
-		return columnName;
+		final DatabaseFieldConfig dfc = new DatabaseFieldConfig(
+				f.getName(),
+				(String) Reflect.getAnnotationParameter(a, "columnName"),
+				(DataType) Reflect.getAnnotationParameter(a, "dataType"),
+				(String) Reflect.getAnnotationParameter(a, "defaultValue"),
+				(Integer) Reflect.getAnnotationParameter(a, "width"),
+				(Boolean) Reflect.getAnnotationParameter(a, "canBeNull"),
+				(Boolean) Reflect.getAnnotationParameter(a, "id"),
+				(Boolean) Reflect.getAnnotationParameter(a, "generatedId"),
+				(String) Reflect.getAnnotationParameter(a, "generatedIdSequence"),
+				(Boolean) Reflect.getAnnotationParameter(a, "foreign"),
+				null, //Reflect.getAnnotationParameter(a, "foreignTableConfig"),
+				(Boolean) Reflect.getAnnotationParameter(a, "useGetSet"),
+				null, //(Enum<?>) Reflect.getAnnotationParameter(a, "unknownEnumValue"),
+				(Boolean) Reflect.getAnnotationParameter(a, "throwIfNull"),
+				(String) Reflect.getAnnotationParameter(a, "format"),
+				(Boolean) Reflect.getAnnotationParameter(a, "unique"),
+				(String) Reflect.getAnnotationParameter(a, "indexName"),
+				(String) Reflect.getAnnotationParameter(a, "uniqueIndexName"),
+				false, //(Boolean) Reflect.getAnnotationParameter(a, "autoRefresh"),
+				(Integer) Reflect.getAnnotationParameter(a, "maxForeignAutoRefreshLevel"),
+				0 //(Integer) Reflect.getAnnotationParameter(a, "maxForeignCollectionLevel")
+		);
+
+		return dfc.getColumnName();
+
+
+//		String columnName = Reflect.getAnnotationParameter(a, "columnName");
+//		if(columnName == null || columnName.length() == 0 || DatabaseField.DEFAULT_STRING.equals(columnName))
+//			columnName = new DatabaseFieldConfig(fieldName, columnName);
+//		else if(isForeignField(f, a))
+//			return f.getName() + "_id";
+//
+//		return columnName;
 	}
 
 	private static boolean isForeignField(Field f, Annotation a) {

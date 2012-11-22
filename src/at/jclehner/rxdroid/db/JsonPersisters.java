@@ -31,6 +31,11 @@ public final class JsonPersisters
 				throw new JSONException(e.getMessage());
 			}
 		}
+
+		@Override
+		public String nullString() {
+			return "0";
+		}
 	}
 
 	public static class DatePersister implements JsonPersister<Date>
@@ -53,6 +58,11 @@ public final class JsonPersisters
 			{
 				throw new JSONException(e.getMessage());
 			}
+		}
+
+		@Override
+		public String nullString() {
+			return "1970-01-01 00:00:00.000+0000";
 		}
 
 		private static SimpleDateFormat getSimpleDateFormat() {
