@@ -14,9 +14,7 @@ import at.caspase.rxdroid.Fraction;
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.util.CollectionUtils;
 
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.DatabaseFieldConfig;
 import com.j256.ormlite.table.DatabaseTableConfig;
 
 public final class ImportExport
@@ -41,10 +39,12 @@ public final class ImportExport
 
 	public interface JsonForeignPersister<T>
 	{
-		public static final long NO_ID = Integer.MIN_VALUE;
+		//public static final long NO_ID = Integer.MIN_VALUE;
 
 		public long toId(T value);
 		public T fromId(long id);
+
+		public long nullId();
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -82,7 +82,11 @@ public final class ImportExport
 		return new JSONObject().put(DatabaseTableConfig.extractTableName(clazz), array);
 	}
 
-	@SuppressWarnings("unchecked")
+	public static void tableFromJsonObject(JSONObject json, Collection<?> outEntries)
+	{
+		throw new UnsupportedOperationException();
+	}
+
 	public static JSONObject entryToJsonObject(Object object) throws JSONException
 	{
 		final Class<?> clazz = object.getClass();
@@ -184,21 +188,19 @@ public final class ImportExport
 	@SuppressWarnings("unchecked")
 	private static long getForeignIdInternal(Object value, Class<?> type) throws JSONException
 	{
-		if(value == null)
-			return JsonForeignPersister.NO_ID;
-
 		@SuppressWarnings("rawtypes")
-		JsonForeignPersister persister = getForeignPersister(type);
-		return persister.toId(value);
+		final JsonForeignPersister persister = getForeignPersister(type);
+		return value != null ? persister.toId(value) : persister.nullId();
 	}
 
 	private static Object fromForeignIdInternal(long id, Class<?> type) throws JSONException
 	{
-		if(id == JsonForeignPersister.NO_ID)
+		@SuppressWarnings("rawtypes")
+		final JsonForeignPersister persister = getForeignPersister(type);
+
+		if(id == persister.nullId())
 			return null;
 
-		@SuppressWarnings("rawtypes")
-		JsonForeignPersister persister = getForeignPersister(type);
 		return persister.fromId(id);
 	}
 
@@ -224,47 +226,11 @@ public final class ImportExport
 
 	private static String getColumnName(Field f, Annotation a)
 	{
-		if(false)
-		{
-			final DatabaseFieldConfig dfc = new DatabaseFieldConfig(
-					f.getName(),
-					(String) Reflect.getAnnotationParameter(a, "columnName"),
-					(DataType) Reflect.getAnnotationParameter(a, "dataType"),
-					(String) Reflect.getAnnotationParameter(a, "defaultValue"),
-					(Integer) Reflect.getAnnotationParameter(a, "width"),
-					(Boolean) Reflect.getAnnotationParameter(a, "canBeNull"),
-					(Boolean) Reflect.getAnnotationParameter(a, "id"),
-					(Boolean) Reflect.getAnnotationParameter(a, "generatedId"),
-					(String) Reflect.getAnnotationParameter(a, "generatedIdSequence"),
-					(Boolean) Reflect.getAnnotationParameter(a, "foreign"),
-					null, //Reflect.getAnnotationParameter(a, "foreignTableConfig"),
-					(Boolean) Reflect.getAnnotationParameter(a, "useGetSet"),
-					null, //(Enum<?>) Reflect.getAnnotationParameter(a, "unknownEnumValue"),
-					(Boolean) Reflect.getAnnotationParameter(a, "throwIfNull"),
-					(String) Reflect.getAnnotationParameter(a, "format"),
-					(Boolean) Reflect.getAnnotationParameter(a, "unique"),
-					(String) Reflect.getAnnotationParameter(a, "indexName"),
-					(String) Reflect.getAnnotationParameter(a, "uniqueIndexName"),
-					false, //(Boolean) Reflect.getAnnotationParameter(a, "autoRefresh"),
-					(Integer) Reflect.getAnnotationParameter(a, "maxForeignAutoRefreshLevel"),
-					0 //(Integer) Reflect.getAnnotationParameter(a, "maxForeignCollectionLevel")
-			);
+		String columnName = Reflect.getAnnotationParameter(a, "columnName");
+		if(columnName == null || columnName.length() == 0 || DatabaseField.DEFAULT_STRING.equals(columnName))
+			columnName = f.getName();
 
-			return dfc.getColumnName();
-		}
-		else
-		{
-			String columnName = Reflect.getAnnotationParameter(a, "columnName");
-			if(columnName == null || columnName.length() == 0 || DatabaseField.DEFAULT_STRING.equals(columnName))
-			{
-				columnName = f.getName();
-//
-//				if(isForeignField(f, a))
-//					columnName += "_id";
-			}
-
-			return columnName;
-		}
+		return columnName;
 	}
 
 	private static boolean isForeignField(Field f, Annotation a) {

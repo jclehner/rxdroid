@@ -93,6 +93,11 @@ public final class JsonPersisters
 		public long toId(E entry) {
 			return entry.id;
 		}
+
+		@Override
+		public long nullId() {
+			return -1;
+		}
 	}
 
 	private JsonPersisters() {}

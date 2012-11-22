@@ -76,6 +76,9 @@ public final class Database
 	private static final String TAG = Database.class.getName();
 	private static final boolean LOGV = false;
 
+	private static final String JSON_NAME_VERSION = "version";
+	private static final String JSON_NAME_DATA = "data";
+
 	static final Class<?>[] CLASSES = {
 		Drug.class,
 		Intake.class,
@@ -289,14 +292,14 @@ public final class Database
 
 	public static JSONObject exportDatabaseToJson() throws JSONException
 	{
-		final JSONArray array = new JSONArray();
+		final JSONArray data = new JSONArray();
 
 		for(Class<?> clazz : CLASSES)
 		{
 			try
 			{
 				final JSONObject obj = ImportExport.tableToJsonObject(clazz, sCache.get(clazz));
-				array.put(obj);
+				data.put(obj);
 			}
 			catch(JSONException e)
 			{
@@ -305,9 +308,29 @@ public final class Database
 		}
 
 		final JSONObject obj = new JSONObject();
-		obj.put("data", array);
-		obj.put("version", DatabaseHelper.DB_VERSION);
+		obj.put(JSON_NAME_DATA, data);
+		obj.put(JSON_NAME_VERSION, DatabaseHelper.DB_VERSION);
 		return obj;
+	}
+
+	public static void importDatabaseFromJson(JSONObject json) throws JSONException
+	{
+		final int version = json.getInt(JSON_NAME_VERSION);
+		if(version != DatabaseHelper.DB_VERSION)
+			throw new UnsupportedOperationException();
+
+		final JSONArray data = json.getJSONArray(JSON_NAME_DATA);
+
+		for(int i = 0; i != data.length(); ++i)
+		{
+			final JSONObject table = data.getJSONObject(i);
+			//table.get
+
+
+
+		}
+
+
 	}
 
 	public static void exportDatabaseToFile()
