@@ -30,8 +30,6 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 
-import org.json.JSONException;
-
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -58,8 +56,6 @@ import android.webkit.WebView;
 import android.widget.Toast;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
-import at.jclehner.rxdroid.db.ImportExport;
-import at.jclehner.rxdroid.db.Intake;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Util;
 
@@ -361,28 +357,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				@Override
 				public boolean onPreferenceClick(Preference preference)
 				{
-					try
-					{
-						//Log.d(TAG, Database.exportDatabaseToJson().toString());
-
-						for(Intake intake : Database.getAll(Intake.class))
-						{
-							if(intake.getTimestamp() == null)
-							{
-								Log.d(TAG, ImportExport.entryToJsonObject(intake).toString(2));
-								break;
-							}
-						}
-
-					}
-					catch(JSONException e)
-					{
-						Log.w(TAG, e);
-					}
-					finally
-					{
-
-					}
+					Database.exportDatabaseToFile();
 					return true;
 				}
 			});

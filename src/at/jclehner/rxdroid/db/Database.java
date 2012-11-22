@@ -22,7 +22,10 @@
 package at.jclehner.rxdroid.db;
 
 
-import java.lang.annotation.Annotation;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -48,10 +51,10 @@ import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.SplashScreenActivity;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.jclehner.rxdroid.util.Timer;
+import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.table.DatabaseTable;
 
 /**
  * All DB access goes here.
@@ -284,16 +287,15 @@ public final class Database
 		return sDbLoadingTimeMillis;
 	}
 
-	public static JSONArray exportDatabaseToJson()
+	public static JSONObject exportDatabaseToJson() throws JSONException
 	{
 		final JSONArray array = new JSONArray();
 
-		for(Class<?> clazz : new Class<?>[] { Drug.class, Intake.class })
+		for(Class<?> clazz : CLASSES)
 		{
 			try
 			{
-				JSONObject obj = ImportExport.tableToJsonObject(clazz, sCache.get(clazz));
-				Log.d(TAG, obj.toString(2));
+				final JSONObject obj = ImportExport.tableToJsonObject(clazz, sCache.get(clazz));
 				array.put(obj);
 			}
 			catch(JSONException e)
@@ -302,7 +304,35 @@ public final class Database
 			}
 		}
 
-		return array;
+		final JSONObject obj = new JSONObject();
+		obj.put("data", array);
+		obj.put("version", DatabaseHelper.DB_VERSION);
+		return obj;
+	}
+
+	public static void exportDatabaseToFile()
+	{
+		try
+		{
+			final File file = RxDroid.getContext().getFileStreamPath("test.json");
+			final FileWriter writer = new FileWriter(file);
+
+			writer.write(exportDatabaseToJson().toString());
+
+			Util.closeQuietly(writer);
+		}
+		catch(FileNotFoundException e)
+		{
+			Log.w(TAG, e);
+		}
+		catch(IOException e)
+		{
+			Log.w(TAG, e);
+		}
+		catch(JSONException e)
+		{
+			Log.w(TAG, e);
+		}
 	}
 
 	static synchronized <T extends Entry> List<T> getCached(Class<T> clazz)

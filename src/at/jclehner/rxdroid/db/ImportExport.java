@@ -10,7 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
 import at.caspase.rxdroid.Fraction;
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.util.CollectionUtils;
@@ -18,7 +17,6 @@ import at.jclehner.rxdroid.util.CollectionUtils;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.DatabaseFieldConfig;
-import com.j256.ormlite.table.DatabaseTable;
 import com.j256.ormlite.table.DatabaseTableConfig;
 
 public final class ImportExport
@@ -27,34 +25,51 @@ public final class ImportExport
 
 	public interface JsonPersister<T>
 	{
-		public static final String NULL = JsonPersister.class.getName() + ".NULL";
+		public String toJsonString(T value) throws JSONException;
+		public T fromJsonString(String string) throws JSONException;
 
-		public String toJsonString(T object) throws JSONException;
-		public T fromJsonString(String data) throws JSONException;
-
-		public String nullString();
+		public T nullValue();
 	}
 
-	public abstract class AbsJsonPersister<T> implements JsonPersister<T>
+	public static abstract class JsonPersisterBase<T> implements JsonPersister<T>
 	{
 		@Override
-		public String nullString() {
+		public T nullValue() {
 			return null;
 		}
+	}
+
+	public interface JsonForeignPersister<T>
+	{
+		public static final long NO_ID = Integer.MIN_VALUE;
+
+		public long toId(T value);
+		public T fromId(long id);
 	}
 
 	@SuppressWarnings("rawtypes")
 	private static HashMap<Class<?>, JsonPersister> sPersisters =
 			new HashMap<Class<?>, JsonPersister>();
 
+	@SuppressWarnings("rawtypes")
+	private static HashMap<Class<?>, JsonForeignPersister> sForeignPersisters =
+			new HashMap<Class<?>, JsonForeignPersister>();
+
 	static
 	{
 		sPersisters.put(Fraction.class, new JsonPersisters.FractionPersister());
 		sPersisters.put(Date.class, new JsonPersisters.DatePersister());
+
+		register(Drug.class, new JsonPersisters.ForeignDrugPersister());
+		register(Schedule.class, new JsonPersisters.ForeignSchedulePersister());
 	}
 
 	public static <T> void register(Class<? extends T> clazz, JsonPersister<T> persister) {
 		sPersisters.put(clazz, persister);
+	}
+
+	public static <T> void register(Class<? extends T> clazz, JsonForeignPersister<T> persister) {
+		sForeignPersisters.put(clazz, persister);
 	}
 
 	public static JSONObject tableToJsonObject(Class<?> clazz, Collection<?> entries) throws JSONException
@@ -67,12 +82,11 @@ public final class ImportExport
 		return new JSONObject().put(DatabaseTableConfig.extractTableName(clazz), array);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static JSONObject entryToJsonObject(Object object) throws JSONException
 	{
 		final Class<?> clazz = object.getClass();
 		final JSONObject json = new JSONObject();
-
-		Log.d(TAG, "entryToJsonObject");
 
 		for(Field f : clazz.getDeclaredFields())
 		{
@@ -80,20 +94,29 @@ public final class ImportExport
 			if(a == null)
 				continue;
 
-			final Class<?> type = !isForeignField(f, a) ? f.getType() : Long.class;
+			final Class<?> type = f.getType();
 			final String name = getColumnName(f, a);
 			final Object value = Reflect.getFieldValue(f, object);
 
-			Log.d(TAG, "  " + name + "=" + value);
-
-			if(isJsonable(type))
-				json.put(name, value);
-			else if(isFloat(type))
-				json.put(name, (Double) value);
+			if(!isForeignField(f, a))
+			{
+				if(isJsonable(type) || isFloat(type))
+				{
+					if(value != null)
+						json.put(name, value);
+					else
+						json.put(name, JSONObject.NULL);
+				}
+				else
+				{
+					if(value == null)
+						json.put(name, JSONObject.NULL);
+					else
+						json.put(name, toJsonStringInternal(value, type));
+				}
+			}
 			else
-				json.put(name, toJsonStringInternal(value, type));
-
-			Log.d(TAG, "  " + name + ": " + json.get(name));
+				json.put(name, getForeignIdInternal(value, type));
 		}
 
 		return json;
@@ -109,16 +132,21 @@ public final class ImportExport
 			if(a == null)
 				continue;
 
-			final Class<?> type = !isForeignField(f, a) ? f.getType() : long.class;
+			final Class<?> type = f.getType();
 			final String name = getColumnName(f, a);
 			final Object value;
 
-			if(isJsonable(type))
-				value = json.get(name);
-			else if(isFloat(type))
-				value = (float) json.getDouble(name);
+			if(!isForeignField(f, a))
+			{
+				if(isJsonable(type))
+					value = json.get(name);
+				else if(isFloat(type))
+					value = (float) json.getDouble(name);
+				else
+					value = fromJsonStringInternal(json.getString(name), clazz);
+			}
 			else
-				value = fromJsonStringInternal(json.getString(name), clazz);
+				value = fromForeignIdInternal(json.getLong(name), type);
 
 			try
 			{
@@ -144,69 +172,99 @@ public final class ImportExport
 		return persister;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static String toJsonStringInternal(Object object, Class<?> clazz) throws JSONException
+	public static JsonForeignPersister<?> getForeignPersister(Class<?> clazz) throws JSONException
 	{
-		Log.d(TAG, "toJsonStringInternal(" + object + ", " + clazz + ")");
+		final JsonForeignPersister<?> persister = sForeignPersisters.get(clazz);
+		if(persister == null)
+			throw new JSONException("No registered foreign persister for " + clazz.getName());
 
-		final JsonPersister persister = getPersister(clazz);
-		final String string = object != null ? persister.toJsonString(object) : persister.nullString();
+		return persister;
+	}
 
-		Log.d(TAG, "  string=" + string);
+	@SuppressWarnings("unchecked")
+	private static long getForeignIdInternal(Object value, Class<?> type) throws JSONException
+	{
+		if(value == null)
+			return JsonForeignPersister.NO_ID;
 
-		return string;
+		@SuppressWarnings("rawtypes")
+		JsonForeignPersister persister = getForeignPersister(type);
+		return persister.toId(value);
+	}
+
+	private static Object fromForeignIdInternal(long id, Class<?> type) throws JSONException
+	{
+		if(id == JsonForeignPersister.NO_ID)
+			return null;
+
+		@SuppressWarnings("rawtypes")
+		JsonForeignPersister persister = getForeignPersister(type);
+		return persister.fromId(id);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static String toJsonStringInternal(Object value, Class<?> type) throws JSONException
+	{
+		if(value == null)
+			throw new NullPointerException();
+
+		final JsonPersister persister = getPersister(type);
+		return persister.toJsonString(value);
 	}
 
 	private static Object fromJsonStringInternal(String string, Class<?> clazz) throws JSONException
 	{
-//		final String[] data = string.split("|");
-//		if(data.length != 2)
-//			throw new JSONException("Invalid data");
-//		final Class<?> clazz = Class.forName(data[1]);
+		final JsonPersister<?> persister = getPersister(clazz);
 
 		if(string == null || string.length() == 0)
-			return null;
+			return persister.nullValue();
 
-		final JsonPersister<?> persister = getPersister(clazz);
 		return persister.fromJsonString(string);
 	}
 
 	private static String getColumnName(Field f, Annotation a)
 	{
-		final DatabaseFieldConfig dfc = new DatabaseFieldConfig(
-				f.getName(),
-				(String) Reflect.getAnnotationParameter(a, "columnName"),
-				(DataType) Reflect.getAnnotationParameter(a, "dataType"),
-				(String) Reflect.getAnnotationParameter(a, "defaultValue"),
-				(Integer) Reflect.getAnnotationParameter(a, "width"),
-				(Boolean) Reflect.getAnnotationParameter(a, "canBeNull"),
-				(Boolean) Reflect.getAnnotationParameter(a, "id"),
-				(Boolean) Reflect.getAnnotationParameter(a, "generatedId"),
-				(String) Reflect.getAnnotationParameter(a, "generatedIdSequence"),
-				(Boolean) Reflect.getAnnotationParameter(a, "foreign"),
-				null, //Reflect.getAnnotationParameter(a, "foreignTableConfig"),
-				(Boolean) Reflect.getAnnotationParameter(a, "useGetSet"),
-				null, //(Enum<?>) Reflect.getAnnotationParameter(a, "unknownEnumValue"),
-				(Boolean) Reflect.getAnnotationParameter(a, "throwIfNull"),
-				(String) Reflect.getAnnotationParameter(a, "format"),
-				(Boolean) Reflect.getAnnotationParameter(a, "unique"),
-				(String) Reflect.getAnnotationParameter(a, "indexName"),
-				(String) Reflect.getAnnotationParameter(a, "uniqueIndexName"),
-				false, //(Boolean) Reflect.getAnnotationParameter(a, "autoRefresh"),
-				(Integer) Reflect.getAnnotationParameter(a, "maxForeignAutoRefreshLevel"),
-				0 //(Integer) Reflect.getAnnotationParameter(a, "maxForeignCollectionLevel")
-		);
+		if(false)
+		{
+			final DatabaseFieldConfig dfc = new DatabaseFieldConfig(
+					f.getName(),
+					(String) Reflect.getAnnotationParameter(a, "columnName"),
+					(DataType) Reflect.getAnnotationParameter(a, "dataType"),
+					(String) Reflect.getAnnotationParameter(a, "defaultValue"),
+					(Integer) Reflect.getAnnotationParameter(a, "width"),
+					(Boolean) Reflect.getAnnotationParameter(a, "canBeNull"),
+					(Boolean) Reflect.getAnnotationParameter(a, "id"),
+					(Boolean) Reflect.getAnnotationParameter(a, "generatedId"),
+					(String) Reflect.getAnnotationParameter(a, "generatedIdSequence"),
+					(Boolean) Reflect.getAnnotationParameter(a, "foreign"),
+					null, //Reflect.getAnnotationParameter(a, "foreignTableConfig"),
+					(Boolean) Reflect.getAnnotationParameter(a, "useGetSet"),
+					null, //(Enum<?>) Reflect.getAnnotationParameter(a, "unknownEnumValue"),
+					(Boolean) Reflect.getAnnotationParameter(a, "throwIfNull"),
+					(String) Reflect.getAnnotationParameter(a, "format"),
+					(Boolean) Reflect.getAnnotationParameter(a, "unique"),
+					(String) Reflect.getAnnotationParameter(a, "indexName"),
+					(String) Reflect.getAnnotationParameter(a, "uniqueIndexName"),
+					false, //(Boolean) Reflect.getAnnotationParameter(a, "autoRefresh"),
+					(Integer) Reflect.getAnnotationParameter(a, "maxForeignAutoRefreshLevel"),
+					0 //(Integer) Reflect.getAnnotationParameter(a, "maxForeignCollectionLevel")
+			);
 
-		return dfc.getColumnName();
-
-
-//		String columnName = Reflect.getAnnotationParameter(a, "columnName");
-//		if(columnName == null || columnName.length() == 0 || DatabaseField.DEFAULT_STRING.equals(columnName))
-//			columnName = new DatabaseFieldConfig(fieldName, columnName);
-//		else if(isForeignField(f, a))
-//			return f.getName() + "_id";
+			return dfc.getColumnName();
+		}
+		else
+		{
+			String columnName = Reflect.getAnnotationParameter(a, "columnName");
+			if(columnName == null || columnName.length() == 0 || DatabaseField.DEFAULT_STRING.equals(columnName))
+			{
+				columnName = f.getName();
 //
-//		return columnName;
+//				if(isForeignField(f, a))
+//					columnName += "_id";
+			}
+
+			return columnName;
+		}
 	}
 
 	private static boolean isForeignField(Field f, Annotation a) {
