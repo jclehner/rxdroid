@@ -132,10 +132,32 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		p = findPreference(Settings.Keys.DONATE);
 		if(p != null)
 		{
-			final Uri uri = Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QTBC4AVEYASYU");
+			final String uriString;
+			final int titleResId;
+			final String summary;
+
+			if(/*BuildConfig.DEBUG ||*/ Util.wasInstalledViaGooglePlay())
+			{
+				// Google Play doesn't allow donations using PayPal,
+				// so we show a link to the project's website instead.
+				uriString = "http://code.google.com/p/rxdroid";
+				titleResId = R.string._title_website;
+				summary = uriString;
+			}
+			else
+			{
+				uriString = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QTBC4AVEYASYU";
+				titleResId = R.string._title_donate;
+				summary = null;
+			}
+
 			final Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setData(uri);
+			intent.setData(Uri.parse(uriString));
+
 			p.setIntent(intent);
+			p.setEnabled(true);
+			p.setTitle(titleResId);
+			p.setSummary(summary);
 		}
 
 		p = findPreference(Settings.Keys.DB_STATS);

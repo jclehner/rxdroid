@@ -282,7 +282,9 @@
 		Zeit eventuell reduziert werden.</string>
 	
 	<string name="_title_compact_action_bar">Kompakte Aktionsleiste</string>
-	<string name="_summary_compact_action_bar">Weniger Icons in der Aktionsleiste anzeigen</string>	
+	<string name="_summary_compact_action_bar">Weniger Icons in der Aktionsleiste anzeigen</string>
+	
+	<string name="_title_website">Website</string>
 	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

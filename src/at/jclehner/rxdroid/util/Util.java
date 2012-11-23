@@ -31,6 +31,7 @@ import java.util.Scanner;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.text.Spannable;
@@ -42,9 +43,9 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.TimePicker;
 import at.jclehner.androidutils.Reflect;
-import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
@@ -399,6 +400,21 @@ public final class Util
 		}
 
 		return sb.toString();
+	}
+
+	public static boolean wasInstalledViaGooglePlay()
+	{
+		final String installer = getInstallerPackageName(RxDroid.getContext().getPackageName());
+		if(installer == null)
+			return false;
+
+		return installer.startsWith("com.android") || installer.startsWith("com.google");
+	}
+
+	public static String getInstallerPackageName(String packageName)
+	{
+		final PackageManager pm = RxDroid.getContext().getPackageManager();
+		return pm.getInstallerPackageName(packageName);
 	}
 
 	public static void closeQuietly(Closeable closeable)
