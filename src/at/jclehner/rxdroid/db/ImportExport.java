@@ -39,8 +39,6 @@ public final class ImportExport
 
 	public interface JsonForeignPersister<T>
 	{
-		//public static final long NO_ID = Integer.MIN_VALUE;
-
 		public long toId(T value);
 		public T fromId(long id);
 
@@ -57,11 +55,11 @@ public final class ImportExport
 
 	static
 	{
-		sPersisters.put(Fraction.class, new JsonPersisters.FractionPersister());
-		sPersisters.put(Date.class, new JsonPersisters.DatePersister());
+		register(Fraction.class, new JsonPersisters.FractionPersister());
+		register(Date.class, new JsonPersisters.DatePersister());
 
-		register(Drug.class, new JsonPersisters.ForeignDrugPersister());
 		register(Schedule.class, new JsonPersisters.ForeignSchedulePersister());
+		register(Drug.class, new JsonPersisters.ForeignDrugPersister());
 	}
 
 	public static <T> void register(Class<? extends T> clazz, JsonPersister<T> persister) {
@@ -82,9 +80,18 @@ public final class ImportExport
 		return new JSONObject().put(DatabaseTableConfig.extractTableName(clazz), array);
 	}
 
-	public static void tableFromJsonObject(JSONObject json, Collection<?> outEntries)
+	public static <T> void tableFromJsonObject(JSONObject json, Class<T> clazz, Collection<T> outEntries)
+			throws JSONException
 	{
-		throw new UnsupportedOperationException();
+		final String tableName = DatabaseTableConfig.extractTableName(clazz);
+		final JSONArray data = json.getJSONArray(tableName);
+
+		for(int i = 0; i != data.length(); ++i)
+		{
+			final T entry = Reflect.newInstance(clazz);
+			entryFromJsonObject(data.getJSONObject(i), entry);
+			outEntries.add(entry);
+		}
 	}
 
 	public static JSONObject entryToJsonObject(Object object) throws JSONException
