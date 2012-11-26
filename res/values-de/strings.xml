@@ -231,7 +231,7 @@
 	<string name="_title_dark_theme">Dunkles Theme</string>
 	<string name="_toast_theme_changed">App wird neu gestartet…</string>
 	
-	<string name="_toast_low_supplies">Vorrat dieses Medikaments ist niedrig.</string>
+	<string name="_toast_low_supplies">Vorrat dieses Medikaments hält bis %1$s.</string>
 	
 	<string name="_title_about">Über</string>
 	<string name="_title_db_status_creating_intakes">Fehlende Einträge erstellen…</string>

@@ -300,11 +300,14 @@ public class NotificationReceiver extends BroadcastReceiver
 			}
 		}
 
+		final boolean isShowingLowSupplyNotification;
+
 		if(lowSupplyDrugCount != 0)
 		{
 			icon = R.drawable.ic_stat_exclamation;
+			isShowingLowSupplyNotification = sb.length() == 0;
 
-			if(sb.length() == 0)
+			if(isShowingLowSupplyNotification)
 			{
 				titleResId = R.string._title_notification_low_supplies;
 
@@ -319,6 +322,8 @@ public class NotificationReceiver extends BroadcastReceiver
 				}
 			}
 		}
+		else
+			isShowingLowSupplyNotification = false;
 
 		final String message = sb.toString();
 		final int currentHash = message.hashCode();
@@ -351,13 +356,16 @@ public class NotificationReceiver extends BroadcastReceiver
 		else
 			builder.setOnlyAlertOnce(true);
 
+
+		// Prevents low supplies from constantly annoying the user with
+		// notification's sound and/or vibration if alarms are repeated.
+		if(isShowingLowSupplyNotification)
+			mode = NOTIFICATION_FORCE_SILENT;
+
 		int defaults = 0;
 
 		if(Settings.getBoolean(Settings.Keys.USE_LED, true))
-		{
-//			builder.setLights(0xff0000ff, 200, 800);
 			defaults |= Notification.DEFAULT_LIGHTS;
-		}
 
 		if(mode != NOTIFICATION_FORCE_SILENT && Settings.getBoolean(Settings.Keys.USE_SOUND, true))
 		{

@@ -463,8 +463,13 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		setDate(cal.getTime(), PAGER_INIT | PAGER_SCROLL);
 	}
 
-	public void onLowSupplyIndicatorClicked(View view) {
-		Toast.makeText(this, R.string._toast_low_supplies, Toast.LENGTH_SHORT).show();
+	public void onLowSupplyIndicatorClicked(View view)
+	{
+		final Drug drug = (Drug) view.getTag();
+		final int daysLeft = Entries.getSupplyDaysLeftForDrug(drug, mDate);
+		final String dateString = DateTime.toNativeDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, daysLeft));
+
+		Toast.makeText(this, getString(R.string._toast_low_supplies, dateString), Toast.LENGTH_LONG).show();
 	}
 
 	@Override
