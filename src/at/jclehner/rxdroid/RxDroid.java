@@ -98,8 +98,12 @@ public class RxDroid extends Application
 		getContext().sendBroadcast(intent);
 	}
 
-	public static String getQuantityString(int id, int quantity, Object... formatArgs) {
-		return getContext().getResources().getQuantityString(id, quantity, quantity, formatArgs);
+	public static String getQuantityString(int id, int quantity, Object... formatArgs)
+	{
+		final Object[] newArgs = new Object[formatArgs.length + 1];
+		newArgs[0] = quantity;
+		System.arraycopy(formatArgs, 0, newArgs, 1, formatArgs.length);
+		return getContext().getResources().getQuantityString(id, quantity, newArgs);
 	}
 
 	public static String getQuantityString(int id, int quantity) {

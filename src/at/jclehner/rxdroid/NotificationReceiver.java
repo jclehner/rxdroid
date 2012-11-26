@@ -315,7 +315,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				else
 				{
 					final String second = drugsWithLowSupplies.get(1).getName();
-					sb.append(RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount, first, second));
+					sb.append(RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount - 1, first, second));
 				}
 			}
 		}
