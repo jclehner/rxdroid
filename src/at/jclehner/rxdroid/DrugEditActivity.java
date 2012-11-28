@@ -63,8 +63,8 @@ import at.jclehner.androidutils.otpm.CheckboxPreferenceHelper;
 import at.jclehner.androidutils.otpm.ListPreferenceWithIntHelper;
 import at.jclehner.androidutils.otpm.MyDialogPreferenceHelper;
 import at.jclehner.androidutils.otpm.OTPM;
-import at.jclehner.androidutils.otpm.PreferenceHelper;
 import at.jclehner.androidutils.otpm.OTPM.CreatePreference;
+import at.jclehner.androidutils.otpm.PreferenceHelper;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -495,7 +495,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		@CreatePreference
 		(
-			titleResId = R.string._title_prefscreen_notifications,
+			titleResId = R.string._title_per_drug_reminders,
 			order = 12,
 			type = ListPreference.class,
 			helper = NotificationsPreferenceHelper.class

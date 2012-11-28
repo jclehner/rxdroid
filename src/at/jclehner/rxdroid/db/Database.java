@@ -76,13 +76,16 @@ public final class Database
 	private static final String TAG = Database.class.getName();
 	private static final boolean LOGV = false;
 
+	/* package */ static final boolean USE_CUSTOM_CACHE = true;
+
 	private static final String JSON_NAME_VERSION = "version";
 	private static final String JSON_NAME_DATA = "data";
 
 	static final Class<?>[] CLASSES = {
 		Drug.class,
 		Intake.class,
-		Schedule.class
+		Schedule.class,
+		//Patient.class
 	};
 
 	static final int ID_VIRTUAL_ENTRY = 0x7fffffff;
@@ -155,9 +158,12 @@ public final class Database
 			sHelper = new DatabaseHelper(context);
 			sDbLoadingTimeMillis = 0;
 
-			// precache entries
-			for(Class clazz : CLASSES)
-				getCached(clazz);
+			if(USE_CUSTOM_CACHE)
+			{
+				// precache entries
+				for(Class clazz : CLASSES)
+					getCached(clazz);
+			}
 
 			sIsLoaded = true;
 			sEventMgr.post("onDatabaseInitialized");
@@ -256,8 +262,21 @@ public final class Database
 		}
 	}
 
-	public static <T extends Entry> T find(Class<T> clazz, int id) {
-		return Entries.findInCollectionById(getCached(clazz), id);
+	public static <T extends Entry> T find(Class<T> clazz, int id)
+	{
+		if(USE_CUSTOM_CACHE)
+			return Entries.findInCollectionById(getCached(clazz), id);
+		else
+		{
+			try
+			{
+				return getDaoChecked(clazz).queryForId(id);
+			}
+			catch(SQLException e)
+			{
+				throw new WrappedCheckedException(e);
+			}
+		}
 	}
 
 	public static <T extends Entry> T get(Class<T> clazz, int id)
@@ -274,12 +293,20 @@ public final class Database
 	}
 
 
-	public static <T extends Entry> List<T> getAll(Class<T> clazz) {
-		return new LinkedList<T>(getCached(clazz));
+	public static <T extends Entry> List<T> getAll(Class<T> clazz)
+	{
+		if(USE_CUSTOM_CACHE)
+			return new LinkedList<T>(getCached(clazz));
+		else
+			return queryForAll(clazz);
 	}
 
-	public static <T extends Entry> int countAll(Class<T> clazz) {
-		return getCached(clazz).size();
+	public static <T extends Entry> int countAll(Class<T> clazz)
+	{
+		if(USE_CUSTOM_CACHE)
+			return getCached(clazz).size();
+		else
+			return getDaoChecked(clazz).getObjectCache().size(clazz);
 	}
 
 	public static boolean hasPendingOperations() {
@@ -360,6 +387,13 @@ public final class Database
 
 	static synchronized <T extends Entry> List<T> getCached(Class<T> clazz)
 	{
+		if(!USE_CUSTOM_CACHE)
+		{
+			//Log.w(TAG, "getCached called", new )
+			//throw new UnsupportedOperationException();
+			return queryForAll(clazz);
+		}
+
 		if(!sCache.containsKey(clazz))
 		{
 			if(!sIsLoaded)
@@ -410,20 +444,23 @@ public final class Database
 		final Class<E> clazz = (Class<E>) entry.getClass();
 		final List<E> cached = getCached(clazz);
 
-		if("create".equals(methodName))
-			cached.add(entry);
-		else if("delete".equals(methodName))
-			cached.remove(entry);
-		else if("update".equals(methodName))
+		if(USE_CUSTOM_CACHE)
 		{
-			final Entry oldEntry = Entries.findInCollectionById(cached, entry.getId());
-			int index = cached.indexOf(oldEntry);
+			if("create".equals(methodName))
+				cached.add(entry);
+			else if("delete".equals(methodName))
+				cached.remove(entry);
+			else if("update".equals(methodName))
+			{
+				final Entry oldEntry = Entries.findInCollectionById(cached, entry.getId());
+				int index = cached.indexOf(oldEntry);
 
-			cached.remove(index);
-			cached.add(index, entry);
+				cached.remove(index);
+				cached.add(index, entry);
+			}
+			else
+				throw new IllegalArgumentException("methodName=" + methodName);
 		}
-		else
-			throw new IllegalArgumentException("methodName=" + methodName);
 
 		final Dao<E, Integer> dao = getDaoChecked(clazz);
 		runDaoMethodInThread(dao, methodName, entry);

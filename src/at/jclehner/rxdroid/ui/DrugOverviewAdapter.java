@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
+import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
@@ -46,7 +47,7 @@ import at.jclehner.rxdroid.widget.DrugNameView;
 public class DrugOverviewAdapter extends AbsDrugAdapter
 {
 	private static final String TAG = DrugOverviewAdapter.class.getName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = BuildConfig.DEBUG;
 
 	private final Timer mTimer;
 

@@ -260,7 +260,7 @@
 	<string name="_title_notification_sound">Notification sound</string>
 	
 	<string name="_title_doses_and_low_supplies">All</string>
-	<string name="_title_low_supplies_only">Low supplies only</string>
+	<string name="_title_low_supplies_only">Refill only</string>
 	
 	<string name="_title_about">About</string>
 	<string name="_title_licenses">Licenses</string>
@@ -310,6 +310,9 @@
 	<string name="_summary_compact_action_bar">Show less icons in the action bar</string>
 	
 	<string name="_title_website">Website</string>
+	
+	<string name="_title_per_drug_reminders">Reminders</string>
+	
 					
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

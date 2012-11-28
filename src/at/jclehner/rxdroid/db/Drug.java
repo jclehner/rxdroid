@@ -27,13 +27,11 @@ import java.util.NoSuchElementException;
 
 import android.util.Log;
 import at.caspase.rxdroid.Fraction;
-import at.jclehner.rxdroid.preferences.FractionPreference;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Hasher;
 
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -124,6 +122,9 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	@DatabaseField(unique = true)
 	private String name;
+
+//	@DatabaseField(foreign = true)
+//	private Patient patient;
 
 	@DatabaseField
 	private int icon;

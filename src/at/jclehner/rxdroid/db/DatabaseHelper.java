@@ -28,18 +28,17 @@ import java.sql.SQLException;
 import java.util.List;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.R;
-import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.SplashScreenActivity;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.dao.ReferenceObjectCache;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
@@ -181,6 +180,16 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 
 		onCreate(getWritableDatabase(), cs);
+	}
+
+	public <D extends Dao<T,?>, T extends Object> D getDao(Class<T> clazz) throws SQLException
+	{
+		final D dao = super.getDao(clazz);
+
+		if(!Database.USE_CUSTOM_CACHE)
+			dao.setObjectCache(WeakObjectCache.getInstance());
+
+		return dao;
 	}
 
 	/* package */ <T> Dao<T, Integer> getDaoChecked(Class<T> clazz)
@@ -387,37 +396,32 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		return false;
 	}
 
-	/*
-	private void backup()
+	/* package */ static class WeakObjectCache extends ReferenceObjectCache
 	{
-		String packageName = mContext.getApplicationInfo().packageName;
+		private static final WeakObjectCache sInstance = new WeakObjectCache();
 
-		File dbDir = new File(Environment.getDataDirectory(), packageName + "/databases");
-		File currentDb = new File(dbDir, DB_NAME);
-	    File backupDb = new File(dbDir, "backup-" + System.currentTimeMillis() / 1000 + ".sqlite");
-
-	    if(!dbDir.exists() || !currentDb.exists() || !dbDir.canWrite() || !backupDb.canWrite())
-	    	throw new DbError(DbError.E_BACKUP);
-
-		try
+		@Override
+		public <T extends Object, ID extends Object> T get(Class<T> clazz, ID id)
 		{
-			FileChannel src = new FileInputStream(currentDb).getChannel();
-			FileChannel dst = new FileOutputStream(backupDb).getChannel();
-
-			dst.transferFrom(src, 0, src.size());
-
-			src.close();
-			dst.close();
+			final T ret = super.get(clazz, id);
+			//Log.d("WeakObjectCache", "get(" + clazz.getSimpleName() + ", " + id + ")");
+			return ret;
 		}
-		catch (FileNotFoundException e)
+
+		@Override
+		public <T extends Object, ID extends Object> void put(Class<T> clazz, ID id, T data)
 		{
-			throw new DbError(DbError.E_BACKUP, e);
+			super.put(clazz, id, data);
+			//Log.d("WeakObjectCache", "put(" + clazz.getSimpleName() + ", " + id + ", " + data + ")");
 		}
-		catch (IOException e)
-		{
-			throw new DbError(DbError.E_BACKUP, e);
+
+		public static WeakObjectCache getInstance() {
+			return sInstance;
+		}
+
+		private WeakObjectCache() {
+			super(true);
 		}
 	}
-	*/
 }
 
