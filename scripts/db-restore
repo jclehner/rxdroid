@@ -28,7 +28,7 @@ echo -n "Pushing database to device ... "
 adb push "$1" "$DTEMP/.rxdroid.db" || die
 
 echo -n "Moving to target directory ... "
-run adb-shell cp "$DTEMP/.rxdroid.db" "$TARGET"
+run adb-shell "cat '$DTEMP/.rxdroid.db' >  '$TARGET'"
 run adb-shell rm "$DTEMP/.rxdroid.db"
 echo "done"
 

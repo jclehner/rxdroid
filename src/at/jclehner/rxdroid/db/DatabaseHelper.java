@@ -21,7 +21,6 @@
 
 package at.jclehner.rxdroid.db;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -114,7 +113,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		private final int mType;
 	}
 
-	public static final int DB_VERSION = 55;
+	// XXX
+	public static final int DB_VERSION = 56;
+	// XXX
+
 	public static final String DB_NAME = "db.sqlite";
 
 	DatabaseHelper(Context context) {
@@ -162,6 +164,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	// !!! Do NOT @Override (crashes on API < 11) !!!
 	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		onUpgrade(db, oldVersion, newVersion);
+	}
+
+	@Override
+	public void close()
+	{
+		super.close();
+
+
 	}
 
 	public void reset()
@@ -223,14 +233,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 		try
 		{
-			final String callbackName;
-
-			if(oldVersion < 54)
-				callbackName = "BeforeDatabaseUpgradeHook";
-			else
-				callbackName = "BeforeDatabaseUpgradeCallback";
-
-			if(runCallback(oldPackageName, callbackName, cs))
+			if(runUpgradeHelperMethodUpgradeDatabase(oldPackageName, cs))
 				++updatedDataCount;
 
 			for(Class<?> clazz : Database.CLASSES)
@@ -324,7 +327,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 
 		return true;
-		//return !oldData.isEmpty();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -333,14 +335,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			IllegalAccessException, InvocationTargetException
 	{
 		final String packageName = Database.class.getPackage().getName() + ".v" + oldVersion;
-		final String updaterClassName = packageName + ".TableUpdater";
+		final String methodName = "update" + clazz.getSimpleName() + "TableEntry";
+		final Method method = getUpgradeHelperMethod(packageName, methodName, clazz);
 
-		final Class<?> updaterClass = Reflect.classForName(updaterClassName);
-		if(updaterClass == null)
-			return false;
-
-		final Method updateMethod = Reflect.getMethod(updaterClass, "update" + clazz.getSimpleName(), Entry.class);
-		if(updateMethod == null)
+		if(method == null)
 			return false;
 
 		final Dao dao = getDao(clazz);
@@ -348,37 +346,52 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 		for(Object entry : entries)
 		{
-			updateMethod.invoke(null, entry);
+			invokeUpgradeHelperMethod(method, entry);
 			dao.update(entry);
 		}
 
 		return true;
 	}
 
-	private boolean runCallback(String packageName, String hookName, ConnectionSource cs)
+	private boolean runUpgradeHelperMethodUpgradeDatabase(String packageName, ConnectionSource cs)
+	{
+		final Method method = getUpgradeHelperMethod(packageName, "upgradeDatabase", ConnectionSource.class);
+
+		if(method == null)
+			return false;
+
+		return invokeUpgradeHelperMethod(method, cs);
+	}
+
+	private Method getUpgradeHelperMethod(String packageName, String methodName, Class<?>... parameterTypes)
 	{
 		try
 		{
-			final Class<?> hook = Class.forName(packageName + "." + hookName);
-			if(LOGV) Log.v(TAG, "  Found " + hookName + " in " + packageName);
+			final Class<?> helper = Class.forName(packageName + ".UpgradeHelper");
+			final Method method = helper.getMethod(methodName, ConnectionSource.class);
 
-			final Constructor<?> ctor = hook.getConstructor(cs.getClass());
-			Runnable r = (Runnable) ctor.newInstance(cs);
-			r.run();
-
-			return true;
+			return method;
 		}
 		catch(ClassNotFoundException e)
 		{
-			// ignore
-		}
-		catch(InstantiationException e)
-		{
-			Log.w(TAG, e);
+			// fall through
 		}
 		catch(NoSuchMethodException e)
 		{
-			Log.w(TAG, e);
+			// fall through
+		}
+
+		if(LOGV) Log.v(TAG, "getUpgradeHelperMethod: no " + methodName + " in " + packageName);
+		return null;
+	}
+
+	private boolean invokeUpgradeHelperMethod(Method method, Object... args)
+	{
+		try
+		{
+			method.invoke(null, args);
+			Log.i(TAG, "Invoked " + method.getName());
+			return true;
 		}
 		catch(IllegalArgumentException e)
 		{

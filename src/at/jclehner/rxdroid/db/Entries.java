@@ -21,9 +21,9 @@
 
 package at.jclehner.rxdroid.db;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,21 +42,25 @@ public final class Entries
 		"MORNING", "NOON", "EVENING", "NIGHT"
 	};
 
-	private static final List<Intake> sConsolidatedIntakes =
-			new LinkedList<Intake>();
-
-	/*
-	private static final List<Intake> sConsolidatedIntakes = new ArrayList<Intake>();
-
-	public static Intake findAllIntakesConsolidated(Drug drug, Date date, int doseTime)
+	public static List<Drug> getAllDrugs(int patientId)
 	{
-		final List<Intake> intakes = Intake.findAll(drug, date, doseTime);
+		final List<Drug> list = new ArrayList<Drug>();
 
-		Intake intake = new Intake();
+		for(Drug drug : Database.getCached(Drug.class))
+		{
+			final boolean matches;
 
-		return intake;
+			if(patientId == 0)
+				matches = (drug.getPatient() == null || drug.getPatient().isDefaultPatient());
+			else
+				matches = (patientId == drug.getPatientId());
+
+			if(matches)
+				list.add(drug);
+		}
+
+		return list;
 	}
-	*/
 
 	public static boolean hasMissingIntakesBeforeDate(Drug drug, Date date)
 	{
@@ -228,17 +232,6 @@ public final class Entries
 
 			default:
 				return 1.0;
-		}
-	}
-
-	private static void fillConsolidatedIntakesListMaybe()
-	{
-		synchronized(sConsolidatedIntakes)
-		{
-			if(!sConsolidatedIntakes.isEmpty())
-				return;
-
-			final List<Intake> intakes = Database.getAll(Intake.class);
 		}
 	}
 

@@ -123,8 +123,10 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField(unique = true)
 	private String name;
 
-//	@DatabaseField(foreign = true)
-//	private Patient patient;
+	// XXX
+	@DatabaseField(foreign = true)
+	private Patient patient;
+	// XXX
 
 	@DatabaseField
 	private int icon;
@@ -154,12 +156,17 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField
 	private int repeatMode= REPEAT_DAILY;
 
+
+	@DatabaseField
+	private long repeatArg = 0;
+
 	/**
 	 * Defines the repeat origin.
 	 *
+	 *
+	 *
 	 * For every repeat other than {@link #REPEAT_DAILY}, this field holds a specific value,
-	 * allowing {@link #hasDoseOnDate(Date)} to determine whether a dose is pending
-	 * on a specific date.
+	 * allowing {@link #hasDoseOnDate(Date)} to determine whether a dose is scheduled on a specific date.
 	 *
 	 * <ul>
 	 *     <li><code>FREQ_EVERY_OTHER_DAY</code>: field is set to a date (in milliseconds) where this drug's
@@ -168,9 +175,6 @@ public class Drug extends Entry implements Comparable<Drug>
 	 *     <li><code>FREQ_WEEKLY</code>: field is set to a week day value from {@link java.util.Calendar}.</li>
 	 * </ul>
 	 */
-	@DatabaseField
-	private long repeatArg = 0;
-
 	@DatabaseField
 	private Date repeatOrigin;
 
@@ -508,6 +512,18 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.schedule = schedule;
 	}
 
+	public void setPatient(Patient patient) {
+		this.patient = patient;
+	}
+
+	public Patient getPatient() {
+		return Database.find(Patient.class, getPatientId());
+	}
+
+	public int getPatientId() {
+		return patient != null ? patient.id : Patient.DEFAULT_PATIENT_ID;
+	}
+
 	public /* package */ Date getLastAutoIntakeCreationDate() {
 		return lastAutoIntakeCreationDate;
 	}
@@ -659,12 +675,10 @@ public class Drug extends Entry implements Comparable<Drug>
 	private boolean hasDoseOnWeekday(int calWeekday)
 	{
 		if(repeatMode != REPEAT_WEEKDAYS)
-			throw new IllegalStateException("repeat != FREQ_WEEKDAYS");
+			throw new IllegalStateException("repeatMode != FREQ_WEEKDAYS");
 
-		// first, translate Calendar's weekday representation to our
-		// own.
-
-		int weekday = CollectionUtils.indexOf(calWeekday, Constants.WEEK_DAYS);
+		// first, translate Calendar's weekday representation to our own
+		final int weekday = CollectionUtils.indexOf(calWeekday, Constants.WEEK_DAYS);
 		if(weekday == -1)
 			throw new IllegalArgumentException("Argument " + calWeekday + " does not map to a valid weekday");
 

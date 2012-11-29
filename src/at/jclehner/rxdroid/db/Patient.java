@@ -8,6 +8,8 @@ public class Patient extends Entry implements Comparable<Patient>
 {
 	private static final long serialVersionUID = -7632154835094837404L;
 
+	public static final int DEFAULT_PATIENT_ID = 0;
+
 	@DatabaseField(unique = true)
 	private String name;
 

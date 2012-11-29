@@ -86,7 +86,6 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	private static final int CMENU_TOGGLE_INTAKE = 0;
 	private static final int CMENU_EDIT_DRUG = 2;
 	private static final int CMENU_IGNORE_DOSE = 4;
-	private static final int CMENU_HIGHLIGHT = 6;
 
 	private static final int DIALOG_INFO_SORTING = 0;
 
@@ -100,9 +99,11 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	private ViewPager mPager;
 	private TextView mTextDate;
 
-	private Date mDate;
+	private Date mOriginalDate;
+	private Date mCurrentDate;
 
 	private boolean mShowingAll = false;
+	private int mCurrentPatientId = 0;
 
 	private int mSwipeDirection = 0;
 	private int mLastPage = -1;
@@ -156,13 +157,15 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		RxDroid.setIsVisible(this, true);
 
 		final Intent intent = getIntent();
+		Date date = null;
+
 		if(intent != null)
-			mDate = (Date) intent.getSerializableExtra(EXTRA_DATE);
+			date = (Date) intent.getSerializableExtra(EXTRA_DATE);
 
-		if(mDate == null)
-			mDate = Settings.getActiveDate();
+		if(date == null)
+			date = Settings.getActiveDate();
 
-		setDate(mDate, PAGER_INIT);
+		setDate(date, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
 	}
 
@@ -198,28 +201,6 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		/*menu.add(0, MENU_ADD, 0, R.string._title_add).setIcon(android.R.drawable.ic_menu_add);
-
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-		{
-			// Title is set in onPrepareOptionsMenu
-
-			menu.add(0, MENU_SELECT_DATE, 0, null)
-				.setIcon(R.drawable.ic_menu_calendar_light)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-			;
-		}
-
-		menu.add(0, MENU_PREFERENCES, 0, R.string._title_preferences).setIcon(android.R.drawable.ic_menu_preferences);
-		menu.add(0, MENU_TOGGLE_FILTERING, 0, R.string._title_show_all).setIcon(android.R.drawable.ic_menu_view);
-
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-		{
-			//menu.getItem(MENU_ADD).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-			//menu.getItem(MENU_PREFERENCES).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			//menu.getItem(MENU_TOGGLE_FILTERING).setShowAsAction(MenuItem.SHOW_AS_ACTION_);
-		}*/
-
 		final int menuResId;
 
 		if(Settings.getBoolean(Settings.Keys.COMPACT_ACTION_BAR, false))
@@ -237,7 +218,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	{
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 		{
-			final int titleResId = DateTime.isToday(mDate) ? R.string._title_go_to_date : R.string._title_today;
+			final int titleResId = isCurrentDateActive() ? R.string._title_go_to_date : R.string._title_today;
 			menu.findItem(R.id.menuitem_date).setTitle(titleResId);
 		}
 
@@ -253,7 +234,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		{
 			case R.id.menuitem_date:
 			{
-				if(mDate.equals(Settings.getActiveDate()))
+				if(isCurrentDateActive())
 					mDateClickListener.onLongClick(null);
 				else
 					mDateClickListener.onClick(null);
@@ -278,7 +259,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			case R.id.menuitem_toggle_filtering:
 			{
 				mShowingAll = !mShowingAll;
-				setDate(mDate, PAGER_INIT);
+				setDate(mCurrentDate, PAGER_INIT);
 				return true;
 			}
 
@@ -326,7 +307,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 					else
 					{
 						MutableFraction dose = new MutableFraction();
-						for(Intake intake : Entries.findIntakes(drug, mDate, doseTime))
+						for(Intake intake : Entries.findIntakes(drug, mCurrentDate, doseTime))
 						{
 							dose.add(intake.getDose());
 							Database.delete(intake);
@@ -348,7 +329,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 						@Override
 						public boolean onMenuItemClick(MenuItem item)
 						{
-							Database.create(new Intake(drug, mDate, doseTime));
+							Database.create(new Intake(drug, doseView.getDate(), doseTime));
 							return true;
 						}
 					});
@@ -390,7 +371,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(Settings.Keys.THEME_IS_DARK.equals(key))
 			finish(); // TODO fix this naughty hack
 		else if(mIsShowing)
-			setDate(mDate, PAGER_INIT);
+			setDate(mCurrentDate, PAGER_INIT);
 	}
 
 	@Override
@@ -402,24 +383,17 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			return new ViewStub(this);
 		}
 
-		if(LOGV) Log.d(TAG, "makeView: offset=" + offset);
-
 		final View v = getLayoutInflater().inflate(R.layout.drug_list_fragment, null);
 		final AutoDragSortListView listView = (AutoDragSortListView) v.findViewById(android.R.id.list);
 		final TextView emptyView = (TextView) v.findViewById(android.R.id.empty);
 
-		final Calendar cal = DateTime.calendarFromDate(mDate);
+		final Date date = DateTime.add(mOriginalDate, Calendar.DAY_OF_MONTH, offset);
 
-		if(mSwipeDirection == 0)
-			cal.add(Calendar.DAY_OF_MONTH, offset);
-		else
-			cal.add(Calendar.DAY_OF_MONTH, mSwipeDirection < 0 ? -1 : 1);
+		if(LOGV) Log.d(TAG, "makeView: date=" + DateTime.toDateString(date));
 
-		if(LOGV) Log.v(TAG, "  cal=" + DateTime.toString(cal));
-
-		final List<Drug> drugs = Database.getAll(Drug.class);
+		final List<Drug> drugs = Entries.getAllDrugs(mCurrentPatientId);
 		Collections.sort(drugs);
-		updateListAdapter(listView, cal.getTime(), drugs);
+		updateListAdapter(listView, date, drugs);
 
 		final int emptyResId = drugs.isEmpty() ? R.string.virtual_msg_no_drugs : R.string._msg_no_doses_on_this_day;
 		emptyView.setText(getString(emptyResId, getString(R.string._title_add)));
@@ -437,8 +411,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 		if(toastIfPastMaxHistoryAge(date))
 			return;
-		else if(!date.equals(mDate))
-			throw new IllegalStateException("Activity date " + mDate + " differs from DoseView date " + date);
+		else if(!date.equals(mCurrentDate))
+			throw new IllegalStateException("Activity date " + mCurrentDate + " differs from DoseView date " + date);
 
 		final Bundle args = new Bundle();
 		args.putInt(IntakeDialog.ARG_DRUG_ID, doseView.getDrug().getId());
@@ -451,7 +425,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	public void onMissedIndicatorClicked(View view)
 	{
 		final Drug drug = (Drug) view.getTag();
-		final Calendar cal = DateTime.calendarFromDate(mDate);
+		final Calendar cal = DateTime.calendarFromDate(mCurrentDate);
 
 		do
 		{
@@ -466,8 +440,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	public void onLowSupplyIndicatorClicked(View view)
 	{
 		final Drug drug = (Drug) view.getTag();
-		final int daysLeft = Entries.getSupplyDaysLeftForDrug(drug, mDate);
-		final String dateString = DateTime.toNativeDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, daysLeft));
+		final int daysLeft = Entries.getSupplyDaysLeftForDrug(drug, mCurrentDate);
+		final String dateString = DateTime.toNativeDate(DateTime.add(mCurrentDate, Calendar.DAY_OF_MONTH, daysLeft));
 
 		Toast.makeText(this, getString(R.string._toast_low_supplies, dateString), Toast.LENGTH_LONG).show();
 	}
@@ -529,7 +503,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	@TargetApi(11)
 	private void setDate(Date date, int flags)
 	{
-		if(LOGV) Log.v(TAG, "setDate: date=" + date + ", flags=" + flags);
+		//if(LOGV) Log.v(TAG, "setDate: date=" + date + ", flags=" + flags);
 
 		if(!mIsShowing)
 		{
@@ -541,12 +515,14 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			return;
 
 
-		mDate = date;
-		getIntent().putExtra(EXTRA_DATE, mDate);
+		mCurrentDate = date;
+		getIntent().putExtra(EXTRA_DATE, date);
 
 		if((flags & PAGER_INIT) != 0)
 		{
 			final boolean smoothScroll = (flags & PAGER_SCROLL) != 0;
+
+			mOriginalDate = date;
 
 			mSwipeDirection = 0;
 			mLastPage = -1;
@@ -601,6 +577,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		updateDateString();
 	}
 
+	private boolean isCurrentDateActive() {
+		return DateTime.isToday(mCurrentDate);
+	}
+
 	private void updateListAdapter(DragSortListView listView, Date date, List<Drug> drugs)
 	{
 		if(listView == null)
@@ -630,12 +610,13 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	@TargetApi(11)
 	private void updateDateString()
 	{
-		if(mDate == null)
+		if(mCurrentDate == null)
 			return;
 
-		final SpannableString dateString = new SpannableString(DateFormat.getDateFormat(this).format(mDate.getTime()));
+		final SpannableString dateString =
+				new SpannableString(DateFormat.getDateFormat(this).format(mCurrentDate.getTime()));
 
-		if(DateTime.isToday(mDate))
+		if(isCurrentDateActive())
 			Util.applyStyle(dateString, new UnderlineSpan());
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
@@ -718,7 +699,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			dialog.show();
 			return true;*/
 
-			DatePickerFragment datePicker = DatePickerFragment.newInstance(mDate, DrugListActivity.this);
+			DatePickerFragment datePicker = DatePickerFragment.newInstance(mCurrentDate, DrugListActivity.this);
 			datePicker.show(getSupportFragmentManager(), "datePicker");
 			return true;
 		}
@@ -738,8 +719,6 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		@Override
 		public void onPageSelected(int page)
 		{
-			if(LOGV) Log.v(TAG, "onPageSelected: page=" + page);
-
 			mPage = page;
 
 			//final int swipeDirection;
@@ -752,13 +731,15 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			else
 				mSwipeDirection = mPage - mLastPage;
 
-			if(LOGV) Log.v(TAG, "  swipeDirection=" + mSwipeDirection);
-
 			if(mSwipeDirection != 0)
 			{
-				if(LOGV) Log.v(TAG, "  mDate: " + mDate);
-				setDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, mSwipeDirection), 0);
+				final Date date = DateTime.add(mCurrentDate, Calendar.DAY_OF_MONTH, mSwipeDirection);
+				setDate(date, 0);
+				if(LOGV) Log.d(TAG, "onPageSelected: swipe " + (mSwipeDirection < 0 ? "right" : "left"));
+
 			}
+			else
+				if(LOGV) Log.d(TAG, "onPageSelected: no swipe");
 
 			mLastPage = page;
 		}
@@ -809,14 +790,14 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			}
 
 			if(entry instanceof Drug)
-				setDate(mDate, PAGER_INIT);
+				setDate(mCurrentDate, PAGER_INIT);
 		}
 
 		@Override
 		public void onEntryCreated(Entry entry, int flags)
 		{
 			if(entry instanceof Drug)
-				setDate(mDate, PAGER_INIT);
+				setDate(mCurrentDate, PAGER_INIT);
 		}
 	};
 
@@ -825,13 +806,13 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		@Override
 		public void onDoseTimeBegin(Date date, int doseTime)
 		{
-			if(!date.equals(mDate))
+			if(!date.equals(mCurrentDate))
 				setDate(date, PAGER_INIT);
 		}
 
 		public void onDoseTimeEnd(Date date, int doseTime)
 		{
-			setDate(mDate, PAGER_INIT);
+			setDate(mCurrentDate, PAGER_INIT);
 		}
 	};
 }

@@ -85,7 +85,9 @@ public final class Database
 		Drug.class,
 		Intake.class,
 		Schedule.class,
-		//Patient.class
+		// XXX
+		Patient.class
+		// XXX
 	};
 
 	static final int ID_VIRTUAL_ENTRY = 0x7fffffff;
