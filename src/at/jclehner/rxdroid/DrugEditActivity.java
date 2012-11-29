@@ -1023,6 +1023,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		private static final int NOTIFY_SUPPLIES_ONLY = 1;
 		private String[] mEntries;
 
+		@SuppressWarnings("unused")
 		public NotificationsPreferenceHelper() {
 			// TODO Auto-generated constructor stub
 		}

@@ -30,6 +30,9 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -379,7 +382,16 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				@Override
 				public boolean onPreferenceClick(Preference preference)
 				{
-					Database.exportDatabaseToFile();
+					try
+					{
+						final JSONObject json = Database.exportDatabaseToJson();
+						Database.importDatabaseFromJson(json);
+					}
+					catch(JSONException e)
+					{
+						Log.w(TAG, e);
+					}
+
 					return true;
 				}
 			});

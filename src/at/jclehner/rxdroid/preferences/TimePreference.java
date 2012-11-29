@@ -230,17 +230,6 @@ public class TimePreference extends MyDialogPreference<DumbTime>
 		return mDialogTime;
 	}
 
-	private void updateSetButton()
-	{
-		if(mSetButton != null)
-		{
-			final DumbTime begin = getConstraint(IDX_AFTER);
-			final DumbTime end = getConstraint(IDX_BEFORE);
-
-			mSetButton.setEnabled(mDialogTime.isWithinRange(begin, end, mWrapFlags != 0));
-		}
-	}
-
 	private boolean isTimeWithinConstraints(DumbTime time)
 	{
 		final DumbTime after = getConstraint(IDX_AFTER);

@@ -30,6 +30,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -55,6 +56,7 @@ import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.table.DatabaseTableConfig;
 
 /**
  * All DB access goes here.
@@ -342,24 +344,45 @@ public final class Database
 		return obj;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static void importDatabaseFromJson(JSONObject json) throws JSONException
 	{
 		final int version = json.getInt(JSON_NAME_VERSION);
 		if(version != DatabaseHelper.DB_VERSION)
 			throw new UnsupportedOperationException();
 
-		final JSONArray data = json.getJSONArray(JSON_NAME_DATA);
-
-		for(int i = 0; i != data.length(); ++i)
+		synchronized(LOCK_INIT)
 		{
-			final JSONObject table = data.getJSONObject(i);
-			//table.get
+			sIsLoaded = false;
+			sCache.clear();
 
+			final JSONArray data = json.getJSONArray(JSON_NAME_DATA);
 
+			for(int i = 0; i != data.length(); ++i)
+			{
+				final JSONObject table = data.getJSONObject(i);
 
+				for(Class clazz : CLASSES)
+				{
+					final String tableName = DatabaseTableConfig.extractTableName(clazz);
+
+					if(table.has(tableName))
+					{
+						final List entries = new ArrayList();
+						ImportExport.tableFromJsonObject(table, clazz, entries);
+
+						for(Object entry : entries)
+							createOrUpdateWithoutMagic(entry);
+
+						sCache.put(clazz, entries);
+					}
+				}
+			}
+
+			sEventMgr.post("onDatabaseInitialized");
+
+			sIsLoaded = true;
 		}
-
-
 	}
 
 	public static void exportDatabaseToFile()
@@ -432,6 +455,21 @@ public final class Database
 
 	private static <T> Dao<T, Integer> getDaoChecked(Class<T> clazz) {
 		return sHelper.getDaoChecked(clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void createOrUpdateWithoutMagic(Object entry)
+	{
+		try
+		{
+			@SuppressWarnings("rawtypes")
+			final Dao dao = sHelper.getDao(entry.getClass());
+			dao.createOrUpdate(entry);
+		}
+		catch (SQLException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -555,7 +593,7 @@ public final class Database
 		if(sHelper == null)
 		{
 			Log.w(TAG, "Database not initialized - initializing it now...");
-			Database.init();
+			init();
 		}
 
 		try

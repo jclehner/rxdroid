@@ -31,7 +31,6 @@ import java.util.TimeZone;
 
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.util.SparseArray;
 import at.jclehner.rxdroid.PerThreadInstance;
 import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.DumbTime;
@@ -360,6 +359,7 @@ public final class DateTime
 			super.set(field, value);
 		}
 
+		@SuppressWarnings("unused")
 		private void setTimeZoneInternal(TimeZone timezone) {
 			super.setTimeZone(timezone);
 		}

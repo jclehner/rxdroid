@@ -28,7 +28,6 @@ import at.caspase.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.Hasher;
 import at.jclehner.rxdroid.util.Util;
 
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -74,6 +73,7 @@ public class Intake extends Entry
 	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction dose;
 
+	@SuppressWarnings("unused")
 	@DatabaseField
 	private boolean wasAutoCreated = false;
 

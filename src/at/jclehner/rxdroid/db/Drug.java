@@ -25,7 +25,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
-import android.util.Log;
 import at.caspase.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Constants;
@@ -303,8 +302,6 @@ public class Drug extends Entry implements Comparable<Drug>
 		}
 		else
 			lastAutoIntakeCreationDate = null;
-
-		Log.d(TAG, "setAutoAddIntakesEnabled: lastAutoIntakeCreationDate=" + lastAutoIntakeCreationDate);
 	}
 
 	public boolean isAutoAddIntakesEnabled() {
@@ -587,7 +584,7 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	@Override
 	public String toString() {
-		return name;
+		return "drug " + name;
 	}
 
 	@Override

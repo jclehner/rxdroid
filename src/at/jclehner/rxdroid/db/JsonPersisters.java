@@ -73,6 +73,7 @@ public final class JsonPersisters
 		{
 			final Drug drug = new Drug();
 			drug.id = (int) id;
+
 			return drug;
 		}
 	}

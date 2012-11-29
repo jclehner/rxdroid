@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.util.Log;
@@ -121,6 +122,7 @@ public final class Reflect
 		}
 		catch(IllegalArgumentException e)
 		{
+			Log.e(TAG, "setFieldValue: value=" + value);
 			throw new WrappedCheckedException(e);
 		}
 		catch(IllegalAccessException e)
@@ -163,6 +165,28 @@ public final class Reflect
 		}
 
 		throw new WrappedCheckedException(ex);
+	}
+
+	public static List<Field> getAllFields(Class<?> clazz) {
+		return getAllFieldsUpTo(clazz, null);
+	}
+
+	public static <T> List<Field> getAllFieldsUpTo(Class<T> clazz, Class<? super T> superClazz)
+	{
+		if(clazz == Object.class)
+			throw new IllegalArgumentException();
+
+		final List<Field> fields = new ArrayList<Field>();
+
+		Class<?> cls = clazz;
+
+		do
+		{
+			getDeclaredFields(cls, fields);
+
+		} while((cls != superClazz) && ((cls = cls.getSuperclass()) != Object.class));
+
+		return fields;
 	}
 
 	/**
@@ -287,6 +311,10 @@ public final class Reflect
 			types[i] = args[i].getClass();
 
 		return types;
+	}
+
+	private static void getDeclaredFields(Class<?> clazz, List<Field> outFields) {
+		outFields.addAll(Arrays.asList(clazz.getDeclaredFields()));
 	}
 
 	@SuppressWarnings("unchecked")

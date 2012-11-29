@@ -286,14 +286,12 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			Database.registerEventListener(this);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onDetachedFromWindow()
 	{
 		super.onDetachedFromWindow();
 
 		changeBackground(0);
-
 		Database.unregisterEventListener(this);
 	}
 

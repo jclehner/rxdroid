@@ -118,13 +118,4 @@ public class DosePreference extends FractionPreference
 
 		return doseTime;
 	}
-
-	private final OnClickListener mViewClickListener = new OnClickListener() {
-
-		@Override
-		public void onClick(View v)
-		{
-			DosePreference.this.onClick();
-		}
-	};
 }

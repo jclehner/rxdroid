@@ -3,7 +3,6 @@ package at.jclehner.rxdroid.db;
 import java.sql.SQLException;
 
 import at.caspase.rxdroid.Fraction;
-import at.jclehner.rxdroid.db.ImportExport.JsonPersister;
 
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;

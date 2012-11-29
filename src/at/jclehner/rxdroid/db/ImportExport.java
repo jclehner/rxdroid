@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
 import at.caspase.rxdroid.Fraction;
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.util.CollectionUtils;
@@ -20,6 +21,11 @@ import com.j256.ormlite.table.DatabaseTableConfig;
 public final class ImportExport
 {
 	private static final String TAG = ImportExport.class.getName();
+
+	public @interface Jsonable
+	{
+		Class<?> persister() default Void.class;
+	}
 
 	public interface JsonPersister<T>
 	{
@@ -99,7 +105,7 @@ public final class ImportExport
 		final Class<?> clazz = object.getClass();
 		final JSONObject json = new JSONObject();
 
-		for(Field f : clazz.getDeclaredFields())
+		for(Field f : Reflect.getAllFields(clazz))
 		{
 			Annotation a = f.getAnnotation(DatabaseField.class);
 			if(a == null)
@@ -137,7 +143,7 @@ public final class ImportExport
 	{
 		final Class<?> clazz = outObject.getClass();
 
-		for(Field f : clazz.getFields())
+		for(Field f : Reflect.getAllFields(clazz))
 		{
 			Annotation a = f.getAnnotation(DatabaseField.class);
 			if(a == null)
@@ -147,6 +153,8 @@ public final class ImportExport
 			final String name = getColumnName(f, a);
 			final Object value;
 
+			Log.d(TAG, "  (" + type + ") + " + name);
+
 			if(!isForeignField(f, a))
 			{
 				if(isJsonable(type))
@@ -154,40 +162,35 @@ public final class ImportExport
 				else if(isFloat(type))
 					value = (float) json.getDouble(name);
 				else
-					value = fromJsonStringInternal(json.getString(name), clazz);
+				{
+					final String string = json.isNull(name) ? null : json.getString(name);
+					value = fromJsonStringInternal(string, type);
+				}
 			}
 			else
 				value = fromForeignIdInternal(json.getLong(name), type);
 
-			try
-			{
-				f.set(outObject, value);
-			}
-			catch(IllegalArgumentException e)
-			{
-				throw new JSONException(e.getMessage());
-			}
-			catch(IllegalAccessException e)
-			{
-				throw new JSONException(e.getMessage());
-			}
+			if(value == JSONObject.NULL)
+				Reflect.setFieldValue(f, outObject, null);
+			else
+				Reflect.setFieldValue(f, outObject, value);
 		}
 	}
 
-	public static JsonPersister<?> getPersister(Class<?> clazz) throws JSONException
+	public static JsonPersister<?> getPersister(Class<?> type) throws JSONException
 	{
-		final JsonPersister<?> persister = sPersisters.get(clazz);
+		final JsonPersister<?> persister = sPersisters.get(type);
 		if(persister == null)
-			throw new JSONException("No registered persister for " + clazz.getName());
+			throw new JSONException("No registered persister for " + type.getName());
 
 		return persister;
 	}
 
-	public static JsonForeignPersister<?> getForeignPersister(Class<?> clazz) throws JSONException
+	public static JsonForeignPersister<?> getForeignPersister(Class<?> type) throws JSONException
 	{
-		final JsonForeignPersister<?> persister = sForeignPersisters.get(clazz);
+		final JsonForeignPersister<?> persister = sForeignPersisters.get(type);
 		if(persister == null)
-			throw new JSONException("No registered foreign persister for " + clazz.getName());
+			throw new JSONException("No registered foreign persister for " + type.getName());
 
 		return persister;
 	}
@@ -221,9 +224,9 @@ public final class ImportExport
 		return persister.toJsonString(value);
 	}
 
-	private static Object fromJsonStringInternal(String string, Class<?> clazz) throws JSONException
+	private static Object fromJsonStringInternal(String string, Class<?> type) throws JSONException
 	{
-		final JsonPersister<?> persister = getPersister(clazz);
+		final JsonPersister<?> persister = getPersister(type);
 
 		if(string == null || string.length() == 0)
 			return persister.nullValue();
@@ -250,12 +253,12 @@ public final class ImportExport
 		String.class
 	};
 
-	private static boolean isJsonable(Class<?> clazz) {
-		return CollectionUtils.indexOfByReference(clazz, JSONABLE) != -1;
+	private static boolean isJsonable(Class<?> type) {
+		return CollectionUtils.indexOfByReference(type, JSONABLE) != -1;
 	}
 
-	private static boolean isFloat(Class<?> clazz) {
-		return clazz == float.class || clazz == Float.class;
+	private static boolean isFloat(Class<?> type) {
+		return type == float.class || type == Float.class;
 	}
 
 	private ImportExport() {}

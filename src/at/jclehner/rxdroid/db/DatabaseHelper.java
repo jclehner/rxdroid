@@ -214,7 +214,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean upgrade(ConnectionSource cs, int oldVersion, int newVersion)
 	{
 		if(oldVersion > newVersion)
