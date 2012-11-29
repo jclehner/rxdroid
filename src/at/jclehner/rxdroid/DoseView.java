@@ -216,7 +216,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			switch(action)
 			{
 				case MotionEvent.ACTION_DOWN:
-					changeBackground(R.drawable.doseview_background_selected);
+					changeBackground(R.drawable.generic_pressed);
 					break;
 
 				case MotionEvent.ACTION_UP:
@@ -301,7 +301,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
 
 		if(gainFocus)
-			changeBackground(R.drawable.doseview_background_selected);
+			changeBackground(R.drawable.generic_pressed);
 		else
 			changeBackground(0);
 

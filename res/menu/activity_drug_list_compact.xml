@@ -3,8 +3,14 @@
 
 		<item android:id="@+id/menuitem_add"
 		android:title="@string/_title_add"
-		android:icon="@android:drawable/ic_menu_add"
+		android:icon="@drawable/ic_menu_new"
 		android:showAsAction="never"		
+	/>
+		
+	<item android:id="@+id/menuitem_patient"
+		android:title="@string/_title_patient"
+		android:icon="@drawable/ic_menu_patient"
+		android:showAsAction="always"
 	/>
 		
 	<item android:id="@+id/menuitem_date"

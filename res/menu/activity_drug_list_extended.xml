@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
+		
+	<item android:id="@+id/menuitem_add"
+		android:title="@string/_title_add"
+		android:icon="@drawable/ic_menu_new"
+		android:showAsAction="always"		
+	/>	
 	
 	<item android:id="@+id/menuitem_toggle_filtering"
 		android:title="@string/_title_show_all"
@@ -7,10 +13,10 @@
 		android:showAsAction="always"
 	/>
 	
-	<item android:id="@+id/menuitem_add"
-		android:title="@string/_title_add"
-		android:icon="@android:drawable/ic_menu_add"
-		android:showAsAction="always"		
+	<item android:id="@+id/menuitem_patient"
+		android:title="@string/_title_patient"
+		android:icon="@drawable/ic_menu_patient"
+		android:showAsAction="always"
 	/>
 		
 	<item android:id="@+id/menuitem_date"

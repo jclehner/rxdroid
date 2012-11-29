@@ -32,6 +32,7 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
@@ -88,6 +89,11 @@ public enum AutoIntakeCreator implements
 	@Override
 	public void onDatabaseInitialized()
 	{
+		if(Database.countAll(Patient.class) == 0)
+			Database.create(new Patient(), Database.FLAG_DONT_NOTIFY_LISTENERS);
+		else
+			Log.d(TAG, "NOT CREATING");
+
 		SplashScreenActivity.setStatusMessage(R.string._title_db_status_creating_intakes);
 
 		for(Drug drug : Database.getAll(Drug.class))

@@ -62,6 +62,7 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 import at.caspase.rxdroid.Fraction.MutableFraction;
+import at.jclehner.androidutils.DialogFragmentWithListener;
 import at.jclehner.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.jclehner.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
 import at.jclehner.rxdroid.db.Database;
@@ -69,6 +70,7 @@ import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.ui.DrugOverviewAdapter;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
@@ -103,7 +105,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	private Date mCurrentDate;
 
 	private boolean mShowingAll = false;
-	private int mCurrentPatientId = 0;
+	private int mCurrentPatientId = Patient.DEFAULT_PATIENT_ID;
 
 	private int mSwipeDirection = 0;
 	private int mLastPage = -1;
@@ -241,7 +243,64 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 				return true;
 			}
+			case R.id.menuitem_patient:
+			{
+				final DialogFragmentWithListener dialog = new DialogFragmentWithListener() {
 
+					@Override
+					public Dialog onCreateDialog(Bundle savedInstanceState)
+					{
+						final List<Patient> patients = Database.getAll(Patient.class);
+						final String[] names = new String[patients.size()];
+
+						int checkedItem = -1;
+
+						for(int i = 0; i != names.length; ++i)
+						{
+							final Patient p = patients.get(i);
+
+							if(!p.isDefaultPatient())
+								names[i] = p.getName();
+							else
+								names[i] = getString(R.string._title_me);
+
+							if(mCurrentPatientId == p.getId())
+								checkedItem = i;
+						}
+
+						final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+						ab.setTitle(R.string._title_patient);
+						ab.setSingleChoiceItems(names, checkedItem, this);
+						ab.setNeutralButton(R.string._title_add, this);
+
+						return ab.create();
+					}
+
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						final List<Patient> patients = Database.getAll(Patient.class);
+
+						if(which == Dialog.BUTTON_NEUTRAL)
+						{
+							final Patient patient = new Patient();
+							patient.setName("Patient " + patients.size());
+							Database.create(patient);
+							return;
+						}
+
+						mCurrentPatientId = patients.get(which).getId();
+
+						Log.d(TAG, "mCurrentPatientId=" + mCurrentPatientId);
+
+						invalidateListView();
+						dismiss();
+					}
+				};
+
+				dialog.show(getSupportFragmentManager(), "patients");
+				return true;
+			}
 			case R.id.menuitem_add:
 			{
 				Intent intent = new Intent(Intent.ACTION_INSERT);
@@ -259,7 +318,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			case R.id.menuitem_toggle_filtering:
 			{
 				mShowingAll = !mShowingAll;
-				setDate(mCurrentDate, PAGER_INIT);
+				invalidateListView();
 				return true;
 			}
 
@@ -371,7 +430,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(Settings.Keys.THEME_IS_DARK.equals(key))
 			finish(); // TODO fix this naughty hack
 		else if(mIsShowing)
-			setDate(mCurrentDate, PAGER_INIT);
+			invalidateListView();
 	}
 
 	@Override
@@ -499,6 +558,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 	private static final int PAGER_SCROLL = 1;
 	private static final int PAGER_INIT = 1 << 1;
+
+	private void invalidateListView() {
+		setDate(mCurrentDate, PAGER_INIT);
+	}
 
 	@TargetApi(11)
 	private void setDate(Date date, int flags)
@@ -790,14 +853,14 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			}
 
 			if(entry instanceof Drug)
-				setDate(mCurrentDate, PAGER_INIT);
+				invalidateListView();
 		}
 
 		@Override
 		public void onEntryCreated(Entry entry, int flags)
 		{
 			if(entry instanceof Drug)
-				setDate(mCurrentDate, PAGER_INIT);
+				invalidateListView();
 		}
 	};
 
@@ -812,7 +875,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 		public void onDoseTimeEnd(Date date, int doseTime)
 		{
-			setDate(mCurrentDate, PAGER_INIT);
+			invalidateListView();
 		}
 	};
 }

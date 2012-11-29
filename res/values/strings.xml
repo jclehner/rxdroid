@@ -312,8 +312,9 @@
 	<string name="_title_website">Website</string>
 	
 	<string name="_title_per_drug_reminders">Reminders</string>
-	
-					
+	<string name="_title_me">Me</string>
+	<string name="_title_patient">Patient</string>
+							
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 

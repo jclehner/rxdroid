@@ -23,9 +23,6 @@ package at.jclehner.rxdroid;
 
 import java.io.File;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -301,16 +298,6 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 					return doInBackground(++count);
 
 				return new WrappedCheckedException(e);
-			}
-
-			try
-			{
-				final JSONObject json = Database.exportDatabaseToJson();
-				Database.importDatabaseFromJson(json);
-			}
-			catch(JSONException e)
-			{
-				throw new WrappedCheckedException(e);
 			}
 
 			return null;

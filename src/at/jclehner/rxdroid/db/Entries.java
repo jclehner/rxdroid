@@ -62,6 +62,17 @@ public final class Entries
 		return list;
 	}
 
+	public static CharSequence[] getAllPatientNames()
+	{
+		final List<Patient> patients = Database.getCached(Patient.class);
+		final String[] names = new String[patients.size()];
+
+		for(int i = 0; i != names.length; ++i)
+			names[i] = patients.get(i).getName();
+
+		return names;
+	}
+
 	public static boolean hasMissingIntakesBeforeDate(Drug drug, Date date)
 	{
 		if(!drug.isActive())

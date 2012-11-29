@@ -288,6 +288,9 @@
 	
 	<string name="_title_per_drug_reminders">Erinnerungen</string>
 	
+	<string name="_title_me">Ich</string>
+	<string name="_title_patient">Patient</string>
+	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.
