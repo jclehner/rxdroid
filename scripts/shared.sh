@@ -91,13 +91,13 @@ adb-shell() {
 	[[ $# -eq 0 ]] && die "adb-shell: no arguments"
 
 	local tmp="${DTEMP}/.exitstatus"
-	#adb shell "su -c '$@; echo $? > $tmp'"
-	adb shell "$@; > $tmp"
+	adb shell "su -c '$@; echo $? > $tmp'"
+	#adb shell "$@; > $tmp"
 	local status=$(adb shell cat $tmp | tr -d "\r\n")
 	let status=$status+0
 
-	adb shell rm "$tmp"
-	#adb shell su -c "rm $tmp"
+	#adb shell rm "$tmp"
+	adb shell su -c "rm $tmp"
 
 	return $status
 }
