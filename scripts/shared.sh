@@ -1,7 +1,7 @@
 #!/bin/bash
 
 readonly PKG="at.jclehner.rxdroid"
-readonly DTEMP="/data/local/tmp"
+readonly DTEMP="/sdcard/"
 readonly MISC="scripts/misc/"
 
 DEBUG=0
