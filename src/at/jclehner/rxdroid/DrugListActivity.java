@@ -293,7 +293,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 						Log.d(TAG, "mCurrentPatientId=" + mCurrentPatientId);
 
-						invalidateListView();
+						invalidateViewPager();
 						dismiss();
 					}
 				};
@@ -318,7 +318,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			case R.id.menuitem_toggle_filtering:
 			{
 				mShowingAll = !mShowingAll;
-				invalidateListView();
+				invalidateViewPager();
 				return true;
 			}
 
@@ -430,7 +430,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(Settings.Keys.THEME_IS_DARK.equals(key))
 			finish(); // TODO fix this naughty hack
 		else if(mIsShowing)
-			invalidateListView();
+			invalidateViewPager();
 	}
 
 	@Override
@@ -475,7 +475,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			Log.i(TAG, "DoseView date " + DateTime.toDateString(date) +
 					" differs from Activity date " + DateTime.toDateString(mCurrentDate) + " ");
 
-			invalidateListView();
+			invalidateViewPager();
 			date = mCurrentDate;
 
 			if(BuildConfig.DEBUG)
@@ -570,7 +570,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	private static final int PAGER_SCROLL = 1;
 	private static final int PAGER_INIT = 1 << 1;
 
-	private void invalidateListView() {
+	private void invalidateViewPager() {
 		setDate(mCurrentDate, PAGER_INIT);
 	}
 
@@ -867,14 +867,14 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			}
 
 			if(entry instanceof Drug)
-				invalidateListView();
+				invalidateViewPager();
 		}
 
 		@Override
 		public void onEntryCreated(Entry entry, int flags)
 		{
 			if(entry instanceof Drug)
-				invalidateListView();
+				invalidateViewPager();
 		}
 	};
 
@@ -889,7 +889,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 		public void onDoseTimeEnd(Date date, int doseTime)
 		{
-			invalidateListView();
+			invalidateViewPager();
 		}
 	};
 }

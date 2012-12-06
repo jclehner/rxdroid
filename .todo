@@ -108,6 +108,18 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1332514693" done="1354818396">
+        consider name change - rxdroid is already taken!
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1332777147" done="1354818397">
+        Display GPL on first use
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="veryhigh" time="1332882462" done="1335391433">
         Fix DrugEditActivity
         <comment>
@@ -228,6 +240,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1324602189" done="1354818420">
+        Allow the user to customize the display order in DrugListActivity
+        <comment>
+            fixed
+        </comment>
+    </note>
     <note priority="high" time="1326234311" done="1326463373">
         Move entry-type specific operations from Database to Drug/Intake
         <comment>
@@ -288,10 +306,22 @@
             not relevant since removal of NotifcationService
         </comment>
     </note>
+    <note priority="high" time="1342730192" done="1354818772">
+        Move tests to separate test project
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1342732778" done="1346276508">
         Move functions accessing other Entry types to Entries.java
         <comment>
             done
+        </comment>
+    </note>
+    <note priority="high" time="1343595716" done="1354818422">
+        Don't play notification sound if UI is visible
+        <comment>
+            fixed
         </comment>
     </note>
     <note priority="high" time="1348963921" done="1350583487">
@@ -372,10 +402,22 @@
             done
         </comment>
     </note>
+    <note priority="medium" time="1318943892" done="1354818757">
+        Consider modelling DrugNamePreference's layout after the layout found in the old DrugEditActivty layout
+        <comment>
+            n/a
+        </comment>
+    </note>
     <note priority="medium" time="1318945060" done="1319583835">
         Implement three snoozing options: don't snooze, snooze on click, autosnooze
         <comment>
             done
+        </comment>
+    </note>
+    <note priority="medium" time="1320707746" done="1354818758">
+        only update notifications when really neccessary
+        <comment>
+            n/a
         </comment>
     </note>
     <note priority="medium" time="1320793646" done="1324429884">
@@ -447,6 +489,12 @@
             done
         </comment>
     </note>
+    <note priority="medium" time="1350606880" done="1354818850">
+        Send broadcasts for db upgrade/cleaning/loading for better progress indicator?
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="low" time="1316529505" done="1316548042">
         Ask the user for confirmation before resetting all preferences to their defaults
     </note>
@@ -477,10 +525,34 @@
             done
         </comment>
     </note>
+    <note priority="low" time="1317226740" done="1354818830">
+        Allow moving the app to SD, but display a big fat warning (OK button should only be active after 5 seconds). Also the dialog should be displayed every time until the user checks a checkbox in the dialog.
+        <comment>
+            wont implement
+        </comment>
+    </note>
     <note priority="low" time="1317306209" done="1318783849">
         Implement the "show doseless/inactive" settings
         <comment>
             fixed
+        </comment>
+    </note>
+    <note priority="low" time="1326536117" done="1354818817">
+        Allow per-weekday doseTime definitions
+        <comment>
+            wont implement
+        </comment>
+    </note>
+    <note priority="low" time="1326753387" done="1354818863">
+        Move icon selection in DrugEditActivity to DrugNamePreference itself?
+        <comment>
+            wont implement
+        </comment>
+    </note>
+    <note priority="verylow" time="1316529783" done="1354818803">
+        Add icons for all drug forms.
+        <comment>
+            done
         </comment>
     </note>
     <note priority="verylow" time="1316548531" done="1328202433">
@@ -495,47 +567,32 @@
             done
         </comment>
     </note>
+    <note priority="verylow" time="1316548662" done="1354818804">
+        Consider keeping intake entries only for a certain number of days, before removing them from the DB. The user should be able to choose this history size, within reasonable bounds.
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="verylow" time="1316614566" done="1350583500">
         Make it possible to navigate DrugListActivity using the trackball
         <comment>
             abandoned
         </comment>
     </note>
-    <note priority="veryhigh" time="1332514693">
-        consider name change - rxdroid is already taken!
-    </note>
-    <note priority="veryhigh" time="1332777147">
-        Display GPL on first use
+    <note priority="veryhigh" time="1354818925">
+        Highlight current dose time in DrugListActivity if applicable
     </note>
     <note priority="high" time="1324308938">
         Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?
     </note>
-    <note priority="high" time="1324602189">
-        Allow the user to customize the display order in DrugListActivity
-    </note>
     <note priority="high" time="1335391425">
         Support per doseTime listing in DrugListActivity
-    </note>
-    <note priority="high" time="1342730192">
-        Move tests to separate test project
-    </note>
-    <note priority="high" time="1343595716">
-        Don't play notification sound if UI is visible
-    </note>
-    <note priority="high" time="1349866067">
-        Cache results of findIntakes and countIntakes ?
     </note>
     <note priority="high" time="1350763239">
         move refill size and cur spply to own category
     </note>
     <note priority="high" time="1350856491">
         Fix end-of-supply date for drugs with 21/7 repeatMode
-    </note>
-    <note priority="medium" time="1318943892">
-        Consider modelling DrugNamePreference's layout after the layout found in the old DrugEditActivty layout
-    </note>
-    <note priority="medium" time="1320707746">
-        only update notifications when really neccessary
     </note>
     <note priority="medium" time="1320778180">
         Better tablet support; use Fragments!
@@ -546,17 +603,17 @@
     <note priority="medium" time="1350583452">
         Use extended notifications for &gt;= JB + add preference for disabling
     </note>
-    <note priority="medium" time="1350606880">
-        Send broadcasts for db upgrade/cleaning/loading for better progress indicator?
+    <note priority="medium" time="1350583720">
+        Implement multiple stashes using the patient database
     </note>
     <note priority="medium" time="1351004787">
         Show notifications like low supply / missed doses when repeat != daily in notification panel at bottom? For &gt;= 11, maybe item in ActionBar?
     </note>
+    <note priority="medium" time="1354818880">
+        Make drug icon selector a Spinner with drawables
+    </note>
     <note priority="low" time="1317226248">
         For Version, don't get the revision from strings.xml, as this requires faking a change in the file to update the revision tag.
-    </note>
-    <note priority="low" time="1317226740">
-        Allow moving the app to SD, but display a big fat warning (OK button should only be active after 5 seconds). Also the dialog should be displayed every time until the user checks a checkbox in the dialog.
     </note>
     <note priority="low" time="1318540605">
         Somehow, implement an "Every N hours" frequency option
@@ -564,25 +621,13 @@
     <note priority="low" time="1320793916">
         use or remove the comment field in Drug
     </note>
-    <note priority="low" time="1326536117">
-        Allow per-weekday doseTime definitions
-    </note>
-    <note priority="low" time="1326753387">
-        Move icon selection in DrugEditActivity to DrugNamePreference itself?
-    </note>
-    <note priority="low" time="1350583720">
-        Implement multiple stashes?
-    </note>
     <note priority="low" time="1350583779">
         Allow multiple drug entries with the same name, as long as their dose definitions don't intersect. Use a shared supply pool and also share intake entries.
     </note>
-    <note priority="verylow" time="1316529783">
-        Add icons for all drug forms.
-    </note>
-    <note priority="verylow" time="1316548662">
-        Consider keeping intake entries only for a certain number of days, before removing them from the DB. The user should be able to choose this history size, within reasonable bounds.
-    </note>
     <note priority="verylow" time="1336603009">
         Consolidate Intake entries for most operations
+    </note>
+    <note priority="verylow" time="1349866067">
+        Cache results of findIntakes and countIntakes ?
     </note>
 </todo>
