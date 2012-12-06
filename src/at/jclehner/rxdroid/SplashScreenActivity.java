@@ -202,7 +202,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			else
 				sb.append(getString(R.string._msg_db_error_general));
 
-			sb.append(getString(R.string._msg_db_error_footer, getString(R.string._btn_reset)));
+			sb.append(" " + getString(R.string._msg_db_error_footer, getString(R.string._btn_reset)));
 			((AlertDialog) dialog).setMessage(sb);
 		}
 		else

@@ -85,8 +85,8 @@ public class DrugDetailAdapter extends AbsDrugAdapter
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
 			//holder.notification = (ImageView) v.findViewById(R.id.drug_notification_icon);
 			//holder.notification.setTag(drug);
-			holder.info1 = (TextView) v.findViewById(R.id.text_info1);
-			holder.info2 = (TextView) v.findViewById(R.id.text_info2);
+//			holder.info1 = (TextView) v.findViewById(R.id.text_info1);
+//			holder.info2 = (TextView) v.findViewById(R.id.text_info2);
 
 			holder.doseViews[0] = (DoseView) v.findViewById(R.id.dose_view);
 			mActivity.registerForContextMenu(holder.doseViews[0]);
@@ -116,16 +116,16 @@ public class DrugDetailAdapter extends AbsDrugAdapter
 			doseView.setDoseFromDrugAndDate(mAdapterDate, drug);
 
 		// TODO fill them with meaningful info
-		holder.info1.setVisibility(View.GONE);
-		holder.info2.setVisibility(View.GONE);
+//		holder.info1.setVisibility(View.GONE);
+//		holder.info2.setVisibility(View.GONE);
 
 		//// FIXME hack
 		if(Entries.countIntakes(drug, mAdapterDate, mDoseTime) != 0)
 		{
 			final Intake intake = Entries.findIntakes(drug, mAdapterDate, mDoseTime).get(0);
 
-			holder.info1.setText("Taken: " + intake.getTimestamp());
-			holder.info1.setVisibility(View.VISIBLE);
+//			holder.info1.setText("Taken: " + intake.getTimestamp());
+//			holder.info1.setVisibility(View.VISIBLE);
 		}
 		////////////////////////////
 

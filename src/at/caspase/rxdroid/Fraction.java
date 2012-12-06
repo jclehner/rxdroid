@@ -21,8 +21,7 @@
 
 package at.caspase.rxdroid;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashMap;
 
 import at.jclehner.rxdroid.util.Hasher;
 
@@ -83,7 +82,6 @@ public class Fraction extends Number implements Comparable<Number>
 
 	@SuppressWarnings("unused")
 	private static  final String TAG = Fraction.class.getName();
-	private static final Pattern REGEX = Pattern.compile("^\\s*(?:(-?\\d+)\\s+)?\\s*(?:(-?\\d+)\\s*/\\s*(\\d+)\\s*)\\s*$");
 
 	private static boolean sDisplayMixedNumbers = true;
 
@@ -304,45 +302,52 @@ public class Fraction extends Number implements Comparable<Number>
 	 *
 	 * @throws NumberFormatException
 	 */
-	public static Fraction valueOf(String string)
+	public static Fraction valueOf(final String string)
 	{
 		int wholeNum = 0, numerator = 0, denominator = 1;
 
-		// this matcher will always have a group count of three,
-		// but the subgroups that are specified as optional will
-		// be null!
-		Matcher matcher = REGEX.matcher(string);
-		if(matcher.find())
+		//
+		// string = "1 2/3"
+		//
+		// a) -> [ "1", "2/3" ]
+		// b) -> [ "2", "3" ]
+		//
+		// string = "2/3"
+		//
+		// a) -> [ "2/3" ]
+		// b) -> [ "2", "3" ]
+		//
+		// string = "1"
+		//
+		// a) -> [ "1" ]
+		// b) -> [ "1" ]
+		//
+
+		final String fractionPart;
+
+		String[] tokens = string.split(" ");
+
+		if(tokens.length == 2)
 		{
-			if(matcher.groupCount() != 3)
-				throw new NumberFormatException();
+			fractionPart = tokens[1];
+			wholeNum = Integer.parseInt(tokens[0]);
+		}
+		else if(tokens.length == 1)
+			fractionPart = tokens[0];
+		else
+			throw new NumberFormatException(string);
 
-			if(matcher.group(1) != null)
-				wholeNum = Integer.parseInt(matcher.group(1), 10);
+		tokens = fractionPart.split("/");
 
-			if(matcher.group(2) != null)
-			{
-				assert matcher.group(3) != null;
-
-				numerator = Integer.parseInt(matcher.group(2), 10);
-				denominator = Integer.parseInt(matcher.group(3), 10);
-
-				if(denominator == 0)
-					throw new NumberFormatException();
-			}
+		if(tokens.length == 1)
+			wholeNum = Integer.parseInt(tokens[0]);
+		else if(tokens.length == 2)
+		{
+			numerator = Integer.parseInt(tokens[0]);
+			denominator = Integer.parseInt(tokens[1]);
 		}
 		else
-		{
-			string = string.trim();
-
-			if(string.length() == 0)
-				throw new NumberFormatException();
-
-			// TODO the regex currently fails to handle single numbers correctly,
-			// so we try to parse the whole string in case the regex-matching
-			// failed
-			wholeNum = Integer.parseInt(string, 10);
-		}
+			throw new NumberFormatException(string);
 
 		return new Fraction(wholeNum, numerator, denominator);
 	}

@@ -35,10 +35,10 @@
 	android:nextFocusDown="@+id/drug_name"	
 >
 	<!-- first line: icon + name -->
-	
+		
 	<ImageView android:id="@+id/drug_icon"
 		android:layout_width="36dip"
-		android:layout_height="96dip"
+		android:layout_height="36dip"
 		
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentTop="true"
@@ -50,6 +50,20 @@
 		android:src="?attr/drugIconTablet"
 	/>
 	
+	<TextView android:id="@+id/text_supply"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@id/drug_icon"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignBottom="@+id/dose_container"
+	    android:layout_toLeftOf="@id/dose_container"
+	    
+	    android:gravity="bottom"
+	    android:textAppearance="?android:attr/textAppearanceSmall"
+	    android:textSize="10sp"
+	    android:paddingLeft="3dip"
+	    android:text="36"
+	/>	
   
   	<at.jclehner.rxdroid.widget.DrugNameView android:id="@id/drug_name"
   		android:layout_width="wrap_content"
@@ -69,7 +83,7 @@
   		  		  		
   		style="@style/TextAppearance.Large.Clickable"
   		  		
-  		android:nextFocusDown="@+id/dose_container"
+  		android:nextFocusDown="@id/dose_container"
 	/>
 	
 	<!-- second line: dose views android:layout_alignBottom="@id/drug_icon" -->

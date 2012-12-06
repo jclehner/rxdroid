@@ -466,12 +466,23 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	public void onDoseViewClick(View view)
 	{
 		final DoseView doseView = (DoseView) view;
-		final Date date = doseView.getDate();
+		Date date = doseView.getDate();
 
 		if(toastIfPastMaxHistoryAge(date))
 			return;
 		else if(!date.equals(mCurrentDate))
-			throw new IllegalStateException("Activity date " + mCurrentDate + " differs from DoseView date " + date);
+		{
+			Log.i(TAG, "DoseView date " + DateTime.toDateString(date) +
+					" differs from Activity date " + DateTime.toDateString(mCurrentDate) + " ");
+
+			invalidateListView();
+			date = mCurrentDate;
+
+			if(BuildConfig.DEBUG)
+				Toast.makeText(this, "Invoked workaround!", Toast.LENGTH_SHORT).show();
+
+			//throw new IllegalStateException("Activity date " + mCurrentDate + " differs from DoseView date " + date);
+		}
 
 		final Bundle args = new Bundle();
 		args.putInt(IntakeDialog.ARG_DRUG_ID, doseView.getDrug().getId());

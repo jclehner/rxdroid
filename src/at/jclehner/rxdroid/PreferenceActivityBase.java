@@ -46,10 +46,10 @@ public abstract class PreferenceActivityBase extends PreferenceActivity
 		{
 			if(item.getItemId() == android.R.id.home)
 			{
-				startActivity(getHomeButtonIntent());
+				final Intent intent = getHomeButtonIntent();
+				intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-				Intent intent = getHomeButtonIntent();
-				intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+				startActivity(intent);
 
 				return true;
 			}

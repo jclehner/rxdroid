@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
+import android.widget.TextView;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity;
@@ -58,7 +59,6 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		mTimer = LOGV ? new Timer() : null;
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public View getView(int position, View v, ViewGroup parent)
 	{
@@ -78,6 +78,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
 			holder.missedDoseIndicator = v.findViewById(R.id.missed_dose_indicator);
 			holder.lowSupplyIndicator = v.findViewById(R.id.low_supply_indicator);
+			holder.currentSupply = (TextView) v.findViewById(R.id.text_supply);
 
 			for(int i = 0; i != holder.doseViews.length; ++i)
 			{
@@ -101,6 +102,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		//holder.icon.setImageResource(drug.getIconResourceId());
 		holder.icon.setImageResource(Util.getDrugIconDrawable(getContext(), drug.getIcon()));
+		holder.currentSupply.setText(drug.getCurrentSupply().toString());
 
 		if(DateTime.today().equals(mAdapterDate))
 		{

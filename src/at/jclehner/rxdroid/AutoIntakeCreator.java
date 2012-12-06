@@ -59,40 +59,11 @@ public enum AutoIntakeCreator implements
 		createIntakes(date, doseTime);
 	}
 
-	/*@Override
-	public void onEntryCreated(Entry entry, int flags)
-	{
-		if(LOGV) Log.v(TAG, "onEntryCreated");
-		onEntryUpdated(entry, flags);
-	}
-
-	@Override
-	public void onEntryUpdated(Entry entry, int flags)
-	{
-		if(!(entry instanceof Drug))
-			return;
-
-		if(LOGV) Log.v(TAG, "onEntryUpdated");
-
-		final Drug drug = (Drug) entry;
-		if(!drug.isAutoAddIntakesEnabled())
-			return;
-
-		createMissingIntakes(drug);
-	}
-
-	@Override
-	public void onEntryDeleted(Entry entry, int flags) {
-		// do nothing
-	}*/
-
 	@Override
 	public void onDatabaseInitialized()
 	{
 		if(Database.countAll(Patient.class) == 0)
 			Database.create(new Patient(), Database.FLAG_DONT_NOTIFY_LISTENERS);
-		else
-			Log.d(TAG, "NOT CREATING");
 
 		SplashScreenActivity.setStatusMessage(R.string._title_db_status_creating_intakes);
 

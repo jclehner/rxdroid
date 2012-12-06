@@ -48,7 +48,7 @@ public class DatePickerFragment extends DialogFragment implements OnShowListener
 
 		if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
 		{
-			// Work around for Android issue #34833
+			// Workaround for Android issue #34833
 			final Dialog dialog = new DatePickerDialog(getActivity(), null, y, m, d);
 			dialog.setOnShowListener(this);
 			return dialog;
