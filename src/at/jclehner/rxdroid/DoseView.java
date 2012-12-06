@@ -304,9 +304,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			changeBackground(R.drawable.generic_pressed);
 		else
 			changeBackground(0);
-
-		Log.d(TAG, "onFocusChanged: gainFocus=" + gainFocus);
-		Log.d(TAG, "  drug=" + mDrug.getName() + ", doseTime=" + mDoseTime);
 	}
 
 	private void changeBackground(int resId)

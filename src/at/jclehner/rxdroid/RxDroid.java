@@ -49,7 +49,7 @@ public class RxDroid extends Application
 	@Override
 	public void onCreate()
 	{
-		RxDroid.sContextRef = new WeakReference<Context>(getApplicationContext());
+		setContext(getApplicationContext());
 
 		Settings.init();
 		AutoIntakeCreator.registerSelf();
@@ -68,6 +68,10 @@ public class RxDroid extends Application
 		}
 
 		super.onCreate();
+	}
+
+	public static void setContext(Context context) {
+		RxDroid.sContextRef = new WeakReference<Context>(context);
 	}
 
 	/**

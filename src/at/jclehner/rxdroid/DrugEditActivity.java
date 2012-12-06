@@ -590,7 +590,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		private ListPreference mPref;
 		private Context mContext;
 
-		@SuppressWarnings("unused")
 		public RepeatModePreferenceHelper() {
 			super(R.array.drug_repeat);
 		}
@@ -616,8 +615,6 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		@Override
 		public boolean updatePreference(ListPreference preference, Integer newValue)
 		{
-			Log.v(TAG, "RepeatModePreferenceHelper.updatePreference: ");
-
 			switch(newValue)
 			{
 				case Drug.REPEAT_EVERY_N_DAYS:

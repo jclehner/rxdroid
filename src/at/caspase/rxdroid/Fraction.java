@@ -21,8 +21,9 @@
 
 package at.caspase.rxdroid;
 
-import java.util.HashMap;
+import java.util.Arrays;
 
+import android.util.Log;
 import at.jclehner.rxdroid.util.Hasher;
 
 
@@ -323,9 +324,38 @@ public class Fraction extends Number implements Comparable<Number>
 		// b) -> [ "1" ]
 		//
 
+		if(true)
+		{
+			final String[] tokens = string.trim().split("\\s*/\\s*|\\s+");
+
+			switch(tokens.length)
+			{
+				case 2:
+					numerator = Integer.parseInt(tokens[0]);
+					denominator = Integer.parseInt(tokens[1]);
+					break;
+
+				case 3:
+					numerator = Integer.parseInt(tokens[1]);
+					denominator = Integer.parseInt(tokens[2]);
+					// fall through
+
+				case 1:
+					wholeNum = Integer.parseInt(tokens[0]);
+					break;
+
+				default:
+					throw new NumberFormatException(string + " -> " + Arrays.toString(tokens));
+			}
+
+			return new Fraction(wholeNum, numerator, denominator);
+		}
+
 		final String fractionPart;
 
-		String[] tokens = string.split(" ");
+		String[] tokens = string.trim().split("\\s+");
+
+		Log.d(TAG, "tokens=" + Arrays.toString(tokens));
 
 		if(tokens.length == 2)
 		{
@@ -359,10 +389,10 @@ public class Fraction extends Number implements Comparable<Number>
 	private void init(int integer, int numerator, int denominator)
 	{
 		if(denominator <= 0)
-			throw new IllegalArgumentException("Denominator must be greater than zero");
+			throw new NumberFormatException("Denominator must be greater than zero");
 
 		if(integer != 0 && numerator < 0)
-			throw new IllegalArgumentException("Nominator must not be negative if wholeNum is non-zero");
+			throw new NumberFormatException("Nominator must not be negative if wholeNum is non-zero");
 
 		// set mNumerator, even though we divide it by the GCD later, so as to pass the
 		// original argument to this function to findGCD
