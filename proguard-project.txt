@@ -22,7 +22,11 @@
 -dontobfuscate
 
 -keep class * extends at.jclehner.androidutils.otpm.PreferenceHelper { *; }
-
+-keep class * extends android.preference.Preference { *; }
+-keep class * extends at.jclehner.rxdroid.db.Database$OnChangedListener { *; }
+-keep class * extends at.jclehner.rxdroid.db.Database$OnInitializedListener { *; }
+-keep class * extends at.jclehner.rxdroid.NotificationReceiver$OnDoseTimeChangeListener { *; }
+-keep class * extends android.preference.Preference { *; }
 -keep class at.jclehner.rxdroid.preference.* { *; }
 
 -keepattributes *Annotation*, AnnotationDefault
@@ -31,6 +35,12 @@
 	@at.jclehner.androidutils.otpm.OTPM$CreatePreference *;
 	@at.jclehner.androidutils.otpm.OTPM$AddPreference *;
 }
+
+-keepclassmembers class at.jclehner.** {
+	void on*(...);
+}
+
+-keep interface at.jclehner.androidutils.otpm.** { *; }
 
 -keepclassmembers interface at.jclehner.androidutils.otpm.OTPM$CreatePreference {
 	*;
@@ -44,8 +54,15 @@
 	*;
 }
 
+# For ORMLite
+
 -keep class * implements com.j256.ormlite.field.FieldConverter { *; }
 -keep class com.j256.** { *; }
 -keep enum com.j256.** { *; }
 -keep interface com.j256.** { *; }
+
+# For Guava
+-dontwarn sun.misc.Unsafe
+-dontwarn com.google.common.collect.MinMaxPriorityQueue
+
 

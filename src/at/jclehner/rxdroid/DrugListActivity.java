@@ -739,11 +739,14 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 				return mShowSupplyMonitors;
 			}
 
+			if(!drug.isActive())
+				return false;
+
 			if(Entries.countIntakes(drug, mFilterDate, null) != 0)
 				return true;
 
-			if(!drug.isActive())
-				return false;
+			if(Settings.hasLowSupplies(drug))
+				return true;
 
 			if(DateTime.isToday(mFilterDate) && Entries.hasMissingIntakesBeforeDate(drug, mFilterDate))
 				return true;

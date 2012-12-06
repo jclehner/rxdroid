@@ -239,8 +239,11 @@ public class OTPM
 				}
 			}
 
-			final Annotation a = field.getAnnotation(CreatePreference.class);
-			final Class<? extends Preference> prefClazz = Reflect.getAnnotationParameter(a, "type");
+			//final Annotation a = field.getAnnotation(CreatePreference.class);
+			final CreatePreference a = field.getAnnotation(CreatePreference.class);
+			final Class<? extends Preference> prefClazz = a.type();
+
+			//final Class<? extends Preference> prefClazz = Reflect.getAnnotationParameter(a, "type");
 			final String key = getStringParameter(a, "key", field.getName());
 
 			if(key.equals(hierarchyKey))
