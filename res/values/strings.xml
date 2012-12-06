@@ -180,7 +180,7 @@
    
     <string name="_msg_no_drugs_v8">Press MENU and select "%1$s" to add a drug</string>
     <string name="_msg_no_drugs_v11">Press the + button in the action bar to add a drug</string>
-    <string name="_msg_no_doses_on_this_day">There are no doses to be taken on this date</string>
+    <string name="_msg_no_doses_on_this_day">There are no doses scheduled on this date</string>
     
     <string name="_msg_db_error_general">Unknown database error.</string>
 	<string name="_msg_db_error_upgrade">Database upgrade error.</string>
