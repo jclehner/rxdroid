@@ -2,7 +2,7 @@ package at.jclehner.rxdroid.db;
 
 import java.sql.SQLException;
 
-import at.caspase.rxdroid.Fraction;
+import at.jclehner.rxdroid.Fraction;
 
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;

@@ -221,7 +221,7 @@
 	<string name="_title_repetition_origin">Starting date</string>
 	
 	<string name="_title_history_age">History size</string>
-	<string name="_summary_history_age">Data older than the given amount of time will be deleted</string>
+	<string name="_summary_history_age">Data older than the specified amount of time will be deleted</string>
 	<string name="_title_history_1_month">One Month</string>
 	<string name="_title_history_2_months">Two Months</string>
 	<string name="_title_history_6_months">Six months</string>

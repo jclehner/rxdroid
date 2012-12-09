@@ -3,7 +3,11 @@
 source "$(dirname $_)/shared.sh"
 
 BAK=".backup.sqlite"
-APK="bin/RxDroid.apk"
+APK="${1:-bin/RxDroid.apk}"
+
+if [[ ! -f "$APK" ]]; then
+	die "$APK does not exist"
+fi
 
 rm -f "$BAK"
 

@@ -1,6 +1,5 @@
 package at.jclehner.rxdroid.db.v53;
 
-import at.caspase.rxdroid.Fraction;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.FractionPersister;
@@ -27,7 +26,7 @@ public class OldIntake extends Entry
 	private int doseTime;
 
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
-	private Fraction dose;
+	private at.caspase.rxdroid.Fraction dose;
 
 	@DatabaseField
 	private boolean wasAutoCreated = false;
@@ -37,7 +36,9 @@ public class OldIntake extends Entry
 	{
 		final Intake newIntake = new Intake();
 		Entry.copy(newIntake, this);
-		// TODO some more magic here?
+
+		newIntake.setDose(OldDrug.convertFraction(dose));
+
 		return newIntake;
 	}
 

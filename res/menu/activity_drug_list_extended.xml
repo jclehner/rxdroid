@@ -17,6 +17,7 @@
 		android:title="@string/_title_patient"
 		android:icon="@drawable/ic_menu_patient"
 		android:showAsAction="always"
+		android:visible="false"
 	/>
 		
 	<item android:id="@+id/menuitem_date"

@@ -2,7 +2,6 @@ package at.jclehner.rxdroid.db.v53;
 
 import java.util.Date;
 
-import at.caspase.rxdroid.Fraction;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Schedule;
@@ -28,19 +27,19 @@ public class OldDrug extends Entry
 	private int refillSize;
 
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
-	private Fraction currentSupply = new Fraction();
+	private at.caspase.rxdroid.Fraction currentSupply;
 
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
-	private Fraction doseMorning = new Fraction();
+	private at.caspase.rxdroid.Fraction doseMorning;
 
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
-	private Fraction doseNoon = new Fraction();
+	private at.caspase.rxdroid.Fraction doseNoon;
 
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
-	private Fraction doseEvening = new Fraction();
+	private at.caspase.rxdroid.Fraction doseEvening;
 
 	@DatabaseField(dataType = DataType.SERIALIZABLE)
-	private Fraction doseNight = new Fraction();
+	private at.caspase.rxdroid.Fraction doseNight;
 
 	@DatabaseField(columnName = "repeat")
 	private int repeatMode= Drug.REPEAT_DAILY;
@@ -85,7 +84,16 @@ public class OldDrug extends Entry
 	{
 		final Drug newDrug = new Drug();
 		Entry.copy(newDrug, this);
+
 		newDrug.setIcon(icon);
+
+		newDrug.setCurrentSupply(convertFraction(currentSupply));
+
+		newDrug.setDose(Schedule.TIME_MORNING, convertFraction(doseMorning));
+		newDrug.setDose(Schedule.TIME_NOON, convertFraction(doseNoon));
+		newDrug.setDose(Schedule.TIME_EVENING, convertFraction(doseEvening));
+		newDrug.setDose(Schedule.TIME_NIGHT, convertFraction(doseNight));
+
 		return newDrug;
 	}
 
@@ -97,5 +105,11 @@ public class OldDrug extends Entry
 	@Override
 	public int hashCode() {
 		throw new UnsupportedOperationException();
+	}
+
+	/* package */ static at.jclehner.rxdroid.Fraction convertFraction(at.caspase.rxdroid.Fraction f)
+	{
+		int[] data = f.getFractionData(false);
+		return new at.jclehner.rxdroid.Fraction(data[1], data[2]);
 	}
 }

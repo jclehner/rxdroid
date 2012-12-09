@@ -21,7 +21,8 @@
 
 package at.caspase.rxdroid;
 
-import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import at.jclehner.rxdroid.util.Hasher;
 
@@ -78,10 +79,12 @@ public class Fraction extends Number implements Comparable<Number>
 		}
 	}
 
-	private static final long serialVersionUID = 2050536341303052796L;
+	//private static final long serialVersionUID = 2050536341303052796L;
+	private static final long serialVersionUID = 4041205791139064339L;
 
 	@SuppressWarnings("unused")
 	private static  final String TAG = Fraction.class.getName();
+	private static final Pattern REGEX = Pattern.compile("^\\s*(?:(-?\\d+)\\s+)?\\s*(?:(-?\\d+)\\s*/\\s*(\\d+)\\s*)\\s*$");
 
 	private static boolean sDisplayMixedNumbers = true;
 
@@ -181,22 +184,6 @@ public class Fraction extends Number implements Comparable<Number>
 	 */
 	public Fraction negate() {
 		return new Fraction(-mNumerator, mDenominator);
-	}
-
-	/**
-	 * Returns the fraction's reciprocal value.
-	 */
-	public Fraction reciprocal()
-	{
-		if(mNumerator < 0)
-		{
-			// The sign is always kept in mNumerator, so mDenominator
-			// can't be negative. We thus pass -mDenominator which
-			// makes it negative, and -mNumerator, which makes it positive.
-			return new Fraction(-mDenominator, -mNumerator);
-		}
-
-		return new Fraction(mDenominator, mNumerator);
 	}
 
 	/**
@@ -318,29 +305,44 @@ public class Fraction extends Number implements Comparable<Number>
 	 *
 	 * @throws NumberFormatException
 	 */
-	public static Fraction valueOf(final String string)
+	public static Fraction decode(String string)
 	{
-		final String[] tokens = string.trim().split("\\s*/\\s*|\\s+");
 		int wholeNum = 0, numerator = 0, denominator = 1;
 
-		switch(tokens.length)
+		// this matcher will always have a group count of three,
+		// but the subgroups that are specified as optional will
+		// be null!
+		Matcher matcher = REGEX.matcher(string);
+		if(matcher.find())
 		{
-			case 2:
-				numerator = Integer.parseInt(tokens[0]);
-				denominator = Integer.parseInt(tokens[1]);
-				break;
+			if(matcher.groupCount() != 3)
+				throw new NumberFormatException();
 
-			case 3:
-				numerator = Integer.parseInt(tokens[1]);
-				denominator = Integer.parseInt(tokens[2]);
-				// fall through
+			if(matcher.group(1) != null)
+				wholeNum = Integer.parseInt(matcher.group(1), 10);
 
-			case 1:
-				wholeNum = Integer.parseInt(tokens[0]);
-				break;
+			if(matcher.group(2) != null)
+			{
+				assert matcher.group(3) != null;
 
-			default:
-				throw new NumberFormatException(string + " -> " + Arrays.toString(tokens));
+				numerator = Integer.parseInt(matcher.group(2), 10);
+				denominator = Integer.parseInt(matcher.group(3), 10);
+
+				if(denominator == 0)
+					throw new NumberFormatException();
+			}
+		}
+		else
+		{
+			string = string.trim();
+
+			if(string.length() == 0)
+				throw new NumberFormatException();
+
+			// TODO the regex currently fails to handle single numbers correctly,
+			// so we try to parse the whole string in case the regex-matching
+			// failed
+			wholeNum = Integer.parseInt(string, 10);
 		}
 
 		return new Fraction(wholeNum, numerator, denominator);
@@ -350,28 +352,28 @@ public class Fraction extends Number implements Comparable<Number>
 		sDisplayMixedNumbers = displayMixedNumbers;
 	}
 
-	private void init(final int integer, final int numerator, final int denominator)
+	private void init(int integer, int numerator, int denominator)
 	{
 		if(denominator <= 0)
-			throw new NumberFormatException("Denominator must be greater than zero");
+			throw new IllegalArgumentException("Denominator must be greater than zero");
 
 		if(integer != 0 && numerator < 0)
-			throw new NumberFormatException("Nominator must not be negative if integer is non-zero");
+			throw new IllegalArgumentException("Nominator must not be negative if wholeNum is non-zero");
 
 		// set mNumerator, even though we divide it by the GCD later, so as to pass the
-		// original argument of this function to findGCD
+		// original argument to this function to findGCD
 		if(integer >= 0)
 			mNumerator = integer * denominator + numerator;
 		else
 			mNumerator = integer * denominator - numerator;
 
 		// the sign, if present, has been moved to the numerator by now
-		mDenominator = Math.abs(denominator);
+		denominator = Math.abs(denominator);
 
 		final int divisor = findGCD(Math.abs(numerator), denominator);
 
 		mNumerator = mNumerator / divisor;
-		mDenominator = mDenominator / divisor;
+		mDenominator = denominator / divisor;
 	}
 
 	private static <F extends Fraction> F add(F dest, Fraction other)

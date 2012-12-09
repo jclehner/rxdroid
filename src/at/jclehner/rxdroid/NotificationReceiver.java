@@ -37,7 +37,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import at.caspase.rxdroid.Fraction;
+import at.jclehner.rxdroid.Fraction;
 import at.jclehner.androidutils.EventDispatcher;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.db.Database;
@@ -441,17 +441,19 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private int getDrugsWithMissedDoses(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime, List<Drug> outDrugs)
 	{
+		final int end;
+
 		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
 		{
-			Log.d(TAG, "Next dose time is morning on " + DateTime.toDateString(date));
-
 			date = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
-			return getDrugsWithDueDoses(date, Drug.TIME_NIGHT, outDrugs);
+			end = Drug.TIME_INVALID;
 		}
+		else
+			end = activeOrNextDoseTime;
 
 		int count = 0;
 
-		for(int doseTime = Schedule.TIME_MORNING; doseTime != activeOrNextDoseTime; ++doseTime)
+		for(int doseTime = Schedule.TIME_MORNING; doseTime != end; ++doseTime)
 			count += getDrugsWithDueDoses(date, doseTime, outDrugs);
 
 		return count;

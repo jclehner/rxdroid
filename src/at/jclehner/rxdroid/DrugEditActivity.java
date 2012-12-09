@@ -57,7 +57,7 @@ import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Toast;
-import at.caspase.rxdroid.Fraction;
+import at.jclehner.rxdroid.Fraction;
 import at.jclehner.androidutils.MyDialogPreference;
 import at.jclehner.androidutils.otpm.CheckboxPreferenceHelper;
 import at.jclehner.androidutils.otpm.ListPreferenceWithIntHelper;

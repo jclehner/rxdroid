@@ -29,7 +29,9 @@
 -keep class * extends android.preference.Preference { *; }
 -keep class at.jclehner.rxdroid.preference.* { *; }
 
--keepattributes *Annotation*, AnnotationDefault
+-keepattributes *Annotation*
+
+-keep class at.jclehner.rxdroid.db.v** { *; }
 
 -keepclassmembers class * {
 	@at.jclehner.androidutils.otpm.OTPM$CreatePreference *;

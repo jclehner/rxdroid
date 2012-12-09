@@ -26,8 +26,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import android.app.Activity;
-import at.caspase.rxdroid.Fraction;
-import at.caspase.rxdroid.Fraction.MutableFraction;
+import at.jclehner.rxdroid.Fraction;
+import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.db.schedules.ScheduleBase;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;

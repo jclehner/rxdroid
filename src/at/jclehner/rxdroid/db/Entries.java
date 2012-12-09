@@ -28,8 +28,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import at.caspase.rxdroid.Fraction;
-import at.caspase.rxdroid.Fraction.MutableFraction;
+import at.jclehner.rxdroid.Fraction;
+import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 

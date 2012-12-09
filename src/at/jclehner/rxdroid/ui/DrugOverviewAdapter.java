@@ -26,6 +26,9 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,7 +80,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			holder.name = (DrugNameView) v.findViewById(R.id.drug_name);
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
 			holder.missedDoseIndicator = v.findViewById(R.id.missed_dose_indicator);
-			holder.lowSupplyIndicator = v.findViewById(R.id.low_supply_indicator);
+//			holder.lowSupplyIndicator = v.findViewById(R.id.low_supply_indicator);
 			holder.currentSupply = (TextView) v.findViewById(R.id.text_supply);
 
 			for(int i = 0; i != holder.doseViews.length; ++i)
@@ -120,17 +123,28 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			else
 				holder.missedDoseIndicator.setVisibility(View.GONE);
 
+
+			final boolean isCurrentSupplyVisible = drug.getRefillSize() != 0 || !drug.getCurrentSupply().isZero();
+			holder.currentSupply.setVisibility(isCurrentSupplyVisible ? View.VISIBLE : View.INVISIBLE);
+
 			if(Settings.hasLowSupplies(drug))
 			{
-				if(holder.lowSupplyIndicator instanceof ViewStub)
-					holder.lowSupplyIndicator = ((ViewStub) holder.lowSupplyIndicator).inflate();
-
-				holder.lowSupplyIndicator.setTag(drug);
-				holder.lowSupplyIndicator.setVisibility(View.VISIBLE);
+//				if(holder.lowSupplyIndicator instanceof ViewStub)
+//					holder.lowSupplyIndicator = ((ViewStub) holder.lowSupplyIndicator).inflate();
+//
+//				holder.lowSupplyIndicator.setTag(drug);
+//				holder.lowSupplyIndicator.setVisibility(View.VISIBLE);
 				isIndicatorIconVisible |= true;
+
+				holder.currentSupply.setTypeface(null, Typeface.BOLD_ITALIC);
 			}
 			else
-				holder.lowSupplyIndicator.setVisibility(View.GONE);
+				holder.currentSupply.setTextAppearance(mActivity, android.R.style.TextAppearance_Small);
+
+			holder.currentSupply.setTag(drug);
+
+//			else
+//				holder.lowSupplyIndicator.setVisibility(View.GONE);
 
 			//holder.dividers[3].setVisibility(isIndicatorIconVisible ? View.VISIBLE : View.GONE);
 		}

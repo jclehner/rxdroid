@@ -23,7 +23,7 @@ package at.jclehner.rxdroid.test;
 
 import android.test.AndroidTestCase;
 import android.util.Log;
-import at.caspase.rxdroid.Fraction;
+import at.jclehner.rxdroid.Fraction;
 
 public class FractionTest extends AndroidTestCase
 {

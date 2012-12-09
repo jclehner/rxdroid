@@ -29,7 +29,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
-import at.caspase.rxdroid.Fraction;
+import at.jclehner.rxdroid.Fraction;
 import at.jclehner.androidutils.MyDialogPreference;
 import at.jclehner.androidutils.InstanceState;
 import at.jclehner.androidutils.InstanceState.SaveState;

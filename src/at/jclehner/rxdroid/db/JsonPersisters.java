@@ -7,7 +7,7 @@ import java.util.Locale;
 
 import org.json.JSONException;
 
-import at.caspase.rxdroid.Fraction;
+import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.db.ImportExport.JsonForeignPersister;
 import at.jclehner.rxdroid.db.ImportExport.JsonPersisterBase;
 

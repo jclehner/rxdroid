@@ -61,7 +61,7 @@ import android.view.Window;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
-import at.caspase.rxdroid.Fraction.MutableFraction;
+import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.androidutils.DialogFragmentWithListener;
 import at.jclehner.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.jclehner.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
@@ -245,61 +245,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			}
 			case R.id.menuitem_patient:
 			{
-				final DialogFragmentWithListener dialog = new DialogFragmentWithListener() {
-
-					@Override
-					public Dialog onCreateDialog(Bundle savedInstanceState)
-					{
-						final List<Patient> patients = Database.getAll(Patient.class);
-						final String[] names = new String[patients.size()];
-
-						int checkedItem = -1;
-
-						for(int i = 0; i != names.length; ++i)
-						{
-							final Patient p = patients.get(i);
-
-							if(!p.isDefaultPatient())
-								names[i] = p.getName();
-							else
-								names[i] = getString(R.string._title_me);
-
-							if(mCurrentPatientId == p.getId())
-								checkedItem = i;
-						}
-
-						final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-						ab.setTitle(R.string._title_patient);
-						ab.setSingleChoiceItems(names, checkedItem, this);
-						ab.setNeutralButton(R.string._title_add, this);
-
-						return ab.create();
-					}
-
-					@Override
-					public void onClick(DialogInterface dialog, int which)
-					{
-						final List<Patient> patients = Database.getAll(Patient.class);
-
-						if(which == Dialog.BUTTON_NEUTRAL)
-						{
-							final Patient patient = new Patient();
-							patient.setName("Patient " + patients.size());
-							Database.create(patient);
-							return;
-						}
-
-						mCurrentPatientId = patients.get(which).getId();
-
-						Log.d(TAG, "mCurrentPatientId=" + mCurrentPatientId);
-
-						invalidateViewPager();
-						dismiss();
-					}
-				};
-
-				dialog.show(getSupportFragmentManager(), "patients");
-				return true;
+				
 			}
 			case R.id.menuitem_add:
 			{

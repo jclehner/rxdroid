@@ -24,7 +24,7 @@ package at.jclehner.rxdroid.db.schedules;
 import java.util.Calendar;
 import java.util.Date;
 
-import at.caspase.rxdroid.Fraction;
+import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;

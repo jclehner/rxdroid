@@ -42,6 +42,7 @@
 		
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentTop="true"
+		android:layout_alignBottom="@+id/dose_container"
 									
 		android:scaleType="fitStart"
 		android:padding="1dip"
@@ -50,6 +51,7 @@
 		android:src="?attr/drugIconTablet"
 	/>
 	
+	<!--  
 	<TextView android:id="@+id/text_supply"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
@@ -63,7 +65,8 @@
 	    android:textSize="10sp"
 	    android:paddingLeft="3dip"
 	    android:text="36"
-	/>	
+	/>
+	-->	
   
   	<at.jclehner.rxdroid.widget.DrugNameView android:id="@id/drug_name"
   		android:layout_width="wrap_content"
@@ -164,7 +167,21 @@
 	  			  		 		
 	  		android:orientation="vertical"
 	  >
-	  	
+		  	<TextView android:id="@+id/text_supply"
+			    android:layout_width="match_parent"
+			    android:layout_height="48dip"
+			    
+			    android:gravity="center"
+			    android:textAppearance="?android:attr/textAppearanceSmall"
+			    
+			    android:background="@drawable/generic_background"
+			    android:clickable="true"
+			    android:onClick="onLowSupplyIndicatorClicked"
+			    
+			    android:paddingBottom="12dip"
+			    
+			    android:text="36"
+			/>	
 	  	
 	  		<ViewStub android:id="@+id/missed_dose_indicator"
 		  		android:layout_width="match_parent"
@@ -173,10 +190,12 @@
 	   		/>
 		  	<!-- android:layout_alignBottom="@id/drug_name" -->
 		  	
+		  	<!--
 		  	<ViewStub android:id="@+id/low_supply_indicator"
 		  		android:layout_width="match_parent"
 		  		android:layout_height="48dip"
 		  		android:layout="@layout/stub_low_supply_indicator"
-		  	/>  		
+		  	/>  
+		  	  -->		
 	  	</LinearLayout>    
 </RelativeLayout>

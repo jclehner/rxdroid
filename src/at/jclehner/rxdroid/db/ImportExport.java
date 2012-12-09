@@ -11,7 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
-import at.caspase.rxdroid.Fraction;
+import at.jclehner.rxdroid.Fraction;
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.util.CollectionUtils;
 

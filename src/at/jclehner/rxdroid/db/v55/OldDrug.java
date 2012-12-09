@@ -2,7 +2,7 @@ package at.jclehner.rxdroid.db.v55;
 
 import java.util.Date;
 
-import at.caspase.rxdroid.Fraction;
+import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.FractionPersister;
