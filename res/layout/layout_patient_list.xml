@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+	android:gravity="center_vertical"
+    android:orientation="horizontal"
+>
+    <TextView android:id="@+id/patient_name"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+       	android:layout_alignParentLeft="true"
+       	android:layout_alignParentTop="true"
+       	android:layout_alignParentBottom="true"
+       	android:layout_toLeftOf="@+id/patient_delete"
+        
+        android:gravity="center_vertical"
+        
+        android:textAppearance="?android:attr/textAppearanceLargeInverse"
+                
+        android:text="Patient"
+    />
+    
+    <ImageView android:id="@id/patient_delete" 
+        android:layout_height="match_parent"
+        android:layout_width="48dip"
+        android:layout_alignParentRight="true"
+        
+        android:src="@android:drawable/ic_menu_delete"
+        android:scaleType="fitCenter"
+        
+        android:background="@drawable/generic_background"
+        
+    />
+
+</RelativeLayout>
