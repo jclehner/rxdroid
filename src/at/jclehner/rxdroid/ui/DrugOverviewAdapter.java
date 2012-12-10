@@ -26,9 +26,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.text.SpannableString;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,8 +38,11 @@ import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Settings;
+import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
+import at.jclehner.rxdroid.db.Entry;
+import at.jclehner.rxdroid.db.Intake;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Timer;
@@ -148,6 +149,37 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 			//holder.dividers[3].setVisibility(isIndicatorIconVisible ? View.VISIBLE : View.GONE);
 		}
+
+		Database.registerEventListener(new Database.OnChangeListener() {
+
+			@Override
+			public void onEntryCreated(Entry entry, int flags)
+			{
+				if(entry instanceof Intake)
+					updateText(entry);
+			}
+
+			@Override
+			public void onEntryUpdated(Entry entry, int flags)
+			{
+				if(entry instanceof Intake)
+					updateText(entry);
+			}
+
+			@Override
+			public void onEntryDeleted(Entry entry, int flags)
+			{
+				if(entry instanceof Intake)
+					updateText(entry);
+			}
+
+			private void updateText(Entry entry)
+			{
+				final Drug myDrug = ((Intake) entry).getDrug();
+				if(myDrug != null && myDrug.getId() == drug.getId())
+					holder.currentSupply.setText(myDrug.getCurrentSupply().toString());
+			}
+		});
 
 		for(DoseView doseView : holder.doseViews)
 		{
