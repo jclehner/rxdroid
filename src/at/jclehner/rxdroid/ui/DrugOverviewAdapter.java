@@ -32,22 +32,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
-import android.widget.TextView;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Settings;
-import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
-import at.jclehner.rxdroid.db.Entry;
-import at.jclehner.rxdroid.db.Intake;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Timer;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.DrugNameView;
+import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
 public class DrugOverviewAdapter extends AbsDrugAdapter
 {
@@ -82,7 +79,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
 			holder.missedDoseIndicator = v.findViewById(R.id.missed_dose_indicator);
 //			holder.lowSupplyIndicator = v.findViewById(R.id.low_supply_indicator);
-			holder.currentSupply = (TextView) v.findViewById(R.id.text_supply);
+			holder.currentSupply = (DrugSupplyMonitor) v.findViewById(R.id.text_supply);
 
 			for(int i = 0; i != holder.doseViews.length; ++i)
 			{
@@ -106,7 +103,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		//holder.icon.setImageResource(drug.getIconResourceId());
 		holder.icon.setImageResource(Util.getDrugIconDrawable(getContext(), drug.getIcon()));
-		holder.currentSupply.setText(drug.getCurrentSupply().toString());
+		holder.currentSupply.setDrug(drug);
 
 		if(DateTime.today().equals(mAdapterDate))
 		{
@@ -130,56 +127,14 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 			if(Settings.hasLowSupplies(drug))
 			{
-//				if(holder.lowSupplyIndicator instanceof ViewStub)
-//					holder.lowSupplyIndicator = ((ViewStub) holder.lowSupplyIndicator).inflate();
-//
-//				holder.lowSupplyIndicator.setTag(drug);
-//				holder.lowSupplyIndicator.setVisibility(View.VISIBLE);
 				isIndicatorIconVisible |= true;
-
 				holder.currentSupply.setTypeface(null, Typeface.BOLD_ITALIC);
 			}
 			else
 				holder.currentSupply.setTextAppearance(mActivity, android.R.style.TextAppearance_Small);
 
 			holder.currentSupply.setTag(drug);
-
-//			else
-//				holder.lowSupplyIndicator.setVisibility(View.GONE);
-
-			//holder.dividers[3].setVisibility(isIndicatorIconVisible ? View.VISIBLE : View.GONE);
 		}
-
-		Database.registerEventListener(new Database.OnChangeListener() {
-
-			@Override
-			public void onEntryCreated(Entry entry, int flags)
-			{
-				if(entry instanceof Intake)
-					updateText(entry);
-			}
-
-			@Override
-			public void onEntryUpdated(Entry entry, int flags)
-			{
-				if(entry instanceof Intake)
-					updateText(entry);
-			}
-
-			@Override
-			public void onEntryDeleted(Entry entry, int flags)
-			{
-				if(entry instanceof Intake)
-					updateText(entry);
-			}
-
-			private void updateText(Entry entry)
-			{
-				final Drug myDrug = ((Intake) entry).getDrug();
-				if(myDrug != null && myDrug.getId() == drug.getId())
-					holder.currentSupply.setText(myDrug.getCurrentSupply().toString());
-			}
-		});
 
 		for(DoseView doseView : holder.doseViews)
 		{

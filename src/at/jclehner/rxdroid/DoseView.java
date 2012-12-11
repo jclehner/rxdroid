@@ -269,8 +269,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 				mDisplayDose.subtract(intake.getDose());
 				--mIntakeCount;
 				updateView();
-
-				Log.d(TAG, "onEntryDeleted: mDose=" + mDisplayDose + ", mIntakeCount=" + mIntakeCount);
 			}
 		}
 	}

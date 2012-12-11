@@ -167,7 +167,7 @@
 	  			  		 		
 	  		android:orientation="vertical"
 	  >
-		  	<TextView android:id="@+id/text_supply"
+		  	<at.jclehner.rxdroid.widget.DrugSupplyMonitor android:id="@+id/text_supply"
 			    android:layout_width="match_parent"
 			    android:layout_height="48dip"
 			    

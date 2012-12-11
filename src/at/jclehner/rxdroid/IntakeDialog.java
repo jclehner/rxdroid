@@ -261,12 +261,12 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 	private void addIntakeAndDismiss()
 	{
-		Intake intake = new Intake(mDrug, mDate, mDoseTime, mDose);
-		Database.create(intake);
-
-		Fraction newSupply = mDrug.getCurrentSupply().minus(mDose);
+		final Fraction newSupply = mDrug.getCurrentSupply().minus(mDose);
 		mDrug.setCurrentSupply(newSupply.isNegative() ? new Fraction() : newSupply);
 		Database.update(mDrug, Database.FLAG_DONT_NOTIFY_LISTENERS);
+
+		Intake intake = new Intake(mDrug, mDate, mDoseTime, mDose);
+		Database.create(intake);
 
 		dismiss();
 
