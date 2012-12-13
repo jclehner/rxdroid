@@ -73,7 +73,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 
 		@Override
 		public String toString() {
-			return "" + mBegin + "-" + mEnd;
+			return mBegin.toString(true, false) + "-" + mEnd.toString(true, false);
 		}
 
 		public static TimePeriod fromString(String string)
@@ -96,16 +96,11 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		}
 	}
 
-	//private CharSequence mSummary;
-	//private TimePeriod mDialogValue;
-
 	private DumbTime mBegin;
 	private DumbTime mEnd;
 
 	private String[] mConstraintKeys = new String[2];
 	private DumbTime[] mConstraintTimes = new DumbTime[2];
-	//private boolean[] mAllowConstraintWrap = { false, false };
-	//private boolean[] mAllowTimeWrap = { false, false };
 	private boolean mAllowEndWrap = false;
 
 	private View mContainer;
@@ -178,11 +173,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			mTimePicker = (TimePicker) mContainer.findViewById(R.id.picker);
 
 			mTimePicker.setIs24HourView(DateFormat.is24HourFormat(getContext()));
-			//mTimePicker.setCurrentHour(mDialogValue.begin.getHours());
-			//mTimePicker.setCurrentMinute(mDialogValue.begin.getMinutes());
 			mTimePicker.setOnTimeChangedListener(mTimeListener);
-
-			//mMessageView.
 		}
 
 		return mContainer;
@@ -262,6 +253,9 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		min = getConstraintTimeForCurrentlyVisibleTimePicker(MIN);
 		max = getConstraintTimeForCurrentlyVisibleTimePicker(MAX);
 
+		if(min == null && max == null)
+			return true;
+
 		return current.isWithinRange(min, max, mCurrentPage == END ? mAllowEndWrap : false);
 	}
 
@@ -288,29 +282,13 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		return mConstraintTimes[which];
 	}
 
-	/*private DumbTime getConstraintTimeForCurrentlyVisibleTimePicker(int which)
-	{
-		final DumbTime ret = getConstraintTimeForCurrentlyVisibleTimePicker_(which);
-
-		if(LOGV)
-		{
-			final String[] WHICH = { "MIN", "MAX" };
-			final String[] PAGE = { "BEGIN", "END" };
-
-			Log.d(TAG, "getConstraintTimeForCurrentlyVisibleTimePicker: key=" + getKey());
-			Log.d(TAG, "  which: " + WHICH[which]);
-			Log.d(TAG, "  page : " + PAGE[mCurrentPage]);
-			Log.d(TAG, "  returning " + ret);
-		}
-
-		return ret;
-	}*/
-
 	private DumbTime getConstraintTimeForCurrentlyVisibleTimePicker(int which)
 	{
 		if(mCurrentPage == BEGIN)
 		{
 			final DumbTime min = getConstraintTime(MIN);
+			if(min == null)
+				return null;
 
 			if(which == MIN)
 			{
@@ -330,6 +308,8 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		else
 		{
 			final DumbTime max = getConstraintTime(MAX);
+			if(max == null)
+				return null;
 
 			if(which == MIN)
 			{
@@ -352,12 +332,17 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 
 		if(min != null && max != null)
 			resId = R.string._msg_constraints_ab;
-		else if(min == null)
+		else if(max != null)
 			resId = R.string._msg_constraints_b;
-		else
+		else if(min != null)
 			resId = R.string._msg_constraints_a;
+		else
+			resId = 0;
 
-		mMessageView.setText(getContext().getString(resId, min, max));
+		if(resId != 0)
+			mMessageView.setText(getContext().getString(resId, min, max));
+		else
+			mMessageView.setVisibility(View.GONE);
 
 		final boolean isValidTime = isCurrentlyVisibleTimePickerValueValid();
 		mNextButton.setEnabled(isCurrentlyVisibleTimePickerValueValid());
@@ -441,7 +426,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		public void onClick(View v)
 		{
 			mTimePicker.clearFocus();
-			
+
 			if(v == mBackButton)
 			{
 				if(mCurrentPage == 0)
@@ -457,7 +442,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			{
 				// must be called before incrementing mCurrentPage
 				final boolean positiveResult = isCurrentlyVisibleTimePickerValueValid();
-				
+
 				if(++mCurrentPage == mPageCount)
 				{
 					// We check the value again because it might have

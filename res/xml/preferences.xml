@@ -219,6 +219,12 @@
 			android:selectAllOnFocus="true"
 		/>
 		
+		<at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="@string/key_quiet_hours"
+			android:title="@string/_title_quiet_hours"
+			android:summary="@string/_summary_quiet_hours"
+			android:defaultValue="@string/pref_default_quiet_hours"
+		/>
+		
 		<PreferenceCategory 
 			android:title="@string/_title_pref_notification_methods">
 		

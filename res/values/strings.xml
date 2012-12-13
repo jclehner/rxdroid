@@ -314,6 +314,10 @@
 	<string name="_title_per_drug_reminders">Reminders</string>
 	<string name="_title_me">Me</string>
 	<string name="_title_patient">Patient</string>
+	
+	<string name="_title_quiet_hours">Quiet hours</string>
+	<string name="_summary_quiet_hours">During this time period, notifications will use neither sound nor vibration</string>
+	
 							
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
