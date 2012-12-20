@@ -62,7 +62,6 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
-import at.jclehner.androidutils.DialogFragmentWithListener;
 import at.jclehner.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.jclehner.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
 import at.jclehner.rxdroid.db.Database;
@@ -76,6 +75,7 @@ import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.AutoDragSortListView;
+import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
 import com.mobeta.android.dslv.DragSortListView;
 
@@ -245,7 +245,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			}
 			case R.id.menuitem_patient:
 			{
-				
+
 			}
 			case R.id.menuitem_add:
 			{
@@ -455,7 +455,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 	public void onLowSupplyIndicatorClicked(View view)
 	{
-		final Drug drug = (Drug) view.getTag();
+		final Drug drug = ((DrugSupplyMonitor) view).getDrug();
+		if(drug == null)
+			return;
+
 		final int daysLeft = Entries.getSupplyDaysLeftForDrug(drug, mCurrentDate);
 		final String dateString = DateTime.toNativeDate(DateTime.add(mCurrentDate, Calendar.DAY_OF_MONTH, daysLeft));
 

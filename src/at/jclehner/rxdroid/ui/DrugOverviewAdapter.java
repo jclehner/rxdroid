@@ -105,10 +105,11 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		holder.icon.setImageResource(Util.getDrugIconDrawable(getContext(), drug.getIcon()));
 		holder.currentSupply.setDrug(drug);
 
-		if(DateTime.today().equals(mAdapterDate))
-		{
-			boolean isIndicatorIconVisible = false;
+		final Date today = DateTime.today();
+		boolean isCurrentSupplyVisible;
 
+		if(today.equals(mAdapterDate))
+		{
 			if(Entries.hasMissingIntakesBeforeDate(drug, mAdapterDate))
 			{
 				if(holder.missedDoseIndicator instanceof ViewStub)
@@ -116,32 +117,28 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 				holder.missedDoseIndicator.setTag(drug);
 				holder.missedDoseIndicator.setVisibility(View.VISIBLE);
-				isIndicatorIconVisible |= true;
 			}
 			else
 				holder.missedDoseIndicator.setVisibility(View.GONE);
 
 
-			final boolean isCurrentSupplyVisible = drug.getRefillSize() != 0 || !drug.getCurrentSupply().isZero();
-			holder.currentSupply.setVisibility(isCurrentSupplyVisible ? View.VISIBLE : View.INVISIBLE);
-
 			if(Settings.hasLowSupplies(drug))
-			{
-				isIndicatorIconVisible |= true;
 				holder.currentSupply.setTypeface(null, Typeface.BOLD_ITALIC);
-			}
 			else
 				holder.currentSupply.setTextAppearance(mActivity, android.R.style.TextAppearance_Small);
 
-			holder.currentSupply.setTag(drug);
+			isCurrentSupplyVisible = drug.getRefillSize() != 0 || !drug.getCurrentSupply().isZero();
 		}
+		else
+			isCurrentSupplyVisible = false;
+
+		holder.currentSupply.setVisibility(isCurrentSupplyVisible ? View.VISIBLE : View.INVISIBLE);
 
 		for(DoseView doseView : holder.doseViews)
 		{
 			if(!doseView.hasInfo(mAdapterDate, drug))
 				doseView.setDoseFromDrugAndDate(mAdapterDate, drug);
 		}
-
 
 		final int dividerVisibility;
 		if(v.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)

@@ -30,6 +30,10 @@ public class DrugSupplyMonitor extends TextView implements Database.OnChangeList
 		setText(drug.getCurrentSupply().toString());
 	}
 
+	public Drug getDrug() {
+		return Database.find(Drug.class, mDrugId);
+	}
+
 	@Override
 	public void onEntryCreated(Entry entry, int flags) {
 		updateTextIfApplicable(entry);

@@ -131,13 +131,15 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 	@Override
 	public CharSequence getSummary()
 	{
-		final TimePeriod value = getValue();
-		//return value == null ? super.getSummary() : value.toString();
+		final CharSequence summary = super.getSummary();
+		if(summary != null)
+			return summary;
 
+		final TimePeriod value = getValue();
 		if(value != null)
 			return DateTime.toNativeTime(value.getBegin()) + "-" + DateTime.toNativeTime(value.getEnd());
 
-		return super.getSummary();
+		return null;
 	}
 
 	@Override
