@@ -27,6 +27,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
@@ -218,6 +222,40 @@ public final class Entries
 
 	public static String getDoseTimeString(int doseTime) {
 		return TIME_NAMES[doseTime];
+	}
+
+	public static Fraction getTotalDoseInTimePeriod(Drug drug, Date begin, Date end)
+	{
+		final MutableFraction totalDose = new MutableFraction();
+
+		final Calendar cal = DateTime.calendarFromDate(begin);
+		cal.add(Calendar.DAY_OF_MONTH, 1);
+		Date date;
+
+		while((date = cal.getTime()).before(end) || date.equals(end))
+		{
+			getTotalDose(drug, date, totalDose);
+
+			if(totalDose.isNegative())
+				return Fraction.ZERO;
+
+			cal.add(Calendar.DAY_OF_MONTH, 1);
+		}
+
+		return totalDose;
+	}
+
+	private static void getTotalDose(Drug drug, Date date, MutableFraction outTotalDose)
+	{
+		if(!drug.hasDoseOnDate(date))
+			return;
+
+		final int repeatMode = drug.getRepeatMode();
+		if(repeatMode == Drug.REPEAT_ON_DEMAND)
+			return;
+
+		for(int doseTime : Constants.DOSE_TIMES)
+			outTotalDose.add(drug.getDose(doseTime, date));
 	}
 
 	private static double getDailyDose(Drug drug)

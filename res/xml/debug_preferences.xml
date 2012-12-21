@@ -3,8 +3,8 @@
 	android:title="Debugging stuff"
 >	
 	
-	<Preference android:key="debug_dump_db"
+	<!-- <Preference android:key="debug_dump_db"
 		android:title="Dump database"
 		android:summary="Dumps the database to JSON arrays"
-	/>
+	/> -->
 </PreferenceCategory>

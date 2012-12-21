@@ -35,7 +35,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.FractionInput.OnChangedListener;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;

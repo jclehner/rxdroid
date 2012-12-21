@@ -27,7 +27,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.view.View;
 import android.view.ViewStub;
-import at.jclehner.rxdroid.Fraction;
 
 public class FractionInputDialog extends AlertDialog implements OnClickListener, FractionInput.OnChangedListener
 {

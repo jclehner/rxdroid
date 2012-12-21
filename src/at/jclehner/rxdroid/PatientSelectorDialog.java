@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,8 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Patient;
-import at.jclehner.rxdroid.ui.DrugOverviewAdapter;
-import at.jclehner.rxdroid.util.DateTime;
 
 public class PatientSelectorDialog extends DialogFragment
 {

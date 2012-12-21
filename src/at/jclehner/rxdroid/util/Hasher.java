@@ -26,8 +26,7 @@ import java.lang.reflect.Array;
 /**
  * Helper class for writing hashCode methods.
  *
- * The design is essentially copied from the Android SDK's javadoc, which in
- * turn is based on <em>Effective Java</em> item 8.
+ * The design is essentially copied from the Android SDK's javadoc.
  *
  * Usage example:
  * <pre>

@@ -21,13 +21,10 @@
 
 package at.jclehner.rxdroid;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 import at.jclehner.rxdroid.util.Hasher;
 
 

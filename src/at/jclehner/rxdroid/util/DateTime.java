@@ -31,9 +31,9 @@ import java.util.TimeZone;
 
 import android.text.format.DateFormat;
 import android.util.Log;
+import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.PerThreadInstance;
 import at.jclehner.rxdroid.RxDroid;
-import at.jclehner.rxdroid.DumbTime;
 
 /**
  * Date/time utilities.

@@ -10,6 +10,7 @@ import android.widget.ListAdapter;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.Version;
+
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 

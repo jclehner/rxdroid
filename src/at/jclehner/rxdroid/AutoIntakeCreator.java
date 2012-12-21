@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.List;
 
 import android.util.Log;
-import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;

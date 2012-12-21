@@ -1,16 +1,23 @@
 package at.jclehner.rxdroid.widget;
 
+import java.util.Date;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.TextView;
+import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
+import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.util.DateTime;
 
 public class DrugSupplyMonitor extends TextView implements Database.OnChangeListener
 {
-	private int mDrugId = -1;
+	//private int mDrugId = -1;
+	private Drug mDrug;
+	private Date mDate;
 
 	public DrugSupplyMonitor(Context context) {
 		super(context);
@@ -26,12 +33,25 @@ public class DrugSupplyMonitor extends TextView implements Database.OnChangeList
 
 	public void setDrug(Drug drug)
 	{
-		mDrugId = drug.getId();
-		setText(drug.getCurrentSupply().toString());
+		mDrug = drug;
+		updateText(drug, mDate);
+	}
+
+	public void setDate(Date date)
+	{
+		mDate = date;
+		updateText(mDrug, date);
+	}
+
+	public void setDrugAndDate(Drug drug, Date date)
+	{
+		mDrug = drug;
+		mDate = date;
+		updateText(drug, date);
 	}
 
 	public Drug getDrug() {
-		return Database.find(Drug.class, mDrugId);
+		return mDrug;
 	}
 
 	@Override
@@ -69,14 +89,14 @@ public class DrugSupplyMonitor extends TextView implements Database.OnChangeList
 
 		if(entry instanceof Drug)
 		{
-			if(mDrugId != entry.getId())
+			if(mDrug.getId() != entry.getId())
 				return;
 
 			drug = (Drug) entry;
 		}
 		else if(entry instanceof Intake)
 		{
-			if(mDrugId != ((Intake) entry).getDrugId())
+			if(mDrug.getId() != ((Intake) entry).getDrugId())
 				return;
 
 			drug = ((Intake) entry).getDrug();
@@ -84,7 +104,23 @@ public class DrugSupplyMonitor extends TextView implements Database.OnChangeList
 		else
 			return;
 
-		if(drug != null)
-			setText(drug.getCurrentSupply().toString());
+		setDrug(drug);
+	}
+
+	private void updateText(Drug drug, Date date)
+	{
+		if(drug == null)
+			return;
+
+		final Date today = DateTime.today();
+		MutableFraction currentSupply = drug.getCurrentSupply().mutate();
+
+		if(date != null && date.after(today))
+			currentSupply.subtract(Entries.getTotalDoseInTimePeriod(drug, today, date));
+
+		if(!currentSupply.isNegative())
+			setText(currentSupply.toString());
+		else
+			setText("0");
 	}
 }

@@ -21,9 +21,6 @@
 
 package at.jclehner.rxdroid.ui;
 
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 
 /*
  * Copied from http://developer.android.com/reference/android/app/ActionBar.html#newTab%28%29

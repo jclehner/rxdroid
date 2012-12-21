@@ -103,7 +103,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		//holder.icon.setImageResource(drug.getIconResourceId());
 		holder.icon.setImageResource(Util.getDrugIconDrawable(getContext(), drug.getIcon()));
-		holder.currentSupply.setDrug(drug);
+		holder.currentSupply.setDrugAndDate(drug, mAdapterDate);
 
 		final Date today = DateTime.today();
 		boolean isCurrentSupplyVisible;
@@ -130,7 +130,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			isCurrentSupplyVisible = drug.getRefillSize() != 0 || !drug.getCurrentSupply().isZero();
 		}
 		else
-			isCurrentSupplyVisible = false;
+			isCurrentSupplyVisible = mAdapterDate.after(today);
 
 		holder.currentSupply.setVisibility(isCurrentSupplyVisible ? View.VISIBLE : View.INVISIBLE);
 

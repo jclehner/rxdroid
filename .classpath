@@ -16,5 +16,7 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/NumberPicker"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/DragSortListView"/>
+	<classpathentry kind="lib" path="libs/guava-14.0-rc1.jar"/>
+	<classpathentry kind="lib" path="libs/jsr305-2.0.1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

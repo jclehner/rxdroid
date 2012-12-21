@@ -2,7 +2,6 @@ package at.jclehner.rxdroid.db.v53;
 
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
-import at.jclehner.rxdroid.db.FractionPersister;
 import at.jclehner.rxdroid.db.Intake;
 
 import com.j256.ormlite.field.DataType;
