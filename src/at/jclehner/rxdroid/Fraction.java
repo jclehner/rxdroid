@@ -78,6 +78,22 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 		public MutableFraction subtract(int n) {
 			return add(this, -n);
 		}
+
+		public MutableFraction multiplyBy(Fraction other) {
+			return multiplyBy(this, other);
+		}
+
+		public MutableFraction multiplyBy(int n) {
+			return multiplyBy(this, n);
+		}
+
+		public MutableFraction divideBy(Fraction other) {
+			return divideBy(this, other);
+		}
+
+		public MutableFraction divideBy(int n) {
+			return divideBy(this, n);
+		}
 	}
 
 	private static final long serialVersionUID = 2050536341303052796L;
@@ -142,53 +158,69 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	/**
 	 * Returns <code>true</code> if <code>numerator / denominator</code> yields an integer.
 	 */
-	public boolean isInteger() {
+	public final boolean isInteger() {
 		return mNumerator % mDenominator == 0;
 	}
 
-	public boolean isNegative() {
+	public final boolean isNegative() {
 		return mNumerator < 0;
 	}
 
-	public boolean isZero() {
+	public final boolean isZero() {
 		return mNumerator == 0;
 	}
 
-	public MutableFraction mutate() {
+	public final MutableFraction mutate() {
 		return new MutableFraction(this);
 	}
 
-	public Fraction plus(final Fraction other)
+	public final Fraction plus(final Fraction other)
 	{
 		Fraction result = new Fraction(this);
 		return add(result, other);
 	}
 
-	public Fraction plus(int n)
+	public final Fraction plus(int n)
 	{
 		Fraction result = new Fraction(this);
 		return add(result, n);
 	}
 
-	public Fraction minus(final Fraction other) {
+	public final Fraction minus(final Fraction other) {
 		return plus(other.negate());
 	}
 
-	public Fraction minus(int n) {
+	public final Fraction minus(int n) {
 		return plus(-n);
+	}
+
+	public final Fraction times(Fraction other) {
+		return multiplyBy(new Fraction(this), other);
+	}
+
+	public final Fraction times(int n) {
+		return multiplyBy(new Fraction(this), n);
+	}
+
+	public final Fraction dividedBy(Fraction other) {
+		return divideBy(new Fraction(this), other);
+	}
+
+	public final Fraction dividedBy(int n) {
+		return divideBy(new Fraction(this), n);
 	}
 
 	/**
 	 * Returns the fraction's negative form.
 	 */
-	public Fraction negate() {
+	public final Fraction negate() {
 		return new Fraction(-mNumerator, mDenominator);
 	}
 
 	/**
 	 * Returns the fraction's reciprocal value.
 	 */
-	public Fraction reciprocal()
+	public final Fraction reciprocal()
 	{
 		if(mNumerator < 0)
 		{
@@ -208,7 +240,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	 * @return an <code>int[]</code> with the values <code>{ wholeNum, numerator, denominator }</code>, where <code>wholeNum</code> will
 	 *     be zero if <code>returnAsMixedNumber</code> is <code>true</code>
 	 */
-	public int[] getFractionData(boolean returnAsMixedNumber)
+	public final int[] getFractionData(boolean returnAsMixedNumber)
 	{
 		if(!returnAsMixedNumber)
 			return new int[] { 0, mNumerator, mDenominator };
@@ -437,6 +469,30 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	{
 		//init(0, mNumerator + n * mDenominator, mDenominator);
 		dest.mNumerator += n * dest.mDenominator;
+		return dest;
+	}
+
+	private static <F extends Fraction> F multiplyBy(F dest, Fraction other)
+	{
+		final int numerator = dest.mNumerator * other.mNumerator;
+		final int denominator = dest.mDenominator * dest.mNumerator;
+		dest.init(0, numerator, denominator);
+		return dest;
+	}
+
+	private static <F extends Fraction> F multiplyBy(F dest, int n)
+	{
+		dest.init(0, dest.mNumerator * n, dest.mDenominator);
+		return dest;
+	}
+
+	private static <F extends Fraction> F divideBy(F dest, Fraction other) {
+		return multiplyBy(dest, other.reciprocal());
+	}
+
+	private static <F extends Fraction> F divideBy(F dest, int n)
+	{
+		dest.init(0, dest.mNumerator, dest.mDenominator * n);
 		return dest;
 	}
 

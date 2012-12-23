@@ -55,11 +55,6 @@ public class InfiniteViewPagerAdapter extends PagerAdapter
 		return ITEM_COUNT;
 	}
 
-	/*@Override
-	public int getItemPosition(Object object) {
-		return 1;
-	}*/
-
 	@Override
 	public boolean isViewFromObject(View v, Object o) {
 		return v == (View) o;
@@ -88,8 +83,4 @@ public class InfiniteViewPagerAdapter extends PagerAdapter
 		super.setPrimaryItem(container, position, object);
 		mCurrentItemIndex = position;
 	}
-
-	/*public static int getPagerOffset(ViewPager pager) {
-		return pager.getCurrentItem() - CENTER;
-	}*/
 }

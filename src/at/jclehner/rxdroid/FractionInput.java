@@ -63,7 +63,6 @@ public class FractionInput extends LinearLayout
 	private NumberPickerWrapper mDenominatorPicker;
 	private TextView mFractionBar;
 	private Button mModeSwitcher;
-	//private Button mCustomButton;
 
 	@SaveState
 	private int mInteger = 0;
@@ -91,7 +90,6 @@ public class FractionInput extends LinearLayout
 		mDenominatorPicker = (NumberPickerWrapper) findViewById(R.id.denominator);
 		mFractionBar = (TextView) findViewById(R.id.fraction_bar);
 		mModeSwitcher = (Button) findViewById(R.id.mode_switcher);
-		//mCustomButton = (Button) findViewById(R.id.custom_button);
 
 		mIntegerPicker.setOnValueChangeListener(mPickerListener);
 		mIntegerPicker.setWrapSelectorWheel(false);
