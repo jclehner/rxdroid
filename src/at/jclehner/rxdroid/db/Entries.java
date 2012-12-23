@@ -27,11 +27,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
+import android.util.Log;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.util.Constants;
@@ -224,7 +221,7 @@ public final class Entries
 		return TIME_NAMES[doseTime];
 	}
 
-	public static Fraction getTotalDoseInTimePeriod(Drug drug, Date begin, Date end)
+	public static Fraction getTotalDoseInTimePeriod_dumb(Drug drug, Date begin, Date end)
 	{
 		final MutableFraction totalDose = new MutableFraction();
 
@@ -245,9 +242,110 @@ public final class Entries
 		return totalDose;
 	}
 
+	public static Fraction getTotalDoseInTimePeriod_smart(Drug drug, Date begin, Date end)
+	{
+		final int repeatMode = drug.getRepeatMode();
+		final MutableFraction baseDose = new MutableFraction();
+		int doseMultiplier = 0;
+
+		if(repeatMode == Drug.REPEAT_ON_DEMAND)
+			return Fraction.ZERO;
+		if(repeatMode == Drug.REPEAT_DAILY)
+		{
+			getTotalDose(drug, null, baseDose);
+			doseMultiplier = (int) DateTime.diffDays(begin, end);
+		}
+		else if(repeatMode == Drug.REPEAT_EVERY_N_DAYS)
+		{
+			getTotalDose(drug, null, baseDose);
+
+			final long arg = drug.getRepeatArg();
+			final long daysInPeriod = DateTime.diffDays(begin, end);
+
+			if(drug.hasDoseOnDate(begin) || drug.hasDoseOnDate(end))
+				doseMultiplier = 1;
+
+			doseMultiplier += daysInPeriod / arg;
+		}
+		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
+		{
+			getTotalDose(drug, null, new MutableFraction());
+
+			final Calendar cal = DateTime.calendarFromDate(begin);
+			int weekDay;
+
+			// Manually check the days before the first Monday
+			while((weekDay = cal.get(Calendar.DAY_OF_WEEK)) != Calendar.MONDAY)
+			{
+				if(drug.hasDoseOnWeekday(weekDay))
+					++doseMultiplier;
+
+				cal.add(Calendar.DAY_OF_WEEK, 1);
+			}
+
+			final Date firstMonday = cal.getTime();
+
+			// Now check the days after the last Sunday
+			cal.setTime(end);
+
+			while((weekDay = cal.get(Calendar.DAY_OF_WEEK)) != Calendar.SUNDAY)
+			{
+				if(drug.hasDoseOnWeekday(weekDay))
+					++doseMultiplier;
+
+				cal.add(Calendar.DAY_OF_WEEK, -1);
+			}
+
+			final Date lastSunday = cal.getTime();
+
+			// Now comes the easy part: dealing with the full week(s) in between
+			final long days = DateTime.diffDays(firstMonday, lastSunday);
+			if(days > 7)
+			{
+				if(days % 7 != 0)
+					throw new IllegalStateException("Not a full week: " + firstMonday + " - " + lastSunday);
+
+				doseMultiplier += days / 7 * Long.bitCount(drug.getRepeatArg());
+			}
+		}
+		else if(repeatMode == Drug.REPEAT_21_7)
+		{
+			getTotalDose(drug, null, baseDose);
+
+			final Date origin = drug.getRepeatOrigin();
+
+			long daysInTimePeriod = DateTime.diffDays(begin, end);
+			final long daysFromOriginToBegin = DateTime.diffDays(origin, begin);
+			final long daysFromOriginToEnd = DateTime.diffDays(origin, end);
+
+			long index = daysFromOriginToBegin % 28;
+			if(index < 21)
+			{
+				final long days = 21 - index;
+				daysInTimePeriod -= days + 7;
+				doseMultiplier += days;
+			}
+
+			index = daysFromOriginToEnd % 28;
+			if(index < 21)
+			{
+				final long days = 21 - index;
+				daysInTimePeriod -= days + 7;
+				doseMultiplier += days;
+			}
+
+			if(daysInTimePeriod > 28)
+				doseMultiplier += (daysInTimePeriod * 3) / 4;
+		}
+		else
+			throw new UnsupportedOperationException();
+
+		return baseDose.times(doseMultiplier);
+	}
+
 	private static void getTotalDose(Drug drug, Date date, MutableFraction outTotalDose)
 	{
-		if(!drug.hasDoseOnDate(date))
+		if(date != null && !drug.hasDoseOnDate(date))
 			return;
 
 		final int repeatMode = drug.getRepeatMode();
@@ -255,7 +353,18 @@ public final class Entries
 			return;
 
 		for(int doseTime : Constants.DOSE_TIMES)
-			outTotalDose.add(drug.getDose(doseTime, date));
+		{
+			final Fraction dose;
+
+			if(date == null)
+				dose = drug.getDose(doseTime);
+			else
+				dose = drug.getDose(doseTime, date);
+
+			outTotalDose.add(dose);
+		}
+
+		return;
 	}
 
 	private static double getDailyDose(Drug drug)

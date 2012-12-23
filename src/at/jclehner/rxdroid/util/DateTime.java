@@ -244,7 +244,7 @@ public final class DateTime
 
 	public static long diffDays(Date date1, Date date2)
 	{
-		return (date1.getTime() - date2.getTime()) / Constants.MILLIS_PER_DAY;
+		return (date2.getTime() - date1.getTime()) / Constants.MILLIS_PER_DAY;
 	}
 
 	public static void disableDateCache()

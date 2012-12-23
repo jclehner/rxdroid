@@ -356,8 +356,6 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 		dest.writeInt(mDenominator);
 	}
 
-
-
 	/**
 	 * Parses the textual representation of a fraction.
 	 * <p>
@@ -419,7 +417,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 			throw new NumberFormatException("Denominator must be greater than zero");
 
 		if(integer != 0 && numerator < 0)
-			throw new NumberFormatException("Nominator must not be negative if integer is non-zero");
+			throw new NumberFormatException("Numerator must not be negative if integer is non-zero");
 
 		// set mNumerator, even though we divide it by the GCD later, so as to pass the
 		// original argument of this function to findGCD
@@ -433,8 +431,8 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 
 		final int divisor = findGCD(Math.abs(numerator), denominator);
 
-		mNumerator = mNumerator / divisor;
-		mDenominator = mDenominator / divisor;
+		mNumerator /= divisor;
+		mDenominator /= divisor;
 	}
 
 	private static <F extends Fraction> F add(F dest, Fraction other)
@@ -476,6 +474,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	{
 		final int numerator = dest.mNumerator * other.mNumerator;
 		final int denominator = dest.mDenominator * dest.mNumerator;
+
 		dest.init(0, numerator, denominator);
 		return dest;
 	}
@@ -486,8 +485,13 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 		return dest;
 	}
 
-	private static <F extends Fraction> F divideBy(F dest, Fraction other) {
-		return multiplyBy(dest, other.reciprocal());
+	private static <F extends Fraction> F divideBy(F dest, Fraction other)
+	{
+		final int numerator = dest.mNumerator * other.mDenominator;
+		final int denominator = dest.mDenominator * other.mNumerator;
+
+		dest.init(0, numerator, denominator);
+		return dest;
 	}
 
 	private static <F extends Fraction> F divideBy(F dest, int n)

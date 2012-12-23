@@ -353,7 +353,8 @@ public class Drug extends Entry implements Comparable<Drug>
 		if(repeatMode != REPEAT_CUSTOM)
 		{
 			if(!hasDoseOnDate(date))
-				return new Fraction(0);
+				return Fraction.ZERO;
+
 			return getDose(doseTime);
 		}
 
@@ -669,7 +670,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		return members;
 	}
 
-	private boolean hasDoseOnWeekday(int calWeekday)
+	/* package */ boolean hasDoseOnWeekday(int calWeekday)
 	{
 		if(repeatMode != REPEAT_WEEKDAYS)
 			throw new IllegalStateException("repeatMode != FREQ_WEEKDAYS");
