@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import android.util.Log;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.util.Constants;
@@ -221,7 +220,7 @@ public final class Entries
 		return TIME_NAMES[doseTime];
 	}
 
-	public static Fraction getTotalDoseInTimePeriod_dumb(Drug drug, Date begin, Date end)
+	public static Fraction getTotalDoseInTimePeriod_dumb(Drug drug, Date begin, Date end, boolean stopIfSupplyIsEmpty)
 	{
 		final MutableFraction totalDose = new MutableFraction();
 
@@ -233,8 +232,8 @@ public final class Entries
 		{
 			getTotalDose(drug, date, totalDose);
 
-			if(totalDose.isNegative())
-				return Fraction.ZERO;
+			if(totalDose.isNegative() && stopIfSupplyIsEmpty)
+				return drug.getCurrentSupply();
 
 			cal.add(Calendar.DAY_OF_MONTH, 1);
 		}
@@ -288,7 +287,7 @@ public final class Entries
 			// Now check the days after the last Sunday
 			cal.setTime(end);
 
-			while((weekDay = cal.get(Calendar.DAY_OF_WEEK)) != Calendar.SUNDAY)
+			while((weekDay = cal.get(Calendar.DAY_OF_WEEK)) != Calendar.MONDAY)
 			{
 				if(drug.hasDoseOnWeekday(weekDay))
 					++doseMultiplier;

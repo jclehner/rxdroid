@@ -459,8 +459,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(drug == null)
 			return;
 
-		final int daysLeft = Entries.getSupplyDaysLeftForDrug(drug, mCurrentDate);
-		final String dateString = DateTime.toNativeDate(DateTime.add(mCurrentDate, Calendar.DAY_OF_MONTH, daysLeft));
+		final Date today = DateTime.today();
+
+		final int daysLeft = Entries.getSupplyDaysLeftForDrug(drug, today);
+		final String dateString = DateTime.toNativeDate(DateTime.add(today, Calendar.DAY_OF_MONTH, daysLeft));
 
 		Toast.makeText(this, getString(R.string._toast_low_supplies, dateString), Toast.LENGTH_LONG).show();
 	}

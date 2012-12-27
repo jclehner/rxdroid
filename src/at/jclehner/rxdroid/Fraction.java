@@ -222,6 +222,9 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	 */
 	public final Fraction reciprocal()
 	{
+		if(mNumerator == 0)
+			throw new IllegalStateException("Zero value");
+
 		if(mNumerator < 0)
 		{
 			// The sign is always kept in mNumerator, so mDenominator
@@ -297,11 +300,11 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	 * Returns the fraction's textual representation.
 	 * <p>
 	 * The generated string's format depends on whether you've disabled the displaying of
-	 * 'mixed numbers' (it's enabled by default) by calling setDisplayMixedNumbers().
+	 * 'mixed numbers' (it's enabled by default) by calling {@link #setDisplayMixedNumbers(boolean)}
 	 * Note that regardless of that setting's state, the returned string is guaranteed
-	 * to be accepted by Fraction.decode().
+	 * to be accepted by {@link #valueOf(String)}.
 	 *
-	 * @see Fraction#decode
+	 * @see Fraction#valueOf(String)
 	 * @see Fraction#setDisplayMixedNumbers
 	 */
 	@Override
@@ -439,8 +442,6 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	{
 		int numerator, denominator;
 
-		//Log.d(TAG, "plus: this=" + this + ", other=" + other);
-
 		if(dest.mDenominator != other.mDenominator)
 		{
 			int lcm = findLCM(dest.mDenominator, other.mDenominator);
@@ -465,7 +466,6 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 
 	private static <F extends Fraction> F add(F dest, int n)
 	{
-		//init(0, mNumerator + n * mDenominator, mDenominator);
 		dest.mNumerator += n * dest.mDenominator;
 		return dest;
 	}

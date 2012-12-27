@@ -291,6 +291,9 @@
 	<string name="_title_me">Ich</string>
 	<string name="_title_patient">Patient</string>
 	
+	<string name="_title_quiet_hours">Nicht stören</string>
+	<string name="_summary_quiet_hours">Während dieser Zeit wird für Benachrichtigungen weder Ton noch Vibration verwendet</string>
+	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.

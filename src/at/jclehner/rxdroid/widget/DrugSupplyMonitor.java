@@ -4,7 +4,6 @@ import java.util.Date;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.TextView;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
@@ -119,15 +118,9 @@ public class DrugSupplyMonitor extends TextView implements Database.OnChangeList
 
 		if(date != null && date.after(today))
 		{
-			Fraction doseInTimePeriod_smart = Entries.getTotalDoseInTimePeriod_smart(drug, today, date);
-			Fraction doseInTimePeriod_dumb = Entries.getTotalDoseInTimePeriod_dumb(drug, today, date);
-
-			if(!doseInTimePeriod_smart.equals(doseInTimePeriod_dumb))
-			{
-				Log.w("DrugSupplyMonitor", "smart: " + doseInTimePeriod_smart + "\ndumb: " + doseInTimePeriod_dumb + "\n---");
-			}
-
-			currentSupply.subtract(doseInTimePeriod_smart);
+			//Fraction doseInTimePeriod_smart = Entries.getTotalDoseInTimePeriod_smart(drug, today, date);
+			Fraction doseInTimePeriod_dumb = Entries.getTotalDoseInTimePeriod_dumb(drug, today, date, true);
+			currentSupply.subtract(doseInTimePeriod_dumb);
 		}
 
 		if(!currentSupply.isNegative())

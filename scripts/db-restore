@@ -35,6 +35,6 @@ adb push "$1" "$TARGET" || die
 echo -n "Fixing permissions ... "
 run adb-shell chown $FUID.$FGID $DATABASES $DATABASES/"*"
 run adb-shell chmod 600 $DATABASES/"*"
-run adb-shell am force-stop $PKG
+adb-shell am force-stop $PKG &> /dev/null
 
 echo "done"
