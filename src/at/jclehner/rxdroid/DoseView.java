@@ -332,23 +332,26 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			{
 				setStatus(STATUS_TAKEN);
 
-				final Fraction scheduledDose = mDrug.getDose(mDoseTime, mDate);
-				int cmp = mDisplayDose.compareTo(scheduledDose);
-				String suffix;
-
-				if(cmp < 0)
-					suffix = "-";
-				else if(cmp > 0)
-					suffix = "+";
-				else
-					suffix = null;
-
 				SpannableStringBuilder sb = new SpannableStringBuilder(mDisplayDose.toString());
 
-				if(suffix != null)
+				if(Entries.isDateAfterLastScheduleUpdateOfDrug(mDate, mDrug))
 				{
-					sb.append(suffix);
-					sb.setSpan(new SuperscriptSpan(), sb.length() - 1, sb.length(), 0);
+					final Fraction scheduledDose = mDrug.getDose(mDoseTime, mDate);
+					int cmp = mDisplayDose.compareTo(scheduledDose);
+					String suffix;
+
+					if(cmp < 0)
+						suffix = "-";
+					else if(cmp > 0)
+						suffix = "+";
+					else
+						suffix = null;
+
+					if(suffix != null)
+					{
+						sb.append(suffix);
+						sb.setSpan(new SuperscriptSpan(), sb.length() - 1, sb.length(), 0);
+					}
 				}
 
 				mDoseText.setText(sb);

@@ -25,7 +25,6 @@ import java.util.Arrays;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import at.jclehner.rxdroid.util.Hasher;
 
 
 /**
@@ -223,7 +222,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	public final Fraction reciprocal()
 	{
 		if(mNumerator == 0)
-			throw new IllegalStateException("Zero value");
+			throw new ArithmeticException("Zero has no reciprocal");
 
 		if(mNumerator < 0)
 		{
@@ -266,12 +265,14 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	@Override
 	public int hashCode()
 	{
-		final Hasher hasher = new Hasher();
+		/*final Hasher hasher = new Hasher();
 
 		hasher.hash(mNumerator);
 		hasher.hash(mDenominator);
 
-		return hasher.getHashCode();
+		return hasher.getHashCode();*/
+
+		return mDenominator << 16 | mNumerator;
 	}
 
 	@Override
@@ -414,9 +415,11 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
         }
     };
 
-	private void init(final int integer, final int numerator, final int denominator)
+	private void init(int integer, int numerator, int denominator)
 	{
-		if(denominator <= 0)
+		if(denominator == 0)
+			throw new ArithmeticException("Division by zero");
+		else if(denominator < 0)
 			throw new NumberFormatException("Denominator must be greater than zero");
 
 		if(integer != 0 && numerator < 0)

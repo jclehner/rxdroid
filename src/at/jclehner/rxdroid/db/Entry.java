@@ -32,7 +32,7 @@ import com.j256.ormlite.field.DatabaseField;
 /**
  * Base class for all database entries.
  * <p>
- * The main purpose of this class is to provide alleviate child classes from
+ * The main purpose of this class is to alleviate child classes from
  * declaring an ID field and to force descendants to declare {@link #equals(Object)} and
  * {@link #hashCode()}.
  * <p>
@@ -90,10 +90,10 @@ public abstract class Entry implements Serializable
 
 	protected static void copy(Entry dest, Entry src)
 	{
-		Class<?> clsD = dest.getClass();
-		Class<?> clsS = src.getClass();
+		Class<? extends Entry> clsD = dest.getClass();
+		Class<? extends Entry> clsS = src.getClass();
 
-		for(Field fS : clsS.getDeclaredFields())
+		for(Field fS : Reflect.getAllFieldsUpTo(Entry.class, clsS))
 		{
 			if(fS.isAnnotationPresent(DatabaseField.class))
 			{

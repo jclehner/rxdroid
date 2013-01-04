@@ -184,6 +184,9 @@ public class Drug extends Entry implements Comparable<Drug>
 	private Date lastAutoIntakeCreationDate;
 
 	@DatabaseField
+	private Date lastScheduleUpdateDate;
+
+	@DatabaseField
 	private int sortRank = Integer.MAX_VALUE;
 
 	@DatabaseField(foreign = true)
@@ -388,6 +391,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.repeatMode = repeatMode;
 		this.repeatArg = 0;
 		this.repeatOrigin = null;
+		onScheduleUpdated();
 	}
 
 	/**
@@ -422,6 +426,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		}
 
 		this.repeatArg = repeatArg;
+		onScheduleUpdated();
 	}
 
 	/**
@@ -439,6 +444,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			throw new IllegalArgumentException();
 
 		this.repeatOrigin = repeatOrigin;
+		onScheduleUpdated();
 	}
 
 	public void setActive(boolean active) {
@@ -484,6 +490,8 @@ public class Drug extends Entry implements Comparable<Drug>
 
 		if(mSimpleSchedule != null)
 			mSimpleSchedule[doseTime] = value;
+
+		onScheduleUpdated();
 	}
 
 	public void setComment(String comment) {
@@ -506,8 +514,10 @@ public class Drug extends Entry implements Comparable<Drug>
 		return Database.get(Schedule.class, schedule.id);
 	}
 
-	public void setSchedule(Schedule schedule) {
+	public void setSchedule(Schedule schedule)
+	{
 		this.schedule = schedule;
+		onScheduleUpdated();
 	}
 
 	public void setPatient(Patient patient) {
@@ -526,9 +536,17 @@ public class Drug extends Entry implements Comparable<Drug>
 		return lastAutoIntakeCreationDate;
 	}
 
-	public void setLastAutoIntakeCreationDate(/* package */ Date lastAutoIntakeCreationDate) {
+	public void setLastAutoIntakeCreationDate(Date lastAutoIntakeCreationDate) {
 		this.lastAutoIntakeCreationDate = lastAutoIntakeCreationDate;
 	}
+
+	public Date getLastScheduleUpdateDate() {
+		return lastScheduleUpdateDate;
+	}
+
+//	public void setLastScheduleUpdateDate(Date lastScheduleUpdateDate) {
+//		this.lastScheduleUpdateDate = lastScheduleUpdateDate;
+//	}
 
 	public boolean hasNoDoses()
 	{
@@ -637,6 +655,10 @@ public class Drug extends Entry implements Comparable<Drug>
 		if(drug == null)
 			throw new NoSuchElementException("No drug with id=" + drugId);
 		return drug;
+	}
+
+	private void onScheduleUpdated() {
+		lastScheduleUpdateDate = DateTime.today();
 	}
 
 	/**

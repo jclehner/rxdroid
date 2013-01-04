@@ -78,8 +78,11 @@ public final class Entries
 		if(!drug.isActive())
 			return false;
 
-		int repeatMode = drug.getRepeatMode();
+		final Date lastScheduleUpdateDate = drug.getLastScheduleUpdateDate();
+		if(lastScheduleUpdateDate != null && date.before(lastScheduleUpdateDate))
+			return false;
 
+		final int repeatMode = drug.getRepeatMode();
 		switch(repeatMode)
 		{
 			case Drug.REPEAT_EVERY_N_DAYS:
@@ -105,6 +108,9 @@ public final class Entries
 				offset = (int) -days;
 
 			final Date lastIntakeDate = DateTime.add(date, Calendar.DAY_OF_MONTH, offset);
+			if(!isDateAfterLastScheduleUpdateOfDrug(lastIntakeDate, drug))
+				return false;
+
 			return !hasAllIntakes(drug, lastIntakeDate);
 		}
 		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
@@ -119,6 +125,8 @@ public final class Entries
 			for(int i = 0; i != 7; ++i)
 			{
 				final Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -7 + i);
+				if(!isDateAfterLastScheduleUpdateOfDrug(checkDate, drug))
+					continue;
 
 				for(int doseTime : Constants.DOSE_TIMES)
 				{
@@ -340,6 +348,15 @@ public final class Entries
 			throw new UnsupportedOperationException();
 
 		return baseDose.times(doseMultiplier);
+	}
+
+	public static boolean isDateAfterLastScheduleUpdateOfDrug(Date date, Drug drug)
+	{
+		final Date lastScheduleUpdateDate = drug.getLastScheduleUpdateDate();
+		if(lastScheduleUpdateDate == null)
+			return true;
+
+		return date.after(lastScheduleUpdateDate);
 	}
 
 	private static void getTotalDose(Drug drug, Date date, MutableFraction outTotalDose)

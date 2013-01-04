@@ -638,6 +638,8 @@ public final class Settings
 	// converts the string set [ "foo", "bar", "foobar", "barz" ] to the following string:
 	// 4:3:foo3:bar6:foobar4:barz
 
+
+
 	private static String stringSetToString(Set<String> set)
 	{
 		final StringBuilder sb = new StringBuilder();

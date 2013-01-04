@@ -95,7 +95,7 @@ public class Intake extends Entry
 	 * used for ignoring a dose.
 	 */
 	public Intake(Drug drug, Date date, int doseTime) {
-		this(drug, date, doseTime, new Fraction());
+		this(drug, date, doseTime, Fraction.ZERO);
 	}
 
 	public int getDrugId() {

@@ -168,10 +168,10 @@ public final class Reflect
 	}
 
 	public static List<Field> getAllFields(Class<?> clazz) {
-		return getAllFieldsUpTo(clazz, null);
+		return getAllFieldsUpTo(null, clazz);
 	}
 
-	public static <T> List<Field> getAllFieldsUpTo(Class<T> clazz, Class<? super T> superClazz)
+	public static <T> List<Field> getAllFieldsUpTo(Class<? super T> superClazz, Class<T> clazz)
 	{
 		if(clazz == Object.class)
 			throw new IllegalArgumentException();

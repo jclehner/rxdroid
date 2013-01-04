@@ -37,14 +37,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
- * Handles advanced intake schedules.
- * <p>
- * Note that an advanced schedule is implemented by extending
- * {@link ScheduleBase}. This class merely serves as a wrapper to accomodate
- * all schedules in one DB table. To achieve this, the schedule
- * class extending {@link ScheduleBase} is serialized into this DB entry's
- * <code>schedule</code> field. All function calls are thus relayed
- * to the actual implementation in said field.
+ * Handles advanced dose schedules.
  *
  * @see ScheduleBase
  *
@@ -83,21 +76,31 @@ public final class Schedule extends Entry
 	@DatabaseField(dataType = DataType.SERIALIZABLE, canBeNull = true)
 	private Repetiton repetition;
 
-	/**
-	 * The schedule's doses.
-	 * <p>
-	 * Values are stored in a two-dimensional array and are accessed
-	 * in the following way:
-	 *
-	 * weeklySchedule[weekday index*][dose time]
-	 *
-	 * If weeklySchedule[weekday index] is null, weeklySchedule[7] is used.
-	 *
-	 * *) 0 = Monday, 1 = Tuesday, ..., 6 = Sunday
-	 *
-	 */
-	@DatabaseField(dataType = DataType.SERIALIZABLE)
-	private Fraction[][] weeklySchedule = new Fraction[8][4];
+	@DatabaseField(persisterClass = FractionArrayPersister.class)
+	private Fraction[] dosesDefault;
+
+	@DatabaseField(persisterClass = FractionArrayPersister.class)
+	private Fraction[] dosesMon;
+
+	@DatabaseField(persisterClass = FractionArrayPersister.class)
+	private Fraction[] dosesTue;
+
+	@DatabaseField(persisterClass = FractionArrayPersister.class)
+	private Fraction[] dosesWed;
+
+	@DatabaseField(persisterClass = FractionArrayPersister.class)
+	private Fraction[] dosesThu;
+
+	@DatabaseField(persisterClass = FractionArrayPersister.class)
+	private Fraction[] dosesFri;
+
+	@DatabaseField(persisterClass = FractionArrayPersister.class)
+	private Fraction[] dosesSat;
+
+	@DatabaseField(persisterClass = FractionArrayPersister.class)
+	private Fraction[] dosesSun;
+
+	private transient Fraction[][] doses = null;
 
 	public String getName() {
 		return name;
@@ -133,6 +136,9 @@ public final class Schedule extends Entry
 
 	public boolean hasNoDoses()
 	{
+
+
+
 		for(Fraction[] doses : weeklySchedule)
 		{
 			if(doses == null)
@@ -160,9 +166,46 @@ public final class Schedule extends Entry
 
 	private Fraction[] getDoses(Date date)
 	{
-		final int weekdayIndex = Util.calWeekdayToIndex(DateTime.get(date, Calendar.DAY_OF_WEEK));
-		final Fraction[] doses = weeklySchedule[weekdayIndex];
-		return doses == null ? weeklySchedule[7] : doses;
+		final Fraction[] doses;
+
+		switch(DateTime.get(date, Calendar.DAY_OF_WEEK))
+		{
+			case Calendar.MONDAY:
+				doses = dosesMon;
+				break;
+
+			case Calendar.TUESDAY:
+				doses = dosesTue;
+				break;
+
+			case Calendar.WEDNESDAY:
+				doses = dosesWed;
+				break;
+
+			case Calendar.THURSDAY:
+				doses = dosesThu;
+				break;
+
+			case Calendar.FRIDAY:
+				doses = dosesFri;
+				break;
+
+			case Calendar.SATURDAY:
+				doses = dosesSat;
+				break;
+
+			case Calendar.SUNDAY:
+				doses = dosesSun;
+				break;
+
+			default:
+				throw new IllegalStateException("Unexpected DAY_OF_WEEK");
+		}
+
+		if(doses == null)
+			return dosesDefault;
+
+		return doses;
 	}
 
 	private static MutableFraction sum(Fraction[] fractions)
