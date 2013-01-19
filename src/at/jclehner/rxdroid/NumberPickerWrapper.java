@@ -81,6 +81,13 @@ public class NumberPickerWrapper extends LinearLayout
 		LayoutInflater inflater = LayoutInflater.from(context);
 		inflater.inflate(R.layout.number_picker_wrapper, this, true);
 
+		if(isInEditMode())
+		{
+			mNumberPickerNew = null;
+			mNumberPickerOld = null;
+			return;
+		}
+
 		if(Version.SDK_IS_PRE_HONEYCOMB)
 		{
 			mNumberPickerNew = null;

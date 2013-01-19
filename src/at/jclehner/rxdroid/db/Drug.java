@@ -25,13 +25,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
+import android.util.Log;
+import at.jclehner.androidutils.LazyValue;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Hasher;
+import at.jclehner.rxdroid.util.Keep;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
@@ -189,8 +194,8 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField
 	private int sortRank = Integer.MAX_VALUE;
 
-	@DatabaseField(foreign = true)
-	private Schedule schedule;
+	@ForeignCollectionField(eager = true, maxEagerLevel = 2)
+	private ForeignCollection<Schedule> schedules;
 
 	@DatabaseField
 	private String comment;
@@ -238,7 +243,7 @@ public class Drug extends Entry implements Comparable<Drug>
 				return (DateTime.diffDays(date, repeatOrigin) % 28) < 21;
 
 			case REPEAT_CUSTOM:
-				return schedule.hasDoseOnDate(date);
+				return Schedules.hasDoseOnDate(date, mSchedulesArray.get());
 
 			default:
 				throw new IllegalStateException("Unknown repeat mode");
@@ -361,7 +366,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			return getDose(doseTime);
 		}
 
-		return schedule.getDose(date, doseTime);
+		return Schedules.getDose(date, doseTime, mSchedulesArray.get());
 	}
 
 	public String getComment() {
@@ -462,7 +467,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	{
 		if(currentSupply == null)
 			this.currentSupply = Fraction.ZERO;
-		else if(currentSupply.compareTo(0) == -1)
+		else if(currentSupply.isNegative())
 			throw new IllegalArgumentException();
 
 		this.currentSupply = currentSupply;
@@ -506,18 +511,10 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.sortRank = sortRank;
 	}
 
-	public Schedule getSchedule()
-	{
-		if(schedule == null)
-			return null;
-
-		return Database.get(Schedule.class, schedule.id);
-	}
-
 	public void setSchedule(Schedule schedule)
 	{
-		this.schedule = schedule;
-		onScheduleUpdated();
+		if(schedules != null)
+			schedules.add(schedule);
 	}
 
 	public void setPatient(Patient patient) {
@@ -532,7 +529,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		return patient != null ? patient.id : Patient.DEFAULT_PATIENT_ID;
 	}
 
-	public /* package */ Date getLastAutoIntakeCreationDate() {
+	public Date getLastAutoIntakeCreationDate() {
 		return lastAutoIntakeCreationDate;
 	}
 
@@ -551,7 +548,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	public boolean hasNoDoses()
 	{
 		if(repeatMode == REPEAT_CUSTOM)
-			return schedule.hasNoDoses();
+			return Schedules.hasNoDoses(mSchedulesArray.get());
 
 		for(Fraction dose : getSimpleSchedule())
 		{
@@ -705,7 +702,27 @@ public class Drug extends Entry implements Comparable<Drug>
 		return (repeatArg & 1 << weekday) != 0;
 	}
 
-	public static final Callback<Drug> CALLBACK_DELETED = new Callback<Drug>() {
+	private final transient LazyValue<Schedule[]> mSchedulesArray = new LazyValue<Schedule[]>() {
+
+		@Override
+		public Schedule[] value()
+		{
+			if(schedules == null)
+			{
+				if(repeatMode == REPEAT_CUSTOM)
+					Log.d(TAG, this + ": no custom schedule!");
+				return null;
+			}
+
+
+			Schedule[] array = new Schedule[schedules.size()];
+			return schedules.toArray(array);
+		}
+
+	};
+
+	@Keep
+	/* package */ static final Callback<Drug> CALLBACK_DELETED = new Callback<Drug>() {
 
 		@Override
 		public void call(Drug drug)
@@ -715,10 +732,19 @@ public class Drug extends Entry implements Comparable<Drug>
 				if(intake.getDrug() == null || intake.getDrugId() == drug.id)
 					Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
 			}
+			
+			final Schedule[] schedules = drug.mSchedulesArray.get();
+			if(schedules == null)
+				return;
+			
+			for(Schedule schedule : schedules)
+				Database.delete(schedule, Database.FLAG_DONT_NOTIFY_LISTENERS);
+			
 		}
 	};
 
-	public static final Callback<Drug> CALLBACK_ALL_CACHED = new Callback<Drug>() {
+	@Keep
+	/* package */ static final Callback<Drug> CALLBACK_ALL_CACHED = new Callback<Drug>() {
 
 		@Override
 		public void call(Drug entry)

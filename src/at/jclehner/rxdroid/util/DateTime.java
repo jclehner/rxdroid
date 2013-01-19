@@ -21,6 +21,9 @@
 
 package at.jclehner.rxdroid.util;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -247,6 +250,12 @@ public final class DateTime
 		return (date2.getTime() - date1.getTime()) / Constants.MILLIS_PER_DAY;
 	}
 
+	public static int getIsoWeekDayNumberIndex(Date date)
+	{
+		final Calendar cal = calendarFromDate(date);
+		return CollectionUtils.indexOf(cal.get(Calendar.DAY_OF_WEEK), Constants.WEEK_DAYS);
+	}
+
 	public static void disableDateCache()
 	{
 		sDateCacheEnabled = false;
@@ -380,19 +389,27 @@ public final class DateTime
 	private static final class ImmutableDate extends Date
 	{
 		private static final long serialVersionUID = -660796950979760891L;
-
+		private boolean mIsTimeSet = false;		
+		
 		@SuppressWarnings("unused")
 		public ImmutableDate(Date date) {
-			this(date.getTime());
+			setTime(date.getTime());
 		}
 
 		public ImmutableDate(long timeInMillis) {
-			super.setTime(timeInMillis);
+			setTime(timeInMillis);
 		}
 
 		@Override
-		public void setTime(long milliseconds) {
-			throw new UnsupportedOperationException();
+		public void setTime(long milliseconds) 
+		{
+			if(!mIsTimeSet)
+			{
+				super.setTime(milliseconds);
+				mIsTimeSet = true;
+			}
+			else
+				throw new UnsupportedOperationException();
 		}
 
 		@Override

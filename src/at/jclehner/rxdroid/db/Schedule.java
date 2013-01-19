@@ -21,19 +21,20 @@
 
 package at.jclehner.rxdroid.db;
 
-import java.io.Serializable;
-import java.util.Calendar;
 import java.util.Date;
 
-import android.app.Activity;
+import android.view.ViewDebug.FlagToString;
+import at.jclehner.androidutils.LazyValue;
 import at.jclehner.rxdroid.Fraction;
-import at.jclehner.rxdroid.Fraction.MutableFraction;
+import at.jclehner.rxdroid.db.Entry.Callback;
 import at.jclehner.rxdroid.db.schedules.ScheduleBase;
 import at.jclehner.rxdroid.util.DateTime;
-import at.jclehner.rxdroid.util.Util;
+import at.jclehner.rxdroid.util.Exceptions;
+import at.jclehner.rxdroid.util.Keep;
 
-import com.j256.ormlite.field.DataType;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
@@ -55,71 +56,69 @@ public final class Schedule extends Entry
 	public static final int TIME_NIGHT   = 3;
 	public static final int TIME_INVALID = 4;
 
-	@SuppressWarnings("serial")
-	public static abstract class Repetiton implements Serializable
-	{
-		public abstract boolean hasDoseOnDate(Date date);
-		public abstract Date getNextDoseDate(Date date);
-		public abstract int getSupplyDaysLeft(Fraction supplyLeft);
-		public abstract Class<? extends Activity> getPreferenceActivityClass();
-	}
+	public static final int REPEAT_DAILY = 0;
+	public static final int REPEAT_ON_DEMAND = 1;
+	public static final int REPEAT_EVERY_N_DAYS = 2;
+	public static final int REPEAT_EVERY_6_8_12_OR_24_HOURS = 3;
+	public static final int REPEAT_WEEKDAYS = 4;
+	public static final int REPEAT_DAILY_WITH_PAUSE = 5;
 
-	@DatabaseField(canBeNull = true)
+	private static final int MASK_REPEAT_ARG_PAUSE = 0xffff;
+	private static final int MASK_REPEAT_ARG_CYCLE_LENGTH = 0xffff0000;
+
+	private static final Fraction[] ZERO_DOSE_ARRAY = new Fraction[] {
+		Fraction.ZERO, Fraction.ZERO, Fraction.ZERO, Fraction.ZERO
+	};
+
+	@DatabaseField
 	private String name;
 
-	@DatabaseField(canBeNull = true)
-	private Date begin;
+	@DatabaseField(canBeNull = false)
+	/* package */ Date begin;
 
-	@DatabaseField(canBeNull = true)
-	private Date end;
+	@DatabaseField
+	/* package */ Date end;
 
-	@DatabaseField(dataType = DataType.SERIALIZABLE, canBeNull = true)
-	private Repetiton repetition;
+	@DatabaseField
+	private int repeatMode = REPEAT_DAILY;
 
-	@DatabaseField(persisterClass = FractionArrayPersister.class)
-	private Fraction[] dosesDefault;
+	@DatabaseField
+	private long repeatArg;
 
-	@DatabaseField(persisterClass = FractionArrayPersister.class)
-	private Fraction[] dosesMon;
+	@DatabaseField(persisterClass = FractionPersister.class)
+	private Fraction doseMorning;
 
-	@DatabaseField(persisterClass = FractionArrayPersister.class)
-	private Fraction[] dosesTue;
+	@DatabaseField(persisterClass = FractionPersister.class)
+	private Fraction doseNoon;
 
-	@DatabaseField(persisterClass = FractionArrayPersister.class)
-	private Fraction[] dosesWed;
+	@DatabaseField(persisterClass = FractionPersister.class)
+	private Fraction doseEvening;
 
-	@DatabaseField(persisterClass = FractionArrayPersister.class)
-	private Fraction[] dosesThu;
+	@DatabaseField(persisterClass = FractionPersister.class)
+	private Fraction doseNight;
 
-	@DatabaseField(persisterClass = FractionArrayPersister.class)
-	private Fraction[] dosesFri;
+	@DatabaseField(foreign = true)
+	private Drug owner;
 
-	@DatabaseField(persisterClass = FractionArrayPersister.class)
-	private Fraction[] dosesSat;
-
-	@DatabaseField(persisterClass = FractionArrayPersister.class)
-	private Fraction[] dosesSun;
-
-	private transient Fraction[][] doses = null;
+	@ForeignCollectionField(eager = true)
+	private ForeignCollection<SchedulePart> scheduleParts;
 
 	public String getName() {
 		return name;
 	}
 
-	public Fraction getDose(Date date, int doseTime)
-	{
-		if(date == null || doseTime >= TIME_INVALID)
-			throw new IllegalArgumentException();
-
-		if(!hasDoseOnDate(date))
-			return Fraction.ZERO;
-
-		Fraction[] doses = getDoses(date);
-		if(doses == null)
-			return Fraction.ZERO;
-
-		return doses[doseTime];
+	public void setBegin(Date begin) {
+		this.begin = begin;
 	}
+
+	public void setEnd(Date end) {
+		this.end = end;
+	}
+
+	public void setOwner(Drug owner) {
+		this.owner = owner;
+	}
+
 
 	public boolean hasDoseOnDate(Date date)
 	{
@@ -128,27 +127,81 @@ public final class Schedule extends Entry
 		else if(end != null && date.after(end))
 			return false;
 
-		if(repetition != null)
-			return repetition.hasDoseOnDate(date);
+		if(!isDosePossibleOnDate(date))
+			return false;
 
-		return !sum(getDoses(date)).isZero();
+		for(Fraction dose : getDoses(date))
+		{
+			if(!dose.isZero())
+				return true;
+		}
+
+		return false;
+	}
+
+	public void setDose(int doseTime, Fraction dose)
+	{
+		switch(doseTime)
+		{
+			case TIME_MORNING:
+				doseMorning = dose;
+				break;
+
+			case TIME_NOON:
+				doseNoon = dose;
+				break;
+
+			case TIME_EVENING:
+				doseEvening = dose;
+				break;
+
+			case TIME_NIGHT:
+				doseNight = dose;
+				break;
+
+			default:
+				throw new Exceptions.UnexpectedValueInSwitch(doseTime);
+		}
+	}
+
+	public Fraction[] getDoses(Date date)
+	{
+		if(!isDosePossibleOnDate(date))
+			return ZERO_DOSE_ARRAY;
+
+		final SchedulePart[] schedulePartsArray = mSchedulePartsArray.get();
+		if(schedulePartsArray.length != 0)
+		{
+			final int weekday = DateTime.getIsoWeekDayNumberIndex(date);
+			for(SchedulePart part : schedulePartsArray)
+			{
+				if((part.weekdays & (1 << weekday)) != 0)
+					return part.getDoses();
+			}
+		}
+
+		return mDoses.get();
+	}
+
+	public Fraction getDose(Date date, int doseTime)
+	{
+		final Fraction dose = getDoses(date)[doseTime];
+		return dose != null ? dose : Fraction.ZERO;
 	}
 
 	public boolean hasNoDoses()
 	{
-
-
-
-		for(Fraction[] doses : weeklySchedule)
+		final SchedulePart[] schedulePartsArray = mSchedulePartsArray.get();
+		for(SchedulePart part : schedulePartsArray)
 		{
-			if(doses == null)
-				continue;
+			if(part.hasDoses())
+				return false;
+		}
 
-			for(Fraction dose : doses)
-			{
-				if(dose != null && !dose.isZero())
-					return false;
-			}
+		for(Fraction dose : mDoses.get())
+		{
+			if(!dose.isZero())
+				return false;
 		}
 
 		return true;
@@ -161,59 +214,72 @@ public final class Schedule extends Entry
 
 	@Override
 	public int hashCode() {
-		throw new UnsupportedOperationException();
+		return 0;
 	}
 
-	private Fraction[] getDoses(Date date)
+	private boolean isDosePossibleOnDate(Date date)
 	{
-		final Fraction[] doses;
-
-		switch(DateTime.get(date, Calendar.DAY_OF_WEEK))
+		switch(repeatMode)
 		{
-			case Calendar.MONDAY:
-				doses = dosesMon;
-				break;
+			case REPEAT_DAILY:
+			case REPEAT_ON_DEMAND:
+			case REPEAT_EVERY_6_8_12_OR_24_HOURS:
+				return true;
 
-			case Calendar.TUESDAY:
-				doses = dosesTue;
-				break;
+			case REPEAT_EVERY_N_DAYS:
+				return DateTime.diffDays(date, begin) % repeatArg == 0;
 
-			case Calendar.WEDNESDAY:
-				doses = dosesWed;
-				break;
+			case REPEAT_WEEKDAYS:
+				return (repeatArg & (1 << DateTime.getIsoWeekDayNumberIndex(date))) != 0;
 
-			case Calendar.THURSDAY:
-				doses = dosesThu;
-				break;
-
-			case Calendar.FRIDAY:
-				doses = dosesFri;
-				break;
-
-			case Calendar.SATURDAY:
-				doses = dosesSat;
-				break;
-
-			case Calendar.SUNDAY:
-				doses = dosesSun;
-				break;
+			case REPEAT_DAILY_WITH_PAUSE:
+				final long pauseDays = repeatArg & MASK_REPEAT_ARG_PAUSE;
+				final long cycleLength = (repeatArg & MASK_REPEAT_ARG_CYCLE_LENGTH) >> 4;
+				return DateTime.diffDays(date, begin) % cycleLength < (cycleLength - pauseDays);
 
 			default:
-				throw new IllegalStateException("Unexpected DAY_OF_WEEK");
+				throw new Exceptions.UnexpectedValueInSwitch(repeatMode);
 		}
-
-		if(doses == null)
-			return dosesDefault;
-
-		return doses;
 	}
 
-	private static MutableFraction sum(Fraction[] fractions)
-	{
-		final MutableFraction sum = new MutableFraction();
-		for(Fraction f : fractions)
-			sum.add(f);
+	transient private LazyValue<SchedulePart[]> mSchedulePartsArray = new LazyValue<SchedulePart[]>() {
 
-		return sum;
-	}
+		@Override
+		public SchedulePart[] value()
+		{
+			if(scheduleParts == null)
+				return null;
+
+			SchedulePart[] value = new SchedulePart[scheduleParts.size()];
+			return scheduleParts.toArray(value);
+		}
+	};
+
+	transient private LazyValue<Fraction[]> mDoses = new LazyValue<Fraction[]>() {
+
+		@Override
+		public Fraction[] value()
+		{
+			return new Fraction[] {
+					doseMorning, doseNoon, doseEvening, doseNight
+			};
+		}
+	};
+	
+	@Keep
+	/* package */ static final Callback<Schedule> CALLBACK_DELETED = new Callback<Schedule>() {
+
+		@Override
+		public void call(Schedule schedule)
+		{
+			final SchedulePart[] scheduleParts = schedule.mSchedulePartsArray.get();
+			if(scheduleParts == null)
+				return;
+			
+			for(SchedulePart part : scheduleParts)
+			{
+				Database.delete(part, Database.FLAG_DONT_NOTIFY_LISTENERS);
+			}
+		}
+	};
 }

@@ -59,7 +59,10 @@ import android.webkit.WebView;
 import android.widget.Toast;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
+import at.jclehner.rxdroid.db.Drug;
+import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.CollectionUtils;
+import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
 @SuppressWarnings("deprecation")
@@ -391,6 +394,40 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					{
 						Log.w(TAG, e);
 					}
+
+					return true;
+				}
+			});
+		}
+
+		p = findPreference("db_create_drug_with_schedule");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					final int drugCount = Database.countAll(Drug.class);
+
+					Fraction dose = new Fraction(1, 2);
+
+					Schedule schedule = new Schedule();
+					schedule.setDose(Schedule.TIME_MORNING, dose);
+					schedule.setDose(Schedule.TIME_EVENING, dose);
+
+					schedule.setBegin(DateTime.date(2013, 01, 01));
+					schedule.setEnd(DateTime.date(2013, 01, 14));
+
+					Drug drug = new Drug();
+					drug.setName("Drug #" + (drugCount + 1));
+					drug.setSchedule(schedule);
+					drug.setRepeatMode(Drug.REPEAT_CUSTOM);
+					drug.setActive(true);
+
+					Database.create(drug);
+					schedule.setOwner(drug);
+					Database.create(schedule);
 
 					return true;
 				}

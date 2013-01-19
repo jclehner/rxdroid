@@ -128,7 +128,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	 * Construct a fraction from an integer.
 	 */
 	public Fraction(int integer) {
-		this(integer, 1);
+		mNumerator = integer;
 	}
 
 	/**
@@ -157,69 +157,69 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	/**
 	 * Returns <code>true</code> if <code>numerator / denominator</code> yields an integer.
 	 */
-	public final boolean isInteger() {
+	public boolean isInteger() {
 		return mNumerator % mDenominator == 0;
 	}
 
-	public final boolean isNegative() {
+	public boolean isNegative() {
 		return mNumerator < 0;
 	}
 
-	public final boolean isZero() {
+	public boolean isZero() {
 		return mNumerator == 0;
 	}
 
-	public final MutableFraction mutate() {
+	public MutableFraction mutate() {
 		return new MutableFraction(this);
 	}
 
-	public final Fraction plus(final Fraction other)
+	public Fraction plus(final Fraction other)
 	{
 		Fraction result = new Fraction(this);
 		return add(result, other);
 	}
 
-	public final Fraction plus(int n)
+	public Fraction plus(int n)
 	{
 		Fraction result = new Fraction(this);
 		return add(result, n);
 	}
 
-	public final Fraction minus(final Fraction other) {
+	public Fraction minus(final Fraction other) {
 		return plus(other.negate());
 	}
 
-	public final Fraction minus(int n) {
+	public Fraction minus(int n) {
 		return plus(-n);
 	}
 
-	public final Fraction times(Fraction other) {
+	public Fraction times(Fraction other) {
 		return multiplyBy(new Fraction(this), other);
 	}
 
-	public final Fraction times(int n) {
+	public Fraction times(int n) {
 		return multiplyBy(new Fraction(this), n);
 	}
 
-	public final Fraction dividedBy(Fraction other) {
+	public Fraction dividedBy(Fraction other) {
 		return divideBy(new Fraction(this), other);
 	}
 
-	public final Fraction dividedBy(int n) {
+	public Fraction dividedBy(int n) {
 		return divideBy(new Fraction(this), n);
 	}
 
 	/**
 	 * Returns the fraction's negative form.
 	 */
-	public final Fraction negate() {
+	public Fraction negate() {
 		return new Fraction(-mNumerator, mDenominator);
 	}
 
 	/**
 	 * Returns the fraction's reciprocal value.
 	 */
-	public final Fraction reciprocal()
+	public Fraction reciprocal()
 	{
 		if(mNumerator == 0)
 			throw new ArithmeticException("Zero has no reciprocal");
@@ -235,6 +235,14 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 		return new Fraction(mDenominator, mNumerator);
 	}
 
+	public int numerator() {
+		return mNumerator;
+	}
+
+	public int denominator() {
+		return mDenominator;
+	}
+
 	/**
 	 * Gets the raw fraction data.
 	 *
@@ -242,7 +250,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	 * @return an <code>int[]</code> with the values <code>{ wholeNum, numerator, denominator }</code>, where <code>wholeNum</code> will
 	 *     be zero if <code>returnAsMixedNumber</code> is <code>true</code>
 	 */
-	public final int[] getFractionData(boolean returnAsMixedNumber)
+	public int[] getFractionData(boolean returnAsMixedNumber)
 	{
 		if(!returnAsMixedNumber)
 			return new int[] { 0, mNumerator, mDenominator };
@@ -404,16 +412,16 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 
 		@Override
 		public Fraction createFromParcel(Parcel in)
-        {
-            return new Fraction(in.readInt(), in.readInt());
-        }
+		{
+			return new Fraction(in.readInt(), in.readInt());
+		}
 
-        @Override
+		@Override
 		public Fraction[] newArray(int size)
-        {
-            return new Fraction[size];
-        }
-    };
+		{
+			return new Fraction[size];
+		}
+	};
 
 	private void init(int integer, int numerator, int denominator)
 	{
@@ -443,6 +451,9 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 
 	private static <F extends Fraction> F add(F dest, Fraction other)
 	{
+		if(other.mDenominator == 1)
+			return add(dest, other.mNumerator);
+
 		int numerator, denominator;
 
 		if(dest.mDenominator != other.mDenominator)

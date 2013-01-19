@@ -76,7 +76,7 @@ import com.j256.ormlite.table.DatabaseTableConfig;
 public final class Database
 {
 	private static final String TAG = Database.class.getName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = true;
 
 	/* package */ static final boolean USE_CUSTOM_CACHE = true;
 
@@ -86,9 +86,10 @@ public final class Database
 	static final Class<?>[] CLASSES = {
 		Drug.class,
 		Intake.class,
+		Patient.class,
 		Schedule.class,
 		// XXX
-		Patient.class
+		SchedulePart.class
 		// XXX
 	};
 
@@ -519,6 +520,9 @@ public final class Database
 				if(LOGV) Log.v(TAG, "Ran callback " + callbackField.getName());
 			}
 		}
+		else if(LOGV)
+			Log.v(TAG, "No callback " + callbackName + " for " + clazz.getSimpleName());
+			
 
 		if((flags & FLAG_DONT_NOTIFY_LISTENERS) == 0)
 		{
@@ -552,8 +556,8 @@ public final class Database
 			final Method m = dao.getClass().getMethod(methodName, Object.class);
 			final Timer t = LOGV ? new Timer() : null;
 			m.invoke(dao, entry);
-			--sPendingDaoOperations;
-			if(LOGV) Log.v(TAG, "dao." + methodName + ": " + t);
+			
+			if(LOGV) Log.v(TAG, "runDaoMethod: " + methodName + ": " + t);
 
 			//dao.deleteBuilder().where().idEq(id)
 
@@ -583,6 +587,10 @@ public final class Database
 		{
 			ex = e;
 			// handled at end of function
+		}
+		finally
+		{
+			--sPendingDaoOperations;
 		}
 
 		throw new WrappedCheckedException("Failed to run DAO method " + methodName, ex);

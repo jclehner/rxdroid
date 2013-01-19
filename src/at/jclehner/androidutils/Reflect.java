@@ -90,13 +90,14 @@ public final class Reflect
 		}
 	}
 
-	public static Object getFieldValue(Field field, Object o, Object defValue)
+	public static Object getFieldValue(Field field, Object object, Object defValue)
 	{
 		Exception ex;
 
 		try
 		{
-			return field.get(o);
+			makeAccessible(field);
+			return field.get(object);
 		}
 		catch(IllegalArgumentException e)
 		{

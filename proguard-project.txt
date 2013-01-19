@@ -36,6 +36,7 @@
 -keepclassmembers class * {
 	@at.jclehner.androidutils.otpm.OTPM$CreatePreference *;
 	@at.jclehner.androidutils.otpm.OTPM$AddPreference *;
+	@at.jclehner.rxdroid.util.Keep *;
 }
 
 -keepclassmembers class at.jclehner.** {
