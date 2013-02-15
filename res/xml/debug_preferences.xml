@@ -11,4 +11,11 @@
 	<Preference android:key="db_create_drug_with_schedule"
 		android:title="Custom schedule drug"
 	/>
+	
+	<!-- <at.jclehner.rxdroid.preferences.CheckableListPreference
+	    android:key="checkable_list_preference"
+	    android:title="Checkable"
+	    android:entries="@array/alarm_repeat_times"
+	    android:entryValues="@array/alarm_repeat_times_values"
+	/> -->
 </PreferenceScreen>

@@ -2,16 +2,17 @@
 
 source "$(dirname $_)/shared.sh"
 
-BAK=".backup.sqlite"
+BAKDB=".backup.sqlite"
+BAKCFG=".backup.config"
 APK="${1:-bin/RxDroid.apk}"
 
 if [[ ! -f "$APK" ]]; then
 	die "$APK does not exist"
 fi
 
-rm -f "$BAK"
+rm -f "$BAKDB" "$BAKCFG"
 
-scripts/db-backup $BAK || die
+scripts/db-backup $BAKDB $BAKCFG || die
 
 echo -n "Removing $PKG ... "
 adb uninstall $PKG || die
@@ -19,5 +20,5 @@ adb uninstall $PKG || die
 echo -n "Reinstalling $PKG ... "
 adb install $APK || die
 
-scripts/db-restore $BAK || die
-rm -f $BAK
+scripts/db-restore $BAKDB $BAKCFG || die
+rm -f $BAKDB

@@ -125,6 +125,10 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		if(p != null)
 			p.setOnPreferenceChangeListener(this);
 
+		p = findPreference(Settings.Keys.NOTIFICATION_LIGHT_COLOR);
+		if(p != null)
+			p.setOnPreferenceChangeListener(this);
+
 		p = findPreference(Settings.Keys.NOTIFICATION_SOUND);
 		if(p != null)
 		{
@@ -250,10 +254,15 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		if(Settings.Keys.NOTIFICATION_SOUND.equals(key))
 		{
 			final Uri uri = Uri.parse((String) newValue);
-			final Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
+			if(Uri.EMPTY.equals(uri))
+				preference.setSummary(R.string._title_silent);
+			else
+			{
+				final Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
 
-			if(ringtone != null)
-				preference.setSummary(ringtone.getTitle(this));
+				if(ringtone != null)
+					preference.setSummary(ringtone.getTitle(this));
+			}
 		}
 		else if(Settings.Keys.THEME_IS_DARK.equals(key))
 		{
@@ -261,7 +270,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 
 			final Context context = RxDroid.getContext();
 
-			Toast.makeText(context, R.string._toast_theme_changed, Toast.LENGTH_LONG).show();
+			RxDroid.toastLong(R.string._toast_theme_changed);
 
 			final PackageManager pm = context.getPackageManager();
 			final Intent intent = pm.getLaunchIntentForPackage(context.getPackageName());
@@ -269,6 +278,12 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			RxDroid.doStartActivity(intent);
 
 			finish();
+		}
+		else if(Settings.Keys.NOTIFICATION_LIGHT_COLOR.equals(key))
+		{
+			final String value = (String) newValue;
+			if(!("".equals(value) || "0".equals(value)))
+				RxDroid.toastLong(R.string._toast_custom_led_color);
 		}
 
 		return true;

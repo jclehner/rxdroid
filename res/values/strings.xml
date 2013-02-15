@@ -195,7 +195,7 @@
 		
 	<string name="_title_weekdays">Weekdays</string>
 	
-	<string name="_title_on_demand">On demand</string>
+	<string name="_title_on_demand">As needed</string>
 	
 	<string name="_title_delete_drug">Really delete %1$s?</string>
 	<string name="_msg_delete_drug">This cannot be undone!</string>
@@ -255,7 +255,7 @@
 	<string name="_title_dark_theme">Use dark theme</string>
 	<string name="_toast_theme_changed">Restarting app…</string>
 	
-	<string name="_toast_low_supplies">This drug\'s supply will run out on %1$s.</string>
+	<string name="_toast_low_supplies">Lasts until %1$s.</string>
 	
 	<string name="_title_notification_sound">Notification sound</string>
 	
@@ -317,6 +317,19 @@
 	
 	<string name="_title_quiet_hours">Quiet hours</string>
 	<string name="_summary_quiet_hours">During this time period, notifications will use neither sound nor vibration</string>
+	
+	<string name="_title_silent">Silent</string>
+	
+	<string name="_title_off">Off</string>
+	<string name="_title_default">Default</string>
+	
+	<string name="_title_white">White</string>
+	<string name="_title_red">Red</string>
+	<string name="_title_green">Green</string>
+	<string name="_title_blue">Blue</string>
+	<string name="_title_yellow">Yellow</string>
+	
+	<string name="_toast_custom_led_color">Warning: this feature might not be supported on your device.</string>
 								
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

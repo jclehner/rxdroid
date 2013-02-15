@@ -67,6 +67,7 @@ public final class Settings
 		public static final String REPEAT_ALARM = key(R.string.key_repeat_alarm);
 		public static final String DB_STATS = key(R.string.key_db_stats);
 		public static final String COMPACT_ACTION_BAR = key(R.string.key_compact_action_bar);
+		public static final String NOTIFICATION_LIGHT_COLOR = key(R.string.key_notification_light_color);
 
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
 		public static final String DISPLAYED_INFO_IDS = "displayed_info_ids";
@@ -105,6 +106,51 @@ public final class Settings
 		if(sSharedPrefs == null)
 		{
 			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(RxDroid.getContext());
+
+			// XXX
+
+			//putBoolean(Keys.USE_SOUND, true);
+			//putBoolean(Keys.USE_LED, true);
+
+			// XXX
+
+
+			if(sSharedPrefs.contains(Keys.USE_SOUND))
+			{
+				Log.d(TAG, "init: migrating USE_SOUND");
+
+				/**
+				 * USE_SOUND:
+				 *
+				 * true -> no change needed
+				 * false -> set sound to "" (=silent)
+				 *
+				 */
+
+				if(!getBoolean(Keys.USE_SOUND, true))
+					putString(Keys.NOTIFICATION_SOUND, "");
+
+				remove(Keys.USE_SOUND);
+			}
+
+			if(sSharedPrefs.contains(Keys.USE_LED))
+			{
+				Log.d(TAG, "init: migrating USE_LED");
+
+				/**
+				 * USE_LED -> NOTIFICATION_LIGHT_COLOR:
+				 *
+				 * true -> no change needed; "" means default color
+				 * false -> "0"
+				 */
+				if(!getBoolean(Keys.USE_LED, true))
+					putString(Keys.NOTIFICATION_LIGHT_COLOR, "0");
+				else
+					putString(Keys.NOTIFICATION_LIGHT_COLOR, "");
+
+				remove(Keys.USE_LED);
+			}
+
 //			sSharedPrefs.registerOnSharedPreferenceChangeListener(LISTENER);
 		}
 	}
@@ -633,6 +679,10 @@ public final class Settings
 			target.add(Calendar.DAY_OF_MONTH, 1);
 
 		return target.getTimeInMillis() - time.getTimeInMillis();
+	}
+
+	private static void remove(String key) {
+		sSharedPrefs.edit().remove(key).commit();
 	}
 
 	// converts the string set [ "foo", "bar", "foobar", "barz" ] to the following string:

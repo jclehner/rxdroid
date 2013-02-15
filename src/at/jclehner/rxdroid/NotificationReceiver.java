@@ -33,6 +33,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ParseException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -50,6 +51,10 @@ public class NotificationReceiver extends BroadcastReceiver
 {
 	private static final String TAG = NotificationReceiver.class.getName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
+
+	private static final int LED_CYCLE_MS = 5000;
+	private static final int LED_ON_MS = 200;
+	private static final int LED_OFF_MS = LED_CYCLE_MS - LED_ON_MS;
 
 	private static final Class<?>[] EVENT_HANDLER_ARG_TYPES = { Date.class, Integer.TYPE };
 
@@ -363,10 +368,28 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		int defaults = 0;
 
-		if(Settings.getBoolean(Settings.Keys.USE_LED, true))
+		final String lightColor = Settings.getString(Settings.Keys.NOTIFICATION_LIGHT_COLOR, "");
+		if(lightColor.length() == 0)
 			defaults |= Notification.DEFAULT_LIGHTS;
+		else
+		{
+			try
+			{
+				int ledARGB = Integer.parseInt(lightColor, 16);
+				if(ledARGB != 0)
+				{
+					ledARGB |= 0xff000000; // set alpha to ff
+					builder.setLights(ledARGB, LED_ON_MS, LED_OFF_MS);
+				}
+			}
+			catch(NumberFormatException e)
+			{
+				Log.e(TAG, "Failed to parse light color; using default", e);
+				defaults |= Notification.DEFAULT_LIGHTS;
+			}
+		}
 
-		if(mode != NOTIFICATION_FORCE_SILENT && Settings.getBoolean(Settings.Keys.USE_SOUND, true))
+		if(mode != NOTIFICATION_FORCE_SILENT /*&& Settings.getBoolean(Settings.Keys.USE_SOUND, true)*/)
 		{
 			final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
 			if(ringtone != null)

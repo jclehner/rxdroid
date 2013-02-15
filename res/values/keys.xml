@@ -44,5 +44,6 @@
 	<string translatable="false" name="key_repeat_alarm">repeat_alarm</string>
 	<string translatable="false" name="key_db_stats">stats</string>
 	<string translatable="false" name="key_compact_action_bar">compact_action_bar</string>
-	<string translatable="false" name="key_quiet_hours">quiet_hours</string>	
+	<string translatable="false" name="key_quiet_hours">quiet_hours</string>
+	<string translatable="false" name="key_notification_light_color">notification_light_color</string>
 </resources>

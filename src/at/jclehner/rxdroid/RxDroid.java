@@ -29,8 +29,11 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Intake;
@@ -45,6 +48,7 @@ public class RxDroid extends Application
 
 	private static long sUnlockedTime = 0;
 	private static volatile WeakReference<Context> sContextRef;
+	private static volatile Handler sHandler;
 
 	@Override
 	public void onCreate()
@@ -70,8 +74,10 @@ public class RxDroid extends Application
 		super.onCreate();
 	}
 
-	public static void setContext(Context context) {
-		RxDroid.sContextRef = new WeakReference<Context>(context);
+	public static void setContext(Context context)
+	{
+		sContextRef = new WeakReference<Context>(context);
+		sHandler = new Handler(context.getMainLooper());
 	}
 
 	/**
@@ -87,6 +93,26 @@ public class RxDroid extends Application
 		if(c == null && !allowNullContext)
 			throw new IllegalStateException("Context is null");
 		return c;
+	}
+
+	public static void toastShort(int textResId) {
+		toast(textResId, Toast.LENGTH_SHORT);
+	}
+
+	public static void toastLong(int textResId) {
+		toast(textResId, Toast.LENGTH_LONG);
+	}
+
+	public static void runInMainThread(Runnable r)
+	{
+		if(true)
+		{
+			sHandler.post(r);
+		}
+		else
+		{
+			r.run();
+		}
 	}
 
 	public static LocalBroadcastManager getLocalBroadcastManager() {
@@ -144,6 +170,17 @@ public class RxDroid extends Application
 //		}
 
 		return false;
+	}
+
+	private static void toast(final int textResId, final int duration)
+	{
+		runInMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				Toast.makeText(getContext(), textResId, duration).show();
+			}
+		});
 	}
 
 	private static final Database.OnChangeListener sNotificationUpdater = new Database.OnChangeListener() {

@@ -67,5 +67,25 @@
         <item>@string/_title_history_1_year</item>
         <item>@string/_title_history_unlimited</item>
     </string-array>
+    
+    <string-array name="led_colors">
+        <item>@string/_title_off</item>
+        <item>@string/_title_default</item>
+        <item>@string/_title_red</item>        
+        <item>@string/_title_green</item>        
+        <item>@string/_title_blue</item>        
+        <item>@string/_title_yellow</item>
+        <item>@string/_title_white</item>      
+    </string-array>
+    
+    <string-array name="led_color_values">
+        <item>0</item>
+        <item></item>
+        <item>ff0000</item>
+        <item>00ff00</item>
+        <item>0000ff</item>
+        <item>ffff00</item>
+        <item>ffffff</item>        
+    </string-array>
 
 </resources>
