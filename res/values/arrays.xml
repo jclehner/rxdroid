@@ -75,7 +75,9 @@
         <item>@string/_title_green</item>        
         <item>@string/_title_blue</item>        
         <item>@string/_title_yellow</item>
-        <item>@string/_title_white</item>      
+        <item>@string/_title_orange</item>
+        <item>@string/_title_magenta</item>
+        <item>@string/_title_white</item>
     </string-array>
     
     <string-array name="led_color_values">
@@ -85,6 +87,8 @@
         <item>00ff00</item>
         <item>0000ff</item>
         <item>ffff00</item>
+        <item>ff6600</item>
+        <item>ff00ff</item>
         <item>ffffff</item>        
     </string-array>
 

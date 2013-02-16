@@ -219,48 +219,34 @@
 			android:selectAllOnFocus="true"
 		/>
 		
-		<!-- 
 		<at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="@string/key_quiet_hours"
 			android:title="@string/_title_quiet_hours"
 			android:summary="@string/_summary_quiet_hours"
 			android:defaultValue="@string/pref_default_quiet_hours"
 		/>
-		 -->
 		
 		<PreferenceCategory 
-			android:title="@string/_title_pref_notification_methods">
-		
-		    <!-- 
-			<CheckBoxPreference android:key="@string/key_use_led"
-				android:title="@string/_title_pref_use_led"
-				android:defaultValue="true" 
-			/>
-			-->
-				
-			<CheckBoxPreference android:key="@string/key_use_vibrator"
-				android:title="@string/_title_pref_use_vibrator"
-				android:defaultValue="true" 
-			/>		
-				
-			<!-- 
-			<CheckBoxPreference android:key="@string/key_use_sound"
-				android:title="@string/_title_pref_use_sound"
-				android:defaultValue="true" 
-			/>
-			 -->
-			
-			<at.jclehner.rxdroid.preferences.AutoSummaryListPreference android:key="@string/key_notification_light_color"
-				android:title="@string/_title_pref_use_led"
-				android:entries="@array/led_colors"
-				android:entryValues="@array/led_color_values"
-			/>
+			android:title="@string/_title_pref_notification_methods"
+		>
 			
 			<RingtonePreference android:key="@string/key_notification_sound"
 			    android:title="@string/_title_notification_sound"
 			    android:ringtoneType="notification"
 			    android:showDefault="true"
 			    android:showSilent="true"
-			/>			    
+			/>			
+			
+			<at.jclehner.rxdroid.preferences.AutoSummaryListPreference 
+			    android:key="@string/key_notification_light_color"
+				android:title="@string/_title_pref_use_led"
+				android:entries="@array/led_colors"
+				android:entryValues="@array/led_color_values"
+			/>		
+						
+			<CheckBoxPreference android:key="@string/key_use_vibrator"
+				android:title="@string/_title_pref_use_vibrator"
+				android:defaultValue="true" 
+			/>	    
 			    		
 		</PreferenceCategory>
 	</PreferenceScreen>

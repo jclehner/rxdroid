@@ -109,7 +109,7 @@
     <string name="_title_prefscreen_notifications">Notifications</string>
     <string name="_summary_prefscreen_notifications">Notification methods, snooze time, etc.</string>
     
-    <string name="_title_pref_notification_methods">Notification methods</string>
+    <string name="_title_pref_notification_methods">Modes</string>
     
     <string name="_title_min_supply_days">Refill reminder</string>
     <string name="_summary_min_supply_days">Minimum number of days of a drug\'s supply before displaying a notification – currently %1$s</string>
@@ -257,7 +257,7 @@
 	
 	<string name="_toast_low_supplies">Lasts until %1$s.</string>
 	
-	<string name="_title_notification_sound">Notification sound</string>
+	<string name="_title_notification_sound">Sound</string>
 	
 	<string name="_title_doses_and_low_supplies">All</string>
 	<string name="_title_low_supplies_only">Refill only</string>
@@ -328,6 +328,8 @@
 	<string name="_title_green">Green</string>
 	<string name="_title_blue">Blue</string>
 	<string name="_title_yellow">Yellow</string>
+	<string name="_title_orange">Orange</string>
+	<string name="_title_magenta">Magenta</string>
 	
 	<string name="_toast_custom_led_color">Warning: this feature might not be supported on your device.</string>
 								

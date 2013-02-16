@@ -33,7 +33,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ParseException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -53,10 +52,10 @@ public class NotificationReceiver extends BroadcastReceiver
 	private static final boolean LOGV = BuildConfig.DEBUG;
 
 	private static final int LED_CYCLE_MS = 5000;
-	private static final int LED_ON_MS = 200;
+	private static final int LED_ON_MS = 500;
 	private static final int LED_OFF_MS = LED_CYCLE_MS - LED_ON_MS;
 
-	private static final Class<?>[] EVENT_HANDLER_ARG_TYPES = { Date.class, Integer.TYPE };
+	private static final Class<?>[] EVENT_HANDLER_ARG_TYPES = { Date.class, int.class };
 
 	public interface OnDoseTimeChangeListener
 	{
@@ -230,13 +229,13 @@ public class NotificationReceiver extends BroadcastReceiver
 		final long triggerDiffFromNow = triggerAtMillis - System.currentTimeMillis();
 		if(triggerDiffFromNow < 0)
 		{
-			// 5 seconds should be more than enough to prevent FCs if this function is run
-			// just milliseconds before a dose time's begin or end.
-
 			if(triggerDiffFromNow < -50000)
-				throw new IllegalStateException("Alarm time is in the past: " + DateTime.toString(time));
-
-			Log.w(TAG, "Alarm time is in the past by less than 5 seconds. Ignoring...");
+				Log.w(TAG, "Alarm time is in the past by less than 5 seconds.");
+			else
+			{
+				Log.w(TAG, "Alarm time is in the past. Ignoring...");
+				return;
+			}
 		}
 
 		if(alarmExtras.getBoolean(EXTRA_IS_ALARM_REPETITION))
@@ -329,6 +328,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		else
 			isShowingLowSupplyNotification = false;
 
+		final int priority;
+		if(isShowingLowSupplyNotification)
+			priority = NotificationCompat.PRIORITY_DEFAULT;
+		else
+			priority = NotificationCompat.PRIORITY_HIGH;
+
 		final String message = sb.toString();
 		final int currentHash = message.hashCode();
 		final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
@@ -342,6 +347,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setOngoing(true);
 		builder.setUsesChronometer(false);
 		builder.setWhen(0);
+		builder.setPriority(priority);
 
 //		final long offset;
 //
