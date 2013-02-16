@@ -109,7 +109,7 @@
     <string name="_title_prefscreen_notifications">Notifications</string>
     <string name="_summary_prefscreen_notifications">Notification methods, snooze time, etc.</string>
     
-    <string name="_title_pref_notification_methods">Modes</string>
+    <string name="_title_pref_notification_methods">Customizations</string>
     
     <string name="_title_min_supply_days">Refill reminder</string>
     <string name="_summary_min_supply_days">Minimum number of days of a drug\'s supply before displaying a notification – currently %1$s</string>

@@ -193,13 +193,6 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 	public boolean isWithinRange(DumbTime begin, DumbTime end, boolean allowWrap)
 	{
-		boolean r = isWithinRange_(begin, end, allowWrap);
-		android.util.Log.d(TAG, this + ": isWithinRange(" + begin + ", " + end + ", " + allowWrap + ") = " + r);
-		return r;
-	}
-
-	public boolean isWithinRange_(DumbTime begin, DumbTime end, boolean allowWrap)
-	{
 		if(begin != null && end != null)
 		{
 			if(allowWrap && end.isLessThan(begin))
