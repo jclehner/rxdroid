@@ -389,8 +389,8 @@ public final class DateTime
 	private static final class ImmutableDate extends Date
 	{
 		private static final long serialVersionUID = -660796950979760891L;
-		private boolean mIsTimeSet = false;		
-		
+		private boolean mIsTimeSet = false;
+
 		@SuppressWarnings("unused")
 		public ImmutableDate(Date date) {
 			setTime(date.getTime());
@@ -401,7 +401,7 @@ public final class DateTime
 		}
 
 		@Override
-		public void setTime(long milliseconds) 
+		public void setTime(long milliseconds)
 		{
 			if(!mIsTimeSet)
 			{

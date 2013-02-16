@@ -29,7 +29,7 @@
   android:orderingFromXml="true"  
 >
 	
-	<!-- TIMES -->
+	<!-- Times -->
 
 	<Preference android:key="prefscreen_times"
 		android:title="@string/_title_prefscreen_times"
@@ -44,58 +44,8 @@
 		</intent>		
 		
 	</Preference>
-		
-		<!--  
-	    <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_morning"
-	        android:title="@string/_title_morning"
-	        android:dialogIcon="@drawable/ic_morning"
-	        android:persistent="true"
-	        
-	        rxdroid:after="time_night"
-	        rxdroid:before="time_noon"        
-	        
-	        android:defaultValue="@string/pref_default_time_morning"
-	    />
-	    
-	    <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_noon"
-	        android:title="@string/_title_noon"
-	        android:dialogIcon="@drawable/ic_noon"
-	        android:persistent="true"
-	        
-	        rxdroid:after="time_morning"
-	        rxdroid:before="time_evening"
-	        	        
-	        android:defaultValue="@string/pref_default_time_noon"
-	    />
-	    
-	     <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_evening"
-	        android:title="@string/_title_evening"
-	        android:dialogIcon="@drawable/ic_evening"
-	        android:persistent="true"
-	        
-	        rxdroid:after="time_noon"
-	        rxdroid:before="time_night"
-	        
-	        android:defaultValue="@string/pref_default_time_evening"
-	    />
-	     
-	     <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_night"
-	        android:title="@string/_title_night"
-	        android:dialogIcon="@drawable/ic_night"
-	        android:persistent="true"
-	        
-	        rxdroid:after="time_evening"
-	        rxdroid:before="time_morning"
-	        rxdroid:allowEndWrap="true"
-	        
-	        android:defaultValue="@string/pref_default_time_night"
-	    />
-	    
-	   
-	</PreferenceScreen>
-	 -->
 	
-	<!-- DISPLAY -->
+	<!-- Appearance -->
 	
 	<PreferenceScreen 
 		android:key="prefscreen_display"
@@ -138,42 +88,7 @@
 			    android:defaultValue="false"
 			/>
 	   
-	    </PreferenceCategory>	    	
-	 <!-- 
-			<CheckBoxPreference
-				android:key="show_inactive"
-				android:title="@string/_title_pref_show_inactive"
-				android:summary="@string/_summary_pref_show_inactive"
-				android:defaultValue="false"
-			/>
-			
-			<CheckBoxPreference
-				android:key="show_doseless"
-				android:title="@string/_title_pref_show_days_without_intakes"
-				android:summary="@string/_summary_pref_show_days_without_intakes"
-				android:defaultValue="false"
-			/>
-			
-			<CheckBoxPreference android:key="show_supply_monitors"
-			    android:title="@string/_title_show_supply_monitors"
-			    
-			    />
-		
-		
-		
-		<CheckBoxPreference android:key="privacy_scramble_names"
-		    android:title="@string/_title_scramble_names"
-		    android:summary="@string/_summary_scramble_names"
-		    android:defaultValue="false"
-		/>	
-		
-		<Preference
-			android:title="@string/_title_prefscreen_display_info"
-			android:summary="@string/_summary_prefscreen_display_info"
-			android:enabled="false"
-			android:selectable="false"
-		/>
-		 -->    
+	    </PreferenceCategory>	 
 	
 	</PreferenceScreen>
 	
@@ -184,24 +99,6 @@
 		android:title="@string/_title_prefscreen_notifications"
 		android:icon="@drawable/android:ic_menu_info_details"
 	>
-		<!--  
-				
-		<ListPreference android:key="alarm_mode"
-			android:title="@string/_title_alarm_mode"
-			android:summary="@string/_summary_alarm_mode_normal"
-			android:entries="@array/alarm_modes"
-			android:defaultValue="0"
-			android:enabled="false"
-		/>		
-		
-		<at.jclehner.rxdroid.preferences.TimePreference android:key="alarm_timeout"
-			android:title="@string/_title_alarm_timeout"
-			android:defaultValue="@string/pref_default_alarm_timeout"
-			android:enabled="false"
-		/>	
-		
-		-->
-		
 		<ListPreference android:key="@string/key_alarm_mode"
 		    android:title="@string/_title_repeat_alarm"
 		    android:summary="@string/_summary_repeat_alarm"
@@ -219,9 +116,9 @@
 			android:selectAllOnFocus="true"
 		/>
 		
-		<at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="@string/key_quiet_hours"
+		<at.jclehner.rxdroid.preferences.TogglableTimePeriodPreference 
+		    android:key="@string/key_quiet_hours"
 			android:title="@string/_title_quiet_hours"
-			android:summary="@string/_summary_quiet_hours"
 			android:defaultValue="@string/pref_default_quiet_hours"
 		/>
 		
@@ -270,49 +167,6 @@
 		/>
 		
 	</PreferenceScreen>
-	
-	<!--  
-	<PreferenceScreen android:key="prefscreen_debug"
-		android:title="Debug"
-		android:icon="@android:drawable/ic_menu_preferences"	
-	>
-		<Preference android:key="debug_generate_db_source"
-			android:title="Generate source"
-			android:summary="Create java sources for DB upgrades"
-		/>
-		
-		<Preference android:key="debug_sorter"
-			android:title="Launch Activity for testing"
-		/>			
-				
-		<CheckBoxPreference android:key="debug_logv"
-			android:title="Debug loglevel"
-			android:summary="Enables more verbose logging for debugging purposes"	
-			android:defaultValue="false" 
-		/>
-		
-		<CheckBoxPreference android:key="debug_snooze_time_short"
-			android:title="Short snooze time"
-			android:summary="Set snooze time to 10 seconds"			
-			android:defaultValue="false"
-		/>
-		
-		<Preference android:key="debug_add_5_drugs"
-		    android:title="Add 5 random drugs"
-		/>
-		
-		<at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_period"
-		    android:title="TimePeriodPreference"
-		    android:defaultValue="07:00-13:00"
-		    android:persistent="true"
-		   
-		    rxdroid:before="23:00"
-		    rxdroid:allowEndWrap="true"
-		    rxdroid:after="14:00"		    
-		/>
-	
-	</PreferenceScreen>
-	-->
 	
 	<PreferenceCategory 
 		android:title="@string/_title_about"		

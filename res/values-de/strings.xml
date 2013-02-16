@@ -294,6 +294,18 @@
 	<string name="_title_quiet_hours">Nicht stören</string>
 	<string name="_summary_quiet_hours">Während dieser Zeit wird für Benachrichtigungen weder Ton noch Vibration verwendet</string>
 	
+	<string name="_title_blue">Blau</string>
+	<string name="_title_default">Standard</string>
+	<string name="_title_green">Grün</string>
+	<string name="_title_magenta">Magenta</string>
+	<string name="_title_off">Deaktiviert</string>
+	<string name="_title_orange">Orange</string>
+	<string name="_title_red">Rot</string>
+	<string name="_title_silent">Stumm</string>
+	<string name="_title_white">Weiß</string>
+	<string name="_title_yellow">Gelb</string>
+	<string name="_toast_custom_led_color">Achtung: diese Farbe wird möglicherweise nicht unterstützt.</string>
+	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.

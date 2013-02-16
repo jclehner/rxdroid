@@ -81,6 +81,10 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		this(offset, false);
 	}
 
+	public DumbTime() {
+		this(System.currentTimeMillis() % Constants.MILLIS_PER_DAY);
+	}
+
 	/**
 	 * Creates an instance using an offset from midnight.
 	 *
@@ -189,6 +193,13 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 	public boolean isWithinRange(DumbTime begin, DumbTime end, boolean allowWrap)
 	{
+		boolean r = isWithinRange_(begin, end, allowWrap);
+		android.util.Log.d(TAG, this + ": isWithinRange(" + begin + ", " + end + ", " + allowWrap + ") = " + r);
+		return r;
+	}
+
+	public boolean isWithinRange_(DumbTime begin, DumbTime end, boolean allowWrap)
+	{
 		if(begin != null && end != null)
 		{
 			if(allowWrap && end.isLessThan(begin))
@@ -205,10 +216,10 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	}
 
 	public static DumbTime now() {
-		return new DumbTime(new Date().getTime());
+		return fromDate(new Date());
 	}
 
-	@SuppressWarnings("deprecation")
+
 	public static DumbTime fromString(String timeString)
 	{
 		if(timeString != null)
@@ -220,8 +231,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 					final SimpleDateFormat sdf =
 						PerThreadInstance.get(SimpleDateFormat.class, format);
 
-					final Date date = sdf.parse(timeString);
-					return new DumbTime(date.getHours(), date.getMinutes(), date.getSeconds());
+					return fromDate(sdf.parse(timeString));
 				}
 				catch(ParseException e)
 				{
@@ -231,6 +241,11 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		}
 
 		throw new IllegalArgumentException("timeString=" + timeString);
+	}
+
+	@SuppressWarnings("deprecation")
+	public static DumbTime fromDate(Date date) {
+		return new DumbTime(date.getHours(), date.getMinutes(), date.getSeconds());
 	}
 
 	public static DumbTime fromCalendar(Calendar cal) {

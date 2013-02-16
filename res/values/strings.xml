@@ -331,7 +331,7 @@
 	<string name="_title_orange">Orange</string>
 	<string name="_title_magenta">Magenta</string>
 	
-	<string name="_toast_custom_led_color">Warning: this feature might not be supported on your device.</string>
+	<string name="_toast_custom_led_color">Warning: this color might not be supported on your device.</string>
 								
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

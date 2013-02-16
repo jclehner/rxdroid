@@ -43,6 +43,7 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
@@ -397,13 +398,35 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		if(mode != NOTIFICATION_FORCE_SILENT /*&& Settings.getBoolean(Settings.Keys.USE_SOUND, true)*/)
 		{
-			final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
-			if(ringtone != null)
-				builder.setSound(Uri.parse(ringtone));
-			else
-				defaults |= Notification.DEFAULT_SOUND;
+			boolean isNowWithinQuietHours = false;
 
-			if(LOGV) Log.i(TAG, "Sound: " + (ringtone != null ? ringtone.toString() : "DEFAULT_SOUND"));
+			do
+			{
+				if(!Settings.isChecked(Settings.Keys.QUIET_HOURS, false))
+					break;
+
+				final String quietHoursStr = Settings.getString(Settings.Keys.QUIET_HOURS);
+				if(quietHoursStr == null)
+					break;
+
+				final TimePeriod quietHours = TimePeriod.fromString(quietHoursStr);
+				if(quietHours.contains(DumbTime.now()))
+					isNowWithinQuietHours = true;
+
+			} while(false);
+
+			if(!isNowWithinQuietHours)
+			{
+				final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
+				if(ringtone != null)
+					builder.setSound(Uri.parse(ringtone));
+				else
+					defaults |= Notification.DEFAULT_SOUND;
+
+				if(LOGV) Log.i(TAG, "Sound: " + (ringtone != null ? ringtone.toString() : "(default)"));
+			}
+			else
+				Log.i(TAG, "Currently within quiet hours; muting sound...");
 		}
 		else if(LOGV)
 		{

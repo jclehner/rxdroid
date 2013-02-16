@@ -22,7 +22,7 @@
 package at.jclehner.rxdroid.preferences;
 
 import java.io.Serializable;
-import java.util.StringTokenizer;
+import java.text.ParseException;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -78,11 +78,14 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 
 		public static TimePeriod fromString(String string)
 		{
-			final StringTokenizer st = new StringTokenizer(string, "|-");
+			final String[] tokens = string.split("-");
+			if(tokens.length != 2)
+				throw new IllegalArgumentException();
+
 			final DumbTime begin, end;
 
-			begin = DumbTime.fromString(st.nextToken());
-			end = DumbTime.fromString(st.nextToken());
+			begin = DumbTime.fromString(tokens[0]);
+			end = DumbTime.fromString(tokens[1]);
 
 			return new TimePeriod(begin, end);
 		}
@@ -93,6 +96,10 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 
 		public DumbTime getEnd() {
 			return mEnd;
+		}
+
+		public boolean contains(DumbTime time) {
+			return time.isWithinRange(mBegin, mEnd, true);
 		}
 	}
 

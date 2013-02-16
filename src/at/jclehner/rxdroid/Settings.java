@@ -68,6 +68,7 @@ public final class Settings
 		public static final String DB_STATS = key(R.string.key_db_stats);
 		public static final String COMPACT_ACTION_BAR = key(R.string.key_compact_action_bar);
 		public static final String NOTIFICATION_LIGHT_COLOR = key(R.string.key_notification_light_color);
+		public static final String QUIET_HOURS = key(R.string.key_quiet_hours);
 
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
 		public static final String DISPLAYED_INFO_IDS = "displayed_info_ids";
@@ -154,6 +155,18 @@ public final class Settings
 //			sSharedPrefs.registerOnSharedPreferenceChangeListener(LISTENER);
 		}
 	}
+
+	public static void setChecked(String key, boolean checked) {
+		putBoolean(getKeyForCheckedStatus(key), checked);
+	}
+
+	public static boolean isChecked(String key, boolean defaultChecked) {
+		return getBoolean(getKeyForCheckedStatus(key), defaultChecked);
+	}
+
+//	public static boolean isChecked(String key) {
+//		return isChecked(key, true);
+//	}
 
 	public static Set<String> getStringSet(String key) {
 		return stringToStringSet(sSharedPrefs.getString(key, null));
@@ -681,7 +694,17 @@ public final class Settings
 		return target.getTimeInMillis() - time.getTimeInMillis();
 	}
 
-	private static void remove(String key) {
+	private static String getKeyForCheckedStatus(String key) {
+		return "__" + key + "_is_checked__";
+	}
+
+	private static void remove(String key)
+	{
+		removeInternal(key);
+		removeInternal(getKeyForCheckedStatus(key));
+	}
+
+	private static void removeInternal(String key) {
 		sSharedPrefs.edit().remove(key).commit();
 	}
 
