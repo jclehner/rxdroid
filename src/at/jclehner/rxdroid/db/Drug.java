@@ -111,7 +111,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	public static final int REPEAT_DAILY = 0;
 	public static final int REPEAT_EVERY_N_DAYS = 1;
 	public static final int REPEAT_WEEKDAYS = 2;
-	public static final int REPEAT_ON_DEMAND = 3;
+	public static final int REPEAT_AS_NEEDED = 3;
 	public static final int REPEAT_21_7 = 4; // for oral contraceptives, 21 days on, 7 off
 	public static final int REPEAT_CUSTOM = 5;
 	public static final int REPEAT_INVALID = 6;
@@ -232,7 +232,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		switch(repeatMode)
 		{
 			case REPEAT_DAILY:
-			case REPEAT_ON_DEMAND:
+			case REPEAT_AS_NEEDED:
 				return true;
 
 			case REPEAT_EVERY_N_DAYS:

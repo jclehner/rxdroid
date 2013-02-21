@@ -636,7 +636,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					return false;
 
 				case Drug.REPEAT_DAILY:
-				case Drug.REPEAT_ON_DEMAND:
+				case Drug.REPEAT_AS_NEEDED:
 					return super.updatePreference(preference, newValue);
 
 				default:
@@ -654,7 +654,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 					preference.setSummary(R.string._title_daily);
 					break;
 
-				case Drug.REPEAT_ON_DEMAND:
+				case Drug.REPEAT_AS_NEEDED:
 					preference.setSummary(R.string._title_on_demand);
 					break;
 
@@ -920,7 +920,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 				return "0";
 			}
 
-			if(drug.getRepeatMode() == Drug.REPEAT_ON_DEMAND || drug.hasNoDoses())
+			if(drug.getRepeatMode() == Drug.REPEAT_AS_NEEDED || drug.hasNoDoses())
 			{
 				// TODO change?
 				return currentSupply.toString();

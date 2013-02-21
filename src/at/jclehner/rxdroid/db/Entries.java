@@ -255,7 +255,7 @@ public final class Entries
 		final MutableFraction baseDose = new MutableFraction();
 		int doseMultiplier = 0;
 
-		if(repeatMode == Drug.REPEAT_ON_DEMAND)
+		if(repeatMode == Drug.REPEAT_AS_NEEDED)
 			return Fraction.ZERO;
 		if(repeatMode == Drug.REPEAT_DAILY)
 		{
@@ -365,7 +365,7 @@ public final class Entries
 			return;
 
 		final int repeatMode = drug.getRepeatMode();
-		if(repeatMode == Drug.REPEAT_ON_DEMAND)
+		if(repeatMode == Drug.REPEAT_AS_NEEDED)
 			return;
 
 		for(int doseTime : Constants.DOSE_TIMES)

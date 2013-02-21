@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -169,6 +170,12 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 		setDate(date, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
+
+		if(getString(R.string.translator).length() == 0)
+		{
+			final String language = Locale.getDefault().getDisplayLanguage(Locale.US);
+			showInfoDialog(Settings.InfoIds.MISSING_TRANSLATION, R.string._msg_no_translation, language);
+		}
 	}
 
 	@Override
@@ -474,17 +481,20 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			return new IntakeDialog(this);
 		else if(id == DIALOG_INFO_SORTING)
 		{
+			final String msg = args.getString("msg");
+			final String infoId = args.getString("info_id");
+
 			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
 			ab.setIcon(android.R.drawable.ic_dialog_info);
 			ab.setTitle(R.string._title_info);
-			ab.setMessage(R.string._msg_drag_drop_sorting);
+			ab.setMessage(msg);
 			ab.setCancelable(false);
 			ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					Settings.putStringSetEntry(Settings.Keys.DISPLAYED_INFO_IDS, Settings.InfoIds.DRAG_DROP_SORTING);
+					Settings.putStringSetEntry(Settings.Keys.DISPLAYED_INFO_IDS, infoId);
 				}
 			});
 
@@ -545,8 +555,6 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 		if((flags & PAGER_INIT) != 0)
 		{
-			final boolean smoothScroll = (flags & PAGER_SCROLL) != 0;
-
 			mOriginalDate = date;
 
 			mSwipeDirection = 0;
@@ -554,13 +562,17 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 			mPager.removeAllViews();
 
-			if(Database.countAll(Drug.class) != 0)
+
+			final int drugCount = Database.countAll(Drug.class);
+			if(drugCount != 0)
 			{
+				final boolean smoothScroll = (flags & PAGER_SCROLL) != 0;
+
 				mPager.setAdapter(new InfiniteViewPagerAdapter(this));
 				mPager.setCurrentItem(InfiniteViewPagerAdapter.CENTER, smoothScroll);
 
-				if(!Settings.containsStringSetEntry(Settings.Keys.DISPLAYED_INFO_IDS, Settings.InfoIds.DRAG_DROP_SORTING))
-					showDialog(DIALOG_INFO_SORTING);
+				if(drugCount >= 2)
+					showInfoDialog(Settings.InfoIds.DRAG_DROP_SORTING, R.string._msg_drag_drop_sorting);
 			}
 			else
 			{
@@ -664,6 +676,18 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		}
 
 		return false;
+	}
+
+	private void showInfoDialog(String infoId, int msgResId, Object... args)
+	{
+		if(Settings.containsStringSetEntry(Settings.Keys.DISPLAYED_INFO_IDS, infoId))
+			return;
+
+		Bundle bundle = new Bundle();
+		bundle.putString("info_id", infoId);
+		bundle.putString("msg", getString(msgResId, args));
+
+		showDialog(DIALOG_INFO_SORTING, bundle);
 	}
 
 	static class DrugFilter implements CollectionUtils.Filter<Drug>

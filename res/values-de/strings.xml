@@ -23,6 +23,7 @@
 -->
 
 <resources>
+    <string name="translator">builtin</string>
         
     <!-- 
     Translatable strings start here. The naming scheme is as follows:

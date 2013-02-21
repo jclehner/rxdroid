@@ -26,6 +26,7 @@
     <string name="app_name" translatable="false">RxDroid</string>
     <string name="version" translatable="false">0.9.6</string>
     <string name="vcs_revision" translatable="false">$Revision$</string>
+    <string name="translator"></string>
         
     <!--  WARNING: Do NOT replace - with an en dash as suggested by lint -->
     <string name="pref_default_time_morning" translatable="false">06:00-10:00</string>
@@ -179,7 +180,7 @@
     <string name="_msg_touch_to_edit">(touch to edit)</string>
    
     <string name="_msg_no_drugs_v8">Press MENU and select "%1$s" to add a drug</string>
-    <string name="_msg_no_drugs_v11">Press the + button in the action bar to add a drug</string>
+    <string name="_msg_no_drugs_v11">Select "%1$s" from the three-dot menu to add a drug</string>
     <string name="_msg_no_doses_on_this_day">There are no doses scheduled on this date</string>
     
     <string name="_msg_db_error_general">Unknown database error.</string>
@@ -297,7 +298,7 @@
 	
 	<string name="_title_info">Information</string>
 	<string name="_toast_past_max_history_age">This date is beyond the selected history size limit.</string>
-	<string name="_msg_drag_drop_sorting">You can now change the display order by clicking
+	<string name="_msg_drag_drop_sorting">You can change the display order by clicking
 	    a drug\'s icon and then dragging it to the desired position.</string>
 	
 	<string name="_title_new_drug">New drug</string>
@@ -332,6 +333,10 @@
 	<string name="_title_magenta">Magenta</string>
 	
 	<string name="_toast_custom_led_color">Warning: this color might not be supported on your device.</string>
+	
+	<string name="_msg_no_translation">RxDroid has not yet been translated to your language. If you want
+	    to help translating this app into %1$s, please contact me! 
+	</string>
 								
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are

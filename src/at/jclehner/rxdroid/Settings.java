@@ -87,6 +87,7 @@ public final class Settings
 	public static class InfoIds
 	{
 		public static final String DRAG_DROP_SORTING = "drag_drop_sorting";
+		public static final String MISSING_TRANSLATION = "missing_translation";
 	}
 
 	public static class Defaults
