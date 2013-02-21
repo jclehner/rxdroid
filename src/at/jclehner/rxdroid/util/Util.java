@@ -54,6 +54,16 @@ public final class Util
 {
 	private static final String TAG = Util.class.getName();
 
+	public static boolean equalsIgnoresNull(Object a, Object b)
+	{
+		if(a == null && b == null)
+			return true;
+		else if(a != null && b != null)
+			return a.equals(b);
+		else
+			return false;
+	}
+
 	public static void detachFromParent(View v)
 	{
 		if(v == null)
@@ -224,16 +234,6 @@ public final class Util
 	public static String millis(long millis)
 	{
 		return millis + "ms (" + new DumbTime(millis, true).toString(true, true) + ")";
-	}
-
-	public static boolean equals(Object a, Object b)
-	{
-		if(a == null && b == null)
-			return true;
-		else if(a != null)
-			return a.equals(b);
-
-		return b.equals(a);
 	}
 
 	/**

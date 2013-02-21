@@ -162,7 +162,7 @@ public class Intake extends Entry
 		if(this.doseTime != other.doseTime)
 			return false;
 
-		if(!Util.equals(this.timestamp, other.timestamp))
+		if(!Util.equalsIgnoresNull(this.timestamp, other.timestamp))
 			return false;
 
 		if(!this.date.equals(other.date))

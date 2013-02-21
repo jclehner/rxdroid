@@ -21,18 +21,22 @@
 
 package at.jclehner.rxdroid.db;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.NoSuchElementException;
 
-import android.util.Log;
 import at.jclehner.androidutils.LazyValue;
+import at.jclehner.androidutils.LazyValue.Mutator;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Hasher;
 import at.jclehner.rxdroid.util.Keep;
+import at.jclehner.rxdroid.util.Util;
 
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
@@ -75,7 +79,6 @@ public class Drug extends Entry implements Comparable<Drug>
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = Drug.class.getName();
-	private static final long serialVersionUID = -2569745648137404894L;
 
 	public static final int ICON_TABLET = 0;
 	public static final int ICON_SYRINGE = 1;
@@ -195,7 +198,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	private int sortRank = Integer.MAX_VALUE;
 
 	@ForeignCollectionField(eager = true, maxEagerLevel = 2)
-	private ForeignCollection<Schedule> schedules;
+	private ForeignCollection<Schedule> foreignSchedules;
 
 	@DatabaseField
 	private String comment;
@@ -243,7 +246,7 @@ public class Drug extends Entry implements Comparable<Drug>
 				return (DateTime.diffDays(date, repeatOrigin) % 28) < 21;
 
 			case REPEAT_CUSTOM:
-				return Schedules.hasDoseOnDate(date, mSchedulesArray.get());
+				return Schedules.hasDoseOnDate(date, mSchedules.get());
 
 			default:
 				throw new IllegalStateException("Unknown repeat mode");
@@ -366,7 +369,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			return getDose(doseTime);
 		}
 
-		return Schedules.getDose(date, doseTime, mSchedulesArray.get());
+		return Schedules.getDose(date, doseTime, mSchedules.get());
 	}
 
 	public String getComment() {
@@ -511,10 +514,16 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.sortRank = sortRank;
 	}
 
-	public void setSchedule(Schedule schedule)
-	{
-		if(schedules != null)
-			schedules.add(schedule);
+	public void addSchedule(Schedule schedule) {
+		mSchedules.get().add(schedule);
+	}
+
+	public void setSchedules(List<Schedule> schedules) {
+		mSchedules.set(schedules);
+	}
+
+	public List<Schedule> getSchedules() {
+		return mSchedules.get();
 	}
 
 	public void setPatient(Patient patient) {
@@ -548,7 +557,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	public boolean hasNoDoses()
 	{
 		if(repeatMode == REPEAT_CUSTOM)
-			return Schedules.hasNoDoses(mSchedulesArray.get());
+			return Schedules.hasNoDoses(mSchedules.get());
 
 		for(Fraction dose : getSimpleSchedule())
 		{
@@ -575,11 +584,7 @@ public class Drug extends Entry implements Comparable<Drug>
 
 		for(int i = 0; i != thisMembers.length; ++i)
 		{
-			if(thisMembers[i] == null && otherMembers[i] == null)
-				continue;
-			else if(thisMembers[i] == null || otherMembers[i] == null)
-				return false;
-			else if(!thisMembers[i].equals(otherMembers[i]))
+			if(!Util.equalsIgnoresNull(thisMembers[i], otherMembers[i]))
 				return false;
 		}
 
@@ -672,6 +677,8 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.name,
 			this.icon,
 			this.active,
+			this.sortRank,
+			//this.patient,
 			this.doseMorning,
 			this.doseNoon,
 			this.doseEvening,
@@ -680,6 +687,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.refillSize,
 			this.autoAddIntakes,
 			this.lastAutoIntakeCreationDate,
+			//this.lastScheduleUpdateDate,
 			this.repeatMode,
 			this.repeatArg,
 			this.repeatOrigin,
@@ -702,21 +710,16 @@ public class Drug extends Entry implements Comparable<Drug>
 		return (repeatArg & 1 << weekday) != 0;
 	}
 
-	private final transient LazyValue<Schedule[]> mSchedulesArray = new LazyValue<Schedule[]>() {
+	private final LazyValue<List<Schedule>> mSchedules = new LazyValue<List<Schedule>>() {
 
 		@Override
-		public Schedule[] value()
+		public List<Schedule> value()
 		{
-			if(schedules == null)
-			{
-				if(repeatMode == REPEAT_CUSTOM)
-					Log.d(TAG, this + ": no custom schedule!");
-				return null;
-			}
+			if(foreignSchedules == null)
+				return new ArrayList<Schedule>();
 
-
-			Schedule[] array = new Schedule[schedules.size()];
-			return schedules.toArray(array);
+			final Schedule[] array = new Schedule[foreignSchedules.size()];
+			return Arrays.asList(foreignSchedules.toArray(array));
 		}
 
 	};
@@ -732,14 +735,10 @@ public class Drug extends Entry implements Comparable<Drug>
 				if(intake.getDrug() == null || intake.getDrugId() == drug.id)
 					Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
 			}
-			
-			final Schedule[] schedules = drug.mSchedulesArray.get();
-			if(schedules == null)
-				return;
-			
-			for(Schedule schedule : schedules)
+
+			for(Schedule schedule : drug.mSchedules.get())
 				Database.delete(schedule, Database.FLAG_DONT_NOTIFY_LISTENERS);
-			
+
 		}
 	};
 

@@ -226,27 +226,27 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		else
 			mDose = new Fraction();
 
-		 mDoseText.setText(mDose.toString());
-         mDoseInput.setValue(mDose);
-         mDoseInput.setAutoInputModeEnabled(true);
-         mDoseInput.setOnChangeListener(this);
-         mInsufficientSupplyText.setOnClickListener(new View.OnClickListener() {
+		mDoseText.setText(mDose.toString());
+		mDoseInput.setValue(mDose);
+		mDoseInput.setAutoInputModeEnabled(true);
+		mDoseInput.setOnChangeListener(this);
+		mInsufficientSupplyText.setOnClickListener(new View.OnClickListener() {
 
-                 @Override
-                 public void onClick(View v)
-                 {
-                         final Context context = IntakeDialog.this.getContext();
-                         final Intent intent = new Intent(context, DrugEditActivity.class);
-                         intent.setAction(Intent.ACTION_EDIT);
-                         intent.putExtra(DrugEditActivity.EXTRA_DRUG, mDrug);
-                         intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
+			@Override
+			public void onClick(View v)
+			{
+				final Context context = IntakeDialog.this.getContext();
+				final Intent intent = new Intent(context, DrugEditActivity.class);
+				intent.setAction(Intent.ACTION_EDIT);
+				intent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, mDrug.getId());
+				intent.putExtra(DrugEditActivity.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
 
-                         context.startActivity(intent);
-                 }
-         });
+				context.startActivity(intent);
+			}
+		});
 
-         //setTitle(mDrug.getName());
-         //setIcon(Util.getDrugIconDrawable(getContext(), mDrug.getIcon()));
+		//setTitle(mDrug.getName());
+		//setIcon(Util.getDrugIconDrawable(getContext(), mDrug.getIcon()));
 	}
 
 	private boolean hasInsufficientSupplies()

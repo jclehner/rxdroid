@@ -436,7 +436,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 
 					Drug drug = new Drug();
 					drug.setName("Drug #" + (drugCount + 1));
-					drug.setSchedule(schedule);
+					drug.addSchedule(schedule);
 					drug.setRepeatMode(Drug.REPEAT_CUSTOM);
 					drug.setActive(true);
 

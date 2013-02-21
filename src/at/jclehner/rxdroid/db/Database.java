@@ -428,11 +428,11 @@ public final class Database
 				final List<T> entries = queryForAll(clazz);
 				sCache.put(clazz, entries);
 
-				if(LOGV)
-				{
-					for(T t : entries)
-						Log.v(TAG, "  " + t);
-				}
+//				if(LOGV)
+//				{
+//					for(T t : entries)
+//						Log.v(TAG, "  " + t);
+//				}
 
 				sDbLoadingTimeMillis += timer.elapsed();
 

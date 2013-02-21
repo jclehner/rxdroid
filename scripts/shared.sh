@@ -1,10 +1,14 @@
 #!/bin/bash
 
+adb start-server
+eval "$(adb shell set | grep EXTERNAL_STORAGE= | tr -d "\r\n")"
+
 readonly PKG="at.jclehner.rxdroid"
-readonly DTEMP="/sdcard/"
+readonly DTEMP="${EXTERNAL_STORAGE}/"
 readonly MISC="scripts/misc/"
 
 DEBUG=0
+
 
 die() {
 	if [[ $# -ne 0 ]]; then

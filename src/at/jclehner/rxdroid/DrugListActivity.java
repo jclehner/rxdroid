@@ -290,7 +290,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 		final Intent editIntent = new Intent(this, DrugEditActivity.class);
 		editIntent.setAction(Intent.ACTION_EDIT);
-		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
+		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, drug.getId());
 		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
 
 		// ////////////////////////////////////////////////
@@ -347,7 +347,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		intent.setClass(this, DrugEditActivity.class);
 
 		Drug drug = Drug.get((Integer) view.getTag(TAG_DRUG_ID));
-		intent.putExtra(DrugEditActivity.EXTRA_DRUG, drug);
+		intent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, drug.getId());
 		intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 
 		//startActivityForResult(intent, 0);

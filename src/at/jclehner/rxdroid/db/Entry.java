@@ -46,14 +46,12 @@ import com.j256.ormlite.field.DatabaseField;
  * @author Joseph Lehner
  *
  */
-public abstract class Entry implements Serializable
+public abstract class Entry
 {
 	interface Callback<E extends Entry>
 	{
 		void call(E entry);
 	}
-
-	private static final long serialVersionUID = 8300191193261799857L;
 
 	@DatabaseField(generatedId = true)
 	protected int id = -1;

@@ -141,6 +141,8 @@ public final class Schedule extends Entry
 
 	public void setDose(int doseTime, Fraction dose)
 	{
+		mDoses.get()[doseTime] = dose;
+
 		switch(doseTime)
 		{
 			case TIME_MORNING:
@@ -255,7 +257,7 @@ public final class Schedule extends Entry
 		}
 	};
 
-	transient private LazyValue<Fraction[]> mDoses = new LazyValue<Fraction[]>() {
+	private final LazyValue<Fraction[]> mDoses = new LazyValue<Fraction[]>() {
 
 		@Override
 		public Fraction[] value()
@@ -265,7 +267,7 @@ public final class Schedule extends Entry
 			};
 		}
 	};
-	
+
 	@Keep
 	/* package */ static final Callback<Schedule> CALLBACK_DELETED = new Callback<Schedule>() {
 
@@ -275,7 +277,7 @@ public final class Schedule extends Entry
 			final SchedulePart[] scheduleParts = schedule.mSchedulePartsArray.get();
 			if(scheduleParts == null)
 				return;
-			
+
 			for(SchedulePart part : scheduleParts)
 			{
 				Database.delete(part, Database.FLAG_DONT_NOTIFY_LISTENERS);

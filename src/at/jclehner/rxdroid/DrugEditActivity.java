@@ -21,10 +21,10 @@
 
 package at.jclehner.rxdroid;
 
-import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -67,6 +67,7 @@ import at.jclehner.androidutils.otpm.PreferenceHelper;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
+import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.preferences.DosePreference;
 import at.jclehner.rxdroid.preferences.DrugNamePreference2;
@@ -86,7 +87,8 @@ import at.jclehner.rxdroid.util.Util;
 @SuppressWarnings("deprecation")
 public class DrugEditActivity extends PreferenceActivity implements OnPreferenceClickListener
 {
-	public static final String EXTRA_DRUG = "drug";
+	//public static final String EXTRA_DRUG = "drug";
+	public static final String EXTRA_DRUG_ID = "drug_id";
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
 
 	private static final int MENU_DELETE = 0;
@@ -94,7 +96,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	//private static final String ARG_DRUG = "drug";
 
 	private static final String TAG = DrugEditActivity.class.getName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = true;
 
 	private DrugWrapper mWrapper;
 	private int mDrugHash;
@@ -188,11 +190,11 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 		if(Intent.ACTION_EDIT.equals(action))
 		{
-			Serializable extra = intent.getSerializableExtra(EXTRA_DRUG);
-			if(extra == null)
+			final int drugId = intent.getIntExtra(EXTRA_DRUG_ID, -1);
+			if(drugId == -1)
 				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG");
 
-			drug = (Drug) extra;
+			drug = Drug.get(drugId);
 
 			if(LOGV) Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, "drug");
 
@@ -516,7 +518,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		private long repeatArg;
 		private Date repeatOrigin;
 		private int sortRank;
-		private Schedule schedule;
+		private List<Schedule> schedules;
+		private Patient patient;
 		private String comment;
 
 		/*@CreatePreference
@@ -547,6 +550,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			sortRank = drug.getSortRank();
 			autoAddIntakes = drug.isAutoAddIntakesEnabled();
 			lastAutoIntakeCreationDate = drug.getLastAutoIntakeCreationDate();
+			patient = drug.getPatient();
+			schedules = drug.getSchedules();
 
 			name = drug.getName();
 			form = drug.getIcon();
@@ -569,6 +574,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			//drug.setSchedule(schedule);
 			drug.setLastAutoIntakeCreationDate(lastAutoIntakeCreationDate);
 			drug.setAutoAddIntakesEnabled(autoAddIntakes);
+			drug.setPatient(patient);
+			drug.setSchedules(schedules);
 
 			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };
 

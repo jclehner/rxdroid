@@ -1,13 +1,13 @@
 package at.jclehner.rxdroid.db;
 
 import java.util.Date;
+import java.util.List;
 
-import android.util.Log;
 import at.jclehner.rxdroid.Fraction;
 
 /* package */ final class Schedules
 {
-	static Fraction getDose(Date date, int doseTime, Schedule[] schedules)
+	static Fraction getDose(Date date, int doseTime, List<Schedule> schedules)
 	{
 		if(schedules != null)
 		{
@@ -21,7 +21,7 @@ import at.jclehner.rxdroid.Fraction;
 		return Fraction.ZERO;
 	}
 
-	static boolean hasDoseOnDate(Date date, Schedule[] schedules)
+	static boolean hasDoseOnDate(Date date, List<Schedule> schedules)
 	{
 		for(Schedule s : schedules)
 		{
@@ -32,7 +32,7 @@ import at.jclehner.rxdroid.Fraction;
 		return false;
 	}
 
-	static boolean hasNoDoses(Schedule[] schedules)
+	static boolean hasNoDoses(List<Schedule> schedules)
 	{
 		for(Schedule s : schedules)
 		{

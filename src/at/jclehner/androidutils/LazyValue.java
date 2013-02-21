@@ -2,22 +2,44 @@ package at.jclehner.androidutils;
 
 public abstract class LazyValue<T>
 {
-	private T mValue;
+	public interface Mutator<T>
+	{
+		void mutate(T value);
+	}
+
+	private volatile T mValue;
 
 	public T get()
 	{
 		if(mValue == null)
 		{
-			synchronized(this) {
-				mValue = value();
+			synchronized(this)
+			{
+				if(mValue == null)
+					mValue = value();
 			}
 		}
 
 		return mValue;
 	}
 
-	public void clear() {
+	public void set(T value)
+	{
+		synchronized(this) {
+			mValue = value;
+		}
+	}
+
+	public synchronized void reset() {
 		mValue = null;
+	}
+
+	public synchronized void mutate(Mutator<T> mutator)
+	{
+		if(mValue == null)
+			return;
+
+		mutator.mutate(mValue);
 	}
 
 	public abstract T value();
