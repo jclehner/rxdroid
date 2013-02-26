@@ -1,7 +1,7 @@
 /**
- * Copyright (C) 2011 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * RxDroid - A Medication Reminder
+ * Copyright 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
- * This file is part of RxDroid.
  *
  * RxDroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
