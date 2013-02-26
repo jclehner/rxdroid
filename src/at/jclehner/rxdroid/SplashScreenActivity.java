@@ -73,7 +73,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		}
 	}
 
-	private static final String TAG = SplashScreenActivity.class.getName();
+	private static final String TAG = SplashScreenActivity.class.getSimpleName();
 	private static final String ARG_EXCEPTION = "exception";
 
 	private final BroadcastReceiver mReceiver = new DatabaseStatusReceiver();

@@ -15,7 +15,8 @@ import at.jclehner.rxdroid.Settings;
 
 public class TogglableTimePeriodPreference extends TimePeriodPreference
 {
-	private static final String TAG = TimePeriodPreference.class.getName();
+	private static final String TAG = TimePeriodPreference.class.getSimpleName();
+	private static final TimePeriod EMPTY = TimePeriod.fromString("00:00-00:00");
 
 	private CompoundButton mToggler;
 	private boolean mChecked = true;
@@ -39,7 +40,26 @@ public class TogglableTimePeriodPreference extends TimePeriodPreference
 	protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue)
 	{
 		super.onSetInitialValue(restorePersistedValue, defaultValue);
-		mChecked = Settings.isChecked(getKey(), false);
+		setChecked(Settings.isChecked(getKey(), false));
+		//onValueSet(getValue());
+	}
+
+	@Override
+	protected String toSummaryString(TimePeriod value)
+	{
+		if(value == EMPTY)
+			return null;
+
+		return super.toSummaryString(value);
+	}
+
+	private void setChecked(boolean checked)
+	{
+		mChecked = checked;
+		if(!mChecked)
+			setSummaryInternal(getContext().getString(R.string._title_disabled));
+
+		Settings.setChecked(getKey(), mChecked);
 	}
 
 	private final OnCheckedChangeListener mToggleListener = new OnCheckedChangeListener() {
@@ -47,8 +67,7 @@ public class TogglableTimePeriodPreference extends TimePeriodPreference
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 		{
-			mChecked = isChecked;
-			Settings.setChecked(getKey(), mChecked);
+			setChecked(isChecked);
 
 			if(mChecked)
 				showDialog(null);

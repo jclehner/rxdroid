@@ -44,7 +44,7 @@ import at.jclehner.rxdroid.FractionInputDialog.OnFractionSetListener;
  */
 public class FractionPreference extends MyDialogPreference<Fraction> implements OnFractionSetListener
 {
-	private static final String TAG = FractionPreference.class.getName();
+	private static final String TAG = FractionPreference.class.getSimpleName();
 
 	private static final String KEY_VALUE = "value";
 

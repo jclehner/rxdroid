@@ -31,7 +31,7 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class UtilTest extends AndroidTestCase
 {
-	private static final String TAG = UtilTest.class.getName();
+	private static final String TAG = UtilTest.class.getSimpleName();
 
 	//private static final String STR = "Hello, world!";
 	private static int[] ARRAY = { 0, 1, 2 };

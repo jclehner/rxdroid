@@ -48,7 +48,7 @@ import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
 public class DrugOverviewAdapter extends AbsDrugAdapter
 {
-	private static final String TAG = DrugOverviewAdapter.class.getName();
+	private static final String TAG = DrugOverviewAdapter.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
 
 	private final Timer mTimer;

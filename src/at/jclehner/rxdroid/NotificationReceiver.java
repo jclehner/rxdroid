@@ -49,7 +49,7 @@ import at.jclehner.rxdroid.util.Util;
 
 public class NotificationReceiver extends BroadcastReceiver
 {
-	private static final String TAG = NotificationReceiver.class.getName();
+	private static final String TAG = NotificationReceiver.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
 
 	private static final int LED_CYCLE_MS = 5000;
@@ -224,7 +224,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				alarmExtras.putBoolean(EXTRA_IS_ALARM_REPETITION, true);
 			}
 
-			triggerAtMillis = base + (i * alarmRepeatMillis);
+			//triggerAtMillis = base + (i * alarmRepeatMillis);
 		}
 
 		final long triggerDiffFromNow = triggerAtMillis - System.currentTimeMillis();
@@ -339,6 +339,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		final int currentHash = message.hashCode();
 		final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
 
+		if(message.length() == 0)
+		{
+			getNotificationManager().cancel(R.id.notification);
+			return;
+		}
+
 		final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
 		builder.setContentTitle(getString(titleResId));
 		builder.setContentIntent(createDrugListIntent(date));
@@ -396,7 +402,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			}
 		}
 
-		if(mode != NOTIFICATION_FORCE_SILENT /*&& Settings.getBoolean(Settings.Keys.USE_SOUND, true)*/)
+		if(mode != NOTIFICATION_FORCE_SILENT)
 		{
 			boolean isNowWithinQuietHours = false;
 
@@ -428,43 +434,13 @@ public class NotificationReceiver extends BroadcastReceiver
 			else
 				Log.i(TAG, "Currently within quiet hours; muting sound...");
 		}
-		else if(LOGV)
-		{
-			final String modeName;
-
-			switch(mode)
-			{
-				case NOTIFICATION_NORMAL:
-					modeName = "NORMAL";
-					break;
-
-				case NOTIFICATION_FORCE_SILENT:
-					modeName = "FORCE_SILENT";
-					break;
-
-				case NOTIFICATION_FORCE_UPDATE:
-					modeName = "FORCE_UPDATE";
-					break;
-
-				default:
-					modeName = "(UNKNOWN)";
-			}
-
-			final boolean soundEnabled = Settings.getBoolean(Settings.Keys.USE_SOUND, true);
-			Log.i(TAG, "No sound: mode=" + modeName + ", soundEnabled=" + soundEnabled);
-		}
 
 		if(mode != NOTIFICATION_FORCE_SILENT && Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true))
 			defaults |= Notification.DEFAULT_VIBRATE;
 
 		builder.setDefaults(defaults);
 
-		final NotificationManager nm = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
-		if(message.length() != 0)
-			nm.notify(R.id.notification, builder.build());
-		else
-			nm.cancel(R.id.notification);
+		getNotificationManager().notify(R.id.notification, builder.build());
 	}
 
 	private int getDrugsWithDueDoses(Date date, int doseTime, List<Drug> outDrugs)
@@ -530,6 +506,10 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private String getString(int resId, Object... formatArgs) {
 		return mContext.getString(resId, formatArgs);
+	}
+
+	private NotificationManager getNotificationManager() {
+		return (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 
 	/* package */ static void rescheduleAlarmsAndUpdateNotification(boolean silent) {

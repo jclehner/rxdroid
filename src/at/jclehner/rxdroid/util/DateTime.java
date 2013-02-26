@@ -45,7 +45,7 @@ import at.jclehner.rxdroid.RxDroid;
  */
 public final class DateTime
 {
-	private static final String TAG = DateTime.class.getName();
+	private static final String TAG = DateTime.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	private static final int[] CALENDAR_TIME_FIELDS = { Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND };

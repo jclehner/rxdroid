@@ -37,7 +37,7 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
  */
 public class EventDispatcher<T>
 {
-	private static final String TAG = EventDispatcher.class.getName();
+	private static final String TAG = EventDispatcher.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	private final WeakHashMap<Object, Void> mReceivers =

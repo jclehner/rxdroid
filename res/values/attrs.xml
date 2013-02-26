@@ -38,6 +38,14 @@
         <attr name="allowEndWrap" format="boolean" />
     </declare-styleable>
     
+    <declare-styleable name="MyDialogPreference">
+        <attr name="autoSummary" format="boolean" />
+    </declare-styleable>
+        
+    <declare-styleable name="DrugSupplyMontior">
+        <attr name="onLongClick" format="string" /> 
+    </declare-styleable>
+    
     <declare-styleable name="SpotlightView">
     	<attr name="backgroundDim" format="fraction" />
     	<attr name="spotOnView" format="reference" />

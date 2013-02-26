@@ -2,9 +2,12 @@
 
 source "$(dirname $_)/shared.sh"
 
-
 [[ -f "$1" ]] || die "$1: No such file"
-[[ -z "$2" || ! -f "$2" ]] && die "$2: No such file"
+
+set +u
+[[ ! -z "$2" && ! -f "$2" ]] && die "$2: No such file"
+CONFFILE=$2
+set -u
 
 if [[ "$(head -c 6 "$1")" != "SQLite" ]]; then
 	die "$1: Not an SQLite database"
@@ -29,9 +32,9 @@ run adb-shell mkdir -p $(dirname $TARGET)
 echo -n "Pushing database to device ... "
 adb push "$1" "$TARGET" || die
 
-if [[ -f "$2" ]]; then
+if [[ -f "$CONFFILE" ]]; then
 	echo -n "Pushing configuration to device ... "
-	adb push "$2" "$PREFS/${PKG}_preferences.xml"
+	adb push "$CONFFILE" "$PREFS/${PKG}_preferences.xml"
 fi
 
 #echo -n "Moving to target directory ... "

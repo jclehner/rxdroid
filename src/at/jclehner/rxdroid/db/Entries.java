@@ -36,7 +36,7 @@ import at.jclehner.rxdroid.util.DateTime;
 public final class Entries
 {
 	@SuppressWarnings("unused")
-	private static final String TAG = Entries.class.getName();
+	private static final String TAG = Entries.class.getSimpleName();
 
 	private static final String[] TIME_NAMES = {
 		"MORNING", "NOON", "EVENING", "NIGHT"

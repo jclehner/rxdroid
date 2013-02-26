@@ -98,7 +98,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	private static final long serialVersionUID = 2050536341303052796L;
 
 	@SuppressWarnings("unused")
-	private static  final String TAG = Fraction.class.getName();
+	private static  final String TAG = Fraction.class.getSimpleName();
 
 	private static boolean sDisplayMixedNumbers = true;
 

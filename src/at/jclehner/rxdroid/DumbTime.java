@@ -51,7 +51,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	private static final long serialVersionUID = -6977398555336283902L;
 
 	@SuppressWarnings("unused")
-	private static final String TAG = DumbTime.class.getName();
+	private static final String TAG = DumbTime.class.getSimpleName();
 
 	private static final String[] FORMATS = { "HH:mm", "HH:mm:ss", "HH:mm:ss.SSS" };
 

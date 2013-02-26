@@ -1,10 +1,11 @@
 #!/bin/bash
 
 adb start-server
-eval "$(adb shell set | grep EXTERNAL_STORAGE= | tr -d "\r\n")"
+#eval "$(adb shell set | grep EXTERNAL_STORAGE= | tr -d "\r\n")"
 
 readonly PKG="at.jclehner.rxdroid"
-readonly DTEMP="${EXTERNAL_STORAGE}/"
+#readonly DTEMP="${EXTERNAL_STORAGE}/"
+readonly DTEMP="/cache/"
 readonly MISC="scripts/misc/"
 
 DEBUG=0
@@ -96,7 +97,7 @@ adb-shell() {
 
 	local tmp="${DTEMP}/.exitstatus"
 	#adb shell "su -c '$@; echo $? > $tmp'"
-	adb shell "$@; > $tmp"
+	adb shell "$@; echo $? > $tmp"
 	local status=$(adb shell cat $tmp | tr -d "\r\n")
 	let status=$status+0
 
@@ -104,6 +105,15 @@ adb-shell() {
 	#adb shell su -c "rm $tmp"
 
 	return $status
+}
+
+adb-pull() {
+	[[ $# -ne 2 ]] && die "adb-pull: no arguments"
+
+	[[ -e "$2" ]] && die "adb-pull: refusing to overwrite $2"
+
+	adb pull "$1" "$2"
+	[[ ! -e "$2" ]] && exit 1
 }
 
 run() {

@@ -27,7 +27,7 @@ import at.jclehner.rxdroid.Fraction;
 
 public class FractionTest extends AndroidTestCase
 {
-	private static final String TAG = FractionTest.class.getName();
+	private static final String TAG = FractionTest.class.getSimpleName();
 
 	private static final String[] FRACTIONS = {
 			"1 1       /4",

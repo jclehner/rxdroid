@@ -49,7 +49,7 @@ import com.j256.ormlite.table.TableUtils;
  */
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 {
-	private static final String TAG = DatabaseHelper.class.getName();
+	private static final String TAG = DatabaseHelper.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	public static class DatabaseError extends RuntimeException

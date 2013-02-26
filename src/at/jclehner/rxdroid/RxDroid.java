@@ -41,7 +41,7 @@ import at.jclehner.rxdroid.db.Intake;
 
 public class RxDroid extends Application
 {
-	private static final String TAG = RxDroid.class.getName();
+	private static final String TAG = RxDroid.class.getSimpleName();
 
 	private static WeakHashMap<Activity, Boolean> sActivityVisibility =
 			new WeakHashMap<Activity, Boolean>();

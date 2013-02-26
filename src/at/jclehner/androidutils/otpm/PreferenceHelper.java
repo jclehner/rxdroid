@@ -55,7 +55,7 @@ import at.jclehner.rxdroid.util.CollectionUtils;
  */
 public abstract class PreferenceHelper<P extends Preference, T>
 {
-	private static final String TAG = PreferenceHelper.class.getName();
+	private static final String TAG = PreferenceHelper.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	protected Object mObject;

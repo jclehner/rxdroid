@@ -36,7 +36,7 @@ import android.widget.Button;
 
 public abstract class AlertDialogFragment extends DialogFragment implements DialogInterface.OnClickListener
 {
-	private static final String TAG = AlertDialogFragment.class.getName();
+	private static final String TAG = AlertDialogFragment.class.getSimpleName();
 
 	private Button mPositiveBtn;
 	private Button mNeutralBtn;

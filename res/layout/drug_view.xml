@@ -24,6 +24,7 @@
 
 <RelativeLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:paddingRight="5dip"
@@ -177,6 +178,7 @@
 			    android:background="@drawable/generic_background"
 			    android:clickable="true"
 			    android:onClick="onLowSupplyIndicatorClicked"
+			    rxdroid:onLongClick="onSupplyMonitorLongClick"
 			    
 			    android:paddingBottom="12dip"
 			    

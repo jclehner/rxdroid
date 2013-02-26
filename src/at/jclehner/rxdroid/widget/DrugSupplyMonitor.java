@@ -1,20 +1,30 @@
 package at.jclehner.rxdroid.widget;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Date;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.widget.TextView;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
+import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Intake;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.WrappedCheckedException;
 
-public class DrugSupplyMonitor extends TextView implements Database.OnChangeListener
+public class DrugSupplyMonitor extends TextView implements
+		Database.OnChangeListener/*, OnLongClickListener*/
 {
 	//private int mDrugId = -1;
 	private Drug mDrug;
@@ -24,12 +34,15 @@ public class DrugSupplyMonitor extends TextView implements Database.OnChangeList
 		super(context);
 	}
 
-	public DrugSupplyMonitor(Context context, AttributeSet attrs) {
+	public DrugSupplyMonitor(Context context, AttributeSet attrs)
+	{
 		super(context, attrs);
+		handleAttributes(attrs);
 	}
 
 	public DrugSupplyMonitor(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		handleAttributes(attrs);
 	}
 
 	public void setDrug(Drug drug)
@@ -127,5 +140,49 @@ public class DrugSupplyMonitor extends TextView implements Database.OnChangeList
 			setText(currentSupply.toString());
 		else
 			setText("0");
+	}
+
+	private void handleAttributes(AttributeSet attrs)
+	{
+		if(attrs == null)
+			return;
+		final Context context = getContext();
+		final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.DrugSupplyMontior);
+		final String onLongClick = a.getString(R.styleable.DrugSupplyMontior_onLongClick);
+		if(onLongClick != null)
+		{
+			setOnLongClickListener(new OnLongClickListener() {
+
+				@Override
+				public boolean onLongClick(View v)
+				{
+					final Class<?> cls = context.getClass();
+					try
+					{
+						final Method m = cls.getMethod(onLongClick, View.class);
+						m.invoke(context, DrugSupplyMonitor.this);
+						return true;
+					}
+					catch(NoSuchMethodException e)
+					{
+						throw new WrappedCheckedException(e);
+					}
+					catch(IllegalArgumentException e)
+					{
+						throw new WrappedCheckedException(e);
+					}
+					catch(IllegalAccessException e)
+					{
+						throw new WrappedCheckedException(e);
+					}
+					catch(InvocationTargetException e)
+					{
+						throw new WrappedCheckedException(e);
+					}
+				}
+			});
+		}
+
+		a.recycle();
 	}
 }

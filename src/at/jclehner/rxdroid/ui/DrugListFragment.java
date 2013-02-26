@@ -35,7 +35,7 @@ import at.jclehner.rxdroid.db.Drug;
 
 public class DrugListFragment extends ListFragment
 {
-	private static final String TAG = DrugListFragment.class.getName();
+	private static final String TAG = DrugListFragment.class.getSimpleName();
 
 	//public static final String ARG_ADAPTER = "adapter";
 	public static final String ARG_DATE = "date";

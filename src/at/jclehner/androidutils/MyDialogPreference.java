@@ -38,6 +38,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import at.jclehner.androidutils.InstanceState.SaveState;
+import at.jclehner.rxdroid.FractionInput.OnChangedListener;
+import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.util.Util;
 
 
@@ -53,9 +55,8 @@ import at.jclehner.rxdroid.util.Util;
  */
 public abstract class MyDialogPreference<T extends Serializable> extends DialogPreference
 {
-	private static final String TAG = MyDialogPreference.class.getName();
-	@SuppressWarnings("unused")
-	private static final boolean LOGV = false;
+	private static final String TAG = MyDialogPreference.class.getSimpleName();
+	private static final boolean LOGV = true;
 
 	private static final String EMPTY = "<!!!!!!!!!!!!!!!!!!!!!!EMPTY";
 
@@ -68,16 +69,24 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	@SaveState
 	private T mDefaultValue;
 
+	@SaveState
+	private boolean mAutoSummary = true;
+
+	@SaveState
+	private boolean mHasSummary = false;
+
 	private Dialog mDialog;
 
 	private static final String KEY_IS_DIALOG_SHOWING = TAG + ".is_showing";
 
-	public MyDialogPreference(Context context, AttributeSet attrs, int defStyle) {
+	public MyDialogPreference(Context context, AttributeSet attrs, int defStyle)
+	{
 		super(context, attrs, defStyle);
+		handleAttributes(attrs);
 	}
 
 	public MyDialogPreference(Context context, AttributeSet attrs) {
-		super(context, attrs, android.R.attr.preferenceStyle);
+		this(context, attrs, android.R.attr.preferenceStyle);
 	}
 
 	public void setNeutralButtonText(CharSequence text) {
@@ -96,14 +105,19 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	 * Sets the internal value represented by this Preference.
 	 * <p>
 	 * Calling this function will also persist the value, if
-	 * enabled. Note that the summary will be automatically
-	 * updated with the result of <code>value.toString()</code>.
-	 * The summary may be changed again by overriding {@link #onValueSet(Object)}.
+	 * neccessary. When using the auto-summary functionality
+	 * (enabled by default), the summary will be updated using
+	 * {@link #toSummaryString(T)}. This function also calls
+	 * the callback {@link #onValueSet(T)}.
 	 */
 	public final void setValue(T value)
 	{
+		if(LOGV) Log.v(TAG, getKey() + ": setValue: value=" + value);
+
 		mValue = value;
-		setSummary(getSummary());
+
+		if(!mHasSummary && mAutoSummary)
+			setSummaryInternal(value != null ? toSummaryString(value) : null);
 
 		onValueSet(value);
 
@@ -112,14 +126,15 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	}
 
 	/**
-	 * Similar to {@link #setValue(Object)}, but also calls the <code>OnChangeListener</code>
-	 * associated with this Preference.
+	 * Calls {@link #setValue(T)} iff the change listener returned <code>true</code>.
 	 *
 	 * @param value
 	 * @see #setValue(Object)
 	 */
 	public final void changeValue(T value)
 	{
+		if(LOGV) Log.v(TAG, getKey() + ": changeValue: value=" + value);
+
 		if(callChangeListener(value))
 		{
 			setValue(value);
@@ -131,6 +146,8 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	{
 		if(mValue == null)
 		{
+			Log.e(TAG, "This shouldn't have happened...");
+
 			String persisted = getPersistedString(EMPTY);
 			if(persisted != null && persisted != EMPTY) // the != operator is intentional!
 				mValue = fromPersistedString(persisted);
@@ -141,7 +158,16 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 			}
 		}
 
+		if(LOGV) Log.v(TAG, getKey() + ": getValue: mValue=" + mValue);
+
 		return mValue;
+	}
+
+	@Override
+	public void setSummary(CharSequence summary)
+	{
+		super.setSummary(summary);
+		mHasSummary = summary != null;
 	}
 
 	@Override
@@ -159,8 +185,15 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		return getTitle();
 	}
 
-	protected abstract String toPersistedString(T value);
 	protected abstract T fromPersistedString(String string);
+
+	protected String toPersistedString(T value) {
+		return value.toString();
+	}
+
+	protected String toSummaryString(T value) {
+		return value.toString();
+	}
 
 	@Override
 	protected Object onGetDefaultValue(TypedArray a, int index)
@@ -168,8 +201,33 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		final String string = a.getString(index);
 		final T newValue = fromPersistedString(string);
 
+		if(LOGV) Log.v(TAG, getKey() + ": onGetDefaultValue: value=" + newValue);
+
 		mDefaultValue = newValue;
 		return newValue;
+	}
+
+	@Override
+	protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue)
+	{
+		if(LOGV)
+		{
+			Log.v(TAG, getKey() + ": onSetInitialValue: restorePersistedValue=" + restorePersistedValue +
+					", defaultValue=" + defaultValue);
+		}
+
+		if(restorePersistedValue)
+		{
+			final String persisted = getPersistedString(null);
+			if(persisted != null)
+			{
+				setValue(fromPersistedString(persisted));
+				return;
+			}
+		}
+
+		if(defaultValue != null)
+			setValue(fromPersistedString(defaultValue.toString()));
 	}
 
 	@Override
@@ -206,8 +264,8 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	 * </ul>
 	 *
 	 * Also note that dialog properties returned by functions such as
-	 * {@link #getDialogTitle()} will <em>not</em> be automatically
-	 * applied if using a custom dialog.
+	 * {@link #getDialogTitle()} will <em>not</em> be applied
+	 * automatically when using a custom dialog.
 	 * <p>
 	 * <sup>*)</sup> This function <em>might</em> be called, if you've used the
 	 * {@link OnClickListener} returned by {@link #getDialogOnClickListener()}
@@ -302,6 +360,8 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	@Override
 	protected Parcelable onSaveInstanceState()
 	{
+		if(LOGV) Log.v(TAG, getKey() + ": onSaveInstanceState");
+
 		// This might be a hack, but it's the only way I've found to work
 		// around those pesky 'Window leaked by Activity' errors.
 		final boolean isShowing = mDialog != null;
@@ -318,6 +378,8 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	@Override
 	protected void onRestoreInstanceState(Parcelable state)
 	{
+		if(LOGV) Log.v(TAG, getKey() + ": onRestoreInstanceState");
+
 		super.onRestoreInstanceState(InstanceState.getSuperState(state));
 		InstanceState.restoreTo(this, state);
 
@@ -333,8 +395,37 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	@Override
 	protected void onDialogClosed(boolean positiveResult)
 	{
+		if(LOGV) Log.v(TAG, getKey() + ": onDialogClosed: positiveResult=" + positiveResult);
+
 		if(positiveResult)
 			changeValue(getDialogValue());
+	}
+
+	protected void setSummaryInternal(CharSequence summary)
+	{
+		if(LOGV) Log.v(TAG, getKey() + ": setSummaryInternal: summary=" + summary);
+
+		super.setSummary(summary);
+		mAutoSummary = true;
+	}
+
+	private void handleAttributes(AttributeSet attrs)
+	{
+		if(attrs == null)
+			return;
+
+		if(false)
+		{
+			final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.MyDialogPreference);
+			mAutoSummary = a.getBoolean(R.styleable.MyDialogPreference_autoSummary, true);
+			a.recycle();
+		}
+		else
+		{
+			mAutoSummary = attrs.getAttributeBooleanValue(R.styleable.MyDialogPreference_autoSummary, true);
+		}
+
+		if(LOGV) Log.v(TAG, getKey() + ": handleAttributes: mAutoSummary=" + mAutoSummary);
 	}
 
 	private final OnDismissListener mDismissListener = new OnDismissListener() {

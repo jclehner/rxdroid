@@ -38,6 +38,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -83,7 +84,7 @@ import com.mobeta.android.dslv.DragSortListView;
 public class DrugListActivity extends FragmentActivity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
 {
-	private static final String TAG = DrugListActivity.class.getName();
+	private static final String TAG = DrugListActivity.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	private static final int CMENU_TOGGLE_INTAKE = 0;
@@ -174,7 +175,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(getString(R.string.translator).length() == 0)
 		{
 			final String language = Locale.getDefault().getDisplayLanguage(Locale.US);
-			showInfoDialog(Settings.InfoIds.MISSING_TRANSLATION, R.string._msg_no_translation, language);
+			showInfoDialog(Settings.OnceIds.MISSING_TRANSLATION, R.string._msg_no_translation, language);
 		}
 	}
 
@@ -474,6 +475,16 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		Toast.makeText(this, getString(R.string._toast_low_supplies, dateString), Toast.LENGTH_LONG).show();
 	}
 
+	public void onSupplyMonitorLongClick(View view)
+	{
+		final Drug drug = ((DrugSupplyMonitor) view).getDrug();
+		if(drug == null)
+			return;
+
+		final DrugSupplyEditFragment dialog = DrugSupplyEditFragment.newInstance(drug);
+		dialog.show(getSupportFragmentManager(), "supply_edit_dialog");
+	}
+
 	@Override
 	protected Dialog onCreateDialog(int id, Bundle args)
 	{
@@ -482,7 +493,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		else if(id == DIALOG_INFO_SORTING)
 		{
 			final String msg = args.getString("msg");
-			final String infoId = args.getString("info_id");
+			final String onceId = args.getString("once_id");
 
 			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
 			ab.setIcon(android.R.drawable.ic_dialog_info);
@@ -494,7 +505,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					Settings.putStringSetEntry(Settings.Keys.DISPLAYED_INFO_IDS, infoId);
+					Settings.putStringSetEntry(Settings.Keys.DISPLAYED_ONCE, onceId);
 				}
 			});
 
@@ -572,7 +583,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 				mPager.setCurrentItem(InfiniteViewPagerAdapter.CENTER, smoothScroll);
 
 				if(drugCount >= 2)
-					showInfoDialog(Settings.InfoIds.DRAG_DROP_SORTING, R.string._msg_drag_drop_sorting);
+					showInfoDialog(Settings.OnceIds.DRAG_DROP_SORTING, R.string._msg_drag_drop_sorting);
 			}
 			else
 			{
@@ -678,13 +689,13 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		return false;
 	}
 
-	private void showInfoDialog(String infoId, int msgResId, Object... args)
+	private void showInfoDialog(String onceId, int msgResId, Object... args)
 	{
-		if(Settings.containsStringSetEntry(Settings.Keys.DISPLAYED_INFO_IDS, infoId))
+		if(Settings.containsStringSetEntry(Settings.Keys.DISPLAYED_ONCE, onceId))
 			return;
 
 		Bundle bundle = new Bundle();
-		bundle.putString("info_id", infoId);
+		bundle.putString("once_id", onceId);
 		bundle.putString("msg", getString(msgResId, args));
 
 		showDialog(DIALOG_INFO_SORTING, bundle);

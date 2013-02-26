@@ -78,7 +78,7 @@ import com.j256.ormlite.table.DatabaseTable;
 public class Drug extends Entry implements Comparable<Drug>
 {
 	@SuppressWarnings("unused")
-	private static final String TAG = Drug.class.getName();
+	private static final String TAG = Drug.class.getSimpleName();
 
 	public static final int ICON_TABLET = 0;
 	public static final int ICON_SYRINGE = 1;

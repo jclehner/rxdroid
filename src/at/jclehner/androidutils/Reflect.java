@@ -41,7 +41,7 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
  */
 public final class Reflect
 {
-	private static final String TAG = Reflect.class.getName();
+	private static final String TAG = Reflect.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	/**

@@ -29,6 +29,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.preference.Preference;
 import android.text.format.DateFormat;
@@ -51,7 +52,7 @@ import at.jclehner.rxdroid.util.Util;
 
 public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 {
-	private static final String TAG = TimePeriodPreference.class.getName();
+	private static final String TAG = TimePeriodPreference.class.getSimpleName();
 
 	private static final int END = 1;
 	private static final int MAX = END;
@@ -90,11 +91,11 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			return new TimePeriod(begin, end);
 		}
 
-		public DumbTime getBegin() {
+		public DumbTime begin() {
 			return mBegin;
 		}
 
-		public DumbTime getEnd() {
+		public DumbTime end() {
 			return mEnd;
 		}
 
@@ -138,25 +139,36 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 	@Override
 	public CharSequence getSummary()
 	{
+//		if(!mHasSummary)
+//			updateSummary(mBegin, mEnd);
+
+		return super.getSummary();
+
+		/*if(mHasSummary)
+			return super.getSummary();
+
 		final CharSequence summary = super.getSummary();
 		if(summary != null)
 			return summary;
 
 		final TimePeriod value = getValue();
 		if(value != null)
-			return DateTime.toNativeTime(value.getBegin()) + "-" + DateTime.toNativeTime(value.getEnd());
+			return DateTime.toNativeTime(value.begin()) + "-" + DateTime.toNativeTime(value.end());
 
-		return null;
-	}
-
-	@Override
-	protected String toPersistedString(TimePeriod value) {
-		return value.toString();
+		return null;*/
 	}
 
 	@Override
 	protected TimePeriod fromPersistedString(String string) {
 		return TimePeriod.fromString(string);
+	}
+
+	@Override
+	protected String toSummaryString(TimePeriod value)
+	{
+		final String beginStr = DateTime.toNativeTime(value.begin());
+		final String endStr = DateTime.toNativeTime(value.end());
+		return getContext().getString(R.string._title_x_to_y, beginStr, endStr);
 	}
 
 	@Override
@@ -167,8 +179,8 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 	@Override
 	protected void onValueSet(TimePeriod value)
 	{
-		mBegin = value.getBegin();
-		mEnd = value.getEnd();
+		mBegin = value.begin();
+		mEnd = value.end();
 	}
 
 	@Override
@@ -217,6 +229,7 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 		}
 
 		mAllowEndWrap = a.getBoolean(R.styleable.TimePeriodPreference_allowEndWrap, false);
+		a.recycle();
 	}
 
 	private void onPageChanged(int page)
@@ -422,8 +435,8 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 			mNextButton.setOnClickListener(mOnBtnClickListener);
 
 			final TimePeriod value = getValue();
-			mBegin = value.getBegin();
-			mEnd = value.getEnd();
+			mBegin = value.begin();
+			mEnd = value.end();
 
 			onPageChanged(0);
 		}

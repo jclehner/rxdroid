@@ -138,6 +138,7 @@
 				android:title="@string/_title_pref_use_led"
 				android:entries="@array/led_colors"
 				android:entryValues="@array/led_color_values"
+				android:defaultValue=""
 			/>		
 						
 			<CheckBoxPreference android:key="@string/key_use_vibrator"

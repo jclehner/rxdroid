@@ -31,7 +31,7 @@ import at.jclehner.rxdroid.util.Timer;
 
 public final class Theme
 {
-	private static final String TAG = Theme.class.getName();
+	private static final String TAG = Theme.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	public static final int LIGHT = R.style.LightTheme;

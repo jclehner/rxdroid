@@ -47,7 +47,9 @@ public final class Settings
 {
 	public static class Keys
 	{
+		@Deprecated
 		public static final String USE_LED = key(R.string.key_use_led);
+		@Deprecated
 		public static final String USE_SOUND = key(R.string.key_use_sound);
 		public static final String USE_VIBRATOR = key(R.string.key_use_vibrator);
 		public static final String LOCKSCREEN_TIMEOUT = key(R.string.key_lockscreen_timeout);
@@ -70,8 +72,9 @@ public final class Settings
 		public static final String NOTIFICATION_LIGHT_COLOR = key(R.string.key_notification_light_color);
 		public static final String QUIET_HOURS = key(R.string.key_quiet_hours);
 
+		@Deprecated
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
-		public static final String DISPLAYED_INFO_IDS = "displayed_info_ids";
+		public static final String DISPLAYED_ONCE = "displayed_once";
 		public static final String IS_FIRST_LAUNCH = "is_first_launch";
 	}
 
@@ -84,7 +87,7 @@ public final class Settings
 		public static final int HISTORY_SIZE_UNLIMITED = 4;
 	}
 
-	public static class InfoIds
+	public static class OnceIds
 	{
 		public static final String DRAG_DROP_SORTING = "drag_drop_sorting";
 		public static final String MISSING_TRANSLATION = "missing_translation";
@@ -95,7 +98,7 @@ public final class Settings
 		public static final boolean ENABLE_LANDSCAPE = booleanResource(R.bool.pref_default_landscape_enabled);
 	}
 
-	private static final String TAG = Settings.class.getName();
+	private static final String TAG = Settings.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	private static final String DATE_FORMAT = "yyyy-MM-dd";
@@ -108,52 +111,7 @@ public final class Settings
 		if(sSharedPrefs == null)
 		{
 			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(RxDroid.getContext());
-
-			// XXX
-
-			//putBoolean(Keys.USE_SOUND, true);
-			//putBoolean(Keys.USE_LED, true);
-
-			// XXX
-
-
-			if(sSharedPrefs.contains(Keys.USE_SOUND))
-			{
-				Log.d(TAG, "init: migrating USE_SOUND");
-
-				/**
-				 * USE_SOUND:
-				 *
-				 * true -> no change needed
-				 * false -> set sound to "" (=silent)
-				 *
-				 */
-
-				if(!getBoolean(Keys.USE_SOUND, true))
-					putString(Keys.NOTIFICATION_SOUND, "");
-
-				remove(Keys.USE_SOUND);
-			}
-
-			if(sSharedPrefs.contains(Keys.USE_LED))
-			{
-				Log.d(TAG, "init: migrating USE_LED");
-
-				/**
-				 * USE_LED -> NOTIFICATION_LIGHT_COLOR:
-				 *
-				 * true -> no change needed; "" means default color
-				 * false -> "0"
-				 */
-				if(!getBoolean(Keys.USE_LED, true))
-					putString(Keys.NOTIFICATION_LIGHT_COLOR, "0");
-				else
-					putString(Keys.NOTIFICATION_LIGHT_COLOR, "");
-
-				remove(Keys.USE_LED);
-			}
-
-//			sSharedPrefs.registerOnSharedPreferenceChangeListener(LISTENER);
+			migrateSettings();
 		}
 	}
 
@@ -164,10 +122,6 @@ public final class Settings
 	public static boolean isChecked(String key, boolean defaultChecked) {
 		return getBoolean(getKeyForCheckedStatus(key), defaultChecked);
 	}
-
-//	public static boolean isChecked(String key) {
-//		return isChecked(key, true);
-//	}
 
 	public static Set<String> getStringSet(String key) {
 		return stringToStringSet(sSharedPrefs.getString(key, null));
@@ -336,13 +290,13 @@ public final class Settings
 	public static DumbTime getDoseTimeBegin(int doseTime)
 	{
 		final TimePeriod p = getTimePeriodPreference(doseTime);
-		return p == null ? null : p.getBegin();
+		return p == null ? null : p.begin();
 	}
 
 	public static DumbTime getDoseTimeEnd(int doseTime)
 	{
 		final TimePeriod p = getTimePeriodPreference(doseTime);
-		return p == null ? null : p.getEnd();
+		return p == null ? null : p.end();
 	}
 
 	/*public DumbTime getTimePreference(String key)
@@ -709,10 +663,59 @@ public final class Settings
 		sSharedPrefs.edit().remove(key).commit();
 	}
 
+	private static boolean contains(String key) {
+		return sSharedPrefs.contains(key);
+	}
+
+	private static void migrateSettings()
+	{
+		if(contains("displayed_info_ids"))
+		{
+			Log.d(TAG, "init: migrating DISPLAYED_INFO_IDS");
+
+			putString(Keys.DISPLAYED_ONCE, getString("displayed_info_ids"));
+			remove("displayed_info_ids");
+		}
+
+		if(contains(Keys.USE_SOUND))
+		{
+			Log.d(TAG, "init: migrating USE_SOUND");
+
+			/**
+			 * USE_SOUND:
+			 *
+			 * true -> no change needed
+			 * false -> set sound to "" (=silent)
+			 *
+			 */
+
+			if(!getBoolean(Keys.USE_SOUND, true))
+				putString(Keys.NOTIFICATION_SOUND, "");
+
+			remove(Keys.USE_SOUND);
+		}
+
+		if(contains(Keys.USE_LED))
+		{
+			Log.d(TAG, "init: migrating USE_LED");
+
+			/**
+			 * USE_LED -> NOTIFICATION_LIGHT_COLOR:
+			 *
+			 * true -> no change needed; "" means default color
+			 * false -> "0"
+			 */
+			if(!getBoolean(Keys.USE_LED, true))
+				putString(Keys.NOTIFICATION_LIGHT_COLOR, "0");
+			else
+				putString(Keys.NOTIFICATION_LIGHT_COLOR, "");
+
+			remove(Keys.USE_LED);
+		}
+	}
+
 	// converts the string set [ "foo", "bar", "foobar", "barz" ] to the following string:
 	// 4:3:foo3:bar6:foobar4:barz
-
-
 
 	private static String stringSetToString(Set<String> set)
 	{

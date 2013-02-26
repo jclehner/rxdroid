@@ -43,7 +43,7 @@ import android.util.Log;
 
 public final class InstanceState
 {
-	private static final String TAG = InstanceState.class.getName();
+	private static final String TAG = InstanceState.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	/**

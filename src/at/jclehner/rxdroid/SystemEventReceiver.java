@@ -29,7 +29,7 @@ import at.jclehner.rxdroid.util.DateTime;
 
 public class SystemEventReceiver extends BroadcastReceiver
 {
-	private static final String TAG = SystemEventReceiver.class.getName();
+	private static final String TAG = SystemEventReceiver.class.getSimpleName();
 
 	@Override
 	public void onReceive(Context context, Intent intent)

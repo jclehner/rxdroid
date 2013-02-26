@@ -57,7 +57,7 @@ import at.jclehner.rxdroid.util.DateTime;
  */
 public class PreferencesTest extends AndroidTestCase
 {
-	private static final String TAG = PreferencesTest.class.getName();
+	private static final String TAG = PreferencesTest.class.getSimpleName();
 
 	private SharedPreferences mPrefs;
 	private Map<String, String> mPrefBackup;

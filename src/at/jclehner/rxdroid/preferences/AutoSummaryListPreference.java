@@ -8,7 +8,7 @@ import at.jclehner.rxdroid.util.CollectionUtils;
 
 public class AutoSummaryListPreference extends ListPreference
 {
-	private static final String TAG = AutoSummaryListPreference.class.getName();
+	private static final String TAG = AutoSummaryListPreference.class.getSimpleName();
 
 	public AutoSummaryListPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -29,18 +29,10 @@ public class AutoSummaryListPreference extends ListPreference
 	@Override
 	protected void onSetInitialValue(boolean restoreValue, Object defaultValue)
 	{
+		Log.d(TAG, getKey() + " onSetIntialValue(" + restoreValue + ", " + defaultValue);
 		super.onSetInitialValue(restoreValue, defaultValue);
-
 		setSummaryFromValue(getValue());
 	}
-
-//	@Override
-//	protected String getPersistedString(String defaultReturnValue)
-//	{
-//		final String value = super.getPersistedString(defaultReturnValue);
-//		setSummaryFromValue(value);
-//		return value;
-//	}
 
 	private void setSummaryFromValue(String value)
 	{

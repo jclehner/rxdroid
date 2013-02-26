@@ -31,7 +31,7 @@ import android.view.ViewStub;
 public class FractionInputDialog extends AlertDialog implements OnClickListener, FractionInput.OnChangedListener
 {
 	@SuppressWarnings("unused")
-	private static final String TAG = FractionInputDialog.class.getName();
+	private static final String TAG = FractionInputDialog.class.getSimpleName();
 
 	public interface OnFractionSetListener
 	{

@@ -69,7 +69,7 @@ import at.jclehner.rxdroid.util.Util;
 public class PreferencesActivity extends PreferenceActivityBase implements
 		OnSharedPreferenceChangeListener, OnPreferenceClickListener, OnPreferenceChangeListener
 {
-	private static final String TAG = PreferencesActivity.class.getName();
+	private static final String TAG = PreferencesActivity.class.getSimpleName();
 
 	private static final String[] KEEP_DISABLED = {
 		Settings.Keys.VERSION, Settings.Keys.DB_STATS

@@ -19,10 +19,10 @@ CFG="/data/data/$PKG/shared_prefs/${PKG}_preferences.xml"
 #echo "done"
 
 echo -n "Pulling database from device ... "
-run adb pull $DB "$BASENAME.sqlite"
+adb-pull $DB "$BASENAME.sqlite"
 
 echo -n "Pulling configuration from device ... "
-run adb pull $CFG "$BASENAME.config"
+adb-pull $CFG "$BASENAME.config"
 
 #echo -n "Removing database at temporary location ... "
 #run adb-shell "su -c 'rm $TEMPDB'"

@@ -33,7 +33,7 @@ import at.jclehner.rxdroid.util.Util;
 
 public class DosePreference extends FractionPreference
 {
-	private static final String TAG = DosePreference.class.getName();
+	private static final String TAG = DosePreference.class.getSimpleName();
 
 	private int mDoseTime = -1;
 	private Drug mDrug;

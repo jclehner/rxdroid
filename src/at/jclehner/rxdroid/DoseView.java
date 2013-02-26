@@ -54,7 +54,7 @@ import at.jclehner.rxdroid.util.DateTime;
  */
 public class DoseView extends FrameLayout implements OnChangeListener
 {
-	private static final String TAG = DoseView.class.getName();
+	private static final String TAG = DoseView.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	public static final int STATUS_INDETERMINATE = 0;

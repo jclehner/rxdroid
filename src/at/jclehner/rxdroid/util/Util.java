@@ -52,7 +52,7 @@ import at.jclehner.rxdroid.db.Schedule;
 
 public final class Util
 {
-	private static final String TAG = Util.class.getName();
+	private static final String TAG = Util.class.getSimpleName();
 
 	public static boolean equalsIgnoresNull(Object a, Object b)
 	{

@@ -64,6 +64,7 @@ import at.jclehner.androidutils.otpm.MyDialogPreferenceHelper;
 import at.jclehner.androidutils.otpm.OTPM;
 import at.jclehner.androidutils.otpm.OTPM.CreatePreference;
 import at.jclehner.androidutils.otpm.PreferenceHelper;
+import at.jclehner.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -95,7 +96,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 
 	//private static final String ARG_DRUG = "drug";
 
-	private static final String TAG = DrugEditActivity.class.getName();
+	private static final String TAG = DrugEditActivity.class.getSimpleName();
 	private static final boolean LOGV = true;
 
 	private DrugWrapper mWrapper;
@@ -986,38 +987,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		@Override
 		protected Dialog onGetCustomDialog()
 		{
-			final FractionInputDialog dialog = (FractionInputDialog) super.onGetCustomDialog();
+			final DrugSupplyEditFragment.Dialog d =
+					new DrugSupplyEditFragment.Dialog(getContext(), getDialogValue(), mRefillSize, this);
 
-			if(mRefillSize != 0)
-			{
-				//final ViewStub stub = (ViewStub) dialog.findViewById(R.id.stub);
-				//stub.setLayoutResource(R.layout.current_supply_button);
+			d.setTitle(getDialogTitle());
+			d.setIcon(getDialogIcon());
 
-				final ViewStub stub = dialog.getFooterStub();
-				stub.setLayoutResource(R.layout.current_supply_button);
-				//final View inflated = stub.inflate();
-
-				final Button btn = (Button) stub.inflate().findViewById(R.id.btn_current_supply);
-				btn.setText("+" + Integer.toString(mRefillSize));
-				btn.setOnClickListener(mListener);
-			}
-
-			return dialog;
+			return d;
 		}
-
-		private View.OnClickListener mListener = new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v)
-			{
-				final FractionInputDialog dialog = (FractionInputDialog) getDialog();
-				if(dialog != null)
-				{
-					dialog.setValue(dialog.getValue().plus(mRefillSize));
-					v.setEnabled(false);
-				}
-			}
-		};
 	}
 
 	private static class NotificationsPreferenceHelper extends PreferenceHelper<ListPreference, Boolean>
@@ -1044,6 +1021,21 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			Util.populateListPreferenceEntryValues(preference);
 			preference.setValueIndex(fieldValue ? NOTIFY_SUPPLIES_ONLY : NOTIFY_ALL);
 			preference.setDialogTitle(preference.getTitle());
+
+//			preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+//
+//				@Override
+//				public boolean onPreferenceClick(Preference preference)
+//				{
+//					if(Settings.containsStringSetEntry(Settings.Keys.DISPLAYED_ONCE, entry))
+//
+//
+//
+//
+//					// TODO Auto-generated method stub
+//					return false;
+//				}
+//			});
 		}
 
 		@Override

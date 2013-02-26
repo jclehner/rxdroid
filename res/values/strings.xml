@@ -27,15 +27,6 @@
     <string name="version" translatable="false">0.9.6</string>
     <string name="vcs_revision" translatable="false">$Revision$</string>
     <string name="translator"></string>
-        
-    <!--  WARNING: Do NOT replace - with an en dash as suggested by lint -->
-    <string name="pref_default_time_morning" translatable="false">06:00-10:00</string>
-    <string name="pref_default_time_noon" translatable="false">12:00-14:00</string>
-    <string name="pref_default_time_evening" translatable="false">19:00-21:00</string>
-    <string name="pref_default_time_night" translatable="false">22:00-23:00</string>
-    
-    <string name="pref_default_alarm_timeout" translatable="false">00:30</string>
-    <string name="pref_default_theme_is_dark" translatable="false">true</string> 
        
     <!-- 
     Translatable strings start here. The naming scheme is as follows:
@@ -337,7 +328,13 @@
 	<string name="_msg_no_translation">RxDroid has not yet been translated to your language. If you want
 	    to help translating this app into %1$s, please contact me! 
 	</string>
-								
+	
+	<string name="_title_supply_edit">Supply: %1$s</string>
+	<string name="_title_x_to_y">%1$s – %2$s</string>
+	
+	<string name="_title_disabled">Disabled</string>
+	
+									
 	<!-- 
 	Strings prefixed with virtual_ are not to be translated. They are
 	wrappers around api-specific strings in the form of <id>_v<api version>, 

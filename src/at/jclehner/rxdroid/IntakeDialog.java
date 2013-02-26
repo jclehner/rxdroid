@@ -45,7 +45,7 @@ import at.jclehner.rxdroid.db.Schedule;
 
 public class IntakeDialog extends AlertDialog implements OnChangedListener, Database.OnChangeListener
 {
-	private static final String TAG = IntakeDialog.class.getName();
+	private static final String TAG = IntakeDialog.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	public static final String ARG_DRUG_ID = "drug_id";

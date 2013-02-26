@@ -43,7 +43,7 @@ import at.jclehner.rxdroid.util.Util;
 
 public class TimePreference extends MyDialogPreference<DumbTime>
 {
-	private static final String TAG = TimePreference.class.getName();
+	private static final String TAG = TimePreference.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	private static final int WRAP_AFTER = 1;

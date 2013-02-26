@@ -53,7 +53,7 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
  */
 public class OTPM
 {
-	private static final String TAG = OTPM.class.getName();
+	private static final String TAG = OTPM.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	/* package */ static final String EXTRA_PREF_HELPERS = TAG + ".EXTRA_PREF_HELPERS";

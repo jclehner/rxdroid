@@ -48,7 +48,7 @@ public class FractionInput extends LinearLayout
 		public void onFractionChanged(FractionInput widget, Fraction oldValue);
 	}
 
-	private static final String TAG = FractionInput.class.getName();
+	private static final String TAG = FractionInput.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	private static final String[] MODE_SWITCHER_LABELS = { "1", "1\u00BE", "\u00BE" };

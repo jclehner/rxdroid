@@ -44,7 +44,7 @@ import at.jclehner.rxdroid.widget.DrugNameView;
 
 public class DrugDetailAdapter extends AbsDrugAdapter
 {
-	private final String TAG = DrugDetailAdapter.class.getName();
+	private final String TAG = DrugDetailAdapter.class.getSimpleName();
 	private final boolean LOGV = true;
 
 	private final int mDoseTime;

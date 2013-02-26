@@ -20,7 +20,7 @@ import com.j256.ormlite.table.DatabaseTableConfig;
 
 public final class ImportExport
 {
-	private static final String TAG = ImportExport.class.getName();
+	private static final String TAG = ImportExport.class.getSimpleName();
 
 	public @interface Jsonable
 	{

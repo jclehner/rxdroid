@@ -31,7 +31,7 @@ import android.widget.Button;
 
 public class AdvancedAlertDialog extends AlertDialog
 {
-	private static final String TAG = AdvancedAlertDialog.class.getName();
+	private static final String TAG = AdvancedAlertDialog.class.getSimpleName();
 
 	private OnShowListener mOnShowListener;
 	private Button mBtnPositive;

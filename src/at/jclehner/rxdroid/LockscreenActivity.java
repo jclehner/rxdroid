@@ -35,7 +35,7 @@ import at.jclehner.rxdroid.util.CollectionUtils;
 
 public class LockscreenActivity extends Activity implements OnClickListener
 {
-	private static final String TAG = LockscreenActivity.class.getName();
+	private static final String TAG = LockscreenActivity.class.getSimpleName();
 
 	private static final int PIN_LENGTH = 4;
 	private static final String DIGITS = "0123456789";

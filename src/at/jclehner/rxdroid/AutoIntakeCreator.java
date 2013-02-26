@@ -43,7 +43,7 @@ public enum AutoIntakeCreator implements
 {
 	INSTANCE;
 
-	private static final String TAG = AutoIntakeCreator.class.getName();
+	private static final String TAG = AutoIntakeCreator.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	@Override

@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-	<item name="pref_default_landscape_enabled" type="bool">false</item>
-	<item name="pref_visibility_landscape_enabled" type="bool">true</item>
+    <item name="pref_default_time_morning" type="string">06:00-10:00</item>
+    <item name="pref_default_time_noon" type="string">12:00-14:00</item>
+    <item name="pref_default_time_evening" type="string">19:00-21:00</item>
+    <item name="pref_default_time_night" type="string">22:00-23:00</item>
+    
+    <item name="pref_default_alarm_timeout" type="string">00:30</item>
+    <item name="pref_default_theme_is_dark" type="string">true</item> 
+    <item name="pref_default_landscape_enabled" type="bool">false</item>    
 	<item name="pref_default_compact_action_bar" type="bool">true</item>
-	<item name="pref_visibility_compact_action_bar" type="bool">false</item>
 	<item name="pref_default_quiet_hours" type="string">00:00-06:00</item>
+	
+	<item name="pref_visibility_landscape_enabled" type="bool">true</item>
+	<item name="pref_visibility_compact_action_bar" type="bool">false</item>
 	
 	<item name="is_drug_list_activity_date_menu_item_visible" type="bool">false</item>
 	

@@ -75,7 +75,7 @@ import com.j256.ormlite.table.DatabaseTableConfig;
  */
 public final class Database
 {
-	private static final String TAG = Database.class.getName();
+	private static final String TAG = Database.class.getSimpleName();
 	private static final boolean LOGV = true;
 
 	/* package */ static final boolean USE_CUSTOM_CACHE = true;
