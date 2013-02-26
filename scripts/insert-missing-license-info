@@ -57,7 +57,9 @@ for s in "${SEARCHDIRS[@]}"; do
 	
 	for f in $(grep -L 'Copyright (C)' $(find ${INFO[1]} -name "*${INFO[0]}")); do
 		echo "$f"
-		insert_gpl_info "$f" ${INFO[0]}
+		if [[ $# -ne 1 || "$1" != "--pretend" ]]; then
+			insert_gpl_info "$f" ${INFO[0]}
+		fi
 	done
 done
 
