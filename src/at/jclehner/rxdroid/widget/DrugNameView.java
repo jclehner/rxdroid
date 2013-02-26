@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.TextView;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.db.Drug;
+import at.jclehner.rxdroid.db.Entries;
 
 public class DrugNameView extends TextView
 {
@@ -63,7 +64,7 @@ public class DrugNameView extends TextView
 
 	public void setScrambled(boolean scrambled)
 	{
-		setText(scrambled ? Settings.getDrugName(mDrug) : mName);
+		setText(scrambled ? Entries.getDrugName(mDrug) : mName);
 		mIsCurrentlyScrambled = scrambled;
 	}
 

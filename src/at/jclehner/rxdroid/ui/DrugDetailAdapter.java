@@ -32,7 +32,6 @@ import android.widget.ImageView;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
-import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Intake;
@@ -95,7 +94,7 @@ public class DrugDetailAdapter extends AbsDrugAdapter
 		else
 			holder = (DoseViewHolder) v.getTag();
 
-		holder.name.setText(Settings.getDrugName(drug));
+		holder.name.setText(Entries.getDrugName(drug));
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
 		//holder.icon.setImageResource(drug.getIconResourceId());
 		holder.icon.setImageResource(Util.getDrugIconDrawable(mActivity, drug.getIcon()));

@@ -260,7 +260,13 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		{
 			final String value = (String) newValue;
 			if(!("".equals(value) || "0".equals(value)))
-				RxDroid.toastLong(R.string._toast_custom_led_color);
+			{
+				if(!Settings.wasDisplayedOnce("custom_led_color"))
+				{
+					RxDroid.toastLong(R.string._toast_custom_led_color);
+					Settings.setDisplayedOnce("custom_led_color");
+				}
+			}
 		}
 
 		return true;

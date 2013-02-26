@@ -719,7 +719,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 			if(drug.isAutoAddIntakesEnabled())
 			{
-				if(Settings.hasLowSupplies(drug))
+				if(Entries.hasLowSupplies(drug))
 					return true;
 
 				return mShowSupplyMonitors;
@@ -731,7 +731,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			if(Entries.countIntakes(drug, mFilterDate, null) != 0)
 				return true;
 
-			if(Settings.hasLowSupplies(drug))
+			if(Entries.hasLowSupplies(drug))
 				return true;
 
 			if(DateTime.isToday(mFilterDate) && Entries.hasMissingIntakesBeforeDate(drug, mFilterDate))

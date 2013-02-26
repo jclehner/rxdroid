@@ -35,12 +35,10 @@ import android.content.pm.ActivityInfo;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.jclehner.rxdroid.db.Drug;
-import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
-import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public final class Settings
@@ -237,31 +235,12 @@ public final class Settings
 		return date.before(reference);
 	}
 
-	public static boolean hasLowSupplies(Drug drug)
-	{
-		if(!drug.isActive() || drug.getRefillSize() == 0 || drug.hasNoDoses())
-			return false;
-
-		final int minSupplyDays = Integer.parseInt(sSharedPrefs.getString(Keys.LOW_SUPPLY_THRESHOLD, "10"), 10);
-		return Entries.getSupplyDaysLeftForDrug(drug, null) < minSupplyDays;
-	}
-
 	public static long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, FLAG_GET_MILLIS_UNTIL_BEGIN);
 	}
 
 	public static long getMillisUntilDoseTimeEnd(Calendar time, int doseTime) {
 		return getMillisUntilDoseTimeBeginOrEnd(time, doseTime, 0);
-	}
-
-	public static long getAlarmTimeout()
-	{
-		// FIXME
-
-		if(!sSharedPrefs.getBoolean("debug_snooze_time_short", false))
-			return 1800 * 1000;
-
-		return 10000;
 	}
 
 	public static long getDoseTimeBeginOffset(int doseTime) {
@@ -298,24 +277,6 @@ public final class Settings
 		final TimePeriod p = getTimePeriodPreference(doseTime);
 		return p == null ? null : p.end();
 	}
-
-	/*public DumbTime getTimePreference(String key)
-	{
-		if(key == null)
-			return null;
-
-		String value = sSharedPrefs.getString(key, null);
-		if(value == null)
-		{
-			int resId = sApplicationContext.getResources().getIdentifier("at.jclehner.rxdroid:string/pref_default_" + key, null, null);
-			if(resId != 0)
-				value = sApplicationContext.getString(resId);
-			else
-				value = "00:30";
-		}
-
-		return DumbTime.fromString(value);
-	}*/
 
 	public static TimePeriod getTimePeriodPreference(int doseTime)
 	{
@@ -379,31 +340,7 @@ public final class Settings
 		private DoseTimeInfo() {}
 	}
 
-	public static DoseTimeInfo getDoseTimeInfo()
-	{
-		/*final DoseTimeInfo dtInfo = DoseTimeInfo.INSTANCES.get();
-
-		dtInfo.mCurrentTime = DateTime.nowCalendar();
-		dtInfo.mActiveDate = getActiveDate(dtInfo.mCurrentTime);
-		dtInfo.mActiveDoseTime = getActiveDoseTime(dtInfo.mCurrentTime);
-		dtInfo.mNextDoseTime = getNextDoseTime(dtInfo.mCurrentTime);
-
-		final Date currentDate = DateTime.getDatePart(dtInfo.mCurrentTime).getTime();
-
-		if(dtInfo.mActiveDoseTime == Schedule.TIME_INVALID && dtInfo.mNextDoseTime == Schedule.TIME_MORNING)
-		{
-			// If active date is equal to the current date, we're somewhere before
-			// midnight on that date and thus need to adjust mNextDoseTimeDate.
-
-			if(dtInfo.mActiveDate.equals(currentDate))
-				dtInfo.mNextDoseTimeDate = DateTime.add(currentDate, Calendar.DAY_OF_MONTH, 1);
-		}
-
-		if(dtInfo.mNextDoseTimeDate == null)
-			dtInfo.mNextDoseTimeDate = currentDate;
-
-		return dtInfo;*/
-
+	public static DoseTimeInfo getDoseTimeInfo() {
 		return getDoseTimeInfo(DateTime.nowCalendar());
 	}
 
@@ -542,20 +479,6 @@ public final class Settings
 		return retDoseTime;
 	}
 
-	/*public int getLastNotificationCount() {
-		return sSharedPrefs.getInt(KEY_LAST_MSG_COUNT, 0);
-	}
-
-	public void setLastNotificationCount(int notificationCount)
-	{
-		if(notificationCount < 0 || notificationCount > 3)
-			throw new IllegalArgumentException();
-
-		Editor editor = sSharedPrefs.edit();
-		editor.putInt(KEY_LAST_MSG_COUNT, notificationCount);
-		editor.commit();
-	}*/
-
 	public static int getIntFromList(String key, int defValue)
 	{
 		String valueStr = getString(key, null);
@@ -582,33 +505,12 @@ public final class Settings
 			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 	}
 
-	public static String getDrugName(Drug drug)
-	{
-		final String name = drug.getName();
-		// this should never happen unless there's a DB problem
-		if(name == null || name.length() == 0)
-			return "<???>";
+	public static boolean wasDisplayedOnce(String onceId) {
+		return containsStringSetEntry(Keys.DISPLAYED_ONCE, onceId);
+	}
 
-		if(getBoolean(Keys.SCRAMBLE_NAMES, false))
-		{
-			// We rot13 word by word and ignore those beginning with
-			// a digit, so things like 10mg won't get converted to 10zt.
-
-			final StringBuilder sb = new StringBuilder(name.length());
-			for(String word : name.split(" "))
-			{
-				if(word.length() == 0 || Character.isDigit(word.charAt(0)))
-					sb.append(word);
-				else
-					sb.append(Util.rot13(word));
-
-				sb.append(" ");
-			}
-
-			return sb.toString();
-		}
-
-		return name;
+	public static void setDisplayedOnce(String onceId) {
+		putStringSetEntry(Keys.DISPLAYED_ONCE, onceId);
 	}
 
 	private static String key(int resId) {

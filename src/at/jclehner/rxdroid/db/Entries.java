@@ -30,8 +30,11 @@ import java.util.List;
 
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
+import at.jclehner.rxdroid.Settings;
+import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.Util;
 
 public final class Entries
 {
@@ -357,6 +360,44 @@ public final class Entries
 			return true;
 
 		return date.after(lastScheduleUpdateDate);
+	}
+
+	public static boolean hasLowSupplies(Drug drug)
+	{
+		if(!drug.isActive() || drug.getRefillSize() == 0 || drug.hasNoDoses())
+			return false;
+
+		final int minSupplyDays = Settings.getStringAsInt(Settings.Keys.LOW_SUPPLY_THRESHOLD, 10);
+		return getSupplyDaysLeftForDrug(drug, null) < minSupplyDays;
+	}
+
+	public static String getDrugName(Drug drug)
+	{
+		final String name = drug.getName();
+		// this should never happen unless there's a DB problem
+		if(name == null || name.length() == 0)
+			return "<???>";
+
+		if(Settings.getBoolean(Settings.Keys.SCRAMBLE_NAMES, false))
+		{
+			// We rot13 word by word and ignore those beginning with
+			// a digit, so things like 10mg won't get converted to 10zt.
+
+			final StringBuilder sb = new StringBuilder(name.length());
+			for(String word : name.split(" "))
+			{
+				if(word.length() == 0 || Character.isDigit(word.charAt(0)))
+					sb.append(word);
+				else
+					sb.append(Util.rot13(word));
+
+				sb.append(" ");
+			}
+
+			return sb.toString();
+		}
+
+		return name;
 	}
 
 	private static void getTotalDose(Drug drug, Date date, MutableFraction outTotalDose)

@@ -492,7 +492,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		for(Drug drug : mAllDrugs)
 		{
-			if(Settings.hasLowSupplies(drug))
+			if(Entries.hasLowSupplies(drug))
 			{
 				++count;
 

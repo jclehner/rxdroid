@@ -36,7 +36,6 @@ import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
-import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.util.Constants;
@@ -122,7 +121,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 				holder.missedDoseIndicator.setVisibility(View.GONE);
 
 
-			if(Settings.hasLowSupplies(drug))
+			if(Entries.hasLowSupplies(drug))
 				holder.currentSupply.setTypeface(null, Typeface.BOLD_ITALIC);
 			else
 				holder.currentSupply.setTextAppearance(mActivity, android.R.style.TextAppearance_Small);
