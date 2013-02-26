@@ -129,16 +129,6 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		if(p != null)
 			p.setOnPreferenceChangeListener(this);
 
-		p = findPreference(Settings.Keys.NOTIFICATION_SOUND);
-		if(p != null)
-		{
-			p.setOnPreferenceChangeListener(this);
-
-			final String key = Settings.Keys.NOTIFICATION_SOUND;
-			final String defValue = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString();
-			onPreferenceChange(p, Settings.getString(key, defValue));
-		}
-
 		p = findPreference(Settings.Keys.DONATE);
 		if(p != null)
 		{
@@ -251,20 +241,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 	{
 		final String key = preference.getKey();
 
-		if(Settings.Keys.NOTIFICATION_SOUND.equals(key))
-		{
-			final Uri uri = Uri.parse((String) newValue);
-			if(Uri.EMPTY.equals(uri))
-				preference.setSummary(R.string._title_silent);
-			else
-			{
-				final Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
-
-				if(ringtone != null)
-					preference.setSummary(ringtone.getTitle(this));
-			}
-		}
-		else if(Settings.Keys.THEME_IS_DARK.equals(key))
+		if(Settings.Keys.THEME_IS_DARK.equals(key))
 		{
 			Theme.clearAttributeCache();
 

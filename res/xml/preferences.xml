@@ -126,11 +126,12 @@
 			android:title="@string/_title_pref_notification_methods"
 		>
 			
-			<RingtonePreference android:key="@string/key_notification_sound"
+			<at.jclehner.rxdroid.preferences.SmartRingtonePreference android:key="@string/key_notification_sound"
 			    android:title="@string/_title_notification_sound"
 			    android:ringtoneType="notification"
 			    android:showDefault="true"
 			    android:showSilent="true"
+			    android:defaultValue="default"
 			/>			
 			
 			<at.jclehner.rxdroid.preferences.AutoSummaryListPreference 
