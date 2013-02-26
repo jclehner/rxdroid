@@ -30,13 +30,6 @@ public class SmartRingtonePreference extends RingtonePreference
 	@Override
 	protected Object onGetDefaultValue(TypedArray a, int index)
 	{
-		final Object r = onGetDefaultValue_(a, index);
-		Log.d("SmartRingtonePreference", "onGetDefaultValue: return=" + r);
-		return r;
-	}
-
-	protected Object onGetDefaultValue_(TypedArray a, int index)
-	{
 		final String defValue = (String) super.onGetDefaultValue(a, index);
 		if("default".equals(defValue))
 			return Settings.System.DEFAULT_NOTIFICATION_URI.toString();

@@ -22,14 +22,12 @@
 package at.jclehner.rxdroid.preferences;
 
 import java.io.Serializable;
-import java.text.ParseException;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.preference.Preference;
 import android.text.format.DateFormat;

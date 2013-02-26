@@ -1,13 +1,8 @@
 package at.jclehner.rxdroid.preferences;
 
 import android.content.Context;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import at.jclehner.rxdroid.R;
@@ -15,6 +10,7 @@ import at.jclehner.rxdroid.Settings;
 
 public class TogglableTimePeriodPreference extends TimePeriodPreference
 {
+	@SuppressWarnings("unused")
 	private static final String TAG = TimePeriodPreference.class.getSimpleName();
 	private static final TimePeriod EMPTY = TimePeriod.fromString("00:00-00:00");
 
@@ -41,7 +37,6 @@ public class TogglableTimePeriodPreference extends TimePeriodPreference
 	{
 		super.onSetInitialValue(restorePersistedValue, defaultValue);
 		setChecked(Settings.isChecked(getKey(), false));
-		//onValueSet(getValue());
 	}
 
 	@Override
