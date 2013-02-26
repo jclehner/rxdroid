@@ -21,7 +21,6 @@
 
 package at.jclehner.rxdroid.db;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 
 import at.jclehner.androidutils.Reflect;

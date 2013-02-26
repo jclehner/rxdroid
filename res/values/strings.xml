@@ -323,7 +323,7 @@
 	<string name="_title_orange">Orange</string>
 	<string name="_title_magenta">Magenta</string>
 	
-	<string name="_toast_custom_led_color">Warning: this color might not be supported on your device.</string>
+	<string name="_toast_custom_led_color">Warning: your device may not support all colors.</string>
 	
 	<string name="_msg_no_translation">RxDroid has not yet been translated to your language. If you want
 	    to help translating this app into %1$s, please contact me! 

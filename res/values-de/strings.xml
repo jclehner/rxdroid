@@ -305,7 +305,7 @@
 	<string name="_title_silent">Stumm</string>
 	<string name="_title_white">Weiß</string>
 	<string name="_title_yellow">Gelb</string>
-	<string name="_toast_custom_led_color">Achtung: diese Farbe wird möglicherweise nicht unterstützt.</string>
+	<string name="_toast_custom_led_color">Achtung: Möglicherweise werden nicht alle Farben unterstützt.</string>
 		
 	<string name="_title_supply_edit">Vorrat: %1$s</string>	
 	

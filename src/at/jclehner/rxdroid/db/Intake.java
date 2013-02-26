@@ -56,8 +56,6 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "intake")
 public class Intake extends Entry
 {
-	private static final long serialVersionUID = -9158847314588407608L;
-
 	@DatabaseField(foreign = true)
 	private Drug drug;
 

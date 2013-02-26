@@ -23,11 +23,8 @@ package at.jclehner.rxdroid.db;
 
 import java.util.Date;
 
-import android.view.ViewDebug.FlagToString;
 import at.jclehner.androidutils.LazyValue;
 import at.jclehner.rxdroid.Fraction;
-import at.jclehner.rxdroid.db.Entry.Callback;
-import at.jclehner.rxdroid.db.schedules.ScheduleBase;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Exceptions;
 import at.jclehner.rxdroid.util.Keep;
@@ -48,8 +45,6 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName="schedules")
 public final class Schedule extends Entry
 {
-	private static final long serialVersionUID = 7534352445550766725L;
-
 	public static final int TIME_MORNING = 0;
 	public static final int TIME_NOON    = 1;
 	public static final int TIME_EVENING = 2;

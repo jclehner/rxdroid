@@ -27,8 +27,6 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "patients")
 public class Patient extends Entry implements Comparable<Patient>
 {
-	private static final long serialVersionUID = -7632154835094837404L;
-
 	public static final int DEFAULT_PATIENT_ID = 1;
 
 	@DatabaseField(unique = true)
