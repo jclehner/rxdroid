@@ -91,7 +91,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	private static final int CMENU_EDIT_DRUG = 2;
 	private static final int CMENU_IGNORE_DOSE = 4;
 
-	private static final int DIALOG_INFO_SORTING = 0;
+	private static final int DIALOG_INFO = 0;
 
 	public static final String EXTRA_DATE = "date";
 	public static final String EXTRA_STARTED_FROM_NOTIFICATION = "started_from_notification";
@@ -175,7 +175,9 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(getString(R.string.translator).length() == 0)
 		{
 			final String language = Locale.getDefault().getDisplayLanguage(Locale.US);
-			showInfoDialog(Settings.OnceIds.MISSING_TRANSLATION, R.string._msg_no_translation, language);
+			final String lang = Locale.getDefault().getLanguage();
+
+			showInfoDialog("missing_translation_" + lang, R.string._msg_no_translation, language);
 		}
 	}
 
@@ -490,7 +492,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	{
 		if(id == R.id.dose_dialog)
 			return new IntakeDialog(this);
-		else if(id == DIALOG_INFO_SORTING)
+		else if(id == DIALOG_INFO)
 		{
 			final String msg = args.getString("msg");
 			final String onceId = args.getString("once_id");
@@ -505,7 +507,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					Settings.putStringSetEntry(Settings.Keys.DISPLAYED_ONCE, onceId);
+					Settings.setDisplayedOnce(onceId);
 				}
 			});
 
@@ -691,14 +693,14 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 	private void showInfoDialog(String onceId, int msgResId, Object... args)
 	{
-		if(Settings.containsStringSetEntry(Settings.Keys.DISPLAYED_ONCE, onceId))
+		if(Settings.wasDisplayedOnce(onceId))
 			return;
 
 		Bundle bundle = new Bundle();
 		bundle.putString("once_id", onceId);
 		bundle.putString("msg", getString(msgResId, args));
 
-		showDialog(DIALOG_INFO_SORTING, bundle);
+		showDialog(DIALOG_INFO, bundle);
 	}
 
 	static class DrugFilter implements CollectionUtils.Filter<Drug>

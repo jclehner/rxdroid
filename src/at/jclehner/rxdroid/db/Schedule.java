@@ -92,6 +92,7 @@ public final class Schedule extends Entry
 	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction doseNight;
 
+	@SuppressWarnings("unused")
 	@DatabaseField(foreign = true)
 	private Drug owner;
 

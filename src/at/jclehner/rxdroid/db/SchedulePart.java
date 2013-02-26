@@ -51,6 +51,7 @@ public class SchedulePart extends Entry
 	@DatabaseField
 	/* package */ int weekdays;
 
+	@SuppressWarnings("unused")
 	@DatabaseField(foreign = true)
 	private Schedule owner;
 

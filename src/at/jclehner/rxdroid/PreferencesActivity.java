@@ -93,14 +93,14 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		if(p != null)
 		{
 			final int format = BuildConfig.DEBUG ? Version.FORMAT_FULL : Version.FORMAT_SHORT;
-			String summary = Version.get(format) + ", DB v" + DatabaseHelper.DB_VERSION;
+			String version = Version.get(format) + ", DB v" + DatabaseHelper.DB_VERSION;
 
 			if(BuildConfig.DEBUG)
 			{
 				try
 				{
 					final String apkModDate = new Date(new File(getPackageCodePath()).lastModified()).toString();
-					summary = summary + "\n" + apkModDate;
+					version = version + "\n" + apkModDate;
 				}
 				catch(NullPointerException e)
 				{
@@ -108,9 +108,13 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				}
 			}
 			else
-				summary = getString(R.string.app_name) + " " + summary;
+			{
+				version = getString(R.string.app_name) + " " + version + "\n" +
+						"Copyright (C) 2011-2013  Joseph C. Lehner\n" +
+						"joseph.c.lehner@gmail.com";
+			}
 
-			p.setSummary(summary);
+			p.setSummary(version);
 		}
 
 		p = findPreference(Settings.Keys.HISTORY_SIZE);
