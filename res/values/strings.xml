@@ -26,7 +26,7 @@
     <string name="app_name" translatable="false">RxDroid</string>
     <string name="version" translatable="false">0.9.6</string>
     <string name="vcs_revision" translatable="false">$Revision$</string>
-    <string name="translator"></string>
+    <string name="translator">builtin</string>
        
     <!-- 
     Translatable strings start here. The naming scheme is as follows:
