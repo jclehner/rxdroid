@@ -31,6 +31,8 @@
 
 -keepattributes *Annotation*
 
+-keep class * extends at.jclehner.rxdroid.db.Entry { *; }
+
 -keep class at.jclehner.rxdroid.db.v** { *; }
 
 -keepclassmembers class * {

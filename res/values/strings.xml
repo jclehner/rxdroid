@@ -24,7 +24,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">RxDroid</string>
-    <string name="version" translatable="false">0.9.6</string>
+    <string name="version" translatable="false">0.9.7</string>
     <string name="vcs_revision" translatable="false">$Revision$</string>
     <string name="translator">builtin</string>
        
@@ -325,12 +325,12 @@
 	
 	<string name="_toast_custom_led_color">Warning: your device may not support all colors.</string>
 	
-	<string name="_msg_no_translation">RxDroid has not yet been translated to your language. If you want
-	    to help translating this app into %1$s, please contact me! 
+	<string name="_msg_no_translation" translatable="false">RxDroid has not yet been translated to your language. If you want
+	    to help translating this app into %1$s, please contact me! Contact details can be found under Preferences.
 	</string>
 	
 	<string name="_title_supply_edit">Supply: %1$s</string>
-	<string name="_title_x_to_y">%1$s – %2$s</string>
+	<string name="_title_x_to_y" tools:ignore="MissingTranslation">%1$s – %2$s</string>
 	
 	<string name="_title_disabled">Disabled</string>
 	

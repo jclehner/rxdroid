@@ -172,12 +172,11 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		setDate(date, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
 
-		if(getString(R.string.translator).length() == 0)
+		final String isoLang = Locale.getDefault().getLanguage();
+		if(!CollectionUtils.contains(Version.TRANSLATIONS, isoLang))
 		{
 			final String language = Locale.getDefault().getDisplayLanguage(Locale.US);
-			final String lang = Locale.getDefault().getLanguage();
-
-			showInfoDialog("missing_translation_" + lang, R.string._msg_no_translation, language);
+			showInfoDialog("missing_translation_" + isoLang, R.string._msg_no_translation, language);
 		}
 	}
 

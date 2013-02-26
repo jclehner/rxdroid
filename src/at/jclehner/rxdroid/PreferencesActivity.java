@@ -110,11 +110,26 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			else
 			{
 				version = getString(R.string.app_name) + " " + version + "\n" +
-						"Copyright (C) 2011-2013  Joseph C. Lehner\n" +
-						"joseph.c.lehner@gmail.com";
+						"Copyright (C) 2011-2013 Joseph Lehner\n" +
+						"<joseph.c.lehner@gmail.com>";
 			}
 
 			p.setSummary(version);
+
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					final Intent intent = new Intent(Intent.ACTION_SEND);
+					intent.setType("plain/text");
+			        intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "joseph.c.lehner+rxdroid-feedback@gmail.com" });
+			        intent.putExtra(Intent.EXTRA_SUBJECT, "RxDroid");
+
+			        startActivity(intent);
+			        return true;
+				}
+			});
 		}
 
 		p = findPreference(Settings.Keys.HISTORY_SIZE);
