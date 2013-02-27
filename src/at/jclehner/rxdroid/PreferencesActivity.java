@@ -36,6 +36,7 @@ import org.json.JSONObject;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -123,11 +124,19 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				{
 					final Intent intent = new Intent(Intent.ACTION_SEND);
 					intent.setType("plain/text");
-			        intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "joseph.c.lehner+rxdroid-feedback@gmail.com" });
-			        intent.putExtra(Intent.EXTRA_SUBJECT, "RxDroid");
+					intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "joseph.c.lehner+rxdroid-feedback@gmail.com" });
+					intent.putExtra(Intent.EXTRA_SUBJECT, "RxDroid");
 
-			        startActivity(intent);
-			        return true;
+					try
+					{
+						startActivity(intent);
+					}
+					catch(ActivityNotFoundException e)
+					{
+						// Happens if no mail client is installed
+					}
+
+					return true;
 				}
 			});
 		}

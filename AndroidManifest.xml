@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	android:versionCode="19" package="at.jclehner.rxdroid" android:installLocation="internalOnly" android:versionName="@string/version">
-
+	package="at.jclehner.rxdroid" 
+	android:versionCode="19"	
+	android:versionName="@string/version"
+	android:installLocation="internalOnly" 
+>
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 

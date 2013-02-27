@@ -24,6 +24,8 @@ adb-pull $DB "$BASENAME.sqlite"
 echo -n "Pulling configuration from device ... "
 adb-pull $CFG "$BASENAME.config"
 
+exit 0
+
 #echo -n "Removing database at temporary location ... "
 #run adb-shell "su -c 'rm $TEMPDB'"
 #echo "done"
