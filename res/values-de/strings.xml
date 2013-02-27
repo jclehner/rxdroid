@@ -187,8 +187,6 @@
 	<string name="_btn_back">Zurück</string>
 	<string name="_btn_next">Weiter</string>
 	<string name="_msg_freq_21days_on_7days_off">21 Tage ab %1$s, danach 7-tägige Pause</string>
-	<string name="_msg_no_drugs_v8">MENÜ drücken und %1$s auswählen, um ein Medikament hinzuzufügen</string>
-	<string name="_msg_no_drugs_v11">Den +-Button in der Aktionsleiste klicken, um ein Medikament hinzuzufügen</string>
 	<string name="_summary_scramble_names">Namen von Medikamenten unkenntlich machen. Den Namen anklicken, um ihn zu zeigen.</string>
 	<string name="_title_21_days_on_7_days_off">7-tägige Pause alle 21 Tage</string>
 	<string name="_title_begin">Beginn</string>
@@ -310,6 +308,10 @@
 	<string name="_title_supply_edit">Vorrat: %1$s</string>	
 	
 	<string name="_title_disabled">Deaktiviert</string>
+	
+	<string name="_msg_no_drugs_no_ab">MENÜ drücken und »%1$s« auswählen, um ein Medikament hinzuzufügen</string>
+	<string name="_msg_no_drugs_compact_ab">»%1$s« aus dem Drei-Punkte-Menü in der Aktionsleiste auswählen, um ein Medikament hinzuzufügen</string>
+	<string name="_msg_no_drugs_extended_ab">Den »+« Button in der Aktionsleiste klicken, um ein Medikament hinzuzufügen</string>
 	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

@@ -79,6 +79,9 @@ import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.AutoDragSortListView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
+import static at.jclehner.rxdroid.Settings.Keys;
+import static at.jclehner.rxdroid.Settings.Defaults;
+
 import com.mobeta.android.dslv.DragSortListView;
 
 public class DrugListActivity extends FragmentActivity implements OnLongClickListener,
@@ -214,7 +217,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	{
 		final int menuResId;
 
-		if(Settings.getBoolean(Settings.Keys.COMPACT_ACTION_BAR, false))
+		if(Settings.getBoolean(Keys.COMPACT_ACTION_BAR, Defaults.COMPACT_ACTION_BAR))
 			menuResId = R.menu.activity_drug_list_compact;
 		else
 			menuResId = R.id.menu_default_drug_list_activity;
@@ -409,7 +412,29 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		Collections.sort(drugs);
 		updateListAdapter(listView, date, drugs);
 
-		final int emptyResId = drugs.isEmpty() ? R.string.virtual_msg_no_drugs : R.string._msg_no_doses_on_this_day;
+		final int emptyResId;
+
+		if(drugs.isEmpty())
+		{
+			if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+			{
+				if(Settings.getBoolean(Keys.COMPACT_ACTION_BAR, Defaults.COMPACT_ACTION_BAR))
+				{
+					Log.d(TAG, "COMPACT_ACTION_BAR");
+					emptyResId = R.string._msg_no_drugs_compact_ab;
+				}
+				else
+				{
+					Log.d(TAG, "EXTENDED_ACTION_BAR");
+					emptyResId = R.string._msg_no_drugs_extended_ab;
+				}
+			}
+			else
+				emptyResId = R.string._msg_no_drugs_no_ab;
+		}
+		else
+			emptyResId = R.string._msg_no_doses_on_this_day;
+
 		emptyView.setText(getString(emptyResId, getString(R.string._title_add)));
 
 		listView.setEmptyView(emptyView);

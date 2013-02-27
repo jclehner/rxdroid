@@ -94,6 +94,7 @@ public final class Settings
 	public static class Defaults
 	{
 		public static final boolean ENABLE_LANDSCAPE = booleanResource(R.bool.pref_default_landscape_enabled);
+		public static final boolean COMPACT_ACTION_BAR = booleanResource(R.bool.pref_default_compact_action_bar);
 	}
 
 	private static final String TAG = Settings.class.getSimpleName();
