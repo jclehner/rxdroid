@@ -93,6 +93,6 @@ public class SmartRingtonePreference extends RingtonePreference
 
 		final Context c = getContext();
 		final Ringtone r = RingtoneManager.getRingtone(c, Uri.parse(value));
-		setSummary(r.getTitle(c));
+		setSummary(r == null ? null : r.getTitle(c));
 	}
 }
