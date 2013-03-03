@@ -83,6 +83,8 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		Settings.init();
+
 		setTheme(Theme.get());
 		setContentView(R.layout.loader);
 

@@ -100,6 +100,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		if(intent == null)
 			return;
 
+		Settings.init();
 		Database.init();
 
 		final boolean isAlarmRepetition = intent.getBooleanExtra(EXTRA_IS_ALARM_REPETITION, false);

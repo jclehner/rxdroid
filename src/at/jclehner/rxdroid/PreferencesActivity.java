@@ -78,17 +78,15 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 
 	private static final int MENU_RESTORE_DEFAULTS = 0;
 
-	SharedPreferences mSharedPreferences;
-
 	@TargetApi(11)
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		mSharedPreferences = getPreferenceManager().getSharedPreferences();
-		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		addPreferencesFromResource(R.xml.preferences);
+
+		Settings.registerOnChangeListener(this);
 
 		Preference p = findPreference(Settings.Keys.VERSION);
 		if(p != null)
@@ -347,7 +345,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					mSharedPreferences.edit().clear().commit();
+					Settings.clear();
 				}
 			});
 
@@ -370,7 +368,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		Preference p = findPreference(Settings.Keys.LOW_SUPPLY_THRESHOLD);
 		if(p != null)
 		{
-			String value = mSharedPreferences.getString(Settings.Keys.LOW_SUPPLY_THRESHOLD, "10");
+			String value = Settings.getString(Settings.Keys.LOW_SUPPLY_THRESHOLD, "10");
 			p.setSummary(getString(R.string._summary_min_supply_days, value));
 		}
 	}

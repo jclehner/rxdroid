@@ -158,6 +158,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		Settings.init();
+
 		setTheme(Theme.get());
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.empty);

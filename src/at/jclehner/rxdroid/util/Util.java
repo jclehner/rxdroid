@@ -22,7 +22,12 @@
 package at.jclehner.rxdroid.util;
 
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -419,11 +424,14 @@ public final class Util
 
 	public static void closeQuietly(Closeable closeable)
 	{
+		if(closeable == null)
+			return;
+
 		try
 		{
 			closeable.close();
 		}
-		catch(Exception e)
+		catch(IOException e)
 		{
 			// ignore
 		}

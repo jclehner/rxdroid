@@ -26,12 +26,16 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import android.app.Activity;
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.jclehner.rxdroid.db.Drug;
@@ -110,8 +114,33 @@ public final class Settings
 		if(sSharedPrefs == null)
 		{
 			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(RxDroid.getContext());
+
+			if(LOGV)
+			{
+				Log.d(TAG, "init: ");
+
+				final Map<String, ?> prefs = sSharedPrefs.getAll();
+				for(String key : prefs.keySet())
+					Log.d(TAG, "  " + key + "=" + prefs.get(key));
+			}
+
+			registerOnChangeListener(sBackupNotifier);
+
+			fixSettings();
 			migrateSettings();
 		}
+	}
+
+	public static void clear() {
+		sSharedPrefs.edit().clear().commit();
+	}
+
+	public static void registerOnChangeListener(OnSharedPreferenceChangeListener l) {
+		sSharedPrefs.registerOnSharedPreferenceChangeListener(l);
+	}
+
+	public static void unregisterOnChangeListener(OnSharedPreferenceChangeListener l) {
+		sSharedPrefs.unregisterOnSharedPreferenceChangeListener(l);
 	}
 
 	public static void setChecked(String key, boolean checked) {
@@ -617,6 +646,21 @@ public final class Settings
 		}
 	}
 
+	private static void fixSettings()
+	{
+		final Configuration config = RxDroid.getContext().getResources().getConfiguration();
+		final int screenSize = config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+
+		if(screenSize == Configuration.SCREENLAYOUT_SIZE_SMALL)
+		{
+			if(Settings.getBoolean(Settings.Keys.ENABLE_LANDSCAPE, Settings.Defaults.ENABLE_LANDSCAPE))
+			{
+				Log.i(TAG, "Small screen detected - disabling landscape mode");
+				Settings.putBoolean(Settings.Keys.ENABLE_LANDSCAPE, false);
+			}
+		}
+	}
+
 	// converts the string set [ "foo", "bar", "foobar", "barz" ] to the following string:
 	// 4:3:foo3:bar6:foobar4:barz
 
@@ -687,6 +731,16 @@ public final class Settings
 		prefix.firstCharPos = i + 1;
 		return prefix;
 	}
+
+	private static OnSharedPreferenceChangeListener sBackupNotifier =
+			new OnSharedPreferenceChangeListener() {
+
+		@Override
+		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
+		{
+			RxDroid.notifyBackupDataChanged();
+		}
+	};
 
 	private Settings() {}
 }

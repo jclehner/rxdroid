@@ -42,6 +42,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.util.Log;
 import at.jclehner.androidutils.EventDispatcher;
@@ -77,6 +78,8 @@ public final class Database
 {
 	private static final String TAG = Database.class.getSimpleName();
 	private static final boolean LOGV = true;
+
+	public static Object LOCK_DATA = new Object();
 
 	/* package */ static final boolean USE_CUSTOM_CACHE = true;
 
@@ -522,7 +525,7 @@ public final class Database
 		}
 		else if(LOGV)
 			Log.v(TAG, "No callback " + callbackName + " for " + clazz.getSimpleName());
-			
+
 
 		if((flags & FLAG_DONT_NOTIFY_LISTENERS) == 0)
 		{
@@ -555,8 +558,13 @@ public final class Database
 		{
 			final Method m = dao.getClass().getMethod(methodName, Object.class);
 			final Timer t = LOGV ? new Timer() : null;
-			m.invoke(dao, entry);
-			
+
+			synchronized(LOCK_DATA) {
+				m.invoke(dao, entry);
+			}
+
+			RxDroid.notifyBackupDataChanged();
+
 			if(LOGV) Log.v(TAG, "runDaoMethod: " + methodName + ": " + t);
 
 			//dao.deleteBuilder().where().idEq(id)

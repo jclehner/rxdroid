@@ -49,7 +49,8 @@ public class DoseHistoryActivity extends ExpandableListActivity
 
 		Database.init();
 
-		Drug drug = (Drug) getIntent().getSerializableExtra(Extras.DRUG);
+		//Drug drug = (Drug) getIntent().getSerializableExtra(Extras.DRUG);
+		Drug drug = Drug.get(getIntent().getIntExtra(Extras.DRUG_ID, 0));
 
 		setTitle("History: " + drug.getName());
 		setListAdapter(new DoseHistoryAdapter(this, drug));

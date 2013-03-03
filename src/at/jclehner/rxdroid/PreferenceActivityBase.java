@@ -31,6 +31,8 @@ public abstract class PreferenceActivityBase extends PreferenceActivity
 {
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		Settings.init();
+
 		// See android issue #4611
 		setTheme(Version.SDK_IS_PRE_HONEYCOMB ? android.R.style.Theme : Theme.get());
 		super.onCreate(savedInstanceState);

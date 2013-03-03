@@ -26,6 +26,7 @@ import java.util.WeakHashMap;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -53,23 +54,17 @@ public class RxDroid extends Application
 	@Override
 	public void onCreate()
 	{
+		Log.d(TAG, "onCreate");
+
 		setContext(getApplicationContext());
 
-		Settings.init();
+		// We can't call Settings.init() here, because this overwrites the
+		// shared preferences if this class is instantiated by the Android
+		// backup framework.
+
 		AutoIntakeCreator.registerSelf();
 		Database.registerEventListener(sNotificationUpdater);
 
-		final Configuration config = getResources().getConfiguration();
-		final int screenSize = config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
-
-		if(screenSize == Configuration.SCREENLAYOUT_SIZE_SMALL)
-		{
-			if(Settings.getBoolean(Settings.Keys.ENABLE_LANDSCAPE, Settings.Defaults.ENABLE_LANDSCAPE))
-			{
-				Log.i(TAG, "Small screen detected - disabling landscape mode");
-				Settings.putBoolean(Settings.Keys.ENABLE_LANDSCAPE, false);
-			}
-		}
 
 		super.onCreate();
 	}
@@ -170,6 +165,12 @@ public class RxDroid extends Application
 //		}
 
 		return false;
+	}
+
+	public static void notifyBackupDataChanged()
+	{
+		new BackupManager(getContext()).dataChanged();
+		Log.i(TAG, "notifyBackupDataChanged");
 	}
 
 	private static void toast(final int textResId, final int duration)

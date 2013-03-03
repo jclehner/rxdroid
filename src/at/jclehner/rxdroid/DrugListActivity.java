@@ -90,6 +90,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	private static final String TAG = DrugListActivity.class.getSimpleName();
 	private static final boolean LOGV = false;
 
+	private static final boolean DEBUG_DATE_MISMATCH = true;
+
 	private static final int CMENU_TOGGLE_INTAKE = 0;
 	private static final int CMENU_EDIT_DRUG = 2;
 	private static final int CMENU_IGNORE_DOSE = 4;
@@ -121,17 +123,13 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		Settings.init();
+
 		setTheme(Theme.get());
 		setContentView(R.layout.drug_list);
 
-		setProgressBarIndeterminateVisibility(false);
-
 		mPager = (ViewPager) findViewById(R.id.drug_list_pager);
 		mTextDate = (TextView) findViewById(R.id.text_date);
-
-		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
 		mTextDate.setOnLongClickListener(mDateClickListener);
 		mTextDate.setOnClickListener(mDateClickListener);
@@ -140,13 +138,14 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
 			mTextDate.setVisibility(View.GONE);
 
-		mPager.setOnPageChangeListener(mPageListener);
+		//mPager.setOnPageChangeListener(mPageListener);
 		mPager.setOffscreenPageLimit(1);
 
 		//startNotificationService();
 		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true);
 
 		Database.registerEventListener(mDatabaseListener);
+		Settings.registerOnChangeListener(this);
 
 		super.onCreate(savedInstanceState);
 	}
@@ -575,7 +574,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	@TargetApi(11)
 	private void setDate(Date date, int flags)
 	{
-		//if(LOGV) Log.v(TAG, "setDate: date=" + date + ", flags=" + flags);
+		if(DEBUG_DATE_MISMATCH) Log.d(TAG, "setDate(" + date + ", " + flags + ")");
 
 		if(!mIsShowing)
 		{
@@ -593,12 +592,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if((flags & PAGER_INIT) != 0)
 		{
 			mOriginalDate = date;
-
 			mSwipeDirection = 0;
-			mLastPage = -1;
 
+			mPager.setOnPageChangeListener(null);
 			mPager.removeAllViews();
-
 
 			final int drugCount = Database.countAll(Drug.class);
 			if(drugCount != 0)
@@ -607,6 +604,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 				mPager.setAdapter(new InfiniteViewPagerAdapter(this));
 				mPager.setCurrentItem(InfiniteViewPagerAdapter.CENTER, smoothScroll);
+
+				mLastPage = InfiniteViewPagerAdapter.CENTER;
 
 				if(drugCount >= 2)
 					showInfoDialog(Settings.OnceIds.DRAG_DROP_SORTING, R.string._msg_drag_drop_sorting);
@@ -641,8 +640,12 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 						container.removeView((View) item);
 					}
 				});
+
 				mPager.setCurrentItem(0);
+				mLastPage = 0;
 			}
+
+			mPager.setOnPageChangeListener(mPageListener);
 		}
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
@@ -808,6 +811,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		@Override
 		public void onPageSelected(int page)
 		{
+			if(DEBUG_DATE_MISMATCH) Log.d(TAG, "onPageSelected(" + page + ")");
+
 			mPage = page;
 
 			//final int swipeDirection;
@@ -824,11 +829,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			{
 				final Date date = DateTime.add(mCurrentDate, Calendar.DAY_OF_MONTH, mSwipeDirection);
 				setDate(date, 0);
-				if(LOGV) Log.d(TAG, "onPageSelected: swipe " + (mSwipeDirection < 0 ? "right" : "left"));
+				//if(LOGV) Log.d(TAG, "onPageSelected: swipe " + (mSwipeDirection < 0 ? "right" : "left"));
 
 			}
-			else
-				if(LOGV) Log.d(TAG, "onPageSelected: no swipe");
+			//else if(LOGV) Log.d(TAG, "onPageSelected: no swipe");
 
 			mLastPage = page;
 		}
