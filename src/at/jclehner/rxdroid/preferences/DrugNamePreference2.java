@@ -34,12 +34,12 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import at.jclehner.androidutils.MyDialogPreference;
+import at.jclehner.androidutils.AdvancedDialogPreference;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 
-public class DrugNamePreference2 extends MyDialogPreference<String>
+public class DrugNamePreference2 extends AdvancedDialogPreference<String>
 {
 	private EditText mEditText;
 	private Button mBtnPositive;

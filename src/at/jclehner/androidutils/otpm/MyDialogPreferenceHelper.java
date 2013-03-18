@@ -23,13 +23,13 @@ package at.jclehner.androidutils.otpm;
 
 import java.io.Serializable;
 
-import at.jclehner.androidutils.MyDialogPreference;
+import at.jclehner.androidutils.AdvancedDialogPreference;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class MyDialogPreferenceHelper extends PreferenceHelper<MyDialogPreference, Object>
+public class MyDialogPreferenceHelper extends PreferenceHelper<AdvancedDialogPreference, Object>
 {
 	@Override
-	public void initPreference(MyDialogPreference preference, Object fieldValue)
+	public void initPreference(AdvancedDialogPreference preference, Object fieldValue)
 	{
 		preference.setValue((Serializable) fieldValue);
 		//preference.setSummary(fieldValue.toString());

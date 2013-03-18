@@ -35,23 +35,6 @@ public class DrugSupplyEditFragment extends DialogFragment
 {
 	public static class Dialog extends FractionInputDialog
 	{
-		/*public Dialog(Context context, final Drug drug) {
-			this(context, drug, drug.getCurrentSupply());
-		}
-
-		public Dialog(Context context, final Drug drug, Fraction value)
-		{
-			this(context, drug, value, new OnFractionSetListener() {
-
-				@Override
-				public void onFractionSet(FractionInputDialog dialog, Fraction value)
-				{
-					drug.setCurrentSupply(value);
-					Database.update(drug);
-				}
-			});
-		}*/
-
 		public Dialog(Context context, Fraction currentSupply, final int refillSize, OnFractionSetListener l)
 		{
 			super(context, currentSupply, l);

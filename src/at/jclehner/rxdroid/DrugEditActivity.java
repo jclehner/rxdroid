@@ -57,7 +57,7 @@ import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Toast;
-import at.jclehner.androidutils.MyDialogPreference;
+import at.jclehner.androidutils.AdvancedDialogPreference;
 import at.jclehner.androidutils.otpm.CheckboxPreferenceHelper;
 import at.jclehner.androidutils.otpm.ListPreferenceWithIntHelper;
 import at.jclehner.androidutils.otpm.MyDialogPreferenceHelper;
@@ -878,7 +878,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		@Override
-		public void initPreference(MyDialogPreference preference, Object fieldValue)
+		public void initPreference(AdvancedDialogPreference preference, Object fieldValue)
 		{
 			super.initPreference(preference, fieldValue);
 			mContext = preference.getContext().getApplicationContext();
@@ -887,7 +887,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		@Override
-		public boolean updatePreference(MyDialogPreference preference, Object newValue)
+		public boolean updatePreference(AdvancedDialogPreference preference, Object newValue)
 		{
 			super.updatePreference(preference, newValue);
 			//preference.setSummary(getSummary());
@@ -896,14 +896,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		@Override
-		public void updateSummary(MyDialogPreference preference, Object newValue)
+		public void updateSummary(AdvancedDialogPreference preference, Object newValue)
 		{
 			preference.setSummary(getSummary(newValue));
 			mValue = newValue;
 		}
 
 		@Override
-		public void onDependencyChange(MyDialogPreference preference, String depKey)
+		public void onDependencyChange(AdvancedDialogPreference preference, String depKey)
 		{
 			preference.setSummary(getSummary(mValue));
 			if("refillSize".equals(depKey))
@@ -944,14 +944,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 
 		@Override
-		public void initPreference(MyDialogPreference preference, Object fieldValue)
+		public void initPreference(AdvancedDialogPreference preference, Object fieldValue)
 		{
 			super.initPreference(preference, new Fraction((Integer) fieldValue));
 			((FractionPreference) preference).disableFractionInputMode(true);
 		}
 
 		@Override
-		public void updateSummary(MyDialogPreference preference, Object newValue)
+		public void updateSummary(AdvancedDialogPreference preference, Object newValue)
 		{
 			final int value = (Integer) newValue;
 

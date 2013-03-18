@@ -35,13 +35,13 @@ import android.widget.TimePicker;
 import android.widget.TimePicker.OnTimeChangedListener;
 import android.widget.Toast;
 import at.jclehner.androidutils.InstanceState.SaveState;
-import at.jclehner.androidutils.MyDialogPreference;
+import at.jclehner.androidutils.AdvancedDialogPreference;
 import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
-public class TimePreference extends MyDialogPreference<DumbTime>
+public class TimePreference extends AdvancedDialogPreference<DumbTime>
 {
 	private static final String TAG = TimePreference.class.getSimpleName();
 	private static final boolean LOGV = false;

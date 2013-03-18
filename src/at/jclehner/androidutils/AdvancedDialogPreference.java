@@ -23,6 +23,8 @@ package at.jclehner.androidutils;
 
 import java.io.Serializable;
 
+import com.j256.ormlite.stmt.query.NeedsFutureClause;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -53,10 +55,15 @@ import at.jclehner.rxdroid.util.Util;
  * @author Joseph Lehner
  *
  */
-public abstract class MyDialogPreference<T extends Serializable> extends DialogPreference
+public abstract class AdvancedDialogPreference<T extends Serializable> extends DialogPreference
 {
-	private static final String TAG = MyDialogPreference.class.getSimpleName();
-	private static final boolean LOGV = true;
+	private static final String TAG = AdvancedDialogPreference.class.getSimpleName();
+	private static final boolean LOGV = false;
+
+	private static final boolean USE_NEW_DISMISS_LOGIC = false;
+
+	private static final String EXTRA_DIALOG_VALUE = "at.jclehner.androidutils.DIALOG_VALUE";
+	private static final String EXTRA_DIALOG_STATE = "at.jclehner.androidutils.DIALOG_STATE";
 
 	private static final String EMPTY = "<!!!!!!!!!!!!!!!!!!!!!!EMPTY";
 
@@ -75,17 +82,22 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	@SaveState
 	private boolean mHasSummary = false;
 
+	@SaveState
+	private int mLastButtonId = -1;
+
 	private Dialog mDialog;
 
-	private static final String KEY_IS_DIALOG_SHOWING = TAG + ".is_showing";
+	//private static final String KEY_IS_DIALOG_SHOWING = TAG + ".is_showing";
+	//private static final String KEY_DIALOG_VALUE = TAG + ".dialog_value";
 
-	public MyDialogPreference(Context context, AttributeSet attrs, int defStyle)
+	public AdvancedDialogPreference(Context context, AttributeSet attrs, int defStyle)
 	{
 		super(context, attrs, defStyle);
 		handleAttributes(attrs);
+		Log.d(TAG, "ctor: key=" + getKey());
 	}
 
-	public MyDialogPreference(Context context, AttributeSet attrs) {
+	public AdvancedDialogPreference(Context context, AttributeSet attrs) {
 		this(context, attrs, android.R.attr.preferenceStyle);
 	}
 
@@ -99,6 +111,14 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 
 	public CharSequence getNeutralButtonText() {
 		return mNeutralButtonText;
+	}
+
+	public void setAutoSummaryEnabled(boolean enabled) {
+		mAutoSummary = enabled;
+	}
+
+	public boolean isAutoSummaryEnabled() {
+		return mAutoSummary;
 	}
 
 	/**
@@ -176,13 +196,19 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	}
 
 	@Override
-	public void onClick(DialogInterface dialog, int which) {
-		onDialogClosed(which == Dialog.BUTTON_POSITIVE);
+	public void onClick(DialogInterface dialog, int which)
+	{
+		if(USE_NEW_DISMISS_LOGIC)
+			mLastButtonId = which;
+		else
+			onDialogClosed(which == Dialog.BUTTON_POSITIVE);
 	}
 
 	@Override
-	public CharSequence getDialogTitle() {
-		return getTitle();
+	public CharSequence getDialogTitle()
+	{
+		final CharSequence title = super.getDialogTitle();
+		return title != null ? title : getTitle();
 	}
 
 	protected abstract T fromPersistedString(String string);
@@ -296,6 +322,10 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		// do nothing
 	}
 
+	protected void onSetInitialDialogValue(Dialog dialog, T dialogValue) {
+
+	}
+
 	/**
 	 * Called when the dialog is dismissed.
 	 * <p>
@@ -304,16 +334,17 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	 * do perform any additional cleanup.
 	 */
 	@Override
-	public void onDismiss(DialogInterface dialog) {
-		super.onDismiss(dialog);
+	public void onDismiss(DialogInterface dialog)
+	{
+		if(USE_NEW_DISMISS_LOGIC)
+			onDialogClosed(mLastButtonId == Dialog.BUTTON_POSITIVE);
+		else
+			super.onDismiss(dialog);
 	}
 
 	@Override
 	protected final void showDialog(Bundle state)
 	{
-		if(state != null)
-			Log.w(TAG, "showDialog: ignoring non-null state");
-
 		mDialog = onGetCustomDialog();
 		if(mDialog == null)
 		{
@@ -348,6 +379,17 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 
 		onPrepareDialog(mDialog);
 
+		if(state != null)
+			mDialog.onRestoreInstanceState(state);
+
+//		final T dialogValue;
+//		if(state != null)
+//			dialogValue = fromPersistedString(state.getString(EXTRA_DIALOG_VALUE));
+//		else
+//			dialogValue = mValue;
+//
+//		onSetInitialDialogValue(mDialog, dialogValue);
+
 		mDialog.setOnDismissListener(mDismissListener);
 		mDialog.show();
 	}
@@ -362,34 +404,38 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 	{
 		if(LOGV) Log.v(TAG, getKey() + ": onSaveInstanceState");
 
-		// This might be a hack, but it's the only way I've found to work
-		// around those pesky 'Window leaked by Activity' errors.
-		final boolean isShowing = mDialog != null;
-		if(isShowing)
+		final Bundle extras = new Bundle();
+
+		if(mDialog != null)
+		{
 			mDialog.dismiss();
+			extras.putBundle(EXTRA_DIALOG_STATE, mDialog.onSaveInstanceState());
+			//extras.putString(EXTRA_DIALOG_VALUE, toPersistedString(getDialogValue()));
+		}
 
-		Parcelable superState = super.onSaveInstanceState();
-		Bundle extras = new Bundle();
-		extras.putBoolean(KEY_IS_DIALOG_SHOWING, isShowing);
-
+		final Parcelable superState = super.onSaveInstanceState();
 		return InstanceState.createFrom(this, superState, extras);
 	}
 
 	@Override
 	protected void onRestoreInstanceState(Parcelable state)
 	{
-		if(LOGV) Log.v(TAG, getKey() + ": onRestoreInstanceState");
+		if(LOGV) Log.v(TAG, getKey() + ": onRestoreInstanceState: value=" + mValue);
 
 		super.onRestoreInstanceState(InstanceState.getSuperState(state));
 		InstanceState.restoreTo(this, state);
 
-		Bundle extras = InstanceState.getExtras(state);
+		if(LOGV) Log.v(TAG, "  value=" + mValue);
 
+		final Bundle extras = InstanceState.getExtras(state);
 		if(extras != null)
 		{
-			if(extras.getBoolean(KEY_IS_DIALOG_SHOWING, false))
-				showDialog(null);
+			final Bundle dialogState = extras.getBundle(EXTRA_DIALOG_STATE);
+			if(dialogState != null)
+				showDialog(dialogState);
 		}
+
+		//mDialog.onS
 	}
 
 	@Override
@@ -414,16 +460,12 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		if(attrs == null)
 			return;
 
-		if(false)
-		{
-			final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.MyDialogPreference);
-			mAutoSummary = a.getBoolean(R.styleable.MyDialogPreference_autoSummary, true);
-			a.recycle();
-		}
-		else
-		{
-			mAutoSummary = attrs.getAttributeBooleanValue(R.styleable.MyDialogPreference_autoSummary, true);
-		}
+		final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.AdvancedDialogPreference);
+
+		setAutoSummaryEnabled(a.getBoolean(R.styleable.AdvancedDialogPreference_autoSummary, true));
+		setNeutralButtonText(a.getString(R.styleable.AdvancedDialogPreference_neutralButtonText));
+
+		a.recycle();
 
 		if(LOGV) Log.v(TAG, getKey() + ": handleAttributes: mAutoSummary=" + mAutoSummary);
 	}
@@ -433,7 +475,7 @@ public abstract class MyDialogPreference<T extends Serializable> extends DialogP
 		@Override
 		public void onDismiss(DialogInterface dialog)
 		{
-			MyDialogPreference.this.onDismiss(mDialog);
+			AdvancedDialogPreference.this.onDismiss(mDialog);
 			mDialog = null;
 		}
 	};

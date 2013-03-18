@@ -27,7 +27,7 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
 >
-    <CheckBox android:id="@android:id/checkbox"
+    <CheckBox android:id="@+id/toggler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
     />

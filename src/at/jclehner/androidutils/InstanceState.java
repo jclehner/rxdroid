@@ -57,8 +57,8 @@ public final class InstanceState
 	/**
 	 * Creates a Parcelable with the given object's state.
 	 * <p>
-	 * This function automagically saves all members annotated using
-	 * SaveState and combines their values with the state of the object's
+	 * This function automagically saves all members annotated with
+	 * {@link SaveState} and combines their values with the state of the object's
 	 * superclass.
 	 *
 	 * @param object The object from which to create an instance state.
@@ -167,8 +167,26 @@ public final class InstanceState
 		});
 	}
 
-	private static void forEachAnnotatedMember(Object o, Callback callback) {
-		forEachAnnotatedMemberInternal(o.getClass(), o, callback);
+	private static void forEachAnnotatedMember(Object o, Callback callback)
+	{
+		if(true)
+		{
+			final Class<?> clazz = o.getClass();
+
+			if(LOGV) Log.v(TAG, "forEachAnnotatedMember: " + clazz.getSimpleName());
+
+			for(Field f : Reflect.getAllFields(clazz))
+			{
+				if(!f.isAnnotationPresent(SaveState.class))
+					continue;
+
+				final String mapKey = f.getName() + "@" + clazz.getName();
+				if(LOGV) Log.v(TAG, "  " + f.getName() + " (" + mapKey + ")");
+				callback.invoke(o, f, mapKey);
+			}
+		}
+		else
+			forEachAnnotatedMemberInternal(o.getClass(), o, callback);
 	}
 
 	private static void forEachAnnotatedMemberInternal(Class<?> clazz, Object o, Callback callback)

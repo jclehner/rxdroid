@@ -40,7 +40,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.TimePicker.OnTimeChangedListener;
-import at.jclehner.androidutils.MyDialogPreference;
+import at.jclehner.androidutils.AdvancedDialogPreference;
 import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
@@ -48,7 +48,7 @@ import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
-public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
+public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
 {
 	private static final String TAG = TimePeriodPreference.class.getSimpleName();
 
@@ -345,6 +345,9 @@ public class TimePeriodPreference extends MyDialogPreference<TimePeriod>
 
 	private void updateMessageAndButtons()
 	{
+		if(mNextButton == null)
+			return;
+
 		final String min = getConstraintTimeForCurrentlyVisibleTimePickerAsString(MIN);
 		final String max = getConstraintTimeForCurrentlyVisibleTimePickerAsString(MAX);
 

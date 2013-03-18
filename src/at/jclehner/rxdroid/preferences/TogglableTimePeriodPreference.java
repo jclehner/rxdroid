@@ -33,7 +33,6 @@ public class TogglableTimePeriodPreference extends TimePeriodPreference
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = TimePeriodPreference.class.getSimpleName();
-	private static final TimePeriod EMPTY = TimePeriod.fromString("00:00-00:00");
 
 	private CompoundButton mToggler;
 	private boolean mChecked = true;
@@ -48,7 +47,7 @@ public class TogglableTimePeriodPreference extends TimePeriodPreference
 	protected void onBindView(View view)
 	{
 		super.onBindView(view);
-		mToggler = (CompoundButton) view.findViewById(android.R.id.checkbox);
+		mToggler = (CompoundButton) view.findViewById(R.id.toggler);
 		mToggler.setChecked(mChecked);
 		mToggler.setOnCheckedChangeListener(mToggleListener);
 	}
@@ -58,15 +57,6 @@ public class TogglableTimePeriodPreference extends TimePeriodPreference
 	{
 		super.onSetInitialValue(restorePersistedValue, defaultValue);
 		setChecked(Settings.isChecked(getKey(), false));
-	}
-
-	@Override
-	protected String toSummaryString(TimePeriod value)
-	{
-		if(value == EMPTY)
-			return null;
-
-		return super.toSummaryString(value);
 	}
 
 	private void setChecked(boolean checked)

@@ -36,9 +36,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -59,7 +57,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.view.Window;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -102,8 +99,6 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	public static final String EXTRA_STARTED_FROM_NOTIFICATION = "started_from_notification";
 
 	public static final int TAG_DRUG_ID = R.id.tag_drug_id;
-
-	private SharedPreferences mSharedPreferences;
 
 	private ViewPager mPager;
 	private TextView mTextDate;
@@ -510,6 +505,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		dialog.show(getSupportFragmentManager(), "supply_edit_dialog");
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected Dialog onCreateDialog(int id, Bundle args)
 	{
@@ -540,6 +536,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		return super.onCreateDialog(id, args);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog, Bundle args)
 	{
@@ -718,6 +715,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	private void showInfoDialog(String onceId, int msgResId, Object... args)
 	{
 		if(Settings.wasDisplayedOnce(onceId))
@@ -870,6 +868,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 	private final Database.OnChangeListener mDatabaseListener = new Database.EmptyOnChangeListener() {
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void onEntryDeleted(Entry entry, int flags)
 		{

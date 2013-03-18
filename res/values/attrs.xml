@@ -38,8 +38,9 @@
         <attr name="allowEndWrap" format="boolean" />
     </declare-styleable>
     
-    <declare-styleable name="MyDialogPreference">
+    <declare-styleable name="AdvancedDialogPreference">
         <attr name="autoSummary" format="boolean" />
+        <attr name="neutralButtonText" format="string" />
     </declare-styleable>
         
     <declare-styleable name="DrugSupplyMontior">
