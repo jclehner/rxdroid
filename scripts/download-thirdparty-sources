@@ -10,6 +10,9 @@ GIT_REPOS=(
 #	"ActionBarSherlock git://github.com/JakeWharton/ActionBarSherlock.git library" 
 )
 
+THIRDPARTY=thirdparty
+ZIPFILE=thirdparty.zip
+
 DEFAULT_BUILDCOMMANDS=(
 	com.android.ide.eclipse.adt.ResourceManagerBuilder
 	com.android.ide.eclipse.adt.PreCompilerBuilder
@@ -152,16 +155,18 @@ if [[ $# -gt 0 ]]; then
 	if [[ "$1" == "update" ]]; then
 		UPDATE=1
 	elif [[ "$1" == "cleanup" ]]; then
-		run rm -rf thirdparty
-		run mkdir thirdparty
-		echo "INFO: Emptied directory \`thirdparty'"
+		run rm -rf ${THIRDPARTY}
+		run mkdir ${THIRDPARTY}
+		echo "INFO: Emptied directory \`${THIRDPARTY}'"
 		exit 0
 	fi
 fi
 
 
-run mkdir -p thirdparty
-cd thirdparty || exit 1
+run mkdir -p ${THIRDPARTY}
+cd ${THIRDPARTY} || exit 1
+
+ZIPDIRS=
 
 for REPO in "${GIT_REPOS[@]}"; do
 	
@@ -185,8 +190,26 @@ for REPO in "${GIT_REPOS[@]}"; do
 		fix_project_properties "${TARGET}"
 		#create_project_files "${TARGET}"
 	fi
+
+	ZIPDIRS+="${THIRDPARTY}/${TARGET} "
 done
 
+cd - &> /dev/null
+
+rm -f ${ZIPFILE}
+run zip -q -r ${ZIPFILE} ${ZIPDIRS}
+
+ZIPSIZE=$(stat -c %s ${ZIPFILE})
+let ZIPSIZE=${ZIPSIZE}/1024
+
+echo "Created ${ZIPFILE}: ${ZIPSIZE} kB"
+
 echo
+echo "=========================================================================="
 echo "YOU NEED TO MANUALLY IMPORT THE DOWNLOADED SOURCES INTO AN ECLIPSE PROJECT"
+echo "=========================================================================="
+
+
+
+
 
