@@ -74,9 +74,9 @@ public class OTPM
 		Class<? extends Preference> type();
 
 		/**
-		 * The type of PreferenceHelper to use for this preference.
+		 * The type of PreferenceController to use for this preference.
 		 */
-		Class<? extends PreferenceHelper<?, ?>> helper();
+		Class<? extends PreferenceController<?, ?>> controller();
 
 		/**
 		 * The preference key (defaults to the field name).
@@ -86,7 +86,7 @@ public class OTPM
 		/**
 		 * The preference title.
 		 * <p>
-		 * Note that some implementations of {@link PreferenceHelper} ignore this.
+		 * Note that some implementations of {@link PreferenceController} ignore this.
 		 */
 		String title() default UNDEFINED;
 
@@ -95,21 +95,21 @@ public class OTPM
 		/**
 		 * The preference title.
 		 * <p>
-		 * Note that some implementations of {@link PreferenceHelper} ignore this.
+		 * Note that some implementations of {@link PreferenceController} ignore this.
 		 */
 		int titleResId() default 0;
 
 		/**
 		 * The preference's summary.
 		 * <p>
-		 * Note that some implementations of {@link PreferenceHelper} ignore this.
+		 * Note that some implementations of {@link PreferenceController} ignore this.
 		 */
 		String summary() default UNDEFINED;
 
 		/**
 		 * The preference's summary.
 		 * <p>
-		 * Note that some implementations of {@link PreferenceHelper} ignore this.
+		 * Note that some implementations of {@link PreferenceController} ignore this.
 		 */
 		int summaryResId() default 0;
 
@@ -297,7 +297,7 @@ public class OTPM
 
 		if(LOGV) Log.v(TAG, "initializePreferences");
 
-		final HashMap<String, PreferenceHelper> prefHelpers = new HashMap<String, PreferenceHelper>();
+		final HashMap<String, PreferenceController> prefHelpers = new HashMap<String, PreferenceController>();
 		final HashMap<String, ArrayList<String>> additionalForwardDependencies = new HashMap<String, ArrayList<String>>();
 
 		for(PrefInfo info : prefInfoList)
@@ -310,8 +310,8 @@ public class OTPM
 			if(LOGV) Log.v(TAG, "  key=" + key);
 
 			final Annotation a = info.annotation;
-			final Class<? extends PreferenceHelper> prefHlpClazz = Reflect.getAnnotationParameter(a, "helper");
-			final PreferenceHelper prefHlp;
+			final Class<? extends PreferenceController> prefHlpClazz = Reflect.getAnnotationParameter(a, "helper");
+			final PreferenceController prefHlp;
 
 			try
 			{
@@ -356,7 +356,7 @@ public class OTPM
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static void setupFieldDependencies(PreferenceHelper prefHlp, Annotation a)
+	private static void setupFieldDependencies(PreferenceController prefHlp, Annotation a)
 	{
 		final String[] fieldDependencies = Reflect.getAnnotationParameter(a, "fieldDependencies");
 		if(fieldDependencies.length != 0)
@@ -364,7 +364,7 @@ public class OTPM
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static void setupSummary(Preference p, PreferenceHelper prefHlp, Annotation a, Context context)
+	private static void setupSummary(Preference p, PreferenceController prefHlp, Annotation a, Context context)
 	{
 		final String summary = getStringResourceParameter(context, a, "summary");
 		if(summary != null)
@@ -378,7 +378,7 @@ public class OTPM
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static void setupForwardDependencies(PreferenceHelper prefHlp, Annotation a, PreferenceGroup root)
+	private static void setupForwardDependencies(PreferenceController prefHlp, Annotation a, PreferenceGroup root)
 	{
 		final String[] fDependencies = Reflect.getAnnotationParameter(a, "forwardDependencies");
 		if(fDependencies.length != 0)
@@ -408,7 +408,7 @@ public class OTPM
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static void setupReverseDependencies(HashMap<String, PreferenceHelper> prefHelpers,
+	private static void setupReverseDependencies(HashMap<String, PreferenceController> prefHelpers,
 			HashMap<String, ArrayList<String>> additionalForwardDependencies)
 	{
 		for(String key : additionalForwardDependencies.keySet())

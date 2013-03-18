@@ -21,14 +21,17 @@
 
 package at.jclehner.androidutils.otpm;
 
-import android.preference.CheckBoxPreference;
+import java.io.Serializable;
 
-public class CheckboxPreferenceHelper extends PreferenceHelper<CheckBoxPreference, Boolean>
+import at.jclehner.androidutils.AdvancedDialogPreference;
+
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class AdvancedDialogPreferenceController extends PreferenceController<AdvancedDialogPreference, Object>
 {
 	@Override
-	public void initPreference(CheckBoxPreference preference, Boolean fieldValue)
+	public void initPreference(AdvancedDialogPreference preference, Object fieldValue)
 	{
-		preference.setChecked(fieldValue);
-		//preference.setSummary(getSummary());
+		preference.setValue((Serializable) fieldValue);
+		//preference.setSummary(fieldValue.toString());
 	}
 }

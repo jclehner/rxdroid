@@ -58,12 +58,12 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Toast;
 import at.jclehner.androidutils.AdvancedDialogPreference;
-import at.jclehner.androidutils.otpm.CheckboxPreferenceHelper;
-import at.jclehner.androidutils.otpm.ListPreferenceWithIntHelper;
-import at.jclehner.androidutils.otpm.MyDialogPreferenceHelper;
+import at.jclehner.androidutils.otpm.CheckboxPreferenceController;
+import at.jclehner.androidutils.otpm.ListPreferenceWithIntController;
+import at.jclehner.androidutils.otpm.AdvancedDialogPreferenceController;
 import at.jclehner.androidutils.otpm.OTPM;
 import at.jclehner.androidutils.otpm.OTPM.CreatePreference;
-import at.jclehner.androidutils.otpm.PreferenceHelper;
+import at.jclehner.androidutils.otpm.PreferenceController;
 import at.jclehner.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
@@ -411,7 +411,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			titleResId = R.string._title_drug_name,
 			order = 1,
 			type = DrugNamePreference2.class,
-			helper = MyDialogPreferenceHelper.class
+			controller = AdvancedDialogPreferenceController.class
 		)
 		private String name;
 
@@ -422,7 +422,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			categoryResId = R.string._title_intake_schedule,
 			order = 3,
 			type = DosePreference.class,
-			helper = MyDialogPreferenceHelper.class
+			controller = AdvancedDialogPreferenceController.class
 		)
 		private Fraction doseMorning;
 
@@ -432,7 +432,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			key = "noon",
 			order = 4,
 			type = DosePreference.class,
-			helper = MyDialogPreferenceHelper.class
+			controller = AdvancedDialogPreferenceController.class
 		)
 		private Fraction doseNoon;
 
@@ -442,7 +442,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			key = "evening",
 			order = 5,
 			type = DosePreference.class,
-			helper = MyDialogPreferenceHelper.class
+			controller = AdvancedDialogPreferenceController.class
 		)
 		private Fraction doseEvening;
 
@@ -453,7 +453,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			endActiveCategory = true,
 			order = 6,
 			type = DosePreference.class,
-			helper = MyDialogPreferenceHelper.class
+			controller = AdvancedDialogPreferenceController.class
 		)
 		private Fraction doseNight;
 
@@ -462,7 +462,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			titleResId = R.string._title_repeat,
 			order = 7,
 			type = ListPreference.class,
-			helper = RepeatModePreferenceHelper.class,
+			controller = RepeatModePreferenceController.class,
 			fieldDependencies = { "repeatArg", "repeatOrigin" }
 		)
 		private int repeat;
@@ -473,7 +473,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			categoryResId = R.string._title_misc,
 			order = 8,
 			type = ListPreference.class,
-			helper = FormPreferenceHelper.class
+			controller = FormPreferenceController.class
 		)
 		private int form;
 
@@ -482,7 +482,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			titleResId = R.string._title_refill_size,
 			order = 10,
 			type = FractionPreference.class,
-			helper = RefillSizePreferenceHelper.class
+			controller = RefillSizePreferenceController.class
 		)
 		private int refillSize;
 
@@ -491,7 +491,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			titleResId = R.string._title_current_supply,
 			order = 11,
 			type = CurrentSupplyPreference.class,
-			helper = CurrentSupplyPreferenceHelper.class,
+			controller = CurrentSupplyPreferenceController.class,
 			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat"},
 			fieldDependencies = { "repeatArg", "repeatOrigin" }
 		)
@@ -502,7 +502,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			titleResId = R.string._title_per_drug_reminders,
 			order = 12,
 			type = ListPreference.class,
-			helper = NotificationsPreferenceHelper.class
+			controller = NotificationsPreferenceController.class
 		)
 		private boolean autoAddIntakes;
 
@@ -512,7 +512,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			summary = "",
 			order = 13,
 			type = CheckBoxPreference.class,
-			helper = CheckboxPreferenceHelper.class
+			controller = CheckboxPreferenceController.class
 		)
 		private boolean active;
 
@@ -594,12 +594,12 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 	}
 
-	private static class RepeatModePreferenceHelper extends ListPreferenceWithIntHelper
+	private static class RepeatModePreferenceController extends ListPreferenceWithIntController
 	{
 		private ListPreference mPref;
 		private Context mContext;
 
-		public RepeatModePreferenceHelper() {
+		public RepeatModePreferenceController() {
 			super(R.array.drug_repeat);
 		}
 
@@ -867,13 +867,13 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static class CurrentSupplyPreferenceHelper extends MyDialogPreferenceHelper
+	private static class CurrentSupplyPreferenceController extends AdvancedDialogPreferenceController
 	{
 		private Context mContext;
 		private Object mValue;
 
 		@SuppressWarnings({ "unused" })
-		public CurrentSupplyPreferenceHelper() {
+		public CurrentSupplyPreferenceController() {
 			// TODO Auto-generated constructor stub
 		}
 
@@ -936,10 +936,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static class RefillSizePreferenceHelper extends MyDialogPreferenceHelper
+	private static class RefillSizePreferenceController extends AdvancedDialogPreferenceController
 	{
 		@SuppressWarnings("unused")
-		public RefillSizePreferenceHelper() {
+		public RefillSizePreferenceController() {
 			// TODO Auto-generated constructor stub
 		}
 
@@ -967,9 +967,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 	}
 
-	public static class FormPreferenceHelper extends ListPreferenceWithIntHelper
+	public static class FormPreferenceController extends ListPreferenceWithIntController
 	{
-		public FormPreferenceHelper() {
+		public FormPreferenceController() {
 			super(R.array.drug_forms);
 		}
 	}
@@ -999,14 +999,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 	}
 
-	private static class NotificationsPreferenceHelper extends PreferenceHelper<ListPreference, Boolean>
+	private static class NotificationsPreferenceController extends PreferenceController<ListPreference, Boolean>
 	{
 		private static final int NOTIFY_ALL = 0;
 		private static final int NOTIFY_SUPPLIES_ONLY = 1;
 		private String[] mEntries;
 
 		@SuppressWarnings("unused")
-		public NotificationsPreferenceHelper() {
+		public NotificationsPreferenceController() {
 			// TODO Auto-generated constructor stub
 		}
 

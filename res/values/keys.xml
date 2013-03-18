@@ -46,4 +46,5 @@
 	<string translatable="false" name="key_compact_action_bar">compact_action_bar</string>
 	<string translatable="false" name="key_quiet_hours">quiet_hours</string>
 	<string translatable="false" name="key_notification_light_color">notification_light_color</string>
+	<item type="string" name="key_use_smart_sort">use_smart_sort</item>
 </resources>

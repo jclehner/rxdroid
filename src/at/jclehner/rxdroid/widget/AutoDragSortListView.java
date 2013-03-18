@@ -71,16 +71,16 @@ public class AutoDragSortListView extends DragSortListView
 				{
 					mDraggedChild = getChildAt(position + getHeaderViewsCount() - getFirstVisiblePosition());
 
-			        if(mDraggedChild != null)
-			        {
-			        	// On pre-Honeycomb, the ListView items appear to have a background set
-			        	//v.setBackgroundResource(0);
-			        	mDraggedChildBackground = mDraggedChild.getBackground();
-			        	mDraggedChild.setBackgroundColor(color);
-			        }
+					if(mDraggedChild != null)
+					{
+						// On pre-Honeycomb, the ListView items appear to have a background set
+						//v.setBackgroundResource(0);
+						mDraggedChildBackground = mDraggedChild.getBackground();
+						mDraggedChild.setBackgroundColor(color);
+					}
 				}
 
-		        return super.onCreateFloatView(position);
+				return super.onCreateFloatView(position);
 			}
 
 			@Override

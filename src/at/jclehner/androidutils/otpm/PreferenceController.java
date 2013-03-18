@@ -53,9 +53,9 @@ import at.jclehner.rxdroid.util.CollectionUtils;
  * 	the {@link CreatePreference} annotation).
  * @param <T> The type of the field to map to a Preference.
  */
-public abstract class PreferenceHelper<P extends Preference, T>
+public abstract class PreferenceController<P extends Preference, T>
 {
-	private static final String TAG = PreferenceHelper.class.getSimpleName();
+	private static final String TAG = PreferenceController.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	protected Object mObject;
@@ -73,7 +73,7 @@ public abstract class PreferenceHelper<P extends Preference, T>
 
 	private boolean mAutoUpdateSummaries = true;
 
-	public PreferenceHelper() {}
+	public PreferenceController() {}
 
 	/**
 	 * Initializes the <code>Preference</code>.
@@ -244,8 +244,8 @@ public abstract class PreferenceHelper<P extends Preference, T>
 				return;
 			}
 
-			final Map<String, PreferenceHelper> prefHelpers =
-					(Map<String, PreferenceHelper>) extras.getSerializable(OTPM.EXTRA_PREF_HELPERS);
+			final Map<String, PreferenceController> prefHelpers =
+					(Map<String, PreferenceController>) extras.getSerializable(OTPM.EXTRA_PREF_HELPERS);
 
 			if(prefHelpers == null)
 				return;
@@ -253,7 +253,7 @@ public abstract class PreferenceHelper<P extends Preference, T>
 			for(String key : mForwardDependencies)
 			{
 				final Preference p = root.findPreference(key);
-				final PreferenceHelper ph = prefHelpers.get(key);
+				final PreferenceController ph = prefHelpers.get(key);
 
 				if(p == null || ph == null)
 				{

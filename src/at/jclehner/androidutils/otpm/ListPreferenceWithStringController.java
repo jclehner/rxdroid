@@ -24,7 +24,7 @@ package at.jclehner.androidutils.otpm;
 import android.content.res.Resources;
 import android.preference.ListPreference;
 
-public abstract class ListPreferenceWithStringHelper extends PreferenceHelper<ListPreference, String>
+public abstract class ListPreferenceWithStringController extends PreferenceController<ListPreference, String>
 {
 	private String[] mEntries;
 	private String[] mValues;
@@ -32,13 +32,13 @@ public abstract class ListPreferenceWithStringHelper extends PreferenceHelper<Li
 	private int mEntriesResId;
 	private int mValuesResId;
 
-	public ListPreferenceWithStringHelper(int entriesResId, int valuesResId)
+	public ListPreferenceWithStringController(int entriesResId, int valuesResId)
 	{
 		mEntriesResId = entriesResId;
 		mValuesResId = valuesResId;
 	}
 
-	public ListPreferenceWithStringHelper(String[] entries, String[] values)
+	public ListPreferenceWithStringController(String[] entries, String[] values)
 	{
 		if(entries == null || values == null)
 			throw new NullPointerException();

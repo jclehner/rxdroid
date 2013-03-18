@@ -24,16 +24,16 @@ package at.jclehner.androidutils.otpm;
 import android.preference.ListPreference;
 import at.jclehner.rxdroid.util.Util;
 
-public abstract class ListPreferenceWithIntHelper extends PreferenceHelper<ListPreference, Integer>
+public abstract class ListPreferenceWithIntController extends PreferenceController<ListPreference, Integer>
 {
 	private String[] mEntries;
 	private int mEntriesResId;
 
-	public ListPreferenceWithIntHelper(int entriesResId) {
+	public ListPreferenceWithIntController(int entriesResId) {
 		mEntriesResId = entriesResId;
 	}
 
-	public ListPreferenceWithIntHelper(String[] entries)
+	public ListPreferenceWithIntController(String[] entries)
 	{
 		if((mEntries = entries) == null)
 			throw new NullPointerException();

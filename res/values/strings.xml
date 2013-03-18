@@ -335,6 +335,9 @@
     <string name="_msg_no_drugs_no_ab">Press MENU and select "%1$s" to add a drug</string>
     <string name="_msg_no_drugs_compact_ab">Select "%1$s" from the three-dot menu to add a drug</string>
     <string name="_msg_no_drugs_extended_ab">Press the +-button in the action bar to add a drug</string>
+    
+    <string name="_summary_smart_sort">Sort drugs based on importance</string>
+	<string name="_title_smart_sort">Automatic sorting</string>
 		
 	<!-- 
     Keep at the end of strings.xml!  

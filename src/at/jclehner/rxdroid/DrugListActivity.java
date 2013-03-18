@@ -23,6 +23,7 @@ package at.jclehner.rxdroid;
 
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -63,21 +64,22 @@ import android.widget.Toast;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.jclehner.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
+import at.jclehner.rxdroid.Settings.Defaults;
+import at.jclehner.rxdroid.Settings.DoseTimeInfo;
+import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Intake;
 import at.jclehner.rxdroid.db.Patient;
+import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.ui.DrugOverviewAdapter;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.AutoDragSortListView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
-
-import static at.jclehner.rxdroid.Settings.Keys;
-import static at.jclehner.rxdroid.Settings.Defaults;
 
 import com.mobeta.android.dslv.DragSortListView;
 
@@ -403,7 +405,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(LOGV) Log.d(TAG, "makeView: date=" + DateTime.toDateString(date));
 
 		final List<Drug> drugs = Entries.getAllDrugs(mCurrentPatientId);
-		Collections.sort(drugs);
+		Collections.sort(drugs, new DrugComparator());
+
 		updateListAdapter(listView, date, drugs);
 
 		final int emptyResId;
@@ -907,4 +910,54 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			invalidateViewPager();
 		}
 	};
+
+	static class DrugComparator implements Comparator<Drug>
+	{
+		private int mDoseTime;
+		private Date mDate;
+		private boolean mSmartSortEnabled;
+
+		DrugComparator()
+		{
+			final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
+			mDoseTime = dtInfo.activeDoseTime();
+
+			if(mDoseTime != Schedule.TIME_INVALID)
+				mDate = dtInfo.activeDate();
+			else
+			{
+				mDoseTime = dtInfo.nextDoseTime();
+				mDate = dtInfo.nextDoseTimeDate();
+			}
+
+			mSmartSortEnabled = Settings.getBoolean(Keys.USE_SMART_SORT, false);
+		}
+
+		@Override
+		public int compare(Drug lhs, Drug rhs)
+		{
+			if(mSmartSortEnabled)
+			{
+				boolean lActive = lhs.isActive();
+				boolean rActive = rhs.isActive();
+
+				if(lActive != rActive)
+					return lActive ? -1 : 1;
+
+				boolean lHasDose = lhs.hasDoseOnDate(mDate);
+				boolean rHasDose = rhs.hasDoseOnDate(mDate);
+
+				if(lHasDose != rHasDose)
+					return lHasDose ? -1 : 1;
+
+				lHasDose = !lhs.getDose(mDoseTime, mDate).isZero();
+				rHasDose = !rhs.getDose(mDoseTime, mDate).isZero();
+
+				if(lHasDose != rHasDose)
+					return lHasDose ? -1 : 1;
+			}
+
+			return lhs.compareTo(rhs);
+		}
+	}
 }

@@ -87,6 +87,13 @@
 			    android:summary="@string/_summary_scramble_names"
 			    android:defaultValue="false"
 			/>
+		    
+		    <CheckBoxPreference android:key="@string/key_use_smart_sort"
+		        android:title="@string/_title_smart_sort"
+		        android:summary="@string/_summary_smart_sort"
+		        android:defaultValue="false"
+		        android:enabled="false"
+		    />
 	   
 	    </PreferenceCategory>	 
 	

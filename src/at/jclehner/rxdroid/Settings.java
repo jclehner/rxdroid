@@ -73,6 +73,7 @@ public final class Settings
 		public static final String COMPACT_ACTION_BAR = key(R.string.key_compact_action_bar);
 		public static final String NOTIFICATION_LIGHT_COLOR = key(R.string.key_notification_light_color);
 		public static final String QUIET_HOURS = key(R.string.key_quiet_hours);
+		public static final String USE_SMART_SORT = key(R.string.key_use_smart_sort);
 
 		@Deprecated
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
@@ -359,6 +360,14 @@ public final class Settings
 
 		public int nextDoseTime() {
 			return mNextDoseTime;
+		}
+		
+		public int activeOrNextDoseTime() 
+		{
+			if(mActiveDoseTime == Schedule.TIME_INVALID)
+				return mNextDoseTime;
+			
+			return mActiveDoseTime;
 		}
 
 		private Calendar mCurrentTime;

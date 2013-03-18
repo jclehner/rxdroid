@@ -23,7 +23,7 @@ package at.jclehner.androidutils.otpm;
 
 import android.preference.Preference;
 
-public class ReadonlyPreferenceHelper extends PreferenceHelper<Preference, Object>
+public class ReadonlyPreferenceController extends PreferenceController<Preference, Object>
 {
 	@Override
 	public void initPreference(Preference preference, Object fieldValue) {

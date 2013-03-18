@@ -313,6 +313,9 @@
 	<string name="_msg_no_drugs_compact_ab">»%1$s« aus dem Drei-Punkte-Menü in der Aktionsleiste auswählen, um ein Medikament hinzuzufügen</string>
 	<string name="_msg_no_drugs_extended_ab">Den »+« Button in der Aktionsleiste klicken, um ein Medikament hinzuzufügen</string>
 	
+	<string name="_summary_smart_sort">Medikamente nach ihrer Wichtigkeit ordnen</string>
+	<string name="_title_smart_sort">Auto-Sortieren</string>
+	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.
