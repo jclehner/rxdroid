@@ -310,7 +310,7 @@ public class OTPM
 			if(LOGV) Log.v(TAG, "  key=" + key);
 
 			final Annotation a = info.annotation;
-			final Class<? extends PreferenceController> prefHlpClazz = Reflect.getAnnotationParameter(a, "helper");
+			final Class<? extends PreferenceController> prefHlpClazz = Reflect.getAnnotationParameter(a, "controller");
 			final PreferenceController prefHlp;
 
 			try
