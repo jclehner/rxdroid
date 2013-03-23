@@ -23,9 +23,6 @@
 -->
 
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name" translatable="false">RxDroid</string>
-    <string name="version" translatable="false">0.9.7-2</string>
-    <string name="vcs_revision" translatable="false">$Revision$</string>
     <string name="translator">builtin</string>
        
     <!-- 
@@ -322,11 +319,7 @@
 	<string name="_title_magenta">Magenta</string>
 	
 	<string name="_toast_custom_led_color">Warning: your device may not support all colors.</string>
-	
-	<string name="_msg_no_translation" translatable="false">RxDroid has not yet been translated to your language. If you want
-	    to help translating this app into %1$s, please contact me! Contact details can be found under Preferences.
-	</string>
-	
+		
 	<string name="_title_supply_edit">Supply: %1$s</string>
 	<string name="_title_x_to_y" tools:ignore="MissingTranslation">%1$s – %2$s</string>
 	
@@ -334,10 +327,14 @@
 	
     <string name="_msg_no_drugs_no_ab">Press MENU and select "%1$s" to add a drug</string>
     <string name="_msg_no_drugs_compact_ab">Select "%1$s" from the three-dot menu to add a drug</string>
-    <string name="_msg_no_drugs_extended_ab">Press the +-button in the action bar to add a drug</string>
+    <string name="_msg_no_drugs_extended_ab">Press the "+" button in the action bar to add a drug</string>
     
     <string name="_summary_smart_sort">Sort drugs based on importance</string>
 	<string name="_title_smart_sort">Automatic sorting</string>
+	
+	<string name="_toast_restart_app">App must be restarted for changes to take effect!</string>
+	<string name="_title_language">Language</string>
+	
 		
 	<!-- 
     Keep at the end of strings.xml!  

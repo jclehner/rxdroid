@@ -38,8 +38,8 @@ public final class Version
 	public static final boolean SDK_IS_HONEYCOMB_OR_NEWER = !SDK_IS_PRE_HONEYCOMB;
 	public static final boolean SDK_IS_JELLYBEAN_OR_NEWER = Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1;
 
-	public static final String[] TRANSLATIONS = {
-		"en", "de"
+	public static final String[] LANGUAGES = {
+		"en", "de", "it"
 	};
 
 	/**

@@ -35,6 +35,7 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Extras;
 import at.jclehner.rxdroid.util.Util;
@@ -46,8 +47,7 @@ public class DoseHistoryActivity extends ExpandableListActivity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
-		Database.init();
+		Components.onCreateActivity(this, 0);
 
 		//Drug drug = (Drug) getIntent().getSerializableExtra(Extras.DRUG);
 		Drug drug = Drug.get(getIntent().getIntExtra(Extras.DRUG_ID, 0));

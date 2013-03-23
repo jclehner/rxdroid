@@ -74,6 +74,7 @@ public final class Settings
 		public static final String NOTIFICATION_LIGHT_COLOR = key(R.string.key_notification_light_color);
 		public static final String QUIET_HOURS = key(R.string.key_quiet_hours);
 		public static final String USE_SMART_SORT = key(R.string.key_use_smart_sort);
+		public static final String LANGUAGE = key(R.string.key_language);
 
 		@Deprecated
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
@@ -361,12 +362,12 @@ public final class Settings
 		public int nextDoseTime() {
 			return mNextDoseTime;
 		}
-		
-		public int activeOrNextDoseTime() 
+
+		public int activeOrNextDoseTime()
 		{
 			if(mActiveDoseTime == Schedule.TIME_INVALID)
 				return mNextDoseTime;
-			
+
 			return mActiveDoseTime;
 		}
 

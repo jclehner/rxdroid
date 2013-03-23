@@ -32,6 +32,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import at.jclehner.rxdroid.util.CollectionUtils;
+import at.jclehner.rxdroid.util.Components;
 
 public class LockscreenActivity extends Activity implements OnClickListener
 {
@@ -51,7 +52,8 @@ public class LockscreenActivity extends Activity implements OnClickListener
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		setTheme(Theme.get());
+		Components.onCreateActivity(this, 0);
+
 		setContentView(R.layout.activity_lockscreen);
 
 		final int[] pinDigitIds = { R.id.pin_digit1, R.id.pin_digit2, R.id.pin_digit3, R.id.pin_digit4 };
@@ -82,6 +84,7 @@ public class LockscreenActivity extends Activity implements OnClickListener
 	protected void onResume()
 	{
 		super.onResume();
+		Components.onResumeActivity(this, Components.NO_LOCKSCREEN);
 
 		if(!RxDroid.isLocked())
 		{
@@ -91,7 +94,6 @@ public class LockscreenActivity extends Activity implements OnClickListener
 		}
 
 		findViewById(R.id.keypad).setVisibility(View.VISIBLE);
-
 		clearDigits();
 	}
 

@@ -437,6 +437,21 @@ public final class Util
 		}
 	}
 
+	public static String capitalize(String str)
+	{
+		if(str.length() == 0)
+			return "";
+
+		char first = str.charAt(0);
+		if(Character.isLetter(first) && Character.isLowerCase(first))
+			first = Character.toUpperCase(first);
+
+		if(str.length() > 1)
+			return first + str.substring(1);
+
+		return Character.toString(first);
+	}
+
 	private static DisplayMetrics getDisplayMetrics() {
 		return RxDroid.getContext().getResources().getDisplayMetrics();
 	}

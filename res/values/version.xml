@@ -1,0 +1,9 @@
+<resources>
+    <item type="string" name="app_name">RxDroid</item>
+    <item type="string" name="version">0.9.8</item>
+    <item type="string" name="vcs_revision">$Revision: 571 $</item>
+        
+	<item type="string" name="_msg_no_translation">RxDroid has not yet been translated to your language. If you want
+	    to help translating this app into %1$s, please contact me! Contact details can be found under Preferences.
+	</item>
+</resources>

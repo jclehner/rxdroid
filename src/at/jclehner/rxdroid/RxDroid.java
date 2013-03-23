@@ -22,6 +22,7 @@
 package at.jclehner.rxdroid;
 
 import java.lang.ref.WeakReference;
+import java.util.Locale;
 import java.util.WeakHashMap;
 
 import android.app.Activity;
@@ -29,15 +30,17 @@ import android.app.Application;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
+import android.content.SharedPreferences;
 import android.os.Handler;
-import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.preferences.LanguagePreference;
+import at.jclehner.rxdroid.util.Components;
 
 
 public class RxDroid extends Application
@@ -54,8 +57,6 @@ public class RxDroid extends Application
 	@Override
 	public void onCreate()
 	{
-		Log.d(TAG, "onCreate");
-
 		setContext(getApplicationContext());
 
 		// We can't call Settings.init() here, because this overwrites the
@@ -65,6 +66,12 @@ public class RxDroid extends Application
 		AutoIntakeCreator.registerSelf();
 		Database.registerEventListener(sNotificationUpdater);
 
+		Components.onCreate(getContext(), Components.NO_DATABASE_INIT | Components.NO_SETTINGS_INIT);
+
+		final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		final String lang = sp.getString(Settings.Keys.LANGUAGE, null);
+		if(lang != null)
+			LanguagePreference.setLanguage(lang);
 
 		super.onCreate();
 	}
@@ -152,8 +159,10 @@ public class RxDroid extends Application
 		sUnlockedTime = System.currentTimeMillis();
 	}
 
-	public static void setIsVisible(Activity activity, boolean isVisible) {
-		sActivityVisibility.put(activity, isVisible);
+	public static void setIsVisible(Activity activity, boolean isVisible)
+	{
+		if(sActivityVisibility.containsKey(activity))
+			sActivityVisibility.put(activity, isVisible);
 	}
 
 	public static boolean isUiVisible()

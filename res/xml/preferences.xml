@@ -52,6 +52,12 @@
 		android:title="@string/_title_prefscreen_display"
 		android:icon="@drawable/android:ic_menu_view"
 	>
+		
+	    <at.jclehner.rxdroid.preferences.LanguagePreference 
+	        android:key="@string/key_language"
+	        android:title="@string/_title_language"
+	        android:defaultValue=""
+	    />	    
 	     
 		<CheckBoxPreference android:key="@string/key_theme_is_dark" 
 			android:title="@string/_title_dark_theme"

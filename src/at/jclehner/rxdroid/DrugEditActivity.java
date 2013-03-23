@@ -74,6 +74,7 @@ import at.jclehner.rxdroid.preferences.DosePreference;
 import at.jclehner.rxdroid.preferences.DrugNamePreference2;
 import at.jclehner.rxdroid.preferences.FractionPreference;
 import at.jclehner.rxdroid.util.CollectionUtils;
+import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.SimpleBitSet;
@@ -158,10 +159,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		Settings.init();
-
-		setTheme(Theme.get());
 		super.onCreate(savedInstanceState);
+		Components.onCreateActivity(this, 0);
 		addPreferencesFromResource(R.xml.empty);
 
 		if(!Version.SDK_IS_PRE_HONEYCOMB)
@@ -177,11 +176,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	{
 		super.onResume();
 
-		LockscreenActivity.startMaybe(this);
-		Settings.maybeLockInPortraitMode(this);
-
-		Database.init();
-		RxDroid.setIsVisible(this, true);
+		Components.onResumeActivity(this, 0);
 
 		Intent intent = getIntent();
 		String action = intent.getAction();
@@ -242,7 +237,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	protected void onPause()
 	{
 		super.onStop();
-		RxDroid.setIsVisible(this, false);
+		Components.onPauseActivity(this, 0);
 	}
 
 	@TargetApi(11)

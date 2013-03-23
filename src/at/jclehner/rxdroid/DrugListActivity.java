@@ -76,6 +76,7 @@ import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.ui.DrugOverviewAdapter;
 import at.jclehner.rxdroid.util.CollectionUtils;
+import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.AutoDragSortListView;
@@ -120,9 +121,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		Settings.init();
+		Components.onCreateActivity(this, 0);
 
-		setTheme(Theme.get());
 		setContentView(R.layout.drug_list);
 
 		mPager = (ViewPager) findViewById(R.id.drug_list_pager);
@@ -152,12 +152,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	{
 		super.onResume();
 
-		LockscreenActivity.startMaybe(this);
-		Settings.maybeLockInPortraitMode(this);
-
-		Database.init();
+		Components.onResumeActivity(this, 0);
 		mIsShowing = true;
-		RxDroid.setIsVisible(this, true);
 
 		final Intent intent = getIntent();
 		Date date = null;
@@ -172,7 +168,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
 
 		final String isoLang = Locale.getDefault().getLanguage();
-		if(!CollectionUtils.contains(Version.TRANSLATIONS, isoLang))
+		if(!CollectionUtils.contains(Version.LANGUAGES, isoLang))
 		{
 			final String language = Locale.getDefault().getDisplayLanguage(Locale.US);
 			showInfoDialog("missing_translation_" + isoLang, R.string._msg_no_translation, language);
@@ -184,17 +180,15 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	{
 		super.onPause();
 		mIsShowing = false;
-		RxDroid.setIsVisible(this, false);
+		Components.onPauseActivity(this, 0);
 		NotificationReceiver.unregisterOnDoseTimeChangeListener(mDoseTimeListener);
 	}
 
 	@Override
 	protected void onStop()
 	{
-		// TODO Auto-generated method stub
 		super.onStop();
 		mPager.removeAllViews();
-		//mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
 		Database.unregisterEventListener(mDatabaseListener);
 	}
 

@@ -45,11 +45,14 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.Preference;
+import android.preference.PreferenceScreen;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceGroup;
@@ -62,6 +65,7 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.preferences.LanguagePreference;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
@@ -114,46 +118,11 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			}
 
 			p.setSummary(version);
-
-			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-
-				@Override
-				public boolean onPreferenceClick(Preference preference)
-				{
-					final Intent intent = new Intent(Intent.ACTION_SEND);
-					intent.setType("plain/text");
-					intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "joseph.c.lehner+rxdroid-feedback@gmail.com" });
-					intent.putExtra(Intent.EXTRA_SUBJECT, "RxDroid");
-
-					try
-					{
-						startActivity(intent);
-					}
-					catch(ActivityNotFoundException e)
-					{
-						// Happens if no mail client is installed
-					}
-
-					return true;
-				}
-			});
 		}
 
 		p = findPreference(Settings.Keys.HISTORY_SIZE);
 		if(p != null)
 			Util.populateListPreferenceEntryValues(p);
-
-		p = findPreference(Settings.Keys.LICENSES);
-		if(p != null)
-			p.setOnPreferenceClickListener(this);
-
-		p = findPreference(Settings.Keys.THEME_IS_DARK);
-		if(p != null)
-			p.setOnPreferenceChangeListener(this);
-
-		p = findPreference(Settings.Keys.NOTIFICATION_LIGHT_COLOR);
-		if(p != null)
-			p.setOnPreferenceChangeListener(this);
 
 		p = findPreference(Settings.Keys.DONATE);
 		if(p != null)
@@ -195,6 +164,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		}
 
 		removeDisabledPreferences(getPreferenceScreen());
+		setPreferenceListeners();
 		maybeAddDebugPreferences();
 	}
 
@@ -258,6 +228,24 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			showDialog(R.id.licenses_dialog);
 			return true;
 		}
+		else if(Settings.Keys.VERSION.equals(preference.getKey()))
+		{
+			final Intent intent = new Intent(Intent.ACTION_SEND);
+			intent.setType("plain/text");
+			intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "joseph.c.lehner+rxdroid-feedback@gmail.com" });
+			intent.putExtra(Intent.EXTRA_SUBJECT, "RxDroid");
+
+			try
+			{
+				startActivity(intent);
+			}
+			catch(ActivityNotFoundException e)
+			{
+				// Happens if no mail client is installed
+			}
+
+			return true;
+		}
 
 		return false;
 	}
@@ -293,6 +281,11 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					Settings.setDisplayedOnce("custom_led_color");
 				}
 			}
+		}
+		else if(Settings.Keys.LANGUAGE.equals(key))
+		{
+			finish();
+			//new Handler().po
 		}
 
 		return true;
@@ -392,6 +385,18 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 
 		for(Preference p : toRemove)
 			root.removePreference(p);
+	}
+
+	private void setPreferenceListeners()
+	{
+		final PreferenceScreen ps = getPreferenceScreen();
+
+		for(int i = 0; i != ps.getPreferenceCount(); ++i)
+		{
+			final Preference p = ps.getPreference(i);
+			p.setOnPreferenceChangeListener(this);
+			p.setOnPreferenceClickListener(this);
+		}
 	}
 
 	private void maybeAddDebugPreferences()

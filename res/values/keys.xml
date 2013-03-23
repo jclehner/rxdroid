@@ -23,28 +23,29 @@
 -->
 
 <resources>
-	<string translatable="false" name="key_use_led">use_led</string>
-	<string translatable="false" name="key_use_sound">use_sound</string>
-	<string translatable="false" name="key_use_vibrator">use_vibrator</string>
-	<string translatable="false" name="key_lockscreen_timeout">lockscreen_timeout</string>
-	<string translatable="false" name="key_scramble_names">scramble_names</string>
-	<string translatable="false" name="key_pin">pin</string>
-	<string translatable="false" name="key_low_supply_threshold">low_supply_threshold</string>
-	<string translatable="false" name="key_alarm_mode">alarm_mode</string>
-	<string translatable="false" name="key_show_supply_monitors">show_supply_monitors</string>
-	<string translatable="false" name="key_last_msg_hash">last_msg_hash</string>
-	<string translatable="false" name="key_version">version</string>
-	<string translatable="false" name="key_licenses">licenses</string>
-	<string translatable="false" name="key_history_size">history_size</string>
-	<string translatable="false" name="key_theme_is_dark">theme_is_dark</string>
-	<string translatable="false" name="key_notification_sound">notification_sound</string>
-	<string translatable="false" name="key_use_extended_notifications">use_extended_notifications</string>
-	<string translatable="false" name="key_enable_landscape_mode">enable_landscape_mode</string>
-	<string translatable="false" name="key_donate">donate</string>
-	<string translatable="false" name="key_repeat_alarm">repeat_alarm</string>
-	<string translatable="false" name="key_db_stats">stats</string>
-	<string translatable="false" name="key_compact_action_bar">compact_action_bar</string>
-	<string translatable="false" name="key_quiet_hours">quiet_hours</string>
-	<string translatable="false" name="key_notification_light_color">notification_light_color</string>
+	<item type="string" name="key_use_led">use_led</item>
+	<item type="string" name="key_use_sound">use_sound</item>
+	<item type="string" name="key_use_vibrator">use_vibrator</item>
+	<item type="string" name="key_lockscreen_timeout">lockscreen_timeout</item>
+	<item type="string" name="key_scramble_names">scramble_names</item>
+	<item type="string" name="key_pin">pin</item>
+	<item type="string" name="key_low_supply_threshold">low_supply_threshold</item>
+	<item type="string" name="key_alarm_mode">alarm_mode</item>
+	<item type="string" name="key_show_supply_monitors">show_supply_monitors</item>
+	<item type="string" name="key_last_msg_hash">last_msg_hash</item>
+	<item type="string" name="key_version">version</item>
+	<item type="string" name="key_licenses">licenses</item>
+	<item type="string" name="key_history_size">history_size</item>
+	<item type="string" name="key_theme_is_dark">theme_is_dark</item>
+	<item type="string" name="key_notification_sound">notification_sound</item>
+	<item type="string" name="key_use_extended_notifications">use_extended_notifications</item>
+	<item type="string" name="key_enable_landscape_mode">enable_landscape_mode</item>
+	<item type="string" name="key_donate">donate</item>
+	<item type="string" name="key_repeat_alarm">repeat_alarm</item>
+	<item type="string" name="key_db_stats">stats</item>
+	<item type="string" name="key_compact_action_bar">compact_action_bar</item>
+	<item type="string" name="key_quiet_hours">quiet_hours</item>
+	<item type="string" name="key_notification_light_color">notification_light_color</item>
 	<item type="string" name="key_use_smart_sort">use_smart_sort</item>
+	<item type="string" name="key_language">language</item>
 </resources>

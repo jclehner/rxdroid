@@ -26,13 +26,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.view.MenuItem;
+import at.jclehner.rxdroid.util.Components;
 
 public abstract class PreferenceActivityBase extends PreferenceActivity
 {
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		Settings.init();
-
+		Components.onCreateActivity(this, Components.NO_THEME);
 		// See android issue #4611
 		setTheme(Version.SDK_IS_PRE_HONEYCOMB ? android.R.style.Theme : Theme.get());
 		super.onCreate(savedInstanceState);
@@ -42,10 +42,7 @@ public abstract class PreferenceActivityBase extends PreferenceActivity
 	protected void onResume()
 	{
 		super.onResume();
-
-		LockscreenActivity.startMaybe(this);
-		Settings.maybeLockInPortraitMode(this);
-		RxDroid.setIsVisible(this, true);
+		Components.onResumeActivity(this, 0);
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER && isHomeButtonEnabled())
 		{
@@ -59,7 +56,7 @@ public abstract class PreferenceActivityBase extends PreferenceActivity
 	protected void onPause()
 	{
 		super.onPause();
-		RxDroid.setIsVisible(this, false);
+		Components.onPauseActivity(this, 0);
 	}
 
 	@Override
