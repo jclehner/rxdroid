@@ -334,6 +334,7 @@
 	
 	<string name="_title_off">Off</string>
 	<string name="_title_default">Default</string>
+	<string name="_msg_swipe_to_change_date">You can change the displayed date by swiping left or right</string>
 	<!-- </TODO> -->
 	
 		

@@ -601,7 +601,9 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 				mLastPage = InfiniteViewPagerAdapter.CENTER;
 
-				if(drugCount >= 2)
+				if(drugCount == 1)
+					showInfoDialog("date_swipe", R.string._msg_swipe_to_change_date);
+				else if(drugCount >= 2)
 					showInfoDialog(Settings.OnceIds.DRAG_DROP_SORTING, R.string._msg_drag_drop_sorting);
 			}
 			else

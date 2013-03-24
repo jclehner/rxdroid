@@ -320,6 +320,7 @@
 	
 	<string name="_title_use_backup_framework">Daten sichern</string>
 	<string name="_summary_use_backup_framework">Daten mit Hilfe von Diensten wie Googles »Sichern und Wiederherstellen« sichern.</string>
+	<string name="_msg_swipe_to_change_date">Durch Wischen nach links oder rechts kann das angezeigte Datum geändert werden</string>
 	
 	
 	<!-- 

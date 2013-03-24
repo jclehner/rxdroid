@@ -61,8 +61,17 @@ public class BackupAgent extends BackupAgentHelper
 		}
 	}
 
-	private static boolean isBackupEnabled() {
-		return Settings.getBoolean(Keys.USE_BACKUP_FRAMEWORK, true);
+	private static boolean isBackupEnabled()
+	{
+		try
+		{
+			return Settings.getBoolean(Keys.USE_BACKUP_FRAMEWORK, true);
+		}
+		catch(Exception e)
+		{
+			Log.w(TAG, e);
+			return true;
+		}
 	}
 
 	private static class DefaultSharedPreferencesBackupHelper extends SharedPreferencesBackupHelper

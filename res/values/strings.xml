@@ -337,6 +337,8 @@
 	
 	<string name="_title_use_backup_framework">Back up data</string>
 	<string name="_summary_use_backup_framework">Back up up data using services such as Google\'s \"Backup &amp; Restore\".</string>
+	
+	<string name="_msg_swipe_to_change_date">You can change the displayed date by swiping left or right</string>
 		
 	<!-- 
     Keep at the end of strings.xml!  
