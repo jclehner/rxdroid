@@ -316,8 +316,11 @@
 	<string name="_summary_smart_sort">Medikamente nach ihrer Wichtigkeit ordnen</string>
 	<string name="_title_smart_sort">Auto-Sortieren</string>	
 	
-	<string name="_toast_restart_app">App muss neu gestarted werden, um Änderungen wirksam zu machen!</string>
 	<string name="_title_language">Sprache</string>
+	
+	<string name="_title_use_backup_framework">Daten sichern</string>
+	<string name="_summary_use_backup_framework">Daten mit Hilfe von Diensten wie Googles »Sichern und Wiederherstellen« sichern.</string>
+	
 	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

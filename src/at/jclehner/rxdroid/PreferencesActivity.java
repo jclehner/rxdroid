@@ -61,6 +61,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.widget.Toast;
+import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.Drug;
@@ -80,6 +81,17 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		Settings.Keys.VERSION, Settings.Keys.DB_STATS
 	};
 
+	private static final String[] REGISTER_CLICK_LISTENER = {
+		Keys.LICENSES,
+		Keys.VERSION
+	};
+
+	private static final String[] REGISTER_CHANGE_LISTENER = {
+		Keys.THEME_IS_DARK,
+		Keys.NOTIFICATION_LIGHT_COLOR,
+		Keys.LANGUAGE
+	};
+
 	private static final int MENU_RESTORE_DEFAULTS = 0;
 
 	@TargetApi(11)
@@ -91,6 +103,12 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		addPreferencesFromResource(R.xml.preferences);
 
 		Settings.registerOnChangeListener(this);
+
+		for(Preference p : getPreferences(REGISTER_CHANGE_LISTENER))
+			p.setOnPreferenceChangeListener(this);
+
+		for(Preference p : getPreferences(REGISTER_CLICK_LISTENER))
+			p.setOnPreferenceClickListener(this);
 
 		Preference p = findPreference(Settings.Keys.VERSION);
 		if(p != null)
@@ -165,7 +183,15 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 
 		removeDisabledPreferences(getPreferenceScreen());
 		setPreferenceListeners();
-		maybeAddDebugPreferences();
+
+		if(!BuildConfig.DEBUG)
+		{
+			p = findPreference("prefscreen_development");
+			if(p != null)
+				getPreferenceScreen().removePreference(p);
+		}
+		else
+			setupDebugPreferences();
 	}
 
 	@Override
@@ -223,12 +249,14 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 	@Override
 	public boolean onPreferenceClick(Preference preference)
 	{
-		if(Settings.Keys.LICENSES.equals(preference.getKey()))
+		final String key = preference.getKey();
+
+		if(Settings.Keys.LICENSES.equals(key))
 		{
 			showDialog(R.id.licenses_dialog);
 			return true;
 		}
-		else if(Settings.Keys.VERSION.equals(preference.getKey()))
+		else if(Settings.Keys.VERSION.equals(key))
 		{
 			final Intent intent = new Intent(Intent.ACTION_SEND);
 			intent.setType("plain/text");
@@ -395,41 +423,26 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		{
 			final Preference p = ps.getPreference(i);
 			p.setOnPreferenceChangeListener(this);
-			p.setOnPreferenceClickListener(this);
+			//p.setOnPreferenceClickListener(this);
 		}
 	}
 
-	private void maybeAddDebugPreferences()
+	private List<Preference> getPreferences(String[] keys)
 	{
-		if(!BuildConfig.DEBUG)
-			return;
-
-		addPreferencesFromResource(R.xml.debug_preferences);
-
-		Preference p = findPreference("debug_dump_db");
-		if(p != null)
+		final ArrayList<Preference> list = new ArrayList<Preference>(keys.length);
+		for(String key : keys)
 		{
-			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-
-				@Override
-				public boolean onPreferenceClick(Preference preference)
-				{
-					try
-					{
-						final JSONObject json = Database.exportDatabaseToJson();
-						Database.importDatabaseFromJson(json);
-					}
-					catch(JSONException e)
-					{
-						Log.w(TAG, e);
-					}
-
-					return true;
-				}
-			});
+			final Preference p = findPreference(key);
+			if(p != null)
+				list.add(p);
 		}
 
-		p = findPreference("db_create_drug_with_schedule");
+		return list;
+	}
+
+	private void setupDebugPreferences()
+	{
+		Preference p = findPreference("db_create_drug_with_schedule");
 		if(p != null)
 		{
 			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {

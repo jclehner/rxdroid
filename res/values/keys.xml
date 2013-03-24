@@ -48,4 +48,5 @@
 	<item type="string" name="key_notification_light_color">notification_light_color</item>
 	<item type="string" name="key_use_smart_sort">use_smart_sort</item>
 	<item type="string" name="key_language">language</item>
+	<item type="string" name="key_use_backup_framework">use_backup_framework</item>
 </resources>

@@ -159,8 +159,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		super.onCreate(savedInstanceState);
 		Components.onCreateActivity(this, 0);
+		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.empty);
 
 		if(!Version.SDK_IS_PRE_HONEYCOMB)

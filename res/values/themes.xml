@@ -46,6 +46,13 @@
 		<item name="iconLowSupplies">@drawable/ic_low_supply_warning</item>
 		<item name="iconMissedDose">@drawable/ic_warning</item>
 		
+		<item name="menuIconLock">@drawable/ic_menu_lock_black</item>
+		<item name="menuIconTime">@drawable/ic_menu_time_black</item>
+		<item name="menuIconPicture">@drawable/ic_menu_picture_black</item>
+		<item name="menuIconInfo">@drawable/ic_menu_info_black</item>		
+		<item name="menuIconWarning">@drawable/ic_menu_warning_black</item>
+		<item name="menuIconStorage">@drawable/ic_menu_storage_black</item>
+				
 		<item name="dividerColor">@color/list_divider_light</item>
 		
 		<item name="android:windowAnimationStyle">@null</item>
@@ -66,6 +73,13 @@
 		
 		<item name="iconLowSupplies">@drawable/ic_low_supply_warning_white</item>
 		<item name="iconMissedDose">@drawable/ic_warning_white</item>
+		
+		<item name="menuIconLock">@drawable/ic_menu_lock_white</item>
+		<item name="menuIconTime">@drawable/ic_menu_time_white</item>
+		<item name="menuIconPicture">@drawable/ic_menu_picture_white</item>
+		<item name="menuIconInfo">@drawable/ic_menu_info_white</item>		
+		<item name="menuIconWarning">@drawable/ic_menu_warning_white</item>
+		<item name="menuIconStorage">@drawable/ic_menu_storage_white</item>
 		
 		<item name="dividerColor">@color/list_divider_dark</item>
 		

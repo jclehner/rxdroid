@@ -44,7 +44,7 @@ scan_string_xml()
 
 			if ! grep -q $t $f; then
 					key=$(sed -e 's/key_//' <<< "$t")
-					echo "<string translatable=\"false\" name=\"$t\">$key</string>"
+					echo "<item type=\"string\" name=\"$t\">$key</item>"
 			fi
 		done
 

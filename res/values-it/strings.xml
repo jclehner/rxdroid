@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * RxDroid - A Medication Reminder
+ * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ *
+ *
+ * RxDroid is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * RxDroid is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
+-->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="translator">Luca Scorrano</string>
+       
+    <!-- 
+    Translatable strings start here. The naming scheme is as follows:
+    
+    _title_<foobar>		Titles for Dialogs, Preferences, Activities, etc. (as short as possible)
+    _summary_<foobar>	Preference summaries (w/o trailing dot*)
+    _toast_<foobar>		Message for Toast notifications (w/ trailing dot)
+    _btn_<foobar>		Button label. Should be as short as possible. (w/o trailing dot)
+    _msg_<foobar>		Everything that does not fit into the categories above (w/o trailing dot*) 
+    _help_<foobar>		Very long text for HelpActivity.
+    
+    If the first part is prefixed with a q (_qtitle_<foobar>, qmsg_<foobar>, etc.) the string is a
+    quantity-specific string. The first format argument (%1$d) will always be the quantity used for
+    selecting the string. 
+    
+    *) Use trailing dots if more than one sentence or if original text includes a trailing dot.
+    
+    -->
+    
+    <string name="_title_morning">Mattina</string>
+    <string name="_title_noon">Pomeriggio</string>
+    <string name="_title_evening">Sera</string>
+    <string name="_title_night">Notte</string>
+     
+    <string name="_title_begin">Inizio</string>
+    <string name="_title_end">Fine</string>
+        
+    <string name="_msg_new_notification">Nuova notifica</string>
+    
+    <plurals name="_qmsg_missed">
+        <item quantity="other">%1$d mancata</item>
+    </plurals>
+    
+    <plurals name="_qmsg_due">
+        <item quantity="other">%1$d in sospeso</item>
+    </plurals>    
+    
+    <string name="_qmsg_low_supply_single">%1$s</string>        
+	
+	<plurals name="_qmsg_low_supply_multiple">
+        <item quantity="one">%2$s e %3$s</item>
+        <item quantity="other">%2$s e %1$d altri</item>       
+    </plurals>
+    
+	<string name="_msg_constraints_ab">Seleziona un orario tra %1$s e %2$s</string>
+	<string name="_msg_constraints_a">Seleziona un orario dopo le %1$s</string>
+	<string name="_msg_constraints_b">Seleziona un orario prima delle %2$s</string>
+	
+	<string name="_btn_set">Imposta</string>    
+    <string name="_title_drug_name">Nome medicinale</string>
+    <string name="_title_delete">Elimina</string>
+    
+    <string name="_msg_freq_daily">Giornaliero</string>
+
+	<string name="_toast_deleted">Eliminato.</string>
+	  
+     
+    <string name="_title_error">Errore</string>    
+	
+	<string name="_msg_timepreference_constraint_failed">L\'orario non è compreso nell\'intervallo specificato</string>
+	<string name="_msg_err_empty_drug_name">Questa medicina non ha nome e sarà scartata</string>
+	<string name="_msg_err_non_unique_drug_name">Questo nome è già impostato</string>
+    
+    
+	<string name="_title_warning">Attenzione</string> 
+    
+    <string name="_title_preferences">Preferenze</string>
+        
+    <string name="_title_prefscreen_times">Orari</string>
+    <string name="_summary_prefscreen_times">Definizioni di mattina, pomeriggio, etc.</string>
+    
+    <string name="_title_prefscreen_notifications">Notifiche</string>
+    <string name="_summary_prefscreen_notifications">Metodi di notifica, intervallo di ripetizione, etc.</string>
+    
+    <string name="_title_pref_notification_methods">Personalizzazioni</string>
+    
+    <string name="_title_min_supply_days">Promemoria di approvvigionamento</string>
+    <string name="_summary_min_supply_days">Numero minimo di giorni per l\'approvvigionamento di un medicinale prima di visualizzare una notifica – attualmente %1$s</string>
+    
+    <string name="_title_pref_use_led">LED</string>
+    <string name="_title_pref_use_sound">Suono</string>
+    <string name="_title_pref_use_vibrator">Vibrazione</string>
+    
+    <string name="_title_prefscreen_display">Aspetto</string>
+    <string name="_summary_prefscreen_display"></string>
+    
+    <string name="_title_pref_restore_defaults">Ripristina valori iniziali</string>
+		
+	<string name="_title_prefscreen_display_info">Note</string>
+	<string name="_summary_prefscreen_display_info">Queste impostazioni possono essere sovrascritte temporaneamente tramite MENU -&gt; Mostra tutto</string>		
+	
+	<string name="_btn_discard">Annulla</string>
+	<string name="_btn_save">Salva</string>
+	<string name="_toast_intake_noted">Annotato.</string>
+	<string name="_toast_saved">Salvato.</string>
+	
+	<string name="_title_add">Aggiungi</string>
+	
+	<string name="_msg_intake_normal">Prendi questa dose di &lt;b&gt;%1$s&lt;/b&gt;</string>
+	<string name="_msg_intake_unscheduled">Specifica una dose di &lt;b&gt;%1$s&lt;/b&gt;</string>
+	<string name="_title_change_dose">Cambia dose</string>
+	<string name="_title_edit_drug">Modifica medicinale</string>
+	<string name="_title_mark_not_taken">Rimuovi la dose assunta</string>
+	<string name="_title_mark_taken">Prendi dose</string>
+	
+	<string name="_msg_freq_every_n_days">Ogni %1$s giorni, iniziando dal %2$s</string>
+	<string name="_msg_freq_21days_on_7days_off">21 giorni iniziando da %1$s, seguiti da 7 giorni di pausa</string>
+	
+	<string name="_summary_intake_never">Mai</string>
+	<string name="_msg_drug_repeat_ge_2">Deve essere più grande o uguale a 2</string>
+	<string name="_title_version">Versione</string>
+	
+	<string name="_summary_not_available">N/D</string>
+	
+	<string name="_title_tablet">Pasticca</string>
+	<string name="_title_injection">Siringa</string>
+	<string name="_title_spray">Spray</string>
+	<string name="_title_drop">Bicchiere</string>
+	<string name="_title_gel">Flacone</string>	
+	<string name="_title_ring">Anello</string>
+	<string name="_title_other">Altro</string>
+	
+	<string name="_title_daily">Giornalmente</string>
+	<string name="_title_every_n_days">Ogni N giorni</string>
+	<string name="_title_pick_days">Seleziona giorni</string>
+	<string name="_title_21_days_on_7_days_off">7 giorni di pausa ogni 21 giorni</string>
+		
+	<string name="_msg_supply">%1$s – fino al %2$s</string>
+	<string name="_title_save_chanes">Salva modifiche</string>
+	<string name="_msg_save_drug_changes">Vuoi salvare le modifiche fatte a questo medicinale?</string>
+	<string name="_msg_every_n_days_distance">Giorni tra ogni ripetizione</string>
+	
+	<string name="_title_intake_schedule">Programma</string>
+	<string name="_title_repeat">Ripetizione</string>
+	<string name="_title_misc">Varie</string>
+	<string name="_title_icon">Icona</string>
+	<string name="_title_current_supply">Rifornimento attuale</string>
+	<string name="_title_refill_size">Quantità per confezione</string>
+	<string name="_title_active">Attivo</string>
+	<string name="_title_ignore_dose">Ignora dose</string>
+	
+    <string name="_msg_touch_to_edit">(tocca per modificare)</string>
+   
+    <string name="_msg_no_doses_on_this_day">Non ci sono dosi programmate per questa data</string>
+    
+    <string name="_msg_db_error_general">Errore database sconosciuto.</string>
+	<string name="_msg_db_error_upgrade">Errore aggiornamento database.</string>
+	<string name="_msg_db_error_downgrade">Versione database incompatibile.</string>
+		
+	<string name="_msg_db_error_footer">Clicca %1$s per resettare il database.</string>	
+	
+	<string name="_btn_reset">Reset</string>
+	
+	<string name="_msg_footer_insufficient_supplies">Quantità insufficiente per la dose. 
+		Premi %2$s per ignorare, cancella per modificare la dose, oppure tocca questo testo per modificare &lt;b&gt;%3$s&lt;/b&gt;.</string>
+		
+	<string name="_title_weekdays">Gioni della settimana</string>
+	
+	<string name="_title_on_demand">In base alle esigenze</string>
+	
+	<string name="_title_delete_drug">Elimina %1$s?</string>
+	<string name="_msg_delete_drug">Questa operazione non può essere annullata!</string>
+	
+	<string name="_toast_db_reset_success">Database resettato con successo.</string>
+	<string name="_toast_db_reset_failure">Reset del database fallito. Reinstallare.</string>
+	
+	<string name="_btn_exit">Esci</string>
+	
+	<string name="_toast_drug_notification_icon">Questa medicina ha almeno una dose mancata in passato.</string> 
+        
+    <string name="_title_notification_doses">Dosi</string>
+	<string name="_title_notification_low_supplies">Scorte in esaurimento</string>
+	
+	<string name="_btn_next">Avanti</string>
+	<string name="_btn_back">Indietro</string>
+	
+	<string name="_title_scramble_names">Maschera nomi</string>
+	<string name="_summary_scramble_names">Maschera i nomi delle tue medicine. Per vedere il vero nome, cliccalo.</string>
+    	
+	<string name="_title_select_date">Seleziona data</string>
+	
+	<string name="_title_repetition_origin">Data d\'inizio</string>
+	
+	<string name="_title_history_age">Dimensione dello storico</string>
+	<string name="_summary_history_age">I dati precedenti all\'intervallo specificato saranno eliminati</string>
+	<string name="_title_history_1_month">Un mese</string>
+	<string name="_title_history_2_months">Due mesi</string>
+	<string name="_title_history_6_months">Sei mesi</string>
+	<string name="_title_history_1_year">Un anno</string>
+	<string name="_title_history_unlimited">Illimitato</string>	
+	
+	<string name="_title_database">Database</string>
+	
+	<string name="_toast_large_history_size">Attenzione: queste impostazioni potrebbero provocare lunghi tempi di caricamento!</string>			
+	
+	<string name="_title_supply_monitor">Segna come fatto</string>
+	<string name="_summary_supply_monitor">Le dosi saranno automaticamente contrassegnate come prese. Sarà notificato solo un allarme in caso di scorte in esaurimento.
+	</string>
+		
+	<string name="_title_go_to_date">Vai alla data</string>
+	<string name="_title_today">Oggi</string>
+	
+	
+	<string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
+	<string name="_msg_restore_default_settings">Verranno ripristinate tutte le configurazioni ai valuri di default</string>
+	
+	<string name="_title_show_supply_monitors">Mostra tutto</string>
+	<string name="_summary_show_supply_monitors">Mostra medicinali con la notifica sulla dose disabilitata</string>
+		
+	<string name="_title_show_in_list">Elenco medicinali</string>
+	
+	<string name="_title_help">Aiuto</string>
+	<string name="_title_n_of_n">%1$d di %2$d</string>
+		
+	<string name="_title_dark_theme">Usa il tema scuro</string>
+	<string name="_toast_theme_changed">Riavvio applicazione…</string>
+	
+	<string name="_toast_low_supplies">Dura fino al %1$s.</string>
+	
+	<string name="_title_notification_sound">Suono</string>
+	
+	<string name="_title_doses_and_low_supplies">Tutto</string>
+	<string name="_title_low_supplies_only">Solo ricarica</string>
+	
+	<string name="_title_about">Informazioni</string>
+	<string name="_title_licenses">Licenze</string>
+	
+	<string name="_title_db_status_loading">Caricamento…</string>
+	<string name="_title_db_status_upgrading">Aggiornamento…</string>
+	<string name="_title_db_status_discarding_intakes">Cancellazione dati obsoleti…</string>
+	<string name="_title_db_status_creating_intakes">Inserimento dati mancanti…</string>
+	<string name="_title_db_status_initializing">Inizializzazione…</string>
+	
+	<string name="_summary_enable_landscape_mode">Abilita modalità landscape (sperimentale)</string>
+	<string name="_title_enable_landscape_mode">Modalità landscape</string>
+	
+	<string name="_msg_repetition_origin">Scegli data d\'inizio</string>
+	
+	<string name="_title_filter">Filtra</string>
+	<string name="_title_show_all">Mostra tutto</string>
+	
+	<string name="_title_donate">Dona!</string>
+	
+	<string name="_title_factory_reset">Ripristino valori iniziali</string>	
+	
+	<string name="_title_dont_repeat">Non ripetere</string>
+	<string name="_title_15_minutes">15 minuti</string>
+	<string name="_title_30_minutes">30 minuti</string>
+	<string name="_title_1_hour">1 ora</string>
+	<string name="_title_2_hour">2 ore</string>
+	
+	<string name="_title_repeat_alarm">Ripeti</string>
+	<string name="_summary_repeat_alarm">Ripeti notifiche dopo un certo intervallo di tempo</string>
+		
+	<string name="_help_dose_times">Hai avviato RxDroid per la prima volta. Definisci i quattro intervalli di tempo che userai più avanti nella posologia dei medicinali.</string>
+	
+	<string name="_title_info">Informazioni</string>
+	<string name="_toast_past_max_history_age">Questa data supera il massimo intervallo temporale memorizzato.</string>
+	<string name="_msg_drag_drop_sorting">Puoi cambiare l\'ordine di visualizzazione cliccando
+	    l\'icona del medicinale e spostandola nella posizione desiderata.</string>
+	
+	<string name="_title_new_drug">Nuovo medicinale</string>
+	
+	<string name="_title_db_stats">Statistiche</string>
+	<string name="_msg_db_stats">Database caricato in %1$s. Puoi ridurre questo tempo riducendo la dimensione del database.</string>
+		
+	<string name="_title_compact_action_bar">Barra compatta</string>
+	<string name="_summary_compact_action_bar">Mostra meno icone nella barra</string>
+	
+	<string name="_title_website">Sito web</string>
+	
+	<string name="_title_per_drug_reminders">Promemoria</string>
+	<string name="_title_me">Io</string>
+	<string name="_title_patient">Paziente</string>
+	
+	<string name="_title_quiet_hours">Ore di riposo</string>
+	<string name="_summary_quiet_hours">Durante questo periodo le notifiche non useranno suoni e vibrazione</string>
+	
+	<string name="_title_silent">Silenzioso</string>
+		
+	<string name="_title_white">Bianco</string>
+	<string name="_title_red">Rosso</string>
+	<string name="_title_green">Verde</string>
+	<string name="_title_blue">Blu</string>
+	<string name="_title_yellow">Giallo</string>
+	<string name="_title_orange">Arancione</string>
+	<string name="_title_magenta">Magenta</string>
+	
+	<string name="_toast_custom_led_color">Attenzione: il tuo dispositivo non supporta tutti i colori.</string>
+		
+	<string name="_title_supply_edit">Rifornimento: %1$s</string>
+	<string name="_title_x_to_y" tools:ignore="MissingTranslation">%1$s – %2$s</string>
+	
+	<string name="_title_disabled">Disattivato</string>	
+	
+    <string name="_msg_no_drugs_no_ab">Premi MENU e seleziona \"%1$s\" per aggiungere un medicinale</string>
+    <string name="_msg_no_drugs_compact_ab">Seleziona \"%1$s\" dal menu con tre puntini per aggiungere un medicinale</string>
+    <string name="_msg_no_drugs_extended_ab">Premi il bottone \"+\"" nella barra per aggiungere un medicinale</string>
+    
+    <string name="_summary_smart_sort">Seleziona medicinali per importanza</string>
+	<string name="_title_smart_sort">Ordinamento automatico</string>
+	
+	<string name="_title_language">Lingua</string>	
+	
+	<!-- <TODO> -->
+	<string name="_title_use_backup_framework">Back up data</string>
+	<string name="_summary_use_backup_framework">Backup up your data using services such as Google\'s \"Backup &amp; Restore\".</string>
+	
+	<string name="_title_off">Off</string>
+	<string name="_title_default">Default</string>
+	<!-- </TODO> -->
+	
+		
+	<!-- 
+    Keep at the end of strings.xml!  
+     -->
+    <string name="dialog_set_number">@string/_btn_set</string>
+    <string name="dialog_cancel">@android:string/cancel</string>
+    <string name="dialog_picker_title">Scegli un numero</string>
+    
+</resources>

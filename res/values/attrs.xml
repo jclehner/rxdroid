@@ -66,6 +66,13 @@
     <attr name="iconLowSupplies" format="reference" />
     <attr name="iconMissedDose" format="reference" />
     
+    <attr name="menuIconLock" />
+	<attr name="menuIconTime" />
+	<attr name="menuIconPicture" />
+	<attr name="menuIconInfo" />
+	<attr name="menuIconWarning" />
+	<attr name="menuIconStorage" />
+    
     <attr name="textColorClickable" format="color|reference" />
     
     <attr name="dividerColor" format="color|reference" />

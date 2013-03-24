@@ -33,7 +33,7 @@
 
 	<Preference android:key="prefscreen_times"
 		android:title="@string/_title_prefscreen_times"
-		android:icon="@drawable/android:ic_menu_recent_history"
+		android:icon="?attr/menuIconTime"
 	>
 		<intent 
 			android:action="android.intent.action.VIEW"
@@ -50,15 +50,8 @@
 	<PreferenceScreen 
 		android:key="prefscreen_display"
 		android:title="@string/_title_prefscreen_display"
-		android:icon="@drawable/android:ic_menu_view"
-	>
-		
-	    <at.jclehner.rxdroid.preferences.LanguagePreference 
-	        android:key="@string/key_language"
-	        android:title="@string/_title_language"
-	        android:defaultValue=""
-	    />	    
-	     
+		android:icon="?attr/menuIconPicture"
+	>	     
 		<CheckBoxPreference android:key="@string/key_theme_is_dark" 
 			android:title="@string/_title_dark_theme"
 			android:defaultValue="@bool/pref_default_theme_is_dark"
@@ -110,7 +103,7 @@
 	<PreferenceScreen
 		android:key="prefscreen_notifications"
 		android:title="@string/_title_prefscreen_notifications"
-		android:icon="@drawable/android:ic_menu_info_details"
+		android:icon="?attr/menuIconWarning"
 	>
 		<ListPreference android:key="@string/key_alarm_mode"
 		    android:title="@string/_title_repeat_alarm"
@@ -162,10 +155,19 @@
 			    		
 		</PreferenceCategory>
 	</PreferenceScreen>
+	
+	<!-- 
+	<PreferenceScreen
+	    android:title="@string/_title_privacy"
+	    android:icon="?attr/menuIconLock"
+	>
+	    
+	</PreferenceScreen>
+	 -->
 		
 	<PreferenceScreen android:key="prefscreen_db"
 		android:title="@string/_title_database"
-		android:icon="@android:drawable/ic_menu_save"	
+		android:icon="?attr/menuIconStorage"	
 	>
 		
 		<ListPreference android:key="@string/key_history_size"
@@ -175,12 +177,33 @@
 			android:defaultValue="1"
 		/>
 		
+		<CheckBoxPreference android:key="@string/key_use_backup_framework"
+	        android:title="@string/_title_use_backup_framework"
+	        android:summary="@string/_summary_use_backup_framework"
+	        android:defaultValue="true"
+	    />
+		
 		<Preference android:key="@string/key_db_stats"
 			android:title="@string/_title_db_stats"
 			android:summary="@string/_msg_db_stats"
 			android:enabled="false"
 		/>
 		
+	</PreferenceScreen>
+	
+	<PreferenceScreen android:key="prefscreen_development"
+	    android:title="Development"
+	    android:icon="@android:drawable/ic_menu_preferences"
+	>
+		<at.jclehner.rxdroid.preferences.LanguagePreference 
+	        android:key="@string/key_language"
+	        android:title="@string/_title_language"
+	        android:defaultValue=""
+	    />
+	    
+		<Preference android:key="db_create_drug_with_schedule"
+			android:title="Custom schedule drug"
+		/>	    
 	</PreferenceScreen>
 	
 	<PreferenceCategory 
