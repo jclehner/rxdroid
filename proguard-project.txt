@@ -21,7 +21,7 @@
 
 -dontobfuscate
 
--keep class * extends at.jclehner.androidutils.otpm.PreferenceHelper { *; }
+-keep class * extends at.jclehner.androidutils.otpm.PreferenceController { *; }
 -keep class * extends android.preference.Preference { *; }
 -keep class * extends at.jclehner.rxdroid.db.Database$OnChangedListener { *; }
 -keep class * extends at.jclehner.rxdroid.db.Database$OnInitializedListener { *; }
