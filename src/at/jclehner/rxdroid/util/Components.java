@@ -56,7 +56,7 @@ public final class Components
 			activity.setTheme(Theme.get());
 
 		final String lang = Settings.getString(Keys.LANGUAGE);
-		if(lang != null)
+		if(lang != null && lang.length() != 0)
 		{
 			final Resources res = activity.getResources();
 			final Configuration cfg = res.getConfiguration();

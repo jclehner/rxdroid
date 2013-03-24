@@ -46,10 +46,10 @@ public final class Version
 	 * Short format. Example: <code>1.2.3</code>
 	 */
 	public static final int FORMAT_SHORT = 0;
-	/**
+	/*
 	 * Long format. Example: <code>1.2.3-r6666</code>
 	 */
-	public static final int FORMAT_LONG = 1;
+	//public static final int FORMAT_LONG = 1;
 	/**
 	 * Full format. Example: <code>RxDroid 1.2.3-r6666</code>
 	 */
@@ -60,10 +60,10 @@ public final class Version
 	private static String sAppName;
 
 	/**
-	 * Calls {@link #get(int)} with {@link #FORMAT_LONG}
+	 * Calls {@link #get(int)} with {@link #FORMAT_FULL}
 	 */
 	public static String get() {
-		return get(FORMAT_LONG);
+		return get(FORMAT_FULL);
 	}
 
 	/**
@@ -76,13 +76,11 @@ public final class Version
 		switch(format)
 		{
 			case FORMAT_SHORT:
-				return sVersion;
-
-			case FORMAT_LONG:
-				return get(FORMAT_SHORT) + "-r" + sRevision;
+				return sAppName + " " + sVersion;
 
 			case FORMAT_FULL:
-				return sAppName + " " + get(FORMAT_LONG);
+				return get(FORMAT_SHORT) + "-r" + sRevision;
+
 
 			default:
 				throw new IllegalArgumentException();

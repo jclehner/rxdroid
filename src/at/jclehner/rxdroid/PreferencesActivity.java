@@ -129,9 +129,28 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				}
 			}
 
-			version = getString(R.string.app_name) + " " + version + "\n" +
+			version += "\n" +
 					"Copyright (C) 2011-2013 Joseph Lehner\n" +
 					"<joseph.c.lehner@gmail.com>";
+
+			final String translator = getString(R.string.translator);
+			if(!translator.equals("builtin"))
+			{
+				Log.d(TAG, "translator=" + translator);
+				final Locale l = Locale.getDefault();
+
+				if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+					version += "\n\n";
+				else
+				{
+					// Preference appears to be limited in height on pre-HC
+					// devices... Prefix with an en-dash to make it look a
+					// little less ugly!
+					version += "\n\u2013 ";
+				}
+
+				version += Util.capitalize(l.getDisplayLanguage(l))  + ": " + translator;
+			}
 
 			p.setSummary(version);
 		}
