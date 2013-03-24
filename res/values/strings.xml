@@ -336,7 +336,7 @@
 	<string name="_title_language">Language</string>
 	
 	<string name="_title_use_backup_framework">Back up data</string>
-	<string name="_summary_use_backup_framework">Backup up your data using services such as Google\'s \"Backup &amp; Restore\".</string>
+	<string name="_summary_use_backup_framework">Back up up data using services such as Google\'s \"Backup &amp; Restore\".</string>
 		
 	<!-- 
     Keep at the end of strings.xml!  
