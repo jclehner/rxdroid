@@ -193,7 +193,6 @@
 	
 	<PreferenceScreen android:key="prefscreen_development"
 	    android:title="Development"
-	    android:icon="@android:drawable/ic_menu_preferences"
 	>
 		<at.jclehner.rxdroid.preferences.LanguagePreference 
 	        android:key="@string/key_language"

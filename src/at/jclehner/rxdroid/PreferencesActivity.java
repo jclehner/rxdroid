@@ -121,19 +121,17 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				try
 				{
 					final String apkModDate = new Date(new File(getPackageCodePath()).lastModified()).toString();
-					version = version + "\n" + apkModDate;
+					version = version + "\n(" + apkModDate + ")";
 				}
 				catch(NullPointerException e)
 				{
 					// eat
 				}
 			}
-			else
-			{
-				version = getString(R.string.app_name) + " " + version + "\n" +
-						"Copyright (C) 2011-2013 Joseph Lehner\n" +
-						"<joseph.c.lehner@gmail.com>";
-			}
+
+			version = getString(R.string.app_name) + " " + version + "\n" +
+					"Copyright (C) 2011-2013 Joseph Lehner\n" +
+					"<joseph.c.lehner@gmail.com>";
 
 			p.setSummary(version);
 		}
