@@ -168,7 +168,7 @@ public final class Schedule extends Entry
 			return ZERO_DOSE_ARRAY;
 
 		final SchedulePart[] schedulePartsArray = mSchedulePartsArray.get();
-		if(schedulePartsArray.length != 0)
+		if(schedulePartsArray != null && schedulePartsArray.length != 0)
 		{
 			final int weekday = DateTime.getIsoWeekDayNumberIndex(date);
 			for(SchedulePart part : schedulePartsArray)
