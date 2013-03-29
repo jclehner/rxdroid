@@ -187,6 +187,10 @@ public final class Schedule extends Entry
 		return dose != null ? dose : Fraction.ZERO;
 	}
 
+	public Fraction getDose(int doseTime) {
+		return mDoses.get()[doseTime];
+	}
+
 	public boolean hasNoDoses()
 	{
 		final SchedulePart[] schedulePartsArray = mSchedulePartsArray.get();

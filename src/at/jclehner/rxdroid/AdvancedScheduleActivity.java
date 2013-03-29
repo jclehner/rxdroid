@@ -6,15 +6,16 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ListView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import at.jclehner.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.jclehner.rxdroid.ui.ScheduleViewHolder;
@@ -274,7 +275,8 @@ public class AdvancedScheduleActivity extends ListActivity
 	}
 }
 
-class ScheduleGridAdapter implements ListAdapter
+class ScheduleGrid extends ListView
+		implements ListAdapter
 {
 	static class ViewHolder extends ScheduleViewHolder
 	{
@@ -288,8 +290,10 @@ class ScheduleGridAdapter implements ListAdapter
 	private View[] mViews = new View[8];
 	private BitSet mEnabled = new BitSet(7);
 
-	public ScheduleGridAdapter(Context context)
+	public ScheduleGrid(Context context, AttributeSet attrs)
 	{
+		super(context, attrs);
+
 		for(int i = 0; i != mViews.length; ++i)
 		{
 			final View v = mViews[i] = LayoutInflater.from(context).inflate(R.layout.schedule_day, null);
@@ -306,6 +310,28 @@ class ScheduleGridAdapter implements ListAdapter
 
 			v.setTag(holder);
 		}
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent)
+	{
+		View v = mViews[position];
+		final ViewHolder holder = (ViewHolder) v.getTag();
+
+		final int weekDay = position - 1;
+
+		if(weekDay != NO_WEEKDAY)
+		{
+			final boolean enabled = mEnabled.get(weekDay);
+			holder.dayChecked.setChecked(enabled);
+			holder.doseContainer.setEnabled(enabled);
+		}
+		else
+		{
+			holder.doseContainer.setEnabled(mEnabled.cardinality() < 7);
+		}
+
+		return v;
 	}
 
 	@Override
@@ -335,28 +361,6 @@ class ScheduleGridAdapter implements ListAdapter
 	}
 
 	@Override
-	public View getView(int position, View v, ViewGroup parent)
-	{
-		v = mViews[position];
-		final ViewHolder holder = (ViewHolder) v.getTag();
-
-		final int weekDay = position - 1;
-
-		if(weekDay != NO_WEEKDAY)
-		{
-			final boolean enabled = mEnabled.get(weekDay);
-			holder.dayChecked.setChecked(enabled);
-			holder.doseContainer.setEnabled(enabled);
-		}
-		else
-		{
-
-		}
-
-		return v;
-	}
-
-	@Override
 	public int getItemViewType(int position) {
 		return 0;
 	}
@@ -379,22 +383,6 @@ class ScheduleGridAdapter implements ListAdapter
 	@Override
 	public boolean isEnabled(int position) {
 		return true;
-	}
-}
-
-class ScheduleGrid extends ListView
-{
-	private Fraction[][] mDoses = new Fraction[8][4];
-
-	public ScheduleGrid(Context context)
-	{
-		super(context);
-
-		for(int i = 0; i != mDoses.length; ++i)
-		{
-			for(int j = 0; j != mDoses[i].length; ++j)
-				mDoses[i][j] = Fraction.ZERO;
-		}
 	}
 }
 

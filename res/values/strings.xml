@@ -339,6 +339,16 @@
 	<string name="_summary_use_backup_framework">Back up up data using services such as Google\'s \"Backup &amp; Restore\".</string>
 	
 	<string name="_msg_swipe_to_change_date">You can change the displayed date by swiping left or right</string>
+	
+	<string name="test_schedule">
+	    Mon    0 - 0 - 0 - 1\n
+	    Tue    0 - 1 - 0 - 1\n
+	    Wed    0 - 0 - 0 - 1\n
+	    Thu    0 - 0 - 0 - 1\n
+	    Fri    0 - 0 - 0 - 1\n
+	    Sat    0 - 0 - 0 - 0\n
+	    Sun    0 - 0 - 0 - 0\n  
+	</string>
 		
 	<!-- 
     Keep at the end of strings.xml!  

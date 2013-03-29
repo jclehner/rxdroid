@@ -93,7 +93,7 @@
 			android:exported="false"
 		/>
 		
-		<activity android:name=".AdvancedScheduleActivity"
+		<activity android:name=".AdvancedScheduleActivity2"
 		    android:exported="false"
 		/>
 

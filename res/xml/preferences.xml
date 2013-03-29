@@ -215,13 +215,16 @@
 		    <intent 
 				android:action="android.intent.action.VIEW"
 				android:targetPackage="at.jclehner.rxdroid"
-				android:targetClass="at.jclehner.rxdroid.AdvancedScheduleActivity"
+				android:targetClass="at.jclehner.rxdroid.AdvancedScheduleActivity2"
 			/>
 		    
 		</Preference>
 		
-			    
-	</PreferenceScreen>
+		<Preference android:title="Test"
+		    android:summary="@string/test_schedule"
+		/>
+				    
+</PreferenceScreen>
 	
 	<PreferenceCategory 
 		android:title="@string/_title_about"		

@@ -29,6 +29,10 @@ public class SimpleBitSet
 		mValue = value;
 	}
 
+	public void set(long value) {
+		mValue = value;
+	}
+
 	public void set(int n, boolean value)
 	{
 		if(value)
@@ -41,7 +45,7 @@ public class SimpleBitSet
 		return (mValue & 1 << n) != 0;
 	}
 
-	public int bitCount() {
+	public int cardinality() {
 		return Long.bitCount(mValue);
 	}
 
