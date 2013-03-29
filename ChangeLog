@@ -1,0 +1,15 @@
+0.9.8:
+	* New language: Italian
+	* App now uses backup frameworks such as 
+	  Google's "Backup & Restore"
+	* Updated icons
+	* Minor bugs fixed
+
+0.9.7-2:
+	* Fixed a crash in "Preferences"
+
+0.9.7:
+	* LED color can now be customized (on devices that support it)
+	* Added a "Quiet hours" option to mute notification sound in a specific time interval
+	* The supply can now be edited by long-pressing the supply info in the main view
+	* Fixed a bug that caused notifications to be displayed at the wrong time

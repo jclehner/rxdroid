@@ -61,7 +61,8 @@ public class DrugSupplyMonitor extends TextView implements
 		handleAttributes(attrs);
 	}
 
-	public DrugSupplyMonitor(Context context, AttributeSet attrs, int defStyle) {
+	public DrugSupplyMonitor(Context context, AttributeSet attrs, int defStyle)
+	{
 		super(context, attrs, defStyle);
 		handleAttributes(attrs);
 	}
