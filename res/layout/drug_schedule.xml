@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    	xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
+		android:id="@+id/dose_container"
+		android:layout_height="wrap_content"
+  		android:layout_width="match_parent" 			
+  	>  	
+  	
+	  	<at.jclehner.rxdroid.DoseView android:id="@+id/morning"
+	  		android:layout_height="wrap_content"
+	  		android:layout_width="0dip"
+	  		android:layout_weight="1"
+	  		
+	  		android:nextFocusDown="@+id/noon"
+	  		
+	  		android:focusable="true"
+	  		android:onClick="onDoseViewClick"
+	  	/>	  	
+	  	
+		<include android:id="@+id/divider1" 
+	  		layout="@layout/divider" 
+	  	/>
+	  	
+	  	<at.jclehner.rxdroid.DoseView android:id="@+id/noon"
+	  		android:layout_height="wrap_content"
+	  		android:layout_width="0dip"
+	  		android:layout_weight="1"
+	  		
+	  		android:nextFocusDown="@+id/evening"
+	  		
+	  		android:focusable="true"
+	  		android:onClick="onDoseViewClick"
+	  	/>
+	  	
+	  	<include android:id="@+id/divider2" 
+	  		layout="@layout/divider" 
+	  	/>
+	  	
+	  	<at.jclehner.rxdroid.DoseView android:id="@+id/evening"
+	  		android:layout_height="wrap_content"
+	  		android:layout_width="0dip"
+	  		android:layout_weight="1"
+	  		
+	  		android:nextFocusDown="@+id/night"
+	  		
+	  		android:focusable="true"
+	  		android:onClick="onDoseViewClick"
+	  	/>
+	  	
+	  	<include android:id="@+id/divider3" 
+	  		layout="@layout/divider" 
+	  	/>
+	  	
+	  	<at.jclehner.rxdroid.DoseView android:id="@+id/night"
+	  		android:layout_height="wrap_content"
+	  		android:layout_width="0dip"
+	  		android:layout_weight="1"
+	  		
+	  		android:focusable="true"
+	  		android:onClick="onDoseViewClick"
+	  	/>	  	
+	  		
+	  </LinearLayout>

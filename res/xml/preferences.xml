@@ -202,7 +202,25 @@
 	    
 		<Preference android:key="db_create_drug_with_schedule"
 			android:title="Custom schedule drug"
-		/>	    
+		/>
+		
+		<EditTextPreference android:key="doseview_zero"
+		    android:title="DoseView zero"
+		    android:defaultValue="0"
+		/>    
+		    		
+		<Preference
+		    android:title="Advanced schedule"
+		>
+		    <intent 
+				android:action="android.intent.action.VIEW"
+				android:targetPackage="at.jclehner.rxdroid"
+				android:targetClass="at.jclehner.rxdroid.AdvancedScheduleActivity"
+			/>
+		    
+		</Preference>
+		
+			    
 	</PreferenceScreen>
 	
 	<PreferenceCategory 

@@ -26,6 +26,9 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.text.SpannableStringBuilder;
 import android.text.style.SuperscriptSpan;
@@ -202,9 +205,20 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	}
 
 	@Override
+	public void setEnabled(boolean enabled)
+	{
+		super.setEnabled(enabled);
+
+		final int alpha = enabled ? 0xff : 0x7f;
+		mDoseTimeIcon.setImageAlpha(alpha);
+		//mDoseText.setAlpha(alpha / 255.0f);
+		mDoseText.setEnabled(enabled);
+	}
+
+	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		if(isClickable())
+		if(isClickable() && isEnabled())
 		{
 			// This background change could of course be handled more elegantly
 			// using a drawable selector, but state_pressed is much less responsive
@@ -379,6 +393,16 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		}
 		else if(mDisplayDose != null)
 			mDoseText.setText(mDisplayDose.toString());
+
+		if(BuildConfig.DEBUG)
+		{
+			if("0".equals(mDoseText.getText()))
+			{
+				final String zeroStr = Settings.getString("doseview_zero");
+				if(zeroStr != null)
+					mDoseText.setText(zeroStr);
+			}
+		}
 	}
 
 	private void setStatus(int status)
@@ -402,5 +426,13 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		}
 
 		mIntakeStatus.setImageResource(imageResId);
+	}
+
+	private static class LightenerFilter extends PorterDuffColorFilter
+	{
+		public LightenerFilter()
+		{
+			super(Color.BLACK, PorterDuff.Mode.LIGHTEN);
+		}
 	}
 }

@@ -182,6 +182,7 @@ public final class InstanceState
 
 				final String mapKey = f.getName() + "@" + clazz.getName();
 				if(LOGV) Log.v(TAG, "  " + f.getName() + " (" + mapKey + ")");
+				f.setAccessible(true);
 				callback.invoke(o, f, mapKey);
 			}
 		}

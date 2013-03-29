@@ -92,6 +92,20 @@
 	
 	<!-- second line: dose views android:layout_alignBottom="@id/drug_icon" -->
   	
+  	<include layout="@layout/drug_schedule"
+  	    android:layout_height="wrap_content"
+  	    android:layout_width="match_parent"
+  	
+  		android:focusable="true"
+  		android:descendantFocusability="afterDescendants"
+  		android:nextFocusDown="@+id/morning"
+  		
+  		android:layout_toRightOf="@id/drug_icon"
+  		android:layout_toLeftOf="@+id/indicators"
+  		android:layout_below="@id/drug_name"
+  	/>  	
+  	
+  	<!--  
   	<LinearLayout android:id="@id/dose_container"
   		android:layout_height="wrap_content"
   		android:layout_width="match_parent"
@@ -160,6 +174,8 @@
 	  	/>	  	
 	  		
 	  </LinearLayout>
+	  -->
+	  
 	  <LinearLayout android:id="@id/indicators"
 	  		android:layout_height="match_parent"
 	  		android:layout_width="48dip"

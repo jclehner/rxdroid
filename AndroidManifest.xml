@@ -92,6 +92,10 @@
 		<activity android:name=".HelpActivity"
 			android:exported="false"
 		/>
+		
+		<activity android:name=".AdvancedScheduleActivity"
+		    android:exported="false"
+		/>
 
 		<uses-library android:name="android.test.runner" />
 

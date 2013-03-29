@@ -61,6 +61,8 @@ public enum AutoIntakeCreator implements
 	@Override
 	public void onDatabaseInitialized()
 	{
+		Settings.init();
+
 		if(Database.countAll(Patient.class) == 0)
 			Database.create(new Patient(), Database.FLAG_DONT_NOTIFY_LISTENERS);
 
