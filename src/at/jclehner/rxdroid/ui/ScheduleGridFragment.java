@@ -3,7 +3,10 @@ package at.jclehner.rxdroid.ui;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -43,10 +46,12 @@ public class ScheduleGridFragment extends ListFragment implements
 
 		for(int i = 0; i != mHolders.length; ++i)
 		{
+			final int weekDay = i - 1;
+
 			final ViewHolder holder = mHolders[i] = new ViewHolder();
 			final View v = mHolders[i].view = getLayoutInflater(icicle).inflate(R.layout.schedule_day, null);
 
-			holder.fillDoseViewsAndDividers(v);
+			holder.setDoseViewsAndDividersFromLayout(v);
 
 			holder.dayContainer = (ViewGroup) v.findViewById(R.id.day_container);
 			holder.dayChecked = (CheckBox) v.findViewById(R.id.day_checked);
@@ -54,12 +59,21 @@ public class ScheduleGridFragment extends ListFragment implements
 
 			holder.dayChecked.setOnCheckedChangeListener(this);
 
-			if(i != 0)
+			if(weekDay != NO_WEEKDAY)
 				holder.dayName.setText(Constants.SHORT_WEEK_DAY_NAMES[i - 1]);
+			else
+			{
+				if(false)
+				{
+					SpannableString ss = new SpannableString("Mon\nTue\nWed\nThu\nFri\nSat\nSun");
+					Util.applyStyle(ss, new RelativeSizeSpan(0.75f));
+					holder.dayChecked.setVisibility(View.GONE);
+					holder.dayName.setText(ss);
+					holder.dayName.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
+				}
+			}
 
 			holder.dayContainer.setVisibility(i == 0 ? View.INVISIBLE : View.VISIBLE);
-
-			final int weekDay = i - 1;
 
 			for(DoseView dv : holder.doseViews)
 			{
@@ -265,7 +279,10 @@ public class ScheduleGridFragment extends ListFragment implements
 
 		final ViewHolder holder = mHolders[weekDay + 1];
 		for(DoseView dv : holder.doseViews)
+		{
 			dv.setEnabled(enabled);
+			dv.setDoseTimeIconVisible(enabled);
+		}
 	}
 
 	private void setWeekDayEnabled(int weekDay, boolean enabled)

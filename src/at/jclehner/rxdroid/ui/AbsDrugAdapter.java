@@ -107,17 +107,17 @@ public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 		}
 	}
 
-	static class DoseViewHolder
+	static class DoseViewHolder extends ScheduleViewHolder
 	{
 		DrugNameView name;
 		ImageView icon;
-		DoseView[] doseViews = new DoseView[4];
+		//DoseView[] doseViews = new DoseView[4];
 		View missedDoseIndicator;
 		//View lowSupplyIndicator;
 		DrugSupplyMonitor currentSupply;
 		//TextView info1;
 		//TextView info2;
-		View[] dividers = new View[3];
+		//View[] dividers = new View[3];
 	}
 }
 

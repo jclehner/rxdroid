@@ -14,7 +14,7 @@ public class ScheduleViewHolder
 	public DoseView[] doseViews = new DoseView[4];
 	public View[] dividers = new View[3];
 
-	public void fillDoseViewsAndDividers(View layout)
+	public void setDoseViewsFromLayout(View layout)
 	{
 		doseContainer = (ViewGroup) layout.findViewById(R.id.dose_container);
 
@@ -23,11 +23,20 @@ public class ScheduleViewHolder
 			final int id = Constants.DOSE_VIEW_IDS[i];
 			doseViews[i] = (DoseView) layout.findViewById(id);
 		}
+	}
 
+	public void setDividersFromLayout(View layout)
+	{
 		for(int i = 0; i != dividers.length; ++i)
 		{
 			final int id = DIVIDER_IDS[i];
 			dividers[i] = layout.findViewById(id);
 		}
+	}
+
+	public void setDoseViewsAndDividersFromLayout(View layout)
+	{
+		setDoseViewsFromLayout(layout);
+		setDividersFromLayout(layout);
 	}
 }

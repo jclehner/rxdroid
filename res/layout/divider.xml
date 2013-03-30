@@ -29,7 +29,7 @@
 >
 -->
 	<View xmlns:android="http://schemas.android.com/apk/res/android"
-		android:layout_width="2dip"
+		android:layout_width="@dimen/divider_width"
 		android:layout_height="match_parent"
 		android:layout_marginLeft="0dip"
 		android:layout_marginRight="6dip"	

@@ -25,17 +25,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
+import android.support.v4.view.ViewCompat;
 import android.text.SpannableStringBuilder;
 import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -165,6 +168,10 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		return mDate;
 	}
 
+	public void setDoseTimeIconVisible(boolean visible) {
+		mDoseTimeIcon.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+	}
+
 	public void setDoseFromDrugAndDate(Date date, Drug drug)
 	{
 		if(date == null || drug == null)
@@ -204,13 +211,19 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		return mStatus == STATUS_TAKEN;
 	}
 
+	@TargetApi(16)
+	@SuppressWarnings("deprecation")
 	@Override
 	public void setEnabled(boolean enabled)
 	{
 		super.setEnabled(enabled);
 
 		final int alpha = enabled ? 0xff : 0x7f;
-		mDoseTimeIcon.setImageAlpha(alpha);
+
+		if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
+			mDoseTimeIcon.setImageAlpha(alpha);
+		else
+			mDoseTimeIcon.setAlpha(alpha);
 		//mDoseText.setAlpha(alpha / 255.0f);
 		mDoseText.setEnabled(enabled);
 	}

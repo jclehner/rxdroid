@@ -28,5 +28,6 @@
 	<dimen name="keypad_button_width">70dip</dimen>
 	<dimen name="keypad_button_margin">2dip</dimen>
 	<dimen name="keypad_margin_bottom">20dip</dimen>	
-	<dimen name="pin_margin">20dip</dimen>		
+	<dimen name="pin_margin">20dip</dimen>
+	<dimen name="divider_width">2dip</dimen>		
 </resources>

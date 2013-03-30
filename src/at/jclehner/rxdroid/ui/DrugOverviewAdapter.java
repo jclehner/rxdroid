@@ -87,9 +87,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 				mActivity.registerForContextMenu(holder.doseViews[i]);
 			}
 
-			final int[] dividerIds = { R.id.divider1, R.id.divider2, R.id.divider3 /*, R.id.divider4*/ };
-			for(int i = 0; i != holder.dividers.length; ++i)
-				holder.dividers[i] = v.findViewById(dividerIds[i]);
+			holder.setDividersFromLayout(v);
 
 			v.setTag(holder);
 		}
@@ -159,6 +157,12 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			final double timePerView = elapsed / viewCount;
 
 			Log.v(TAG, mAdapterDate + ": " + viewCount + " views created in " + elapsed + "s (" + timePerView + "s per view)");
+		}
+
+		if(BuildConfig.DEBUG)
+		{
+			holder.dividers[1].setVisibility(View.VISIBLE);
+			holder.dividers[2].setVisibility(View.VISIBLE);
 		}
 
 		return v;

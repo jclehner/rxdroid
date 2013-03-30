@@ -147,7 +147,7 @@ public class AdvancedScheduleActivity extends ListActivity
 				//holder = mHolders[position] = new ViewHolder();
 
 				holder.view = LayoutInflater.from(getBaseContext()).inflate(R.layout.schedule_day, null);
-				holder.fillDoseViewsAndDividers(holder.view);
+				holder.setDoseViewsAndDividersFromLayout(holder.view);
 
 				holder.dayContainer = (ViewGroup) holder.view.findViewById(R.id.day_container);
 				holder.dayChecked = (CheckBox) holder.view.findViewById(R.id.day_checked);
@@ -299,7 +299,7 @@ class ScheduleGrid extends ListView
 			final View v = mViews[i] = LayoutInflater.from(context).inflate(R.layout.schedule_day, null);
 
 			ViewHolder holder = new ViewHolder();
-			holder.fillDoseViewsAndDividers(v);
+			holder.setDoseViewsAndDividersFromLayout(v);
 
 			holder.dayContainer = (ViewGroup) v.findViewById(R.id.day_container);
 			holder.dayChecked = (CheckBox) v.findViewById(R.id.day_checked);
