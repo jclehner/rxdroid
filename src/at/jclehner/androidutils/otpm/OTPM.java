@@ -269,7 +269,8 @@ public class OTPM
 				prefCat = new PreferenceCategory(context);
 				prefCat.setTitle(categoryTitle);
 
-				String prefCatKey = Reflect.getAnnotationParameter(a, "categoryKey");
+				String prefCatKey = a.categoryKey();
+//				String prefCatKey = Reflect.getAnnotationParameter(a, "categoryKey");
 				if(prefCatKey == null || prefCatKey == UNDEFINED)
 					prefCat.setKey(categoryTitle);
 				else
@@ -277,7 +278,7 @@ public class OTPM
 
 				root.addPreference(prefCat);
 			}
-			else if((Boolean) Reflect.getAnnotationParameter(a, "endActiveCategory"))
+			else if(a.endActiveCategory())
 				prefCat = null;
 
 			if(prefCat != null)
