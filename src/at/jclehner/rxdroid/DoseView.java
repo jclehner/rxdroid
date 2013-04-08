@@ -213,18 +213,20 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	@TargetApi(16)
 	@SuppressWarnings("deprecation")
+	public void setDoseTimeIconAlpha(int alpha)
+	{
+		if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
+			mDoseTimeIcon.setImageAlpha(alpha);
+		else
+			mDoseTimeIcon.setAlpha(alpha);
+	}
+
 	@Override
 	public void setEnabled(boolean enabled)
 	{
 		super.setEnabled(enabled);
 
-		final int alpha = enabled ? 0xff : 0x7f;
-
-		if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
-			mDoseTimeIcon.setImageAlpha(alpha);
-		else
-			mDoseTimeIcon.setAlpha(alpha);
-		//mDoseText.setAlpha(alpha / 255.0f);
+		setDoseTimeIconAlpha(enabled ? 0xff : 0x7f);
 		mDoseText.setEnabled(enabled);
 	}
 

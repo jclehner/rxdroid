@@ -68,10 +68,13 @@ public class RxDroid extends Application
 
 		Components.onCreate(getContext(), Components.NO_DATABASE_INIT | Components.NO_SETTINGS_INIT);
 
-		final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-		final String lang = sp.getString(Settings.Keys.LANGUAGE, null);
-		if(lang != null)
-			LanguagePreference.setLanguage(lang);
+		if(BuildConfig.DEBUG)
+		{
+			final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+			final String lang = sp.getString(Settings.Keys.LANGUAGE, null);
+			if(lang != null)
+				LanguagePreference.setLanguage(lang);
+		}
 
 		super.onCreate();
 	}

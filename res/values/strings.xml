@@ -340,7 +340,7 @@
 	
 	<string name="_msg_swipe_to_change_date">You can change the displayed date by swiping left or right</string>
 	
-	<string name="test_schedule">
+	<string translatable="false" name="test_schedule">
 	    Mon    0 - 0 - 0 - 1\n
 	    Tue    0 - 1 - 0 - 1\n
 	    Wed    0 - 0 - 0 - 1\n

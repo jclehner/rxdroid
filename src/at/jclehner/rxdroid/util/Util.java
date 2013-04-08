@@ -445,6 +445,8 @@ public final class Util
 		char first = str.charAt(0);
 		if(Character.isLetter(first) && Character.isLowerCase(first))
 			first = Character.toUpperCase(first);
+		else
+			return str;
 
 		if(str.length() > 1)
 			return first + str.substring(1);
