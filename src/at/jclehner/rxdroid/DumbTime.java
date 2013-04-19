@@ -28,7 +28,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import android.text.format.DateFormat;
 import android.widget.TimePicker;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.Hasher;
@@ -170,20 +169,21 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 
 	public String toString(boolean use24HourTime, boolean withMillis)
 	{
-		final boolean is24HourFormat = DateFormat.is24HourFormat(RxDroid.getContext());
 		final StringBuilder pattern = new StringBuilder();
 
-		if(is24HourFormat)
-			pattern.append("HH:mm");
+		if(use24HourTime)
+			pattern.append("HH");
 		else
-			pattern.append("K:mm");
+			pattern.append("h");
+
+		pattern.append(":mm");
 
 		if(withMillis)
 			pattern.append(":ss.SSS");
 		else if(mSeconds != 0)
 			pattern.append(":ss");
 
-		if(!is24HourFormat)
+		if(!use24HourTime)
 			pattern.append(" aa");
 
 		final SimpleDateFormat sdf = new SimpleDateFormat(pattern.toString());
@@ -211,7 +211,6 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	public static DumbTime now() {
 		return fromDate(new Date());
 	}
-
 
 	public static DumbTime fromString(String timeString)
 	{

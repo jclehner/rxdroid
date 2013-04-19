@@ -157,6 +157,13 @@ public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
 	}
 
 	@Override
+	protected String toPersistedString(TimePeriod value)
+	{
+		String str = value.toString();
+		return str;
+	}
+
+	@Override
 	protected TimePeriod fromPersistedString(String string) {
 		return TimePeriod.fromString(string);
 	}
@@ -166,6 +173,7 @@ public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
 	{
 		final String beginStr = DateTime.toNativeTime(value.begin());
 		final String endStr = DateTime.toNativeTime(value.end());
+
 		return getContext().getString(R.string._title_x_to_y, beginStr, endStr);
 	}
 

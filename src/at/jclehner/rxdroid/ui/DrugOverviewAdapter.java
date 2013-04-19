@@ -161,8 +161,8 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		if(BuildConfig.DEBUG)
 		{
-			holder.dividers[1].setVisibility(View.VISIBLE);
-			holder.dividers[2].setVisibility(View.VISIBLE);
+			//holder.dividers[1].setVisibility(View.VISIBLE);
+			//holder.dividers[2].setVisibility(View.VISIBLE);
 		}
 
 		return v;

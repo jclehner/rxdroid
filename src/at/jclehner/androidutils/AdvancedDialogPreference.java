@@ -94,7 +94,7 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	{
 		super(context, attrs, defStyle);
 		handleAttributes(attrs);
-		Log.d(TAG, "ctor: key=" + getKey());
+		if(LOGV) Log.d(TAG, "ctor: key=" + getKey());
 	}
 
 	public AdvancedDialogPreference(Context context, AttributeSet attrs) {

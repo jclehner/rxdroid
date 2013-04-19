@@ -409,14 +409,18 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		else if(mDisplayDose != null)
 			mDoseText.setText(mDisplayDose.toString());
 
-		if(BuildConfig.DEBUG)
+		if("0".equals(mDoseText.getText()))
 		{
-			if("0".equals(mDoseText.getText()))
-			{
-				final String zeroStr = Settings.getString("doseview_zero");
-				if(zeroStr != null)
-					mDoseText.setText(zeroStr);
-			}
+			String zeroStr = null;
+
+			if(BuildConfig.DEBUG)
+				zeroStr = Settings.getString("doseview_zero");
+
+			if(zeroStr == null)
+				zeroStr = "-";
+
+			mDoseText.setText(zeroStr);
+
 		}
 	}
 
@@ -441,13 +445,5 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		}
 
 		mIntakeStatus.setImageResource(imageResId);
-	}
-
-	private static class LightenerFilter extends PorterDuffColorFilter
-	{
-		public LightenerFilter()
-		{
-			super(Color.BLACK, PorterDuff.Mode.LIGHTEN);
-		}
 	}
 }
