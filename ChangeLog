@@ -1,3 +1,8 @@
+0.9.9:
+	* Fixed bug that prevented setting the time intervals correctly when using 12-hour clock
+	* Updated Italian translation
+	* Times without a dose are now displayed as "-"
+
 0.9.8:
 	* New language: Italian
 	* App now uses backup frameworks such as 
