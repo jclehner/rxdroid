@@ -528,8 +528,17 @@ public final class Settings
 	public static int getStringAsInt(String key, int defValue)
 	{
 		final String value = getString(key);
-		if(value != null)
-			return Integer.parseInt(value);
+		if(value != null && value.length() != 0)
+		{
+			try
+			{
+				return Integer.parseInt(value);
+			}
+			catch(NumberFormatException e)
+			{
+				Log.w(TAG, "getStringAsInt", e);
+			}
+		}
 
 		return defValue;
 	}
