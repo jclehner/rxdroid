@@ -23,7 +23,7 @@ package at.jclehner.rxdroid.db.v53;
 
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
-import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.DoseEvent;
 
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
@@ -54,7 +54,7 @@ public class OldIntake extends Entry
 	@Override
 	public Entry convertToCurrentDatabaseFormat()
 	{
-		final Intake newIntake = new Intake();
+		final DoseEvent newIntake = new DoseEvent();
 		Entry.copy(newIntake, this);
 
 		newIntake.setDose(OldDrug.convertFraction(dose));

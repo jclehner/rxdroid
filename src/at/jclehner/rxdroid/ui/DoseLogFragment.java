@@ -25,7 +25,7 @@ import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
-import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.SimpleBaseExpandanbleListAdapter;
@@ -54,7 +54,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		super.onCreate(savedInstanceState);
 
 		mToday = DateTime.today();
-		gatherEvents();
+		gatherEventInfos();
 		setListAdapter(new Adapter());
 	}
 
@@ -62,27 +62,24 @@ public class DoseLogFragment extends ExpandableListFragment
 		return Drug.get(getArguments().getInt("drug_id"));
 	}
 
-	private void gatherEvents()
+	private void gatherEventInfos()
 	{
 		final Timer t;
 		if(LOGV)
 			t = new Timer();
 
 		final Drug drug = getDrug();
-		final List<Intake> intakes = Entries.findIntakes(drug, null, null);
-		if(intakes.isEmpty())
+		final List<DoseEvent> events = Entries.findDoseEvents(drug, null, null);
+		if(events.isEmpty())
 			return;
 
-		Date date = Settings.getOldestPossibleHistoryDate(mToday);
-
 		Date date = Settings.getDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME);
-
 		if(date == null)
-			date = intakes.get(0).getDate();
+			date = events.get(0).getDate();
 
-		List<EventInfo> events = new ArrayList<EventInfo>();
-		for(Intake intake : intakes)
-			events.add(EventInfo.newTakenOrIgnoredEvent(intake));
+		List<EventInfo> infos = new ArrayList<EventInfo>();
+		for(DoseEvent event : events)
+			infos.add(EventInfo.newTakenOrIgnoredEvent(event));
 
 //		final Date lastDosesClearedDate = drug.getLastDosesClearedDate();
 //		if(lastDosesClearedDate != null)
@@ -100,10 +97,10 @@ public class DoseLogFragment extends ExpandableListFragment
 				{
 					Fraction dose = drug.getDose(doseTime, date);
 
-					if(!dose.isZero() && !containsDoseEvent(intakes, date, doseTime))
+					if(!dose.isZero() && !containsDoseEvent(events, date, doseTime))
 					{
 						//Log.d(TAG, "Creating missed event: date=" + date + ", doseTime=" + doseTime);
-						events.add(EventInfo.newMissedEvent(date, doseTime));
+						infos.add(EventInfo.newMissedEvent(date, doseTime));
 					}
 				}
 			}
@@ -111,20 +108,20 @@ public class DoseLogFragment extends ExpandableListFragment
 			date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
 		}
 
-		Collections.sort(events, EventInfoByDateComparator.INSTANCE);
+		Collections.sort(infos, EventInfoByDateComparator.INSTANCE);
 
 		mGroupedEvents = new ArrayList<List<EventInfo>>();
 
 		for(int i = 0; i < events.size();)
 		{
-			date = events.get(i).date;
+			date = infos.get(i).date;
 
 			final List<EventInfo> group = new ArrayList<EventInfo>();
 
-			while(i < events.size() && date.equals(events.get(i).date))
+			while(i < events.size() && date.equals(infos.get(i).date))
 			{
 				//Log.d(TAG, "  CHILD: " + events.get(i));
-				group.add(events.get(i));
+				group.add(infos.get(i));
 				++i;
 			}
 
@@ -136,9 +133,9 @@ public class DoseLogFragment extends ExpandableListFragment
 		if(LOGV) Log.d(TAG, "gatherEvents: " + t);
 	}
 
-	private static boolean containsDoseEvent(List<Intake> doseEvents, Date date, int doseTime)
+	private static boolean containsDoseEvent(List<DoseEvent> doseEvents, Date date, int doseTime)
 	{
-		for(Intake doseEvent : doseEvents)
+		for(DoseEvent doseEvent : doseEvents)
 		{
 			if(doseEvent.getDate().equals(date) && doseEvent.getDoseTime() == doseTime)
 				return true;
@@ -243,7 +240,7 @@ public class DoseLogFragment extends ExpandableListFragment
 
 			holder.dose.setDoseTime(event.doseTime);
 
-			final Intake doseEvent = event.intake;
+			final DoseEvent doseEvent = event.intake;
 			if(doseEvent != null)
 			{
 				holder.dose.setDose(doseEvent.getDose());
@@ -374,9 +371,9 @@ class EventInfo
 	final int doseTime;
 	final int status;
 
-	final Intake intake;
+	final DoseEvent intake;
 
-	static EventInfo newTakenOrIgnoredEvent(Intake intake) {
+	static EventInfo newTakenOrIgnoredEvent(DoseEvent intake) {
 		return new EventInfo(intake);
 	}
 
@@ -429,7 +426,7 @@ class EventInfo
 		return date.getTime();
 	}
 
-	private EventInfo(Intake intake)
+	private EventInfo(DoseEvent intake)
 	{
 		timestamp = intake.getTimestamp();
 		date = intake.getDate();

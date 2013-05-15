@@ -76,7 +76,7 @@ public final class Entries
 		return names;
 	}
 
-	public static boolean hasMissingIntakesBeforeDate(Drug drug, Date date)
+	public static boolean hasMissingDosesBeforeDate(Drug drug, Date date)
 	{
 		if(!drug.isActive())
 			return false;
@@ -114,11 +114,11 @@ public final class Entries
 			if(!isDateAfterLastScheduleUpdateOfDrug(lastIntakeDate, drug))
 				return false;
 
-			return !hasAllIntakes(drug, lastIntakeDate);
+			return !hasAllDoseEvents(drug, lastIntakeDate);
 		}
 		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
 		{
-			// FIXME this may fail to report a missed Intake if
+			// FIXME this may fail to report a missed intake if
 			// the dose was taken on a later date (i.e. unscheduled)
 			// in the week before.
 
@@ -136,7 +136,7 @@ public final class Entries
 					if(!drug.getDose(doseTime, checkDate).isZero())
 					{
 						++expectedIntakeCount;
-						actualScheduledIntakeCount += countIntakes(drug, checkDate, doseTime);
+						actualScheduledIntakeCount += countDoseEvents(drug, checkDate, doseTime);
 					}
 				}
 			}
@@ -164,7 +164,7 @@ public final class Entries
 		{
 			for(int doseTime : Constants.DOSE_TIMES)
 			{
-				if(countIntakes(drug, date, doseTime) == 0)
+				if(countDoseEvents(drug, date, doseTime) == 0)
 					doseLeftOnDate.add(drug.getDose(doseTime, date));
 			}
 		}
@@ -185,41 +185,41 @@ public final class Entries
 	}
 
 	/**
-	 * Find all intakes meeting the specified criteria.
+	 * Find all events meeting the specified criteria.
 	 * <p>
 	 * @param drug The drug to search for (based on its database ID).
-	 * @param date The Intake's date. Can be <code>null</code>.
-	 * @param doseTime The Intake's doseTime. Can be <code>null</code>.
+	 * @param date The intake's date. Can be <code>null</code>.
+	 * @param doseTime The intake's doseTime. Can be <code>null</code>.
 	 */
-	public static List<Intake> findIntakes(Drug drug, Date date, Integer doseTime)
+	public static List<DoseEvent> findDoseEvents(Drug drug, Date date, Integer doseTime)
 	{
-		final List<Intake> intakes = new LinkedList<Intake>();
+		final List<DoseEvent> events = new LinkedList<DoseEvent>();
 
-		for(Intake intake : Database.getCached(Intake.class))
+		for(DoseEvent intake : Database.getCached(DoseEvent.class))
 		{
-			if(Intake.has(intake, drug, date, doseTime))
-				intakes.add(intake);
+			if(DoseEvent.has(intake, drug, date, doseTime))
+				events.add(intake);
 		}
 
-		return intakes;
+		return events;
 	}
 
-	public static int countIntakes(Drug drug, Date date, Integer doseTime) {
-		return findIntakes(drug, date, doseTime).size();
+	public static int countDoseEvents(Drug drug, Date date, Integer doseTime) {
+		return findDoseEvents(drug, date, doseTime).size();
 	}
 
-	public static boolean hasAllIntakes(Drug drug, Date date)
+	public static boolean hasAllDoseEvents(Drug drug, Date date)
 	{
 		if(!drug.hasDoseOnDate(date))
 			return true;
 
-		//List<Intake> intakes = findAll(drug, date, null);
+		//List<intake> events = findAll(drug, date, null);
 		for(int doseTime : Constants.DOSE_TIMES)
 		{
 			Fraction dose = drug.getDose(doseTime, date);
 			if(!dose.isZero())
 			{
-				if(countIntakes(drug, date, doseTime) == 0)
+				if(countDoseEvents(drug, date, doseTime) == 0)
 					return false;
 			}
 		}

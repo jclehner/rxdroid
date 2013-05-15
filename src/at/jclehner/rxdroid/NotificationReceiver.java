@@ -455,7 +455,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(!drug.isActive() || dose.isZero() || drug.isAutoAddIntakesEnabled() || drug.getRepeatMode() == Drug.REPEAT_AS_NEEDED)
 				continue;
 
-			if(Entries.countIntakes(drug, date, doseTime) == 0)
+			if(Entries.countDoseEvents(drug, date, doseTime) == 0)
 			{
 				++count;
 

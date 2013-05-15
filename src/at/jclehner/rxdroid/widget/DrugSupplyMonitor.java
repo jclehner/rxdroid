@@ -40,7 +40,7 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
-import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
@@ -130,12 +130,12 @@ public class DrugSupplyMonitor extends TextView implements
 
 			drug = (Drug) entry;
 		}
-		else if(entry instanceof Intake)
+		else if(entry instanceof DoseEvent)
 		{
-			if(mDrug.getId() != ((Intake) entry).getDrugId())
+			if(mDrug.getId() != ((DoseEvent) entry).getDrugId())
 				return;
 
-			drug = ((Intake) entry).getDrug();
+			drug = ((DoseEvent) entry).getDrug();
 		}
 		else
 			return;

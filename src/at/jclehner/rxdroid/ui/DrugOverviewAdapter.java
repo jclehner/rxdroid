@@ -107,7 +107,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		if(today.equals(mAdapterDate))
 		{
-			if(Entries.hasMissingIntakesBeforeDate(drug, mAdapterDate))
+			if(Entries.hasMissingDosesBeforeDate(drug, mAdapterDate))
 			{
 				if(holder.missedDoseIndicator instanceof ViewStub)
 					holder.missedDoseIndicator = ((ViewStub) holder.missedDoseIndicator).inflate();

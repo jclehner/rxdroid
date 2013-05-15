@@ -88,7 +88,7 @@ public final class Database
 
 	static final Class<?>[] CLASSES = {
 		Drug.class,
-		Intake.class,
+		DoseEvent.class,
 		Patient.class,
 		Schedule.class,
 		// XXX

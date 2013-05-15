@@ -36,7 +36,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
-import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.ui.DoseLogFragment;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.Constants;
@@ -98,12 +98,12 @@ public class DoseHistoryActivity extends FragmentActivity
 	class DoseHistoryAdapter extends BaseExpandableListAdapter
 	{
 		private Context mContext;
-		final List<Intake> mIntakes;
+		final List<DoseEvent> mIntakes;
 
 		public DoseHistoryAdapter(Context context, Drug drug)
 		{
 			mContext = context;
-			mIntakes = Entries.findIntakes(drug, null, null);
+			mIntakes = Entries.findDoseEvents(drug, null, null);
 		}
 
 		@Override
@@ -119,7 +119,7 @@ public class DoseHistoryActivity extends FragmentActivity
 		@Override
 		public View getGroupView(int groupPosition, boolean isExpanded, View view, ViewGroup parent)
 		{
-			final Intake intake = mIntakes.get(groupPosition);
+			final DoseEvent intake = mIntakes.get(groupPosition);
 			final TextView tv;
 
 			if(view == null)
@@ -158,7 +158,7 @@ public class DoseHistoryActivity extends FragmentActivity
 		@Override
 		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent)
 		{
-			final Intake intake = mIntakes.get(groupPosition);
+			final DoseEvent intake = mIntakes.get(groupPosition);
 			final TextView tv;
 
 			if(convertView == null)

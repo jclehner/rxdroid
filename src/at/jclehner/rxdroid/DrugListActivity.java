@@ -71,7 +71,7 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
-import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.ui.DrugOverviewAdapter;
@@ -320,7 +320,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 					else
 					{
 						MutableFraction dose = new MutableFraction();
-						for(Intake intake : Entries.findIntakes(drug, mCurrentDate, doseTime))
+						for(DoseEvent intake : Entries.findDoseEvents(drug, mCurrentDate, doseTime))
 						{
 							dose.add(intake.getDose());
 							Database.delete(intake);
@@ -342,7 +342,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 						@Override
 						public boolean onMenuItemClick(MenuItem item)
 						{
-							Database.create(new Intake(drug, doseView.getDate(), doseTime));
+							Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
 							return true;
 						}
 					});
@@ -787,13 +787,13 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			if(!drug.isActive())
 				return false;
 
-			if(Entries.countIntakes(drug, mFilterDate, null) != 0)
+			if(Entries.countDoseEvents(drug, mFilterDate, null) != 0)
 				return true;
 
 			if(Entries.hasLowSupplies(drug))
 				return true;
 
-			if(DateTime.isToday(mFilterDate) && Entries.hasMissingIntakesBeforeDate(drug, mFilterDate))
+			if(DateTime.isToday(mFilterDate) && Entries.hasMissingDosesBeforeDate(drug, mFilterDate))
 				return true;
 
 			if(!drug.hasDoseOnDate(mFilterDate))

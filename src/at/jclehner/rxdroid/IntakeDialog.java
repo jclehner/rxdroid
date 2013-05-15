@@ -40,7 +40,7 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
-import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Schedule;
 
 public class IntakeDialog extends AlertDialog implements OnChangedListener, Database.OnChangeListener
@@ -219,7 +219,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 		if(LOGV) Log.v(TAG, "update: doseTime=" + doseTime + ", date=" + date + ", drug=" + drug);
 
-		mIntakeCount = Entries.countIntakes(drug, date, doseTime);
+		mIntakeCount = Entries.countDoseEvents(drug, date, doseTime);
 
 		if(mIntakeCount == 0)
 			mDose = drug.getDose(doseTime, date);
@@ -264,7 +264,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		mDrug.setCurrentSupply(newSupply.isNegative() ? new Fraction() : newSupply);
 		Database.update(mDrug, Database.FLAG_DONT_NOTIFY_LISTENERS);
 
-		Intake intake = new Intake(mDrug, mDate, mDoseTime, mDose);
+		DoseEvent intake = new DoseEvent(mDrug, mDate, mDoseTime, mDose);
 		Database.create(intake);
 
 		dismiss();

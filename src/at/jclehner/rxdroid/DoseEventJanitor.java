@@ -31,7 +31,7 @@ import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
-import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.Constants;
@@ -78,14 +78,14 @@ public enum DoseEventJanitor implements
 
 		final Date today = DateTime.today();
 
-		final List<Intake> intakes = Database.getAll(Intake.class);
+		final List<DoseEvent> events = Database.getAll(DoseEvent.class);
 //		final ArrayList<Integer> idsToDelete = new ArrayList<Integer>();
-		final int oldIntakeCount = intakes.size();
+		final int oldIntakeCount = events.size();
 		int deleteCount = 0;
 
 		Date oldest = null, newest = null;
 
-		for(Intake intake : intakes)
+		for(DoseEvent intake : events)
 		{
 			final Date date = intake.getDate();
 
@@ -106,7 +106,7 @@ public enum DoseEventJanitor implements
 			}
 		}
 
-//		Database.deleteByIds(Intake.class, idsToDelete);
+//		Database.deleteByIds(intake.class, idsToDelete);
 
 		final int deletedPercentage = (int) (deleteCount == 0 ? 0 : (deleteCount * 100.0) / oldIntakeCount);
 
@@ -175,12 +175,12 @@ public enum DoseEventJanitor implements
 		if(newSupply.isNegative())
 			return;
 
-		if(Entries.countIntakes(drug, date, doseTime) != 0)
+		if(Entries.countDoseEvents(drug, date, doseTime) != 0)
 			return;
 
 		if(LOGV) Log.v(TAG, "createIntake: drug=" + drug + ", date=" + date + ", doseTime=" + doseTime);
 
-		final Intake intake = new Intake(drug, date, doseTime, dose);
+		final DoseEvent intake = new DoseEvent(drug, date, doseTime, dose);
 		intake.setWasAutoCreated(true);
 
 		if(doseTime == Schedule.TIME_NIGHT)

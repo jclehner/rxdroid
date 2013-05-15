@@ -38,7 +38,7 @@ import android.util.Log;
 import android.widget.Toast;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Entry;
-import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.preferences.LanguagePreference;
 import at.jclehner.rxdroid.util.Components;
 
@@ -200,7 +200,7 @@ public class RxDroid extends Application
 
 		@Override
 		public void onEntryUpdated(Entry entry, int flags) {
-			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(entry instanceof Intake);
+			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(entry instanceof DoseEvent);
 		}
 
 		@Override
@@ -210,7 +210,7 @@ public class RxDroid extends Application
 
 		@Override
 		public void onEntryCreated(Entry entry, int flags) {
-			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(entry instanceof Intake);
+			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(entry instanceof DoseEvent);
 		}
 	};
 }

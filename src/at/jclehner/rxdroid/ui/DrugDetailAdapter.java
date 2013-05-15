@@ -34,7 +34,7 @@ import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
-import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Timer;
@@ -101,7 +101,7 @@ public class DrugDetailAdapter extends AbsDrugAdapter
 
 		final int visibility;
 
-		if(DateTime.today().equals(mAdapterDate) && Entries.hasMissingIntakesBeforeDate(drug, mAdapterDate))
+		if(DateTime.today().equals(mAdapterDate) && Entries.hasMissingDosesBeforeDate(drug, mAdapterDate))
 			visibility = View.VISIBLE;
 		else
 			visibility = View.GONE;
@@ -118,9 +118,9 @@ public class DrugDetailAdapter extends AbsDrugAdapter
 //		holder.info2.setVisibility(View.GONE);
 
 		//// FIXME hack
-		if(Entries.countIntakes(drug, mAdapterDate, mDoseTime) != 0)
+		if(Entries.countDoseEvents(drug, mAdapterDate, mDoseTime) != 0)
 		{
-			final Intake intake = Entries.findIntakes(drug, mAdapterDate, mDoseTime).get(0);
+			final DoseEvent intake = Entries.findDoseEvents(drug, mAdapterDate, mDoseTime).get(0);
 
 //			holder.info1.setText("Taken: " + intake.getTimestamp());
 //			holder.info1.setVisibility(View.VISIBLE);

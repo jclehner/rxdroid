@@ -48,7 +48,7 @@ import at.jclehner.rxdroid.db.Database.OnChangeListener;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
-import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.util.DateTime;
 
 /**
@@ -184,14 +184,14 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		mDisplayDose = new MutableFraction();
 
-		List<Intake> intakes = Entries.findIntakes(mDrug, mDate, mDoseTime);
-		for(Intake intake : intakes)
+		List<DoseEvent> events = Entries.findDoseEvents(mDrug, mDate, mDoseTime);
+		for(DoseEvent intake : events)
 		{
 			mDisplayDose.add(intake.getDose());
 			if(LOGV) Log.v(TAG, intake.toString());
 		}
 
-		mIntakeCount = intakes.size();
+		mIntakeCount = events.size();
 
 		updateView();
 	}
@@ -261,10 +261,10 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	@Override
 	public void onEntryCreated(Entry entry, int flags)
 	{
-		if(entry instanceof Intake)
+		if(entry instanceof DoseEvent)
 		{
-			Intake intake = (Intake) entry;
-			if(isApplicableIntake(intake))
+			DoseEvent intake = (DoseEvent) entry;
+			if(isApplicableDoseEvent(intake))
 			{
 				mDisplayDose.add(intake.getDose());
 				++mIntakeCount;
@@ -289,10 +289,10 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	@Override
 	public void onEntryDeleted(Entry entry, int flags)
 	{
-		if(entry instanceof Intake)
+		if(entry instanceof DoseEvent)
 		{
-			Intake intake = (Intake) entry;
-			if(isApplicableIntake(intake))
+			DoseEvent intake = (DoseEvent) entry;
+			if(isApplicableDoseEvent(intake))
 			{
 				mDisplayDose.subtract(intake.getDose());
 				--mIntakeCount;
@@ -338,7 +338,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		setPadding(0, 0, 0, 0);
 	}
 
-	private boolean isApplicableIntake(Intake intake)
+	private boolean isApplicableDoseEvent(DoseEvent intake)
 	{
 		if(intake.getDrugId() != mDrug.getId())
 			return false;

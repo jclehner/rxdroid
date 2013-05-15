@@ -756,7 +756,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		@Override
 		public void call(Drug drug)
 		{
-			for(Intake intake : Database.getAll(Intake.class))
+			for(DoseEvent intake : Database.getAll(DoseEvent.class))
 			{
 				if(intake.getDrug() == null || intake.getDrugId() == drug.id)
 					Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
