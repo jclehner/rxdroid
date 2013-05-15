@@ -27,6 +27,7 @@ import java.util.List;
 
 import android.util.Log;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
+import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -36,14 +37,14 @@ import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 
-public enum AutoIntakeCreator implements
+public enum DoseEventJanitor implements
 		NotificationReceiver.OnDoseTimeChangeListener,
 		/*Database.OnChangeListener,*/
 		Database.OnInitializedListener
 {
 	INSTANCE;
 
-	private static final String TAG = AutoIntakeCreator.class.getSimpleName();
+	private static final String TAG = DoseEventJanitor.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	@Override
@@ -82,7 +83,7 @@ public enum AutoIntakeCreator implements
 		final int oldIntakeCount = intakes.size();
 		int deleteCount = 0;
 
-		Date oldest = null;
+		Date oldest = null, newest = null;
 
 		for(Intake intake : intakes)
 		{
@@ -93,10 +94,13 @@ public enum AutoIntakeCreator implements
 				if(oldest == null || date.before(oldest))
 					oldest = date;
 
+				if(newest == null || date.after(newest))
+					newest = date;
+
 				++deleteCount;
 				Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
 
-				intake.getDrug().setLastDosesClearedDate(date);
+				//intake.getDrug().setLastDosesClearedDate(date);
 
 //				idsToDelete.add(intake.getId());
 			}
@@ -106,8 +110,15 @@ public enum AutoIntakeCreator implements
 
 		final int deletedPercentage = (int) (deleteCount == 0 ? 0 : (deleteCount * 100.0) / oldIntakeCount);
 
-		Log.i(TAG, "Deleted " + deleteCount + " entries (~" + deletedPercentage + "%); oldest entry: " +
-				(oldest == null ? "N/A" : DateTime.toDateString(oldest)));
+		Log.i(TAG, "Deleted " + deleteCount + " entries (~" + deletedPercentage + "%); oldest: " +
+				(oldest == null ? "N/A" : DateTime.toDateString(oldest)) + ", newest: " +
+				(oldest == null ? "N/A" : DateTime.toDateString(newest)));
+
+		// the day after the most recent dose event that was just deleted is the oldest possible
+		// date for any dose event.
+		newest = DateTime.add(newest, Calendar.DAY_OF_MONTH, 1);
+		Settings.putDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME, newest);
+
 	}
 
 	public static void registerSelf()

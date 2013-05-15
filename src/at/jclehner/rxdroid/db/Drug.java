@@ -196,8 +196,8 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField
 	private Date lastScheduleUpdateDate;
 
-	@DatabaseField
-	private Date lastDosesClearedDate;
+//	@DatabaseField
+//	private Date lastDosesClearedDate;
 
 	@DatabaseField
 	private int sortRank = Integer.MAX_VALUE;
@@ -555,26 +555,26 @@ public class Drug extends Entry implements Comparable<Drug>
 		return lastScheduleUpdateDate;
 	}
 
-	public Date getLastDosesClearedDate() {
-		return lastDosesClearedDate;
-	}
-
-	public void setLastDosesClearedDate(Date date)
-	{
-		if(lastDosesClearedDate != null)
-		{
-			if(date == null)
-			{
-				if(BuildConfig.DEBUG)
-					throw new IllegalStateException("Attempted to reset lastDosesClearedDate");
-			}
-			else if(!date.before(lastDosesClearedDate))
-				return;
-		}
-
-		lastDosesClearedDate = date;
-
-	}
+//	public Date getLastDosesClearedDate() {
+//		return lastDosesClearedDate;
+//	}
+//
+//	public void setLastDosesClearedDate(Date date)
+//	{
+//		if(lastDosesClearedDate != null)
+//		{
+//			if(date == null)
+//			{
+//				if(BuildConfig.DEBUG)
+//					throw new IllegalStateException("Attempted to reset lastDosesClearedDate");
+//			}
+//			else if(!date.before(lastDosesClearedDate))
+//				return;
+//		}
+//
+//		lastDosesClearedDate = date;
+//
+//	}
 
 //	public void setLastScheduleUpdateDate(Date lastScheduleUpdateDate) {
 //		this.lastScheduleUpdateDate = lastScheduleUpdateDate;

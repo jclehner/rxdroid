@@ -22,6 +22,7 @@ import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.Theme;
+import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Intake;
@@ -73,6 +74,9 @@ public class DoseLogFragment extends ExpandableListFragment
 			return;
 
 		Date date = Settings.getOldestPossibleHistoryDate(mToday);
+
+		Date date = Settings.getDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME);
+
 		if(date == null)
 			date = intakes.get(0).getDate();
 
@@ -80,12 +84,12 @@ public class DoseLogFragment extends ExpandableListFragment
 		for(Intake intake : intakes)
 			events.add(EventInfo.newTakenOrIgnoredEvent(intake));
 
-		final Date lastDosesClearedDate = drug.getLastDosesClearedDate();
-		if(lastDosesClearedDate != null)
-		{
-			while(!date.after(lastDosesClearedDate))
-				date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
-		}
+//		final Date lastDosesClearedDate = drug.getLastDosesClearedDate();
+//		if(lastDosesClearedDate != null)
+//		{
+//			while(!date.after(lastDosesClearedDate))
+//				date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
+//		}
 
 		while(!date.after(mToday))
 		{

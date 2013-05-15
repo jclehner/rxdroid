@@ -63,7 +63,7 @@ public class RxDroid extends Application
 		// shared preferences if this class is instantiated by the Android
 		// backup framework.
 
-		AutoIntakeCreator.registerSelf();
+		DoseEventJanitor.registerSelf();
 		Database.registerEventListener(sNotificationUpdater);
 
 		Components.onCreate(getContext(), Components.NO_DATABASE_INIT | Components.NO_SETTINGS_INIT);

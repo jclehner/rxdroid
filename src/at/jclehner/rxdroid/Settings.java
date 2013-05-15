@@ -80,6 +80,7 @@ public final class Settings
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
 		public static final String DISPLAYED_ONCE = "displayed_once";
 		public static final String IS_FIRST_LAUNCH = "is_first_launch";
+		public static final String OLDEST_POSSIBLE_DOSE_EVENT_TIME = "oldest_possible_dose_event_time";
 	}
 
 	public static class Enums
@@ -203,6 +204,14 @@ public final class Settings
 
 	public static void putDate(String key, Date date)
 	{
+		if(date == null)
+		{
+			if(contains(key))
+				remove(key);
+
+			return;
+		}
+
 		SimpleDateFormat sdf = PerThreadInstance.get(SimpleDateFormat.class, DATE_FORMAT);
 		putString(key, sdf.format(date));
 	}
