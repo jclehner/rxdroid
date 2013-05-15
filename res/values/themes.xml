@@ -42,6 +42,8 @@
 		<item name="doseStatusIgnored">@drawable/ic_dose_ignored_dark</item>
 		
 		<item name="textColorClickable">@color/black_clickable</item>
+		<item name="bgColorLogGroup">#eee</item>
+		<item name="bgColorLogChild">@android:color/transparent</item>
 		
 		<item name="iconLowSupplies">@drawable/ic_low_supply_warning</item>
 		<item name="iconMissedDose">@drawable/ic_warning</item>
@@ -56,6 +58,7 @@
 		<item name="dividerColor">@color/list_divider_light</item>
 		
 		<item name="android:windowAnimationStyle">@null</item>
+		
 	</style>
 	
 	<style name="DarkTheme" parent="@style/_ApiSpecificDarkTheme">
@@ -70,6 +73,8 @@
 		<item name="doseStatusIgnored">@drawable/ic_dose_ignored</item>
 		
 		<item name="textColorClickable">@color/white_clickable</item>
+		<item name="bgColorLogGroup">@android:color/transparent</item>
+		<item name="bgColorLogChild">#111</item>
 		
 		<item name="iconLowSupplies">@drawable/ic_low_supply_warning_white</item>
 		<item name="iconMissedDose">@drawable/ic_warning_white</item>

@@ -74,6 +74,8 @@
 	<attr name="menuIconStorage" />
     
     <attr name="textColorClickable" format="color|reference" />
+    <attr name="bgColorLogGroup" format="color|reference" />
+    <attr name="bgColorLogChild" format="color|reference" />
     
     <attr name="dividerColor" format="color|reference" />
     
