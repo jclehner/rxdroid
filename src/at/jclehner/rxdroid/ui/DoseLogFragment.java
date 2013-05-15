@@ -95,8 +95,22 @@ public class DoseLogFragment extends ExpandableListFragment
 			events = Collections.emptyList();
 
 		Date date = Settings.getDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME);
+
+		if(date != null && !events.isEmpty())
+		{
+			Collections.sort(infos, EventInfoByDateComparator.INSTANCE);
+			date = DateTime.min(date, events.get(events.size() - 1).getDate());
+		}
+		else if(date == null)
+			date = Settings.getOldestPossibleHistoryDate(mToday);
+
 		if(date == null)
-			date = events.get(0).getDate();
+		{
+			Log.w(TAG, "gatherEventInfos(" + flags + "): no date to begin; giving up");
+			return;
+		}
+		else if(LOGV)
+			Log.v(TAG, "gatherEventInfos: date=" + date);
 
 //		final Date lastDosesClearedDate = drug.getLastDosesClearedDate();
 //		if(lastDosesClearedDate != null)

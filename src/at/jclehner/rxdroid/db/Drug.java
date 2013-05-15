@@ -187,11 +187,11 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField
 	private Date repeatOrigin;
 
-	@DatabaseField
-	private boolean autoAddIntakes = false;
+	@DatabaseField(columnName = "autoAddIntakes")
+	private boolean hasAutoDoseEvents = false;
 
-	@DatabaseField
-	private Date lastAutoIntakeCreationDate;
+	@DatabaseField(columnName = "lastAutoIntakeCreationDate")
+	private Date lastAutoDoseEventCreationDate;
 
 	@DatabaseField
 	private Date lastScheduleUpdateDate;
@@ -306,22 +306,22 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public void setAutoAddIntakesEnabled(boolean autoAddIntakes)
 	{
-		if(this.autoAddIntakes == autoAddIntakes)
+		if(this.hasAutoDoseEvents == autoAddIntakes)
 			return;
 
-		this.autoAddIntakes = autoAddIntakes;
+		this.hasAutoDoseEvents = autoAddIntakes;
 
 		if(autoAddIntakes)
 		{
-			if(lastAutoIntakeCreationDate == null)
-				lastAutoIntakeCreationDate = DateTime.yesterday();
+			if(lastAutoDoseEventCreationDate == null)
+				lastAutoDoseEventCreationDate = DateTime.yesterday();
 		}
 		else
-			lastAutoIntakeCreationDate = null;
+			lastAutoDoseEventCreationDate = null;
 	}
 
-	public boolean isAutoAddIntakesEnabled() {
-		return autoAddIntakes;
+	public boolean hasAutoDoseEvents() {
+		return hasAutoDoseEvents;
 	}
 
 	public boolean isActive() {
@@ -543,12 +543,12 @@ public class Drug extends Entry implements Comparable<Drug>
 		return patient != null ? patient.id : Patient.DEFAULT_PATIENT_ID;
 	}
 
-	public Date getLastAutoIntakeCreationDate() {
-		return lastAutoIntakeCreationDate;
+	public Date getLastAutoDoseEventCreationDate() {
+		return lastAutoDoseEventCreationDate;
 	}
 
-	public void setLastAutoIntakeCreationDate(Date lastAutoIntakeCreationDate) {
-		this.lastAutoIntakeCreationDate = lastAutoIntakeCreationDate;
+	public void setLastAutoDoseEventCreationDate(Date lastAutoDoseEventCreationDate) {
+		this.lastAutoDoseEventCreationDate = lastAutoDoseEventCreationDate;
 	}
 
 	public Date getLastScheduleUpdateDate() {
@@ -711,8 +711,8 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.doseNight,
 			this.currentSupply,
 			this.refillSize,
-			this.autoAddIntakes,
-			this.lastAutoIntakeCreationDate,
+			this.hasAutoDoseEvents,
+			this.lastAutoDoseEventCreationDate,
 			//this.lastScheduleUpdateDate,
 			this.repeatMode,
 			this.repeatArg,

@@ -546,8 +546,8 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			repeatOrigin = drug.getRepeatOrigin();
 			//schedule = drug.getSchedule();
 			sortRank = drug.getSortRank();
-			autoAddIntakes = drug.isAutoAddIntakesEnabled();
-			lastAutoIntakeCreationDate = drug.getLastAutoIntakeCreationDate();
+			autoAddIntakes = drug.hasAutoDoseEvents();
+			lastAutoIntakeCreationDate = drug.getLastAutoDoseEventCreationDate();
 			patient = drug.getPatient();
 			schedules = drug.getSchedules();
 
@@ -570,7 +570,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			drug.setRepeatMode(repeat);
 			drug.setSortRank(sortRank);
 			//drug.setSchedule(schedule);
-			drug.setLastAutoIntakeCreationDate(lastAutoIntakeCreationDate);
+			drug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);
 			drug.setAutoAddIntakesEnabled(autoAddIntakes);
 			drug.setPatient(patient);
 			drug.setSchedules(schedules);

@@ -776,7 +776,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			if(mFilterDate == null)
 				return true;
 
-			if(drug.isAutoAddIntakesEnabled())
+			if(drug.hasAutoDoseEvents())
 			{
 				if(Entries.hasLowSupplies(drug))
 					return true;

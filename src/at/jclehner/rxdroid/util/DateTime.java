@@ -106,6 +106,14 @@ public final class DateTime
 		return nowCalendar().getTime();
 	}
 
+	public static Date min(Date date1, Date date2) {
+		return date1.before(date2) ? date1 : date2;
+	}
+
+	public static Date max(Date date1, Date date2) {
+		return date1.after(date2) ? date1 : date2;
+	}
+
 	/**
 	 * Sets a <code>Calendar's</code> time to 00:00:00.000.
 	 */

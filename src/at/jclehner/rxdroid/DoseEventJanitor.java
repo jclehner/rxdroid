@@ -56,7 +56,7 @@ public enum DoseEventJanitor implements
 	public void onDoseTimeEnd(Date date, int doseTime)
 	{
 		if(LOGV) Log.v(TAG, "onDoseTimeEnd");
-		createIntakes(date, doseTime);
+		createDoseEvents(date, doseTime);
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public enum DoseEventJanitor implements
 		SplashScreenActivity.setStatusMessage(R.string._title_db_status_creating_intakes);
 
 		for(Drug drug : Database.getAll(Drug.class))
-			createMissingIntakes(drug);
+			createAutoDoseEvents(drug);
 
 		////////////////////////////////////
 
@@ -114,14 +114,16 @@ public enum DoseEventJanitor implements
 				(oldest == null ? "N/A" : DateTime.toDateString(oldest)) + ", newest: " +
 				(oldest == null ? "N/A" : DateTime.toDateString(newest)));
 
-		// the day after the most recent dose event that was just deleted is the oldest possible
-		// date for any dose event.
-		newest = DateTime.add(newest, Calendar.DAY_OF_MONTH, 1);
+		if(newest != null)
+		{
+			// the day after the most recent dose event that was just deleted is the oldest possible
+			// date for any dose event.
+			newest = DateTime.add(newest, Calendar.DAY_OF_MONTH, 1);
 
-		final Date oldestPossibleDoseEventTime = Settings.getDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME);
-		if(oldestPossibleDoseEventTime == null || newest.after(oldestPossibleDoseEventTime))
-			Settings.putDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME, newest);
-
+			final Date oldestPossibleDoseEventTime = Settings.getDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME);
+			if(oldestPossibleDoseEventTime == null || newest.after(oldestPossibleDoseEventTime))
+				Settings.putDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME, newest);
+		}
 	}
 
 	public static void registerSelf()
@@ -131,18 +133,18 @@ public enum DoseEventJanitor implements
 		NotificationReceiver.registerOnDoseTimeChangeListener(INSTANCE);
 	}
 
-	private static void createIntakes(Date date, int doseTime)
+	private static void createDoseEvents(Date date, int doseTime)
 	{
 		for(Drug drug : Database.getAll(Drug.class))
-			createIntake(drug, date, doseTime);
+			createDoseEvent(drug, date, doseTime);
 	}
 
-	private static void createMissingIntakes(Drug drug)
+	private static void createAutoDoseEvents(Drug drug)
 	{
-		if(!drug.isAutoAddIntakesEnabled())
+		if(!drug.hasAutoDoseEvents())
 			return;
 
-		Date date = drug.getLastAutoIntakeCreationDate();
+		Date date = drug.getLastAutoDoseEventCreationDate();
 		if(date == null)
 			throw new IllegalStateException();
 
@@ -154,7 +156,7 @@ public enum DoseEventJanitor implements
 		{
 			for(int doseTime : Constants.DOSE_TIMES)
 			{
-				createIntake(drug, date, doseTime);
+				createDoseEvent(drug, date, doseTime);
 			}
 
 			if(LOGV) Log.v(TAG, "  date=" + date);
@@ -162,12 +164,12 @@ public enum DoseEventJanitor implements
 		}
 
 		for(int doseTime = Schedule.TIME_MORNING; doseTime != dtInfo.nextDoseTime(); ++doseTime)
-			createIntake(drug, dtInfo.activeDate(), doseTime);
+			createDoseEvent(drug, dtInfo.activeDate(), doseTime);
 	}
 
-	private static void createIntake(Drug drug, Date date, int doseTime)
+	private static void createDoseEvent(Drug drug, Date date, int doseTime)
 	{
-		if(!drug.isAutoAddIntakesEnabled())
+		if(!drug.hasAutoDoseEvents())
 			return;
 
 		final Fraction dose = drug.getDose(doseTime, date);
@@ -181,20 +183,20 @@ public enum DoseEventJanitor implements
 		if(Entries.countDoseEvents(drug, date, doseTime) != 0)
 			return;
 
-		if(LOGV) Log.v(TAG, "createIntake: drug=" + drug + ", date=" + date + ", doseTime=" + doseTime);
+		if(LOGV) Log.v(TAG, "createDoseEvent: drug=" + drug + ", date=" + date + ", doseTime=" + doseTime);
 
 		final DoseEvent intake = new DoseEvent(drug, date, doseTime, dose);
 		intake.setWasAutoCreated(true);
 
 		if(doseTime == Schedule.TIME_NIGHT)
-			drug.setLastAutoIntakeCreationDate(date);
+			drug.setLastAutoDoseEventCreationDate(date);
 		else
 		{
-			final Date lastAutoIntakeCreationDate = drug.getLastAutoIntakeCreationDate();
+			final Date lastAutoIntakeCreationDate = drug.getLastAutoDoseEventCreationDate();
 			if(lastAutoIntakeCreationDate == null)
-				drug.setLastAutoIntakeCreationDate(DateTime.yesterday());
+				drug.setLastAutoDoseEventCreationDate(DateTime.yesterday());
 			else if(DateTime.diffDays(date, lastAutoIntakeCreationDate) != 1)
-				drug.setLastAutoIntakeCreationDate(DateTime.add(date, Calendar.DAY_OF_MONTH, -1));
+				drug.setLastAutoDoseEventCreationDate(DateTime.add(date, Calendar.DAY_OF_MONTH, -1));
 		}
 
 		drug.setCurrentSupply(newSupply);
