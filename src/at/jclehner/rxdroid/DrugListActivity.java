@@ -78,6 +78,7 @@ import at.jclehner.rxdroid.ui.DrugOverviewAdapter;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.Extras;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.AutoDragSortListView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
@@ -95,6 +96,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	private static final int CMENU_TOGGLE_INTAKE = 0;
 	private static final int CMENU_EDIT_DRUG = 2;
 	private static final int CMENU_IGNORE_DOSE = 4;
+	private static final int CMENU_LOG = 5;
+	private static final int CMENU_DUMP = 6;
 
 	private static final int DIALOG_INFO = 0;
 
@@ -167,7 +170,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		setDate(date, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
 
-		if(false)
+		if(true)
 		{
 			final String isoLang = Locale.getDefault().getLanguage();
 			if(!CollectionUtils.contains(Version.LANGUAGES, isoLang))
@@ -340,6 +343,33 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 						public boolean onMenuItemClick(MenuItem item)
 						{
 							Database.create(new Intake(drug, doseView.getDate(), doseTime));
+							return true;
+						}
+					});
+		}
+
+		if(BuildConfig.DEBUG)
+		{
+			menu.add(0, CMENU_LOG, 0, "Log")
+					.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+						@Override
+						public boolean onMenuItemClick(MenuItem item)
+						{
+							Intent intent = new Intent(getApplicationContext(), DoseHistoryActivity.class);
+							intent.putExtra(Extras.DRUG_ID, drug.getId());
+							startActivity(intent);
+							return true;
+						}
+					});
+
+			menu.add(0, CMENU_DUMP, 0, "Dump")
+					.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+						@Override
+						public boolean onMenuItemClick(MenuItem item)
+						{
+							Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, drug.getName());
 							return true;
 						}
 					});

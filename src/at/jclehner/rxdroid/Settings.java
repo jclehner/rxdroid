@@ -227,11 +227,8 @@ public final class Settings
 		sSharedPrefs.edit().putInt(key, value).commit();
 	}
 
-	public static boolean isPastMaxHistoryAge(Date reference, Date date)
+	public static Date getOldestPossibleHistoryDate(Date reference)
 	{
-		if(date == null)
-			return false;
-
 		final int index = getIntFromList(Keys.HISTORY_SIZE, 2);
 
 		final int field;
@@ -260,11 +257,22 @@ public final class Settings
 				break;
 
 			default:
-				return false;
+				return null;
 		}
 
-		reference = DateTime.add(reference, field, -value);
-		return date.before(reference);
+		return DateTime.add(reference, field, -value);
+	}
+
+	public static boolean isPastMaxHistoryAge(Date reference, Date date)
+	{
+		if(date == null)
+			return false;
+
+		Date oldest = getOldestPossibleHistoryDate(reference);
+		if(oldest == null)
+			return false;
+
+		return date.before(oldest);
 	}
 
 	public static long getMillisUntilDoseTimeBegin(Calendar time, int doseTime) {

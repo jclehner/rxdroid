@@ -32,8 +32,10 @@ import at.jclehner.rxdroid.util.Hasher;
  *
  * @author Joseph Lehner
  */
+@Deprecated
 public class Fraction extends Number implements Comparable<Number>
 {
+	@Deprecated
 	public static class MutableFraction extends Fraction
 	{
 		private static final long serialVersionUID = -3830132386515948322L;

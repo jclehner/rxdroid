@@ -52,6 +52,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	private static final String TAG = DatabaseHelper.class.getSimpleName();
 	private static final boolean LOGV = false;
 
+	public static final int DB_VERSION = 59;
+	public static final String DB_NAME = "db.sqlite";
+
 	public static class DatabaseError extends RuntimeException
 	{
 		private static final long serialVersionUID = 4326067582393937172L;
@@ -112,12 +115,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 		private final int mType;
 	}
-
-	// XXX
-	public static final int DB_VERSION = 58;
-	// XXX
-
-	public static final String DB_NAME = "db.sqlite";
 
 	DatabaseHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);

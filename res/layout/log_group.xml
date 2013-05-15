@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+>
+
+    <ImageView android:id="@+id/img_status" 
+        android:layout_width="30dip"
+        android:layout_height="30dip"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="9dip"
+         android:layout_marginBottom="9dip"
+        
+        android:src="@drawable/ic_dose_forgotten"
+    />
+    
+    <TextView android:id="@+id/text_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/img_status"
+        android:layout_alignBottom="@id/img_status"
+        android:layout_toLeftOf="@id/img_status"
+        
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:text="@string/mock_date"
+    />
+    
+    <TextView android:id="@+id/text_count"
+    	android:layout_width="wrap_content"
+        android:layout_height="wrap_content"        
+        android:layout_alignTop="@id/text_date"
+        android:layout_alignBottom="@id/text_date"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="8dip"
+        
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold"
+    	android:gravity="center_vertical"
+    	android:text="@string/mock_count"
+    	
+    	android:visibility="gone"
+   />
+    
+
+</RelativeLayout>

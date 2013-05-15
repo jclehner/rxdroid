@@ -28,8 +28,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import android.util.Log;
 import at.jclehner.androidutils.LazyValue;
-import at.jclehner.androidutils.LazyValue.Mutator;
+import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Constants;
@@ -79,6 +80,7 @@ public class Drug extends Entry implements Comparable<Drug>
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = Drug.class.getSimpleName();
+	private static final boolean LOGV = BuildConfig.DEBUG;
 
 	public static final int ICON_TABLET = 0;
 	public static final int ICON_SYRINGE = 1;
@@ -193,6 +195,9 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	@DatabaseField
 	private Date lastScheduleUpdateDate;
+
+	@DatabaseField
+	private Date lastDosesClearedDate;
 
 	@DatabaseField
 	private int sortRank = Integer.MAX_VALUE;
@@ -548,6 +553,27 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public Date getLastScheduleUpdateDate() {
 		return lastScheduleUpdateDate;
+	}
+
+	public Date getLastDosesClearedDate() {
+		return lastDosesClearedDate;
+	}
+
+	public void setLastDosesClearedDate(Date date)
+	{
+		if(lastDosesClearedDate != null)
+		{
+			if(date == null)
+			{
+				if(BuildConfig.DEBUG)
+					throw new IllegalStateException("Attempted to reset lastDosesClearedDate");
+			}
+			else if(!date.before(lastDosesClearedDate))
+				return;
+		}
+
+		lastDosesClearedDate = date;
+
 	}
 
 //	public void setLastScheduleUpdateDate(Date lastScheduleUpdateDate) {

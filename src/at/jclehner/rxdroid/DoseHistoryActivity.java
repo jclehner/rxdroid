@@ -21,28 +21,61 @@
 
 package at.jclehner.rxdroid;
 
+import java.util.Date;
 import java.util.List;
 
 import android.app.ExpandableListActivity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
-import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Intake;
+import at.jclehner.rxdroid.ui.DoseLogFragment;
 import at.jclehner.rxdroid.util.Components;
+import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Extras;
 import at.jclehner.rxdroid.util.Util;
 
+/*
+ * TODO
+ *
+ * Layout:
+ * +---------------------------------------+
+ * | 2013-05-08                            |
+ * +---------------------------------------+
+ * | 06:33   Morning dose taken (1 1/2)
+ * |
+ * |
+ * +---------------------------------------+
+ * | 2013-05-07                          Δ  |
+ * +---------------------------------------+
+ * | 06:33   Morning dose taken (1 1/2)
+ * | 13:10   Evening dose taken (1)
+ * |
+ * |   Δ         Noon dose not taken!
+ * |
+ * |
+ * |
+ * |
+ * |
+ *
+ *
+ *
+ *
+ */
 
-public class DoseHistoryActivity extends ExpandableListActivity
+public class DoseHistoryActivity extends FragmentActivity
 {
+	private Drug mDrug;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -50,10 +83,16 @@ public class DoseHistoryActivity extends ExpandableListActivity
 		Components.onCreateActivity(this, 0);
 
 		//Drug drug = (Drug) getIntent().getSerializableExtra(Extras.DRUG);
-		Drug drug = Drug.get(getIntent().getIntExtra(Extras.DRUG_ID, 0));
+		mDrug = Drug.get(getIntent().getIntExtra(Extras.DRUG_ID, 0));
 
-		setTitle("History: " + drug.getName());
-		setListAdapter(new DoseHistoryAdapter(this, drug));
+		setTitle("History: " + mDrug.getName());
+
+		//setListAdapter(new DoseHistoryAdapter(this, mDrug));
+
+		DoseLogFragment f = DoseLogFragment.newInstance(mDrug);
+		FragmentManager fm = getSupportFragmentManager();
+		//fm.beginTransaction().add(f, "dose_log_fragment").commit();
+		fm.beginTransaction().add(android.R.id.content, f).commit();
 	}
 
 	class DoseHistoryAdapter extends BaseExpandableListAdapter
@@ -144,6 +183,5 @@ public class DoseHistoryActivity extends ExpandableListActivity
 			return null;
 		}
 	};
-
 
 }

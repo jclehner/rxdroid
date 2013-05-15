@@ -128,11 +128,12 @@ public class Intake extends Entry
 		return dose == null || dose.isZero();
 	}
 
-	public void setWasAutoCreated(boolean wasAutoCreated)
-	{
+	public boolean wasAutoCreated() {
+		return wasAutoCreated;
+	}
+
+	public void setWasAutoCreated(boolean wasAutoCreated) {
 		this.wasAutoCreated = wasAutoCreated;
-		if(wasAutoCreated)
-			timestamp = null;
 	}
 
 	@Override

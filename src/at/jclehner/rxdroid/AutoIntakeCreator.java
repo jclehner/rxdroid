@@ -95,6 +95,9 @@ public enum AutoIntakeCreator implements
 
 				++deleteCount;
 				Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
+
+				intake.getDrug().setLastDosesClearedDate(date);
+
 //				idsToDelete.add(intake.getId());
 			}
 		}

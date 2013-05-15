@@ -22,12 +22,8 @@
 package at.jclehner.rxdroid.util;
 
 import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -37,6 +33,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.text.Spannable;
@@ -452,6 +449,41 @@ public final class Util
 			return first + str.substring(1);
 
 		return Character.toString(first);
+	}
+
+	public static Bundle createBundle(Object... args)
+	{
+		if(args.length % 2 != 0)
+			throw new IllegalArgumentException("Array length must be divisible by 2");
+
+		Bundle b = new Bundle();
+
+		for(int i = 0; i < args.length; i +=2)
+		{
+			final String key;
+			try
+			{
+				key = (String) args[i];
+			}
+			catch(ClassCastException e)
+			{
+				throw new IllegalArgumentException("Expected string type for key at pos " + i);
+			}
+
+			final Object value = args[i + 1];
+			final Class<?> type = value.getClass();
+
+			if(type == int.class || type == Integer.class)
+				b.putInt(key, (Integer) value);
+			else if(type == boolean.class || type == Boolean.class)
+				b.putBoolean(key, (Boolean) value);
+			else if(type == String.class)
+				b.putString(key, (String) value);
+			else
+				throw new IllegalArgumentException("Unhandled value type: " + type);
+		}
+
+		return b;
 	}
 
 	private static DisplayMetrics getDisplayMetrics() {
