@@ -117,7 +117,10 @@ public enum DoseEventJanitor implements
 		// the day after the most recent dose event that was just deleted is the oldest possible
 		// date for any dose event.
 		newest = DateTime.add(newest, Calendar.DAY_OF_MONTH, 1);
-		Settings.putDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME, newest);
+
+		final Date oldestPossibleDoseEventTime = Settings.getDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME);
+		if(oldestPossibleDoseEventTime == null || newest.after(oldestPossibleDoseEventTime))
+			Settings.putDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME, newest);
 
 	}
 

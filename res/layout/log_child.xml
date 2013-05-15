@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="48dip"
     android:orientation="horizontal" 
 >
 
     <at.jclehner.rxdroid.DoseView android:id="@+id/dose_dose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
     />
+    
+    <TextView android:id="@+id/text_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="4dip"
+        
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold"
+        android:minEms="4"
+        
+        android:text="@string/mock_time"
+    />    
     
     <TextView android:id="@+id/text_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:text="@string/mock_dose_text"
+        
+        android:textAppearance="?android:attr/textAppearanceMedium"
     />
     
 

@@ -489,9 +489,9 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		}
 
 		final Bundle args = new Bundle();
-		args.putInt(IntakeDialog.ARG_DRUG_ID, doseView.getDrug().getId());
-		args.putInt(IntakeDialog.ARG_DOSE_TIME, doseView.getDoseTime());
-		args.putSerializable(IntakeDialog.ARG_DATE, date);
+		args.putInt(DoseDialog.ARG_DRUG_ID, doseView.getDrug().getId());
+		args.putInt(DoseDialog.ARG_DOSE_TIME, doseView.getDoseTime());
+		args.putSerializable(DoseDialog.ARG_DATE, date);
 
 		showDialog(R.id.dose_dialog, args);
 	}
@@ -540,7 +540,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	protected Dialog onCreateDialog(int id, Bundle args)
 	{
 		if(id == R.id.dose_dialog)
-			return new IntakeDialog(this);
+			return new DoseDialog(this);
 		else if(id == DIALOG_INFO)
 		{
 			final String msg = args.getString("msg");
@@ -572,7 +572,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	{
 		if(id == R.id.dose_dialog)
 		{
-			if(!Database.exists(Drug.class, args.getInt(IntakeDialog.ARG_DRUG_ID, -1)))
+			if(!Database.exists(Drug.class, args.getInt(DoseDialog.ARG_DRUG_ID, -1)))
 			{
 				// If the drug currently associated with the dialog is deleted,
 				// setArgs() throws when attempting to restore from the non-existent
@@ -580,7 +580,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 				return;
 			}
 
-			((IntakeDialog) dialog).setArgs(args);
+			((DoseDialog) dialog).setArgs(args);
 		}
 		else
 			super.onPrepareDialog(id, dialog, args);

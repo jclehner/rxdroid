@@ -43,9 +43,9 @@ import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Schedule;
 
-public class IntakeDialog extends AlertDialog implements OnChangedListener, Database.OnChangeListener
+public class DoseDialog extends AlertDialog implements OnChangedListener, Database.OnChangeListener
 {
-	private static final String TAG = IntakeDialog.class.getSimpleName();
+	private static final String TAG = DoseDialog.class.getSimpleName();
 	private static final boolean LOGV = false;
 
 	public static final String ARG_DRUG_ID = "drug_id";
@@ -78,7 +78,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 
 	public static final int FLAG_ALLOW_DOSE_EDIT = 1;
 
-	public IntakeDialog(Context context)
+	public DoseDialog(Context context)
 	{
 		super(context);
 
@@ -112,7 +112,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		setMessage("");
 	}
 
-	public IntakeDialog(final Context context, Drug drug, int doseTime, Date date)
+	public DoseDialog(final Context context, Drug drug, int doseTime, Date date)
 	{
 		this(context);
 		update(drug, doseTime, date);
@@ -235,7 +235,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 			@Override
 			public void onClick(View v)
 			{
-				final Context context = IntakeDialog.this.getContext();
+				final Context context = DoseDialog.this.getContext();
 				final Intent intent = new Intent(context, DrugEditActivity.class);
 				intent.setAction(Intent.ACTION_EDIT);
 				intent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, mDrug.getId());
@@ -363,7 +363,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 		@Override
 		public void onShow(final DialogInterface dialog)
 		{
-			Database.registerEventListener(IntakeDialog.this);
+			Database.registerEventListener(DoseDialog.this);
 			setNonDismissingListener(BUTTON_POSITIVE);
 
 			setupViews();
@@ -404,7 +404,7 @@ public class IntakeDialog extends AlertDialog implements OnChangedListener, Data
 			// Allows handling the click in the expected place,
 			// while allowing control over whether the dialog
 			// should be dismissed or not.
-			mLocalOnClickListener.onClick(IntakeDialog.this, mButton);
+			mLocalOnClickListener.onClick(DoseDialog.this, mButton);
 		}
 	}
 }

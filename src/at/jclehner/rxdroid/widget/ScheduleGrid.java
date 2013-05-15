@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
 /**
  * RxDroid - A Medication Reminder
  * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
@@ -20,15 +18,14 @@
  *
  *
  */
--->
 
-<resources>
-	<dimen name="keypad_button_text_size">30sp</dimen>
-	<dimen name="keypad_button_height">60dip</dimen>
-	<dimen name="keypad_button_width">70dip</dimen>
-	<dimen name="keypad_button_margin">2dip</dimen>
-	<dimen name="keypad_margin_bottom">20dip</dimen>
-	<dimen name="log_group_height">40dip</dimen>	
-	<dimen name="pin_margin">20dip</dimen>
-	<dimen name="divider_width">2dip</dimen>		
-</resources>
+package at.jclehner.rxdroid.widget;
+
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import at.jclehner.rxdroid.R;
+
+

@@ -21,10 +21,8 @@
 
 package at.jclehner.rxdroid;
 
-import java.util.Date;
 import java.util.List;
 
-import android.app.ExpandableListActivity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -39,7 +37,6 @@ import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.ui.DoseLogFragment;
 import at.jclehner.rxdroid.util.Components;
-import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Extras;
 import at.jclehner.rxdroid.util.Util;

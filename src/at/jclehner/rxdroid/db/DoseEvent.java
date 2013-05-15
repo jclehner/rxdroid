@@ -54,7 +54,7 @@ import com.j256.ormlite.table.DatabaseTable;
  */
 
 @DatabaseTable(tableName = "intake")
-public class Intake extends Entry
+public class DoseEvent extends Entry
 {
 	@DatabaseField(foreign = true)
 	private Drug drug;
@@ -75,9 +75,9 @@ public class Intake extends Entry
 	@DatabaseField
 	private boolean wasAutoCreated = false;
 
-	public Intake() {}
+	public DoseEvent() {}
 
-	public Intake(Drug drug, Date date, int doseTime, Fraction dose)
+	public DoseEvent(Drug drug, Date date, int doseTime, Fraction dose)
 	{
 		this.drug = drug;
 		this.date = date;
@@ -89,10 +89,10 @@ public class Intake extends Entry
 	/**
 	 * Constructs an empty intake.
 	 * <p>
-	 * Empty intakes (i.e. intakes with a dose of zero) are
+	 * Empty events (i.e. events with a dose of zero) are
 	 * used for ignoring a dose.
 	 */
-	public Intake(Drug drug, Date date, int doseTime) {
+	public DoseEvent(Drug drug, Date date, int doseTime) {
 		this(drug, date, doseTime, Fraction.ZERO);
 	}
 
@@ -153,10 +153,10 @@ public class Intake extends Entry
 	@Override
 	public boolean equals(Object o)
 	{
-		if(!(o instanceof Intake))
+		if(!(o instanceof DoseEvent))
 			return false;
 
-		final Intake other = (Intake) o;
+		final DoseEvent other = (DoseEvent) o;
 
 		if(this.doseTime != other.doseTime)
 			return false;
@@ -185,7 +185,7 @@ public class Intake extends Entry
 		return drugName + ": " + date + " " + Entries.getDoseTimeString(doseTime) + ", " + dose;
 	}
 
-	/* package */ static boolean has(Intake intake, Drug drug, Date date, Integer doseTime)
+	/* package */ static boolean has(DoseEvent intake, Drug drug, Date date, Integer doseTime)
 	{
 		if(drug.id != intake.drug.id)
 			return false;

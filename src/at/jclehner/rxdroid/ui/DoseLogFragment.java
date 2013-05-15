@@ -54,7 +54,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		super.onCreate(savedInstanceState);
 
 		mToday = DateTime.today();
-		gatherEventInfos();
+		gatherEventInfos(GATHER_MISSED | GATHER_SKIPPED);
 		setListAdapter(new Adapter());
 	}
 
@@ -62,24 +62,41 @@ public class DoseLogFragment extends ExpandableListFragment
 		return Drug.get(getArguments().getInt("drug_id"));
 	}
 
-	private void gatherEventInfos()
+	private static final int GATHER_MISSED = 1;
+	private static final int GATHER_TAKEN = 1 << 1;
+	private static final int GATHER_SKIPPED = 1 << 2;
+
+	private void gatherEventInfos(int flags)
 	{
 		final Timer t;
 		if(LOGV)
 			t = new Timer();
 
 		final Drug drug = getDrug();
-		final List<DoseEvent> events = Entries.findDoseEvents(drug, null, null);
-		if(events.isEmpty())
-			return;
+		final List<EventInfo> infos = new ArrayList<EventInfo>();
+		final List<DoseEvent> events;
+
+		if((flags & GATHER_TAKEN) != 0 || (flags & GATHER_SKIPPED) != 0)
+		{
+			events = Entries.findDoseEvents(drug, null, null);
+			for(DoseEvent event : events)
+			{
+				boolean isSkipped = event.getDose().isZero();
+
+				if((isSkipped && (flags & GATHER_SKIPPED) == 0) ||
+						(!isSkipped && (flags & GATHER_TAKEN) == 0)) {
+					continue;
+				}
+
+				infos.add(EventInfo.newTakenOrIgnoredEvent(event));
+			}
+		}
+		else
+			events = Collections.emptyList();
 
 		Date date = Settings.getDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME);
 		if(date == null)
 			date = events.get(0).getDate();
-
-		List<EventInfo> infos = new ArrayList<EventInfo>();
-		for(DoseEvent event : events)
-			infos.add(EventInfo.newTakenOrIgnoredEvent(event));
 
 //		final Date lastDosesClearedDate = drug.getLastDosesClearedDate();
 //		if(lastDosesClearedDate != null)
@@ -88,46 +105,51 @@ public class DoseLogFragment extends ExpandableListFragment
 //				date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
 //		}
 
-		while(!date.after(mToday))
+		if((flags & GATHER_MISSED) != 0)
 		{
-			if(drug.hasDoseOnDate(date))
+			while(!date.after(mToday))
 			{
-
-				for(int doseTime : Constants.DOSE_TIMES)
+				if(drug.hasDoseOnDate(date))
 				{
-					Fraction dose = drug.getDose(doseTime, date);
 
-					if(!dose.isZero() && !containsDoseEvent(events, date, doseTime))
+					for(int doseTime : Constants.DOSE_TIMES)
 					{
-						//Log.d(TAG, "Creating missed event: date=" + date + ", doseTime=" + doseTime);
-						infos.add(EventInfo.newMissedEvent(date, doseTime));
+						Fraction dose = drug.getDose(doseTime, date);
+
+						if(!dose.isZero() && !containsDoseEvent(events, date, doseTime))
+						{
+							//Log.d(TAG, "Creating missed event: date=" + date + ", doseTime=" + doseTime);
+							infos.add(EventInfo.newMissedEvent(date, doseTime));
+						}
 					}
 				}
-			}
 
-			date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
+				date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
+			}
 		}
 
 		Collections.sort(infos, EventInfoByDateComparator.INSTANCE);
 
 		mGroupedEvents = new ArrayList<List<EventInfo>>();
 
-		for(int i = 0; i < events.size();)
+		for(int i = 0; i < infos.size();)
 		{
 			date = infos.get(i).date;
 
 			final List<EventInfo> group = new ArrayList<EventInfo>();
 
-			while(i < events.size() && date.equals(infos.get(i).date))
+			while(i < infos.size() && date.equals(infos.get(i).date))
 			{
 				//Log.d(TAG, "  CHILD: " + events.get(i));
 				group.add(infos.get(i));
 				++i;
 			}
 
-			Collections.sort(group, EventInfoByDoseTimeComparator.INSTANCE);
-
-			mGroupedEvents.add(group);
+			if(!group.isEmpty())
+			{
+				Collections.sort(group, EventInfoByDoseTimeComparator.INSTANCE);
+				mGroupedEvents.add(group);
+			}
 		}
 
 		if(LOGV) Log.d(TAG, "gatherEvents: " + t);
@@ -224,7 +246,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View view,
 				ViewGroup parent)
 		{
-			final EventInfo event = mGroupedEvents.get(groupPosition).get(childPosition);
+			final EventInfo info = mGroupedEvents.get(groupPosition).get(childPosition);
 			final ChildViewHolder holder;
 
 			if(view == null)
@@ -232,29 +254,35 @@ public class DoseLogFragment extends ExpandableListFragment
 				view = mInflater.inflate(R.layout.log_child, null);
 				holder = new ChildViewHolder();
 				holder.dose = (DoseView) view.findViewById(R.id.dose_dose);
+				holder.time = (TextView) view.findViewById(R.id.text_time);
 				holder.text = (TextView) view.findViewById(R.id.text_info);
 				view.setTag(holder);
 			}
 			else
 				holder = (ChildViewHolder) view.getTag();
 
-			holder.dose.setDoseTime(event.doseTime);
+			holder.time.setText(info.getTimeString());
 
-			final DoseEvent doseEvent = event.intake;
+			final DoseEvent doseEvent = info.intake;
 			if(doseEvent != null)
 			{
 				holder.dose.setDose(doseEvent.getDose());
 
-				String text;
-				if(event.status == EventInfo.STAT_TAKEN)
-					holder.text.setText("Taken: " + doseEvent.getTimestamp());
+				StringBuilder sb = new StringBuilder("Dose ");
+
+				if(info.status == EventInfo.STAT_TAKEN)
+					sb.append("taken: ");
 				else
-					holder.text.setText("Skipped: " + doseEvent.getTimestamp());
+					sb.append("skipped: ");
+
+				sb.append(Util.getDoseTimeName(info.doseTime));
+				holder.text.setText(sb.toString() + " " + DateTime.toNativeDate(info.date));
 			}
 			else
 			{
-				holder.dose.setDose(Fraction.ZERO);
-				holder.text.setText("Missed");
+				//holder.dose.setDose(Fraction.ZERO);
+				holder.text.setText("Missed: " + Util.getDoseTimeName(info.doseTime));
+				//holder.time.setText("");
 			}
 
 			return view;
@@ -329,6 +357,7 @@ class GroupViewHolder
 class ChildViewHolder
 {
 	DoseView dose;
+	TextView time;
 	TextView text;
 }
 
@@ -424,6 +453,30 @@ class EventInfo
 
 	long getSortingTime() {
 		return date.getTime();
+	}
+
+	String getTimeString()
+	{
+		if(timestamp == null)
+		{
+			final long offset = Settings.getTrueDoseTimeEndOffset(doseTime);
+			timestamp = DateTime.add(date, Calendar.MILLISECOND, (int) offset);
+		}
+
+		final StringBuilder sb = new StringBuilder(DateTime.toNativeTime(timestamp, false));
+		long diffDays = DateTime.diffDays(date, timestamp);
+
+		if(diffDays != 0)
+		{
+			sb.append(' ');
+
+			if(diffDays > 0)
+				sb.append('+');
+
+			sb.append(diffDays);
+		}
+
+		return sb.toString();
 	}
 
 	private EventInfo(DoseEvent intake)

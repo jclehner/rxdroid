@@ -196,6 +196,29 @@ public final class DateTime
 		return time.toString(DateFormat.is24HourFormat(RxDroid.getContext()), false);
 	}
 
+	public static String toNativeTime(Date time, boolean withSeconds)
+	{
+		final boolean use24HourTime = DateFormat.is24HourFormat(RxDroid.getContext());
+		final StringBuilder pattern = new StringBuilder();
+
+		if(use24HourTime)
+			pattern.append("HH");
+		else
+			pattern.append("h");
+
+		pattern.append(":mm");
+
+		if(withSeconds)
+			pattern.append(":ss");
+
+		if(!use24HourTime)
+			pattern.append(" aa");
+
+		final SimpleDateFormat sdf = new SimpleDateFormat(pattern.toString());
+		//sdf.setTimeZone(TimeZone.getTimeZone(("UTC")));
+		return sdf.format(time);
+	}
+
 	public static long getOffsetFromMidnight(Calendar date)
 	{
 		final int hour = date.get(Calendar.HOUR_OF_DAY);

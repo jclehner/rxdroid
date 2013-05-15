@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="mock_date" type="string">3000-01-01</item>
+    <item name="mock_date" type="string">2013-05-15</item>
+    <item name="mock_time" type="string">15:57 +1</item>
     <item name="mock_count" type="string">(0)</item>
-    <item name="mock_dose_text" type="string">Dose taken on 3000-01-01, 08:34</item>
+    <item name="mock_dose_text" type="string">Dose taken: Morning</item>
 </resources>
