@@ -42,6 +42,11 @@
 		<item name="doseStatusIgnored">@drawable/ic_dose_ignored_dark</item>
 		
 		<item name="textColorClickable">@color/black_clickable</item>
+					
+		<item name="colorStatusMissed">#ad3030</item>
+		<item name="colorStatusSkipped">#ff6600</item>
+		<item name="colorStatusTaken">#536800</item>		
+		
 		<item name="bgColorLogGroup">#eee</item>
 		<item name="bgColorLogChild">@android:color/transparent</item>
 		
@@ -73,6 +78,11 @@
 		<item name="doseStatusIgnored">@drawable/ic_dose_ignored</item>
 		
 		<item name="textColorClickable">@color/white_clickable</item>
+				
+		<item name="colorStatusMissed">#8e5050</item>
+		<item name="colorStatusSkipped">#ff8c3f</item>
+		<item name="colorStatusTaken">#7e8f3d</item>
+		
 		<item name="bgColorLogGroup">@android:color/transparent</item>
 		<item name="bgColorLogChild">#111</item>
 		

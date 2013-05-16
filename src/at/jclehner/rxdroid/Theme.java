@@ -25,6 +25,7 @@ import java.util.NoSuchElementException;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.util.Log;
 import android.util.SparseIntArray;
 import at.jclehner.rxdroid.util.Timer;
@@ -80,6 +81,17 @@ public final class Theme
 
 			return sAttrCache.get(attr);
 		}
+	}
+
+	public static int getColorAttribute(int attr)
+	{
+		final Context c = RxDroid.getContext();
+		final int[] attrs = { attr };
+		final TypedArray a = c.obtainStyledAttributes(get(), attrs);
+		final int color = a.getColor(0, Color.TRANSPARENT);
+
+		a.recycle();
+		return color;
 	}
 
 	public static void clearAttributeCache()

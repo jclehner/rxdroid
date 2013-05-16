@@ -1,6 +1,5 @@
 package at.jclehner.rxdroid.ui;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -21,11 +20,11 @@ import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Settings;
-import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.Settings.Keys;
+import at.jclehner.rxdroid.Theme;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
-import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.SimpleBaseExpandanbleListAdapter;
@@ -37,14 +36,25 @@ public class DoseLogFragment extends ExpandableListFragment
 	private static final String TAG = DoseLogFragment.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
 
+	private static final int[] DOSE_NAME_IDS = {
+		R.string._title_morning_dose,
+		R.string._title_noon_dose,
+		R.string._title_evening_dose,
+		R.string._title_night_dose
+	};
+
 	private List<List<EventInfo>> mGroupedEvents;
 	private Date mToday;
 
-	public static DoseLogFragment newInstance(Drug drug)
+
+	public static final int SHOW_MISSED = 1;
+	public static final int SHOW_TAKEN = 1 << 1;
+	public static final int SHOW_SKIPPED = 1 << 2;
+
+	public static DoseLogFragment newInstance(Drug drug, int flags)
 	{
 		DoseLogFragment f = new DoseLogFragment();
-		f.setArguments(Util.createBundle("drug_id", drug.getId()));
-
+		f.setArguments(Util.createBundle("drug_id", drug.getId(), "flags", flags));
 		return f;
 	}
 
@@ -54,7 +64,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		super.onCreate(savedInstanceState);
 
 		mToday = DateTime.today();
-		gatherEventInfos(GATHER_MISSED | GATHER_SKIPPED);
+		gatherEventInfos(getArguments().getInt("flags"));
 		setListAdapter(new Adapter());
 	}
 
@@ -62,9 +72,6 @@ public class DoseLogFragment extends ExpandableListFragment
 		return Drug.get(getArguments().getInt("drug_id"));
 	}
 
-	private static final int GATHER_MISSED = 1;
-	private static final int GATHER_TAKEN = 1 << 1;
-	private static final int GATHER_SKIPPED = 1 << 2;
 
 	private void gatherEventInfos(int flags)
 	{
@@ -74,25 +81,19 @@ public class DoseLogFragment extends ExpandableListFragment
 
 		final Drug drug = getDrug();
 		final List<EventInfo> infos = new ArrayList<EventInfo>();
-		final List<DoseEvent> events;
+		final List<DoseEvent> events = Entries.findDoseEvents(drug, null, null);
 
-		if((flags & GATHER_TAKEN) != 0 || (flags & GATHER_SKIPPED) != 0)
+		for(DoseEvent event : events)
 		{
-			events = Entries.findDoseEvents(drug, null, null);
-			for(DoseEvent event : events)
-			{
-				boolean isSkipped = event.getDose().isZero();
+			boolean isSkipped = event.getDose().isZero();
 
-				if((isSkipped && (flags & GATHER_SKIPPED) == 0) ||
-						(!isSkipped && (flags & GATHER_TAKEN) == 0)) {
-					continue;
-				}
-
-				infos.add(EventInfo.newTakenOrIgnoredEvent(event));
+			if((isSkipped && (flags & SHOW_SKIPPED) == 0) ||
+					(!isSkipped && (flags & SHOW_TAKEN) == 0)) {
+				continue;
 			}
+
+			infos.add(EventInfo.newTakenOrIgnoredEvent(event));
 		}
-		else
-			events = Collections.emptyList();
 
 		Date date = Settings.getDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME);
 
@@ -119,7 +120,7 @@ public class DoseLogFragment extends ExpandableListFragment
 //				date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
 //		}
 
-		if((flags & GATHER_MISSED) != 0)
+		if((flags & SHOW_MISSED) != 0)
 		{
 			while(!date.after(mToday))
 			{
@@ -277,6 +278,9 @@ public class DoseLogFragment extends ExpandableListFragment
 
 			holder.time.setText(info.getTimeString());
 
+			final int timeColorAttr;
+			final int textResId;
+
 			final DoseEvent doseEvent = info.intake;
 			if(doseEvent != null)
 			{
@@ -285,19 +289,29 @@ public class DoseLogFragment extends ExpandableListFragment
 				StringBuilder sb = new StringBuilder("Dose ");
 
 				if(info.status == EventInfo.STAT_TAKEN)
-					sb.append("taken: ");
+				{
+					textResId = R.string._title_taken;
+					timeColorAttr = R.attr.colorStatusTaken;
+				}
 				else
-					sb.append("skipped: ");
+				{
+					textResId = R.string._title_skipped;
+					timeColorAttr = R.attr.colorStatusSkipped;
+				}
 
 				sb.append(Util.getDoseTimeName(info.doseTime));
 				holder.text.setText(sb.toString() + " " + DateTime.toNativeDate(info.date));
 			}
 			else
 			{
-				//holder.dose.setDose(Fraction.ZERO);
-				holder.text.setText("Missed: " + Util.getDoseTimeName(info.doseTime));
-				//holder.time.setText("");
+				textResId = R.string._title_missed;
+				timeColorAttr = R.attr.colorStatusMissed;
 			}
+
+			holder.text.setText(textResId);
+
+//			final int color = getResources().getColor(Theme.getColorAttribute(timeColorAttr));
+//			holder.time.setTextColor(color);
 
 			return view;
 		}
@@ -506,8 +520,6 @@ class EventInfo
 		{
 			Log.d("EventInfo", "Empty timestamp in " + intake);
 		}
-
-//		generateTimestamp();
 	}
 
 	private EventInfo(Date date, int doseTime)
@@ -516,18 +528,5 @@ class EventInfo
 		this.doseTime = doseTime;
 		status = STAT_MISSED;
 		intake = null;
-
-//		generateTimestamp();
-	}
-
-	private void generateTimestamp()
-	{
-		if(timestamp == null)
-		{
-			long offset = Settings.getDoseTimeBeginOffset(doseTime);
-			//timestamp = DateTime.add(date, Calendar.MILLISECOND, (int) offset);
-			timestamp = new Timestamp(date.getTime() + offset);
-			Log.d("EventInfoComparator", "Forging time for " + this + " to " + DateTime.toNativeDateAndTime(timestamp));
-		}
 	}
 }

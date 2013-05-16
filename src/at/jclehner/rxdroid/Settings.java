@@ -43,6 +43,7 @@ import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.SimpleBitSet;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public final class Settings
@@ -81,6 +82,10 @@ public final class Settings
 		public static final String DISPLAYED_ONCE = "displayed_once";
 		public static final String IS_FIRST_LAUNCH = "is_first_launch";
 		public static final String OLDEST_POSSIBLE_DOSE_EVENT_TIME = "oldest_possible_dose_event_time";
+
+		public static final String LOG_SHOW_TAKEN = "log_show_taken";
+		public static final String LOG_SHOW_SKIPPED = "log_show_skipped";
+		public static final String LOG_SHOW_MISSED = "log_show_missed";
 	}
 
 	public static class Enums

@@ -74,6 +74,9 @@
 	<attr name="menuIconStorage" />
     
     <attr name="textColorClickable" format="color|reference" />
+      <attr name="colorStatusMissed" format="color|reference" />
+      <attr name="colorStatusSkipped" format="color|reference" />
+      <attr name="colorStatusTaken" format="color|reference" />
     <attr name="bgColorLogGroup" format="color|reference" />
     <attr name="bgColorLogChild" format="color|reference" />
     

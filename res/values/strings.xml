@@ -341,6 +341,17 @@
 	<string name="_msg_swipe_to_change_date">You can change the displayed date by swiping left or right</string>
 	
 	<string name="_msg_loading">Loading</string>
+	<string name="_title_view">View</string>
+	
+	<string name="_title_missed">Missed</string>
+	<string name="_title_skipped">Skipped</string>
+	<string name="_title_taken">Taken</string>	
+	
+	<string name="_title_morning_dose">Morning dose</string>	
+	<string name="_title_noon_dose">Noon dose</string>
+	<string name="_title_evening_dose">Evening dose</string>	
+	<string name="_title_night_dose">Night dose</string>	
+	
 	
 	<string translatable="false" name="test_schedule">
 	    Mon    0 - 0 - 0 - 1\n
