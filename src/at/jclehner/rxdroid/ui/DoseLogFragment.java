@@ -12,8 +12,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
+//import android.widget.ListAdapter;
 import android.widget.TextView;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseView;
@@ -27,7 +28,7 @@ import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
-import at.jclehner.rxdroid.util.SimpleBaseExpandanbleListAdapter;
+//import at.jclehner.rxdroid.util.SimpleBaseExpandanbleListAdapter;
 import at.jclehner.rxdroid.util.Timer;
 import at.jclehner.rxdroid.util.Util;
 
@@ -181,7 +182,8 @@ public class DoseLogFragment extends ExpandableListFragment
 		return false;
 	}
 
-	private class Adapter extends SimpleBaseExpandanbleListAdapter implements ListAdapter
+//	private class Adapter extends SimpleBaseExpandanbleListAdapter implements ListAdapter
+	private class Adapter extends BaseExpandableListAdapter
 	{
 		LayoutInflater mInflater;
 
@@ -286,8 +288,6 @@ public class DoseLogFragment extends ExpandableListFragment
 			{
 				holder.dose.setDose(doseEvent.getDose());
 
-				StringBuilder sb = new StringBuilder("Dose ");
-
 				if(info.status == EventInfo.STAT_TAKEN)
 				{
 					textResId = R.string._title_taken;
@@ -299,6 +299,9 @@ public class DoseLogFragment extends ExpandableListFragment
 					timeColorAttr = R.attr.colorStatusSkipped;
 				}
 
+
+				final StringBuilder sb = new StringBuilder("Dose ");
+				sb.append(getString(textResId) + ": ");
 				sb.append(Util.getDoseTimeName(info.doseTime));
 				holder.text.setText(sb.toString() + " " + DateTime.toNativeDate(info.date));
 			}
@@ -324,50 +327,19 @@ public class DoseLogFragment extends ExpandableListFragment
 		}
 
 		@Override
-		public int getCount()
-		{
+		public long getChildId(int groupPosition, int childPosition) {
 			// TODO Auto-generated method stub
-			return 0;
+			return childPosition;
 		}
 
 		@Override
-		public Object getItem(int position)
-		{
+		public long getGroupId(int groupPosition) {
 			// TODO Auto-generated method stub
-			return null;
+			return groupPosition;
 		}
 
 		@Override
-		public long getItemId(int position)
-		{
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public int getItemViewType(int position)
-		{
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public int getViewTypeCount()
-		{
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public boolean isEnabled(int position)
-		{
+		public boolean hasStableIds() {
 			// TODO Auto-generated method stub
 			return false;
 		}
