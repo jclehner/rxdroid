@@ -51,7 +51,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 		 * @return a reference to this instance
 		 */
 		public MutableFraction add(Fraction other) {
-			return add(this, other);
+			return Fraction.add(this, other);
 		}
 
 		/**
@@ -59,7 +59,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 		 * @return a reference to this object
 		 */
 		public MutableFraction add(int n) {
-			return add(this, n);
+			return Fraction.add(this, n);
 		}
 
 		/**
@@ -67,7 +67,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 		 * @return a reference to this instance
 		 */
 		public MutableFraction subtract(Fraction other) {
-			return add(this, other.negate());
+			return Fraction.add(this, other.negate());
 		}
 
 		/**
@@ -75,23 +75,23 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 		 * @return a reference to this instance
 		 */
 		public MutableFraction subtract(int n) {
-			return add(this, -n);
+			return Fraction.add(this, -n);
 		}
 
 		public MutableFraction multiplyBy(Fraction other) {
-			return multiplyBy(this, other);
+			return Fraction.multiplyBy(this, other);
 		}
 
 		public MutableFraction multiplyBy(int n) {
-			return multiplyBy(this, n);
+			return Fraction.multiplyBy(this, n);
 		}
 
 		public MutableFraction divideBy(Fraction other) {
-			return divideBy(this, other);
+			return Fraction.divideBy(this, other);
 		}
 
 		public MutableFraction divideBy(int n) {
-			return divideBy(this, n);
+			return Fraction.divideBy(this, n);
 		}
 	}
 
