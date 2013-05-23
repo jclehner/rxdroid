@@ -106,12 +106,28 @@ public final class DateTime
 		return nowCalendar().getTime();
 	}
 
-	public static Date min(Date date1, Date date2) {
-		return date1.before(date2) ? date1 : date2;
+	public static Date min(Date date1, Date date2)
+	{
+		if(date1 != null && date2 != null)
+			return date1.before(date2) ? date1 : date2;
+		else if(date1 != null)
+			return date1;
+		else if(date2 != null)
+			return date2;
+
+		return null;
 	}
 
-	public static Date max(Date date1, Date date2) {
-		return date1.after(date2) ? date1 : date2;
+	public static Date max(Date date1, Date date2)
+	{
+		if(date1 != null && date2 != null)
+			return date1.after(date2) ? date1 : date2;
+		else if(date1 != null)
+			return date1;
+		else if(date2 != null)
+			return date2;
+
+		return null;
 	}
 
 	/**
@@ -186,6 +202,9 @@ public final class DateTime
 
 	public static String toDateString(Date date)
 	{
+		if(date == null)
+			return null;
+
 		SimpleDateFormat sdf = PerThreadInstance.get(SimpleDateFormat.class, DATE_FORMAT);
 		return sdf.format(date);
 	}

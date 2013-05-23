@@ -59,13 +59,22 @@ public class TogglableTimePeriodPreference extends TimePeriodPreference
 		setChecked(Settings.isChecked(getKey(), false));
 	}
 
+	@Override
+	protected void onDialogClosed(boolean positiveResult)
+	{
+		super.onDialogClosed(positiveResult);
+
+		if(!positiveResult && mToggler != null)
+			mToggler.setChecked(false);
+	}
+
 	private void setChecked(boolean checked)
 	{
-		mChecked = checked;
-		if(!mChecked)
+		if(!checked)
 			setSummaryInternal(getContext().getString(R.string._title_disabled));
 
-		Settings.setChecked(getKey(), mChecked);
+		Settings.setChecked(getKey(), checked);
+		mChecked = checked;
 	}
 
 	private final OnCheckedChangeListener mToggleListener = new OnCheckedChangeListener() {

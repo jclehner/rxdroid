@@ -35,7 +35,7 @@ public abstract class MultiPageDialog extends AdvancedAlertDialog implements OnC
 
 	static
 	{
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+		if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
 		{
 			BUTTON_BACK = Dialog.BUTTON_NEGATIVE;
 			BUTTON_NEXT = Dialog.BUTTON_POSITIVE;

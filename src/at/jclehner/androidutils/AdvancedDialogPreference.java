@@ -58,7 +58,7 @@ import at.jclehner.rxdroid.util.Util;
 public abstract class AdvancedDialogPreference<T extends Serializable> extends DialogPreference
 {
 	private static final String TAG = AdvancedDialogPreference.class.getSimpleName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = true;
 
 	private static final boolean USE_NEW_DISMISS_LOGIC = false;
 
@@ -198,10 +198,15 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	@Override
 	public void onClick(DialogInterface dialog, int which)
 	{
+		if(LOGV) Log.v(TAG, getKey() + ": onClick: which=" + which);
+
 		if(USE_NEW_DISMISS_LOGIC)
 			mLastButtonId = which;
 		else
-			onDialogClosed(which == Dialog.BUTTON_POSITIVE);
+		{
+			super.onClick(dialog, which);
+			//onDialogClosed(which == Dialog.BUTTON_POSITIVE);
+		}
 	}
 
 	@Override

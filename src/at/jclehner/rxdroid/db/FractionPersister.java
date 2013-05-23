@@ -62,7 +62,7 @@ public class FractionPersister extends StringType
 
 	private static Fraction valueOf(Object object)
 	{
-		if(object == null)
+		if(object == null || ((String) object).length() == 0)
 			return Fraction.ZERO;
 
 		return Fraction.valueOf((String) object);

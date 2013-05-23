@@ -101,10 +101,27 @@ public class DoseLogFragment extends ExpandableListFragment
 		if(date != null && !events.isEmpty())
 		{
 			Collections.sort(infos, EventInfoByDateComparator.INSTANCE);
+			date = DateTime.max(date, Settings.getOldestPossibleHistoryDate(mToday));
 			date = DateTime.min(date, events.get(events.size() - 1).getDate());
 		}
 		else if(date == null)
 			date = Settings.getOldestPossibleHistoryDate(mToday);
+
+		if(LOGV)
+		{
+			Log.v(TAG, "gatherEventInfos:\n" +
+					"  oldest reliable DoseEvent date: " +
+					DateTime.toDateString(Settings.getDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME)) + "\n" +
+					"  oldest possible history date  : " +
+					DateTime.toDateString(Settings.getOldestPossibleHistoryDate(mToday)) + "\n" +
+					"  oldest date in DoseEvent set  : " +
+					DateTime.toDateString(events.get(events.size() - 1).getDate()) + "\n\n" +
+					"  date used                     : " +
+					DateTime.toDateString(date));
+		}
+
+
+
 
 		if(date == null)
 		{
@@ -298,12 +315,6 @@ public class DoseLogFragment extends ExpandableListFragment
 					textResId = R.string._title_skipped;
 					timeColorAttr = R.attr.colorStatusSkipped;
 				}
-
-
-				final StringBuilder sb = new StringBuilder("Dose ");
-				sb.append(getString(textResId) + ": ");
-				sb.append(Util.getDoseTimeName(info.doseTime));
-				holder.text.setText(sb.toString() + " " + DateTime.toNativeDate(info.date));
 			}
 			else
 			{
@@ -311,7 +322,11 @@ public class DoseLogFragment extends ExpandableListFragment
 				timeColorAttr = R.attr.colorStatusMissed;
 			}
 
-			holder.text.setText(textResId);
+			final StringBuilder sb = new StringBuilder();
+			sb.append(getString(textResId) + ": ");
+			sb.append(getString(DOSE_NAME_IDS[info.doseTime]));
+			holder.text.setText(sb.toString());
+
 
 //			final int color = getResources().getColor(Theme.getColorAttribute(timeColorAttr));
 //			holder.time.setTextColor(color);

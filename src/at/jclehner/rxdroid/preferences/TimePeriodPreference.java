@@ -456,13 +456,17 @@ public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
 		@Override
 		public void onClick(View v)
 		{
+			// FIXME call onClick(DialogInterface, int) here!!!
+
 			mTimePicker.clearFocus();
 
 			if(v == mBackButton)
 			{
 				if(mCurrentPage == 0)
 				{
-					onDialogClosed(false);
+					TimePeriodPreference.this.onClick(getDialog(), Dialog.BUTTON_NEGATIVE);
+
+					//onDialogClosed(false);
 					getDialog().dismiss();
 					return;
 				}
@@ -476,9 +480,14 @@ public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
 
 				if(++mCurrentPage == mPageCount)
 				{
+					final int which = positiveResult ? Dialog.BUTTON_POSITIVE :
+							Dialog.BUTTON_NEGATIVE;
+
+					TimePeriodPreference.this.onClick(getDialog(), which);
+
 					// We check the value again because it might have
 					// changed by the call to clearFocus()
-					onDialogClosed(positiveResult);
+					//onDialogClosed(positiveResult);
 					getDialog().dismiss();
 					return;
 				}

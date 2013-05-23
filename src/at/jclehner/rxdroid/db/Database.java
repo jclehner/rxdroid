@@ -542,8 +542,16 @@ public final class Database
 		final Thread th = new Thread() {
 
 			@Override
-			public void run() {
-				runDaoMethod(dao, methodName, entry);
+			public void run()
+			{
+				try
+				{
+					runDaoMethod(dao, methodName, entry);
+				}
+				finally
+				{
+					--sPendingDaoOperations;
+				}
 			}
 		};
 
@@ -596,10 +604,10 @@ public final class Database
 			ex = e;
 			// handled at end of function
 		}
-		finally
+		/*finally
 		{
 			--sPendingDaoOperations;
-		}
+		}*/
 
 		throw new WrappedCheckedException("Failed to run DAO method " + methodName, ex);
 	}

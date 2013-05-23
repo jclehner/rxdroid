@@ -42,6 +42,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
@@ -173,7 +174,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(true)
 		{
 			final String isoLang = Locale.getDefault().getLanguage();
-			if(!CollectionUtils.contains(Version.LANGUAGES, isoLang))
+			if(!TextUtils.isEmpty(isoLang) && !CollectionUtils.contains(Version.LANGUAGES, isoLang))
 			{
 				final String language = Locale.getDefault().getDisplayLanguage(Locale.US);
 				showInfoDialog("missing_translation_" + isoLang, R.string._msg_no_translation, language);
@@ -216,7 +217,14 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(Settings.getBoolean(Keys.COMPACT_ACTION_BAR, Defaults.COMPACT_ACTION_BAR))
 			menuResId = R.menu.activity_drug_list_compact;
 		else
-			menuResId = R.id.menu_default_drug_list_activity;
+		{
+			if(!BuildConfig.DEBUG)
+				menuResId = R.id.menu_default_drug_list_activity;
+			else
+				menuResId = R.menu.activity_drug_list_extended;
+		}
+
+		Log.d(TAG, "menuResId=" + menuResId);
 
 		new MenuInflater(this).inflate(menuResId, menu);
 
@@ -556,6 +564,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
+					Log.d(TAG, "onClick: which = " + which);
 					Settings.setDisplayedOnce(onceId);
 				}
 			});

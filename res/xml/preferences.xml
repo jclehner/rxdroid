@@ -223,6 +223,11 @@
 		<Preference android:title="Test"
 		    android:summary="@string/test_schedule"
 		/>
+		
+		<CheckBoxPreference android:key="@string/key_compact_action_bar" 
+			android:title="Compact ActionBar"
+			android:defaultValue="@bool/pref_default_compact_action_bar"
+		/>
 				    
 </PreferenceScreen>
 	

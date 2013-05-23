@@ -49,7 +49,7 @@ public final class Theme
 //	};
 
 	public static boolean isDark() {
-		return Settings.getBoolean(Settings.Keys.THEME_IS_DARK, Version.SDK_IS_PRE_HONEYCOMB);
+		return Settings.getBoolean(Settings.Keys.THEME_IS_DARK, Settings.Defaults.THEME_IS_DARK);
 	}
 
 	public static int get() {

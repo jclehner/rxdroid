@@ -36,6 +36,8 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
@@ -53,6 +55,8 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class SplashScreenActivity extends Activity implements OnClickListener
 {
+	private static final boolean USE_MSG_HANDLER = BuildConfig.DEBUG;
+
 	public class DatabaseStatusReceiver extends BroadcastReceiver
 	{
 		public static final String EXTRA_MESSAGE = "at.jclehner.rxdroid.extra.MESSAGE";
@@ -73,10 +77,34 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		}
 	}
 
+	public class DatabaseStatusHandler extends Handler
+	{
+		public static final int MSG_SET_TEXT = 0;
+
+		@Override
+		public void handleMessage(Message msg)
+		{
+			if(msg.what == MSG_SET_TEXT)
+			{
+				final TextView text = (TextView) findViewById(R.id.text_loading);
+				if(text != null)
+				{
+					final int textResId = msg.arg1;
+					text.setText(getString(R.string._title_database) + ": " + getString(textResId));
+					return;
+				}
+			}
+
+			super.handleMessage(msg);
+		}
+	}
+
 	private static final String TAG = SplashScreenActivity.class.getSimpleName();
 	private static final String ARG_EXCEPTION = "exception";
 
 	private final BroadcastReceiver mReceiver = new DatabaseStatusReceiver();
+	private final DatabaseStatusHandler mHandler = new DatabaseStatusHandler();
+
 	private WrappedCheckedException mException = null;
 
 	@TargetApi(11)
@@ -147,13 +175,25 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 
 	public static void setStatusMessage(int msgResId)
 	{
-		final Context context = RxDroid.getContext();
-		final Intent intent = new Intent(context, DatabaseStatusReceiver.class);
-		intent.setAction(Intent.ACTION_MAIN);
-		intent.putExtra(DatabaseStatusReceiver.EXTRA_MESSAGE, msgResId);
+		if(/*USE_MSG_HANDLER*/ false)
+		{
 
-		LocalBroadcastManager bm = RxDroid.getLocalBroadcastManager();
-		bm.sendBroadcast(intent);
+
+			return;
+
+
+
+		}
+		else
+		{
+			final Context context = RxDroid.getContext();
+			final Intent intent = new Intent(context, DatabaseStatusReceiver.class);
+			intent.setAction(Intent.ACTION_MAIN);
+			intent.putExtra(DatabaseStatusReceiver.EXTRA_MESSAGE, msgResId);
+
+			LocalBroadcastManager bm = RxDroid.getLocalBroadcastManager();
+			bm.sendBroadcast(intent);
+		}
 	}
 
 	@Override
