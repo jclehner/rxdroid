@@ -1,0 +1,50 @@
+#!/bin/bash
+
+source "$(dirname "$0")/shared.sh" || exit 1
+
+REPO="https://rxdroid.googlecode.com/svn"
+TMP=$(mktempd)
+BIN="bin/RxDroid-release-unsigned.apk"
+KEYSTORE="${KEYSTORE:-/___IDONTEXIST__}"
+ALIAS="${ALIAS:-}"
+OUT="${HOME}/RxDroid-release.apk"
+
+checkout() {
+	cd "$TMP"
+	run svn co "$REPO/$1" .
+	run unzip thirdparty.zip
+	run android update project -p .
+	run android update project -p thirdparty/NumberPicker
+	run android update project -p thirdparty/DragSortListView
+	run ant release
+
+	echo
+
+
+	while [[ ! -f "$KEYSTORE" ]] ; do
+		read -p "Keystore file: " KEYSTORE
+	done
+
+	while [[ -z "$ALIAS" ]]; do
+		read -p "Key alias: " ALIAS
+	done
+
+	echo "======================================================"
+	echo "Keystore: $KEYSTORE"
+	echo "Alias   : $ALIAS"
+	echo "======================================================"
+
+	run jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore "$KEYSTORE" "$BIN" "$ALIAS"
+	run jarsigner -verify "$BIN"
+	run zipalign -f 4 "$BIN" ~/RxDroid-release.apk
+
+	echo "======================================================"
+	echo "APK is available at $OUT"
+	echo "======================================================"
+}
+
+if [[ $# -ne 1 ]]; then
+	die "usage: build-for-release <tag>"
+fi
+
+checkout "$1"
