@@ -265,7 +265,7 @@ public final class ImportExport
 	}
 
 	private static boolean isForeignField(Field f, Annotation a) {
-		return Reflect.getAnnotationParameter(a, "foreign");
+		return (Boolean) Reflect.getAnnotationParameter(a, "foreign");
 	}
 
 	private static final Class<?>[] JSONABLE = {
