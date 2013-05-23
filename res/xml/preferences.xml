@@ -55,6 +55,7 @@
 		<CheckBoxPreference android:key="@string/key_theme_is_dark" 
 			android:title="@string/_title_dark_theme"
 			android:defaultValue="@bool/pref_default_theme_is_dark"
+			android:enabled="@bool/pref_visibility_theme_is_dark"
 		/>
 		
 		<CheckBoxPreference android:key="@string/key_enable_landscape_mode"

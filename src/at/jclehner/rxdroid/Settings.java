@@ -701,6 +701,16 @@ public final class Settings
 				Settings.putBoolean(Settings.Keys.ENABLE_LANDSCAPE, false);
 			}
 		}
+
+		if(!Version.SDK_IS_PRE_HONEYCOMB && !Version.SDK_IS_JELLYBEAN_OR_NEWER)
+		{
+			if(!Settings.getBoolean(Keys.THEME_IS_DARK, Defaults.THEME_IS_DARK))
+			{
+				Log.i(TAG, "Android 3.x detected - disabling light theme");
+				Settings.putBoolean(Keys.THEME_IS_DARK, true);
+			}
+		}
+
 	}
 
 	// converts the string set [ "foo", "bar", "foobar", "barz" ] to the following string:

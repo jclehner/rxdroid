@@ -22,6 +22,7 @@
  */
 -->
 
-<resources>	
+<resources>	    
+	<style name="DefaultTheme" parent="@style/LightTheme" />
 	<style name="_ApiSpecificLightTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar" />
 </resources>

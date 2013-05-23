@@ -231,6 +231,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			Log.i(TAG, "Will focus on current supply preference");
 			performPreferenceClick("currentSupply");
 		}
+
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+			invalidateOptionsMenu();
 	}
 
 	@Override
@@ -244,11 +247,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		MenuItem item = menu.add(0, MENU_DELETE, 0, R.string._title_delete)
-				.setIcon(android.R.drawable.ic_menu_delete);
+		if(mIsEditing)
+		{
+			MenuItem item = menu.add(0, MENU_DELETE, 0, R.string._title_delete)
+					.setIcon(android.R.drawable.ic_menu_delete);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+				item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		}
 
 		return super.onCreateOptionsMenu(menu);
 	}

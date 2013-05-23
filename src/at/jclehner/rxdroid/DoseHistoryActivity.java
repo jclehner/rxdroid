@@ -153,95 +153,6 @@ public class DoseHistoryActivity extends FragmentActivity
 		ft.commit();
 	}
 
-	class DoseHistoryAdapter extends BaseExpandableListAdapter
-	{
-		private Context mContext;
-		final List<DoseEvent> mIntakes;
-
-		public DoseHistoryAdapter(Context context, Drug drug)
-		{
-			mContext = context;
-			mIntakes = Entries.findDoseEvents(drug, null, null);
-		}
-
-		@Override
-		public boolean isChildSelectable(int groupPosition, int childPosition) {
-			return false;
-		}
-
-		@Override
-		public boolean hasStableIds() {
-			return false;
-		}
-
-		@Override
-		public View getGroupView(int groupPosition, boolean isExpanded, View view, ViewGroup parent)
-		{
-			final DoseEvent intake = mIntakes.get(groupPosition);
-			final TextView tv;
-
-			if(view == null)
-			{
-				view = LayoutInflater.from(mContext).inflate(android.R.layout.simple_expandable_list_item_1, null);
-				//tv = new TextView(mContext);
-				//parent.addView(tv);
-			}
-			else
-				tv = (TextView) view;
-
-			((TextView) view.findViewById(android.R.id.text1)).setText(DateTime.toNativeDateAndTime(intake.getTimestamp()));
-			return view;
-		}
-
-		@Override
-		public long getGroupId(int groupPosition) {
-			return groupPosition;
-		}
-
-		@Override
-		public int getGroupCount() {
-			return mIntakes.size();
-		}
-
-		@Override
-		public Object getGroup(int groupPosition) {
-			return null;
-		}
-
-		@Override
-		public int getChildrenCount(int groupPosition) {
-			return 1;
-		}
-
-		@Override
-		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent)
-		{
-			final DoseEvent intake = mIntakes.get(groupPosition);
-			final TextView tv;
-
-			if(convertView == null)
-			{
-				tv = new TextView(mContext);
-				//parent.addView(tv);
-			}
-			else
-				tv = (TextView) convertView;
-
-			tv.setText("Scheduled for " + intake.getDate() + "(" + Util.getDoseTimeName(intake.getDoseTime()) +")");
-			return tv;
-		}
-
-		@Override
-		public long getChildId(int groupPosition, int childPosition) {
-			return groupPosition << 16 | childPosition;
-		}
-
-		@Override
-		public Object getChild(int groupPosition, int childPosition) {
-			return null;
-		}
-	}
-
 	class ViewOptionsDialogFragment extends DialogFragment
 	{
 		private boolean[] mChecked;
@@ -308,7 +219,5 @@ public class DoseHistoryActivity extends FragmentActivity
 
 			return ab.create();
 		}
-
 	}
-
 }

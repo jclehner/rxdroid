@@ -34,6 +34,7 @@
 	<item name="pref_default_compact_action_bar" type="bool">true</item>
 	<item name="pref_default_quiet_hours" type="string">00:00-06:00</item>
 	
+	<item name="pref_visibility_theme_is_dark" type="bool">true</item>
 	<item name="pref_visibility_landscape_enabled" type="bool">true</item>
 	<item name="pref_visibility_compact_action_bar" type="bool">false</item>
 	
