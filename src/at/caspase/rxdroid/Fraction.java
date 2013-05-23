@@ -61,7 +61,7 @@ public class Fraction extends Number implements Comparable<Number>
 		 * @return a reference to this object
 		 */
 		public MutableFraction add(int n) {
-			return add(this, n);
+			return Fraction.add(this, n);
 		}
 
 		/**
@@ -69,7 +69,7 @@ public class Fraction extends Number implements Comparable<Number>
 		 * @return a reference to this instance
 		 */
 		public MutableFraction subtract(Fraction other) {
-			return add(this, other.negate());
+			return Fraction.add(this, other.negate());
 		}
 
 		/**
@@ -77,7 +77,7 @@ public class Fraction extends Number implements Comparable<Number>
 		 * @return a reference to this instance
 		 */
 		public MutableFraction subtract(int n) {
-			return add(this, -n);
+			return Fraction.add(this, -n);
 		}
 	}
 
