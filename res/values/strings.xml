@@ -350,7 +350,11 @@
 	<string name="_title_morning_dose">Morning dose</string>	
 	<string name="_title_noon_dose">Noon dose</string>
 	<string name="_title_evening_dose">Evening dose</string>	
-	<string name="_title_night_dose">Night dose</string>	
+	<string name="_title_night_dose">Night dose</string>
+	
+	<string name="_title_collapse">Collapse</string>
+	<string name="_title_expand">Expand</string>
+	
 	
 	
 	<string translatable="false" name="test_schedule">

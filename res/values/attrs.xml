@@ -72,6 +72,8 @@
 	<attr name="menuIconInfo" />
 	<attr name="menuIconWarning" />
 	<attr name="menuIconStorage" />
+	<attr name="menuIconExpandAll" />
+	<attr name="menuIconCollapseAll" />
     
     <attr name="textColorClickable" format="color|reference" />
       <attr name="colorStatusMissed" format="color|reference" />
