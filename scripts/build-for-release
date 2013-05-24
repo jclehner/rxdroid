@@ -5,14 +5,27 @@ source "$(dirname "$0")/shared.sh" || exit 1
 REPO="https://rxdroid.googlecode.com/svn"
 TMP=$(mktempd)
 BIN="bin/RxDroid-release-unsigned.apk"
-KEYSTORE="${KEYSTORE:-/___IDONTEXIST__}"
-ALIAS="${ALIAS:-}"
+RXDROID_KEYSTORE="${RXDROID_KEYSTORE:-/___IDONTEXIST__}"
+RXDROID_KEY_ALIAS="${RXDROID_KEY_ALIAS:-}"
 OUT="${HOME}/RxDroid-release.apk"
+
+cleanup() {
+	rm -rf "$TMP"
+}
 
 checkout() {
 	cd "$TMP"
 	run svn co "$REPO/$1" .
 	run unzip thirdparty.zip
+}
+
+signapk() {
+	jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
+			-keystore "$RXDROID_KEYSTORE" "$BIN" "$RXDROID_KEY_ALIAS"
+}
+
+
+build() {
 	run android update project -p .
 	run android update project -p thirdparty/NumberPicker
 	run android update project -p thirdparty/DragSortListView
@@ -20,21 +33,25 @@ checkout() {
 
 	echo
 
-
-	while [[ ! -f "$KEYSTORE" ]] ; do
-		read -p "Keystore file: " KEYSTORE
+	while [[ ! -f "$RXDROID_KEYSTORE" ]] ; do
+		read -p "Keystore file: " RXDROID_KEYSTORE
 	done
 
-	while [[ -z "$ALIAS" ]]; do
-		read -p "Key alias: " ALIAS
+	while [[ -z "$RXDROID_KEY_ALIAS" ]]; do
+		read -p "Key alias: " RXDROID_KEY_ALIAS
 	done
 
 	echo "======================================================"
-	echo "Keystore: $KEYSTORE"
-	echo "Alias   : $ALIAS"
+	echo "Keystore: $RXDROID_KEYSTORE"
+	echo "Alias   : $RXDROID_KEY_ALIAS"
 	echo "======================================================"
 
-	run jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore "$KEYSTORE" "$BIN" "$ALIAS"
+	while ! signapk; do
+		sleep 1 || exit 1
+	done
+
+
+
 	run jarsigner -verify "$BIN"
 	run zipalign -f 4 "$BIN" ~/RxDroid-release.apk
 
@@ -43,8 +60,19 @@ checkout() {
 	echo "======================================================"
 }
 
-if [[ $# -ne 1 ]]; then
-	die "usage: build-for-release <tag>"
+trap cleanup EXIT INT TERM
+
+if [[ $# -eq 1 ]]; then
+	if [[ $1 != "." ]]; then
+		checkout "$1"
+	fi
+else
+	echo >&2 "usage: build-for-release [PATH]"
+	echo >&2
+	echo >&2 "PATH: relative to $REPO; use ."
+	echo >&2 "      to build using the current directory"
+	exit 1
 fi
 
-checkout "$1"
+build
+

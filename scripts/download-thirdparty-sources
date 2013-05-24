@@ -135,7 +135,7 @@ link_or_copy()
 	# Eclipse 3.6 under Mac OS X 10.7 doesn't like Android library dependencies
 	# that are softlinks, apparently.
 	case $(uname -s) in 
-		Darwin|MINGW*)
+		Darwin|MINGW*|*)
 			echo -n "Copying files to $2... "
 			run cp -r "$1" "$2"
 			echo "done"
@@ -190,6 +190,12 @@ for REPO in "${GIT_REPOS[@]}"; do
 		link_or_copy "${CLONEDIR}/${LIBDIR}" "${TARGET}"
 		fix_project_properties "${TARGET}"
 		#create_project_files "${TARGET}"
+	fi
+
+	if [[ -f ${TARGET}/libs/android-support-v4.jar ]]; then
+		echo "INFO: Replacing android-support-v4.jar in ${TARGET}"
+		rm "${TARGET}/libs/android-support-v4.jar"
+		cp "../libs/android-support-v4.jar" "${TARGET}/libs/android-support-v4.jar"
 	fi
 
 	ZIPDIRS+="${THIRDPARTY}/${TARGET} "

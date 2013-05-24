@@ -38,7 +38,7 @@ elif [[ $KERNEL == "Darwin" ]]; then
 	}
 fi
 
-MKTEMP_CMDLINE="-t fooXXXXXX"
+MKTEMP_CMDLINE="-t rxdroidXXXXXX"
 
 mktempf() {
 	mktemp $MKTEMP_CMDLINE
