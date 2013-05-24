@@ -21,6 +21,8 @@ fi
 
 echo "Old version is $oldversion"
 
+mkdir -p doc
+
 for P in $PACKAGES; do
 	base="$P-$1"
 	library="$base.jar"
