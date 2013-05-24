@@ -21,15 +21,10 @@
 
 package at.jclehner.rxdroid.ui;
 
-import java.util.Locale;
-
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.text.SpannableString;
-import android.text.style.RelativeSizeSpan;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -59,6 +54,7 @@ public class ScheduleGridFragment extends ListFragment implements
 	// private View[] mViews = new View[8];
 	private SimpleBitSet mDayStatus = new SimpleBitSet(0);
 
+	@SuppressWarnings("unused")
 	private Schedule mSchedule;
 
 	@Override
@@ -84,17 +80,6 @@ public class ScheduleGridFragment extends ListFragment implements
 
 			if(weekDay != NO_WEEKDAY)
 				holder.dayName.setText(Constants.SHORT_WEEK_DAY_NAMES[i - 1]);
-			else
-			{
-				if(false)
-				{
-					SpannableString ss = new SpannableString("Mon\nTue\nWed\nThu\nFri\nSat\nSun");
-					Util.applyStyle(ss, new RelativeSizeSpan(0.75f));
-					holder.dayChecked.setVisibility(View.GONE);
-					holder.dayName.setText(ss);
-					holder.dayName.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
-				}
-			}
 
 			holder.dayContainer.setVisibility(i == 0 ? View.INVISIBLE : View.VISIBLE);
 

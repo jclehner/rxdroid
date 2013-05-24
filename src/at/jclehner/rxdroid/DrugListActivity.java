@@ -475,6 +475,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		return v;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void onDoseViewClick(View view)
 	{
 		final DoseView doseView = (DoseView) view;

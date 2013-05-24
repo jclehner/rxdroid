@@ -22,7 +22,6 @@
 package at.jclehner.rxdroid;
 
 import java.lang.ref.WeakReference;
-import java.util.Locale;
 import java.util.WeakHashMap;
 
 import android.app.Activity;
@@ -108,16 +107,8 @@ public class RxDroid extends Application
 		toast(textResId, Toast.LENGTH_LONG);
 	}
 
-	public static void runInMainThread(Runnable r)
-	{
-		if(true)
-		{
-			sHandler.post(r);
-		}
-		else
-		{
-			r.run();
-		}
+	public static void runInMainThread(Runnable r) {
+		sHandler.post(r);
 	}
 
 	public static LocalBroadcastManager getLocalBroadcastManager() {

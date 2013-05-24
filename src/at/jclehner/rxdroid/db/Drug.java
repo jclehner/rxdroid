@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import android.util.Log;
 import at.jclehner.androidutils.LazyValue;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.Fraction;
@@ -80,6 +79,7 @@ public class Drug extends Entry implements Comparable<Drug>
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = Drug.class.getSimpleName();
+	@SuppressWarnings("unused")
 	private static final boolean LOGV = BuildConfig.DEBUG;
 
 	public static final int ICON_TABLET = 0;

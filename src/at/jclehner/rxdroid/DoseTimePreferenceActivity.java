@@ -23,7 +23,6 @@ package at.jclehner.rxdroid;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.view.View;
 
 public class DoseTimePreferenceActivity extends PreferenceActivityBase
@@ -31,6 +30,7 @@ public class DoseTimePreferenceActivity extends PreferenceActivityBase
 	public static final String EXTRA_IS_FIRST_LAUNCH = "at.jclehner.rxroid.extras.IS_FIRST_LAUNCH";
 	private boolean mIsFirstLaunch;
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{

@@ -31,6 +31,7 @@ import android.widget.Button;
 
 public class AdvancedAlertDialog extends AlertDialog
 {
+	@SuppressWarnings("unused")
 	private static final String TAG = AdvancedAlertDialog.class.getSimpleName();
 
 	private OnShowListener mOnShowListener;

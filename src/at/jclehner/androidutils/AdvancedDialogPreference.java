@@ -23,8 +23,6 @@ package at.jclehner.androidutils;
 
 import java.io.Serializable;
 
-import com.j256.ormlite.stmt.query.NeedsFutureClause;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -40,7 +38,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import at.jclehner.androidutils.InstanceState.SaveState;
-import at.jclehner.rxdroid.FractionInput.OnChangedListener;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.util.Util;
 
@@ -62,6 +59,7 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 
 	private static final boolean USE_NEW_DISMISS_LOGIC = false;
 
+	@SuppressWarnings("unused")
 	private static final String EXTRA_DIALOG_VALUE = "at.jclehner.androidutils.DIALOG_VALUE";
 	private static final String EXTRA_DIALOG_STATE = "at.jclehner.androidutils.DIALOG_STATE";
 

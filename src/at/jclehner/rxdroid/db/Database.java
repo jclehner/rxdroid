@@ -22,15 +22,10 @@
 package at.jclehner.rxdroid.db;
 
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -38,11 +33,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.app.backup.BackupManager;
 import android.content.Context;
 import android.util.Log;
 import at.jclehner.androidutils.EventDispatcher;
@@ -53,11 +43,9 @@ import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.SplashScreenActivity;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.jclehner.rxdroid.util.Timer;
-import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.table.DatabaseTableConfig;
 
 /**
  * All DB access goes here.
@@ -82,9 +70,6 @@ public final class Database
 	public static Object LOCK_DATA = new Object();
 
 	/* package */ static final boolean USE_CUSTOM_CACHE = true;
-
-	private static final String JSON_NAME_VERSION = "version";
-	private static final String JSON_NAME_DATA = "data";
 
 	static final Class<?>[] CLASSES = {
 		Drug.class,
@@ -325,95 +310,6 @@ public final class Database
 		return sDbLoadingTimeMillis;
 	}
 
-	public static JSONObject exportDatabaseToJson() throws JSONException
-	{
-		final JSONArray data = new JSONArray();
-
-		for(Class<?> clazz : CLASSES)
-		{
-			try
-			{
-				final JSONObject obj = ImportExport.tableToJsonObject(clazz, sCache.get(clazz));
-				data.put(obj);
-			}
-			catch(JSONException e)
-			{
-				throw new WrappedCheckedException(e);
-			}
-		}
-
-		final JSONObject obj = new JSONObject();
-		obj.put(JSON_NAME_DATA, data);
-		obj.put(JSON_NAME_VERSION, DatabaseHelper.DB_VERSION);
-		return obj;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static void importDatabaseFromJson(JSONObject json) throws JSONException
-	{
-		final int version = json.getInt(JSON_NAME_VERSION);
-		if(version != DatabaseHelper.DB_VERSION)
-			throw new UnsupportedOperationException();
-
-		synchronized(LOCK_INIT)
-		{
-			sIsLoaded = false;
-			sCache.clear();
-
-			final JSONArray data = json.getJSONArray(JSON_NAME_DATA);
-
-			for(int i = 0; i != data.length(); ++i)
-			{
-				final JSONObject table = data.getJSONObject(i);
-
-				for(Class clazz : CLASSES)
-				{
-					final String tableName = DatabaseTableConfig.extractTableName(clazz);
-
-					if(table.has(tableName))
-					{
-						final List entries = new ArrayList();
-						ImportExport.tableFromJsonObject(table, clazz, entries);
-
-						for(Object entry : entries)
-							createOrUpdateWithoutMagic(entry);
-
-						sCache.put(clazz, entries);
-					}
-				}
-			}
-
-			sEventMgr.post("onDatabaseInitialized");
-
-			sIsLoaded = true;
-		}
-	}
-
-	public static void exportDatabaseToFile()
-	{
-		try
-		{
-			final File file = RxDroid.getContext().getFileStreamPath("test.json");
-			final FileWriter writer = new FileWriter(file);
-
-			writer.write(exportDatabaseToJson().toString());
-
-			Util.closeQuietly(writer);
-		}
-		catch(FileNotFoundException e)
-		{
-			Log.w(TAG, e);
-		}
-		catch(IOException e)
-		{
-			Log.w(TAG, e);
-		}
-		catch(JSONException e)
-		{
-			Log.w(TAG, e);
-		}
-	}
-
 	static synchronized <T extends Entry> List<T> getCached(Class<T> clazz)
 	{
 		if(!USE_CUSTOM_CACHE)
@@ -461,7 +357,7 @@ public final class Database
 		return sHelper.getDaoChecked(clazz);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	private static void createOrUpdateWithoutMagic(Object entry)
 	{
 		try

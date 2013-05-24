@@ -32,7 +32,7 @@ import at.jclehner.rxdroid.db.Schedule;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@SuppressWarnings({ "unused", "serial" })
+@SuppressWarnings({ "unused" })
 @DatabaseTable(tableName="schedules")
 public class OldSchedule extends Entry
 {

@@ -169,65 +169,21 @@ public final class InstanceState
 
 	private static void forEachAnnotatedMember(Object o, Callback callback)
 	{
-		if(true)
+		final Class<?> clazz = o.getClass();
+
+		if(LOGV) Log.v(TAG, "forEachAnnotatedMember: " + clazz.getSimpleName());
+
+		for(Field f : Reflect.getAllFields(clazz))
 		{
-			final Class<?> clazz = o.getClass();
+			if(!f.isAnnotationPresent(SaveState.class))
+				continue;
 
-			if(LOGV) Log.v(TAG, "forEachAnnotatedMember: " + clazz.getSimpleName());
-
-			for(Field f : Reflect.getAllFields(clazz))
-			{
-				if(!f.isAnnotationPresent(SaveState.class))
-					continue;
-
-				final String mapKey = f.getName() + "@" + clazz.getName();
-				if(LOGV) Log.v(TAG, "  " + f.getName() + " (" + mapKey + ")");
-				f.setAccessible(true);
-				callback.invoke(o, f, mapKey);
-			}
-		}
-		else
-			forEachAnnotatedMemberInternal(o.getClass(), o, callback);
-	}
-
-	private static void forEachAnnotatedMemberInternal(Class<?> clazz, Object o, Callback callback)
-	{
-		final Class<?> mySuper = clazz.getSuperclass();
-		if(mySuper != null)
-			forEachAnnotatedMemberInternal(mySuper, o, callback);
-
-		if(LOGV) Log.v(TAG, "forEachAnnotatedMemberInternal: " + clazz.getSimpleName());
-
-		for(Field f : clazz.getDeclaredFields())
-		{
-			if(f.isAnnotationPresent(SaveState.class))
-			{
-				final String mapKey = f.getName() + "@" + clazz.getName();
-				if(LOGV) Log.v(TAG, "  " + f.getName() + " (" + mapKey + ")");
-
-				try
-				{
-					makeAccessible(f);
-					callback.invoke(o, f, mapKey);
-				}
-				catch(SecurityException e)
-				{
-					throw new RuntimeException("Error accessing field " +
-							f.getName() + " in class " + clazz.getSimpleName());
-				}
-			}
-		}
-	}
-
-	private static boolean makeAccessible(Field f)
-	{
-		if(!f.isAccessible())
-		{
+			final String mapKey = f.getName() + "@" + clazz.getName();
+			if(LOGV) Log.v(TAG, "  " + f.getName() + " (" + mapKey + ")");
 			f.setAccessible(true);
-			return true;
+			callback.invoke(o, f, mapKey);
 		}
 
-		return false;
 	}
 
 	private interface Callback

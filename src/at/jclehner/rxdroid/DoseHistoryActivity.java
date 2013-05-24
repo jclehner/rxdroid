@@ -21,40 +21,26 @@
 
 package at.jclehner.rxdroid;
 
-import java.util.List;
-
 import android.annotation.TargetApi;
 import android.app.AlertDialog.Builder;
-import android.app.ActionBar;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.TextView;
 import at.jclehner.rxdroid.Settings.Keys;
-import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
-import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.ui.DoseLogFragment;
+import at.jclehner.rxdroid.ui.ExpandableListFragment;
 import at.jclehner.rxdroid.util.Components;
-import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Extras;
-import at.jclehner.rxdroid.util.Util;
 
 /*
  * TODO
@@ -87,8 +73,10 @@ import at.jclehner.rxdroid.util.Util;
 public class DoseHistoryActivity extends FragmentActivity
 {
 	private Drug mDrug;
+	private boolean mIsAllCollapsed = true;
 
 	private static final int MENU_VIEW = 0;
+	private static final int MENU_COLLAPSE_EXPAND = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -96,15 +84,14 @@ public class DoseHistoryActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		Components.onCreateActivity(this, 0);
 
-		//Drug drug = (Drug) getIntent().getSerializableExtra(Extras.DRUG);
+		// Drug drug = (Drug) getIntent().getSerializableExtra(Extras.DRUG);
 		mDrug = Drug.get(getIntent().getIntExtra(Extras.DRUG_ID, 0));
 
 		setTitle(mDrug.getName());
 
 		updateLogFragment();
 
-		//setListAdapter(new DoseHistoryAdapter(this, mDrug));
-
+		// setListAdapter(new DoseHistoryAdapter(this, mDrug));
 
 	}
 
@@ -112,7 +99,9 @@ public class DoseHistoryActivity extends FragmentActivity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		MenuItem item = menu.add(0, MENU_VIEW, 0, R.string._title_view)
+		MenuItem item;
+
+		item = menu.add(0, MENU_VIEW, 0, R.string._title_view)
 				.setIcon(android.R.drawable.ic_menu_view)
 				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
@@ -130,6 +119,40 @@ public class DoseHistoryActivity extends FragmentActivity
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		}
 
+		final int iconAttr = mIsAllCollapsed ? R.attr.menuIconExpandAll : R.attr.menuIconCollapseAll;
+		final int titleResId = mIsAllCollapsed ? R.string._title_expand : R.string._title_collapse;
+
+		item = menu.add(0, MENU_COLLAPSE_EXPAND, 0, titleResId)
+				.setIcon(Theme.getResourceAttribute(iconAttr))
+				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+					@Override
+					public boolean onMenuItemClick(MenuItem item)
+					{
+						FragmentManager fm = getSupportFragmentManager();
+
+						ExpandableListFragment f = (ExpandableListFragment) fm.findFragmentByTag("log");
+						if(f != null)
+						{
+							if(mIsAllCollapsed)
+								f.expandAll(true);
+							else
+								f.collapseAll();
+
+							mIsAllCollapsed = !mIsAllCollapsed;
+
+							if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+								invalidateOptionsMenu();
+						}
+
+						return true;
+					}
+				});
+
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+		{
+			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		}
 
 
 		return super.onCreateOptionsMenu(menu);
@@ -149,7 +172,8 @@ public class DoseHistoryActivity extends FragmentActivity
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
 
-		ft.replace(android.R.id.content, DoseLogFragment.newInstance(mDrug, flags), "log");
+		ft.replace(android.R.id.content,
+				DoseLogFragment.newInstance(mDrug, flags), "log");
 		ft.commit();
 	}
 
@@ -164,49 +188,48 @@ public class DoseHistoryActivity extends FragmentActivity
 			mChecked = new boolean[] {
 					Settings.getBoolean(Keys.LOG_SHOW_MISSED, true),
 					Settings.getBoolean(Keys.LOG_SHOW_SKIPPED, true),
-					Settings.getBoolean(Keys.LOG_SHOW_TAKEN, true)
-			};
+					Settings.getBoolean(Keys.LOG_SHOW_TAKEN, true) };
 
 			mWasChanged = false;
 
-			final String[] items = {
-					getString(R.string._title_missed),
+			final String[] items = { getString(R.string._title_missed),
 					getString(R.string._title_skipped),
-					getString(R.string._title_taken)
-			};
+					getString(R.string._title_taken) };
 
 			Builder ab = new Builder(getActivity());
-			ab.setMultiChoiceItems(items, mChecked, new OnMultiChoiceClickListener() {
+			ab.setMultiChoiceItems(items, mChecked,
+					new OnMultiChoiceClickListener() {
 
-				@Override
-				public void onClick(DialogInterface dialog, int which, boolean isChecked)
-				{
-					if(!mWasChanged)
-						mWasChanged = true;
+						@Override
+						public void onClick(DialogInterface dialog, int which,
+								boolean isChecked)
+						{
+							if(!mWasChanged)
+								mWasChanged = true;
 
-					mChecked[which] = isChecked;
+							mChecked[which] = isChecked;
 
-					final String key;
-					switch(which)
-					{
-						case 0:
-							key = Keys.LOG_SHOW_MISSED;
-							break;
-						case 1:
-							key = Keys.LOG_SHOW_SKIPPED;
-							break;
-						case 2:
-							key = Keys.LOG_SHOW_TAKEN;
-							break;
-						default:
-							return;
-					}
+							final String key;
+							switch(which)
+							{
+								case 0:
+									key = Keys.LOG_SHOW_MISSED;
+									break;
+								case 1:
+									key = Keys.LOG_SHOW_SKIPPED;
+									break;
+								case 2:
+									key = Keys.LOG_SHOW_TAKEN;
+									break;
+								default:
+									return;
+							}
 
-					Settings.putBoolean(key, isChecked);
-				}
-			});
+							Settings.putBoolean(key, isChecked);
+						}
+					});
 
-			//ab.setNegativeButton(android.R.string.cancel, null);
+			// ab.setNegativeButton(android.R.string.cancel, null);
 			ab.setPositiveButton(android.R.string.ok, new OnClickListener() {
 
 				@Override

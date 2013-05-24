@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.Version;
 
 public class ExpandableListFragment extends Fragment
 {
@@ -33,5 +34,28 @@ public class ExpandableListFragment extends Fragment
 
 	public ExpandableListAdapter getAdapter() {
 		return mAdapter;
+	}
+
+	public void expandAll(boolean animate)
+	{
+		if(mList == null || mAdapter == null)
+			return;
+
+		for(int i = 0; i != mAdapter.getGroupCount(); ++i)
+		{
+			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
+				mList.expandGroup(i, animate);
+			else
+				mList.expandGroup(i);
+		}
+	}
+
+	public void collapseAll()
+	{
+		if(mList == null || mAdapter == null)
+			return;
+
+		for(int i = 0; i != mAdapter.getGroupCount(); ++i)
+			mList.collapseGroup(i);
 	}
 }

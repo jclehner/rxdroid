@@ -28,6 +28,7 @@ import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.db.Drug;
 
+@SuppressWarnings("deprecation")
 public final class Constants
 {
 	public static final long MILLIS_PER_DAY = 24L * 3600 * 1000;

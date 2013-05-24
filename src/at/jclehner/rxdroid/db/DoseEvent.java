@@ -71,7 +71,6 @@ public class DoseEvent extends Entry
 	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction dose;
 
-	@SuppressWarnings("unused")
 	@DatabaseField
 	private boolean wasAutoCreated = false;
 

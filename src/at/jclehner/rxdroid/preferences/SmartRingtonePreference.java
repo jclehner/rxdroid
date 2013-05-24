@@ -29,7 +29,6 @@ import android.net.Uri;
 import android.preference.RingtonePreference;
 import android.provider.Settings;
 import android.util.AttributeSet;
-import android.util.Log;
 
 
 /**

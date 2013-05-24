@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 import android.app.Activity;
-import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -43,7 +42,6 @@ import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
-import at.jclehner.rxdroid.util.SimpleBitSet;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public final class Settings

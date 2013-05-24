@@ -25,6 +25,8 @@ public final class Exceptions
 {
 	public static class UnexpectedValueInSwitch extends RuntimeException
 	{
+		private static final long serialVersionUID = 3223514077564332618L;
+
 		public UnexpectedValueInSwitch() {
 			super("Unexpected value in switch statement");
 		}

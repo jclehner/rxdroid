@@ -120,9 +120,6 @@ public class DoseLogFragment extends ExpandableListFragment
 					DateTime.toDateString(date));
 		}
 
-
-
-
 		if(date == null)
 		{
 			Log.w(TAG, "gatherEventInfos(" + flags + "): no date to begin; giving up");

@@ -27,11 +27,7 @@ import java.util.List;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
-import android.support.v4.view.ViewCompat;
 import android.text.SpannableStringBuilder;
 import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;

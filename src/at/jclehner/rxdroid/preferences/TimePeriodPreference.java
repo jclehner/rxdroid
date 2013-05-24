@@ -292,19 +292,18 @@ public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
 		if(mConstraintKeys[which] != null)
 		{
 			final Preference p = findPreferenceInHierarchy(mConstraintKeys[which]);
-			if(p == null || (!(p instanceof TimePeriodPreference) && !(p instanceof TimePreference)))
-			{
-				Log.w(TAG, "No TimePreference or TimePeriodPreference with key=" + mConstraintKeys[which] + " in hierarchy (yet).");
-				return null;
-			}
-
 			if(p instanceof TimePeriodPreference)
 			{
 				final TimePeriod period = ((TimePeriodPreference) p).getValue();
 				return (which == MIN) ? period.mEnd : period.mBegin;
 			}
 			else
-				return ((TimePreference) p).getValue();
+			{
+				Log.w(TAG, "No TimePeriodPreference with key=" + mConstraintKeys[which] + " in hierarchy (yet).");
+				return null;
+			}
+
+
 		}
 
 		return mConstraintTimes[which];

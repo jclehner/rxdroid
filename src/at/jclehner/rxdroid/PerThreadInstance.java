@@ -50,6 +50,7 @@ public final class PerThreadInstance extends ThreadLocal<HashMap<Class<?>, HashM
 
 	private static final PerThreadInstance DATA = ENABLED ? new PerThreadInstance() : null;
 
+	@SuppressWarnings("unused")
 	public static <T> T get(Class<? extends T> clazz, Object... ctorArgs)
 	{
 		if(!ENABLED)

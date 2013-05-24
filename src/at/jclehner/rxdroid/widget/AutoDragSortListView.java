@@ -24,7 +24,6 @@ package at.jclehner.rxdroid.widget;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
@@ -83,6 +82,7 @@ public class AutoDragSortListView extends DragSortListView
 				return super.onCreateFloatView(position);
 			}
 
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onDestroyFloatView(View floatView)
 			{
@@ -129,12 +129,6 @@ public class AutoDragSortListView extends DragSortListView
 		}
 		else
 			throw new IllegalArgumentException("Only ArrayAdapters are supported");
-	}
-
-	@Override
-	public boolean startDrag(int position, int dragFlags, int deltaX, int deltaY) {
-		Log.d("AutoDragSortListView", "startDrag: pos=" + position);
-		return super.startDrag(position, dragFlags, deltaX, deltaY);
 	}
 
 	private final DropListener mDropListener = new DropListener() {

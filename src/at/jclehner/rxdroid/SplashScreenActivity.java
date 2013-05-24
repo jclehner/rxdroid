@@ -55,6 +55,7 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class SplashScreenActivity extends Activity implements OnClickListener
 {
+	@SuppressWarnings("unused")
 	private static final boolean USE_MSG_HANDLER = BuildConfig.DEBUG;
 
 	public class DatabaseStatusReceiver extends BroadcastReceiver
@@ -103,7 +104,6 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 	private static final String ARG_EXCEPTION = "exception";
 
 	private final BroadcastReceiver mReceiver = new DatabaseStatusReceiver();
-	private final DatabaseStatusHandler mHandler = new DatabaseStatusHandler();
 
 	private WrappedCheckedException mException = null;
 
@@ -175,27 +175,16 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 
 	public static void setStatusMessage(int msgResId)
 	{
-		if(/*USE_MSG_HANDLER*/ false)
-		{
+		final Context context = RxDroid.getContext();
+		final Intent intent = new Intent(context, DatabaseStatusReceiver.class);
+		intent.setAction(Intent.ACTION_MAIN);
+		intent.putExtra(DatabaseStatusReceiver.EXTRA_MESSAGE, msgResId);
 
-
-			return;
-
-
-
-		}
-		else
-		{
-			final Context context = RxDroid.getContext();
-			final Intent intent = new Intent(context, DatabaseStatusReceiver.class);
-			intent.setAction(Intent.ACTION_MAIN);
-			intent.putExtra(DatabaseStatusReceiver.EXTRA_MESSAGE, msgResId);
-
-			LocalBroadcastManager bm = RxDroid.getLocalBroadcastManager();
-			bm.sendBroadcast(intent);
-		}
+		LocalBroadcastManager bm = RxDroid.getLocalBroadcastManager();
+		bm.sendBroadcast(intent);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected Dialog onCreateDialog(int id, Bundle args)
 	{
@@ -214,6 +203,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		return super.onCreateDialog(id, args);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog, Bundle args)
 	{
@@ -279,6 +269,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 	{
 		(new Thread() {
 
+			@SuppressWarnings("unused")
 			@Override
 			public void run()
 			{
@@ -345,6 +336,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 			return null;
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected void onPostExecute(WrappedCheckedException result)
 		{
