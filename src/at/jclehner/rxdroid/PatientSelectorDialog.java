@@ -128,6 +128,10 @@ public class PatientSelectorDialog extends DialogFragment
 		return ab.create();
 	}
 
+	public void setOnSelectOrDeletePatientListener(OnSelectOrDeletePatientListener l) {
+		mListener = l;
+	}
+
 	public static PatientSelectorDialog newInstance(int patiendId)
 	{
 		final PatientSelectorDialog dialog = new PatientSelectorDialog();

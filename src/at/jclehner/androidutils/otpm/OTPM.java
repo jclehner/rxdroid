@@ -271,7 +271,7 @@ public class OTPM
 
 				String prefCatKey = a.categoryKey();
 //				String prefCatKey = Reflect.getAnnotationParameter(a, "categoryKey");
-				if(prefCatKey == null || prefCatKey == UNDEFINED)
+				if(prefCatKey == null || prefCatKey == UNDEFINED) // == UNDEFINED is intentional
 					prefCat.setKey(categoryTitle);
 				else
 					prefCat.setKey(prefCatKey);
@@ -468,7 +468,7 @@ public class OTPM
 
 		String str = Reflect.findAnnotationParameter(a, parameterName);
 		if(LOGV) Log.v(TAG, "  str='" + str + "'");
-		if(str == null || str == UNDEFINED)
+		if(str == null || str == UNDEFINED) // == UNDEFINED is intentional
 		{
 			Integer resId = Reflect.findAnnotationParameter(a, parameterName + "ResId");
 			if(LOGV) Log.v(TAG, "  trying " + parameterName + "ResId => " + resId);
