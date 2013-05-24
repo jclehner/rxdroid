@@ -38,6 +38,6 @@ for P in $PACKAGES; do
 done
 svn rm --force libs/ormlite-*$oldversion*.jar
 
-if [[ "$2" != "nocommit" ]]; then
+if [[ $# -eq 0 || "$2" != "nocommit" ]]; then
 	svn ci -m "ORMLite upgrade: $oldversion -> $1"
 fi
