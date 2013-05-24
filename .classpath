@@ -2,14 +2,14 @@
 <classpath>
 	<classpathentry excluding="**/.git/*|**/.svn/*" kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry exported="true" kind="lib" path="libs/ormlite-android-4.41.jar">
+	<classpathentry exported="true" kind="lib" path="libs/ormlite-android-4.45.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/RxDroid/doc/ormlite-android-4.41-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/RxDroid/doc/ormlite-android-4.45-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="libs/ormlite-core-4.41.jar">
+	<classpathentry exported="true" kind="lib" path="libs/ormlite-core-4.45.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/RxDroid/doc/ormlite-core-4.41-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/RxDroid/doc/ormlite-core-4.45-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
