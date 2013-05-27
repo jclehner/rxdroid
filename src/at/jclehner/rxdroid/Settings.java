@@ -242,7 +242,7 @@ public final class Settings
 
 	public static Date getOldestPossibleHistoryDate(Date reference)
 	{
-		final int index = getIntFromList(Keys.HISTORY_SIZE, 2);
+		final int index = getStringAsInt(Keys.HISTORY_SIZE, 2);
 
 		final int field;
 		final int value;
@@ -540,12 +540,6 @@ public final class Settings
 		return retDoseTime;
 	}
 
-	public static int getIntFromList(String key, int defValue)
-	{
-		String valueStr = getString(key, null);
-		return valueStr != null ? Integer.parseInt(valueStr, 10) : defValue;
-	}
-
 	public static int getStringAsInt(String key, int defValue)
 	{
 		final String value = getString(key);
@@ -553,7 +547,7 @@ public final class Settings
 		{
 			try
 			{
-				return Integer.parseInt(value);
+				return Integer.parseInt(value, 10);
 			}
 			catch(NumberFormatException e)
 			{

@@ -367,6 +367,9 @@ public final class Entries
 			return false;
 
 		final int minSupplyDays = Settings.getStringAsInt(Settings.Keys.LOW_SUPPLY_THRESHOLD, 10);
+		if(minSupplyDays == 0)
+			return false;
+
 		return getSupplyDaysLeftForDrug(drug, null) < minSupplyDays;
 	}
 
