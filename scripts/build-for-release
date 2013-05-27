@@ -74,6 +74,8 @@ if [[ $# -eq 1 ]]; then
 		checkout "$1"
 		if [[ "$ARG" == "--beta" ]]; then
 			run ised 's/BETA_BUILD = false/BETA_BUILD = true/g' src/at/jclehner/rxdroid/Version.java
+		else
+			run ised 's/BETA_BUILD = true/BETA_BUILD = false/g' src/at/jclehner/rxdroid/Version.java
 		fi
 	fi
 else
