@@ -44,7 +44,7 @@ public class ExpandableListFragment extends Fragment
 		for(int i = 0; i != mAdapter.getGroupCount(); ++i)
 		{
 			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
-				mList.expandGroup(i, animate);
+				mList.expandGroup(i /*, animate*/);
 			else
 				mList.expandGroup(i);
 		}
