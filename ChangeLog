@@ -1,3 +1,11 @@
+0.9.9-2:
+	* Setting the refill reminder threshold to "0" effectively disables it.
+	* Disabled light theme on Android 3.x
+	* Bug fixes
+
+0.9.9-1:
+	* Fixed crash on Android 3.2
+
 0.9.9:
 	* Fixed bug that prevented setting the time intervals correctly when using 12-hour clock
 	* Updated Italian translation
