@@ -1,4 +1,4 @@
-0.9.9-2:
+0.9.10:
 	* Setting the refill reminder threshold to "0" effectively disables it.
 	* Disabled light theme on Android 3.x
 	* Bug fixes
