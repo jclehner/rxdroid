@@ -28,10 +28,11 @@
   android:title="@string/_title_prefscreen_times"
   android:orderingFromXml="true"  
 >
+
+    
 	<at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_morning"
 	        android:title="@string/_title_morning"
 	        android:dialogIcon="@drawable/ic_morning"
-	        android:icon="@drawable/ic_morning"
 	        android:persistent="true"
 	        
 	        rxdroid:after="time_night"
@@ -43,7 +44,6 @@
 	    <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_noon"
 	        android:title="@string/_title_noon"
 	        android:dialogIcon="@drawable/ic_noon"
-	        android:icon="@drawable/ic_noon"
 	        android:persistent="true"
 	        
 	        rxdroid:after="time_morning"
@@ -55,7 +55,6 @@
 	     <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_evening"
 	        android:title="@string/_title_evening"
 	        android:dialogIcon="@drawable/ic_evening"
-	        android:icon="@drawable/ic_evening"
 	        android:persistent="true"
 	        
 	        rxdroid:after="time_noon"
@@ -67,7 +66,6 @@
 	     <at.jclehner.rxdroid.preferences.TimePeriodPreference android:key="time_night"
 	        android:title="@string/_title_night"
 	        android:dialogIcon="@drawable/ic_night"
-	        android:icon="@drawable/ic_night"
 	        android:persistent="true"
 	        
 	        rxdroid:after="time_evening"
