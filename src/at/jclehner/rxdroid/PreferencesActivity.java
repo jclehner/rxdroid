@@ -107,14 +107,19 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		if(p != null)
 		{
 			final int format = BuildConfig.DEBUG ? Version.FORMAT_FULL : Version.FORMAT_SHORT;
-			String version = Version.get(format) + ", DB v" + DatabaseHelper.DB_VERSION;
+			final StringBuilder sb = new StringBuilder(Version.get(format));
+
+			if(Version.BETA)
+				sb.append(" (BETA)");
+
+			sb.append(", DB v" + DatabaseHelper.DB_VERSION);
 
 			if(BuildConfig.DEBUG)
 			{
 				try
 				{
 					final String apkModDate = new Date(new File(getPackageCodePath()).lastModified()).toString();
-					version = version + "\n(" + apkModDate + ")";
+					sb.append("\n(" + apkModDate + ")");
 				}
 				catch(NullPointerException e)
 				{
@@ -122,30 +127,29 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				}
 			}
 
-			version += "\n" +
+			sb.append("\n" +
 					"Copyright (C) 2011-2013 Joseph Lehner\n" +
-					"<joseph.c.lehner@gmail.com>";
+					"<joseph.c.lehner@gmail.com>");
 
 			final String translator = getString(R.string.translator);
 			if(!translator.equals("builtin"))
 			{
-				Log.d(TAG, "translator=" + translator);
 				final Locale l = Locale.getDefault();
 
 				if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-					version += "\n\n";
+					sb.append("\n\n");
 				else
 				{
 					// Preference appears to be limited in height on pre-HC
 					// devices... Prefix with an en-dash to make it look a
 					// little less ugly!
-					version += "\n\u2013 ";
+					sb.append("\n\u2013 ");
 				}
 
-				version += Util.capitalize(l.getDisplayLanguage(l))  + ": " + translator;
+				sb.append(Util.capitalize(l.getDisplayLanguage(l))  + ": " + translator);
 			}
 
-			p.setSummary(version);
+			p.setSummary(sb.toString());
 		}
 
 		p = findPreference(Settings.Keys.HISTORY_SIZE);
