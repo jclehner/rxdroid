@@ -356,9 +356,9 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 					});
 		}
 
-		if(BuildConfig.DEBUG)
+		if(Version.BETA)
 		{
-			menu.add(0, CMENU_LOG, 0, "Log")
+			menu.add(0, CMENU_LOG, 0, R.string._title_show_log)
 					.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 						@Override
@@ -370,7 +370,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 							return true;
 						}
 					});
+		}
 
+		if(BuildConfig.DEBUG)
+		{
 			menu.add(0, CMENU_DUMP, 0, "Dump")
 					.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 

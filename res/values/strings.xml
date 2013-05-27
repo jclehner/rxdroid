@@ -355,6 +355,8 @@
 	<string name="_title_collapse">Collapse</string>
 	<string name="_title_expand">Expand</string>
 	
+	<string name="_title_show_log">Show log</string>
+	
 	
 	
 	<string translatable="false" name="test_schedule">

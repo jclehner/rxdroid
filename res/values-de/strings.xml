@@ -152,7 +152,7 @@
 	<string name="_title_current_supply">Vorrat</string>
 	<string name="_title_refill_size">Packungsgröße</string>
 	<string name="_title_active">Aktiv</string>
-	<string name="_title_ignore_dose">Dosis ignorieren</string>
+	<string name="_title_ignore_dose">Dosis auslassen</string>
 		    
     <string name="_msg_touch_to_edit">(zum Ändern berühren)</string>
   
@@ -321,6 +321,18 @@
 	<string name="_title_use_backup_framework">Daten sichern</string>
 	<string name="_summary_use_backup_framework">Daten mit Hilfe von Diensten wie Googles »Sichern und Wiederherstellen« sichern.</string>
 	<string name="_msg_swipe_to_change_date">Durch Wischen nach links oder rechts kann das angezeigte Datum geändert werden</string>
+	
+	<string name="_title_collapse">Einklappen</string>
+	<string name="_title_evening_dose">Abenddosis</string>	
+	<string name="_title_expand">Ausklappen</string>
+	<string name="_title_missed">Missed</string>
+	<string name="_title_morning_dose">Morgendosis</string>	
+	<string name="_title_night_dose">Nachtdosis</string>
+	<string name="_title_noon_dose">Mittagsdosis</string>
+	<string name="_title_show_log">Verlauf</string>
+	<string name="_title_skipped">Ausgelassen</string>
+	<string name="_title_taken">Eingenommen</string>	
+	<string name="_title_view">Anzeigen</string>
 	
 	
 	<!-- 
