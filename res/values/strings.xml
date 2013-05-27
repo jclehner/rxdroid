@@ -340,7 +340,6 @@
 	
 	<string name="_msg_swipe_to_change_date">You can change the displayed date by swiping left or right</string>
 	
-	<string name="_msg_loading">Loading</string>
 	<string name="_title_view">View</string>
 	
 	<string name="_title_missed">Missed</string>
