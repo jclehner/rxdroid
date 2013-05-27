@@ -324,6 +324,22 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			finish();
 			//new Handler().po
 		}
+		else if(Keys.LOW_SUPPLY_THRESHOLD.equals(key))
+		{
+			int i;
+
+			try
+			{
+				i = Integer.parseInt((String) newValue, 10);
+			}
+			catch(Exception e)
+			{
+				Log.w(TAG, e);
+				return false;
+			}
+
+			return i >= 0;
+		}
 
 		return true;
 	}
