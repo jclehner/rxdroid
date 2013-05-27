@@ -81,6 +81,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 	private static final String[] REGISTER_CHANGE_LISTENER = {
 		Keys.THEME_IS_DARK,
 		Keys.NOTIFICATION_LIGHT_COLOR,
+		Keys.LOW_SUPPLY_THRESHOLD,
 		Keys.LANGUAGE
 	};
 
