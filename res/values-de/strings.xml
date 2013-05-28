@@ -339,7 +339,7 @@
 	    möglich – bitte melden Sie diese, um den Entwicklungsprozess der App zu beschleunigen.
 	</string>
 	    
-	<string name="_msg_no_history">Keine Verlaufsdaten für die ausgewählten Kriterien vorhanden.</string>
+	<string name="_msg_no_history_data">Keine Verlaufsdaten für die ausgewählten Kriterien vorhanden.</string>
 	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
