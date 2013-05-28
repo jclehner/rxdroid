@@ -226,6 +226,8 @@ public class DoseLogFragment extends ExpandableListFragment
 //	private class Adapter extends SimpleBaseExpandanbleListAdapter implements ListAdapter
 	private class Adapter extends BaseExpandableListAdapter
 	{
+		private Timer mChildTimer = new Timer();
+
 		LayoutInflater mInflater;
 
 		public Adapter()
@@ -303,6 +305,9 @@ public class DoseLogFragment extends ExpandableListFragment
 		public View getChildView(final int groupPosition, int childPosition, boolean isLastChild, View view,
 				ViewGroup parent)
 		{
+			if(childPosition == 0)
+				mChildTimer.restart();
+
 			final ChildViewHolder holder;
 
 			if(view == null)
@@ -391,6 +396,9 @@ public class DoseLogFragment extends ExpandableListFragment
 				holder.text.setOnClickListener(clickListener);
 				holder.text.setText(R.string._msg_tap_to_view_date);
 			}
+
+			if(isLastChild)
+				Log.i(TAG, (childPosition + 1) + " child views created in " + mChildTimer);
 
 			return view;
 		}
