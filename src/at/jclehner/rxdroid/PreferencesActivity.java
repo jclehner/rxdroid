@@ -110,7 +110,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			final StringBuilder sb = new StringBuilder(Version.get(format));
 
 			if(Version.BETA)
-				sb.append(" (BETA)");
+				sb.append(BuildConfig.DEBUG ? " (DEV)" : " (BETA");
 
 			sb.append(", DB v" + DatabaseHelper.DB_VERSION);
 

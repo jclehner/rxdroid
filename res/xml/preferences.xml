@@ -199,6 +199,7 @@
 	        android:key="@string/key_language"
 	        android:title="@string/_title_language"
 	        android:defaultValue=""
+	        android:enabled="false"
 	    />
 	    
 		<Preference android:key="db_create_drug_with_schedule"

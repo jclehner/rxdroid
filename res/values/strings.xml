@@ -357,6 +357,8 @@
 	<string name="_title_show_log">Show log</string>
 	
 	<string name="_msg_tap_to_view_date">(tap to view date)</string>
+	<string name="_msg_beta_version">You are using a beta version of %1$s. Expect bugs and crashes – please report these in order
+	    to help speed up the development of this app.</string>
 		
 	<string translatable="false" name="test_schedule">
 	    Mon    0 - 0 - 0 - 1\n

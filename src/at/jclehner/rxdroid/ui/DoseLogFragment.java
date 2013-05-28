@@ -21,30 +21,21 @@
 
 package at.jclehner.rxdroid.ui;
 
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 import android.content.Intent;
-import android.content.res.Resources;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import at.jclehner.rxdroid.BuildConfig;

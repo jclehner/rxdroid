@@ -335,6 +335,9 @@
 	<string name="_title_view">Anzeigen</string>
 	
 	<string name="_msg_tap_to_view_date">(gehe zu Datum)</string>
+	<string name="_msg_beta_version">Dies ist eine Beta-Version von %1$s. Bugs und Abstürze sind 
+	    möglich – bitte melden Sie diese, um den Entwicklungsprozess der App zu beschleunigen.
+	</string>
 	
 	
 	<!-- 

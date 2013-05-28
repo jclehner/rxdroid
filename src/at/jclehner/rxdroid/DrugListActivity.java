@@ -68,6 +68,7 @@ import at.jclehner.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
 import at.jclehner.rxdroid.Settings.Defaults;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.Settings.Keys;
+import at.jclehner.rxdroid.Settings.OnceIds;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -170,6 +171,9 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 		setDate(date, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
+
+		if(Version.BETA)
+			showInfoDialog(OnceIds.BETA_VERSION, R.string._msg_beta_version, getString(R.string.app_name));
 
 		if(true)
 		{

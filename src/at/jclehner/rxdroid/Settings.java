@@ -100,6 +100,7 @@ public final class Settings
 	{
 		public static final String DRAG_DROP_SORTING = "drag_drop_sorting";
 		public static final String MISSING_TRANSLATION = "missing_translation";
+		public static final String BETA_VERSION = "beta_version";
 	}
 
 	public static class Defaults
@@ -703,7 +704,6 @@ public final class Settings
 				Settings.putBoolean(Keys.THEME_IS_DARK, true);
 			}
 		}
-
 	}
 
 	// converts the string set [ "foo", "bar", "foobar", "barz" ] to the following string:
