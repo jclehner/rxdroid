@@ -77,6 +77,8 @@ public final class Theme
 				sAttrCache.put(attr, resId);
 
 				if(LOGV) Log.v(TAG, "getResourceAttributes: " + t);
+
+				return resId;
 			}
 
 			return sAttrCache.get(attr);
@@ -85,13 +87,24 @@ public final class Theme
 
 	public static int getColorAttribute(int attr)
 	{
-		final Context c = RxDroid.getContext();
-		final int[] attrs = { attr };
-		final TypedArray a = c.obtainStyledAttributes(get(), attrs);
-		final int color = a.getColor(0, Color.TRANSPARENT);
+		synchronized(sAttrCache)
+		{
+			if(sAttrCache.indexOfKey(attr) < 0)
+			{
+				final Context c = RxDroid.getContext();
+				final int[] attrs = { attr };
+				final TypedArray a = c.obtainStyledAttributes(get(), attrs);
+				final int color = a.getColor(0, Color.TRANSPARENT);
 
-		a.recycle();
-		return color;
+				a.recycle();
+
+				sAttrCache.put(attr, color);
+
+				return color;
+			}
+
+			return sAttrCache.get(attr);
+		}
 	}
 
 	public static void clearAttributeCache()

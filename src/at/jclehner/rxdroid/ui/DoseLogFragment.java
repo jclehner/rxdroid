@@ -21,27 +21,39 @@
 
 package at.jclehner.rxdroid.ui;
 
+import java.sql.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
+import android.content.Intent;
+import android.content.res.Resources;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListAdapter;
 import android.widget.ImageView;
-//import android.widget.ListAdapter;
 import android.widget.TextView;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseView;
+import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Settings;
+import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.db.DoseEvent;
@@ -49,7 +61,6 @@ import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
-//import at.jclehner.rxdroid.util.SimpleBaseExpandanbleListAdapter;
 import at.jclehner.rxdroid.util.Timer;
 import at.jclehner.rxdroid.util.Util;
 
@@ -66,8 +77,8 @@ public class DoseLogFragment extends ExpandableListFragment
 	};
 
 	private List<List<EventInfo>> mGroupedEvents;
-	private Date mToday;
 
+	private Date mToday;
 
 	public static final int SHOW_MISSED = 1;
 	public static final int SHOW_TAKEN = 1 << 1;
@@ -93,7 +104,6 @@ public class DoseLogFragment extends ExpandableListFragment
 	private Drug getDrug() {
 		return Drug.get(getArguments().getInt("drug_id"));
 	}
-
 
 	private void gatherEventInfos(int flags)
 	{
@@ -128,7 +138,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		else if(date == null)
 			date = Settings.getOldestPossibleHistoryDate(mToday);
 
-		if(LOGV)
+		if(false)
 		{
 			Log.v(TAG, "gatherEventInfos:\n" +
 					"  oldest reliable DoseEvent date: " +
@@ -156,21 +166,25 @@ public class DoseLogFragment extends ExpandableListFragment
 //				date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
 //		}
 
+		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
+
 		if((flags & SHOW_MISSED) != 0)
 		{
 			while(!date.after(mToday))
 			{
 				if(drug.hasDoseOnDate(date))
 				{
-
 					for(int doseTime : Constants.DOSE_TIMES)
 					{
+						if(date.equals(mToday) && doseTime == dtInfo.activeOrNextDoseTime())
+							break;
+
 						Fraction dose = drug.getDose(doseTime, date);
 
 						if(!dose.isZero() && !containsDoseEvent(events, date, doseTime))
 						{
 							//Log.d(TAG, "Creating missed event: date=" + date + ", doseTime=" + doseTime);
-							infos.add(EventInfo.newMissedEvent(date, doseTime));
+							infos.add(EventInfo.newMissedEvent(date, doseTime, dose));
 						}
 					}
 				}
@@ -234,7 +248,7 @@ public class DoseLogFragment extends ExpandableListFragment
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			return mGroupedEvents.get(groupPosition).size();
+			return mGroupedEvents.get(groupPosition).size() + 1;
 		}
 
 		@Override
@@ -290,15 +304,13 @@ public class DoseLogFragment extends ExpandableListFragment
 			}
 
 			holder.status.setImageResource(statusResId);
-
 			return view;
 		}
 
 		@Override
-		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View view,
+		public View getChildView(final int groupPosition, int childPosition, boolean isLastChild, View view,
 				ViewGroup parent)
 		{
-			final EventInfo info = mGroupedEvents.get(groupPosition).get(childPosition);
 			final ChildViewHolder holder;
 
 			if(view == null)
@@ -308,46 +320,85 @@ public class DoseLogFragment extends ExpandableListFragment
 				holder.dose = (DoseView) view.findViewById(R.id.dose_dose);
 				holder.time = (TextView) view.findViewById(R.id.text_time);
 				holder.text = (TextView) view.findViewById(R.id.text_info);
+				holder.gotoDate = (ImageView) view.findViewById(R.id.img_goto_date);
 				view.setTag(holder);
 			}
 			else
 				holder = (ChildViewHolder) view.getTag();
 
-			holder.time.setText(info.getTimeString());
-
-			final int timeColorAttr;
-			final int textResId;
-
-			final DoseEvent doseEvent = info.intake;
-			if(doseEvent != null)
+			if(!isLastChild)
 			{
-				holder.dose.setDose(doseEvent.getDose());
+				holder.dose.setVisibility(View.VISIBLE);
+				holder.time.setVisibility(View.VISIBLE);
+				holder.gotoDate.setVisibility(View.INVISIBLE);
+				//holder.text.setGravity(Gravity.CENTER_VERTICAL);
 
-				if(info.status == EventInfo.STAT_TAKEN)
+				final EventInfo info = mGroupedEvents.get(groupPosition).get(childPosition);
+
+				holder.time.setText(info.getTimeString());
+				holder.dose.setDose(info.dose);
+
+				final int timeColorAttr;
+				final int textResId;
+
+				final DoseEvent doseEvent = info.intake;
+				if(doseEvent != null)
 				{
-					textResId = R.string._title_taken;
-					timeColorAttr = R.attr.colorStatusTaken;
+					//holder.dose.setDose(doseEvent.getDose());
+					if(info.status == EventInfo.STAT_TAKEN)
+					{
+						textResId = R.string._title_taken;
+						timeColorAttr = R.attr.colorStatusTaken;
+					}
+					else
+					{
+						textResId = R.string._title_skipped;
+						timeColorAttr = R.attr.colorStatusSkipped;
+					}
 				}
 				else
 				{
-					textResId = R.string._title_skipped;
-					timeColorAttr = R.attr.colorStatusSkipped;
+					//holder.dose.setDoseFromDrugAndDate(info.date, null);
+					//holder.dose.setVisibility(View.GONE);
+					textResId = R.string._title_missed;
+					timeColorAttr = R.attr.colorStatusMissed;
 				}
+
+				final StringBuilder sb = new StringBuilder();
+				sb.append(getString(textResId) + ": ");
+				sb.append(getString(DOSE_NAME_IDS[info.doseTime]));
+				holder.text.setText(sb.toString());
+				holder.text.setOnClickListener(null);
+
+				final int color = Theme.getColorAttribute(timeColorAttr);
+
+//				final int color = getResources().getColor(Theme.getColorAttribute(timeColorAttr));
+				holder.time.setTextColor(color);
 			}
 			else
 			{
-				textResId = R.string._title_missed;
-				timeColorAttr = R.attr.colorStatusMissed;
+				holder.dose.setVisibility(View.INVISIBLE);
+				holder.time.setVisibility(View.INVISIBLE);
+				holder.gotoDate.setVisibility(View.VISIBLE);
+				//holder.text.setGravity(Gravity.CENTER);
+
+				final OnClickListener clickListener = new OnClickListener() {
+
+					@Override
+					public void onClick(View v)
+					{
+						final Intent intent = new Intent(getActivity(), DrugListActivity.class);
+						intent.putExtra(DrugListActivity.EXTRA_DATE, getGroupDate(groupPosition));
+						intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+						startActivity(intent);
+					}
+				};
+
+
+				holder.gotoDate.setOnClickListener(clickListener);
+				holder.text.setOnClickListener(clickListener);
+				holder.text.setText(R.string._msg_tap_to_view_date);
 			}
-
-			final StringBuilder sb = new StringBuilder();
-			sb.append(getString(textResId) + ": ");
-			sb.append(getString(DOSE_NAME_IDS[info.doseTime]));
-			holder.text.setText(sb.toString());
-
-
-//			final int color = getResources().getColor(Theme.getColorAttribute(timeColorAttr));
-//			holder.time.setTextColor(color);
 
 			return view;
 		}
@@ -377,6 +428,14 @@ public class DoseLogFragment extends ExpandableListFragment
 			return false;
 		}
 
+		private Date getGroupDate(int groupPosition)
+		{
+			if(!mGroupedEvents.get(groupPosition).isEmpty())
+				return mGroupedEvents.get(groupPosition).get(0).date;
+
+			return null;
+		}
+
 	}
 }
 
@@ -392,6 +451,7 @@ class ChildViewHolder
 	DoseView dose;
 	TextView time;
 	TextView text;
+	ImageView gotoDate;
 }
 
 enum EventInfoByDateComparator implements Comparator<EventInfo>
@@ -431,6 +491,7 @@ class EventInfo
 	Date timestamp;
 	final Date date;
 	final int doseTime;
+	final Fraction dose;
 	final int status;
 
 	final DoseEvent intake;
@@ -439,8 +500,8 @@ class EventInfo
 		return new EventInfo(intake);
 	}
 
-	static EventInfo newMissedEvent(Date date, int doseTime) {
-		return new EventInfo(date, doseTime);
+	static EventInfo newMissedEvent(Date date, int doseTime, Fraction dose) {
+		return new EventInfo(date, doseTime, dose);
 	}
 
 	@Override
@@ -517,7 +578,8 @@ class EventInfo
 		timestamp = intake.getTimestamp();
 		date = intake.getDate();
 		doseTime = intake.getDoseTime();
-		status = intake.getDose().isZero() ? STAT_IGNORED : STAT_TAKEN;
+		dose = intake.getDose();
+		status = dose.isZero() ? STAT_IGNORED : STAT_TAKEN;
 
 		this.intake = intake;
 
@@ -527,10 +589,12 @@ class EventInfo
 		}
 	}
 
-	private EventInfo(Date date, int doseTime)
+	private EventInfo(Date date, int doseTime, Fraction dose)
 	{
 		this.date = date;
 		this.doseTime = doseTime;
+		this.dose = dose;
+
 		status = STAT_MISSED;
 		intake = null;
 	}

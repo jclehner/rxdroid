@@ -28,6 +28,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnGroupCollapseListener;
+import android.widget.ExpandableListView.OnGroupExpandListener;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Version;
 
@@ -36,12 +38,21 @@ public class ExpandableListFragment extends Fragment
 	private ExpandableListView mList;
 	private ExpandableListAdapter mAdapter;
 
+	private OnGroupCollapseExpandListener mGroupCollapseExpandListener;
+
+	public interface OnGroupCollapseExpandListener extends
+			OnGroupCollapseListener, OnGroupExpandListener
+	{}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View v = inflater.inflate(R.layout.layout_expandable_list, null);
 		mList = ((ExpandableListView) v.findViewById(android.R.id.list));
 		mList.setAdapter(mAdapter);
+		mList.setOnGroupCollapseListener(mGroupCollapseExpandListener);
+		mList.setOnGroupExpandListener(mGroupCollapseExpandListener);
+
 		return v;
 	}
 
@@ -53,8 +64,19 @@ public class ExpandableListFragment extends Fragment
 			mList.setAdapter(adapter);
 	}
 
-	public ExpandableListAdapter getAdapter() {
+	public ExpandableListAdapter getListAdapter() {
 		return mAdapter;
+	}
+
+	public void setOnGroupCollapseExpandListener(OnGroupCollapseExpandListener l)
+	{
+		mGroupCollapseExpandListener = l;
+
+		if(mList != null)
+		{
+			mList.setOnGroupCollapseListener(l);
+			mList.setOnGroupExpandListener(l);
+		}
 	}
 
 	public void expandAll(boolean animate)
@@ -78,5 +100,9 @@ public class ExpandableListFragment extends Fragment
 
 		for(int i = 0; i != mAdapter.getGroupCount(); ++i)
 			mList.collapseGroup(i);
+	}
+
+	protected ExpandableListView getListView() {
+		return mList;
 	}
 }

@@ -120,7 +120,7 @@ public class DoseHistoryActivity extends FragmentActivity
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		}
 
-		final int iconAttr = mIsAllCollapsed ? R.attr.menuIconExpandAll : R.attr.menuIconCollapseAll;
+		final int iconAttr = mIsAllCollapsed ? R.attr.actionIconExpandAll : R.attr.actionIconCollapseAll;
 		final int titleResId = mIsAllCollapsed ? R.string._title_expand : R.string._title_collapse;
 
 		item = menu.add(0, MENU_COLLAPSE_EXPAND, 0, titleResId)

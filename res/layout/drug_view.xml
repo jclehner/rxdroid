@@ -74,12 +74,15 @@
   		android:layout_height="36dip"
   		  		
   		android:layout_toRightOf="@id/drug_icon"
+  		android:layout_toLeftOf="@+id/indicators"
   		android:layout_alignParentTop="true"
   		  		
   		android:layout_marginLeft="5dp"
   		  		  		  		
   		android:gravity="center_vertical"
   		android:text="Cocaine 100mg"
+  		android:ellipsize="marquee"
+  		android:singleLine="true"
   		
   		android:focusable="true"
   		android:clickable="true"
@@ -101,7 +104,7 @@
   		android:nextFocusDown="@+id/morning"
   		
   		android:layout_toRightOf="@id/drug_icon"
-  		android:layout_toLeftOf="@+id/indicators"
+  		android:layout_toLeftOf="@id/indicators"
   		android:layout_below="@id/drug_name"
   	/>  	
   	

@@ -334,6 +334,8 @@
 	<string name="_title_taken">Eingenommen</string>	
 	<string name="_title_view">Anzeigen</string>
 	
+	<string name="_msg_tap_to_view_date">(gehe zu Datum)</string>
+	
 	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

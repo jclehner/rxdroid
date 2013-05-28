@@ -4,17 +4,11 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="?attr/bgColorLogChild"
->
-
-    <at.jclehner.rxdroid.DoseView android:id="@+id/dose_dose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-    />
-    
+    android:paddingLeft="4dip"
+>    
     <TextView android:id="@+id/text_time"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/log_group_height"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="4dip"
         
@@ -27,13 +21,41 @@
     />    
     
     <TextView android:id="@+id/text_info"
+        android:layout_width="0dip"
+        android:layout_height="@dimen/log_group_height"
+        android:layout_weight="1"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        
+        android:text="@string/mock_dose_text"        
+        android:textAppearance="?android:attr/textAppearanceSmall"
+    />
+    
+    <FrameLayout 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="@string/mock_dose_text"
+    >
+        <at.jclehner.rxdroid.DoseView android:id="@+id/dose_dose"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:visibility="gone"
+	    />
+    
+    <ImageView android:id="@+id/img_goto_date" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
         
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:scaleType="fitCenter"
+        android:src="?attr/iconArrowRight"
+        
+        android:visibility="gone"
     />
+        
+    </FrameLayout>
+    
+    
+        
     
 
 </LinearLayout>

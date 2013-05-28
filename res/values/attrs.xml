@@ -66,19 +66,21 @@
     <attr name="iconLowSupplies" format="reference" />
     <attr name="iconMissedDose" format="reference" />
     
-    <attr name="menuIconLock" />
-	<attr name="menuIconTime" />
-	<attr name="menuIconPicture" />
-	<attr name="menuIconInfo" />
-	<attr name="menuIconWarning" />
-	<attr name="menuIconStorage" />
-	<attr name="menuIconExpandAll" />
-	<attr name="menuIconCollapseAll" />
+    <attr name="iconLock" />
+	<attr name="iconTime" />
+	<attr name="iconPicture" />
+	<attr name="iconInfo" />
+	<attr name="iconWarning" />
+	<attr name="iconStorage" />
+	<attr name="actionIconExpandAll" />
+	<attr name="actionIconCollapseAll" />
+	
+	<attr name="iconArrowRight" />
     
     <attr name="textColorClickable" format="color|reference" />
-      <attr name="colorStatusMissed" format="color|reference" />
-      <attr name="colorStatusSkipped" format="color|reference" />
-      <attr name="colorStatusTaken" format="color|reference" />
+    <attr name="colorStatusMissed" format="color|reference" />
+    <attr name="colorStatusSkipped" format="color|reference" />
+    <attr name="colorStatusTaken" format="color|reference" />
     <attr name="bgColorLogGroup" format="color|reference" />
     <attr name="bgColorLogChild" format="color|reference" />
     

@@ -33,7 +33,7 @@
 
 	<Preference android:key="prefscreen_times"
 		android:title="@string/_title_prefscreen_times"
-		android:icon="?attr/menuIconTime"
+		android:icon="?attr/iconTime"
 	>
 		<intent 
 			android:action="android.intent.action.VIEW"
@@ -50,7 +50,7 @@
 	<PreferenceScreen 
 		android:key="prefscreen_display"
 		android:title="@string/_title_prefscreen_display"
-		android:icon="?attr/menuIconPicture"
+		android:icon="?attr/iconPicture"
 	>	     
 		<CheckBoxPreference android:key="@string/key_theme_is_dark" 
 			android:title="@string/_title_dark_theme"
@@ -104,7 +104,7 @@
 	<PreferenceScreen
 		android:key="prefscreen_notifications"
 		android:title="@string/_title_prefscreen_notifications"
-		android:icon="?attr/menuIconWarning"
+		android:icon="?attr/iconWarning"
 	>
 		<ListPreference android:key="@string/key_alarm_mode"
 		    android:title="@string/_title_repeat_alarm"
@@ -160,7 +160,7 @@
 	<!-- 
 	<PreferenceScreen
 	    android:title="@string/_title_privacy"
-	    android:icon="?attr/menuIconLock"
+	    android:icon="?attr/iconLock"
 	>
 	    
 	</PreferenceScreen>
@@ -168,7 +168,7 @@
 		
 	<PreferenceScreen android:key="prefscreen_db"
 		android:title="@string/_title_database"
-		android:icon="?attr/menuIconStorage"	
+		android:icon="?attr/iconStorage"	
 	>
 		
 		<ListPreference android:key="@string/key_history_size"
