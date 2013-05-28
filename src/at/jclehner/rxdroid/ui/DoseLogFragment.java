@@ -486,7 +486,7 @@ class EventInfo
 {
 	static final int STAT_TAKEN = 0;
 	static final int STAT_MISSED = 1;
-	static final int STAT_IGNORED = 2;
+	static final int STAT_SKIPPED = 2;
 
 	Date timestamp;
 	final Date date;
@@ -511,16 +511,16 @@ class EventInfo
 
 		switch(status)
 		{
-			case 0:
+			case STAT_TAKEN:
 				statusStr = "taken";
 				break;
 
-			case 1:
+			case STAT_MISSED:
 				statusStr = "missed";
 				break;
 
-			case 2:
-				statusStr = "ignored";
+			case STAT_SKIPPED:
+				statusStr = "skipped";
 				break;
 
 			default:
@@ -578,15 +578,20 @@ class EventInfo
 		timestamp = intake.getTimestamp();
 		date = intake.getDate();
 		doseTime = intake.getDoseTime();
-		dose = intake.getDose();
-		status = dose.isZero() ? STAT_IGNORED : STAT_TAKEN;
+
+		Fraction dose = intake.getDose();
+		if(dose.isZero())
+		{
+			this.dose = intake.getDrug().getDose(doseTime, date);
+			this.status = STAT_SKIPPED;
+		}
+		else
+		{
+			this.dose = dose;
+			this.status = STAT_TAKEN;
+		}
 
 		this.intake = intake;
-
-		if(timestamp == null)
-		{
-			Log.d("EventInfo", "Empty timestamp in " + intake);
-		}
 	}
 
 	private EventInfo(Date date, int doseTime, Fraction dose)
