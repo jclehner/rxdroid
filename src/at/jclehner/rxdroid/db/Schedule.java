@@ -236,7 +236,7 @@ public final class Schedule extends Entry
 
 			case REPEAT_DAILY_WITH_PAUSE:
 				final long pauseDays = repeatArg & MASK_REPEAT_ARG_PAUSE;
-				final long cycleLength = (repeatArg & MASK_REPEAT_ARG_CYCLE_LENGTH) >> 4;
+				final long cycleLength = (repeatArg & MASK_REPEAT_ARG_CYCLE_LENGTH) >> 16;
 				return DateTime.diffDays(date, begin) % cycleLength < (cycleLength - pauseDays);
 
 			default:

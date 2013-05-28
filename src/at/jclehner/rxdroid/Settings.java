@@ -84,6 +84,7 @@ public final class Settings
 		public static final String LOG_SHOW_TAKEN = "log_show_taken";
 		public static final String LOG_SHOW_SKIPPED = "log_show_skipped";
 		public static final String LOG_SHOW_MISSED = "log_show_missed";
+		public static final String LOG_IS_ALL_COLLAPSED = "log_is_all_collapsed";
 	}
 
 	public static class Enums

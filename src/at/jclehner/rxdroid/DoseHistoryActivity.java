@@ -89,6 +89,7 @@ public class DoseHistoryActivity extends FragmentActivity
 
 		setTitle(mDrug.getName());
 
+		mIsAllCollapsed = Settings.getBoolean(Keys.LOG_IS_ALL_COLLAPSED, true);
 		updateLogFragment();
 
 		// setListAdapter(new DoseHistoryAdapter(this, mDrug));
@@ -140,6 +141,7 @@ public class DoseHistoryActivity extends FragmentActivity
 								f.collapseAll();
 
 							mIsAllCollapsed = !mIsAllCollapsed;
+							Settings.putBoolean(Keys.LOG_IS_ALL_COLLAPSED, mIsAllCollapsed);
 
 							if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 								invalidateOptionsMenu();
@@ -169,11 +171,16 @@ public class DoseHistoryActivity extends FragmentActivity
 		if(Settings.getBoolean(Keys.LOG_SHOW_TAKEN, true))
 			flags |= DoseLogFragment.SHOW_TAKEN;
 
-		FragmentManager fm = getSupportFragmentManager();
-		FragmentTransaction ft = fm.beginTransaction();
+		final FragmentManager fm = getSupportFragmentManager();
+		final FragmentTransaction ft = fm.beginTransaction();
+		final DoseLogFragment f = DoseLogFragment.newInstance(mDrug, flags);
 
-		ft.replace(android.R.id.content,
-				DoseLogFragment.newInstance(mDrug, flags), "log");
+		if(!Settings.getBoolean(Keys.LOG_IS_ALL_COLLAPSED, true))
+			f.expandAll(false);
+		else
+			f.collapseAll();
+
+		ft.replace(android.R.id.content, f, "log");
 		ft.commit();
 	}
 
