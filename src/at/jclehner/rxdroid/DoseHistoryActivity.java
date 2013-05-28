@@ -81,8 +81,8 @@ public class DoseHistoryActivity extends FragmentActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		super.onCreate(savedInstanceState);
 		Components.onCreateActivity(this, 0);
+		super.onCreate(savedInstanceState);
 
 		// Drug drug = (Drug) getIntent().getSerializableExtra(Extras.DRUG);
 		mDrug = Drug.get(getIntent().getIntExtra(Extras.DRUG_ID, 0));
