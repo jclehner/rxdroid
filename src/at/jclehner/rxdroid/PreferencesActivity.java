@@ -109,8 +109,8 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			final int format = BuildConfig.DEBUG ? Version.FORMAT_FULL : Version.FORMAT_SHORT;
 			final StringBuilder sb = new StringBuilder(Version.get(format));
 
-			if(Version.BETA)
-				sb.append(BuildConfig.DEBUG ? " (DEV)" : " (BETA");
+			if(BuildConfig.DEBUG)
+				sb.append(" (DEV)");
 
 			sb.append(", DB v" + DatabaseHelper.DB_VERSION);
 
