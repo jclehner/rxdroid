@@ -29,6 +29,7 @@ import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
@@ -114,7 +115,8 @@ public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 		ImageView missedDoseIndicator;
 		//View lowSupplyIndicator;
 		DrugSupplyMonitor currentSupply;
-		ImageView log;
+		View historyMenu;
+		//ImageView log;
 		//TextView info1;
 		//TextView info2;
 		//View[] dividers = new View[3];

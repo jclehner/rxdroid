@@ -83,7 +83,8 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			holder.name = (DrugNameView) v.findViewById(R.id.drug_name);
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
 			holder.missedDoseIndicator = (ImageView) v.findViewById(R.id.img_missed_dose_warning);
-			holder.log = (ImageView) v.findViewById(R.id.img_drug_menu);
+			//holder.log = (ImageView) v.findViewById(R.id.img_drug_menu);
+			holder.historyMenu = v.findViewById(R.id.frame_history_menu);
 //			holder.lowSupplyIndicator = v.findViewById(R.id.low_supply_indicator);
 			holder.currentSupply = (DrugSupplyMonitor) v.findViewById(R.id.text_supply);
 
@@ -129,8 +130,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			isCurrentSupplyVisible = mAdapterDate.after(today);
 
 		holder.missedDoseIndicator.setVisibility(isMissingDoseIndicatorVisible ? View.VISIBLE : View.GONE);
-
-		holder.log.setOnClickListener(new OnClickListener() {
+		holder.historyMenu.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v)
