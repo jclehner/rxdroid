@@ -32,6 +32,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
@@ -73,7 +74,6 @@ import at.jclehner.rxdroid.util.Extras;
 public class DoseHistoryActivity extends FragmentActivity
 {
 	private Drug mDrug;
-	private boolean mIsAllCollapsed = true;
 
 	private static final int MENU_VIEW = 0;
 	private static final int MENU_COLLAPSE_EXPAND = 1;
@@ -89,7 +89,6 @@ public class DoseHistoryActivity extends FragmentActivity
 
 		setTitle(mDrug.getName());
 
-		mIsAllCollapsed = Settings.getBoolean(Keys.LOG_IS_ALL_COLLAPSED, true);
 		updateLogFragment();
 
 		// setListAdapter(new DoseHistoryAdapter(this, mDrug));
@@ -100,6 +99,8 @@ public class DoseHistoryActivity extends FragmentActivity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
+		final boolean isAllCollapsed = Settings.getBoolean(Keys.LOG_IS_ALL_COLLAPSED, true);
+
 		MenuItem item;
 
 		item = menu.add(0, MENU_VIEW, 0, R.string._title_view)
@@ -120,8 +121,8 @@ public class DoseHistoryActivity extends FragmentActivity
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		}
 
-		final int iconAttr = mIsAllCollapsed ? R.attr.actionIconExpandAll : R.attr.actionIconCollapseAll;
-		final int titleResId = mIsAllCollapsed ? R.string._title_expand : R.string._title_collapse;
+		final int iconAttr = isAllCollapsed ? R.attr.actionIconExpandAll : R.attr.actionIconCollapseAll;
+		final int titleResId = isAllCollapsed ? R.string._title_expand : R.string._title_collapse;
 
 		item = menu.add(0, MENU_COLLAPSE_EXPAND, 0, titleResId)
 				.setIcon(Theme.getResourceAttribute(iconAttr))
@@ -135,13 +136,12 @@ public class DoseHistoryActivity extends FragmentActivity
 						ExpandableListFragment f = (ExpandableListFragment) fm.findFragmentByTag("log");
 						if(f != null)
 						{
-							if(mIsAllCollapsed)
+							if(isAllCollapsed)
 								f.expandAll(true);
 							else
 								f.collapseAll();
 
-							mIsAllCollapsed = !mIsAllCollapsed;
-							Settings.putBoolean(Keys.LOG_IS_ALL_COLLAPSED, mIsAllCollapsed);
+							Settings.putBoolean(Keys.LOG_IS_ALL_COLLAPSED, !isAllCollapsed);
 
 							if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 								invalidateOptionsMenu();
@@ -156,6 +156,10 @@ public class DoseHistoryActivity extends FragmentActivity
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		}
 
+		final FragmentManager fm = getSupportFragmentManager();
+		final DoseLogFragment f = (DoseLogFragment) fm.findFragmentByTag("log");
+		if(f != null)
+			item.setVisible(!f.isListEmpty());
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -175,13 +179,25 @@ public class DoseHistoryActivity extends FragmentActivity
 		final FragmentTransaction ft = fm.beginTransaction();
 		final DoseLogFragment f = DoseLogFragment.newInstance(mDrug, flags);
 
+		ft.replace(android.R.id.content, f, "log");
+		ft.commit();
+
 		if(!Settings.getBoolean(Keys.LOG_IS_ALL_COLLAPSED, true))
 			f.expandAll(false);
 		else
 			f.collapseAll();
 
-		ft.replace(android.R.id.content, f, "log");
-		ft.commit();
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+		{
+			RxDroid.runInMainThread(new Runnable() {
+
+				@Override
+				public void run()
+				{
+					invalidateOptionsMenu();
+				}
+			});
+		}
 	}
 
 	class ViewOptionsDialogFragment extends DialogFragment

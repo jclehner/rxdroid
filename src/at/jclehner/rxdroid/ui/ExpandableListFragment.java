@@ -30,13 +30,18 @@ import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
+import android.widget.TextView;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Version;
 
 public class ExpandableListFragment extends Fragment
 {
 	private ExpandableListView mList;
+	private TextView mEmptyView;
 	private ExpandableListAdapter mAdapter;
+	private boolean mExpandAll = false;
+
+	private int mEmptyViewTextResId;
 
 	private OnGroupCollapseExpandListener mGroupCollapseExpandListener;
 
@@ -44,14 +49,30 @@ public class ExpandableListFragment extends Fragment
 			OnGroupCollapseListener, OnGroupExpandListener
 	{}
 
+	public void setEmptyViewText(int resId)
+	{
+		mEmptyViewTextResId = resId;
+
+		if(mEmptyView != null)
+			mEmptyView.setText(resId);
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View v = inflater.inflate(R.layout.layout_expandable_list, null);
-		mList = ((ExpandableListView) v.findViewById(android.R.id.list));
+		mList = (ExpandableListView) v.findViewById(android.R.id.list);
+		mEmptyView = (TextView) v.findViewById(android.R.id.empty);
+
 		mList.setAdapter(mAdapter);
 		mList.setOnGroupCollapseListener(mGroupCollapseExpandListener);
 		mList.setOnGroupExpandListener(mGroupCollapseExpandListener);
+
+		if(mExpandAll)
+			expandAllInternal();
+
+		mList.setEmptyView(mEmptyView);
+		mEmptyView.setText(mEmptyViewTextResId);
 
 		return v;
 	}
@@ -81,20 +102,18 @@ public class ExpandableListFragment extends Fragment
 
 	public void expandAll(boolean animate)
 	{
+		mExpandAll = true;
+
 		if(mList == null || mAdapter == null)
 			return;
 
-		for(int i = 0; i != mAdapter.getGroupCount(); ++i)
-		{
-			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
-				mList.expandGroup(i /*, animate*/);
-			else
-				mList.expandGroup(i);
-		}
+		expandAllInternal();
 	}
 
 	public void collapseAll()
 	{
+		mExpandAll = false;
+
 		if(mList == null || mAdapter == null)
 			return;
 
@@ -102,7 +121,26 @@ public class ExpandableListFragment extends Fragment
 			mList.collapseGroup(i);
 	}
 
+	public boolean isListEmpty()
+	{
+		if(mAdapter != null)
+			return mAdapter.getGroupCount() == 0;
+
+		return true;
+	}
+
 	protected ExpandableListView getListView() {
 		return mList;
+	}
+
+	private void expandAllInternal(/*boolean animate*/)
+	{
+		for(int i = 0; i != mAdapter.getGroupCount(); ++i)
+		{
+			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
+				mList.expandGroup(i /*, animate*/);
+			else
+				mList.expandGroup(i);
+		}
 	}
 }

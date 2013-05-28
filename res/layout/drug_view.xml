@@ -202,13 +202,42 @@
 			    android:paddingBottom="12dip"
 			    
 			    android:text="36"
-			/>	
-	  	
-	  		<ViewStub android:id="@+id/missed_dose_indicator"
-		  		android:layout_width="match_parent"
-		  		android:layout_height="48dip"  		
-		  		android:layout="@layout/stub_missed_dose_indicator"
-	   		/>
+			/>
+		  	
+		  	<FrameLayout 
+		  	    android:layout_width="wrap_content"
+		  	    android:layout_height="wrap_content"
+		  	    
+		  	>		  	    
+		  	
+			  	<ImageView android:id="@+id/img_drug_menu"
+			  	    android:layout_width="wrap_content"
+			  	    android:layout_height="wrap_content"
+			  	    android:layout_gravity="center_horizontal"
+			  	    
+			  	    android:src="?attr/iconList"
+			  	    android:background="@drawable/generic_background"		  	    
+			  	    
+			  	/>
+			  	
+			  	<ImageView android:id="@+id/img_missed_dose_warning"
+			  	    android:layout_width="wrap_content"
+			  	    android:layout_height="wrap_content"
+			  	    android:layout_gravity="bottom|left"
+			  	    
+			  	    android:src="@drawable/ic_error_small"
+			  	/>
+		  	    
+		  	    
+		  	    
+		  	    
+		  	    
+		  	    
+		  	    
+		  	    
+		  	    
+		  	    
+		  	</FrameLayout>
 		  	<!-- android:layout_alignBottom="@id/drug_name" -->
 		  	
 		  	<!--

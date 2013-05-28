@@ -359,6 +359,8 @@
 	<string name="_msg_tap_to_view_date">(tap to view date)</string>
 	<string name="_msg_beta_version">You are using a beta version of %1$s. Expect bugs and crashes – please report these in order
 	    to help speed up the development of this app.</string>
+	    
+	<string name="_msg_no_history_data">No history data matching the specified criteria.</string>
 		
 	<string translatable="false" name="test_schedule">
 	    Mon    0 - 0 - 0 - 1\n

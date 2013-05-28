@@ -72,6 +72,9 @@
 	<attr name="iconInfo" />
 	<attr name="iconWarning" />
 	<attr name="iconStorage" />
+	<attr name="iconOverflow" />
+	<attr name="iconList" />	
+	
 	<attr name="actionIconExpandAll" />
 	<attr name="actionIconCollapseAll" />
 	

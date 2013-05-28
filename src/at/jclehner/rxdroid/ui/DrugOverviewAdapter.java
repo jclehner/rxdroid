@@ -25,21 +25,27 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
 import at.jclehner.rxdroid.BuildConfig;
+import at.jclehner.rxdroid.DoseHistoryActivity;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.Theme;
+import at.jclehner.rxdroid.Version;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.Extras;
 import at.jclehner.rxdroid.util.Timer;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.DrugNameView;
@@ -76,7 +82,8 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 			holder.name = (DrugNameView) v.findViewById(R.id.drug_name);
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
-			holder.missedDoseIndicator = v.findViewById(R.id.missed_dose_indicator);
+			holder.missedDoseIndicator = (ImageView) v.findViewById(R.id.img_missed_dose_warning);
+			holder.log = (ImageView) v.findViewById(R.id.img_drug_menu);
 //			holder.lowSupplyIndicator = v.findViewById(R.id.low_supply_indicator);
 			holder.currentSupply = (DrugSupplyMonitor) v.findViewById(R.id.text_supply);
 
@@ -103,21 +110,13 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		holder.currentSupply.setDrugAndDate(drug, mAdapterDate);
 
 		final Date today = DateTime.today();
-		boolean isCurrentSupplyVisible;
+		final boolean isCurrentSupplyVisible;
+		boolean isMissingDoseIndicatorVisible = false;
 
 		if(today.equals(mAdapterDate))
 		{
 			if(Entries.hasMissingDosesBeforeDate(drug, mAdapterDate))
-			{
-				if(holder.missedDoseIndicator instanceof ViewStub)
-					holder.missedDoseIndicator = ((ViewStub) holder.missedDoseIndicator).inflate();
-
-				holder.missedDoseIndicator.setTag(drug);
-				holder.missedDoseIndicator.setVisibility(View.VISIBLE);
-			}
-			else
-				holder.missedDoseIndicator.setVisibility(View.GONE);
-
+				isMissingDoseIndicatorVisible = true;
 
 			if(Entries.hasLowSupplies(drug))
 				holder.currentSupply.setTypeface(null, Typeface.BOLD_ITALIC);
@@ -128,6 +127,19 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		}
 		else
 			isCurrentSupplyVisible = mAdapterDate.after(today);
+
+		holder.missedDoseIndicator.setVisibility(isMissingDoseIndicatorVisible ? View.VISIBLE : View.GONE);
+
+		holder.log.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v)
+			{
+				Intent intent = new Intent(mActivity, DoseHistoryActivity.class);
+				intent.putExtra(Extras.DRUG_ID, drug.getId());
+				mActivity.startActivity(intent);
+			}
+		});
 
 		holder.currentSupply.setVisibility(isCurrentSupplyVisible ? View.VISIBLE : View.INVISIBLE);
 

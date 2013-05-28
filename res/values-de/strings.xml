@@ -182,7 +182,7 @@
 	
 	<string name="_btn_exit">Verlassen</string>
 	
-	<string name="_toast_drug_notification_icon">Die letzte Einnahme dieses Medikaments wurde ausgelassen.</string>   
+	<string name="_toast_drug_notification_icon">Die letzte Einnahme dieses Medikaments wurde vergessen.</string>   
 	
 	<string name="_btn_back">Zurück</string>
 	<string name="_btn_next">Weiter</string>
@@ -325,7 +325,7 @@
 	<string name="_title_collapse">Einklappen</string>
 	<string name="_title_evening_dose">Abenddosis</string>	
 	<string name="_title_expand">Ausklappen</string>
-	<string name="_title_missed">Missed</string>
+	<string name="_title_missed">Vergessen</string>
 	<string name="_title_morning_dose">Morgendosis</string>	
 	<string name="_title_night_dose">Nachtdosis</string>
 	<string name="_title_noon_dose">Mittagsdosis</string>
@@ -338,7 +338,8 @@
 	<string name="_msg_beta_version">Dies ist eine Beta-Version von %1$s. Bugs und Abstürze sind 
 	    möglich – bitte melden Sie diese, um den Entwicklungsprozess der App zu beschleunigen.
 	</string>
-	
+	    
+	<string name="_msg_no_history">Keine Verlaufsdaten für die ausgewählten Kriterien vorhanden.</string>
 	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

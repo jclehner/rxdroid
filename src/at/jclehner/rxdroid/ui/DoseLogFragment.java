@@ -90,6 +90,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		mToday = DateTime.today();
 		gatherEventInfos(getArguments().getInt("flags"));
 		setListAdapter(new Adapter());
+		setEmptyViewText(R.string._msg_no_history_data);
 	}
 
 	private Drug getDrug() {
