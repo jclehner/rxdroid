@@ -7,7 +7,7 @@ TMP=$(mktempd)
 BIN="bin/RxDroid-release-unsigned.apk"
 RXDROID_KEYSTORE="${RXDROID_KEYSTORE:-/___IDONTEXIST__}"
 RXDROID_KEY_ALIAS="${RXDROID_KEY_ALIAS:-}"
-OUT="${HOME}/RxDroid-release.apk"
+RXDROID_APK_OUT="${RXDROID_APK_OUT:-${HOME}/RxDroid-release.apk}"
 
 cleanup() {
 	rm -rf "$TMP"
@@ -53,10 +53,10 @@ build() {
 
 
 	run jarsigner -verify "$BIN"
-	run zipalign -f 4 "$BIN" ~/RxDroid-release.apk
+	run zipalign -f 4 "$BIN" "${RXDROID_APK_OUT}"
 
 	echo "======================================================"
-	echo "APK is available at $OUT"
+	echo "APK is available at ${RXDROID_APK_OUT}"
 	echo "======================================================"
 }
 
