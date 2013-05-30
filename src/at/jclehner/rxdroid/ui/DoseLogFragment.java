@@ -67,7 +67,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		R.string._title_night_dose
 	};
 
-	private List<List<EventInfo>> mGroupedEvents;
+	private List<List<EventInfo>> mGroupedEvents = Collections.emptyList();
 
 	private Date mToday;
 
