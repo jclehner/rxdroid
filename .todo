@@ -342,6 +342,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1362065317" done="1369925921">
+        Make DrugSupplyMonitor independent of DrugOverviewAdapter
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1316529552" done="1318956457">
         Speed up DrugAdapter#getView()
         <comment>
@@ -426,6 +432,12 @@
             n/a
         </comment>
     </note>
+    <note priority="medium" time="1320778180" done="1369925960">
+        Better tablet support; use Fragments!
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1320793646" done="1324429884">
         Make DatabaseHelper display dialogs for errors/upgrade/downgrade
         <comment>
@@ -499,6 +511,12 @@
         Send broadcasts for db upgrade/cleaning/loading for better progress indicator?
         <comment>
             done
+        </comment>
+    </note>
+    <note priority="medium" time="1351004787" done="1369925908">
+        Show notifications like low supply / missed doses when repeat != daily in notification panel at bottom? For &gt;= 11, maybe item in ActionBar?
+        <comment>
+            dismissed
         </comment>
     </note>
     <note priority="low" time="1316529505" done="1316548042">
@@ -591,6 +609,9 @@
     <note priority="veryhigh" time="1362065331">
         Use antonyt's InfiniteViewPager
     </note>
+    <note priority="veryhigh" time="1369926007">
+        New database table: History (replaces DoseEvent)
+    </note>
     <note priority="high" time="1324308938">
         Support Marcoumar-like schedules (distinct doses each weekday) - maybe add extra table for such entries?
     </note>
@@ -603,12 +624,6 @@
     <note priority="high" time="1350856491">
         Fix end-of-supply date for drugs with 21/7 repeatMode
     </note>
-    <note priority="high" time="1362065317">
-        Make DrugSupplyMonitor independent of DrugOverviewAdapter
-    </note>
-    <note priority="medium" time="1320778180">
-        Better tablet support; use Fragments!
-    </note>
     <note priority="medium" time="1328223980">
         Add PIN protection
     </note>
@@ -617,9 +632,6 @@
     </note>
     <note priority="medium" time="1350583720">
         Implement multiple stashes using the patient database
-    </note>
-    <note priority="medium" time="1351004787">
-        Show notifications like low supply / missed doses when repeat != daily in notification panel at bottom? For &gt;= 11, maybe item in ActionBar?
     </note>
     <note priority="medium" time="1354818880">
         Make drug icon selector a Spinner with drawables

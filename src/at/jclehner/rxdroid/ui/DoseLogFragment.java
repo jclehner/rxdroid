@@ -130,26 +130,16 @@ public class DoseLogFragment extends ExpandableListFragment
 		else if(date == null)
 			date = Settings.getOldestPossibleHistoryDate(mToday);
 
-		if(false)
-		{
-			Log.v(TAG, "gatherEventInfos:\n" +
-					"  oldest reliable DoseEvent date: " +
-					DateTime.toDateString(Settings.getDate(Keys.OLDEST_POSSIBLE_DOSE_EVENT_TIME)) + "\n" +
-					"  oldest possible history date  : " +
-					DateTime.toDateString(Settings.getOldestPossibleHistoryDate(mToday)) + "\n" +
-					"  oldest date in DoseEvent set  : " +
-					DateTime.toDateString(events.get(events.size() - 1).getDate()) + "\n\n" +
-					"  date used                     : " +
-					DateTime.toDateString(date));
-		}
+		final Date lastScheduleUpdateDate = drug.getLastAutoDoseEventCreationDate();
 
 		if(date == null)
 		{
-			Log.w(TAG, "gatherEventInfos(" + flags + "): no date to begin; giving up");
-			return;
+			if((date = lastScheduleUpdateDate) == null)
+			{
+				Log.w(TAG, "gatherEventInfos(" + flags + "): no date to begin; giving up");
+				return;
+			}
 		}
-		else if(LOGV)
-			Log.v(TAG, "gatherEventInfos: date=" + date);
 
 //		final Date lastDosesClearedDate = drug.getLastDosesClearedDate();
 //		if(lastDosesClearedDate != null)
@@ -164,19 +154,22 @@ public class DoseLogFragment extends ExpandableListFragment
 		{
 			while(!date.after(mToday))
 			{
-				if(drug.hasDoseOnDate(date))
+				if(lastScheduleUpdateDate == null || !date.before(lastScheduleUpdateDate))
 				{
-					for(int doseTime : Constants.DOSE_TIMES)
+					if(drug.hasDoseOnDate(date))
 					{
-						if(date.equals(mToday) && doseTime == dtInfo.activeOrNextDoseTime())
-							break;
-
-						Fraction dose = drug.getDose(doseTime, date);
-
-						if(!dose.isZero() && !containsDoseEvent(events, date, doseTime))
+						for(int doseTime : Constants.DOSE_TIMES)
 						{
-							//Log.d(TAG, "Creating missed event: date=" + date + ", doseTime=" + doseTime);
-							infos.add(EventInfo.newMissedEvent(date, doseTime, dose));
+							if(date.equals(mToday) && doseTime == dtInfo.activeOrNextDoseTime())
+								break;
+
+							Fraction dose = drug.getDose(doseTime, date);
+
+							if(!dose.isZero() && !containsDoseEvent(events, date, doseTime))
+							{
+								//Log.d(TAG, "Creating missed event: date=" + date + ", doseTime=" + doseTime);
+								infos.add(EventInfo.newMissedEvent(date, doseTime, dose));
+							}
 						}
 					}
 				}
