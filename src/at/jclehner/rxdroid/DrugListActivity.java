@@ -426,7 +426,11 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(Settings.Keys.THEME_IS_DARK.equals(key))
 			finish(); // TODO fix this naughty hack
 		else if(mIsShowing)
-			invalidateViewPager();
+		{
+			// TODO also exclude all other non-important keys
+			if(!Keys.LAST_MSG_HASH.equals(key))
+				invalidateViewPager();
+		}
 	}
 
 	@Override
