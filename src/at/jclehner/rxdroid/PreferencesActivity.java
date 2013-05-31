@@ -505,5 +505,30 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				}
 			});
 		}
+
+		p = findPreference("key_debug_add_5_drugs");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					for(int i = 0; i != 5; ++i)
+					{
+						Drug drug = new Drug();
+						drug.setName("Drug #" + Database.countAll(Drug.class));
+						drug.setDose(Schedule.TIME_MORNING, new Fraction(1, 2));
+						drug.setDose(Schedule.TIME_EVENING, new Fraction(1));
+						drug.setRepeatMode(Drug.REPEAT_DAILY);
+						drug.setActive(true);
+
+						Database.create(drug);
+					}
+
+					return false;
+				}
+			});
+		}
 	}
 }
