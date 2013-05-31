@@ -30,5 +30,7 @@
 	<dimen name="keypad_margin_bottom">20dip</dimen>
 	<dimen name="log_group_height">40dip</dimen>	
 	<dimen name="pin_margin">20dip</dimen>
-	<dimen name="divider_width">2dip</dimen>		
+	<dimen name="divider_width">2dip</dimen>
+	
+    <dimen name="fraction_wholenum_margin">0dip</dimen>		
 </resources>

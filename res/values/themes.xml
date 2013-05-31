@@ -60,7 +60,7 @@
 		<item name="iconWarning">@drawable/ic_menu_warning_black</item>
 		<item name="iconStorage">@drawable/ic_menu_storage_black</item>
 		<item name="iconOverflow">@drawable/ic_menu_overflow_black</item>
-		<item name="iconList">@drawable/ic_menu_list_black</item>
+		<item name="iconList">@drawable/ic_list_black</item>
 		
 		<item name="actionIconExpandAll">@drawable/ic_menu_expand_all_white</item>
 		<item name="actionIconCollapseAll">@drawable/ic_menu_collapse_all_white</item>
@@ -101,7 +101,7 @@
 		<item name="iconWarning">@drawable/ic_menu_warning_white</item>
 		<item name="iconStorage">@drawable/ic_menu_storage_white</item>		
 		<item name="iconOverflow">@drawable/ic_menu_overflow_white</item>		
-		<item name="iconList">@drawable/ic_menu_list_white</item>
+		<item name="iconList">@drawable/ic_list_white</item>
 		
 		<item name="actionIconExpandAll">@drawable/ic_menu_expand_all_black</item>
 		<item name="actionIconCollapseAll">@drawable/ic_menu_collapse_all_black</item>
