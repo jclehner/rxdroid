@@ -22,6 +22,7 @@
 package at.jclehner.rxdroid.preferences;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -41,6 +42,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.TimePicker.OnTimeChangedListener;
 import at.jclehner.androidutils.AdvancedDialogPreference;
+import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
@@ -52,6 +54,8 @@ public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
 {
 	private static final String TAG = TimePeriodPreference.class.getSimpleName();
 
+	private static final boolean USE_CACHE = true;
+
 	private static final int END = 1;
 	private static final int MAX = END;
 	private static final int BEGIN = 0;
@@ -60,6 +64,7 @@ public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
 	public static class TimePeriod implements Serializable
 	{
 		private static final long serialVersionUID = -2432714902425872383L;
+		private static final HashMap<String, TimePeriod> CACHE = new HashMap<String, TimePeriod>();
 
 		private final DumbTime mBegin;
 		private final DumbTime mEnd;
@@ -77,16 +82,25 @@ public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
 
 		public static TimePeriod fromString(String string)
 		{
-			final String[] tokens = string.split("-");
-			if(tokens.length != 2)
-				throw new IllegalArgumentException();
+			synchronized(CACHE)
+			{
+				TimePeriod value = USE_CACHE ? CACHE.get(string) : null;
+				if(value == null)
+				{
+					final String[] tokens = string.split("-");
+					if(tokens.length != 2)
+						throw new IllegalArgumentException();
 
-			final DumbTime begin, end;
+					final DumbTime begin, end;
 
-			begin = DumbTime.fromString(tokens[0]);
-			end = DumbTime.fromString(tokens[1]);
+					begin = DumbTime.fromString(tokens[0]);
+					end = DumbTime.fromString(tokens[1]);
 
-			return new TimePeriod(begin, end);
+					CACHE.put(string, value = new TimePeriod(begin, end));
+				}
+
+				return value;
+			}
 		}
 
 		public DumbTime begin() {

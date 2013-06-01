@@ -42,10 +42,10 @@ fi
 #run adb-shell rm "$DTEMP/.rxdroid.db"
 #echo "done"
 
-echo -n "Fixing permissions ... "
+echo -n "Fixing permissions ... ($FUID.$FGID) "
 
 for x in $PREFS $DATABASES; do
-	run adb-shell chown $FUID.$FGID "$x" "$x/*"
+	run adb-shell chown $FGID.$FGID "$x" "$x/*"
 	run adb-shell chmod 600 "$x/*"
 done
 

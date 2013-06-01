@@ -40,6 +40,7 @@ import android.util.Log;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
+import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
@@ -114,7 +115,7 @@ public final class Settings
 	private static final boolean LOGV = false;
 
 	private static final String DATE_FORMAT = "yyyy-MM-dd";
-	private static final String KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
+	private static final String DOSE_TIME_KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 
 	private static SharedPreferences sSharedPrefs = null;
 
@@ -335,14 +336,14 @@ public final class Settings
 
 	public static TimePeriod getTimePeriodPreference(int doseTime)
 	{
-		final String key = KEYS[doseTime];
+		final String key = DOSE_TIME_KEYS[doseTime];
 
 		String value = sSharedPrefs.getString(key, null);
 		if(value == null)
 		{
 			final Context context = RxDroid.getContext();
 			int resId = context.getResources().
-				getIdentifier("at.jclehner.rxdroid:string/pref_default_" + key, null, null);
+					getIdentifier("at.jclehner.rxdroid:string/pref_default_" + key, null, null);
 
 			if(resId == 0 || (value = context.getString(resId)) == null)
 				throw new IllegalStateException("No default value for time preference " + key + " in strings.xml");
@@ -783,7 +784,15 @@ public final class Settings
 		@Override
 		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
 		{
-			RxDroid.notifyBackupDataChanged();
+			/*if(USE_DOSE_TIME_CACHE)
+			{
+				final int index = CollectionUtils.indexOf(key, DOSE_TIME_KEYS);
+				if(index != -1)
+					sDoseTimeCache[index] = null;
+			}*/
+
+			if(!Keys.LAST_MSG_HASH.equals(key))
+				RxDroid.notifyBackupDataChanged();
 		}
 	};
 
