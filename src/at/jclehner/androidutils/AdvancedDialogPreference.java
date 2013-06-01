@@ -411,8 +411,9 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 
 		if(mDialog != null)
 		{
-			mDialog.dismiss();
+			//mDialog.dismiss();
 			extras.putBundle(EXTRA_DIALOG_STATE, mDialog.onSaveInstanceState());
+      mDialog.dismiss();
 			//extras.putString(EXTRA_DIALOG_VALUE, toPersistedString(getDialogValue()));
 		}
 
