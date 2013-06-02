@@ -180,9 +180,9 @@ public class ScheduleGridFragment extends ListFragment implements
 
 		for(int i = 0; i != mHolders.length; ++i)
 		{
-			final Fraction[] doses = new Fraction[4];
+			final Fraction[] doses = new Fraction[Schedule.DOSE_TIME_COUNT];
 
-			for(int j = 0; j != 4; ++j)
+			for(int j = 0; j != Schedule.DOSE_TIME_COUNT; ++j)
 				doses[j] = mHolders[i].doseViews[j].getDose();
 
 			outState.putParcelableArray("doses_" + i, doses);

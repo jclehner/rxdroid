@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.Constants;
 
 public class ScheduleViewHolder
@@ -32,7 +33,7 @@ public class ScheduleViewHolder
 	private static final int[] DIVIDER_IDS = { R.id.divider1, R.id.divider2, R.id.divider3 };
 
 	public ViewGroup doseContainer;
-	public DoseView[] doseViews = new DoseView[4];
+	public DoseView[] doseViews = new DoseView[Schedule.DOSE_TIME_COUNT];
 	public View[] dividers = new View[3];
 
 	public void setDoseViewsFromLayout(View layout)

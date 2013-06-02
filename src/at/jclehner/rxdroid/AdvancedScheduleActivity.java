@@ -39,6 +39,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import at.jclehner.rxdroid.FractionInputDialog.OnFractionSetListener;
+import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.ui.ScheduleViewHolder;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.Constants;
@@ -246,7 +247,7 @@ public class AdvancedScheduleActivity extends ListActivity
 
 	static class ViewHolder extends ScheduleViewHolder
 	{
-		Fraction[] doses = new Fraction[4];
+		Fraction[] doses = new Fraction[Schedule.DOSE_TIME_COUNT];
 
 		View view;
 		ViewGroup dayContainer;
