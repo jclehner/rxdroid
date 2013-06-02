@@ -45,6 +45,8 @@ public class BackupAgent extends BackupAgentHelper
 	@Override
 	public void onCreate()
 	{
+		RxDroid.setContext(getApplicationContext());
+
 		if(!isBackupEnabled())
 			return;
 
