@@ -48,6 +48,23 @@
 	  		android:onClick="onDoseViewClick"
 	  	/>
 	  	
+	  	<!-- 	  	
+	  	<include android:id="@+id/divider4" 
+	  		layout="@layout/divider"
+	  		android:visibility="gone"
+	  	/>
+	  	
+	  	
+	  	<at.jclehner.rxdroid.DoseView android:id="@+id/bed"
+	  		android:layout_height="wrap_content"
+	  		android:layout_width="0dip"
+	  		android:layout_weight="1"
+	  		
+	  		android:focusable="true"
+	  		android:onClick="onDoseViewClick"
+	  	/>
+	  	-->	  	
+	  	
 	  	<include android:id="@+id/divider3" 
 	  		layout="@layout/divider" 
 	  	/>
@@ -59,6 +76,6 @@
 	  		
 	  		android:focusable="true"
 	  		android:onClick="onDoseViewClick"
-	  	/>	  	
+	  	/>
 	  		
 	  </LinearLayout>

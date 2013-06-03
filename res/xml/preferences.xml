@@ -226,6 +226,10 @@
 		    android:title="Add 5 drugs"
 		/>
 		
+		<Preference android:key="key_debug_crash_app"
+		    android:title="Crash app"
+		/>
+		
 		<Preference android:title="Test"
 		    android:summary="@string/test_schedule"
 		/>

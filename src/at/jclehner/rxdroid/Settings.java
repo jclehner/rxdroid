@@ -35,6 +35,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import at.jclehner.rxdroid.db.Drug;
@@ -697,14 +698,14 @@ public final class Settings
 			}
 		}
 
-		if(!Version.SDK_IS_PRE_HONEYCOMB && !Version.SDK_IS_JELLYBEAN_OR_NEWER)
+		/*if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
 		{
 			if(!Settings.getBoolean(Keys.THEME_IS_DARK, Defaults.THEME_IS_DARK))
 			{
 				Log.i(TAG, "Android 3.x detected - disabling light theme");
 				Settings.putBoolean(Keys.THEME_IS_DARK, true);
 			}
-		}
+		}*/
 	}
 
 	// converts the string set [ "foo", "bar", "foobar", "barz" ] to the following string:

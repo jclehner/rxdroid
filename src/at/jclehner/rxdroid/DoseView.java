@@ -110,6 +110,13 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			case R.id.night:
 				setDoseTime(Drug.TIME_NIGHT);
 				break;
+
+			// XXX
+			/*case R.id.bed:
+				mDoseTimeIcon.setImageResource(R.drawable.ic_night_test);
+				mDoseText.setText("-");
+				break;*/
+			// XXX
 		}
 	}
 

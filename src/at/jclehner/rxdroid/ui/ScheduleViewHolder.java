@@ -34,7 +34,7 @@ public class ScheduleViewHolder
 
 	public ViewGroup doseContainer;
 	public DoseView[] doseViews = new DoseView[Schedule.DOSE_TIME_COUNT];
-	public View[] dividers = new View[3];
+	public View[] dividers = new View[Schedule.DOSE_TIME_COUNT-1];
 
 	public void setDoseViewsFromLayout(View layout)
 	{

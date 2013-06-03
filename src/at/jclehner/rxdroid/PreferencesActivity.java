@@ -526,7 +526,28 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 						Database.create(drug);
 					}
 
-					return false;
+					return true;
+				}
+			});
+		}
+
+		p = findPreference("key_debug_crash_app");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					RxDroid.runInMainThread(new Runnable() {
+
+						@Override
+						public void run()
+						{
+							throw new RuntimeException("Crash requested by user");
+						}
+					});
+					return true;
 				}
 			});
 		}
