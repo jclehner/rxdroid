@@ -38,6 +38,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import at.jclehner.androidutils.InstanceState.SaveState;
+import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.util.Util;
 
@@ -55,7 +56,7 @@ import at.jclehner.rxdroid.util.Util;
 public abstract class AdvancedDialogPreference<T extends Serializable> extends DialogPreference
 {
 	private static final String TAG = AdvancedDialogPreference.class.getSimpleName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = BuildConfig.DEBUG;
 
 	private static final boolean USE_NEW_DISMISS_LOGIC = false;
 
