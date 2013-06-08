@@ -238,6 +238,11 @@
 			android:title="Compact ActionBar"
 			android:defaultValue="@bool/pref_default_compact_action_bar"
 		/>
+		
+		<CheckBoxPreference android:key="use_lockscreen"
+		    android:title="Enable lockscreen"
+		    android:defaultValue="false"
+		/>
 				    
 </PreferenceScreen>
 	
