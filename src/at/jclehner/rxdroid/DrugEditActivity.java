@@ -45,7 +45,6 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceScreen;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup.LayoutParams;
@@ -59,7 +58,6 @@ import at.jclehner.androidutils.otpm.DialogPreferenceController;
 import at.jclehner.androidutils.otpm.ListPreferenceWithIntController;
 import at.jclehner.androidutils.otpm.OTPM;
 import at.jclehner.androidutils.otpm.OTPM.CreatePreference;
-import at.jclehner.androidutils.otpm.PreferenceController;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -247,7 +245,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		if(mIsEditing)
 		{
 			MenuItem item = menu.add(0, MENU_DELETE, 0, R.string._title_delete)
-					.setIcon(android.R.drawable.ic_menu_delete);
+					.setIcon(R.drawable.ic_action_delete_black);
 
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		}

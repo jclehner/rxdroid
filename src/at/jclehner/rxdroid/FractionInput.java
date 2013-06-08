@@ -91,13 +91,13 @@ public class FractionInput extends LinearLayout
 		mFractionBar = (TextView) findViewById(R.id.fraction_bar);
 		mModeSwitcher = (Button) findViewById(R.id.mode_switcher);
 
-		mIntegerPicker.setOnValueChangeListener(mPickerListener);
+		mIntegerPicker.setOnValueChangedListener(mPickerListener);
 		mIntegerPicker.setWrapSelectorWheel(false);
 
-		mNumeratorPicker.setOnValueChangeListener(mPickerListener);
+		mNumeratorPicker.setOnValueChangedListener(mPickerListener);
 		mNumeratorPicker.setWrapSelectorWheel(false);
 
-		mDenominatorPicker.setOnValueChangeListener(mPickerListener);
+		mDenominatorPicker.setOnValueChangedListener(mPickerListener);
 		mDenominatorPicker.setMinValue(1); // must be called before setWrapSelectorWheel!
 		mDenominatorPicker.setWrapSelectorWheel(false);
 

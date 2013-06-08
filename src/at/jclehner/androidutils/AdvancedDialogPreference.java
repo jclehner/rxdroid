@@ -165,7 +165,8 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	{
 		if(mValue == null)
 		{
-			Log.e(TAG, "This shouldn't have happened...");
+			if(shouldPersist())
+				Log.e(TAG, "This shouldn't have happened...");
 
 			String persisted = getPersistedString(EMPTY);
 			if(persisted != null && persisted != EMPTY) // the != operator is intentional!
@@ -379,6 +380,8 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 			final Window window = mDialog.getWindow();
 			if(window != null)
 				window.setSoftInputMode(softInputMode);
+			else
+				Log.d(TAG, "showDialog: window was null");
 		}
 
 		onPrepareDialog(mDialog);

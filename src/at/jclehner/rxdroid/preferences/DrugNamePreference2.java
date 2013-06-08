@@ -46,8 +46,12 @@ public class DrugNamePreference2 extends AdvancedDialogPreference<String>
 
 	private String mOriginalName;
 
-	public DrugNamePreference2(Context context, AttributeSet attrs) {
+	public DrugNamePreference2(Context context, AttributeSet attrs)
+	{
 		super(context, attrs, android.R.attr.editTextPreferenceStyle);
+
+		setPositiveButtonText(android.R.string.ok);
+		setNegativeButtonText(android.R.string.cancel);
 	}
 
 	@Override
@@ -105,7 +109,7 @@ public class DrugNamePreference2 extends AdvancedDialogPreference<String>
 				mBtnPositive = ((AlertDialog) dialog).getButton(Dialog.BUTTON_POSITIVE);
 			}
 		});
-	};
+	}
 
 	@Override
 	protected int onGetSoftInputMode()

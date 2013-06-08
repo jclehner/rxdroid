@@ -54,7 +54,7 @@
 
 		<activity android:name=".DrugEditActivity"
 		    android:exported="false"
-		    android:windowSoftInputMode="adjustResize"		    
+		    android:windowSoftInputMode="adjustPan"		    
 			android:launchMode="singleTop"
 		    android:configChanges="orientation|screenSize|keyboardHidden"
 		>	    

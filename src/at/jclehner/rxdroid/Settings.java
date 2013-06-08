@@ -647,6 +647,9 @@ public final class Settings
 			remove("displayed_info_ids");
 		}
 
+		if(contains(Keys.THEME_IS_DARK))
+			remove(Keys.THEME_IS_DARK);
+
 		if(contains(Keys.USE_SOUND))
 		{
 			Log.d(TAG, "init: migrating USE_SOUND");
