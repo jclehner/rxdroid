@@ -24,7 +24,7 @@ package at.jclehner.androidutils.otpm;
 import android.content.res.Resources;
 import android.preference.ListPreference;
 
-public abstract class ListPreferenceWithStringController extends at.jclehner.androidutils.otpm.DialogPreferenceController<ListPreference, String>
+public abstract class ListPreferenceWithStringController extends DialogPreferenceController<ListPreference, String>
 {
 	private String[] mEntries;
 	private String[] mValues;
