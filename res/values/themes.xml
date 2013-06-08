@@ -30,7 +30,7 @@
 		<item name="android:windowAnimationStyle">@null</item>		
 	</style>
 	
-	<style name="LightTheme" parent="@style/_ApiSpecificLightTheme">
+	<style name="LightTheme" parent="@style/Theme.Sherlock.Light.DarkActionBar">
 		<item name="drugIconTablet">@drawable/ic_drug_tablet_black</item>
 		<item name="drugIconTube">@drawable/ic_drug_tube_black</item>
 		<item name="drugIconGlass">@drawable/ic_drug_glass_black</item>
@@ -71,7 +71,7 @@
 		
 	</style>
 	
-	<style name="DarkTheme" parent="@style/_ApiSpecificDarkTheme">
+	<style name="DarkTheme" parent="@style/Theme.Sherlock">
 		<item name="drugIconTablet">@drawable/ic_drug_tablet_white</item>
 		<item name="drugIconTube">@drawable/ic_drug_tube_white</item>
 		<item name="drugIconGlass">@drawable/ic_drug_glass_white</item>
