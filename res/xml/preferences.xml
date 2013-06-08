@@ -217,7 +217,7 @@
 		    <intent 
 				android:action="android.intent.action.VIEW"
 				android:targetPackage="at.jclehner.rxdroid"
-				android:targetClass="at.jclehner.rxdroid.AdvancedScheduleActivity2"
+				android:targetClass="at.jclehner.rxdroid.AdvancedScheduleActivity"
 			/>
 		    
 		</Preference>

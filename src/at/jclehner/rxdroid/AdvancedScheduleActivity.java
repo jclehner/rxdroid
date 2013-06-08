@@ -205,6 +205,7 @@ public class AdvancedScheduleActivity extends ListActivity
 				//dv.setDose(holder.getDose(dv.getDoseTime()));
 				dv.setEnabled(doseViewEnabled);
 				dv.setTag(dayTag);
+				dv.setDose(Fraction.ZERO);
 			}
 
 			holder.dayChecked.setTag(dayTag);

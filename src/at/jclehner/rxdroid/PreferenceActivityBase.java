@@ -109,6 +109,7 @@ public abstract class PreferenceActivityBase extends SherlockPreferenceActivity
 		if(Version.SDK_IS_PRE_HONEYCOMB && !mUseDarkTheme)
 		{
 			super.onPreferenceTreeClick(ps, p);
+			setTheme(Theme.get());
 
 			try
 			{
@@ -122,6 +123,8 @@ public abstract class PreferenceActivityBase extends SherlockPreferenceActivity
 						{
 							d.getWindow().getDecorView().setBackgroundDrawable(this.getWindow()
 									.getDecorView().getBackground().getConstantState().newDrawable());
+
+							//((PreferenceScreen) p).set
 						}
 					}
 				}
