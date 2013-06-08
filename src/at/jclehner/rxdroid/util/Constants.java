@@ -35,6 +35,8 @@ public final class Constants
 	public static final String NOTIFICATION_BULLET = "\u2022 ";
 	public static final long NOTIFICATION_INITIAL_DELAY = 5000;
 
+	public static final int HOME_ID = com.actionbarsherlock.R.id.showHome;
+
 	public static final String EMPTY_STRING = "";
 
 	public static final DumbTime MIDNIGHT = new DumbTime(0, 0);
