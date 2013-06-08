@@ -22,9 +22,9 @@
 package at.jclehner.rxdroid;
 
 import java.io.File;
+import java.util.Date;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -53,7 +53,9 @@ import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
-public class SplashScreenActivity extends Activity implements OnClickListener
+import com.actionbarsherlock.app.SherlockActivity;
+
+public class SplashScreenActivity extends SherlockActivity implements OnClickListener
 {
 	@SuppressWarnings("unused")
 	private static final boolean USE_MSG_HANDLER = BuildConfig.DEBUG;
@@ -104,6 +106,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 	private static final String ARG_EXCEPTION = "exception";
 
 	private final BroadcastReceiver mReceiver = new DatabaseStatusReceiver();
+	private Date mDate;
 
 	private WrappedCheckedException mException = null;
 
@@ -116,15 +119,14 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 		setTheme(Theme.get());
 		setContentView(R.layout.loader);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-		{
-			final SpannableString dateString = new SpannableString(DateTime.toNativeDate(DateTime.today()));
+		mDate = Settings.getActiveDate();
 
-			Util.applyStyle(dateString, new RelativeSizeSpan(0.75f));
-			Util.applyStyle(dateString, new UnderlineSpan());
+		final SpannableString dateString = new SpannableString(DateTime.toNativeDate(mDate));
 
-			getActionBar().setSubtitle(dateString);
-		}
+		Util.applyStyle(dateString, new RelativeSizeSpan(0.75f));
+		Util.applyStyle(dateString, new UnderlineSpan());
+
+		getSupportActionBar().setSubtitle(dateString);
 
 		try
 		{
@@ -302,6 +304,7 @@ public class SplashScreenActivity extends Activity implements OnClickListener
 				Intent intent = new Intent(getBaseContext(), intentClass);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
 				intent.putExtra(DoseTimePreferenceActivity.EXTRA_IS_FIRST_LAUNCH, isFirstLaunch);
+				intent.putExtra(DrugListActivity.EXTRA_DATE, mDate);
 				startActivity(intent);
 
 				finish();
