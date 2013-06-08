@@ -28,7 +28,9 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import at.jclehner.rxdroid.Settings.Keys;
@@ -144,8 +146,7 @@ public class DoseHistoryActivity extends SherlockFragmentActivity
 
 							Settings.putBoolean(Keys.LOG_IS_ALL_COLLAPSED, !isAllCollapsed);
 
-							if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-								invalidateOptionsMenu();
+							supportInvalidateOptionsMenu();
 						}
 
 						return true;
@@ -204,7 +205,7 @@ public class DoseHistoryActivity extends SherlockFragmentActivity
 				@Override
 				public void run()
 				{
-					invalidateOptionsMenu();
+					supportInvalidateOptionsMenu();
 				}
 			});
 		}

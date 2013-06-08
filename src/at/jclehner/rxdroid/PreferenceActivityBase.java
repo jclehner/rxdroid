@@ -21,21 +21,47 @@
 
 package at.jclehner.rxdroid;
 
-import android.app.ActionBar;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
-import android.view.MenuItem;
+import android.preference.Preference;
+import android.preference.PreferenceScreen;
+import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import at.jclehner.rxdroid.util.Components;
 
-public abstract class PreferenceActivityBase extends PreferenceActivity
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.MenuItem;
+
+public abstract class PreferenceActivityBase extends SherlockPreferenceActivity
 {
+	private static final String TAG = PreferenceActivityBase.class.getSimpleName();
+	private static final String EXTRA_DARK_THEME = "dark_theme";
+
+	private boolean mUseDarkTheme = false;
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		Components.onCreateActivity(this, Components.NO_THEME);
-		// See android issue #4611
-		setTheme(Version.SDK_IS_PRE_HONEYCOMB ? android.R.style.Theme : Theme.get());
+		mUseDarkTheme = getIntent().getBooleanExtra(EXTRA_DARK_THEME, false);
+
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER || !mUseDarkTheme)
+			Components.onCreateActivity(this, 0);
+		else
+		{
+			Components.onCreateActivity(this, Components.NO_THEME);
+			setTheme(R.style.DarkTheme);
+		}
+
 		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent)
+	{
+		super.onNewIntent(intent);
+		mUseDarkTheme = getIntent().getBooleanExtra(EXTRA_DARK_THEME, false);
 	}
 
 	@Override
@@ -44,9 +70,9 @@ public abstract class PreferenceActivityBase extends PreferenceActivity
 		super.onResume();
 		Components.onResumeActivity(this, 0);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER && isHomeButtonEnabled())
+		if(isHomeButtonEnabled())
 		{
-			ActionBar ab = getActionBar();
+			final ActionBar ab = getSupportActionBar();
 			ab.setDisplayShowHomeEnabled(isHomeButtonEnabled());
 			ab.setDisplayHomeAsUpEnabled(isHomeButtonEnabled());
 		}
@@ -62,21 +88,60 @@ public abstract class PreferenceActivityBase extends PreferenceActivity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+		if(item.getItemId() == android.R.id.home)
 		{
-			if(item.getItemId() == android.R.id.home)
-			{
-				final Intent intent = getHomeButtonIntent();
-				intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			final Intent intent = getHomeButtonIntent();
+			intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-				startActivity(intent);
+			startActivity(intent);
 
-				return true;
-			}
+			return true;
 		}
 
 		return super.onOptionsItemSelected(item);
 	}
+
+	@SuppressWarnings("deprecation")
+    @Override
+    public boolean onPreferenceTreeClick(PreferenceScreen ps, Preference p)
+    {
+		// see http://code.google.com/p/android/issues/detail?id=4611#c35
+		if(Version.SDK_IS_PRE_HONEYCOMB && !mUseDarkTheme)
+		{
+			super.onPreferenceTreeClick(ps, p);
+
+			try
+			{
+				if(p != null)
+				{
+					if(p instanceof PreferenceScreen)
+					{
+						final Dialog d = ((PreferenceScreen) p).getDialog();
+
+						if(d != null)
+						{
+							d.getWindow().getDecorView().setBackgroundDrawable(this.getWindow()
+									.getDecorView().getBackground().getConstantState().newDrawable());
+						}
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				// it's ugly, but who knows if this function works on all flavours of android
+
+				Log.w(TAG, "Caught exception - falling back to dark theme!", e);
+				Intent intent = new Intent(this, getClass());
+				intent.putExtra(EXTRA_DARK_THEME, true);
+				startActivity(intent);
+				finish();
+			}
+
+			return false;
+		}
+
+		return super.onPreferenceTreeClick(ps, p);
+    }
 
 	protected abstract Intent getHomeButtonIntent();
 

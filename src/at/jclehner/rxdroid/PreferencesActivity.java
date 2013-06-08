@@ -45,13 +45,11 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceScreen;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceGroup;
+import android.preference.PreferenceScreen;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.webkit.WebView;
 import android.widget.Toast;
 import at.jclehner.rxdroid.Settings.Keys;
@@ -62,6 +60,9 @@ import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
+
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 
 @SuppressWarnings("deprecation")
 public class PreferencesActivity extends PreferenceActivityBase implements
@@ -523,7 +524,14 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 						drug.setRepeatMode(Drug.REPEAT_DAILY);
 						drug.setActive(true);
 
-						Database.create(drug);
+						try
+						{
+							Database.create(drug);
+						}
+						catch(Exception e)
+						{
+							Log.w(TAG, e);
+						}
 					}
 
 					return true;

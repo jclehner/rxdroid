@@ -45,6 +45,7 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceScreen;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup.LayoutParams;
@@ -228,8 +229,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			performPreferenceClick("currentSupply");
 		}
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			invalidateOptionsMenu();
+		supportInvalidateOptionsMenu();
 	}
 
 	@Override
