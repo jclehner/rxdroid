@@ -7,7 +7,7 @@ readonly MISCDIR="$(dirname $0)/misc"
 GIT_REPOS=( 
 	"NumberPicker git://github.com/mrn/numberpicker.git lib" 
 	"DragSortListView git://github.com/bauerca/drag-sort-listview.git library"
-#	"ActionBarSherlock git://github.com/JakeWharton/ActionBarSherlock.git actionbarsherlock" 
+	"ActionBarSherlock git://github.com/JakeWharton/ActionBarSherlock.git actionbarsherlock" 
 #	"HoloEverywhere https://github.com/Prototik/HoloEverywhere library"
 )
 
@@ -193,11 +193,16 @@ for REPO in "${GIT_REPOS[@]}"; do
 		#create_project_files "${TARGET}"
 	fi
 
-	if [[ -f ${TARGET}/libs/android-support-v4.jar ]]; then
-		echo "INFO: Replacing android-support-v4.jar in ${TARGET}"
-		rm "${TARGET}/libs/android-support-v4.jar"
-		cp "../libs/android-support-v4.jar" "${TARGET}/libs/android-support-v4.jar"
-	fi
+	for LIB in $(find ${TARGET} -name android-support-v4.jar); do
+		echo "INFO: Replacing android-support-v4.jar in $(dirname "${LIB}")"
+		cp "../libs/android-support-v4.jar" "${LIB}"
+	done
+
+	#if [[ -f ${TARGET}/libs/android-support-v4.jar ]]; then
+	#	echo "INFO: Replacing android-support-v4.jar in ${TARGET}"
+	#	rm "${TARGET}/libs/android-support-v4.jar"
+	#	cp "../libs/android-support-v4.jar" "${TARGET}/libs/android-support-v4.jar"
+	#fi
 
 	ZIPDIRS+="${THIRDPARTY}/${TARGET} "
 done
