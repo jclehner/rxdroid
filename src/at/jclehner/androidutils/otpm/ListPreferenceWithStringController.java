@@ -24,7 +24,7 @@ package at.jclehner.androidutils.otpm;
 import android.content.res.Resources;
 import android.preference.ListPreference;
 
-public abstract class ListPreferenceWithStringController extends PreferenceController<ListPreference, String>
+public abstract class ListPreferenceWithStringController extends DialogPreferenceController<ListPreference, String>
 {
 	private String[] mEntries;
 	private String[] mValues;
@@ -50,6 +50,8 @@ public abstract class ListPreferenceWithStringController extends PreferenceContr
 	@Override
 	public void initPreference(ListPreference preference, String fieldValue)
 	{
+		super.initPreference(preference, fieldValue);
+
 		if(mEntries == null || mValues == null)
 		{
 			final Resources r = preference.getContext().getResources();

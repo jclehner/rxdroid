@@ -89,15 +89,15 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	//private static final String KEY_IS_DIALOG_SHOWING = TAG + ".is_showing";
 	//private static final String KEY_DIALOG_VALUE = TAG + ".dialog_value";
 
-	public AdvancedDialogPreference(Context context, AttributeSet attrs, int defStyle)
-	{
-		super(context, attrs, defStyle);
-		handleAttributes(attrs);
-		if(LOGV) Log.d(TAG, "ctor: key=" + getKey());
+	public AdvancedDialogPreference(Context context, AttributeSet attrs, int defStyle) {
+		this(context, attrs);
 	}
 
-	public AdvancedDialogPreference(Context context, AttributeSet attrs) {
-		this(context, attrs, android.R.attr.preferenceStyle);
+	public AdvancedDialogPreference(Context context, AttributeSet attrs)
+	{
+		super(context, attrs, android.R.attr.preferenceStyle);
+		handleAttributes(attrs);
+		if(LOGV) Log.d(TAG, "ctor: key=" + getKey());
 	}
 
 	public void setNeutralButtonText(CharSequence text) {

@@ -68,7 +68,7 @@
 		<item name="dividerColor">@color/list_divider_light</item>
 		
 		<item name="android:windowAnimationStyle">@null</item>
-		
+				
 	</style>
 	
 	<style name="DarkTheme" parent="@style/Theme.Sherlock">

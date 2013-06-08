@@ -55,6 +55,7 @@ import android.widget.Toast;
 import at.jclehner.androidutils.AdvancedDialogPreference;
 import at.jclehner.androidutils.otpm.AdvancedDialogPreferenceController;
 import at.jclehner.androidutils.otpm.CheckboxPreferenceController;
+import at.jclehner.androidutils.otpm.DialogPreferenceController;
 import at.jclehner.androidutils.otpm.ListPreferenceWithIntController;
 import at.jclehner.androidutils.otpm.OTPM;
 import at.jclehner.androidutils.otpm.OTPM.CreatePreference;
@@ -991,7 +992,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		}
 	}
 
-	private static class NotificationsPreferenceController extends PreferenceController<ListPreference, Boolean>
+	private static class NotificationsPreferenceController extends DialogPreferenceController<ListPreference, Boolean>
 	{
 		private static final int NOTIFY_ALL = 0;
 		private static final int NOTIFY_SUPPLIES_ONLY = 1;
