@@ -29,19 +29,20 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MenuItem.OnMenuItemClickListener;
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.ui.DoseLogFragment;
 import at.jclehner.rxdroid.ui.ExpandableListFragment;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.Extras;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
 /*
  * TODO
@@ -71,7 +72,7 @@ import at.jclehner.rxdroid.util.Extras;
  *
  */
 
-public class DoseHistoryActivity extends FragmentActivity
+public class DoseHistoryActivity extends SherlockFragmentActivity
 {
 	private Drug mDrug;
 
@@ -93,6 +94,9 @@ public class DoseHistoryActivity extends FragmentActivity
 
 		// setListAdapter(new DoseHistoryAdapter(this, mDrug));
 
+		final ActionBar ab = getSupportActionBar();
+		ab.setDisplayShowHomeEnabled(true);
+		ab.setDisplayHomeAsUpEnabled(true);
 	}
 
 	@TargetApi(11)
@@ -116,10 +120,7 @@ public class DoseHistoryActivity extends FragmentActivity
 					}
 				});
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-		{
-			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		}
+		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 		final int iconAttr = isAllCollapsed ? R.attr.actionIconExpandAll : R.attr.actionIconCollapseAll;
 		final int titleResId = isAllCollapsed ? R.string._title_expand : R.string._title_collapse;
@@ -151,10 +152,7 @@ public class DoseHistoryActivity extends FragmentActivity
 					}
 				});
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-		{
-			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		}
+		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 		final FragmentManager fm = getSupportFragmentManager();
 		final DoseLogFragment f = (DoseLogFragment) fm.findFragmentByTag("log");
@@ -162,6 +160,18 @@ public class DoseHistoryActivity extends FragmentActivity
 			item.setVisible(!f.isListEmpty());
 
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		if(item.getItemId() == android.R.id.home)
+		{
+			onBackPressed();
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	void updateLogFragment()
