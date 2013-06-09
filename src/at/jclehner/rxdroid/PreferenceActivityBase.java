@@ -28,13 +28,14 @@ import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import at.jclehner.androidutils.PreferenceActivity;
 import at.jclehner.rxdroid.util.Components;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 
-public abstract class PreferenceActivityBase extends SherlockPreferenceActivity
+public abstract class PreferenceActivityBase extends PreferenceActivity
 {
 	private static final String TAG = PreferenceActivityBase.class.getSimpleName();
 	private static final String EXTRA_DARK_THEME = "dark_theme";
@@ -101,6 +102,7 @@ public abstract class PreferenceActivityBase extends SherlockPreferenceActivity
 		return super.onOptionsItemSelected(item);
 	}
 
+	/*
 	@SuppressWarnings("deprecation")
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen ps, Preference p)
@@ -144,7 +146,7 @@ public abstract class PreferenceActivityBase extends SherlockPreferenceActivity
 		}
 
 		return super.onPreferenceTreeClick(ps, p);
-    }
+    }*/
 
 	protected abstract Intent getHomeButtonIntent();
 

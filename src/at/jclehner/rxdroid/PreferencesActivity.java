@@ -92,9 +92,10 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		enqueuePreferencesFromResource(R.xml.preferences);
 		super.onCreate(savedInstanceState);
 
-		addPreferencesFromResource(R.xml.preferences);
+		//addPreferencesFromResource(R.xml.preferences);
 
 		Settings.registerOnChangeListener(this);
 

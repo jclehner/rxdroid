@@ -201,6 +201,15 @@
 	        android:defaultValue=""
 	        android:enabled="false"
 	    />
+		
+		<PreferenceScreen android:key="prefscreen_development_test"
+		    android:title="PreferenceScreen"
+		>
+		    
+		    <Preference 
+		        android:title="Go away!"
+		    />	    
+		</PreferenceScreen>
 	    
 		<Preference android:key="db_create_drug_with_schedule"
 			android:title="Custom schedule drug"
