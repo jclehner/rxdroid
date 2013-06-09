@@ -21,48 +21,21 @@
 
 package at.jclehner.rxdroid;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceScreen;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import at.jclehner.androidutils.PreferenceActivity;
 import at.jclehner.rxdroid.util.Components;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 
 public abstract class PreferenceActivityBase extends PreferenceActivity
 {
-	private static final String TAG = PreferenceActivityBase.class.getSimpleName();
-	private static final String EXTRA_DARK_THEME = "dark_theme";
-
-	private boolean mUseDarkTheme = false;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		mUseDarkTheme = getIntent().getBooleanExtra(EXTRA_DARK_THEME, false);
-
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER || !mUseDarkTheme)
-			Components.onCreateActivity(this, 0);
-		else
-		{
-			Components.onCreateActivity(this, Components.NO_THEME);
-			setTheme(R.style.DarkTheme);
-		}
-
+		Components.onCreateActivity(this, 0);
 		super.onCreate(savedInstanceState);
-	}
-
-	@Override
-	protected void onNewIntent(Intent intent)
-	{
-		super.onNewIntent(intent);
-		mUseDarkTheme = getIntent().getBooleanExtra(EXTRA_DARK_THEME, false);
 	}
 
 	@Override
