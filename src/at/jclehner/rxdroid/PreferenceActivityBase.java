@@ -89,17 +89,21 @@ public abstract class PreferenceActivityBase extends PreferenceActivity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		if(item.getItemId() == android.R.id.home)
+		final boolean consumed = super.onOptionsItemSelected(item);
+		if(!consumed)
 		{
-			final Intent intent = getHomeButtonIntent();
-			intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			if(item.getItemId() == android.R.id.home)
+			{
+				final Intent intent = getHomeButtonIntent();
+				intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-			startActivity(intent);
+				startActivity(intent);
 
-			return true;
+				return true;
+			}
 		}
 
-		return super.onOptionsItemSelected(item);
+		return consumed;
 	}
 
 	/*

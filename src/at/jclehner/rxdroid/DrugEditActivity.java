@@ -245,7 +245,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		if(mIsEditing)
 		{
 			MenuItem item = menu.add(0, MENU_DELETE, 0, R.string._title_delete)
-					.setIcon(R.drawable.ic_action_delete_black);
+					.setIcon(R.drawable.ic_action_delete_white);
 
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		}

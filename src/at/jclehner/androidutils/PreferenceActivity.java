@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.MenuItem;
 
 @SuppressWarnings("deprecation")
 public abstract class PreferenceActivity extends SherlockPreferenceActivity
@@ -25,7 +26,7 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 
 	private int mEnqueuedPreferencesResId = 0;
 
-	private boolean mIsContentViewHidden = false;
+	private boolean mIsRootPreferenceScreen = true;
 
 	private boolean mIgnoreNextSetPreferenceScreenCall = false;
 	private PreferenceScreen mLastIgnoredPreferenceScreen = null;
@@ -34,8 +35,6 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
-		boolean havePreferences = false;
 
 		final Intent intent = getIntent();
 		if(intent != null)
@@ -51,24 +50,13 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 						mLastIgnoredPreferenceScreen.findPreference(key);
 
 				setPreferenceScreen(ps);
-				havePreferences = true;
+				mIsRootPreferenceScreen = false;
 			}
 		}
 
-		if(!havePreferences && mEnqueuedPreferencesResId != 0)
+		if(mIsRootPreferenceScreen && mEnqueuedPreferencesResId != 0)
 			addPreferencesFromResource(mEnqueuedPreferencesResId);
 	}
-
-	/*@Override
-	public void addPreferencesFromResource(int preferencesResId)
-	{
-		if(!mIgnoreNextAddPreferencesFromResourceCall)
-			super.addPreferencesFromResource(preferencesResId);
-		else
-			mIgnoreNextAddPreferencesFromResourceCall = false;
-
-		mPreferencesResId = preferencesResId;
-	}*/
 
 	public void enqueuePreferencesFromResource(int preferencesResId) {
 		mEnqueuedPreferencesResId = preferencesResId;
@@ -78,10 +66,7 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 	public void setPreferenceScreen(PreferenceScreen preferenceScreen)
 	{
 		if(!mIgnoreNextSetPreferenceScreenCall)
-		{
-			setContentViewHidden(false);
 			super.setPreferenceScreen(preferenceScreen);
-		}
 		else
 		{
 			mLastIgnoredPreferenceScreen = preferenceScreen;
@@ -153,24 +138,19 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 		return super.onPreferenceTreeClick(preferenceScreen, preference);
 	}
 
-	private void setContentViewHidden(final boolean hidden)
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		final View v = findViewById(android.R.id.content);
-
-		if(v == null || mIsContentViewHidden == hidden)
-			return;
-
-		v.post(new Runnable() {
-
-			@Override
-			public void run()
+		if(item.getItemId() == android.R.id.home)
+		{
+			if(!mIsRootPreferenceScreen)
 			{
-				int color = hidden ? Color.RED : Color.TRANSPARENT;
-				v.setBackgroundColor(color);
-				//v.setVisibility(hidden ? View.INVISIBLE : View.VISIBLE);
-				mIsContentViewHidden = hidden;
+				onBackPressed();
+				return true;
 			}
-		});
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 }
 
