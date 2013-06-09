@@ -14,7 +14,7 @@
         android:layout_marginBottom="9dip"
         
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_dose_forgotten"
+        android:src="@drawable/ic_dose_forgotten_dark"
     />
     
     <TextView android:id="@+id/text_date"
