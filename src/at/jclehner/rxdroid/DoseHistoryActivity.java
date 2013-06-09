@@ -110,7 +110,7 @@ public class DoseHistoryActivity extends SherlockFragmentActivity
 		MenuItem item;
 
 		item = menu.add(0, MENU_VIEW, 0, R.string._title_view)
-				.setIcon(android.R.drawable.ic_menu_view)
+				.setIcon(R.drawable.ic_action_eye_white)
 				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 					@Override
