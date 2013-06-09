@@ -35,6 +35,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
+import at.jclehner.androidutils.AdvancedDialogPreference;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.DoseEvent;
@@ -66,6 +67,8 @@ public class RxDroid extends Application
 		Database.registerEventListener(sNotificationUpdater);
 
 		Components.onCreate(getContext(), Components.NO_DATABASE_INIT | Components.NO_SETTINGS_INIT);
+
+		AdvancedDialogPreference.setGlobalDialogTheme(R.style.DialogTheme);
 
 		if(false && BuildConfig.DEBUG)
 		{

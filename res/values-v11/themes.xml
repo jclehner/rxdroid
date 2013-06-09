@@ -30,4 +30,7 @@
 	<style name="BottomBar">
 		<item name="android:background">@null</item>
 	</style>
+	
+	<style name="DialogTheme" parent="@android:style/Theme.Holo.Light.Dialog" />
+	
 </resources>

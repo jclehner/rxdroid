@@ -68,6 +68,7 @@
 		<item name="dividerColor">@color/list_divider_light</item>
 		
 		<item name="android:windowAnimationStyle">@null</item>
+		<item name="android:alertDialogStyle">@style/DialogTheme</item>
 				
 	</style>
 	
@@ -121,4 +122,13 @@
 	<style name="BottomBar">
 		<item name="android:background">@android:drawable/bottom_bar</item>
 	</style>
+	
+	<!-- 
+	AlertDialog text color fix thanks to Shawn Castrianni, see: 
+	http://groups.google.com/group/android-developers/browse_thread/thread/f0b34621d3a70c4b 
+	-->
+	<style name="DialogTheme" parent="@android:style/Theme.Light">
+	   <item name="android:textColor">?android:attr/textColorPrimaryInverseDisableOnly</item>
+	</style>
+	
 </resources>

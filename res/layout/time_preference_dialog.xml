@@ -29,10 +29,10 @@
   android:layout_height="match_parent">
   
   <TextView android:id="@+id/text"
-  	android:layout_width="wrap_content"
+  	android:layout_width="match_parent"
   	android:layout_height="wrap_content"
   	
-  	style="@android:style/TextAppearance.Theme.Dialog"  
+  	android:textAppearance="?android:attr/textAppearanceSmallInverse"
   />
     
   <TimePicker android:id="@+id/time_picker"
