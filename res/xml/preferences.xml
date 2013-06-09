@@ -114,7 +114,7 @@
 		    android:entryValues="@array/alarm_repeat_times_values"
 		/>	
 		
-		<EditTextPreference android:key="@string/key_low_supply_threshold"
+		<at.jclehner.rxdroid.preferences.EditTextPreference android:key="@string/key_low_supply_threshold"
 			android:title="@string/_title_min_supply_days"
 			android:summary="@string/_summary_min_supply_days"
 			
