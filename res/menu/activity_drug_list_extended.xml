@@ -58,7 +58,7 @@
 	
 	<item android:id="@+id/menuitem_preferences"
 		android:title="@string/_title_preferences"
-		android:icon="@android:drawable/ic_menu_preferences"
+		android:icon="@drawable/ic_action_settings"
 		android:showAsAction="always"
 	/>
 
