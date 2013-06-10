@@ -38,7 +38,7 @@
 	
 	<item android:id="@+id/menuitem_toggle_filtering"
 		android:title="@string/_title_show_all"
-		android:icon="@android:drawable/ic_menu_view"
+		android:icon="@drawable/ic_action_eye_white"
 		android:showAsAction="always"
 	/>
 	
