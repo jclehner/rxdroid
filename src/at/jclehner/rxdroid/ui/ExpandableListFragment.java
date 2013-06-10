@@ -28,13 +28,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.TextView;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Version;
 
-public class ExpandableListFragment extends Fragment
+public class ExpandableListFragment extends Fragment implements
+		OnChildClickListener, OnGroupClickListener
 {
 	private ExpandableListView mList;
 	private TextView mEmptyView;
@@ -67,6 +70,8 @@ public class ExpandableListFragment extends Fragment
 		mList.setAdapter(mAdapter);
 		mList.setOnGroupCollapseListener(mGroupCollapseExpandListener);
 		mList.setOnGroupExpandListener(mGroupCollapseExpandListener);
+		mList.setOnGroupClickListener(this);
+		mList.setOnChildClickListener(this);
 
 		if(mExpandAll)
 			expandAllInternal();
@@ -75,6 +80,16 @@ public class ExpandableListFragment extends Fragment
 		mEmptyView.setText(mEmptyViewTextResId);
 
 		return v;
+	}
+
+	@Override
+	public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+		return false;
+	}
+
+	@Override
+	public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+		return false;
 	}
 
 	public void setListAdapter(ExpandableListAdapter adapter)

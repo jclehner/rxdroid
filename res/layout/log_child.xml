@@ -5,6 +5,7 @@
     android:orientation="horizontal"
     android:background="?attr/bgColorLogChild"
     android:paddingLeft="4dip"
+    android:descendantFocusability="blocksDescendants"
 >    
     <TextView android:id="@+id/text_time"
         android:layout_width="wrap_content"
@@ -12,6 +13,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginRight="4dip"
         
+        android:focusable="false"
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="bold"
@@ -25,8 +27,10 @@
         android:layout_height="@dimen/log_group_height"
         android:layout_weight="1"
         android:layout_gravity="center_vertical"
-        android:gravity="center_vertical"
         
+        android:focusable="false"
+        android:clickable="false"
+        android:gravity="center_vertical"        
         android:text="@string/mock_dose_text"        
         android:textAppearance="?android:attr/textAppearanceSmall"
     />
@@ -38,6 +42,8 @@
         <at.jclehner.rxdroid.DoseView android:id="@+id/dose_dose"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        
+	        android:focusable="false"
 	        android:visibility="gone"
 	    />
     
@@ -46,9 +52,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         
+        android:focusable="false"
         android:scaleType="fitCenter"
-        android:src="?attr/iconArrowRight"
-        
+        android:src="?attr/iconArrowRight"        
         android:visibility="gone"
     />
         

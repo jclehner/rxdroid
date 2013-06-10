@@ -36,6 +36,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import at.jclehner.rxdroid.BuildConfig;
@@ -91,6 +92,22 @@ public class DoseLogFragment extends ExpandableListFragment
 		gatherEventInfos(getArguments().getInt("flags"));
 		setListAdapter(new Adapter());
 		setEmptyViewText(R.string._msg_no_history_data);
+	}
+
+	@Override
+	public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id)
+	{
+		Log.d(TAG, "onChildClick: " + groupPosition + ":" + childPosition);
+
+		final Date date = getGroupDate(groupPosition);
+		if(date == null)
+			return false;
+
+		final Intent intent = new Intent(getActivity(), DrugListActivity.class);
+		intent.putExtra(DrugListActivity.EXTRA_DATE, date);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+		startActivity(intent);
+		return true;
 	}
 
 	private Drug getDrug() {
@@ -205,6 +222,14 @@ public class DoseLogFragment extends ExpandableListFragment
 		if(LOGV) Log.d(TAG, "gatherEvents: " + t);
 	}
 
+	private Date getGroupDate(int groupPosition)
+	{
+		if(!mGroupedEvents.get(groupPosition).isEmpty())
+			return mGroupedEvents.get(groupPosition).get(0).date;
+
+		return null;
+	}
+
 	private static boolean containsDoseEvent(List<DoseEvent> doseEvents, Date date, int doseTime)
 	{
 		for(DoseEvent doseEvent : doseEvents)
@@ -216,7 +241,6 @@ public class DoseLogFragment extends ExpandableListFragment
 		return false;
 	}
 
-//	private class Adapter extends SimpleBaseExpandanbleListAdapter implements ListAdapter
 	private class Adapter extends BaseExpandableListAdapter
 	{
 		private Timer mChildTimer = new Timer();
@@ -358,7 +382,6 @@ public class DoseLogFragment extends ExpandableListFragment
 				sb.append(getString(textResId) + ": ");
 				sb.append(getString(DOSE_NAME_IDS[info.doseTime]));
 				holder.text.setText(sb.toString());
-				holder.text.setOnClickListener(null);
 
 				final int color = Theme.getColorAttribute(timeColorAttr);
 
@@ -372,7 +395,7 @@ public class DoseLogFragment extends ExpandableListFragment
 				holder.gotoDate.setVisibility(View.VISIBLE);
 				//holder.text.setGravity(Gravity.CENTER);
 
-				final OnClickListener clickListener = new OnClickListener() {
+				/*final OnClickListener clickListener = new OnClickListener() {
 
 					@Override
 					public void onClick(View v)
@@ -386,7 +409,7 @@ public class DoseLogFragment extends ExpandableListFragment
 
 
 				holder.gotoDate.setOnClickListener(clickListener);
-				holder.text.setOnClickListener(clickListener);
+				holder.text.setOnClickListener(clickListener);*/
 				holder.text.setText(R.string._msg_tap_to_view_date);
 			}
 
@@ -399,8 +422,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		@Override
 		public boolean isChildSelectable(int groupPosition, int childPosition)
 		{
-			// TODO Auto-generated method stub
-			return false;
+			return true;
 		}
 
 		@Override
@@ -420,15 +442,6 @@ public class DoseLogFragment extends ExpandableListFragment
 			// TODO Auto-generated method stub
 			return false;
 		}
-
-		private Date getGroupDate(int groupPosition)
-		{
-			if(!mGroupedEvents.get(groupPosition).isEmpty())
-				return mGroupedEvents.get(groupPosition).get(0).date;
-
-			return null;
-		}
-
 	}
 }
 
