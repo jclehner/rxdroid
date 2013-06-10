@@ -35,25 +35,16 @@ public final class Theme
 	private static final String TAG = Theme.class.getSimpleName();
 	private static final boolean LOGV = false;
 
-	public static final int LIGHT = R.style.LightTheme;
-	public static final int DARK = R.style.DarkTheme;
-
 	private static final SparseIntArray sAttrCache = new SparseIntArray();
-//	private static final ThreadLocal<TypedValue> sTypedValue = new ThreadLocal<TypedValue>() {
-//
-//		@Override
-//		protected TypedValue initialValue()
-//		{
-//			return new TypedValue();
-//		}
-//	};
 
+	@Deprecated
 	public static boolean isDark() {
-		return Settings.getBoolean(Settings.Keys.THEME_IS_DARK, Settings.Defaults.THEME_IS_DARK);
+		return false;
 	}
 
+	@Deprecated
 	public static int get() {
-		return isDark() ? DARK : LIGHT;
+		return R.style.Theme_RxDroid;
 	}
 
 	public static int getResourceAttribute(int attr)

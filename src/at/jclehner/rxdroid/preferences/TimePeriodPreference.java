@@ -30,10 +30,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
 import android.content.res.TypedArray;
+import android.os.Message;
 import android.preference.Preference;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,9 +44,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.TimePicker.OnTimeChangedListener;
 import at.jclehner.androidutils.AdvancedDialogPreference;
-import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
@@ -133,19 +135,19 @@ public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
 	private int mCurrentPage = 0;
 	private final int mPageCount = 2;
 
-	public TimePeriodPreference(Context context, AttributeSet attrs, int defStyle)
+	public TimePeriodPreference(Context context, AttributeSet attrs, int defStyle) {
+		this(context, attrs);
+	}
+
+	public TimePeriodPreference(Context context, AttributeSet attrs)
 	{
-		super(context, attrs, android.R.attr.preferenceStyle);
+		super(context, attrs);
 
 		handleAttributes(context, attrs);
 
 		// This ensures that the created dialog actually has buttons
 		setPositiveButtonText(android.R.string.ok);
 		setNegativeButtonText(android.R.string.cancel);
-	}
-
-	public TimePeriodPreference(Context context, AttributeSet attrs) {
-		this(context, attrs, android.R.attr.preferenceStyle);
 	}
 
 	@Override
@@ -208,7 +210,7 @@ public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
 	{
 		if(mContainer == null)
 		{
-			mContainer = LayoutInflater.from(getContext()).inflate(R.layout.time_period_preference, null);
+			mContainer = getLayoutInflater().inflate(R.layout.time_period_preference, null);
 
 			mMessageView = (TextView) mContainer.findViewById(R.id.message);
 			mTimePicker = (TimePicker) mContainer.findViewById(R.id.picker);

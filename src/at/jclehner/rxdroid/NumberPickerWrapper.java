@@ -172,7 +172,7 @@ public class NumberPickerWrapper extends LinearLayout
 		return mListener;
 	}
 
-	public void setOnValueChangeListener(OnValueChangeListener l)
+	public void setOnValueChangedListener(OnValueChangeListener l)
 	{
 		mListener = l;
 

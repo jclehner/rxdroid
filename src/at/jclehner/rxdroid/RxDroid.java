@@ -35,6 +35,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
+import at.jclehner.androidutils.AdvancedDialogPreference;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.DoseEvent;
@@ -58,22 +59,14 @@ public class RxDroid extends Application
 	{
 		setContext(getApplicationContext());
 
-		// We can't call Settings.init() here, because this overwrites the
-		// shared preferences if this class is instantiated by the Android
-		// backup framework.
-
 		DoseEventJanitor.registerSelf();
 		Database.registerEventListener(sNotificationUpdater);
 
+		// We can't call Settings.init() here, because this overwrites the
+		// shared preferences if this class is instantiated by the Android
+		// backup framework.
 		Components.onCreate(getContext(), Components.NO_DATABASE_INIT | Components.NO_SETTINGS_INIT);
-
-		if(false && BuildConfig.DEBUG)
-		{
-			final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-			final String lang = sp.getString(Settings.Keys.LANGUAGE, null);
-			if(lang != null)
-				LanguagePreference.setLanguage(lang);
-		}
+		AdvancedDialogPreference.setGlobalDialogTheme(R.style.Theme_RxDroid_Dialog);
 
 		super.onCreate();
 	}

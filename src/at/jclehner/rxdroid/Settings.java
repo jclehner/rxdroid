@@ -83,6 +83,8 @@ public final class Settings
 		public static final String IS_FIRST_LAUNCH = "is_first_launch";
 		public static final String OLDEST_POSSIBLE_DOSE_EVENT_TIME = "oldest_possible_dose_event_time";
 
+		public static final String SKIP_DOSE_DIALOG = key(R.string.key_skip_dose_dialog);
+
 		public static final String LOG_SHOW_TAKEN = "log_show_taken";
 		public static final String LOG_SHOW_SKIPPED = "log_show_skipped";
 		public static final String LOG_SHOW_MISSED = "log_show_missed";
@@ -646,6 +648,9 @@ public final class Settings
 			putString(Keys.DISPLAYED_ONCE, getString("displayed_info_ids"));
 			remove("displayed_info_ids");
 		}
+
+		if(contains(Keys.THEME_IS_DARK))
+			remove(Keys.THEME_IS_DARK);
 
 		if(contains(Keys.USE_SOUND))
 		{

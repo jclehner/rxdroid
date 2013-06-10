@@ -41,7 +41,6 @@
 		android:title="@string/_title_select_date"
 		android:icon="@drawable/ic_menu_calendar_light"
 		android:showAsAction="always"
-		android:visible="@bool/is_drug_list_activity_date_menu_item_visible"
 	/>
 	
 	<item android:id="@+id/menuitem_preferences"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="at.jclehner.rxdroid" 
-	android:versionCode="32"	
+	android:versionCode="33"	
 	android:versionName="@string/version"
 	android:installLocation="internalOnly" 
 >
@@ -18,7 +18,8 @@
 	    android:label="@string/app_name"
 	    android:name=".RxDroid" android:allowBackup="true"
 		android:backupAgent=".BackupAgent"
-	android:killAfterRestore="true" android:restoreAnyVersion="false">
+		android:theme="@style/Theme.RxDroid"
+		android:killAfterRestore="true" android:restoreAnyVersion="false">
 
 		<meta-data android:name="com.google.android.backup.api_key"
 			android:value="AEdPqrEAAAAItIxwJIR2ke6APuwW_W08I3iBMThG3j_Ptg1-dA" 
@@ -27,7 +28,7 @@
 		<activity android:name=".SplashScreenActivity"
 			android:label="@string/app_name"
 			android:configChanges="orientation|screenSize|keyboardHidden"
-			android:theme="@style/DefaultTheme.NoAnimation"
+			android:theme="@style/Theme.RxDroid.NoAnimation"
 			android:launchMode="singleTop"
 		>
 		
@@ -54,7 +55,7 @@
 
 		<activity android:name=".DrugEditActivity"
 		    android:exported="false"
-		    android:windowSoftInputMode="adjustResize"		    
+		    android:windowSoftInputMode="adjustPan"		    
 			android:launchMode="singleTop"
 		    android:configChanges="orientation|screenSize|keyboardHidden"
 		>	    
@@ -95,7 +96,7 @@
 			android:exported="false"
 		/>
 		
-		<activity android:name=".AdvancedScheduleActivity2"
+		<activity android:name=".AdvancedScheduleActivity"
 		    android:exported="false"
 		/>
 

@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
 /**
  * RxDroid - A Medication Reminder
  * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
@@ -20,9 +18,20 @@
  *
  *
  */
--->
 
-<resources>	    
-	<style name="DefaultTheme" parent="@style/LightTheme" />
-	<style name="_ApiSpecificLightTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar" />
-</resources>
+package at.jclehner.androidutils.otpm;
+
+import android.preference.DialogPreference;
+
+public abstract class DialogPreferenceController<P extends DialogPreference, T> extends PreferenceController<P, T>
+{
+	public void initPreference(P preference, T fieldValue)
+	{
+		if(hideWidget())
+			preference.setWidgetLayoutResource(0);
+	}
+
+	protected boolean hideWidget() {
+		return true;
+	}
+}

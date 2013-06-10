@@ -179,10 +179,12 @@ public class LockscreenActivity extends Activity implements OnClickListener
 		startMaybe(caller, null);
 	}
 
-	@SuppressWarnings("unused")
 	public static void startMaybe(Activity caller, Intent unlockIntent)
 	{
-		if(RxDroid.isLocked() && false) // currently disabled
+		if(!BuildConfig.DEBUG || !Settings.getBoolean("use_lockscreen", false))
+			return;
+
+		if(RxDroid.isLocked())
 		{
 			if(unlockIntent == null)
 			{

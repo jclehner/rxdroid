@@ -24,7 +24,7 @@ package at.jclehner.androidutils.otpm;
 import android.preference.ListPreference;
 import at.jclehner.rxdroid.util.Util;
 
-public abstract class ListPreferenceWithIntController extends PreferenceController<ListPreference, Integer>
+public abstract class ListPreferenceWithIntController extends DialogPreferenceController<ListPreference, Integer>
 {
 	private String[] mEntries;
 	private int mEntriesResId;
@@ -42,6 +42,8 @@ public abstract class ListPreferenceWithIntController extends PreferenceControll
 	@Override
 	public void initPreference(ListPreference preference, Integer fieldValue)
 	{
+		super.initPreference(preference, fieldValue);
+
 		if(mEntries == null)
 			mEntries = preference.getContext().getResources().getStringArray(mEntriesResId);
 

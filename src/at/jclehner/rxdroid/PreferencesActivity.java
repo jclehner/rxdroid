@@ -45,13 +45,11 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceScreen;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceGroup;
+import android.preference.PreferenceScreen;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.webkit.WebView;
 import android.widget.Toast;
 import at.jclehner.rxdroid.Settings.Keys;
@@ -62,6 +60,9 @@ import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
+
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 
 @SuppressWarnings("deprecation")
 public class PreferencesActivity extends PreferenceActivityBase implements
@@ -91,9 +92,10 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		enqueuePreferencesFromResource(R.xml.preferences);
 		super.onCreate(savedInstanceState);
 
-		addPreferencesFromResource(R.xml.preferences);
+		//addPreferencesFromResource(R.xml.preferences);
 
 		Settings.registerOnChangeListener(this);
 
@@ -220,10 +222,9 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		MenuItem item = menu.add(0, MENU_RESTORE_DEFAULTS, 0, R.string._title_factory_reset)
-				.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+				.setIcon(R.drawable.ic_action_undo);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -414,6 +415,11 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		return intent;
 	}
 
+	@Override
+	protected boolean shouldHideOptionsMenuInSubscreens() {
+		return true;
+	}
+
 	private void updateLowSupplyThresholdPreferenceSummary()
 	{
 		Preference p = findPreference(Settings.Keys.LOW_SUPPLY_THRESHOLD);
@@ -523,7 +529,14 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 						drug.setRepeatMode(Drug.REPEAT_DAILY);
 						drug.setActive(true);
 
-						Database.create(drug);
+						try
+						{
+							Database.create(drug);
+						}
+						catch(Exception e)
+						{
+							Log.w(TAG, e);
+						}
 					}
 
 					return true;

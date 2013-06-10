@@ -326,8 +326,7 @@
 	
 	<string name="_title_disabled">Disabled</string>	
 	
-    <string name="_msg_no_drugs_no_ab">Press MENU and select \"%1$s\" to add a drug</string>
-    <string name="_msg_no_drugs_compact_ab">Select \"%1$s\" from the three-dot menu to add a drug</string>
+    <string name="_msg_no_drugs_compact_ab">Select \"%1$s\" from the menu to add a drug</string>
     <string name="_msg_no_drugs_extended_ab">Press the \"+\" button in the action bar to add a drug</string>
     
     <string name="_summary_smart_sort">Sort drugs based on importance</string>
@@ -361,7 +360,11 @@
 	    to help speed up the development of this app.</string>
 	    
 	<string name="_msg_no_history_data">No history data matching the specified criteria.</string>
-		
+	
+	<string name="_title_skip_dose_dialog">Skip dialog</string>
+	<string name="_summary_skip_dose_dialog">Hide the dialog that is shown when clicking a dose. The dialog
+	    can be opened manually by long-pressing the dose and selecting "Take dose".</string>
+			
 	<string translatable="false" name="test_schedule">
 	    Mon    0 - 0 - 0 - 1\n
 	    Tue    0 - 1 - 0 - 1\n

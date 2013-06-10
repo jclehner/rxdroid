@@ -51,12 +51,7 @@
 		android:key="prefscreen_display"
 		android:title="@string/_title_prefscreen_display"
 		android:icon="?attr/iconPicture"
-	>	     
-		<CheckBoxPreference android:key="@string/key_theme_is_dark" 
-			android:title="@string/_title_dark_theme"
-			android:defaultValue="@bool/pref_default_theme_is_dark"
-			android:enabled="@bool/pref_visibility_theme_is_dark"
-		/>
+	>
 		
 		<CheckBoxPreference android:key="@string/key_enable_landscape_mode"
 		    android:title="@string/_title_enable_landscape_mode"
@@ -70,6 +65,12 @@
 			android:summary="@string/_summary_compact_action_bar"
 			android:defaultValue="@bool/pref_default_compact_action_bar"
 			android:enabled="@bool/pref_visibility_compact_action_bar"
+		/>
+		
+		<CheckBoxPreference android:key="@string/key_skip_dose_dialog"
+		    android:title="@string/_title_skip_dose_dialog"
+		    android:summary="@string/_summary_skip_dose_dialog"
+		    android:defaultValue="false"
 		/>
 	     
 	    <PreferenceCategory 
@@ -114,7 +115,7 @@
 		    android:entryValues="@array/alarm_repeat_times_values"
 		/>	
 		
-		<EditTextPreference android:key="@string/key_low_supply_threshold"
+		<at.jclehner.rxdroid.preferences.EditTextPreference android:key="@string/key_low_supply_threshold"
 			android:title="@string/_title_min_supply_days"
 			android:summary="@string/_summary_min_supply_days"
 			
@@ -201,6 +202,20 @@
 	        android:defaultValue=""
 	        android:enabled="false"
 	    />
+		
+		<CheckBoxPreference android:key="@string/key_skip_dose_dialog"
+		    android:title="Skip DoseDialog"
+		    android:defaultValue="false"
+		/>
+		
+		<PreferenceScreen android:key="prefscreen_development_test"
+		    android:title="PreferenceScreen"
+		>
+		    
+		    <Preference 
+		        android:title="Go away!"
+		    />	    
+		</PreferenceScreen>
 	    
 		<Preference android:key="db_create_drug_with_schedule"
 			android:title="Custom schedule drug"
@@ -217,7 +232,7 @@
 		    <intent 
 				android:action="android.intent.action.VIEW"
 				android:targetPackage="at.jclehner.rxdroid"
-				android:targetClass="at.jclehner.rxdroid.AdvancedScheduleActivity2"
+				android:targetClass="at.jclehner.rxdroid.AdvancedScheduleActivity"
 			/>
 		    
 		</Preference>
@@ -238,6 +253,20 @@
 			android:title="Compact ActionBar"
 			android:defaultValue="@bool/pref_default_compact_action_bar"
 		/>
+		
+		<CheckBoxPreference android:key="use_lockscreen"
+		    android:title="Enable lockscreen"
+		    android:defaultValue="false"
+		/>
+		
+		<Preference android:title="Beta link"
+		    android:summary="https://play.google.com/apps/testing/at.jclehner.rxdroid"
+		>
+		    <intent android:action="android.intent.action.VIEW"
+		        android:data="https://play.google.com/apps/testing/at.jclehner.rxdroid"
+		    /> 
+		    
+		</Preference>
 				    
 </PreferenceScreen>
 	

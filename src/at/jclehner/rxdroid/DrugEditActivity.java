@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -45,23 +44,20 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Toast;
 import at.jclehner.androidutils.AdvancedDialogPreference;
-import at.jclehner.androidutils.otpm.CheckboxPreferenceController;
-import at.jclehner.androidutils.otpm.ListPreferenceWithIntController;
 import at.jclehner.androidutils.otpm.AdvancedDialogPreferenceController;
+import at.jclehner.androidutils.otpm.CheckboxPreferenceController;
+import at.jclehner.androidutils.otpm.DialogPreferenceController;
+import at.jclehner.androidutils.otpm.ListPreferenceWithIntController;
 import at.jclehner.androidutils.otpm.OTPM;
 import at.jclehner.androidutils.otpm.OTPM.CreatePreference;
-import at.jclehner.androidutils.otpm.PreferenceController;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -77,6 +73,11 @@ import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.SimpleBitSet;
 import at.jclehner.rxdroid.util.Util;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+
 /**
  * Edit a drug's database entry.
  * @author Joseph Lehner
@@ -84,7 +85,7 @@ import at.jclehner.rxdroid.util.Util;
  */
 
 @SuppressWarnings("deprecation")
-public class DrugEditActivity extends PreferenceActivity implements OnPreferenceClickListener
+public class DrugEditActivity extends SherlockPreferenceActivity implements OnPreferenceClickListener
 {
 	//public static final String EXTRA_DRUG = "drug";
 	public static final String EXTRA_DRUG_ID = "drug_id";
@@ -160,12 +161,10 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.empty);
 
-		if(!Version.SDK_IS_PRE_HONEYCOMB)
-		{
-			final ActionBar ab = getActionBar();
-			ab.setDisplayShowHomeEnabled(true);
-			ab.setDisplayHomeAsUpEnabled(true);
-		}
+		final ActionBar ab = getSupportActionBar();
+		ab.setDisplayShowHomeEnabled(true);
+		ab.setDisplayHomeAsUpEnabled(true);
+
 	}
 
 	@Override
@@ -214,14 +213,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		OTPM.mapToPreferenceHierarchy(getPreferenceScreen(), mWrapper);
 		getPreferenceScreen().setOnPreferenceChangeListener(mListener);
 
-		Preference deletePref = findPreference("delete");
+		/*Preference deletePref = findPreference("delete");
 		if(deletePref != null)
 		{
 			if(Version.SDK_IS_HONEYCOMB_OR_NEWER || !mIsEditing)
 				getPreferenceScreen().removePreference(deletePref);
 			else
 				deletePref.setOnPreferenceClickListener(this);
-		}
+		}*/
 
 		if(mFocusOnCurrentSupply)
 		{
@@ -229,8 +228,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 			performPreferenceClick("currentSupply");
 		}
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			invalidateOptionsMenu();
+		supportInvalidateOptionsMenu();
 	}
 
 	@Override
@@ -247,10 +245,9 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		if(mIsEditing)
 		{
 			MenuItem item = menu.add(0, MENU_DELETE, 0, R.string._title_delete)
-					.setIcon(android.R.drawable.ic_menu_delete);
+					.setIcon(R.drawable.ic_action_delete_white);
 
-			if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-				item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		}
 
 		return super.onCreateOptionsMenu(menu);
@@ -266,18 +263,14 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 	{
 		final int itemId = item.getItemId();
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+		if(itemId == android.R.id.home)
 		{
-			if(itemId == android.R.id.home)
-			{
-				// We can do this since this Activity can only be launched from
-				// DrugListActivity at the moment.
-				onBackPressed();
-				return true;
-			}
+			// We can do this since this Activity can only be launched from
+			// DrugListActivity at the moment.
+			onBackPressed();
+			return true;
 		}
-
-		if(itemId == MENU_DELETE)
+		else if(itemId == MENU_DELETE)
 		{
 			showDialog(R.id.drug_delete_dialog);
 			return true;
@@ -997,7 +990,7 @@ public class DrugEditActivity extends PreferenceActivity implements OnPreference
 		}
 	}
 
-	private static class NotificationsPreferenceController extends PreferenceController<ListPreference, Boolean>
+	private static class NotificationsPreferenceController extends DialogPreferenceController<ListPreference, Boolean>
 	{
 		private static final int NOTIFY_ALL = 0;
 		private static final int NOTIFY_SUPPLIES_ONLY = 1;

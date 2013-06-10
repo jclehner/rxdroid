@@ -27,8 +27,10 @@ signapk() {
 
 build() {
 	run android update project -p .
+
 	run android update project -p thirdparty/NumberPicker
 	run android update project -p thirdparty/DragSortListView
+	run android update project -p thirdparty/ActionBarSherlock
 	run ant release
 
 	echo

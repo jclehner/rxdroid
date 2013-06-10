@@ -37,7 +37,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -49,10 +49,6 @@ import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -70,10 +66,10 @@ import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.Settings.OnceIds;
 import at.jclehner.rxdroid.db.Database;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
-import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.ui.DrugOverviewAdapter;
@@ -85,9 +81,14 @@ import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.AutoDragSortListView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.mobeta.android.dslv.DragSortListView;
 
-public class DrugListActivity extends FragmentActivity implements OnLongClickListener,
+public class DrugListActivity extends SherlockFragmentActivity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
 {
 	private static final String TAG = DrugListActivity.class.getSimpleName();
@@ -96,9 +97,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	private static final boolean DEBUG_DATE_MISMATCH = true;
 
 	private static final int CMENU_TOGGLE_INTAKE = 0;
+	private static final int CMENU_TAKE_DOSE = 1;
+	private static final int CMENU_REMOVE_DOSE = 0;
 	private static final int CMENU_EDIT_DRUG = 2;
 	private static final int CMENU_IGNORE_DOSE = 4;
-	private static final int CMENU_LOG = 5;
 	private static final int CMENU_DUMP = 6;
 
 	private static final int DIALOG_INFO = 0;
@@ -109,7 +111,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	public static final int TAG_DRUG_ID = R.id.tag_drug_id;
 
 	private ViewPager mPager;
-	private TextView mTextDate;
+	//private TextView mTextDate;
 
 	private Date mOriginalDate;
 	private Date mCurrentDate;
@@ -131,14 +133,13 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		setContentView(R.layout.drug_list);
 
 		mPager = (ViewPager) findViewById(R.id.drug_list_pager);
-		mTextDate = (TextView) findViewById(R.id.text_date);
+
+		/*mTextDate = (TextView) findViewById(R.id.text_date);
 
 		mTextDate.setOnLongClickListener(mDateClickListener);
 		mTextDate.setOnClickListener(mDateClickListener);
 
-		// FIXME hack
-		if(!Version.SDK_IS_PRE_HONEYCOMB)
-			mTextDate.setVisibility(View.GONE);
+		mTextDate.setVisibility(View.GONE);*/
 
 		//mPager.setOnPageChangeListener(mPageListener);
 		mPager.setOffscreenPageLimit(1);
@@ -232,18 +233,16 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 		new MenuInflater(this).inflate(menuResId, menu);
 
+		//menu.findItem(R.id.menuitem_date).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 		return true;
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-		{
-			final int titleResId = isCurrentDateActive() ? R.string._title_go_to_date : R.string._title_today;
-			menu.findItem(R.id.menuitem_date).setTitle(titleResId);
-		}
-
+		final int titleResId = isCurrentDateActive() ? R.string._title_go_to_date : R.string._title_today;
+		menu.findItem(R.id.menuitem_date).setTitle(titleResId);
 		menu.findItem(R.id.menuitem_toggle_filtering).setTitle(mShowingAll ? R.string._title_filter : R.string._title_show_all);
 
 		return true;
@@ -293,6 +292,13 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 	}
 
 	@Override
+	public boolean onContextItemSelected(android.view.MenuItem item)
+	{
+		// TODO Auto-generated method stub
+		return super.onContextItemSelected(item);
+	}
+
+	@Override
 	public void onCreateContextMenu(ContextMenu menu, final View v, ContextMenuInfo menuInfo)
 	{
 		final DoseView doseView = (DoseView) v;
@@ -308,81 +314,66 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 		// ////////////////////////////////////////////////
 
+		// ////////////////////////////////////////////////
+
+		final boolean wasDoseTaken = doseView.wasDoseTaken();
+		if(wasDoseTaken)
+		{
+			menu.add(0, CMENU_REMOVE_DOSE, 0, R.string._title_mark_not_taken)
+					.setOnMenuItemClickListener(new OnContextMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(android.view.MenuItem item)
+				{
+					MutableFraction dose = new MutableFraction();
+					for(DoseEvent intake : Entries.findDoseEvents(drug, mCurrentDate, doseTime))
+					{
+						dose.add(intake.getDose());
+						Database.delete(intake);
+					}
+
+					drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
+					Database.update(drug);
+
+					return true;
+				}
+			});
+		}
+		else
+		{
+			menu.add(0, CMENU_IGNORE_DOSE, 0, R.string._title_ignore_dose)
+					.setOnMenuItemClickListener(new OnContextMenuItemClickListener() {
+
+					@Override
+					public boolean onMenuItemClick(android.view.MenuItem item)
+					{
+						Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
+						return true;
+					}
+			});
+		}
+
+		menu.add(0, CMENU_TAKE_DOSE, 0, R.string._title_mark_taken).setOnMenuItemClickListener(new OnContextMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(android.view.MenuItem item)
+				{
+					showDoseDialog(drug, doseView.getDate(), doseTime, true);
+					return true;
+				}
+		});
+
+
 		final Intent editIntent = new Intent(this, DrugEditActivity.class);
 		editIntent.setAction(Intent.ACTION_EDIT);
 		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, drug.getId());
 		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
 
-		// ////////////////////////////////////////////////
-
-		final boolean wasDoseTaken = doseView.wasDoseTaken();
-		final int toggleIntakeMessageId;
-
-		if(wasDoseTaken)
-			toggleIntakeMessageId = R.string._title_mark_not_taken;
-		else
-			toggleIntakeMessageId = R.string._title_mark_taken;
-
-		menu.add(0, CMENU_TOGGLE_INTAKE, 0, toggleIntakeMessageId).setOnMenuItemClickListener(new OnMenuItemClickListener() {
-				@Override
-				public boolean onMenuItemClick(MenuItem item)
-				{
-					if(!wasDoseTaken)
-						doseView.performClick();
-					else
-					{
-						MutableFraction dose = new MutableFraction();
-						for(DoseEvent intake : Entries.findDoseEvents(drug, mCurrentDate, doseTime))
-						{
-							dose.add(intake.getDose());
-							Database.delete(intake);
-						}
-
-						drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
-						Database.update(drug);
-					}
-
-					return true;
-				}
-		});
-
-		if(!wasDoseTaken)
-		{
-			menu.add(0, CMENU_IGNORE_DOSE, 0, R.string._title_ignore_dose)
-					.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-						@Override
-						public boolean onMenuItemClick(MenuItem item)
-						{
-							Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
-							return true;
-						}
-					});
-		}
-
-		if(Version.BETA)
-		{
-			menu.add(0, CMENU_LOG, 0, R.string._title_show_log)
-					.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-						@Override
-						public boolean onMenuItemClick(MenuItem item)
-						{
-							Intent intent = new Intent(getApplicationContext(), DoseHistoryActivity.class);
-							intent.putExtra(Extras.DRUG_ID, drug.getId());
-							startActivity(intent);
-							return true;
-						}
-					});
-		}
-
 		if(BuildConfig.DEBUG)
 		{
 			menu.add(0, CMENU_DUMP, 0, "Dump")
-					.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+					.setOnMenuItemClickListener(new OnContextMenuItemClickListener() {
 
 						@Override
-						public boolean onMenuItemClick(MenuItem item)
+						public boolean onMenuItemClick(android.view.MenuItem item)
 						{
 							Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, drug.getName());
 							return true;
@@ -390,6 +381,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 					});
 		}
 	}
+
+
 
 	public void onDrugNameClick(View view)
 	{
@@ -459,21 +452,17 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 
 		if(drugs.isEmpty())
 		{
-			if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+			if(Settings.getBoolean(Keys.COMPACT_ACTION_BAR, Defaults.COMPACT_ACTION_BAR))
 			{
-				if(Settings.getBoolean(Keys.COMPACT_ACTION_BAR, Defaults.COMPACT_ACTION_BAR))
-				{
-					Log.d(TAG, "COMPACT_ACTION_BAR");
-					emptyResId = R.string._msg_no_drugs_compact_ab;
-				}
-				else
-				{
-					Log.d(TAG, "EXTENDED_ACTION_BAR");
-					emptyResId = R.string._msg_no_drugs_extended_ab;
-				}
+				Log.d(TAG, "COMPACT_ACTION_BAR");
+				emptyResId = R.string._msg_no_drugs_compact_ab;
 			}
 			else
-				emptyResId = R.string._msg_no_drugs_no_ab;
+			{
+				Log.d(TAG, "EXTENDED_ACTION_BAR");
+				emptyResId = R.string._msg_no_drugs_extended_ab;
+			}
+
 		}
 		else
 			emptyResId = R.string._msg_no_doses_on_this_day;
@@ -486,34 +475,10 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		return v;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void onDoseViewClick(View view)
 	{
 		final DoseView doseView = (DoseView) view;
-		Date date = doseView.getDate();
-
-		if(toastIfPastMaxHistoryAge(date))
-			return;
-		else if(!date.equals(mCurrentDate))
-		{
-			Log.i(TAG, "DoseView date " + DateTime.toDateString(date) +
-					" differs from Activity date " + DateTime.toDateString(mCurrentDate) + " ");
-
-			invalidateViewPager();
-			date = mCurrentDate;
-
-			if(BuildConfig.DEBUG)
-				Toast.makeText(this, "Invoked workaround!", Toast.LENGTH_SHORT).show();
-
-			//throw new IllegalStateException("Activity date " + mCurrentDate + " differs from DoseView date " + date);
-		}
-
-		final Bundle args = new Bundle();
-		args.putInt(DoseDialog.ARG_DRUG_ID, doseView.getDrug().getId());
-		args.putInt(DoseDialog.ARG_DOSE_TIME, doseView.getDoseTime());
-		args.putSerializable(DoseDialog.ARG_DATE, date);
-
-		showDialog(R.id.dose_dialog, args);
+		showDoseDialog(doseView.getDrug(), doseView.getDate(), doseView.getDoseTime(), false);
 	}
 
 	public void onMissedIndicatorClicked(View view)
@@ -698,9 +663,7 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 			mPager.setOnPageChangeListener(mPageListener);
 		}
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			invalidateOptionsMenu();
-
+		supportInvalidateOptionsMenu();
 		updateDateString();
 	}
 
@@ -746,13 +709,8 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		if(isCurrentDateActive())
 			Util.applyStyle(dateString, new UnderlineSpan());
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-		{
-			Util.applyStyle(dateString, new RelativeSizeSpan(0.75f));
-			getActionBar().setSubtitle(dateString);
-		}
-		else
-			mTextDate.setText(dateString);
+		Util.applyStyle(dateString, new RelativeSizeSpan(0.75f));
+		getSupportActionBar().setSubtitle(dateString);
 	}
 
 	private boolean toastIfPastMaxHistoryAge(Date date)
@@ -779,6 +737,31 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		bundle.putString("msg", getString(msgResId, args));
 
 		showDialog(DIALOG_INFO, bundle);
+	}
+
+	private void showDoseDialog(Drug drug, Date date, int doseTime, boolean forceShow)
+	{
+		if(toastIfPastMaxHistoryAge(date))
+			return;
+		else if(!date.equals(mCurrentDate))
+		{
+			Log.i(TAG, "DoseView date " + DateTime.toDateString(date) +
+					" differs from Activity date " + DateTime.toDateString(mCurrentDate) + " ");
+
+			invalidateViewPager();
+			date = mCurrentDate;
+
+			if(BuildConfig.DEBUG)
+				Toast.makeText(this, "Invoked workaround!", Toast.LENGTH_SHORT).show();
+		}
+
+		final Bundle args = new Bundle();
+		args.putInt(DoseDialog.ARG_DRUG_ID, drug.getId());
+		args.putInt(DoseDialog.ARG_DOSE_TIME, doseTime);
+		args.putSerializable(DoseDialog.ARG_DATE, date);
+		args.putBoolean(DoseDialog.ARG_FORCE_SHOW, forceShow);
+
+		showDialog(R.id.dose_dialog, args);
 	}
 
 	static class DrugFilter implements CollectionUtils.Filter<Drug>
@@ -1011,3 +994,5 @@ public class DrugListActivity extends FragmentActivity implements OnLongClickLis
 		}
 	}
 }
+
+interface OnContextMenuItemClickListener extends android.view.MenuItem.OnMenuItemClickListener {};
