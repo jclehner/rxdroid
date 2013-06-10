@@ -24,6 +24,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
+	xmlns:abs="http://schemas.android.com/apk/res/com.actionbarsherlock"
 >	
 	<style name="Theme.RxDroid" parent="@style/Theme.Sherlock.Light.DarkActionBar">
 		<item name="drugIconTablet">@drawable/ic_drug_tablet_black</item>
@@ -63,7 +64,8 @@
 		<item name="dividerColor">@color/list_divider_light</item>
 		
 		<item name="android:windowAnimationStyle">@null</item>
-		<item name="android:alertDialogStyle">@style/Theme.RxDroid.Dialog</item>				
+		<item name="android:alertDialogStyle">@style/Theme.RxDroid.Dialog</item>
+			
 	</style>
 	
 	<style name="Theme.RxDroid.NoAnimation" parent="@style/Theme.RxDroid">

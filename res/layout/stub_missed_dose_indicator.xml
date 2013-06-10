@@ -34,5 +34,5 @@
 	android:clickable="true"
   	android:onClick="onMissedIndicatorClicked"
   	
-  	android:background="@drawable/generic_background"
+  	android:background="?attr/selectableItemBackground"
 />
