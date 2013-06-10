@@ -102,8 +102,6 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 		mDoseInput = (FractionInput) view.findViewById(R.id.dose_edit);
 		mInsufficientSupplyText = (TextView) view.findViewById(R.id.text_insufficient_supplies);
 
-		mSkipDialog = Settings.getBoolean(Keys.SKIP_DOSE_DIALOG, false);
-
 		setView(view);
 
 		setButton(BUTTON_NEGATIVE, getString(android.R.string.cancel), mLocalOnClickListener);
@@ -129,6 +127,8 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 		// FIXME remove once we have specialized activities
 		Database.init();
 
+		mSkipDialog = Settings.getBoolean(Keys.SKIP_DOSE_DIALOG, false);
+
 		final Drug drug;
 		final int drugId = args.getInt(ARG_DRUG_ID, -1);
 		if(drugId == -1 || (drug = Drug.find(drugId)) == null)
@@ -142,8 +142,6 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 
 		if(args.getBoolean(ARG_FORCE_SHOW))
 			mSkipDialog = false;
-
-		Log.d(TAG, "setArgs: args=" + args);
 
 		update(drug, doseTime, date);
 	}
@@ -306,8 +304,6 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 	private void setupViews()
 	{
 		boolean doseIsZero = mDose.isZero();
-
-		Log.d(TAG, "setupViews: mSkipDialog=" + mSkipDialog);
 
 		// If we're skipping the dialog, but this function is called, the supply
 		// was insufficient, so we don't want to override this state here
