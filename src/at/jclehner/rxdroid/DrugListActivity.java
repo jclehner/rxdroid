@@ -308,10 +308,22 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 						if(!dose.isZero())
 						{
-							if(drug.getCurrentSupply().minus(dose).isNegative())
+							final Fraction currentSupply = drug.getCurrentSupply();
+
+							if(!currentSupply.isZero() && drug.getRefillSize() != 0)
 							{
-								++skipped;
-								continue;
+								final Fraction newSupply = currentSupply.minus(dose);
+
+								if(newSupply.isNegative())
+								{
+									++skipped;
+									continue;
+								}
+								else
+								{
+									drug.setCurrentSupply(newSupply);
+									Database.update(drug);
+								}
 							}
 
 							Database.create(new DoseEvent(drug, activeDate, activeDoseTime, dose));
@@ -566,7 +578,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 	@SuppressWarnings("deprecation")
 	@Override
-	protected Dialog onCreateDialog(int id, Bundle args)
+	protected Dialog onCreateDialog(final int id, Bundle args)
 	{
 		if(id == R.id.dose_dialog)
 			return new DoseDialog(this);
@@ -587,6 +599,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 				{
 					Log.d(TAG, "onClick: which = " + which);
 					Settings.setDisplayedOnce(onceId);
+					removeDialog(id);
 				}
 			});
 
