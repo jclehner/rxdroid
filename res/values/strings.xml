@@ -364,7 +364,14 @@
 	<string name="_title_skip_dose_dialog">Skip dialog</string>
 	<string name="_summary_skip_dose_dialog">Hide the dialog that is shown when clicking a dose. The dialog
 	    can be opened manually by long-pressing the dose and selecting "Take dose".</string>
+	    
+	<string name="_title_take_all_due_doses">Take all due doses</string>
 			
+	<string name="_toast_all_due_doses_taken">All due doses marked as taken.</string>
+	<string name="_toast_some_due_doses_skipped">Some due doses were not marked as taken due to insufficient supplies.</string>
+	<string name="_toast_no_due_doses">No due doses at the moment.</string>
+	
+	
 	<string translatable="false" name="test_schedule">
 	    Mon    0 - 0 - 0 - 1\n
 	    Tue    0 - 1 - 0 - 1\n

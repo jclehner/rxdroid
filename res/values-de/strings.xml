@@ -345,6 +345,13 @@
 	<string name="_summary_skip_dose_dialog">Überspringe den Dialog nach Anklicken einer Dosis. Um ihn
 	    zu öffnen Dosis lange anklicken und »Dosis einnehmen« auswählen.</string>
 	    
+	<string name="_title_take_all_due_doses">Alle fälligen Dosen einnehmen</string>
+	
+	<string name="_toast_all_due_doses_taken">Alle fälligen Dosen als eingenommen markiert.</string>
+	<string name="_toast_some_due_doses_skipped">Einige fällige Dosen wegen unzureichenden Vorrats 
+	    nicht als eingenommen markiert.</string>
+	<string name="_toast_no_due_doses">Im Moment keine fälligen Dosen.</string>
+	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.

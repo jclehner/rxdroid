@@ -1,3 +1,8 @@
+0.9.14:
+	* Unified theme - ActionBarSherlock is used for Android < 3.0
+	* Added option to skip dose dialog
+	* Added option to mark all due doses as taken
+
 0.9.12:
 	* Main view no longer scrolls to the top after a dose was taken
 

@@ -23,7 +23,13 @@
 -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-		
+	
+    <item android:id="@+id/menuitem_take_all_pending"
+	    android:title="@string/_title_take_all_due_doses"
+	    android:icon="@drawable/ic_action_tick"
+	    android:showAsAction="always"
+	/>
+    	
 	<item android:id="@+id/menuitem_add"
 		android:title="@string/_title_add"
 		android:icon="@drawable/ic_menu_new"

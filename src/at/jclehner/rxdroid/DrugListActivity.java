@@ -213,7 +213,6 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		return true;
 	}
 
-	@TargetApi(11)
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
@@ -229,11 +228,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 				menuResId = R.menu.activity_drug_list_extended;
 		}
 
-		Log.d(TAG, "menuResId=" + menuResId);
-
 		new MenuInflater(this).inflate(menuResId, menu);
-
-		//menu.findItem(R.id.menuitem_date).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 		return true;
 	}
@@ -245,6 +240,10 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		menu.findItem(R.id.menuitem_date).setTitle(titleResId);
 		menu.findItem(R.id.menuitem_toggle_filtering).setTitle(mShowingAll ? R.string._title_filter : R.string._title_show_all);
 
+		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
+		final boolean hasActiveDoseTime = dtInfo.activeDoseTime() != Schedule.TIME_INVALID;
+
+		menu.findItem(R.id.menuitem_take_all_pending).setEnabled(hasActiveDoseTime);
 		return true;
 	}
 
@@ -285,6 +284,51 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 				mShowingAll = !mShowingAll;
 				invalidateViewPager();
 				return true;
+			}
+			case R.id.menuitem_take_all_pending:
+			{
+				final List<Drug> drugs = Entries.getAllDrugs(mCurrentPatientId);
+				final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
+				final int activeDoseTime = dtInfo.activeDoseTime();
+				final Date activeDate = dtInfo.activeDate();
+
+				int toastResId = R.string._toast_no_due_doses;
+				int toastLength = Toast.LENGTH_SHORT;
+
+				if(activeDoseTime != Schedule.TIME_INVALID)
+				{
+					int taken = 0, skipped = 0;
+
+					for(Drug drug : drugs)
+					{
+						if(!Entries.findDoseEvents(drug, activeDate, activeDoseTime).isEmpty())
+							continue;
+
+						final Fraction dose = drug.getDose(activeDoseTime, activeDate);
+
+						if(!dose.isZero())
+						{
+							if(drug.getCurrentSupply().minus(dose).isNegative())
+							{
+								++skipped;
+								continue;
+							}
+
+							Database.create(new DoseEvent(drug, activeDate, activeDoseTime, dose));
+							++taken;
+						}
+					}
+
+					if(skipped != 0)
+					{
+						toastResId = R.string._toast_some_due_doses_skipped;
+						toastLength = Toast.LENGTH_LONG;
+					}
+					else if(taken != 0)
+						toastResId = R.string._toast_all_due_doses_taken;
+				}
+
+				Toast.makeText(this, toastResId, toastLength).show();
 			}
 
 		}
@@ -739,6 +783,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		showDialog(DIALOG_INFO, bundle);
 	}
 
+	@SuppressWarnings("deprecation")
 	private void showDoseDialog(Drug drug, Date date, int doseTime, boolean forceShow)
 	{
 		if(toastIfPastMaxHistoryAge(date))
@@ -926,6 +971,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		{
 			if(entry instanceof Drug)
 				invalidateViewPager();
+			else if(entry instanceof DoseEvent)
+				supportInvalidateOptionsMenu();
 		}
 	};
 
