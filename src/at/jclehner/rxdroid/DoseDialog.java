@@ -36,6 +36,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import at.jclehner.rxdroid.FractionInput.OnChangedListener;
+import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -51,10 +52,13 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 	public static final String ARG_DRUG_ID = "drug_id";
 	public static final String ARG_DOSE_TIME = "dose_time";
 	public static final String ARG_DATE = "date";
+	public static final String ARG_FORCE_SHOW = "force_show";
 
 	private static final int STATE_DOSE_DISPLAY = 0;
 	private static final int STATE_DOSE_EDIT = 1;
 	private static final int STATE_INSUFFICIENT_SUPPLIES = 2;
+
+	private boolean mSkipDialog;
 
 	private Drug mDrug;
 	private int mDoseTime;
@@ -98,6 +102,8 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 		mDoseInput = (FractionInput) view.findViewById(R.id.dose_edit);
 		mInsufficientSupplyText = (TextView) view.findViewById(R.id.text_insufficient_supplies);
 
+		mSkipDialog = Settings.getBoolean(Keys.SKIP_DOSE_DIALOG, false);
+
 		setView(view);
 
 		setButton(BUTTON_NEGATIVE, getString(android.R.string.cancel), mLocalOnClickListener);
@@ -134,7 +140,26 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 		if(doseTime == Schedule.TIME_INVALID || date == null)
 			throw new IllegalArgumentException();
 
+		if(args.getBoolean(ARG_FORCE_SHOW))
+			mSkipDialog = false;
+
+		Log.d(TAG, "setArgs: args=" + args);
+
 		update(drug, doseTime, date);
+	}
+
+	@Override
+	public void show()
+	{
+		if(mSkipDialog)
+		{
+			if(addIntakeAndDismiss(true))
+				return;
+
+			setState(STATE_INSUFFICIENT_SUPPLIES);
+		}
+
+		super.show();
 	}
 
 	@Override
@@ -186,7 +211,7 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 	@Override
 	public void onBackPressed()
 	{
-		if(mState == STATE_INSUFFICIENT_SUPPLIES)
+		if(mState == STATE_INSUFFICIENT_SUPPLIES /*&& !mSkipDialog*/)
 			setState(STATE_DOSE_EDIT);
 		else
 			super.onBackPressed();
@@ -258,10 +283,15 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 		return supplies.compareTo(mDose) == -1;
 	}
 
-	private void addIntakeAndDismiss()
+	private boolean addIntakeAndDismiss(boolean requireSufficientSupply)
 	{
 		final Fraction newSupply = mDrug.getCurrentSupply().minus(mDose);
-		mDrug.setCurrentSupply(newSupply.isNegative() ? new Fraction() : newSupply);
+		final boolean haveInsufficientSupply = newSupply.isNegative();
+
+		if(requireSufficientSupply && haveInsufficientSupply)
+			return false;
+
+		mDrug.setCurrentSupply(haveInsufficientSupply ? Fraction.ZERO : newSupply);
 		Database.update(mDrug, Database.FLAG_DONT_NOTIFY_LISTENERS);
 
 		DoseEvent intake = new DoseEvent(mDrug, mDate, mDoseTime, mDose);
@@ -270,13 +300,19 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 		dismiss();
 
 		Toast.makeText(getContext(), R.string._toast_intake_noted, Toast.LENGTH_SHORT).show();
+		return true;
 	}
 
 	private void setupViews()
 	{
 		boolean doseIsZero = mDose.isZero();
 
-		setState(doseIsZero ? STATE_DOSE_EDIT : STATE_DOSE_DISPLAY);
+		Log.d(TAG, "setupViews: mSkipDialog=" + mSkipDialog);
+
+		// If we're skipping the dialog, but this function is called, the supply
+		// was insufficient, so we don't want to override this state here
+		if(!mSkipDialog)
+			setState(doseIsZero ? STATE_DOSE_EDIT : STATE_DOSE_DISPLAY);
 
 		getButton(BUTTON_POSITIVE).setText(getString(android.R.string.ok));
 		getButton(BUTTON_NEGATIVE).setText(getString(android.R.string.cancel));
@@ -325,14 +361,17 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 		switch(mState)
 		{
 			case STATE_DOSE_DISPLAY:
+				Log.d(TAG, "setState: DOSE_DISPLAY");
 				doseTextVisibility = View.VISIBLE;
 				break;
 
 			case STATE_DOSE_EDIT:
+				Log.d(TAG, "setState: DOSE_EDIT");
 				doseEditVisibility = View.VISIBLE;
 				break;
 
 			case STATE_INSUFFICIENT_SUPPLIES:
+				Log.d(TAG, "setState: INSUFFICIENT_SUPPLIES");
 				insufficientSupplyTextVisibility = View.VISIBLE;
 				break;
 		}
@@ -385,7 +424,7 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 				if(hasInsufficientSupplies() && mState != STATE_INSUFFICIENT_SUPPLIES)
 					setState(STATE_INSUFFICIENT_SUPPLIES);
 				else
-					addIntakeAndDismiss();
+					addIntakeAndDismiss(false);
 			}
 		}
 	};

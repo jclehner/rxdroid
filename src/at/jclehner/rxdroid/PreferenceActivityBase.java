@@ -125,6 +125,15 @@ public abstract class PreferenceActivityBase extends PreferenceActivity
 		return super.onPreferenceTreeClick(ps, p);
     }*/
 
+	@Override
+	protected int onGetListSelectorId()
+	{
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+			return 0;
+
+		return Theme.getResourceAttribute(com.actionbarsherlock.R.attr.selectableItemBackground);
+	}
+
 	protected abstract Intent getHomeButtonIntent();
 
 	protected boolean isHomeButtonEnabled() {

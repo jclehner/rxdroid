@@ -97,9 +97,10 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 	private static final boolean DEBUG_DATE_MISMATCH = true;
 
 	private static final int CMENU_TOGGLE_INTAKE = 0;
+	private static final int CMENU_TAKE_DOSE = 1;
+	private static final int CMENU_REMOVE_DOSE = 0;
 	private static final int CMENU_EDIT_DRUG = 2;
 	private static final int CMENU_IGNORE_DOSE = 4;
-	private static final int CMENU_LOG = 5;
 	private static final int CMENU_DUMP = 6;
 
 	private static final int DIALOG_INFO = 0;
@@ -291,6 +292,13 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 	}
 
 	@Override
+	public boolean onContextItemSelected(android.view.MenuItem item)
+	{
+		// TODO Auto-generated method stub
+		return super.onContextItemSelected(item);
+	}
+
+	@Override
 	public void onCreateContextMenu(ContextMenu menu, final View v, ContextMenuInfo menuInfo)
 	{
 		final DoseView doseView = (DoseView) v;
@@ -306,73 +314,58 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 		// ////////////////////////////////////////////////
 
-		final Intent editIntent = new Intent(this, DrugEditActivity.class);
-		editIntent.setAction(Intent.ACTION_EDIT);
-		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, drug.getId());
-		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
-
 		// ////////////////////////////////////////////////
 
 		final boolean wasDoseTaken = doseView.wasDoseTaken();
-		final int toggleIntakeMessageId;
-
 		if(wasDoseTaken)
-			toggleIntakeMessageId = R.string._title_mark_not_taken;
-		else
-			toggleIntakeMessageId = R.string._title_mark_taken;
-
-		menu.add(0, CMENU_TOGGLE_INTAKE, 0, toggleIntakeMessageId).setOnMenuItemClickListener(new OnContextMenuItemClickListener() {
+		{
+			menu.add(0, CMENU_REMOVE_DOSE, 0, R.string._title_mark_not_taken)
+					.setOnMenuItemClickListener(new OnContextMenuItemClickListener() {
 				@Override
 				public boolean onMenuItemClick(android.view.MenuItem item)
 				{
-					if(!wasDoseTaken)
-						doseView.performClick();
-					else
+					MutableFraction dose = new MutableFraction();
+					for(DoseEvent intake : Entries.findDoseEvents(drug, mCurrentDate, doseTime))
 					{
-						MutableFraction dose = new MutableFraction();
-						for(DoseEvent intake : Entries.findDoseEvents(drug, mCurrentDate, doseTime))
-						{
-							dose.add(intake.getDose());
-							Database.delete(intake);
-						}
-
-						drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
-						Database.update(drug);
+						dose.add(intake.getDose());
+						Database.delete(intake);
 					}
+
+					drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
+					Database.update(drug);
 
 					return true;
 				}
-		});
-
-		if(!wasDoseTaken)
+			});
+		}
+		else
 		{
 			menu.add(0, CMENU_IGNORE_DOSE, 0, R.string._title_ignore_dose)
 					.setOnMenuItemClickListener(new OnContextMenuItemClickListener() {
 
-						@Override
-						public boolean onMenuItemClick(android.view.MenuItem item)
-						{
-							Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
-							return true;
-						}
-					});
+					@Override
+					public boolean onMenuItemClick(android.view.MenuItem item)
+					{
+						Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
+						return true;
+					}
+			});
 		}
 
-		if(Version.BETA)
-		{
-			menu.add(0, CMENU_LOG, 0, R.string._title_show_log)
-					.setOnMenuItemClickListener(new OnContextMenuItemClickListener() {
+		menu.add(0, CMENU_TAKE_DOSE, 0, R.string._title_mark_taken).setOnMenuItemClickListener(new OnContextMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(android.view.MenuItem item)
+				{
+					showDoseDialog(drug, doseView.getDate(), doseTime, true);
+					return true;
+				}
+		});
 
-						@Override
-						public boolean onMenuItemClick(android.view.MenuItem item)
-						{
-							Intent intent = new Intent(getApplicationContext(), DoseHistoryActivity.class);
-							intent.putExtra(Extras.DRUG_ID, drug.getId());
-							startActivity(intent);
-							return true;
-						}
-					});
-		}
+
+		final Intent editIntent = new Intent(this, DrugEditActivity.class);
+		editIntent.setAction(Intent.ACTION_EDIT);
+		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, drug.getId());
+		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
 
 		if(BuildConfig.DEBUG)
 		{
@@ -388,6 +381,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 					});
 		}
 	}
+
+
 
 	public void onDrugNameClick(View view)
 	{
@@ -480,34 +475,10 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		return v;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void onDoseViewClick(View view)
 	{
 		final DoseView doseView = (DoseView) view;
-		Date date = doseView.getDate();
-
-		if(toastIfPastMaxHistoryAge(date))
-			return;
-		else if(!date.equals(mCurrentDate))
-		{
-			Log.i(TAG, "DoseView date " + DateTime.toDateString(date) +
-					" differs from Activity date " + DateTime.toDateString(mCurrentDate) + " ");
-
-			invalidateViewPager();
-			date = mCurrentDate;
-
-			if(BuildConfig.DEBUG)
-				Toast.makeText(this, "Invoked workaround!", Toast.LENGTH_SHORT).show();
-
-			//throw new IllegalStateException("Activity date " + mCurrentDate + " differs from DoseView date " + date);
-		}
-
-		final Bundle args = new Bundle();
-		args.putInt(DoseDialog.ARG_DRUG_ID, doseView.getDrug().getId());
-		args.putInt(DoseDialog.ARG_DOSE_TIME, doseView.getDoseTime());
-		args.putSerializable(DoseDialog.ARG_DATE, date);
-
-		showDialog(R.id.dose_dialog, args);
+		showDoseDialog(doseView.getDrug(), doseView.getDate(), doseView.getDoseTime(), false);
 	}
 
 	public void onMissedIndicatorClicked(View view)
@@ -766,6 +737,31 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		bundle.putString("msg", getString(msgResId, args));
 
 		showDialog(DIALOG_INFO, bundle);
+	}
+
+	private void showDoseDialog(Drug drug, Date date, int doseTime, boolean forceShow)
+	{
+		if(toastIfPastMaxHistoryAge(date))
+			return;
+		else if(!date.equals(mCurrentDate))
+		{
+			Log.i(TAG, "DoseView date " + DateTime.toDateString(date) +
+					" differs from Activity date " + DateTime.toDateString(mCurrentDate) + " ");
+
+			invalidateViewPager();
+			date = mCurrentDate;
+
+			if(BuildConfig.DEBUG)
+				Toast.makeText(this, "Invoked workaround!", Toast.LENGTH_SHORT).show();
+		}
+
+		final Bundle args = new Bundle();
+		args.putInt(DoseDialog.ARG_DRUG_ID, drug.getId());
+		args.putInt(DoseDialog.ARG_DOSE_TIME, doseTime);
+		args.putSerializable(DoseDialog.ARG_DATE, date);
+		args.putBoolean(DoseDialog.ARG_FORCE_SHOW, forceShow);
+
+		showDialog(R.id.dose_dialog, args);
 	}
 
 	static class DrugFilter implements CollectionUtils.Filter<Drug>

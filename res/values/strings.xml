@@ -360,7 +360,11 @@
 	    to help speed up the development of this app.</string>
 	    
 	<string name="_msg_no_history_data">No history data matching the specified criteria.</string>
-		
+	
+	<string name="_title_skip_dose_dialog">Skip dialog</string>
+	<string name="_summary_skip_dose_dialog">Hide the dialog that is shown when clicking a dose. The dialog
+	    can be opened manually by long-pressing the dose and selecting "Take dose".</string>
+			
 	<string translatable="false" name="test_schedule">
 	    Mon    0 - 0 - 0 - 1\n
 	    Tue    0 - 1 - 0 - 1\n

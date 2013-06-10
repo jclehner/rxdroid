@@ -51,12 +51,7 @@
 		android:key="prefscreen_display"
 		android:title="@string/_title_prefscreen_display"
 		android:icon="?attr/iconPicture"
-	>	     
-		<CheckBoxPreference android:key="@string/key_theme_is_dark" 
-			android:title="@string/_title_dark_theme"
-			android:defaultValue="@bool/pref_default_theme_is_dark"
-			android:enabled="@bool/pref_visibility_theme_is_dark"
-		/>
+	>
 		
 		<CheckBoxPreference android:key="@string/key_enable_landscape_mode"
 		    android:title="@string/_title_enable_landscape_mode"
@@ -70,6 +65,12 @@
 			android:summary="@string/_summary_compact_action_bar"
 			android:defaultValue="@bool/pref_default_compact_action_bar"
 			android:enabled="@bool/pref_visibility_compact_action_bar"
+		/>
+		
+		<CheckBoxPreference android:key="@string/key_skip_dose_dialog"
+		    android:title="@string/_title_skip_dose_dialog"
+		    android:summary="@string/_summary_skip_dose_dialog"
+		    android:defaultValue="false"
 		/>
 	     
 	    <PreferenceCategory 
@@ -202,6 +203,11 @@
 	        android:enabled="false"
 	    />
 		
+		<CheckBoxPreference android:key="@string/key_skip_dose_dialog"
+		    android:title="Skip DoseDialog"
+		    android:defaultValue="false"
+		/>
+		
 		<PreferenceScreen android:key="prefscreen_development_test"
 		    android:title="PreferenceScreen"
 		>
@@ -252,6 +258,15 @@
 		    android:title="Enable lockscreen"
 		    android:defaultValue="false"
 		/>
+		
+		<Preference android:title="Beta link"
+		    android:summary="https://play.google.com/apps/testing/at.jclehner.rxdroid"
+		>
+		    <intent android:action="android.intent.action.VIEW"
+		        android:data="https://play.google.com/apps/testing/at.jclehner.rxdroid"
+		    /> 
+		    
+		</Preference>
 				    
 </PreferenceScreen>
 	

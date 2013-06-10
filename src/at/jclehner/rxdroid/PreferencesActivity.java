@@ -222,10 +222,9 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		MenuItem item = menu.add(0, MENU_RESTORE_DEFAULTS, 0, R.string._title_factory_reset)
-				.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+				.setIcon(R.drawable.ic_action_undo);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -414,6 +413,11 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		Intent intent = new Intent(getBaseContext(), DrugListActivity.class);
 		intent.setAction(Intent.ACTION_MAIN);
 		return intent;
+	}
+
+	@Override
+	protected boolean shouldHideOptionsMenuInSubscreens() {
+		return true;
 	}
 
 	private void updateLowSupplyThresholdPreferenceSummary()
