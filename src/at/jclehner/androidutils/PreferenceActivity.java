@@ -20,7 +20,7 @@ import com.actionbarsherlock.view.Window;
 public abstract class PreferenceActivity extends SherlockPreferenceActivity
 {
 	private static final String TAG = PreferenceActivity.class.getSimpleName();
-	private static final boolean USE_WORKAROUND = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
+	private static final boolean USE_WORKAROUND = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN;
 
 	private static final String EXTRA_PREFERENCE_SCREEN_KEY =
 			PreferenceActivity.class.getName() + ".EXTRA_PREFERENCE_SCREEN_KEY";
