@@ -46,16 +46,6 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 
 		mHandler = new Handler(getMainLooper());
 
-		final int selctorResId = onGetListSelectorId();
-		if(selctorResId != 0)
-		{
-			final ListView list = (ListView) findViewById(android.R.id.list);
-			if(list != null)
-				list.setSelector(selctorResId);
-			else
-				Log.w(TAG, "Requested custom ListView selector, but ListView is null");
-		}
-
 		final Intent intent = getIntent();
 		if(intent != null)
 		{
@@ -199,10 +189,6 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 			return false;
 
 		return super.onCreateOptionsMenu(menu);
-	}
-
-	protected int onGetListSelectorId() {
-		return 0;
 	}
 
 	protected boolean shouldHideOptionsMenuInSubscreens() {

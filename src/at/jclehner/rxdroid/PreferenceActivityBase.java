@@ -23,6 +23,7 @@ package at.jclehner.rxdroid;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ListView;
 import at.jclehner.androidutils.PreferenceActivity;
 import at.jclehner.rxdroid.util.Components;
 
@@ -36,6 +37,14 @@ public abstract class PreferenceActivityBase extends PreferenceActivity
 	{
 		Components.onCreateActivity(this, 0);
 		super.onCreate(savedInstanceState);
+
+		final ListView list = getListView();
+		if(list != null)
+		{
+			final int resId = Theme.getResourceAttribute(
+					com.actionbarsherlock.R.attr.selectableItemBackground);
+			list.setSelector(resId);
+		}
 	}
 
 	@Override
@@ -124,15 +133,6 @@ public abstract class PreferenceActivityBase extends PreferenceActivity
 
 		return super.onPreferenceTreeClick(ps, p);
     }*/
-
-	@Override
-	protected int onGetListSelectorId()
-	{
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			return 0;
-
-		return Theme.getResourceAttribute(com.actionbarsherlock.R.attr.selectableItemBackground);
-	}
 
 	protected abstract Intent getHomeButtonIntent();
 

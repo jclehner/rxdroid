@@ -50,6 +50,7 @@ import android.view.Gravity;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ListView;
 import android.widget.Toast;
 import at.jclehner.androidutils.AdvancedDialogPreference;
 import at.jclehner.androidutils.otpm.AdvancedDialogPreferenceController;
@@ -165,6 +166,9 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		ab.setDisplayShowHomeEnabled(true);
 		ab.setDisplayHomeAsUpEnabled(true);
 
+		final ListView list = getListView();
+		if(list != null)
+			list.setSelector(Theme.getResourceAttribute(com.actionbarsherlock.R.attr.selectableItemBackground));
 	}
 
 	@Override
