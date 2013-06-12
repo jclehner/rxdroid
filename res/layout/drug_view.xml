@@ -192,7 +192,7 @@
 			    android:layout_height="48dip"
 			    
 			    android:gravity="center"
-			    android:textAppearance="?android:attr/textAppearanceMedium"
+			    android:textAppearance="?android:attr/textAppearanceSmall"
 			    
 			    android:background="?attr/selectableItemBackground"
 			    android:clickable="true"
