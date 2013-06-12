@@ -86,7 +86,7 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 	{
 		super(context);
 
-		View view = getLayoutInflater().inflate(R.layout.intake, null);
+		View view = getLayoutInflater().inflate(R.layout.dose_dialog, null);
 
 		view.findViewById(R.id.dose_container).setOnClickListener(new View.OnClickListener() {
 

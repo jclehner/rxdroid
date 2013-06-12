@@ -240,10 +240,13 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		menu.findItem(R.id.menuitem_date).setTitle(titleResId);
 		menu.findItem(R.id.menuitem_toggle_filtering).setTitle(mShowingAll ? R.string._title_filter : R.string._title_show_all);
 
-		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
-		final boolean hasActiveDoseTime = dtInfo.activeDoseTime() != Schedule.TIME_INVALID;
+		if(false)
+		{
+			final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
+			final boolean hasActiveDoseTime = dtInfo.activeDoseTime() != Schedule.TIME_INVALID;
 
-		menu.findItem(R.id.menuitem_take_all_pending).setEnabled(hasActiveDoseTime);
+			menu.findItem(R.id.menuitem_take_all_pending).setEnabled(hasActiveDoseTime);
+		}
 		return true;
 	}
 
