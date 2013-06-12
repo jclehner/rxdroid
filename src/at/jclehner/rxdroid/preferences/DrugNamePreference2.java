@@ -39,7 +39,7 @@ import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 
-public class DrugNamePreference2 extends AdvancedDialogPreference<String>
+public class DrugNamePreference2 extends BaseAdvancedDialogPreference<String>
 {
 	private EditText mEditText;
 	private Button mBtnPositive;
@@ -48,7 +48,7 @@ public class DrugNamePreference2 extends AdvancedDialogPreference<String>
 
 	public DrugNamePreference2(Context context, AttributeSet attrs)
 	{
-		super(context, attrs, android.R.attr.editTextPreferenceStyle);
+		super(context, attrs);
 
 		setPositiveButtonText(android.R.string.ok);
 		setNegativeButtonText(android.R.string.cancel);

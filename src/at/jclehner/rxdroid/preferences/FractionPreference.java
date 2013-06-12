@@ -42,7 +42,7 @@ import at.jclehner.rxdroid.FractionInputDialog.OnFractionSetListener;
  * @author Joseph Lehner
  *
  */
-public class FractionPreference extends AdvancedDialogPreference<Fraction> implements OnFractionSetListener
+public class FractionPreference extends BaseAdvancedDialogPreference<Fraction> implements OnFractionSetListener
 {
 	private static final String TAG = FractionPreference.class.getSimpleName();
 
@@ -63,7 +63,7 @@ public class FractionPreference extends AdvancedDialogPreference<Fraction> imple
 
 	public FractionPreference(Context context, AttributeSet attrs, int defStyle)
 	{
-		super(context, attrs, android.R.attr.preferenceStyle);
+		super(context, attrs);
 		mDialogValue = getValue();
 	}
 

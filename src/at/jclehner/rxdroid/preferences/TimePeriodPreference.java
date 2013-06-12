@@ -52,7 +52,7 @@ import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
-public class TimePeriodPreference extends AdvancedDialogPreference<TimePeriod>
+public class TimePeriodPreference extends BaseAdvancedDialogPreference<TimePeriod>
 {
 	private static final String TAG = TimePeriodPreference.class.getSimpleName();
 

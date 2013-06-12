@@ -89,8 +89,8 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 
 	private Dialog mDialog;
 
-	private final LayoutInflater mInflater;
-	private static int sThemeResId = 0;
+	private LayoutInflater mThemedInflater;
+	private Context mThemedContext;
 
 	//private static final String KEY_IS_DIALOG_SHOWING = TAG + ".is_showing";
 	//private static final String KEY_DIALOG_VALUE = TAG + ".dialog_value";
@@ -102,7 +102,6 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	public AdvancedDialogPreference(Context context, AttributeSet attrs)
 	{
 		super(context, attrs, android.R.attr.preferenceStyle);
-		mInflater = LayoutInflater.from(getThemedContext());
 		handleAttributes(attrs);
 
 		if(LOGV) Log.d(TAG, "ctor: key=" + getKey());
@@ -224,16 +223,6 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 		return title != null ? title : getTitle();
 	}
 
-	/**
-	 * Sets a dialog theme for all dialogs created by subclasses of this class.
-	 * <p>
-	 * @see #getThemedContext()
-	 * @see #getLayoutInflater()
-	 */
-	public static void setGlobalDialogTheme(int themeResId) {
-		sThemeResId = themeResId;
-	}
-
 	protected abstract T fromPersistedString(String string);
 
 	protected String toPersistedString(T value) {
@@ -345,8 +334,8 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 		// do nothing
 	}
 
-	protected void onSetInitialDialogValue(Dialog dialog, T dialogValue) {
-
+	protected int getDialogThemeResId() {
+		return 0;
 	}
 
 	/**
@@ -358,10 +347,8 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	 */
 	protected final Context getThemedContext()
 	{
-		if(sThemeResId != 0)
-			return new ContextThemeWrapper(getContext(), sThemeResId);
-
-		return getContext();
+		requireThemedContextAndInflater();
+		return mThemedContext;
 	}
 
 	/**
@@ -386,9 +373,7 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 		mDialog = onGetCustomDialog();
 		if(mDialog == null)
 		{
-			final Context context = getThemedContext();
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(context)
+			AlertDialog.Builder builder = new AlertDialog.Builder(getThemedContext())
 					.setTitle(getDialogTitle())
 					.setIcon(getDialogIcon())
 					.setPositiveButton(getPositiveButtonText(), this)
@@ -500,8 +485,10 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	/**
 	 * Returns a LayoutInflater using the theme set by {@link #setGlobalDialogTheme(int)}.
 	 */
-	protected final LayoutInflater getLayoutInflater() {
-		return mInflater;
+	protected final LayoutInflater getLayoutInflater()
+	{
+		requireThemedContextAndInflater();
+		return mThemedInflater;
 	}
 
 	private void handleAttributes(AttributeSet attrs)
@@ -517,6 +504,27 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 		a.recycle();
 
 		if(LOGV) Log.v(TAG, getKey() + ": handleAttributes: mAutoSummary=" + mAutoSummary);
+	}
+
+	private void requireThemedContextAndInflater()
+	{
+		if(mThemedInflater == null || mThemedContext == null)
+		{
+			synchronized(this)
+			{
+				if(mThemedContext == null)
+				{
+					final int themeResId = getDialogThemeResId();
+					if(themeResId != 0)
+						mThemedContext = new ContextThemeWrapper(getContext(), themeResId);
+					else
+						mThemedContext = getContext();
+				}
+
+				if(mThemedInflater == null)
+					mThemedInflater = LayoutInflater.from(mThemedContext);
+			}
+		}
 	}
 
 	private final OnDismissListener mDismissListener = new OnDismissListener() {
