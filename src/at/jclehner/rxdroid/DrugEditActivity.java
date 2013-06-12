@@ -91,6 +91,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 	//public static final String EXTRA_DRUG = "drug";
 	public static final String EXTRA_DRUG_ID = "drug_id";
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
+	public static final String EXTRA_DISALLOW_DELETE = "disallow_delete";
 
 	private static final int MENU_DELETE = 0;
 
@@ -246,7 +247,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		if(mIsEditing)
+		if(mIsEditing && !getIntent().getBooleanExtra(EXTRA_DISALLOW_DELETE, false))
 		{
 			MenuItem item = menu.add(0, MENU_DELETE, 0, R.string._title_delete)
 					.setIcon(R.drawable.ic_action_delete_white);

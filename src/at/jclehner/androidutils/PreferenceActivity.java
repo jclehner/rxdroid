@@ -1,7 +1,6 @@
 package at.jclehner.androidutils;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.os.Handler;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.util.Log;
-import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.Menu;
@@ -24,6 +22,7 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 
 	private static final String EXTRA_PREFERENCE_SCREEN_KEY =
 			PreferenceActivity.class.getName() + ".EXTRA_PREFERENCE_SCREEN_KEY";
+
 	private static final String EXTRA_PREFERENCES_RES_ID =
 			PreferenceActivity.class.getName() + ".EXTRA_PREFERENCES_RES_ID";
 
@@ -34,7 +33,7 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 	private boolean mIgnoreNextSetPreferenceScreenCall = false;
 	private PreferenceScreen mLastIgnoredPreferenceScreen = null;
 
-	private Handler mHandler;
+	private final Handler mHandler = new Handler();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -44,24 +43,21 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 
 		super.onCreate(savedInstanceState);
 
-		mHandler = new Handler(getMainLooper());
-
 		final Intent intent = getIntent();
-		if(intent != null)
+		final int resId = intent.getIntExtra(EXTRA_PREFERENCES_RES_ID, 0);
+		final String key = intent.getStringExtra(EXTRA_PREFERENCE_SCREEN_KEY);
+
+		if(key != null && resId != 0)
 		{
-			final String key = intent.getStringExtra(EXTRA_PREFERENCE_SCREEN_KEY);
-			final int resId = intent.getIntExtra(EXTRA_PREFERENCES_RES_ID, 0);
+			// even though there is no difference visually, it seems that skipping
+			// the first call to setPreferenceScreen() makes the process of switching
+			// a little faster
+			mIgnoreNextSetPreferenceScreenCall = true;
+			addPreferencesFromResource(resId);
+			final PreferenceScreen ps = (PreferenceScreen) mLastIgnoredPreferenceScreen.findPreference(key);
 
-			if(key != null && resId != 0)
-			{
-				mIgnoreNextSetPreferenceScreenCall = true;
-				addPreferencesFromResource(resId);
-				final PreferenceScreen ps = (PreferenceScreen)
-						mLastIgnoredPreferenceScreen.findPreference(key);
-
-				setPreferenceScreen(ps);
-				mIsRootPreferenceScreen = false;
-			}
+			setPreferenceScreen(ps);
+			mIsRootPreferenceScreen = false;
 		}
 
 		if(mIsRootPreferenceScreen && mEnqueuedPreferencesResId != 0)
@@ -123,7 +119,6 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 						intent.setAction(Intent.ACTION_MAIN);
 						intent.putExtra(EXTRA_PREFERENCES_RES_ID, mEnqueuedPreferencesResId);
 						intent.putExtra(EXTRA_PREFERENCE_SCREEN_KEY, key);
-						//intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
 						if(true)
 						{
@@ -144,18 +139,15 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 
 						super.onPreferenceTreeClick(preferenceScreen, preference);
 
-						final Dialog dialog = ((PreferenceScreen) preference).getDialog();
-						if(dialog != null)
+						try
 						{
-							try
-							{
-								dialog.getWindow().getDecorView().setBackgroundDrawable(this.getWindow()
-										.getDecorView().getBackground().getConstantState().newDrawable());
-							}
-							catch(Exception e)
-							{
-								Log.w(TAG, e);
-							}
+							final Dialog dialog = ((PreferenceScreen) preference).getDialog();
+							dialog.getWindow().getDecorView().setBackgroundDrawable(this.getWindow()
+									.getDecorView().getBackground().getConstantState().newDrawable());
+						}
+						catch(NullPointerException e)
+						{
+							Log.w(TAG, e);
 						}
 
 						return false;

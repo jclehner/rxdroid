@@ -147,7 +147,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		else if(date == null)
 			date = Settings.getOldestPossibleHistoryDate(mToday);
 
-		final Date lastScheduleUpdateDate = drug.getLastAutoDoseEventCreationDate();
+		final Date lastScheduleUpdateDate = drug.getLastScheduleUpdateDate();
 
 		if(date == null)
 		{

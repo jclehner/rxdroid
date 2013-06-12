@@ -96,7 +96,6 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 	private static final boolean DEBUG_DATE_MISMATCH = true;
 
-	private static final int CMENU_TOGGLE_INTAKE = 0;
 	private static final int CMENU_TAKE_DOSE = 1;
 	private static final int CMENU_REMOVE_DOSE = 0;
 	private static final int CMENU_EDIT_DRUG = 2;
@@ -555,7 +554,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		setDate(cal.getTime(), PAGER_INIT | PAGER_SCROLL);
 	}
 
-	public void onLowSupplyIndicatorClicked(View view)
+	public void onSupplyMonitorClick(View view)
 	{
 		final Drug drug = ((DrugSupplyMonitor) view).getDrug();
 		if(drug == null)

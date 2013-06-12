@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import android.util.Log;
 import at.jclehner.androidutils.LazyValue;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.Fraction;
@@ -476,7 +477,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		if(currentSupply == null)
 			this.currentSupply = Fraction.ZERO;
 		else if(currentSupply.isNegative())
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(currentSupply.toString());
 
 		this.currentSupply = currentSupply;
 	}

@@ -404,6 +404,11 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 		return new Fraction(wholeNum, numerator, denominator);
 	}
 
+	public static Fraction nullAsZero(Fraction f) {
+		return f == null ? Fraction.ZERO : f;
+	}
+
+
 	public static void setDisplayMixedNumbers(boolean displayMixedNumbers) {
 		sDisplayMixedNumbers = displayMixedNumbers;
 	}
