@@ -118,7 +118,7 @@
 	<string name="_title_change_dose">Dosis bearbeiten</string>
 	<string name="_title_edit_drug">Medikament bearbeiten</string>
 	<string name="_title_mark_not_taken">Einnahme löschen</string>
-	<string name="_title_mark_taken">Dosis eingenommen</string>
+	<string name="_title_mark_taken">Dosis einnehmen</string>
 	
 	<string name="_msg_freq_every_n_days">Alle %1$s Tage, beginnend am %2$s</string>
 	
