@@ -100,8 +100,8 @@
         <item name="iconOverflow">@drawable/ic_menu_overflow_white</item>
         <item name="iconList">@drawable/ic_list_white</item>
         
-        <item name="actionIconExpandAll">@drawable/ic_menu_expand_all_black</item>
-        <item name="actionIconCollapseAll">@drawable/ic_menu_collapse_all_black</item>
+       <item name="actionIconExpandAll">@drawable/ic_action_expand_all</item>
+		<item name="actionIconCollapseAll">@drawable/ic_action_collapse_all</item>
         
         <item name="dividerColor">@color/list_divider_dark</item>
         
