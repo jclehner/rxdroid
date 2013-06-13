@@ -221,10 +221,13 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		MenuItem item = menu.add(0, MENU_RESTORE_DEFAULTS, 0, R.string._title_factory_reset)
-				.setIcon(R.drawable.ic_action_undo);
+		if(BuildConfig.DEBUG && false)
+		{
+			MenuItem item = menu.add(0, MENU_RESTORE_DEFAULTS, 0, R.string._title_factory_reset)
+					.setIcon(R.drawable.ic_action_undo);
 
-		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		}
 
 		return super.onCreateOptionsMenu(menu);
 	}

@@ -1,3 +1,6 @@
+0.9.15.2:
+	* Black theme is back
+
 0.9.15.1:
 	* Unified theme - ActionBarSherlock is used for Android < 3.0
 	* Added option to skip dose dialog
