@@ -52,6 +52,10 @@
 		android:title="@string/_title_prefscreen_display"
 		android:icon="?attr/iconPicture"
 	>
+		<CheckBoxPreference android:key="@string/key_theme_is_dark"
+	        android:title="@string/_title_dark_theme" 
+	        android:defaultValue="false"
+	    />
 		
 		<CheckBoxPreference android:key="@string/key_enable_landscape_mode"
 		    android:title="@string/_title_enable_landscape_mode"

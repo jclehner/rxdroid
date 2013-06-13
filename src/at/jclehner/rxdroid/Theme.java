@@ -28,6 +28,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.Log;
 import android.util.SparseIntArray;
+import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.util.Timer;
 
 public final class Theme
@@ -37,14 +38,15 @@ public final class Theme
 
 	private static final SparseIntArray sAttrCache = new SparseIntArray();
 
-	@Deprecated
+	private static final int LIGHT = R.style.Theme_RxDroid;
+	private static final int DARK = R.style.Theme_RxDroid_Dark;
+
 	public static boolean isDark() {
-		return false;
+		return Settings.getBoolean(Keys.THEME_IS_DARK, false);
 	}
 
-	@Deprecated
 	public static int get() {
-		return R.style.Theme_RxDroid;
+		return isDark() ? DARK : LIGHT;
 	}
 
 	public static int getResourceAttribute(int attr)

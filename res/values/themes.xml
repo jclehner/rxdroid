@@ -68,6 +68,46 @@
 			
 	</style>
 	
+	<style name="Theme.RxDroid.Dark" parent="@style/Theme.Sherlock">
+		<item name="drugIconTablet">@drawable/ic_drug_tablet_white</item>
+		<item name="drugIconTube">@drawable/ic_drug_tube_white</item>
+        <item name="drugIconGlass">@drawable/ic_drug_glass_white</item>
+        <item name="drugIconSyringe">@drawable/ic_drug_syringe_white</item>
+        <item name="drugIconRing">@drawable/ic_drug_ring_white</item>
+        
+        <item name="doseStatusTaken">@drawable/ic_dose_taken</item>
+        <item name="doseStatusMissed">@drawable/ic_dose_forgotten</item>
+        <item name="doseStatusIgnored">@drawable/ic_dose_ignored</item>
+        
+        <item name="textColorClickable">@color/white_clickable</item>
+        
+        <item name="colorStatusMissed">#ad3030</item>
+        <item name="colorStatusSkipped">#ff6600</item>
+        <item name="colorStatusTaken">#536800</item>
+        
+        <item name="bgColorLogGroup">@android:color/transparent</item>
+        <item name="bgColorLogChild">#111</item>
+        
+        <item name="iconLowSupplies">@drawable/ic_low_supply_warning_white</item>
+        <item name="iconMissedDose">@drawable/ic_warning_white</item>
+        <item name="iconArrowRight">@drawable/ic_arrow_right_white</item>
+        <item name="iconLock">@drawable/ic_menu_lock_white</item>
+        <item name="iconTime">@drawable/ic_menu_time_white</item>
+        <item name="iconPicture">@drawable/ic_menu_picture_white</item>
+        <item name="iconInfo">@drawable/ic_menu_info_white</item>
+        <item name="iconWarning">@drawable/ic_menu_warning_white</item>
+        <item name="iconStorage">@drawable/ic_menu_storage_white</item>
+        <item name="iconOverflow">@drawable/ic_menu_overflow_white</item>
+        <item name="iconList">@drawable/ic_list_white</item>
+        
+        <item name="actionIconExpandAll">@drawable/ic_menu_expand_all_black</item>
+        <item name="actionIconCollapseAll">@drawable/ic_menu_collapse_all_black</item>
+        
+        <item name="dividerColor">@color/list_divider_dark</item>
+        
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+	
 	<style name="Theme.RxDroid.NoAnimation" parent="@style/Theme.RxDroid">
 		<item name="android:windowAnimationStyle">@null</item>		
 	</style>
