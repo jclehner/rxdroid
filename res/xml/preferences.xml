@@ -70,16 +70,17 @@
 			android:defaultValue="@bool/pref_default_compact_action_bar"
 			android:enabled="@bool/pref_visibility_compact_action_bar"
 		/>
-		
-		<CheckBoxPreference android:key="@string/key_skip_dose_dialog"
-		    android:title="@string/_title_skip_dose_dialog"
-		    android:summary="@string/_summary_skip_dose_dialog"
-		    android:defaultValue="false"
-		/>
 	     
 	    <PreferenceCategory 
 	    	android:title="@string/_title_show_in_list" 
-	    >
+	    >    
+		
+			<CheckBoxPreference android:key="@string/key_skip_dose_dialog"
+			    android:title="@string/_title_skip_dose_dialog"
+			    android:summary="@string/_summary_skip_dose_dialog"
+			    android:defaultValue="false"
+			/>
+	        
 	    
 	        <CheckBoxPreference android:key="@string/key_show_supply_monitors"
 	            android:title="@string/_title_show_supply_monitors"
