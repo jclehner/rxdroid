@@ -23,5 +23,5 @@
 -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android" >
-	<item android:drawable="@drawable/ic_menu_new" />
+	<item android:drawable="@android:drawable/ic_menu_add" />
 </selector>
