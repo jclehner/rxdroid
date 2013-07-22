@@ -52,10 +52,18 @@ public class DrugSupplyEditFragment extends DialogFragment
 				btn.setOnClickListener(new View.OnClickListener() {
 
 					@Override
-					public void onClick(View v)
+					public void onClick(final View v)
 					{
 						setValue(getValue().plus(refillSize));
 						v.setEnabled(false);
+						v.postDelayed(new Runnable() {
+
+							@Override
+							public void run()
+							{
+								v.setEnabled(true);
+							}
+						}, 500);
 					}
 				});
 			}
