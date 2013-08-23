@@ -70,6 +70,11 @@ public class Patient extends Entry implements Comparable<Patient>
 	}
 
 	@Override
+	public String toString() {
+		return isDefaultPatient() ? "(default)" : name;
+	}
+
+	@Override
 	public int compareTo(Patient another) {
 		return name.compareTo(another.name);
 	}

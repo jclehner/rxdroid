@@ -293,7 +293,8 @@ public final class Util
 		final StringBuilder sb = new StringBuilder();
 		sb.append("dumpObjectMembers: (" + clazz.getSimpleName() + ") " + name + "\n");
 
-		for(Field f : clazz.getDeclaredFields())
+		//for(Field f : clazz.getDeclaredFields())
+		for(Field f : Reflect.getAllFields(clazz))
 		{
 			int m = f.getModifiers();
 

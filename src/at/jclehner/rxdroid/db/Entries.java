@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid.db;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -34,11 +35,20 @@ import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
+import at.jclehner.rxdroid.util.WrappedCheckedException;
+
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 
 public final class Entries
 {
 	@SuppressWarnings("unused")
 	private static final String TAG = Entries.class.getSimpleName();
+
+	private static final Dao<DoseEvent, Integer> sDoseEventDao =
+		Database.USE_CUSTOM_CACHE ? null : Database.getHelper().getDaoChecked(DoseEvent.class);
 
 	private static final String[] TIME_NAMES = {
 		"MORNING", "NOON", "EVENING", "NIGHT"
@@ -192,15 +202,41 @@ public final class Entries
 	 */
 	public static List<DoseEvent> findDoseEvents(Drug drug, Date date, Integer doseTime)
 	{
-		final List<DoseEvent> events = new LinkedList<DoseEvent>();
-
-		for(DoseEvent intake : Database.getCached(DoseEvent.class))
+		if(Database.USE_CUSTOM_CACHE)
 		{
-			if(DoseEvent.has(intake, drug, date, doseTime))
-				events.add(intake);
-		}
+			final List<DoseEvent> events = new LinkedList<DoseEvent>();
 
-		return events;
+			for(DoseEvent intake : Database.getCached(DoseEvent.class))
+			{
+				if(DoseEvent.has(intake, drug, date, doseTime))
+					events.add(intake);
+			}
+
+			return events;
+		}
+		else
+		{
+			try
+			{
+				final QueryBuilder<DoseEvent, Integer> qb = sDoseEventDao.queryBuilder();
+				final Where<DoseEvent, Integer> where = qb.where();
+
+				if(drug != null)
+					where.eq("drug_id", drug.id).and();
+
+				if(date != null)
+					where.eq("date", date).and();
+
+				if(doseTime != null)
+					where.eq("doseTime", doseTime);
+
+				return sDoseEventDao.query(qb.prepare());
+			}
+			catch(SQLException e)
+			{
+				throw new WrappedCheckedException(e);
+			}
+		}
 	}
 
 	public static int countDoseEvents(Drug drug, Date date, Integer doseTime) {

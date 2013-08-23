@@ -34,6 +34,21 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
+/*
+ * begin - end
+ * repetition mode
+ * pause
+ * as needed?
+ *
+ *
+ *
+ */
+
+
+
+
+
+
 /**
  * Handles advanced dose schedules.
  *
@@ -116,7 +131,6 @@ public final class Schedule extends Entry
 	public void setOwner(Drug owner) {
 		this.owner = owner;
 	}
-
 
 	public boolean hasDoseOnDate(Date date)
 	{
@@ -209,6 +223,14 @@ public final class Schedule extends Entry
 		}
 
 		return true;
+	}
+
+	public void setRepeatMode(int repeatMode) {
+		this.repeatMode = repeatMode;
+	}
+
+	public void setRepeatArg(int repeatArg) {
+		this.repeatArg = repeatArg;
 	}
 
 	@Override

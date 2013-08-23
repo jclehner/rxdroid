@@ -228,8 +228,12 @@
 		
 		<EditTextPreference android:key="doseview_zero"
 		    android:title="DoseView zero"
-		    android:defaultValue="0"
-		/>    
+		    android:defaultValue="-"
+		/>   
+		
+		<Preference android:key="db_create_drug_with_many_dose_events"
+		    android:title="Create drug with many dose events"
+		/>
 		    		
 		<Preference
 		    android:title="Advanced schedule"

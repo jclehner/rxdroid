@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
@@ -55,6 +56,7 @@ import android.widget.Toast;
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.CollectionUtils;
@@ -509,6 +511,35 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					Database.create(drug);
 					schedule.setOwner(drug);
 					Database.create(schedule);
+
+					return true;
+				}
+			});
+		}
+
+		p = findPreference("db_create_drug_with_many_dose_events");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					Fraction dose = new Fraction(1, 2);
+
+					Drug drug = new Drug();
+					drug.setName("Megabite");
+					drug.setDose(Schedule.TIME_MORNING, dose);
+					drug.setRefillSize(30);
+					drug.setCurrentSupply(new Fraction(23, 1, 2));
+
+					Database.create(drug);
+
+					for(int i = 0; i != 100; ++i)
+					{
+						Date date = DateTime.add(DateTime.today(), Calendar.DAY_OF_MONTH, -i);
+						Database.create(new DoseEvent(drug, date, Schedule.TIME_MORNING, dose), Database.FLAG_DONT_NOTIFY_LISTENERS);
+					}
 
 					return true;
 				}
