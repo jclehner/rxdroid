@@ -134,6 +134,11 @@ public abstract class PreferenceActivityBase extends PreferenceActivity
 		return super.onPreferenceTreeClick(ps, p);
     }*/
 
+	@Override
+	protected boolean shouldShowIndeterminateProgressOnScreenChange() {
+		return true;
+	}
+
 	protected abstract Intent getHomeButtonIntent();
 
 	protected boolean isHomeButtonEnabled() {

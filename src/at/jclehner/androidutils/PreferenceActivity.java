@@ -39,7 +39,10 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		if(shouldShowIndeterminateProgressOnScreenChange())
+		{
 			requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+			setSupportProgressBarIndeterminateVisibility(false);
+		}
 
 		super.onCreate(savedInstanceState);
 
