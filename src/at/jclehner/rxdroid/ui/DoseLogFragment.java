@@ -33,7 +33,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -51,12 +50,20 @@ import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
+import at.jclehner.rxdroid.ui.ExpandableListFragment.OnGroupCollapseExpandListener;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Timer;
 import at.jclehner.rxdroid.util.Util;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+
 public class DoseLogFragment extends ExpandableListFragment
+		implements OnGroupCollapseExpandListener
 {
 	private static final String TAG = DoseLogFragment.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
@@ -68,17 +75,20 @@ public class DoseLogFragment extends ExpandableListFragment
 		R.string._title_night_dose
 	};
 
-	private List<List<EventInfo>> mGroupedEvents = Collections.emptyList();
-
-	private Date mToday;
+	private static final int MENU_COLLAPSE_EXPAND = 0;
 
 	public static final int SHOW_MISSED = 1;
 	public static final int SHOW_TAKEN = 1 << 1;
 	public static final int SHOW_SKIPPED = 1 << 2;
 
+	private List<List<EventInfo>> mGroupedEvents = Collections.emptyList();
+	private Date mToday;
+	private int mCollapsedCount = 0;
+
 	public static DoseLogFragment newInstance(Drug drug, int flags)
 	{
 		DoseLogFragment f = new DoseLogFragment();
+		f.setHasOptionsMenu(true);
 		f.setArguments(Util.createBundle("drug_id", drug.getId(), "flags", flags));
 		return f;
 	}
@@ -89,9 +99,9 @@ public class DoseLogFragment extends ExpandableListFragment
 		super.onCreate(savedInstanceState);
 
 		mToday = DateTime.today();
-		gatherEventInfos(getArguments().getInt("flags"));
-		setListAdapter(new Adapter());
+		setOnGroupCollapseExpandListener(this);
 		setEmptyViewText(R.string._msg_no_history_data);
+		updateListView(getArguments().getInt("flags"));
 	}
 
 	@Override
@@ -108,6 +118,91 @@ public class DoseLogFragment extends ExpandableListFragment
 		intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 		startActivity(intent);
 		return true;
+	}
+
+	@Override
+	public void collapseAll()
+	{
+		super.collapseAll();
+		mCollapsedCount = mGroupedEvents.size();
+	}
+
+	@Override
+	public void expandAll(boolean animate)
+	{
+		super.expandAll(animate);
+		mCollapsedCount = 0;
+	}
+
+	@Override
+	public void onGroupCollapse(int groupPosition)
+	{
+		if(!isAllCollapsed())
+		{
+			if(++mCollapsedCount == mGroupedEvents.size())
+				invalidateOptionsMenu();
+		}
+	}
+
+	@Override
+	public void onGroupExpand(int groupPosition)
+	{
+		if(mCollapsedCount != 0)
+		{
+			if(--mCollapsedCount == 0)
+				invalidateOptionsMenu();
+		}
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+	{
+		final int iconAttr = isAllCollapsed() ? R.attr.actionIconExpandAll : R.attr.actionIconCollapseAll;
+		final int titleResId = isAllCollapsed() ? R.string._title_expand : R.string._title_collapse;
+
+		MenuItem item = menu.add(0, MENU_COLLAPSE_EXPAND, 0, titleResId)
+		.setIcon(Theme.getResourceAttribute(iconAttr))
+		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			@Override
+			public boolean onMenuItemClick(MenuItem item)
+			{
+				if(isAllCollapsed())
+					expandAll(true);
+				else
+					collapseAll();
+
+				Settings.putBoolean(Keys.LOG_IS_ALL_COLLAPSED, !isAllCollapsed());
+				//invalidateOptionsMenu();
+
+				return true;
+			}
+		});
+
+		item.setVisible(!getListAdapter().isEmpty());
+		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+		super.onCreateOptionsMenu(menu, inflater);
+	}
+
+	private void invalidateOptionsMenu() {
+		((SherlockFragmentActivity) getActivity()).invalidateOptionsMenu();
+	}
+
+	private boolean isAllCollapsed() {
+		return mCollapsedCount == getListAdapter().getGroupCount();
+	}
+
+	private void updateListView(int flags)
+	{
+		getArguments().putInt("flags", flags);
+		gatherEventInfos(flags);
+		setListAdapter(new Adapter());
+
+		if(!Settings.getBoolean(Keys.LOG_IS_ALL_COLLAPSED, true))
+			expandAll(false);
+		else
+			mCollapsedCount = getListAdapter().getGroupCount();
 	}
 
 	private Drug getDrug() {

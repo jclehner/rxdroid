@@ -105,11 +105,7 @@ public class DoseHistoryActivity extends SherlockFragmentActivity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		final boolean isAllCollapsed = Settings.getBoolean(Keys.LOG_IS_ALL_COLLAPSED, true);
-
-		MenuItem item;
-
-		item = menu.add(0, MENU_VIEW, 0, R.string._title_view)
+		MenuItem item = menu.add(0, MENU_VIEW, 0, R.string._title_view)
 				.setIcon(R.drawable.ic_action_eye_white)
 				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
@@ -123,42 +119,6 @@ public class DoseHistoryActivity extends SherlockFragmentActivity
 				});
 
 		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		final int iconAttr = isAllCollapsed ? R.attr.actionIconExpandAll : R.attr.actionIconCollapseAll;
-		final int titleResId = isAllCollapsed ? R.string._title_expand : R.string._title_collapse;
-
-		item = menu.add(0, MENU_COLLAPSE_EXPAND, 0, titleResId)
-				.setIcon(Theme.getResourceAttribute(iconAttr))
-				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-					@Override
-					public boolean onMenuItemClick(MenuItem item)
-					{
-						FragmentManager fm = getSupportFragmentManager();
-
-						ExpandableListFragment f = (ExpandableListFragment) fm.findFragmentByTag("log");
-						if(f != null)
-						{
-							if(isAllCollapsed)
-								f.expandAll(true);
-							else
-								f.collapseAll();
-
-							Settings.putBoolean(Keys.LOG_IS_ALL_COLLAPSED, !isAllCollapsed);
-
-							supportInvalidateOptionsMenu();
-						}
-
-						return true;
-					}
-				});
-
-		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		final FragmentManager fm = getSupportFragmentManager();
-		final DoseLogFragment f = (DoseLogFragment) fm.findFragmentByTag("log");
-		if(f != null)
-			item.setVisible(!f.isListEmpty());
 
 		return super.onCreateOptionsMenu(menu);
 	}
