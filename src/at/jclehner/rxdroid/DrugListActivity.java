@@ -312,7 +312,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 						{
 							final Fraction currentSupply = drug.getCurrentSupply();
 
-							if(!currentSupply.isZero() && drug.getRefillSize() != 0)
+							if(!currentSupply.isZero())
 							{
 								final Fraction newSupply = currentSupply.minus(dose);
 

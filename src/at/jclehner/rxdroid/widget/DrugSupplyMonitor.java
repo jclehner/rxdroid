@@ -27,17 +27,19 @@ import java.util.Date;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.db.Database;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
-import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
@@ -142,23 +144,37 @@ public class DrugSupplyMonitor extends TextView implements
 
 	private void updateText(Drug drug, Date date)
 	{
-		if(drug == null)
-			return;
+		int typeface = Typeface.NORMAL;
+		float textScaleX = 1.0f;
 
-		final Date today = DateTime.today();
-		MutableFraction currentSupply = drug.getCurrentSupply().mutate();
-
-		if(date != null && date.after(today))
+		if(drug != null)
 		{
-			//Fraction doseInTimePeriod_smart = Entries.getTotalDoseInTimePeriod_smart(drug, today, date);
-			Fraction doseInTimePeriod_dumb = Entries.getTotalDoseInTimePeriod_dumb(drug, today, date, true);
-			currentSupply.subtract(doseInTimePeriod_dumb);
+			final Date today = DateTime.today();
+			MutableFraction currentSupply = drug.getCurrentSupply().mutate();
+
+			if(date != null)
+			{
+				if(date.after(today))
+				{
+					//Fraction doseInTimePeriod_smart = Entries.getTotalDoseInTimePeriod_smart(drug, today, date);
+					Fraction doseInTimePeriod_dumb = Entries.getTotalDoseInTimePeriod_dumb(drug, today, date, true);
+					currentSupply.subtract(doseInTimePeriod_dumb);
+				}
+				else if(date.equals(today) && Entries.hasLowSupplies(drug))
+				{
+					typeface = Typeface.BOLD_ITALIC;
+					textScaleX = 1.25f;
+				}
+			}
+
+			if(!currentSupply.isNegative())
+				setText(currentSupply.toString());
+			else
+				setText("0");
 		}
 
-		if(!currentSupply.isNegative())
-			setText(currentSupply.toString());
-		else
-			setText("0");
+		setTypeface(null, typeface);
+		setTextScaleX(textScaleX);
 	}
 
 	private void handleAttributes(AttributeSet attrs)

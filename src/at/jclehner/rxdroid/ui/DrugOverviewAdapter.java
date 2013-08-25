@@ -119,11 +119,6 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			if(Entries.hasMissingDosesBeforeDate(drug, mAdapterDate))
 				isMissingDoseIndicatorVisible = true;
 
-			if(Entries.hasLowSupplies(drug))
-				holder.currentSupply.setTypeface(null, Typeface.BOLD_ITALIC);
-			else
-				holder.currentSupply.setTextAppearance(mActivity, android.R.style.TextAppearance_Small);
-
 			isCurrentSupplyVisible = drug.getRefillSize() != 0 || !drug.getCurrentSupply().isZero();
 		}
 		else
