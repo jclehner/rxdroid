@@ -1,3 +1,7 @@
+0.9.16.1:
+	* Doses of inactive drugs are no longer marked as taken when 
+	  using the "take all" button.
+
 0.9.16:
 	* Bug fixes
 

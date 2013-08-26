@@ -297,6 +297,9 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 					for(Drug drug : drugs)
 					{
+						if(!drug.isActive())
+							continue;
+
 						if(!Entries.findDoseEvents(drug, activeDate, activeDoseTime).isEmpty())
 							continue;
 
