@@ -33,9 +33,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.text.Html;
 import android.text.Spannable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -124,6 +126,24 @@ public final class Util
 	public static int getDoseTimeDrawableFromDoseTime(int doseTime)
 	{
 		return getDoseTimeDrawableFromDoseViewId(Constants.getDoseViewId(doseTime));
+	}
+
+	public static String escapeHtml(CharSequence str)
+	{
+		if(Build.VERSION.SDK_INT >= 16)
+			return Html.escapeHtml(str);
+
+		// yes, this function is extremely stupid, but it suffices
+		// for our purposes
+
+		final StringBuilder sb = new StringBuilder(str.length());
+		for(int i = 0; i != str.length(); ++i)
+		{
+			final int cp = Character.codePointAt(str, i);
+			sb.append("&#x" + Integer.toHexString(cp));
+		}
+
+		return sb.toString();
 	}
 
 	public static int getDoseTimeFromDoseViewId(int doseViewId)
@@ -271,7 +291,7 @@ public final class Util
 		return sb.toString();
 	}
 
-	public static boolean isAsciiLetter(char c)
+	public static boolean isAsciiLetter(int c)
 	{
 		if(c >= 97 /* a */)
 			return c <= 'z';

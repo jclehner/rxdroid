@@ -258,6 +258,10 @@
 		    android:summary="@string/test_schedule"
 		/>
 		
+		<Preference android:key="key_debug_tablet_layout"
+		    android:title="Tablet layout"
+		/>		
+		
 		<CheckBoxPreference android:key="@string/key_compact_action_bar" 
 			android:title="Compact ActionBar"
 			android:defaultValue="@bool/pref_default_compact_action_bar"

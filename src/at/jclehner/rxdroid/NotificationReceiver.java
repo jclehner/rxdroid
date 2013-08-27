@@ -36,6 +36,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.InboxStyle;
+import android.text.Html;
 import android.util.Log;
 import at.jclehner.androidutils.EventDispatcher;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
@@ -289,7 +291,9 @@ public class NotificationReceiver extends BroadcastReceiver
 		int titleResId = R.string._title_notification_doses;
 		int icon = R.drawable.ic_stat_normal;
 
+
 		final StringBuilder sb = new StringBuilder();
+		final String[] lines = new String[2];
 
 		if(missedDoseCount != 0 || dueDoseCount != 0)
 		{
@@ -303,29 +307,33 @@ public class NotificationReceiver extends BroadcastReceiver
 
 				sb.append(RxDroid.getQuantityString(R.plurals._qmsg_missed, missedDoseCount));
 			}
+
+			lines[1] = "<b>" + getString(R.string._title_notification_doses) + "</b> " + Util.escapeHtml(sb.toString());
 		}
 
 		final boolean isShowingLowSupplyNotification;
 
 		if(lowSupplyDrugCount != 0)
 		{
+			final String msg;
+			final String first = drugsWithLowSupplies.get(0).getName();
+
 			icon = R.drawable.ic_stat_exclamation;
 			isShowingLowSupplyNotification = sb.length() == 0;
+			titleResId = R.string._title_notification_low_supplies;
+
+			if(lowSupplyDrugCount == 1)
+				msg = getString(R.string._qmsg_low_supply_single, first);
+			else
+			{
+				final String second = drugsWithLowSupplies.get(1).getName();
+				msg = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount - 1, first, second);
+			}
 
 			if(isShowingLowSupplyNotification)
-			{
-				titleResId = R.string._title_notification_low_supplies;
+				sb.append(msg);
 
-				final String first = drugsWithLowSupplies.get(0).getName();
-
-				if(lowSupplyDrugCount == 1)
-					sb.append(getString(R.string._qmsg_low_supply_single, first));
-				else
-				{
-					final String second = drugsWithLowSupplies.get(1).getName();
-					sb.append(RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount - 1, first, second));
-				}
-			}
+			lines[0] = "<b>" + getString(R.string._title_notification_low_supplies) + "</b> " + Util.escapeHtml(msg);
 		}
 		else
 			isShowingLowSupplyNotification = false;
@@ -346,6 +354,16 @@ public class NotificationReceiver extends BroadcastReceiver
 			return;
 		}
 
+		final InboxStyle inboxStyle = new InboxStyle();
+		inboxStyle.setBigContentTitle(getString(R.string.app_name) +
+				" (" + (dueDoseCount + missedDoseCount + lowSupplyDrugCount) + ")");
+
+		for(String line : lines)
+		{
+			if(line != null)
+				inboxStyle.addLine(Html.fromHtml(line));
+		}
+
 		final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
 		builder.setContentTitle(getString(titleResId));
 		builder.setContentIntent(createDrugListIntent(date));
@@ -356,6 +374,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setUsesChronometer(false);
 		builder.setWhen(0);
 		builder.setPriority(priority);
+		builder.setStyle(inboxStyle);
 
 //		final long offset;
 //
