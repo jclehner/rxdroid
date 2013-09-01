@@ -612,9 +612,9 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				@Override
 				public boolean onPreferenceClick(Preference preference)
 				{
-					Intent intent = new Intent(getApplicationContext(), LayoutTestActivity.class);
-					intent.putExtra(LayoutTestActivity.EXTRA_LAYOUT_RES_ID, R.layout.mockup_activity_druglist);
-					startActivity(intent);
+//					Intent intent = new Intent(getApplicationContext(), LayoutTestActivity.class);
+//					intent.putExtra(LayoutTestActivity.EXTRA_LAYOUT_RES_ID, R.layout.mockup_activity_druglist);
+//					startActivity(intent);
 					return true;
 				}
 			});
