@@ -281,7 +281,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		{
 			final Intent intent = new Intent(Intent.ACTION_SEND);
 			intent.setType("plain/text");
-			intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "joseph.c.lehner+rxdroid-feedback@gmail.com" });
+			intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "josephclehner+rxdroid-feedback@gmail.com" });
 			intent.putExtra(Intent.EXTRA_SUBJECT, "RxDroid");
 
 			try
