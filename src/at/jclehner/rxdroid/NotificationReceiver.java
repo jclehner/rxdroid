@@ -291,9 +291,10 @@ public class NotificationReceiver extends BroadcastReceiver
 		int titleResId = R.string._title_notification_doses;
 		int icon = R.drawable.ic_stat_normal;
 
-
 		final StringBuilder sb = new StringBuilder();
 		final String[] lines = new String[2];
+
+		int lineCount = 0;
 
 		if(missedDoseCount != 0 || dueDoseCount != 0)
 		{
@@ -361,7 +362,10 @@ public class NotificationReceiver extends BroadcastReceiver
 		for(String line : lines)
 		{
 			if(line != null)
+			{
 				inboxStyle.addLine(Html.fromHtml(line));
+				++lineCount;
+			}
 		}
 
 		final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
@@ -374,7 +378,9 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setUsesChronometer(false);
 		builder.setWhen(0);
 		builder.setPriority(priority);
-		builder.setStyle(inboxStyle);
+
+		if(lineCount > 1)
+			builder.setStyle(inboxStyle);
 
 //		final long offset;
 //
