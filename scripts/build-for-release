@@ -9,8 +9,11 @@ RXDROID_KEYSTORE="${RXDROID_KEYSTORE:-/___IDONTEXIST__}"
 RXDROID_KEY_ALIAS="${RXDROID_KEY_ALIAS:-}"
 RXDROID_APK_OUT="${RXDROID_APK_OUT:-${HOME}/RxDroid-release.apk}"
 
+RET=1
+
 cleanup() {
 	rm -rf "$TMP"
+	exit $RET
 }
 
 checkout() {
@@ -91,4 +94,5 @@ else
 fi
 
 build
+RET=0
 
