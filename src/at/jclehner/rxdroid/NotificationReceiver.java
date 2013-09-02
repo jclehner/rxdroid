@@ -36,6 +36,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.BigTextStyle;
 import android.support.v4.app.NotificationCompat.InboxStyle;
 import android.text.Html;
 import android.util.Log;
@@ -355,15 +356,21 @@ public class NotificationReceiver extends BroadcastReceiver
 			return;
 		}
 
-		final InboxStyle inboxStyle = new InboxStyle();
-		inboxStyle.setBigContentTitle(getString(R.string.app_name) +
-				" (" + (dueDoseCount + missedDoseCount + lowSupplyDrugCount) + ")");
+		final StringBuilder source = new StringBuilder();
+
+//		final InboxStyle inboxStyle = new InboxStyle();
+//		inboxStyle.setBigContentTitle(getString(R.string.app_name) +
+//				" (" + (dueDoseCount + missedDoseCount + lowSupplyDrugCount) + ")");
 
 		for(String line : lines)
 		{
 			if(line != null)
 			{
-				inboxStyle.addLine(Html.fromHtml(line));
+				if(lineCount != 0)
+					source.append("\n<br/>\n");
+
+				source.append(line);
+//				inboxStyle.addLine(Html.fromHtml(line));
 				++lineCount;
 			}
 		}
@@ -380,7 +387,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setPriority(priority);
 
 		if(lineCount > 1)
-			builder.setStyle(inboxStyle);
+		{
+			final BigTextStyle style = new BigTextStyle();
+			style.setBigContentTitle(getString(R.string.app_name));
+			style.bigText(Html.fromHtml(source.toString()));
+			builder.setStyle(style);
+		}
 
 //		final long offset;
 //
