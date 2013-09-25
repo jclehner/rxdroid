@@ -235,6 +235,9 @@ public class Drug extends Entry implements Comparable<Drug>
 			}
 		}
 
+		if(lastScheduleUpdateDate != null && date.before(lastScheduleUpdateDate))
+			return false;
+
 		switch(repeatMode)
 		{
 			case REPEAT_DAILY:
