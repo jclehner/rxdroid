@@ -345,7 +345,7 @@ public class TimePeriodPreference extends BaseAdvancedDialogPreference<TimePerio
 				if(mEnd.isLessThan(min) && mAllowEndWrap)
 					return null;
 
-				return mEnd;
+				return get1MinuteBefore(mEnd);
 			}
 		}
 		else
@@ -359,7 +359,7 @@ public class TimePeriodPreference extends BaseAdvancedDialogPreference<TimePerio
 				if(mBegin.isGreaterThan(max) && !mAllowEndWrap)
 					return null;
 
-				return mBegin;
+				return get1MinuteAfter(mBegin);
 			}
 			else
 				return max;
@@ -403,6 +403,30 @@ public class TimePeriodPreference extends BaseAdvancedDialogPreference<TimePerio
 			return null;
 
 		return DateTime.toNativeTime(time);
+	}
+
+	private static DumbTime get1MinuteAfter(DumbTime time)
+	{
+		if(time == null)
+			return null;
+
+		long millis = time.getMillisFromMidnight() + 60000;
+		if(millis >= Constants.MILLIS_PER_DAY)
+			millis -= Constants.MILLIS_PER_DAY;
+
+		return new DumbTime(millis);
+	}
+
+	private static DumbTime get1MinuteBefore(DumbTime time)
+	{
+		if(time == null)
+			return null;
+
+		long millis = time.getMillisFromMidnight() - 60000;
+		if(millis < 0)
+			millis += Constants.MILLIS_PER_DAY;
+
+		return new DumbTime(millis);
 	}
 
 	private final OnTimeChangedListener mTimeListener = new OnTimeChangedListener() {
