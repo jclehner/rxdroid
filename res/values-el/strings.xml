@@ -85,7 +85,7 @@
     <string name="_title_error">Σφάλμα</string>    
         
         <string name="_msg_timepreference_constraint_failed">Η ώρα δεν είναι μέσα στα συγκεκριμένα όρια</string>
-        <string name="_msg_err_empty_drug_name">Το φάρμακο δεν έχει όνομα, και δεν θα ληφθεί υπ' όψιν</string>
+        <string name="_msg_err_empty_drug_name">Το φάρμακο δεν έχει όνομα, και δεν θα ληφθεί υπ\' όψιν</string>
         <string name="_msg_err_non_unique_drug_name">Αυτό το όνομα χρησιμοποιείται ήδη</string>
     
     
@@ -371,22 +371,12 @@
         <string name="_toast_some_due_doses_skipped">Μερικές εκκρεμείς δόσεις δεν χαρακτηρίστηκαν ότι πάρθηκαν εξαιτίας ανεπαρκούς αποθέματος.</string>
         <string name="_toast_no_due_doses">Καμμία εκκρεμής δόση για τώρα.</string>
         
-        
-        <string translatable="false" name="test_schedule">
-            Δευ    0 - 0 - 0 - 1\n
-            Τρι    0 - 1 - 0 - 1\n
-            Τετ    0 - 0 - 0 - 1\n
-            Πεμ    0 - 0 - 0 - 1\n
-            Παρ    0 - 0 - 0 - 1\n
-            Σαβ    0 - 0 - 0 - 0\n
-            Κυρ    0 - 0 - 0 - 0\n  
-        </string>
                 
         <!-- 
     Keep at the end of strings.xml!  
      -->
     <string name="dialog_set_number">@string/_btn_set</string>
-    <string name="dialog_cancel">@android:string/ακύρωση</string>
+    <string name="dialog_cancel">@android:string/cancel</string>
     <string name="dialog_picker_title">Επιλέξτε έναν αριθμό</string>
     
 </resources>
