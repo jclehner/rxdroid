@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * RxDroid - A Medication Reminder
+ * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ *
+ *
+ * RxDroid is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * RxDroid is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
+-->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+    
+    <string name="translator">Skiadas George-John</string>
+       
+    <!-- 
+    Translatable strings start here. The naming scheme is as follows:
+    
+    _title_<foobar>             Titles for Dialogs, Preferences, Activities, etc. (as short as possible)
+    _summary_<foobar>   Preference summaries (w/o trailing dot*)
+    _toast_<foobar>             Message for Toast notifications (w/ trailing dot)
+    _btn_<foobar>               Button label. Should be as short as possible. (w/o trailing dot)
+    _msg_<foobar>               Everything that does not fit into the categories above (w/o trailing dot*) 
+    _help_<foobar>              Very long text for HelpActivity.
+    
+    If the first part is prefixed with a q (_qtitle_<foobar>, qmsg_<foobar>, etc.) the string is a
+    quantity-specific string. The first format argument (%1$d) will always be the quantity used for
+    selecting the string. 
+    
+    *) Use trailing dots if more than one sentence or if original text includes a trailing dot.
+    
+    -->
+    
+    <string name="_title_morning">Πρωί</string>
+    <string name="_title_noon">Μεσημέρι</string>
+    <string name="_title_evening">Απόγευμα</string>
+    <string name="_title_night">Βράδυ</string>
+     
+    <string name="_title_begin">Έναρξη</string>
+    <string name="_title_end">Λήξη</string>
+        
+    <string name="_msg_new_notification">Νέα ειδοποίηση</string>
+    
+    <plurals name="_qmsg_missed">
+        <item quantity="other">%1$d παραλήφθηκαν</item>
+    </plurals>
+    
+    <plurals name="_qmsg_due">
+        <item quantity="other">%1$d σε εκκρεμότητα</item>
+    </plurals>    
+    
+    <string name="_qmsg_low_supply_single">%1$s</string>        
+        
+        <plurals name="_qmsg_low_supply_multiple">
+        <item quantity="one">%2$s και %3$s</item>
+        <item quantity="other">%2$s και %1$d άλλα</item>       
+    </plurals>
+    
+        <string name="_msg_constraints_ab">Επιλογή ώρας μεταξύ %1$s και %2$s</string>
+        <string name="_msg_constraints_a">Επιλογή ώρας μετά τις %1$s</string>
+        <string name="_msg_constraints_b">Επιλογή ώρας πριν τις %2$s</string>
+        
+        <string name="_btn_set">Ορισμός</string>    
+    <string name="_title_drug_name">Όνομα φαρμάκου</string>
+    <string name="_title_delete">Διαγραφή</string>
+    
+    <string name="_msg_freq_daily">Ημερήσιο</string>
+
+        <string name="_toast_deleted">Διεγραμμένο.</string>
+          
+     
+    <string name="_title_error">Σφάλμα</string>    
+        
+        <string name="_msg_timepreference_constraint_failed">Η ώρα δεν είναι μέσα στα συγκεκριμένα όρια</string>
+        <string name="_msg_err_empty_drug_name">Το φάρμακο δεν έχει όνομα, και δεν θα ληφθεί υπ' όψιν</string>
+        <string name="_msg_err_non_unique_drug_name">Αυτό το όνομα χρησιμοποιείται ήδη</string>
+    
+    
+        <string name="_title_warning">Προειδοποίηση</string> 
+    
+    <string name="_title_preferences">Προτιμήσεις</string>
+        
+    <string name="_title_prefscreen_times">Ώρες</string>
+    <string name="_summary_prefscreen_times">Ορισμοί για πρωί, μεσημέρι, κλπ.</string>
+    
+    <string name="_title_prefscreen_notifications">Ειδοποιήσεις</string>
+    <string name="_summary_prefscreen_notifications">Μέθοδοι ειδοποιήσεων, χρόνος μεταξύ ειδοποιήσεων, κλπ.</string>
+    
+    <string name="_title_pref_notification_methods">Παραμετροποίηση</string>
+    
+    <string name="_title_min_supply_days">Υπενθύμιση συμπλήρωσης</string>
+    <string name="_summary_min_supply_days">Ελάχιστος αριθμός ημερών πριν την εμφάνιση ειδοποίησης για προμήθεια φαρμάκου – τρέχουσα τιμή %1$s</string>
+    
+    <string name="_title_pref_use_led">LED</string>
+    <string name="_title_pref_use_sound">Ήχος</string>
+    <string name="_title_pref_use_vibrator">Δόνηση</string>
+    
+    <string name="_title_prefscreen_display">Εμφάνιση</string>
+    <string name="_summary_prefscreen_display"></string>
+    
+    <string name="_title_pref_restore_defaults">Επαναφορά προεπιλογών</string>
+                
+        <string name="_title_prefscreen_display_info">Σημείωση</string>
+        <string name="_summary_prefscreen_display_info">Αυτές οι ρυθμίσεις μπορούν να παρακαμφθούν προσωρινά μέσω του MENU -&gt; Εμφάνιση όλων</string>         
+        
+        <string name="_btn_discard">Απόρριψη</string>
+        <string name="_btn_save">Αποθήκευση</string>
+        <string name="_toast_intake_noted">Σημειώθηκε.</string>
+        <string name="_toast_saved">Αποθηκεύτηκε.</string>
+        
+        <string name="_title_add">Προσθήκη</string>
+        
+        <string name="_msg_intake_normal">Πάρτε αυτή τη δόση του &lt;b&gt;%1$s&lt;/b&gt;</string>
+        <string name="_msg_intake_unscheduled">Καθορίστε μία δόση για το &lt;b&gt;%1$s&lt;/b&gt;</string>
+        <string name="_title_change_dose">Αλλαγή δόσης</string>
+        <string name="_title_edit_drug">Επεξεργασία φαρμάκου</string>
+        <string name="_title_mark_not_taken">Διαγραφή ληφθείσας δόσης</string>
+        <string name="_title_mark_taken">Πάρτε την δόση</string>
+        
+        <string name="_msg_freq_every_n_days">Κάθε %1$s ημέρες, ξεκινώντας στις %2$s</string>
+        <string name="_msg_freq_21days_on_7days_off">21 ημέρες ξεκινώντας στις %1$s, ακολουθούμενης απο μία 7 ημερη παύση</string>
+        
+        <string name="_summary_intake_never">Ποτέ</string>
+        <string name="_msg_drug_repeat_ge_2">Πρέπει να είναι μεγαλύτερο ή ίσο του 2</string>
+        <string name="_title_version">Έκδοση</string>
+        
+        <string name="_summary_not_available">N/A</string>
+        
+        <string name="_title_tablet">Δισκίο</string>
+        <string name="_title_injection">Σύριγγα</string>
+        <string name="_title_spray">Σπρέι</string>
+        <string name="_title_drop">Ποτήρι</string>
+        <string name="_title_gel">Σωληνάριο</string> 
+        <string name="_title_ring">Δακτύλιος</string>
+        <string name="_title_other">Άλλο</string>
+        
+        <string name="_title_daily">Ημερήσιο</string>
+        <string name="_title_every_n_days">Κάθε N ημέρες</string>
+        <string name="_title_pick_days">Επιλογή ημερών</string>
+        <string name="_title_21_days_on_7_days_off">7 ημέρες παύση κάθε 21 ημέρες</string>
+                
+        <string name="_msg_supply">%1$s – αρκεί μέχρι %2$s</string>
+        <string name="_title_save_chanes">Αποθήκευση αλλαγών</string>
+        <string name="_msg_save_drug_changes">Θέλετε να αποθηκεύσετε τις αλλαγές που έγιναν στο φάρμακο?</string>
+        <string name="_msg_every_n_days_distance">Ημέρες ανάμεσα στην κάθε επανάληψη</string>
+        
+        <string name="_title_intake_schedule">Πρόγραμμα</string>
+        <string name="_title_repeat">Επανάληψη</string>
+        <string name="_title_misc">Διάφορα</string>
+        <string name="_title_icon">Εικονίδιο</string>
+        <string name="_title_current_supply">Τρέχων απόθεμα</string>
+        <string name="_title_refill_size">Ποσότητα συμπλήρωσης</string>
+        <string name="_title_active">Ενεργό</string>
+        <string name="_title_ignore_dose">Παράλειψη δόσης</string>
+        
+    <string name="_msg_touch_to_edit">(αγγίξτε για επεξεργασία)</string>
+   
+    <string name="_msg_no_doses_on_this_day">Δεν υπάρχουν ποργραμματισμένες δόσεις σε αυτή την ημερομηνία</string>
+    
+    <string name="_msg_db_error_general">Άγνωστο σφάλμα βάσης δεδομένων.</string>
+        <string name="_msg_db_error_upgrade">Σφάλμα αναβάθμισης βάσης δεδομένων.</string>
+        <string name="_msg_db_error_downgrade">Ασύμβατη έκδοση βάσης δεδομένων.</string>
+                
+        <string name="_msg_db_error_footer">Πατήστε %1$s για επαναφορά της βάσης δεδομένων.</string>  
+        
+        <string name="_btn_reset">Επαναφορά</string>
+        
+        <string name="_msg_footer_insufficient_supplies">Ανεπαρκής ποσότητα για την δόση. 
+                Πατήστε %2$s για να το αγνοήσετε, άκυρο για επεξεργασία της δόσης, ή αγγίξτε το κείμενο για επεξεργασία &lt;b&gt;%3$s&lt;/b&gt;.</string>
+                
+        <string name="_title_weekdays">Ημέρες εβδομάδας</string>
+        
+        <string name="_title_on_demand">Όπως απαιτείται</string>
+        
+        <string name="_title_delete_drug">Σίγουρα διαγραφή του %1$s?</string>
+        <string name="_msg_delete_drug">Αυτό δεν μπορεί να αναιρεθεί!</string>
+        
+        <string name="_toast_db_reset_success">Επιτυχής επαναφορά της βάσης δεδομένων.</string>
+        <string name="_toast_db_reset_failure">Αποτυχία επαναφοράς της βάσης δεδομένων. Παρακαλώ κάνε επανεγκατάσταση.</string>
+        
+        <string name="_btn_exit">Έξοδος</string>
+        
+        <string name="_toast_drug_notification_icon">Αυτό το φάρμακο έχει τουλάχιστον μία παραληφθείσα δόση στο παρελθόν.</string> 
+        
+    <string name="_title_notification_doses">Δόσεις</string>
+        <string name="_title_notification_low_supplies">Χαμηλό απόθεμα</string>
+        
+        <string name="_btn_next">Επόμενο</string>
+        <string name="_btn_back">Πίσω</string>
+        
+        <string name="_title_scramble_names">Ανακάτεμα ονομάτων</string>
+        <string name="_summary_scramble_names">Ανακατεύει τα ονόματα των φαρμάκων. Για να δείτε το πραγματικό όνομα, πατήστε πάνω του.</string>
+        
+        <string name="_title_select_date">Επιλογή ημερομηνίας</string>
+        
+        <string name="_title_repetition_origin">Ημερομηνία έναρξης</string>
+        
+        <string name="_title_history_age">Μέγεθος ιστορικού</string>
+        <string name="_summary_history_age">Δεδομένα παλαιότερα του χρόνου που ορίστηκε θα διαγραφούν</string>
+        <string name="_title_history_1_month">Ένας Μήνας</string>
+        <string name="_title_history_2_months">Δύο Μήνες</string>
+        <string name="_title_history_6_months">Έξι Μήνες</string>
+        <string name="_title_history_1_year">Ένας χρόνος</string>
+        <string name="_title_history_unlimited">Απεριόριστα</string>      
+        
+        <string name="_title_database">Βάση δεδομένων</string>
+        
+        <string name="_toast_large_history_size">Προειδοποίηση: αυτή η ρύθμιση μπορεί να οδηγήσει σε πολύ αργούς χρόνους φορτώματος!</string>                    
+        
+        <string name="_title_supply_monitor">Μαρκάρισμα ότι πάρθηκε</string>
+        <string name="_summary_supply_monitor">Οι δόσεις θα μαρκαριστούν αυτόματα ότι πάρθηκαν. Οι ειδοποιήσεις θα εμφανίζονται
+                μόνο αν τα αποθέματα είναι χαμηλά.
+        </string>
+                
+        <string name="_title_go_to_date">Μετάβαση στην ημέρα</string>
+        <string name="_title_today">Σήμερα</string>
+        
+        
+        <string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
+        <string name="_msg_restore_default_settings">Αυτό θα επαναφέρει όλες τις ρυθμίσεις στις αρχικές τιμές</string>
+        
+        <string name="_title_show_supply_monitors">Εμφάνιση όλων</string>
+        <string name="_summary_show_supply_monitors">Εμφάνιση φαρμάκων με απενεργοποιημένες ειδοποιήσεις δόσεων</string>
+                
+        <string name="_title_show_in_list">Λίστα φαρμάκων</string>
+        
+        <string name="_title_help">Βοήθεια</string>
+        <string name="_title_n_of_n">%1$d από %2$d</string>
+                
+        <string name="_title_dark_theme">Χρήση σκοτεινού θέματος</string>
+        <string name="_toast_theme_changed">Επανέναρξη εφαρμογής…</string>
+        
+        <string name="_toast_low_supplies">Επαρκεί μέχρι τις %1$s.</string>
+        
+        <string name="_title_notification_sound">Ήχος</string>
+        
+        <string name="_title_doses_and_low_supplies">Όλα</string>
+        <string name="_title_low_supplies_only">Συμπλήρωση μόνο</string>
+        
+        <string name="_title_about">Περί</string>
+        <string name="_title_licenses">Άδειες</string>
+        
+        <string name="_title_db_status_loading">Φόρτωμα…</string>
+        <string name="_title_db_status_upgrading">Αναβάθμιση…</string>
+        <string name="_title_db_status_discarding_intakes">Απόρριψη παλαιών δεδομένων…</string>
+        <string name="_title_db_status_creating_intakes">Εισαγωγή δεδομένων που λείπουν…</string>
+        <string name="_title_db_status_initializing">Αρχικοποίηση…</string>
+        
+        <string name="_summary_enable_landscape_mode">Ενεργοπιεί την την ρύθμιση landscape (δοκιμαστικά)</string>
+        <string name="_title_enable_landscape_mode">Ρύθμιση landscape</string>
+        
+        <string name="_msg_repetition_origin">Επιλογή ημερομηνίας έναρξης</string>
+        
+        <string name="_title_filter">Φίλτρο</string>
+        <string name="_title_show_all">Εμφάνιση όλων</string>
+        
+        <string name="_title_donate">Δωρεά!</string>
+        
+        <string name="_title_factory_reset">Επαναφορά εργοστασιακών ρυθμίσεων</string>      
+        
+        <string name="_title_dont_repeat">Χωρίς επανάληψη</string>
+        <string name="_title_15_minutes">15 λεπτά</string>
+        <string name="_title_30_minutes">30 λεπτά</string>
+        <string name="_title_1_hour">1 ώρα</string>
+        <string name="_title_2_hour">2 ώρες</string>
+        
+        <string name="_title_repeat_alarm">Επανάληψη</string>
+        <string name="_summary_repeat_alarm">Επανάληψη ειδοποιήσεων μετά απο συγκεκριμένο χρόνο</string>
+                
+        <string name="_help_dose_times">Εκκινήσατε το RxDroid για πρώτη φορά. ΠΑρακαλώ ορίστε τα παρακάτω τέσσερα 
+                χρονικά διαστήματα, τα οποία θα χρησιμοποιηθούν αργότερα στον ορισμό του προγράμματος δόσεων.</string>
+        
+        <string name="_title_info">Πληροφορίες</string>
+        <string name="_toast_past_max_history_age">Η ημερομηνία είναι εκτός των ορίων της ιστορικότητας.</string>
+        <string name="_msg_drag_drop_sorting">Μπορείτε να αλλάξετε την σειρά εμφάνισης πατώντας
+            το εικονίδιο ενός φαρμάκου και μετακινώντας το στην επιθυμητή θέση.</string>
+        
+        <string name="_title_new_drug">Νέο φάρμακο</string>
+        
+        <string name="_title_db_stats">Στατιστικά</string>
+        <string name="_msg_db_stats">Η βάση δεδομένων φορτώθηκε σε %1$s. Μπορείτε να μειώσετε τον χρόνο 
+                μειώνοντας το μέγεθος του ιστορικού.</string>
+                
+        <string name="_title_compact_action_bar">Συμπτηγμένη μπάρα ενεργειών</string>
+        <string name="_summary_compact_action_bar">Εμφάνιση λιγότερων εικονιδίων στην μπάρα ενεργειών</string>
+        
+        <string name="_title_website">Website</string>
+        
+        <string name="_title_per_drug_reminders">Υπενθυμίσεις</string>
+        <string name="_title_me">Εγώ</string>
+        <string name="_title_patient">Ασθενής</string>
+        
+        <string name="_title_quiet_hours">Ώρες ησυχίας</string>
+        <string name="_summary_quiet_hours">Στην διάρκεια αυτής της περιόδου, οι ειδοποιήσεις δεν θα χρησιμοποιούν ήχο ή δόνηση</string>
+        
+        <string name="_title_silent">Σίγαση</string>
+        
+        <string name="_title_off">Εκτός λειτουργίας</string>
+        <string name="_title_default">Αρχική τιμή</string>
+        
+        <string name="_title_white">Λευκό</string>
+        <string name="_title_red">Κόκκινο</string>
+        <string name="_title_green">Πράσινο</string>
+        <string name="_title_blue">Μπλέ</string>
+        <string name="_title_yellow">Κίτρινο</string>
+        <string name="_title_orange">Πορτοκαλί</string>
+        <string name="_title_magenta">Φούξια</string>
+        
+        <string name="_toast_custom_led_color">Προειδοποίηση: η συσκευή σας μπορεί να μην υποστηρίζει όλα τα χρώματα.</string>
+                
+        <string name="_title_supply_edit">Προμήθεια: %1$s</string>
+        <string name="_title_x_to_y" tools:ignore="MissingTranslation">%1$s – %2$s</string>
+        
+        <string name="_title_disabled">Απενεργοποιημένο</string>        
+        
+    <string name="_msg_no_drugs_compact_ab">Επιλέξτε \"%1$s\" από το μενού για να προσθέσετε φάρμακο</string>
+    <string name="_msg_no_drugs_extended_ab">Πατήστε το κουμπί \"+\" στην μπάρα ενεργειών για να προσθέσετε ένα φάρμακο</string>
+    
+    <string name="_summary_smart_sort">Ταξινόμηση των φαρμάκων βάση της σημαντικότητας</string>
+        <string name="_title_smart_sort">Αυτόματη ταξινόμηση</string>
+        
+        <string name="_title_language">Γλώσσα</string>
+        
+        <string name="_title_use_backup_framework">Αντίγραφο ασφαλείας των δεδομένων</string>
+        <string name="_summary_use_backup_framework">Δημιουργείστε αντίγραφο ασφαλείας χρησιμοποιώντας υπηρεσίες όπως το Google\'s \"Backup &amp; Restore\".</string>
+        
+        <string name="_msg_swipe_to_change_date">Μπορείτε να αλλάξετε την ημέρα που εμφανίζεται πατώντας δεξιά ή αριστερά</string>
+        
+        <string name="_title_view">Εμφάνιση</string>
+        
+        <string name="_title_missed">Δεν πάρθηκαν</string>
+        <string name="_title_skipped">Παραλήφθηκαν</string>
+        <string name="_title_taken">Πάρθηκαν</string>      
+        
+        <string name="_title_morning_dose">Πρωινή δόση</string>        
+        <string name="_title_noon_dose">Μεσημεριανή δόση</string>
+        <string name="_title_evening_dose">Απογευματινή δόση</string>        
+        <string name="_title_night_dose">Βραδυνή δόση</string>
+        
+        <string name="_title_collapse">Άνοιγμα</string>
+        <string name="_title_expand">Εξάπλωση</string>
+        
+        <string name="_title_show_log">Εμφάνιση ημερολογίου</string>
+        
+        <string name="_msg_tap_to_view_date">(πατήστε για να δείτε την ημερομηνία)</string>
+        <string name="_msg_beta_version">Χρησιμοποιείτε μία έκδοση beta του %1$s. Είναι πιθανό να υπάρχουν λάθη και σκασίματα στο πρόγραμμα – παρακαλώ αναφέρετέ τα
+            για να βοηθήσετε να επιταχυνθει η ανάπτυξη της εφαρμογή.</string>
+            
+        <string name="_msg_no_history_data">Δεν υπάρχουν ιστορικά δεδομένα για κριτήρια που δόθηκαν.</string>
+        
+        <string name="_title_skip_dose_dialog">Παράλειψη διαλόγου</string>
+        <string name="_summary_skip_dose_dialog">Απόκρυψη του διαλόγου που εμφανίζεται όταν πατάτε σε μία δόση. Για να τον ανοίξετε,
+            πατήστε παρατεταμένα στην δόση και επιλέξτε \"Πάρτε την δόση\".</string>
+            
+        <string name="_title_take_all_due_doses">Πάρτε όλες τις εκκρεμείς δόσεις</string>
+                        
+        <string name="_toast_all_due_doses_taken">Όλες οι εκκρεμείς δόσεις θα χαρακτηριστούν σαν να πάρθηκαν.</string>
+        <string name="_toast_some_due_doses_skipped">Μερικές εκκρεμείς δόσεις δεν χαρακτηρίστηκαν ότι πάρθηκαν εξαιτίας ανεπαρκούς αποθέματος.</string>
+        <string name="_toast_no_due_doses">Καμμία εκκρεμής δόση για τώρα.</string>
+        
+        
+        <string translatable="false" name="test_schedule">
+            Δευ    0 - 0 - 0 - 1\n
+            Τρι    0 - 1 - 0 - 1\n
+            Τετ    0 - 0 - 0 - 1\n
+            Πεμ    0 - 0 - 0 - 1\n
+            Παρ    0 - 0 - 0 - 1\n
+            Σαβ    0 - 0 - 0 - 0\n
+            Κυρ    0 - 0 - 0 - 0\n  
+        </string>
+                
+        <!-- 
+    Keep at the end of strings.xml!  
+     -->
+    <string name="dialog_set_number">@string/_btn_set</string>
+    <string name="dialog_cancel">@android:string/ακύρωση</string>
+    <string name="dialog_picker_title">Επιλέξτε έναν αριθμό</string>
+    
+</resources>
