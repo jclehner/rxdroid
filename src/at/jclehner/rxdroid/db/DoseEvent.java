@@ -25,6 +25,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 import at.jclehner.rxdroid.Fraction;
+import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Hasher;
 import at.jclehner.rxdroid.util.Util;
 
@@ -192,7 +193,7 @@ public class DoseEvent extends Entry
 		if(doseTime != null && doseTime != intake.doseTime)
 			return false;
 
-		if(date != null && !date.equals(intake.date))
+		if(date != null && !DateTime.equalsDate(date, intake.date))
 			return false;
 
 		return true;
