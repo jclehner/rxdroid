@@ -182,15 +182,16 @@
 	  <LinearLayout android:id="@id/indicators"
 	  		android:layout_height="match_parent"
 	  		android:layout_width="48dip"
+	  		android:layout_alignParentTop="true"
 	  		android:layout_alignBottom="@id/dose_container"
 	  		android:layout_alignParentRight="true"
-	  			  		 		
+	  		
 	  		android:orientation="vertical"
 	  >
 		  	<at.jclehner.rxdroid.widget.DrugSupplyMonitor android:id="@+id/text_supply"
 			    android:layout_width="match_parent"
 			    android:layout_height="48dip"
-			    
+			   			    
 			    android:gravity="center"
 			    android:textAppearance="?android:attr/textAppearanceSmall"
 			    
