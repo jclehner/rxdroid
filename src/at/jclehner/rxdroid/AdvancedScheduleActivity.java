@@ -176,39 +176,40 @@ public class AdvancedScheduleActivity extends ListActivity
 				holder.dayName = (TextView) holder.view.findViewById(R.id.day_name);
 
 				holder.dayChecked.setOnCheckedChangeListener(AdvancedScheduleActivity.this);
+
+
+				for(View divider : holder.dividers)
+					divider.setVisibility(View.INVISIBLE);
+
+				boolean doseViewEnabled;
+				int dayTag;
+
+				if(position == 0)
+				{
+					holder.dayContainer.setVisibility(View.INVISIBLE);
+					dayTag = WEEKDAY_NONE;
+					doseViewEnabled = true;
+				}
+				else
+				{
+					int weekDay = position - 1;
+
+					holder.dayContainer.setVisibility(View.VISIBLE);
+					holder.dayName.setText(Constants.SHORT_WEEK_DAY_NAMES[weekDay]);
+					dayTag = weekDay;
+					doseViewEnabled = false;
+				}
+
+				for(DoseView dv : holder.doseViews)
+				{
+					//dv.setDose(holder.getDose(dv.getDoseTime()));
+					dv.setEnabled(doseViewEnabled);
+					dv.setTag(dayTag);
+					dv.setDose(Fraction.ZERO);
+				}
+
+				holder.dayChecked.setTag(dayTag);
 			}
-
-			for(View divider : holder.dividers)
-				divider.setVisibility(View.INVISIBLE);
-
-			boolean doseViewEnabled;
-			int dayTag;
-
-			if(position == 0)
-			{
-				holder.dayContainer.setVisibility(View.INVISIBLE);
-				dayTag = WEEKDAY_NONE;
-				doseViewEnabled = true;
-			}
-			else
-			{
-				int weekDay = position - 1;
-
-				holder.dayContainer.setVisibility(View.VISIBLE);
-				holder.dayName.setText(Constants.SHORT_WEEK_DAY_NAMES[weekDay]);
-				dayTag = weekDay;
-				doseViewEnabled = false;
-			}
-
-			for(DoseView dv : holder.doseViews)
-			{
-				//dv.setDose(holder.getDose(dv.getDoseTime()));
-				dv.setEnabled(doseViewEnabled);
-				dv.setTag(dayTag);
-				dv.setDose(Fraction.ZERO);
-			}
-
-			holder.dayChecked.setTag(dayTag);
 
 			return holder.view;
 		}
