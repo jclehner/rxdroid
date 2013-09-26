@@ -141,6 +141,7 @@
 	
 	<string name="_title_tablet">Tablet</string>
 	<string name="_title_capsule">Capsule</string>
+	<string name="_title_inhaler">Inhaler</string>
 	<string name="_title_injection">Syringe</string>
 	<string name="_title_spray">Spray</string>
 	<string name="_title_drop">Glass</string>

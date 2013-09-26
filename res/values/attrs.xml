@@ -59,6 +59,7 @@
     <attr name="drugIconGlass" format="reference" />
     <attr name="drugIconRing" format="reference" />
     <attr name="drugIconCapsule" format="reference" />
+    <attr name="drugIconInhaler" format="reference" />
     
     <attr name="doseStatusTaken" format="reference" />
     <attr name="doseStatusMissed" format="reference" />

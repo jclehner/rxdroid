@@ -32,7 +32,8 @@
 		<item name="drugIconGlass">@drawable/ic_drug_glass_black</item>
 		<item name="drugIconSyringe">@drawable/ic_drug_syringe_black</item>
 		<item name="drugIconRing">@drawable/ic_drug_ring_black</item>	
-        <item name="drugIconCapsule">@drawable/ic_drug_capsule_black</item>
+		<item name="drugIconCapsule">@drawable/ic_drug_capsule_black</item>
+		<item name="drugIconInhaler">@drawable/ic_drug_inhaler_black</item>
 		
 		<item name="doseStatusTaken">@drawable/ic_dose_taken_dark</item>
 		<item name="doseStatusMissed">@drawable/ic_dose_forgotten_dark</item>
@@ -75,7 +76,8 @@
         <item name="drugIconGlass">@drawable/ic_drug_glass_white</item>
         <item name="drugIconSyringe">@drawable/ic_drug_syringe_white</item>
         <item name="drugIconRing">@drawable/ic_drug_ring_white</item>
-        <item name="drugIconCapsule">@drawable/ic_drug_capsule_white</item>
+        <item name="drugIconCapsule">@drawable/ic_drug_capsule_white</item>        
+		<item name="drugIconInhaler">@drawable/ic_drug_inhaler_white</item>
         
         <item name="doseStatusTaken">@drawable/ic_dose_taken</item>
         <item name="doseStatusMissed">@drawable/ic_dose_forgotten</item>

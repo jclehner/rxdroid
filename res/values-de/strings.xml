@@ -130,6 +130,7 @@
 	
 	<string name="_title_tablet">Tablette</string>
 	<string name="_title_capsule">Kapsel</string>
+	<string name="_title_inhaler">Inhalator</string>
 	<string name="_title_injection">Spritze</string>
 	<string name="_title_spray">Spray</string>
 	<string name="_title_drop">Glas</string>
