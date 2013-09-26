@@ -137,6 +137,10 @@
 	<string name="_title_gel">Tube</string>
 	<string name="_title_other">Andere</string>
 	
+	<string name="_title_ampoule">Ampulle</string>
+	<string name="_title_iv_bag">Infusion</string>
+	<string name="_title_pipette">Pipette</string>
+	
 	<string name="_title_daily">Täglich</string>
 	<string name="_title_every_n_days">Alle N Tage</string>
 	<string name="_title_pick_days">Wochentage auswählen</string>

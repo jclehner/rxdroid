@@ -149,6 +149,10 @@
 	<string name="_title_ring">Ring</string>
 	<string name="_title_other">Other</string>
 	
+	<string name="_title_ampoule">Ampoule</string>
+	<string name="_title_iv_bag">IV bag</string>
+	<string name="_title_pipette">Pipette</string>
+	
 	<string name="_title_daily">Daily</string>
 	<string name="_title_every_n_days">Every N days</string>
 	<string name="_title_pick_days">Pick days</string>

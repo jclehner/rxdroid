@@ -90,8 +90,11 @@ public class Drug extends Entry implements Comparable<Drug>
 	public static final int ICON_RING = 4;
 	public static final int ICON_CAPSULE = 5;
 	public static final int ICON_INHALER = 6;
-	public static final int ICON_SPRAY = 7;
-	public static final int ICON_OTHER = 8;
+	public static final int ICON_AMPOULE = 7;
+	public static final int ICON_IV_BAG = 8;
+	public static final int ICON_PIPETTE = 9;
+	public static final int ICON_SPRAY = 10;
+	public static final int ICON_OTHER = 11;
 
 	public static final int TIME_MORNING = 0;
 	public static final int TIME_NOON = 1;

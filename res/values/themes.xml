@@ -35,6 +35,11 @@
 		<item name="drugIconCapsule">@drawable/ic_drug_capsule_black</item>
 		<item name="drugIconInhaler">@drawable/ic_drug_inhaler_black</item>
 		
+		<!-- These have no equivalent old icons -->
+		<item name="drugIconAmpoule">@drawable/ic_drug_tablet_black</item>
+		<item name="drugIconIvBag">@drawable/ic_drug_tablet_black</item>
+		<item name="drugIconPipette">@drawable/ic_drug_tablet_black</item>
+		
 		<item name="doseStatusTaken">@drawable/ic_dose_taken_dark</item>
 		<item name="doseStatusMissed">@drawable/ic_dose_forgotten_dark</item>
 		<item name="doseStatusIgnored">@drawable/ic_dose_ignored_dark</item>
@@ -70,6 +75,20 @@
 			
 	</style>
 	
+	<style name="Theme.RxDroid.NewIcons" parent="@style/Theme.RxDroid">
+	    <item name="drugIconTablet">@drawable/ic_drug_pill2_black</item>
+		<item name="drugIconTube">@drawable/ic_drug_paste2_black</item>
+		<item name="drugIconGlass">@drawable/ic_drug_syrup2_black</item>
+		<item name="drugIconSyringe">@drawable/ic_drug_syringe2_black</item>
+		<item name="drugIconRing">@drawable/ic_drug_ring_black</item>	
+		<item name="drugIconCapsule">@drawable/ic_drug_capsule2_black</item>
+		<item name="drugIconInhaler">@drawable/ic_drug_inhaler2_black</item>
+		
+		<item name="drugIconAmpoule">@drawable/ic_drug_ampoules2_black</item>
+		<item name="drugIconIvBag">@drawable/ic_drug_infusion2_black</item>
+		<item name="drugIconPipette">@drawable/ic_drug_pipette2_black</item>
+	</style>
+	
 	<style name="Theme.RxDroid.Dark" parent="@style/Theme.Sherlock">
 		<item name="drugIconTablet">@drawable/ic_drug_tablet_white</item>
 		<item name="drugIconTube">@drawable/ic_drug_tube_white</item>
@@ -78,6 +97,11 @@
         <item name="drugIconRing">@drawable/ic_drug_ring_white</item>
         <item name="drugIconCapsule">@drawable/ic_drug_capsule_white</item>        
 		<item name="drugIconInhaler">@drawable/ic_drug_inhaler_white</item>
+		
+		<!-- These have no equivalent old icons -->
+		<item name="drugIconAmpoule">@drawable/ic_drug_tablet_white</item>
+		<item name="drugIconIvBag">@drawable/ic_drug_tablet_white</item>
+		<item name="drugIconPipette">@drawable/ic_drug_tablet_white</item>
         
         <item name="doseStatusTaken">@drawable/ic_dose_taken</item>
         <item name="doseStatusMissed">@drawable/ic_dose_forgotten</item>
@@ -111,6 +135,20 @@
         
         <item name="android:windowAnimationStyle">@null</item>
     </style>
+    
+	<style name="Theme.RxDroid.Dark.NewIcons" parent="@style/Theme.RxDroid.Dark">
+	    <item name="drugIconTablet">@drawable/ic_drug_pill2_white</item>
+		<item name="drugIconTube">@drawable/ic_drug_paste2_white</item>
+		<item name="drugIconGlass">@drawable/ic_drug_syrup2_white</item>
+		<item name="drugIconSyringe">@drawable/ic_drug_syringe2_white</item>
+		<item name="drugIconRing">@drawable/ic_drug_ring_white</item>	
+		<item name="drugIconCapsule">@drawable/ic_drug_capsule2_white</item>
+		<item name="drugIconInhaler">@drawable/ic_drug_inhaler2_white</item>
+		
+		<item name="drugIconAmpoule">@drawable/ic_drug_ampoules2_white</item>
+		<item name="drugIconIvBag">@drawable/ic_drug_infusion2_white</item>
+		<item name="drugIconPipette">@drawable/ic_drug_pipette2_white</item>	    
+	</style>
 	
 	<style name="Theme.RxDroid.NoAnimation" parent="@style/Theme.RxDroid">
 		<item name="android:windowAnimationStyle">@null</item>		

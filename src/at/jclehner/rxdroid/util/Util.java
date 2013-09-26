@@ -214,6 +214,15 @@ public final class Util
 			case Drug.ICON_INHALER:
 				return Theme.getResourceAttribute(R.attr.drugIconInhaler);
 
+			case Drug.ICON_AMPOULE:
+				return Theme.getResourceAttribute(R.attr.drugIconAmpoule);
+
+			case Drug.ICON_IV_BAG:
+				return Theme.getResourceAttribute(R.attr.drugIconIvBag);
+
+			case Drug.ICON_PIPETTE:
+				return Theme.getResourceAttribute(R.attr.drugIconPipette);
+
 			case Drug.ICON_TABLET:
 				// fall through, for now
 

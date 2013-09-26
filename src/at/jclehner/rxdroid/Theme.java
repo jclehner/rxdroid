@@ -38,8 +38,24 @@ public final class Theme
 
 	private static final SparseIntArray sAttrCache = new SparseIntArray();
 
-	private static final int LIGHT = R.style.Theme_RxDroid;
-	private static final int DARK = R.style.Theme_RxDroid_Dark;
+	private static final boolean USE_NEW_ICONS = BuildConfig.DEBUG;
+
+	private static final int LIGHT;
+	private static final int DARK;
+
+	static
+	{
+		if(USE_NEW_ICONS)
+		{
+			LIGHT = R.style.Theme_RxDroid_NewIcons;
+			DARK = R.style.Theme_RxDroid_Dark_NewIcons;
+		}
+		else
+		{
+			LIGHT = R.style.Theme_RxDroid;
+			DARK = R.style.Theme_RxDroid_Dark;
+		}
+	}
 
 	public static boolean isDark() {
 		return Settings.getBoolean(Keys.THEME_IS_DARK, false);
