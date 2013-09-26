@@ -274,6 +274,19 @@ public class FractionInput extends LinearLayout
 		updateView();
 	}
 
+	/*
+	@Override
+	public void setVisibility(int visibility)
+	{
+		super.setVisibility(visibility);
+
+		if(visibility == VISIBLE)
+		{
+			Help.spotOn(mModeSwitcher, R.string._help_dose_times);
+		}
+	}
+	*/
+
 	private void updateView()
 	{
 		// hide in fraction mode
