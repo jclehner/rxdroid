@@ -43,6 +43,8 @@ public class DatePickerFragment extends DialogFragment implements OnShowListener
 
 	private OnDateSetListener mListener;
 
+	public DatePickerFragment() {}
+
 	public static DatePickerFragment newInstance(Date date, OnDateSetListener listener)
 	{
 		final DatePickerFragment r = new DatePickerFragment(listener);

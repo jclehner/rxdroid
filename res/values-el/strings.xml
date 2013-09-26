@@ -141,6 +141,9 @@
         
         <string name="_title_tablet">Δισκίο</string>
         <string name="_title_injection">Σύριγγα</string>
+        <string name="_title_capsule">Καψάκιο</string>
+		<string name="_title_inhaler">Εισπνευστήρα</string>
+        
         <string name="_title_spray">Σπρέι</string>
         <string name="_title_drop">Ποτήρι</string>
         <string name="_title_gel">Σωληνάριο</string> 

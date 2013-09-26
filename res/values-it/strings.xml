@@ -140,6 +140,8 @@
 	
 	<string name="_title_tablet">Pasticca</string>
 	<string name="_title_injection">Siringa</string>
+	<string name="_title_capsule">Capsula</string>
+	<string name="_title_inhaler">Inalatore</string>
 	<string name="_title_spray">Spray</string>
 	<string name="_title_drop">Bicchiere</string>
 	<string name="_title_gel">Flacone</string>	
