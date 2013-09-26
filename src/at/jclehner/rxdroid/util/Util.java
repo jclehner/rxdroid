@@ -208,6 +208,9 @@ public final class Util
 			case Drug.ICON_RING:
 				return Theme.getResourceAttribute(R.attr.drugIconRing);
 
+			case Drug.ICON_CAPSULE:
+				return Theme.getResourceAttribute(R.attr.drugIconCapsule);
+
 			case Drug.ICON_TABLET:
 				// fall through, for now
 
