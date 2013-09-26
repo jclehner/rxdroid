@@ -3,7 +3,7 @@
     	xmlns:android="http://schemas.android.com/apk/res/android"
 		xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
 		android:id="@+id/dose_container"
-		android:layout_height="wrap_content"
+		android:layout_height="@dimen/dose_view_height"
   		android:layout_width="match_parent" 			
   	>  	
   	

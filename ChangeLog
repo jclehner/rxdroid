@@ -1,6 +1,7 @@
 0.9.17:
 	* Added Greek translation
 	* Added capsule and inhaler icon
+	* Extended notifications for >= JellyBean
 	* Begin and end of a time specification can no longer be equal
 	* App now behaves as expected when switching between time zones
 	* When adding drugs, doses in the past no longer show up as missed

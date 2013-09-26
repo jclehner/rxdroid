@@ -322,7 +322,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			icon = R.drawable.ic_stat_exclamation;
 			isShowingLowSupplyNotification = sb.length() == 0;
-			titleResId = R.string._title_notification_low_supplies;
+			//titleResId = R.string._title_notification_low_supplies;
 
 			if(lowSupplyDrugCount == 1)
 				msg = getString(R.string._qmsg_low_supply_single, first);
@@ -333,7 +333,10 @@ public class NotificationReceiver extends BroadcastReceiver
 			}
 
 			if(isShowingLowSupplyNotification)
+			{
 				sb.append(msg);
+				titleResId = R.string._title_notification_low_supplies;
+			}
 
 			lines[0] = "<b>" + getString(R.string._title_notification_low_supplies) + "</b> " + Util.escapeHtml(msg);
 		}

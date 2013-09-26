@@ -38,7 +38,7 @@ public final class Theme
 
 	private static final SparseIntArray sAttrCache = new SparseIntArray();
 
-	private static final boolean USE_NEW_ICONS = BuildConfig.DEBUG;
+	private static final boolean USE_NEW_ICONS = false && BuildConfig.DEBUG;
 
 	private static final int LIGHT;
 	private static final int DARK;

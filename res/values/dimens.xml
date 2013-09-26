@@ -32,5 +32,9 @@
 	<dimen name="pin_margin">20dip</dimen>
 	<dimen name="divider_width">2dip</dimen>
 	
+	<dimen name="drug_name_height">36dip</dimen>
+	<dimen name="drug_icon_width">36dip</dimen>
+	<dimen name="dose_view_height">60dip</dimen>
+	
     <dimen name="fraction_wholenum_margin">0dip</dimen>		
 </resources>

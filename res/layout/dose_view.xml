@@ -46,7 +46,7 @@
   
   <TextView android:id="@+id/text_dose"
   	android:layout_width="60dip"
-  	android:layout_height="60dip"
+  	android:layout_height="@dimen/dose_view_height"
   	android:layout_gravity="center"
   	android:gravity="center"
   	android:text="X"
