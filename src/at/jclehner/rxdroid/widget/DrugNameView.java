@@ -64,8 +64,9 @@ public class DrugNameView extends TextView
 
 	public void setScrambled(boolean scrambled)
 	{
-		setText(scrambled ? Entries.getDrugName(mDrug) : mName);
-		mIsCurrentlyScrambled = scrambled;
+		final String name = scrambled ? Entries.getDrugName(mDrug) : mName;
+		setText(name);
+		mIsCurrentlyScrambled = !name.equals(mName);
 	}
 
 	public void setUnscrambledDuration(long millis) {

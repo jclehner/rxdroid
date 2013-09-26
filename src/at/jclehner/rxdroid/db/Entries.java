@@ -422,14 +422,19 @@ public final class Entries
 			// a digit, so things like 10mg won't get converted to 10zt.
 
 			final StringBuilder sb = new StringBuilder(name.length());
-			for(String word : name.split(" "))
-			{
-				if(word.length() == 0 || Character.isDigit(word.charAt(0)))
-					sb.append(word);
-				else
-					sb.append(Util.rot13(word));
+			final String[] tokens = name.split(" ");
 
-				sb.append(" ");
+			for(int i = 0; i != tokens.length; ++i)
+			{
+				if(i != 0)
+					sb.append(" ");
+
+				final String token = tokens[i];
+
+				if(token.length() == 0 || Character.isDigit(token.charAt(0)))
+					sb.append(token);
+				else
+					sb.append(Util.rot13(token));
 			}
 
 			return sb.toString();
