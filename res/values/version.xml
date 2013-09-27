@@ -1,6 +1,6 @@
 <resources>
     <item type="string" name="app_name">RxDroid</item>
-    <item type="string" name="version">0.9.17.1</item>
+    <item type="string" name="version">0.9.17.2</item>
     <item type="string" name="vcs_revision">$Revision$</item>
         
 	<item type="string" name="_msg_no_translation">RxDroid has not yet been translated to your language. If you want
