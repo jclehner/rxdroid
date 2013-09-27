@@ -240,8 +240,16 @@ public class Drug extends Entry implements Comparable<Drug>
 			}
 		}
 
-		if(lastScheduleUpdateDate != null && date.before(lastScheduleUpdateDate))
-			return false;
+		if(lastScheduleUpdateDate != null)
+		{
+			Date min = lastScheduleUpdateDate;
+
+//			if(repeatOrigin != null)
+//				min = DateTime.min(min, repeatOrigin);
+
+			if(date.before(min))
+				return false;
+		}
 
 		switch(repeatMode)
 		{
@@ -257,7 +265,8 @@ public class Drug extends Entry implements Comparable<Drug>
 				return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
 
 			case REPEAT_21_7:
-				return (DateTime.diffDays(date, repeatOrigin) % 28) < 21;
+				final long diff = Math.abs(DateTime.diffDays(date, repeatOrigin)) % 28;
+				return diff < 21;
 
 			case REPEAT_CUSTOM:
 				return Schedules.hasDoseOnDate(date, mSchedules.get());
