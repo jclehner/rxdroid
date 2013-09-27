@@ -1,3 +1,9 @@
+0.9.17.2:
+	* Fixed bug in 21 days on / 7 days off repeat mode
+
+0.9.17.1:
+	* Fixed notification title bug
+
 0.9.17:
 	* Added Greek translation
 	* Added capsule and inhaler icon
