@@ -377,7 +377,10 @@
 	<string name="_toast_some_due_doses_skipped">Some due doses were not marked as taken due to insufficient supplies.</string>
 	<string name="_toast_no_due_doses">No due doses at the moment.</string>
 	
-	
+	<string name="_help_title_fraction_mode">Fraction mode</string>
+	<string name="_help_msg_fraction_mode">If you are not taking full doses, but 1½, ⅔, etc., click here. 
+	    This switches to fraction mode.</string>
+		
 	<string translatable="false" name="test_schedule">
 	    Mon    0 - 0 - 0 - 1\n
 	    Tue    0 - 1 - 0 - 1\n

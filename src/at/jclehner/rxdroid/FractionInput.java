@@ -21,7 +21,9 @@
 
 package at.jclehner.rxdroid;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -35,6 +37,10 @@ import at.jclehner.androidutils.InstanceState;
 import at.jclehner.androidutils.InstanceState.SaveState;
 import at.jclehner.rxdroid.NumberPickerWrapper.OnValueChangeListener;
 import at.jclehner.rxdroid.util.CollectionUtils;
+
+import com.github.espiandev.showcaseview.ShowcaseView;
+import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
+import com.github.espiandev.showcaseview.ShowcaseView.ConfigOptions;
 
 /**
  * A widget for fraction input.
@@ -274,18 +280,23 @@ public class FractionInput extends LinearLayout
 		updateView();
 	}
 
-	/*
 	@Override
 	public void setVisibility(int visibility)
 	{
 		super.setVisibility(visibility);
 
 		if(visibility == VISIBLE)
-		{
-			Help.spotOn(mModeSwitcher, R.string._help_dose_times);
-		}
+			explainFractionModeSwitcher();
 	}
-	*/
+
+	@Override
+	protected void onAttachedToWindow()
+	{
+		super.onAttachedToWindow();
+
+		if(mFractionInputMode == MODE_INTEGER)
+			explainFractionModeSwitcher();
+	}
 
 	private void updateView()
 	{
@@ -301,6 +312,29 @@ public class FractionInput extends LinearLayout
 		mDenominatorPicker.setValue(mDenominator);
 
 		updateModeSwitcher();
+	}
+
+	private void explainFractionModeSwitcher()
+	{
+		if(getVisibility() != View.VISIBLE)
+			return;
+
+		if(!BuildConfig.DEBUG)
+		{
+			if(Settings.getBoolean(Settings.Keys.HAS_FRACTIONS_IN_ANY_SCHEDULE, false))
+				return;
+		}
+
+		ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(getContext());
+		svb.setHideOnClickOutside(false);
+		svb.setShowcaseId(0xdeadc0de); // FIXME
+		svb.setShowcaseView(mModeSwitcher);
+		svb.setText(R.string._help_title_fraction_mode, R.string._help_msg_fraction_mode);
+
+		if(!BuildConfig.DEBUG)
+			svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+
+		svb.show();
 	}
 
 	private void updateModeSwitcher()

@@ -7,7 +7,9 @@ readonly MISCDIR="$(dirname $0)/misc"
 GIT_REPOS=( 
 	"NumberPicker git://github.com/mrn/numberpicker.git lib" 
 	"DragSortListView git://github.com/bauerca/drag-sort-listview.git library"
-	"ActionBarSherlock git://github.com/JakeWharton/ActionBarSherlock.git actionbarsherlock" 
+	"ActionBarSherlock git://github.com/JakeWharton/ActionBarSherlock.git actionbarsherlock"
+	"ShowcaseView git://github.com/jclehner/ShowcaseView.git library"
+	"NineOldAndroids git://github.com/JakeWharton/NineOldAndroids.git library"
 #	"HoloEverywhere https://github.com/Prototik/HoloEverywhere library"
 )
 
@@ -35,7 +37,7 @@ clone_or_fetch()
 		if [[ -d "$2" ]]; then
 			die "ERROR: Directory $2 already exists. Run \`$(basename $0) update' instead'"
 		fi
-		git clone "$1" "$2" || exit 1
+		git clone --depth 1 "$1" "$2" || exit 1
 	fi
 }
 

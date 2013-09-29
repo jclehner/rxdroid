@@ -38,6 +38,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
@@ -89,6 +90,7 @@ public final class Settings
 		public static final String LOG_SHOW_SKIPPED = "log_show_skipped";
 		public static final String LOG_SHOW_MISSED = "log_show_missed";
 		public static final String LOG_IS_ALL_COLLAPSED = "log_is_all_collapsed";
+		public static final String HAS_FRACTIONS_IN_ANY_SCHEDULE = "has_fractions_in_any_schedule";
 	}
 
 	public static class Enums
@@ -115,7 +117,7 @@ public final class Settings
 	}
 
 	private static final String TAG = Settings.class.getSimpleName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = true;
 
 	private static final String DATE_FORMAT = "yyyy-MM-dd";
 	private static final String DOSE_TIME_KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
@@ -635,7 +637,7 @@ public final class Settings
 		sSharedPrefs.edit().remove(key).commit();
 	}
 
-	private static boolean contains(String key) {
+	public static boolean contains(String key) {
 		return sSharedPrefs.contains(key);
 	}
 
@@ -699,6 +701,7 @@ public final class Settings
 				Settings.putBoolean(Settings.Keys.ENABLE_LANDSCAPE, false);
 			}
 		}
+
 
 		/*if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
 		{

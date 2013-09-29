@@ -25,6 +25,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
 	xmlns:abs="http://schemas.android.com/apk/res/com.actionbarsherlock"
+	xmlns:scv="http://schemas.android.com/apk/res/com.github.espiandev.showcaseview"
 >	
 	<style name="Theme.RxDroid" parent="@style/Theme.Sherlock.Light.DarkActionBar">
 		<item name="drugIconTablet">@drawable/ic_drug_tablet_black</item>
@@ -72,7 +73,8 @@
 		
 		<item name="android:windowAnimationStyle">@null</item>
 		<item name="android:alertDialogStyle">@style/Theme.RxDroid.Dialog</item>
-			
+		
+		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>			
 	</style>
 	
 	<style name="Theme.RxDroid.NewIcons" parent="@style/Theme.RxDroid">
@@ -134,6 +136,7 @@
         <item name="dividerColor">@color/list_divider_dark</item>
         
         <item name="android:windowAnimationStyle">@null</item>
+        <item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
     </style>
     
 	<style name="Theme.RxDroid.Dark.NewIcons" parent="@style/Theme.RxDroid.Dark">
@@ -152,6 +155,10 @@
 	
 	<style name="Theme.RxDroid.NoAnimation" parent="@style/Theme.RxDroid">
 		<item name="android:windowAnimationStyle">@null</item>		
+	</style>
+	
+	<style name="ShowcaseView.RxDroid" parent="@style/ShowcaseView">
+	    <item name="sv_backgroundColor">#c0000000</item>
 	</style>
 	
 	<!-- 
