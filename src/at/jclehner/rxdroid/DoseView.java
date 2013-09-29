@@ -46,6 +46,7 @@ import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.Util;
 
 /**
  * A class for displaying dose information.
@@ -364,7 +365,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			{
 				setStatus(STATUS_TAKEN);
 
-				SpannableStringBuilder sb = new SpannableStringBuilder(mDisplayDose.toString());
+				SpannableStringBuilder sb = new SpannableStringBuilder(Util.prettify(mDisplayDose));
 
 				if(Entries.isDateAfterLastScheduleUpdateOfDrug(mDate, mDrug))
 				{
@@ -391,7 +392,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			else
 			{
 				Fraction dose = mDrug.getDose(mDoseTime, mDate);
-				mDoseText.setText(dose.toString());
+				mDoseText.setText(Util.prettify(dose));
 
 				if(mIntakeCount == 0)
 				{
@@ -410,7 +411,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		}
 		else if(mDisplayDose != null)
-			mDoseText.setText(mDisplayDose.toString());
+			mDoseText.setText(Util.prettify(mDisplayDose));
 
 		if("0".equals(mDoseText.getText()))
 		{

@@ -50,4 +50,5 @@
 	<item type="string" name="key_language">language</item>
 	<item type="string" name="key_use_backup_framework">use_backup_framework</item>
 	<item type="string" name="key_skip_dose_dialog">skip_dose_dialog</item>
+	<item type="string" name="key_use_pretty_fractions">use_pretty_fractions</item>
 </resources>

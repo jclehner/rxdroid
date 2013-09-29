@@ -43,6 +43,7 @@ import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.util.Util;
 
 public class DoseDialog extends AlertDialog implements OnChangedListener, Database.OnChangeListener
 {
@@ -178,7 +179,7 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 	{
 		mDose = widget.getValue();
 		getButton(BUTTON_POSITIVE).setEnabled(!mDose.isZero());
-		mDoseText.setText(mDose.toString());
+		mDoseText.setText(Util.prettify(mDose));
 	}
 
 	@Override
@@ -250,7 +251,7 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 		else
 			mDose = Fraction.ZERO;
 
-		mDoseText.setText(mDose.toString());
+		mDoseText.setText(Util.prettify(mDose));
 		mDoseInput.setValue(mDose);
 		mDoseInput.setAutoInputModeEnabled(true);
 		mDoseInput.setOnChangeListener(this);

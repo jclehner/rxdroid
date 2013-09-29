@@ -21,9 +21,7 @@
 
 package at.jclehner.rxdroid;
 
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -37,10 +35,10 @@ import at.jclehner.androidutils.InstanceState;
 import at.jclehner.androidutils.InstanceState.SaveState;
 import at.jclehner.rxdroid.NumberPickerWrapper.OnValueChangeListener;
 import at.jclehner.rxdroid.util.CollectionUtils;
+import at.jclehner.rxdroid.util.ShowcaseViews;
 
 import com.github.espiandev.showcaseview.ShowcaseView;
 import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
-import com.github.espiandev.showcaseview.ShowcaseView.ConfigOptions;
 
 /**
  * A widget for fraction input.
@@ -81,6 +79,8 @@ public class FractionInput extends LinearLayout
 	private int mFractionInputMode = MODE_INVALID;
 	@SaveState
 	private boolean mIsAutoInputModeEnabled = false;
+
+	private boolean mAttached = false;
 
 	private OnChangedListener mListener;
 
@@ -186,6 +186,7 @@ public class FractionInput extends LinearLayout
 		{
 			mFractionInputMode = mode;
 			setValue(getValue());
+			maybeExplainCurrentState();
 		}
 
 		return true;
@@ -284,18 +285,22 @@ public class FractionInput extends LinearLayout
 	public void setVisibility(int visibility)
 	{
 		super.setVisibility(visibility);
-
-		if(visibility == VISIBLE)
-			explainFractionModeSwitcher();
+		maybeExplainCurrentState();
 	}
 
 	@Override
 	protected void onAttachedToWindow()
 	{
 		super.onAttachedToWindow();
+		mAttached = true;
+		maybeExplainCurrentState();
+	}
 
-		if(mFractionInputMode == MODE_INTEGER)
-			explainFractionModeSwitcher();
+	@Override
+	protected void onDetachedFromWindow()
+	{
+		super.onDetachedFromWindow();
+		mAttached = false;
 	}
 
 	private void updateView()
@@ -314,27 +319,62 @@ public class FractionInput extends LinearLayout
 		updateModeSwitcher();
 	}
 
-	private void explainFractionModeSwitcher()
+	private void maybeExplainCurrentState()
 	{
-		if(getVisibility() != View.VISIBLE)
-			return;
+		post(new Runnable() {
 
-		if(!BuildConfig.DEBUG)
-		{
-			if(Settings.getBoolean(Settings.Keys.HAS_FRACTIONS_IN_ANY_SCHEDULE, false))
-				return;
-		}
+			@Override
+			public void run()
+			{
+				if(getVisibility() != View.VISIBLE || !mAttached)
+					return;
 
+				if(!BuildConfig.DEBUG)
+				{
+					if(Settings.getBoolean(Settings.Keys.HAS_FRACTIONS_IN_ANY_SCHEDULE, false))
+						return;
+				}
+
+				final ShowcaseViews svs = new ShowcaseViews();
+
+				if(mFractionInputMode == MODE_INTEGER)
+				{
+					svs.add(makeShowcaseView(mModeSwitcher, 0xdeadc0de,
+							R.string._help_title_to_fraction_mode, R.string._help_msg_to_fraction_mode));
+
+				}
+				else if(mFractionInputMode == MODE_FRACTION)
+				{
+					svs.add(makeShowcaseView(null, 0xdeadc0de+1,
+							R.string._help_title_input_fraction, R.string._help_msg_input_fraction));
+
+					svs.add(makeShowcaseView(mModeSwitcher, 0xdeadc0de+2,
+							R.string._help_title_to_mixed_mode, R.string._help_msg_to_mixed_mode));
+				}
+				else if(mFractionInputMode == MODE_MIXED)
+				{
+					svs.add(makeShowcaseView(null, 0xdeadc0de+3,
+							R.string._help_title_input_mixed, R.string._help_msg_input_mixed));
+				}
+
+				svs.show();
+			}
+		});
+	}
+
+	private ShowcaseView makeShowcaseView(View view, int showcaseId, int titleResId, int msgResId)
+	{
 		ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(getContext());
 		svb.setHideOnClickOutside(false);
-		svb.setShowcaseId(0xdeadc0de); // FIXME
-		svb.setShowcaseView(mModeSwitcher);
-		svb.setText(R.string._help_title_fraction_mode, R.string._help_msg_fraction_mode);
+		svb.setBlock(false);
+		svb.setShowcaseId(showcaseId);
+		svb.setText(titleResId, msgResId);
+		svb.setShowcaseView(view);
 
 		if(!BuildConfig.DEBUG)
 			svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 
-		svb.show();
+		return svb.build();
 	}
 
 	private void updateModeSwitcher()

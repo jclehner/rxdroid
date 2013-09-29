@@ -377,19 +377,29 @@
 	<string name="_toast_some_due_doses_skipped">Some due doses were not marked as taken due to insufficient supplies.</string>
 	<string name="_toast_no_due_doses">No due doses at the moment.</string>
 	
-	<string name="_help_title_fraction_mode">Fraction mode</string>
+	<string name="_help_title_to_fraction_mode">Taking only half a tablet?</string>
+	<string name="_help_msg_to_fraction_mode">By pressing this button you can also enter values such as ½ or 1¾ as doses!</string>
+	
+	<string name="_help_title_input_fraction">Fraction mode</string>
+	<string name="_help_msg_input_fraction">
+	    To enter a value such as ¾, enter 3 in the left field and 4 in the right field.
+	    \n\nTo enter a regular number, enter that number in the left field and 1 in the right field.
+	</string>
+	
+	<string name="_help_title_to_mixed_mode">More than one?</string>
+	<string name="_help_msg_to_mixed_mode">If you are taking doses such as 1¾, press this button.</string>
+	
+	<string name="_help_title_input_mixed">Mixed fraction mode</string>
+	<string name="_help_msg_input_mixed">To enter a value such as 1¾, enter 1 in the left field,
+	    3 in the middle field and 4 in the right field.</string>
+		
+	<!--  
 	<string name="_help_msg_fraction_mode">If you are not taking full doses, but 1½, ⅔, etc., click here. 
 	    This switches to fraction mode.</string>
-		
-	<string translatable="false" name="test_schedule">
-	    Mon    0 - 0 - 0 - 1\n
-	    Tue    0 - 1 - 0 - 1\n
-	    Wed    0 - 0 - 0 - 1\n
-	    Thu    0 - 0 - 0 - 1\n
-	    Fri    0 - 0 - 0 - 1\n
-	    Sat    0 - 0 - 0 - 0\n
-	    Sun    0 - 0 - 0 - 0\n  
-	</string>
+	    -->
+	    
+	<string name="_title_use_pretty_fractions">Pretty fractions</string>
+	<string name="_summary_use_pretty_fractions">Display fractions as "½" instead of "1/2". Note that this only works for common values</string>		
 		
 	<!-- 
     Keep at the end of strings.xml!  

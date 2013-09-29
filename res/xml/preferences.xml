@@ -246,16 +246,18 @@
 		    
 		</Preference>
 		
+		<CheckBoxPreference android:key="@string/key_use_pretty_fractions"
+		    android:title="@string/_title_use_pretty_fractions"
+		    android:summary="@string/_summary_use_pretty_fractions"
+		    android:defaultValue="false"
+		/>
+		
 		<Preference android:key="key_debug_add_5_drugs"
 		    android:title="Add 5 drugs"
 		/>
 		
 		<Preference android:key="key_debug_crash_app"
 		    android:title="Crash app"
-		/>
-		
-		<Preference android:title="Test"
-		    android:summary="@string/test_schedule"
 		/>
 		
 		<Preference android:key="key_debug_tablet_layout"

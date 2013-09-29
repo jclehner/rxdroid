@@ -78,6 +78,7 @@ public final class Settings
 		public static final String USE_SMART_SORT = key(R.string.key_use_smart_sort);
 		public static final String LANGUAGE = key(R.string.key_language);
 		public static final String USE_BACKUP_FRAMEWORK = key(R.string.key_use_backup_framework);
+		public static final String USE_PRETTY_FRACTIONS = key(R.string.key_use_pretty_fractions);
 		@Deprecated
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
 		public static final String DISPLAYED_ONCE = "displayed_once";

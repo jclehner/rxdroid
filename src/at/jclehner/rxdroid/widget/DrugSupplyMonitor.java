@@ -29,7 +29,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import at.jclehner.rxdroid.Fraction;
@@ -41,6 +40,7 @@ import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class DrugSupplyMonitor extends TextView implements
@@ -168,7 +168,7 @@ public class DrugSupplyMonitor extends TextView implements
 			}
 
 			if(!currentSupply.isNegative())
-				setText(currentSupply.toString());
+				setText(Util.prettify(currentSupply));
 			else
 				setText("0");
 		}

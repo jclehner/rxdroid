@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import android.app.Activity;
@@ -47,9 +48,13 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.TimePicker;
 import at.jclehner.androidutils.Reflect;
+import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DumbTime;
+import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.RxDroid;
+import at.jclehner.rxdroid.Settings;
+import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
@@ -520,6 +525,55 @@ public final class Util
 		}
 
 		return b;
+	}
+
+	/*
+VULGAR FRACTION 1/4 	¼ 	&frac14; 	&#188; 	&#xBC;
+VULGAR FRACTION 1/2 	½ 	&frac12; 	&#189; 	&#xBD;
+VULGAR FRACTION 3/4 	¾ 	&frac34; 	&#190; 	&#xBE;
+VULGAR FRACTION 1/3 	⅓ 	-- 	&#8531; 	&#x2153;
+VULGAR FRACTION 2/3 	⅔ 	-- 	&#8532; 	&#x2154;
+VULGAR FRACTION 1/5 	⅕ 	-- 	&#8533; 	&#x2155;
+VULGAR FRACTION 2/5 	⅖ 	-- 	&#8354; 	&#x2156;
+VULGAR FRACTION 3/5 	⅗ 	-- 	&#8535; 	&#x2157;
+VULGAR FRACTION 4/5 	⅘ 	-- 	&#8536; 	&#x2158;
+VULGAR FRACTION 1/6 	⅙ 	-- 	&#8537; 	&#x2159;
+VULGAR FRACTION 5/6 	⅚ 	-- 	&#8538; 	&#x215A;
+VULGAR FRACTION 1/8 	⅛ 	-- 	&#8539; 	&#x215B;
+VULGAR FRACTION 3/8 	⅜ 	-- 	&#8540; 	&#x215C;
+VULGAR FRACTION 5/8 	⅝ 	-- 	&#8541; 	&#x215D;
+VULGAR FRACTION 7/8 	⅞ 	-- 	&#8542; 	&#x215E;
+	 */
+
+	private static final String[][] PRETTY_FRACTIONS = {
+		{ "\u00BD" }, // "1/2"
+		{ "\u2153", "\u2154"  }, // "1/3", "2/3"
+		{ "\u00BC", null, "\u00BE" }, // "1/4", null, "3/4"
+		{ "\u2155", "\u2156", "\u2157", "\u2158" }, // "1/5", "2/5", "3/5", "4/5"
+		{ "\u2158", null, null, null, "\u215A" }, // "1/6", null, null, null, "5/6"
+		null,
+		{ "\u215B", null, "\u215C", null, "\u215D", null, "\u215E" } // "1/8", null, "3/8", null, "5/8", null, "7/8"
+	};
+
+	public static String prettify(Fraction frac)
+	{
+		if(!BuildConfig.DEBUG || !Settings.getBoolean(Keys.USE_PRETTY_FRACTIONS, false))
+			return frac.toString();
+
+		if(frac.isInteger() || frac.denominator() > 8 || frac.denominator() == 7)
+			return frac.toString();
+
+		final int[] data = frac.getFractionData(true);
+		// numerator minus integer component!
+		final int wholeNum = data[0];
+		final int numerator = data[1];
+		final int denominator = data[2];
+
+		final String pretty = PRETTY_FRACTIONS[denominator-2][numerator-1];
+		if(pretty != null)
+			return wholeNum != 0 ? (wholeNum + pretty) : pretty;
+
+		return frac.toString();
 	}
 
 	private static DisplayMetrics getDisplayMetrics() {
