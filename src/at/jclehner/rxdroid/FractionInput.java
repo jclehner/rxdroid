@@ -169,27 +169,8 @@ public class FractionInput extends LinearLayout
 	 * @return <code>false</code> if mode is MODE_INTEGER but the underlying value is
 	 *         not an integer. For other arguments, this function always returns <code>true</code>.
 	 */
-	public boolean setFractionInputMode(int mode)
-	{
-		if(mode == MODE_INTEGER)
-		{
-			if(!getValue().isInteger())
-				return false;
-		}
-		else if(mode >= MODE_INVALID)
-			throw new IllegalArgumentException();
-
-		// an explicit request for a specific mode overrides the automatic setting
-		setAutoInputModeEnabled(false);
-
-		if(mode != mFractionInputMode)
-		{
-			mFractionInputMode = mode;
-			setValue(getValue());
-			maybeExplainCurrentState();
-		}
-
-		return true;
+	public boolean setFractionInputMode(int mode) {
+		return setFractionInputMode(mode, false);
 	}
 
 	public void disableFractionInputMode(boolean disable)
@@ -319,6 +300,30 @@ public class FractionInput extends LinearLayout
 		updateModeSwitcher();
 	}
 
+	private boolean setFractionInputMode(int mode, boolean maybeExplainState)
+	{
+		if(mode == MODE_INTEGER)
+		{
+			if(!getValue().isInteger())
+				return false;
+		}
+		else if(mode >= MODE_INVALID)
+			throw new IllegalArgumentException();
+
+		// an explicit request for a specific mode overrides the automatic setting
+		setAutoInputModeEnabled(false);
+
+		if(mode != mFractionInputMode)
+		{
+			mFractionInputMode = mode;
+			setValue(getValue());
+			if(maybeExplainState)
+				maybeExplainCurrentState();
+		}
+
+		return true;
+	}
+
 	private void maybeExplainCurrentState()
 	{
 		post(new Runnable() {
@@ -335,13 +340,12 @@ public class FractionInput extends LinearLayout
 						return;
 				}
 
-				final ShowcaseViews svs = new ShowcaseViews();
+				final ShowcaseViews svs = ShowcaseViews.create(getContext());
 
 				if(mFractionInputMode == MODE_INTEGER)
 				{
 					svs.add(makeShowcaseView(mModeSwitcher, 0xdeadc0de,
 							R.string._help_title_to_fraction_mode, R.string._help_msg_to_fraction_mode));
-
 				}
 				else if(mFractionInputMode == MODE_FRACTION)
 				{
@@ -374,7 +378,19 @@ public class FractionInput extends LinearLayout
 		if(!BuildConfig.DEBUG)
 			svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 
-		return svb.build();
+		ShowcaseView sv = svb.build();
+
+		if(false && view != null) {
+			//sv.pointTo(view);
+			int[] location = new int[2];
+			view.getLocationOnScreen(location);
+
+			float x = location[0] + view.getWidth() / 2;
+			float y = location[1] + view.getHeight() / 2;
+			sv.animateGesture(x/2, y/2, x, y);
+		}
+
+		return sv;
 	}
 
 	private void updateModeSwitcher()
@@ -433,7 +449,7 @@ public class FractionInput extends LinearLayout
 		@Override
 		public void onClick(View v)
 		{
-			setFractionInputMode(getNextInputMode());
+			setFractionInputMode(getNextInputMode(), true);
 		}
 	};
 }

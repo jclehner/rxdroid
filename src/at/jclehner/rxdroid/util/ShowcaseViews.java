@@ -2,7 +2,9 @@ package at.jclehner.rxdroid.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.WeakHashMap;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.View;
 
@@ -11,7 +13,25 @@ import com.github.espiandev.showcaseview.ShowcaseView.OnShowcaseEventListener;
 
 public final class ShowcaseViews
 {
+	private static final String TAG = ShowcaseViews.class.getSimpleName();
+
 	private final List<ShowcaseView> mViews = new ArrayList<ShowcaseView>();
+	private static final WeakHashMap<Context, ShowcaseViews> sInstances =
+			new WeakHashMap<Context, ShowcaseViews>();
+
+	public static ShowcaseViews create(Context context)
+	{
+		ShowcaseViews ret = sInstances.get(context);
+		if(ret == null)
+		{
+			sInstances.put(context, ret = new ShowcaseViews());
+			Log.d(TAG, "create: returning existing instance");
+		}
+		else
+			Log.d(TAG, "create: returning new instance");
+
+		return ret;
+	}
 
 	public void add(ShowcaseView sv)
 	{
@@ -31,8 +51,16 @@ public final class ShowcaseViews
 	public void show()
 	{
 		if(hasViews())
-			mViews.get(0).show();
+		{
+			final ShowcaseView sv = mViews.get(0);
+			if(sv.getParent() == null)
+				sv.show();
+
+			mViews.remove(0);
+		}
 	}
+
+	private ShowcaseViews() {}
 
 	private final OnShowcaseEventListener mListener = new OnShowcaseEventListener() {
 
@@ -45,7 +73,7 @@ public final class ShowcaseViews
 		@Override
 		public void onShowcaseViewHide(ShowcaseView showcaseView)
 		{
-			mViews.remove(0);
+			//mViews.remove(0);
 			show();
 		}
 	};

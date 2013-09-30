@@ -550,7 +550,7 @@ VULGAR FRACTION 7/8 	⅞ 	-- 	&#8542; 	&#x215E;
 		{ "\u2153", "\u2154"  }, // "1/3", "2/3"
 		{ "\u00BC", null, "\u00BE" }, // "1/4", null, "3/4"
 		{ "\u2155", "\u2156", "\u2157", "\u2158" }, // "1/5", "2/5", "3/5", "4/5"
-		{ "\u2158", null, null, null, "\u215A" }, // "1/6", null, null, null, "5/6"
+		{ "\u2159", null, null, null, "\u215A" }, // "1/6", null, null, null, "5/6"
 		null,
 		{ "\u215B", null, "\u215C", null, "\u215D", null, "\u215E" } // "1/8", null, "3/8", null, "5/8", null, "7/8"
 	};
@@ -560,7 +560,11 @@ VULGAR FRACTION 7/8 	⅞ 	-- 	&#8542; 	&#x215E;
 		if(!BuildConfig.DEBUG || !Settings.getBoolean(Keys.USE_PRETTY_FRACTIONS, false))
 			return frac.toString();
 
-		if(frac.isInteger() || frac.denominator() > 8 || frac.denominator() == 7)
+		// Characters for fifths and sixths are available in the unicode specs, but not in the standard
+		// Android fonts: on Gingerbread, a placeholder box icon is displayed, while Jellybean converts
+		// them to their simple counterparts (i.e. 1/5 instead of ⅕)
+
+		if(frac.isInteger() || (frac.denominator() > 4 && frac.denominator() != 8))
 			return frac.toString();
 
 		final int[] data = frac.getFractionData(true);

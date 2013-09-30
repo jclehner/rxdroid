@@ -36,6 +36,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
@@ -53,6 +54,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.DatePicker;
@@ -503,26 +505,51 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 		updateListAdapter(listView, date, drugs);
 
-		final int emptyResId;
+
+		final String text;
 
 		if(drugs.isEmpty())
 		{
 			if(Settings.getBoolean(Keys.COMPACT_ACTION_BAR, Defaults.COMPACT_ACTION_BAR))
 			{
 				Log.d(TAG, "COMPACT_ACTION_BAR");
-				emptyResId = R.string._msg_no_drugs_compact_ab;
+
+				final boolean hasHardwareMenuKey;
+
+				if(Version.SDK_IS_PRE_HONEYCOMB)
+					hasHardwareMenuKey = true;
+				else
+				{
+					if(Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+					{
+						// For Honeycomb, there appears to be no way to find out. As it
+						// targets tablets only, we will assume that none of these have a
+						// hardware menu key...
+						hasHardwareMenuKey = false;
+					}
+					else
+						hasHardwareMenuKey = ViewConfiguration.get(this).hasPermanentMenuKey();
+				}
+
+				final StringBuilder sb = new StringBuilder(getString(R.string._msg_no_drugs_compact_ab));
+
+				if(hasHardwareMenuKey)
+					sb.append(" " + getString(R.string._help_msg_menu_hardware));
+				else
+					sb.append(" " + getString(R.string._help_msg_menu_ab_overflow));
+
+				text = sb.toString();
 			}
 			else
 			{
 				Log.d(TAG, "EXTENDED_ACTION_BAR");
-				emptyResId = R.string._msg_no_drugs_extended_ab;
+				text = getString(R.string._msg_no_drugs_extended_ab, getString(R.string._title_add));
 			}
-
 		}
 		else
-			emptyResId = R.string._msg_no_doses_on_this_day;
+			text = getString(R.string._msg_no_doses_on_this_day, getString(R.string._title_add));
 
-		emptyView.setText(getString(emptyResId, getString(R.string._title_add)));
+		emptyView.setText(text);
 
 		listView.setEmptyView(emptyView);
 		listView.setDragHandleId(R.id.drug_icon);

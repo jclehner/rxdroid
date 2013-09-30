@@ -332,8 +332,11 @@
 	
 	<string name="_title_disabled">Disabled</string>	
 	
-    <string name="_msg_no_drugs_compact_ab">Select \"%1$s\" from the menu to add a drug</string>
-    <string name="_msg_no_drugs_extended_ab">Press the \"+\" button in the action bar to add a drug</string>
+    <string name="_msg_no_drugs_compact_ab">Select \"%1$s\" from the menu to add a drug.</string>
+    <string name="_msg_no_drugs_extended_ab">Press the \"+\" button in the action bar to add a drug.</string>
+    
+    <string name="_help_msg_menu_hardware">The menu is accessible by pressing the menu key on your device.</string>
+    <string name="_help_msg_menu_ab_overflow">The menu is accessible by pressing the three-dot icon.</string>
     
     <string name="_summary_smart_sort">Sort drugs based on importance</string>
 	<string name="_title_smart_sort">Automatic sorting</string>
