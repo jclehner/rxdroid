@@ -74,7 +74,7 @@
   		android:layout_height="@dimen/drug_name_height"
   		  		
   		android:layout_toRightOf="@id/drug_icon"
-  		android:layout_toLeftOf="@+id/indicators"
+  		
   		android:layout_alignParentTop="true"
   		  		
   		android:layout_marginLeft="5dp"
@@ -104,7 +104,7 @@
   		android:nextFocusDown="@+id/morning"
   		
   		android:layout_toRightOf="@id/drug_icon"
-  		android:layout_toLeftOf="@id/indicators"
+  		android:layout_toLeftOf="@+id/indicators"
   		android:layout_below="@id/drug_name"
   	/>  	
   	

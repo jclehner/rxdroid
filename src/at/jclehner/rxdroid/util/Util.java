@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import android.app.Activity;
@@ -641,6 +642,43 @@ public final class Util
 		PrintWriter pw = new PrintWriter(sw);
 		t.printStackTrace(pw);
 		return sw.toString();
+	}
+
+	public static View findViewById(View root, int id)
+	{
+		Log.d(TAG, "findViewById");
+
+		if(root.getId() == id)
+			return root;
+
+		if(root instanceof ViewGroup)
+			return findViewById((ViewGroup) root, id, 0);
+
+		return null;
+	}
+
+	private static View findViewById(ViewGroup group, int id, int level)
+	{
+		for(int i = 0; i != group.getChildCount(); ++i)
+		{
+			final View child = group.getChildAt(i);
+
+			Log.d(TAG, charsToString(' ', 2*level) + child);
+
+			if(child.getId() == id)
+				return child;
+			else if(child instanceof ViewGroup)
+				return findViewById((ViewGroup) child, id, level + 1);
+		}
+
+		return null;
+	}
+
+	private static String charsToString(char ch, int count)
+	{
+		char[] data = new char[count];
+	    Arrays.fill(data, ch);
+	    return new String(data);
 	}
 
 	private static DisplayMetrics getDisplayMetrics(Context context)

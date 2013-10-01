@@ -70,6 +70,13 @@
 			android:defaultValue="@bool/pref_default_compact_action_bar"
 			android:enabled="@bool/pref_visibility_compact_action_bar"
 		/>
+		
+		
+		<CheckBoxPreference android:key="@string/key_use_pretty_fractions"
+		    android:title="@string/_title_use_pretty_fractions"
+		    android:summary="@string/_summary_use_pretty_fractions"
+		    android:defaultValue="false"
+		/>
 	     
 	    <PreferenceCategory 
 	    	android:title="@string/_title_show_in_list" 

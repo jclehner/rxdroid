@@ -22,5 +22,15 @@
     <string name="_title_ampoule">Ampoule</string>
 	<string name="_title_iv_bag">IV bag</string>
 	<string name="_title_pipette">Pipette</string>
+	
+	<string name="_help_title_swipe_date">Swipe to change date.</string>
+	<string name="_help_msg_swipe_date">The currently displayed date is indicated in the title bar. To go back and forth in time, 
+	    swipe left or right.</string>
+	   
+	    
+	<string name="_help_title_drag_drop_sort">Change order.</string>
+	
+	<string name="_help_title_edit_drug">Edit drug.</string>
+	<string name="_help_msg_edit_drug">If you want to edit the drug, just click its title.</string>
     
 </resources>

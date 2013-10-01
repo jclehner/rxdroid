@@ -21,6 +21,9 @@
 
 package at.jclehner.rxdroid;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;

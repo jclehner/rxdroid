@@ -710,13 +710,13 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 				mLastPage = InfiniteViewPagerAdapter.CENTER;
 
-				if(drugCount == 1)
+				if(drugCount == 1 && !Settings.wasDisplayedOnce("date_swipe"))
 				{
-					final ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(this);
+					ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(this);
 					svb.setText(R.string._help_title_swipe_date, R.string._help_msg_swipe_date);
-
-					final ShowcaseView sv = svb.build();
-					sv.setShowcaseItem(ShowcaseView.ITEM_TITLE, 0, this);
+					svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+					svb.setShowcaseId(0xdeadbeef + 0);
+					svb.setShowcaseItem(ShowcaseView.ITEM_TITLE, 0, this);
 
 					final DisplayMetrics metrics = new DisplayMetrics();
 					getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -726,37 +726,29 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 					final float y = h * 0.6f;
 
-					mShowcaseQueue.setOnShowcaseEventListener(new OnShowcaseEventListener() {
+					svb.setAnimatedGesture(-100, y, w, y);
 
-						@Override
-						public void onShowcaseViewShow(final ShowcaseView showcaseView)
-						{
-							if(showcaseView != sv)
-								return;
+					mShowcaseQueue.add(svb.build());
 
-							// animate from 20% width to 80% width, always at 80% height
-							//sv.setShowcasePosition(w * 0.2f, y);
+					svb = new ShowcaseViewBuilder2(this);
+					svb.setText(R.string._help_title_edit_drug, R.string._help_msg_edit_drug);
+					svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+					svb.setShowcaseId(0xdeadbeef + 1);
+					svb.setShowcaseView(R.id.drug_name, this);
 
-							showcaseView.postDelayed(new Runnable() {
-
-								@Override
-								public void run()
-								{
-									showcaseView.animateGesture(-100, y, w, y);
-								}
-							}, 1000);
-
-							Log.d(TAG, "onShowcaseViewShow");
-						}
-
-						@Override
-						public void onShowcaseViewHide(ShowcaseView showcaseView) {}
-					});
-
-					mShowcaseQueue.add(sv);
+					mShowcaseQueue.add(svb.build());
 				}
-				else if(drugCount >= 2)
-					showInfoDialog(Settings.OnceIds.DRAG_DROP_SORTING, R.string._msg_drag_drop_sorting);
+				else if(drugCount >= 2 && !Settings.wasDisplayedOnce(Settings.OnceIds.DRAG_DROP_SORTING))
+				{
+					ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(this);
+					svb.setShowcaseView(R.id.drug_icon, this);
+					svb.setText(R.string._help_title_drag_drop_sort, R.string._msg_drag_drop_sorting);
+					svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+					svb.setShowcaseId(0xdeadbeef + 2);
+					svb.setRelativeAnimatedGesture(0, 200);
+
+					mShowcaseQueue.add(svb.build());
+				}
 			}
 			else
 			{

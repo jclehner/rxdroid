@@ -378,9 +378,7 @@ public class FractionInput extends LinearLayout
 		svb.setShowcaseId(showcaseId);
 		svb.setText(titleResId, msgResId);
 		svb.setShowcaseView(view);
-
-		if(!BuildConfig.DEBUG)
-			svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+		svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 
 		ShowcaseView sv = svb.build();
 
