@@ -395,6 +395,10 @@
 	<string name="_help_title_input_mixed">Mixed fraction mode</string>
 	<string name="_help_msg_input_mixed">To enter a value such as 1¾, enter \"1\" in the left field,
 	    \"3\" in the middle field and \"4\" in the right field.</string>
+	
+	<string name="_help_title_swipe_date">Swipe to change date</string>
+	<string name="_help_msg_swipe_date">The currently displayed date is indicated in the title bar. To go back and forth in time, 
+	    swipe left or right.</string>
 		
 	<!--  
 	<string name="_help_msg_fraction_mode">If you are not taking full doses, but 1½, ⅔, etc., click here. 

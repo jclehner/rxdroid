@@ -42,7 +42,7 @@ public final class ShowcaseViews
 			if(sv.getParent() == null)
 				sv.show();
 
-			mViews.remove(0);
+			//mViews.remove(0);
 		}
 	}
 
@@ -60,7 +60,7 @@ public final class ShowcaseViews
 		@Override
 		public void onShowcaseViewHide(ShowcaseView showcaseView)
 		{
-			//mViews.remove(0);
+			mViews.remove(0);
 			show();
 
 			if(mListener != null)

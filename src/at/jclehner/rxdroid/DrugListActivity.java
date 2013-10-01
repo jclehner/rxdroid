@@ -38,7 +38,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -47,6 +46,7 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -78,7 +78,7 @@ import at.jclehner.rxdroid.ui.DrugOverviewAdapter;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.DateTime;
-import at.jclehner.rxdroid.util.Extras;
+import at.jclehner.rxdroid.util.ShowcaseViews;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.AutoDragSortListView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
@@ -87,7 +87,9 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import com.github.espiandev.showcaseview.ShowcaseView;
+import com.github.espiandev.showcaseview.ShowcaseView.OnShowcaseEventListener;
+import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
 import com.mobeta.android.dslv.DragSortListView;
 
 public class DrugListActivity extends SherlockFragmentActivity implements OnLongClickListener,
@@ -124,6 +126,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 	private int mLastPage = -1;
 
 	private boolean mIsShowing = false;
+
+	private final ShowcaseViews mShowcaseQueue = new ShowcaseViews();
 
 	@TargetApi(11)
 	@Override
@@ -186,6 +190,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 				showInfoDialog("missing_translation_" + isoLang, R.string._msg_no_translation, language);
 			}
 		}
+
+		mShowcaseQueue.show();
 	}
 
 	@Override
@@ -705,7 +711,50 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 				mLastPage = InfiniteViewPagerAdapter.CENTER;
 
 				if(drugCount == 1)
-					showInfoDialog("date_swipe", R.string._msg_swipe_to_change_date);
+				{
+					final ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(this);
+					svb.setText(R.string._help_title_swipe_date, R.string._help_msg_swipe_date);
+
+					final ShowcaseView sv = svb.build();
+					sv.setShowcaseItem(ShowcaseView.ITEM_TITLE, 0, this);
+
+					final DisplayMetrics metrics = new DisplayMetrics();
+					getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+					final float w = metrics.widthPixels;
+					final float h = metrics.heightPixels;
+
+					final float y = h * 0.6f;
+
+					mShowcaseQueue.setOnShowcaseEventListener(new OnShowcaseEventListener() {
+
+						@Override
+						public void onShowcaseViewShow(final ShowcaseView showcaseView)
+						{
+							if(showcaseView != sv)
+								return;
+
+							// animate from 20% width to 80% width, always at 80% height
+							//sv.setShowcasePosition(w * 0.2f, y);
+
+							showcaseView.postDelayed(new Runnable() {
+
+								@Override
+								public void run()
+								{
+									showcaseView.animateGesture(-100, y, w, y);
+								}
+							}, 1000);
+
+							Log.d(TAG, "onShowcaseViewShow");
+						}
+
+						@Override
+						public void onShowcaseViewHide(ShowcaseView showcaseView) {}
+					});
+
+					mShowcaseQueue.add(sv);
+				}
 				else if(drugCount >= 2)
 					showInfoDialog(Settings.OnceIds.DRAG_DROP_SORTING, R.string._msg_drag_drop_sorting);
 			}

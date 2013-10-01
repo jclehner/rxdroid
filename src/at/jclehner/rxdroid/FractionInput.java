@@ -384,7 +384,7 @@ public class FractionInput extends LinearLayout
 
 		ShowcaseView sv = svb.build();
 
-		if(false && view != null) {
+		if(true && view != null) {
 			//sv.pointTo(view);
 			int[] location = new int[2];
 			view.getLocationOnScreen(location);

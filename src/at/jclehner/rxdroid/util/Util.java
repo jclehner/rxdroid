@@ -108,12 +108,15 @@ public final class Util
 
 	public static int pixelsFromSips(int sips)
 	{
-		return Math.round(sips * getDisplayMetrics().scaledDensity);
+		return Math.round(sips * getDisplayMetrics(null).scaledDensity);
 	}
 
-	public static int pixelsFromDips(int dips)
-	{
-		return Math.round(dips * getDisplayMetrics().density);
+	public static int pixelsFromDips(int dips) {
+		return pixelsFromDips(null, dips);
+	}
+
+	public static int pixelsFromDips(Context context, int dips) {
+		return Math.round(dips * getDisplayMetrics(context).density);
 	}
 
 	public static int getDoseTimeDrawableFromDoseViewId(int doseViewId)
@@ -640,8 +643,11 @@ public final class Util
 		return sw.toString();
 	}
 
-	private static DisplayMetrics getDisplayMetrics()
+	private static DisplayMetrics getDisplayMetrics(Context context)
 	{
-		return RxDroid.getContext().getResources().getDisplayMetrics();
+		if(context == null)
+			context = RxDroid.getContext();
+
+		return context.getResources().getDisplayMetrics();
 	}
 }
