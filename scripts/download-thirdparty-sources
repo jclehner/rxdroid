@@ -207,6 +207,8 @@ for REPO in "${GIT_REPOS[@]}"; do
 	#fi
 
 	ZIPDIRS+="${THIRDPARTY}/${TARGET} "
+
+	android update lib-project -p "${TARGET}"
 done
 
 cd - &> /dev/null
