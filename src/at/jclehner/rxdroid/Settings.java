@@ -118,7 +118,7 @@ public final class Settings
 	}
 
 	private static final String TAG = Settings.class.getSimpleName();
-	private static final boolean LOGV = true;
+	private static final boolean LOGV = false;
 
 	private static final String DATE_FORMAT = "yyyy-MM-dd";
 	private static final String DOSE_TIME_KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
