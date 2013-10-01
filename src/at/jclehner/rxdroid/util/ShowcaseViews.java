@@ -2,9 +2,7 @@ package at.jclehner.rxdroid.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.WeakHashMap;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.View;
 
@@ -13,35 +11,23 @@ import com.github.espiandev.showcaseview.ShowcaseView.OnShowcaseEventListener;
 
 public final class ShowcaseViews
 {
-	private static final String TAG = ShowcaseViews.class.getSimpleName();
-
 	private final List<ShowcaseView> mViews = new ArrayList<ShowcaseView>();
-	private static final WeakHashMap<Context, ShowcaseViews> sInstances =
-			new WeakHashMap<Context, ShowcaseViews>();
 
-	public static ShowcaseViews create(Context context)
-	{
-		ShowcaseViews ret = sInstances.get(context);
-		if(ret == null)
-		{
-			sInstances.put(context, ret = new ShowcaseViews());
-			Log.d(TAG, "create: returning existing instance");
-		}
-		else
-			Log.d(TAG, "create: returning new instance");
-
-		return ret;
-	}
+	private OnShowcaseEventListener mListener;
 
 	public void add(ShowcaseView sv)
 	{
 		if(sv.getVisibility() == View.VISIBLE)
 		{
-			sv.setOnShowcaseEventListener(mListener);
+			sv.setOnShowcaseEventListener(mLocalListener);
 			mViews.add(sv);
 		}
 		else
 			Log.d("ShowcaseViews", "add: not adding; view might be redundant!");
+	}
+
+	public void setOnShowcaseEventListener(OnShowcaseEventListener l) {
+		mListener = l;
 	}
 
 	public boolean hasViews() {
@@ -60,14 +46,15 @@ public final class ShowcaseViews
 		}
 	}
 
-	private ShowcaseViews() {}
+	public ShowcaseViews() {}
 
-	private final OnShowcaseEventListener mListener = new OnShowcaseEventListener() {
+	private final OnShowcaseEventListener mLocalListener = new OnShowcaseEventListener() {
 
 		@Override
 		public void onShowcaseViewShow(ShowcaseView showcaseView)
 		{
-
+			if(mListener != null)
+				mListener.onShowcaseViewShow(showcaseView);
 		}
 
 		@Override
@@ -75,6 +62,9 @@ public final class ShowcaseViews
 		{
 			//mViews.remove(0);
 			show();
+
+			if(mListener != null)
+				mListener.onShowcaseViewHide(showcaseView);
 		}
 	};
 

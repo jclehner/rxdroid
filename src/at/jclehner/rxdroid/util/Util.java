@@ -24,10 +24,11 @@ package at.jclehner.rxdroid.util;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Scanner;
 
 import android.app.Activity;
@@ -88,26 +89,30 @@ public final class Util
 		}
 	}
 
-	public static void lockActivityOrientation(Activity activity, int orientation)
+	public static void lockActivityOrientation(Activity activity,
+			int orientation)
 	{
 		activity.setRequestedOrientation(orientation);
 		activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 	}
 
-//	public static <T extends Serializable> T copy(T object)
-//	{
-//
-//	}
+	// public static <T extends Serializable> T copy(T object)
+	// {
+	//
+	// }
 
-	public static void applyStyle(Spannable spannable, Object style) {
+	public static void applyStyle(Spannable spannable, Object style)
+	{
 		spannable.setSpan(style, 0, spannable.length(), 0);
 	}
 
-	public static int pixelsFromSips(int sips) {
+	public static int pixelsFromSips(int sips)
+	{
 		return Math.round(sips * getDisplayMetrics().scaledDensity);
 	}
 
-	public static int pixelsFromDips(int dips) {
+	public static int pixelsFromDips(int dips)
+	{
 		return Math.round(dips * getDisplayMetrics().density);
 	}
 
@@ -115,14 +120,14 @@ public final class Util
 	{
 		switch(doseViewId)
 		{
-				case R.id.morning:
-						return R.drawable.ic_morning;
-				case R.id.noon:
-						return R.drawable.ic_noon;
-				case R.id.evening:
-						return R.drawable.ic_evening;
-				case R.id.night:
-						return R.drawable.ic_night;
+			case R.id.morning:
+				return R.drawable.ic_morning;
+			case R.id.noon:
+				return R.drawable.ic_noon;
+			case R.id.evening:
+				return R.drawable.ic_evening;
+			case R.id.night:
+				return R.drawable.ic_night;
 		}
 
 		throw new IllegalArgumentException();
@@ -130,7 +135,8 @@ public final class Util
 
 	public static int getDoseTimeDrawableFromDoseTime(int doseTime)
 	{
-		return getDoseTimeDrawableFromDoseViewId(Constants.getDoseViewId(doseTime));
+		return getDoseTimeDrawableFromDoseViewId(Constants
+				.getDoseViewId(doseTime));
 	}
 
 	public static String escapeHtml(CharSequence str)
@@ -155,14 +161,14 @@ public final class Util
 	{
 		switch(doseViewId)
 		{
-				case R.id.morning:
-						return Drug.TIME_MORNING;
-				case R.id.noon:
-						return Drug.TIME_NOON;
-				case R.id.evening:
-						return Drug.TIME_EVENING;
-				case R.id.night:
-						return Drug.TIME_NIGHT;
+			case R.id.morning:
+				return Drug.TIME_MORNING;
+			case R.id.noon:
+				return Drug.TIME_NOON;
+			case R.id.evening:
+				return Drug.TIME_EVENING;
+			case R.id.night:
+				return Drug.TIME_NIGHT;
 		}
 
 		throw new IllegalArgumentException();
@@ -241,14 +247,23 @@ public final class Util
 	 * <p>
 	 * Note that this function automatically resolves string references.
 	 *
-	 * @param context The context
-	 * @param attrs An AttributeSet to query
-	 * @param namespace The attribute's namespace (in the form of <code>http://schemas.android.com/apk/res/&lt;package&gt;</code>)
-	 * @param attribute The name of the attribute to query
-	 * @param defaultValue A default value, in case there's no such attribute
+	 * @param context
+	 *            The context
+	 * @param attrs
+	 *            An AttributeSet to query
+	 * @param namespace
+	 *            The attribute's namespace (in the form of
+	 *            <code>http://schemas.android.com/apk/res/&lt;package&gt;</code>
+	 *            )
+	 * @param attribute
+	 *            The name of the attribute to query
+	 * @param defaultValue
+	 *            A default value, in case there's no such attribute
 	 * @return The attribute's value, or <code>null</code> if it does not exist
 	 */
-	public static String getStringAttribute(Context context, AttributeSet attrs, String namespace, String attribute, String defaultValue)
+	public static String getStringAttribute(Context context,
+			AttributeSet attrs, String namespace, String attribute,
+			String defaultValue)
 	{
 		int resId = attrs.getAttributeResourceValue(namespace, attribute, -1);
 		String value;
@@ -275,16 +290,19 @@ public final class Util
 
 	public static String millis(long millis)
 	{
-		return millis + "ms (" + new DumbTime(millis, true).toString(true, true) + ")";
+		return millis + "ms ("
+				+ new DumbTime(millis, true).toString(true, true) + ")";
 	}
 
 	/**
 	 * Returns an array index for the given weekday.
 	 *
-	 * @param weekday a weekday as found in Calendar's DAY_OF_WEEK field.
+	 * @param weekday
+	 *            a weekday as found in Calendar's DAY_OF_WEEK field.
 	 * @return <code>0</code> for Monday, <code>1</code> for Tuesday, etc.
 	 */
-	public static int calWeekdayToIndex(int weekday) {
+	public static int calWeekdayToIndex(int weekday)
+	{
 		return CollectionUtils.indexOf(weekday, Constants.WEEK_DAYS);
 	}
 
@@ -302,7 +320,9 @@ public final class Util
 				if(c - start < 26)
 					c = (char) (((c - start + 13) % 26) + start);
 				else
-					throw new IllegalStateException("Character out of range: c=" + c + "(" + (int) c + "), start=" + start);
+					throw new IllegalStateException(
+							"Character out of range: c=" + c + "(" + (int) c
+									+ "), start=" + start);
 			}
 
 			sb.append(c);
@@ -321,7 +341,8 @@ public final class Util
 		return false;
 	}
 
-	public static void dumpObjectMembers(String tag, int priority, Object object, String name)
+	public static void dumpObjectMembers(String tag, int priority,
+			Object object, String name)
 	{
 		if(object == null)
 		{
@@ -331,9 +352,10 @@ public final class Util
 
 		final Class<?> clazz = object.getClass();
 		final StringBuilder sb = new StringBuilder();
-		sb.append("dumpObjectMembers: (" + clazz.getSimpleName() + ") " + name + "\n");
+		sb.append("dumpObjectMembers: (" + clazz.getSimpleName() + ") " + name
+				+ "\n");
 
-		//for(Field f : clazz.getDeclaredFields())
+		// for(Field f : clazz.getDeclaredFields())
 		for(Field f : Reflect.getAllFields(clazz))
 		{
 			int m = f.getModifiers();
@@ -341,7 +363,8 @@ public final class Util
 			if(Modifier.isStatic(m))
 				continue;
 
-			sb.append("  (" + f.getType().getSimpleName() + ") " + f.getName() + "=");
+			sb.append("  (" + f.getType().getSimpleName() + ") " + f.getName()
+					+ "=");
 
 			try
 			{
@@ -416,7 +439,8 @@ public final class Util
 				if(elemType.isArray())
 					sb.append(arrayToString(elem));
 				else if(elemType == String.class)
-					sb.append("\"" + elem.toString() + "\""); // TODO escape string?
+					sb.append("\"" + elem.toString() + "\""); // TODO escape
+																// string?
 				else
 					sb.append(elem.toString());
 			}
@@ -447,11 +471,13 @@ public final class Util
 
 	public static boolean wasInstalledViaGooglePlay()
 	{
-		final String installer = getInstallerPackageName(RxDroid.getContext().getPackageName());
+		final String installer = getInstallerPackageName(RxDroid.getContext()
+				.getPackageName());
 		if(installer == null)
 			return false;
 
-		return installer.startsWith("com.android") || installer.startsWith("com.google");
+		return installer.startsWith("com.android")
+				|| installer.startsWith("com.google");
 	}
 
 	public static String getInstallerPackageName(String packageName)
@@ -495,11 +521,12 @@ public final class Util
 	public static Bundle createBundle(Object... args)
 	{
 		if(args.length % 2 != 0)
-			throw new IllegalArgumentException("Array length must be divisible by 2");
+			throw new IllegalArgumentException(
+					"Array length must be divisible by 2");
 
 		Bundle b = new Bundle();
 
-		for(int i = 0; i < args.length; i +=2)
+		for(int i = 0; i < args.length; i += 2)
 		{
 			final String key;
 			try
@@ -508,7 +535,8 @@ public final class Util
 			}
 			catch(ClassCastException e)
 			{
-				throw new IllegalArgumentException("Expected string type for key at pos " + i);
+				throw new IllegalArgumentException(
+						"Expected string type for key at pos " + i);
 			}
 
 			final Object value = args[i + 1];
@@ -521,50 +549,56 @@ public final class Util
 			else if(type == String.class)
 				b.putString(key, (String) value);
 			else
-				throw new IllegalArgumentException("Unhandled value type: " + type);
+				throw new IllegalArgumentException("Unhandled value type: "
+						+ type);
 		}
 
 		return b;
 	}
 
 	/*
-VULGAR FRACTION 1/4 	¼ 	&frac14; 	&#188; 	&#xBC;
-VULGAR FRACTION 1/2 	½ 	&frac12; 	&#189; 	&#xBD;
-VULGAR FRACTION 3/4 	¾ 	&frac34; 	&#190; 	&#xBE;
-VULGAR FRACTION 1/3 	⅓ 	-- 	&#8531; 	&#x2153;
-VULGAR FRACTION 2/3 	⅔ 	-- 	&#8532; 	&#x2154;
-VULGAR FRACTION 1/5 	⅕ 	-- 	&#8533; 	&#x2155;
-VULGAR FRACTION 2/5 	⅖ 	-- 	&#8354; 	&#x2156;
-VULGAR FRACTION 3/5 	⅗ 	-- 	&#8535; 	&#x2157;
-VULGAR FRACTION 4/5 	⅘ 	-- 	&#8536; 	&#x2158;
-VULGAR FRACTION 1/6 	⅙ 	-- 	&#8537; 	&#x2159;
-VULGAR FRACTION 5/6 	⅚ 	-- 	&#8538; 	&#x215A;
-VULGAR FRACTION 1/8 	⅛ 	-- 	&#8539; 	&#x215B;
-VULGAR FRACTION 3/8 	⅜ 	-- 	&#8540; 	&#x215C;
-VULGAR FRACTION 5/8 	⅝ 	-- 	&#8541; 	&#x215D;
-VULGAR FRACTION 7/8 	⅞ 	-- 	&#8542; 	&#x215E;
+	 * VULGAR FRACTION 1/4 ¼ &frac14; &#188; &#xBC; VULGAR FRACTION 1/2 ½
+	 * &frac12; &#189; &#xBD; VULGAR FRACTION 3/4 ¾ &frac34; &#190; &#xBE;
+	 * VULGAR FRACTION 1/3 ⅓ -- &#8531; &#x2153; VULGAR FRACTION 2/3 ⅔ --
+	 * &#8532; &#x2154; VULGAR FRACTION 1/5 ⅕ -- &#8533; &#x2155; VULGAR
+	 * FRACTION 2/5 ⅖ -- &#8354; &#x2156; VULGAR FRACTION 3/5 ⅗ -- &#8535;
+	 * &#x2157; VULGAR FRACTION 4/5 ⅘ -- &#8536; &#x2158; VULGAR FRACTION 1/6 ⅙
+	 * -- &#8537; &#x2159; VULGAR FRACTION 5/6 ⅚ -- &#8538; &#x215A; VULGAR
+	 * FRACTION 1/8 ⅛ -- &#8539; &#x215B; VULGAR FRACTION 3/8 ⅜ -- &#8540;
+	 * &#x215C; VULGAR FRACTION 5/8 ⅝ -- &#8541; &#x215D; VULGAR FRACTION 7/8 ⅞
+	 * -- &#8542; &#x215E;
 	 */
 
-	private static final String[][] PRETTY_FRACTIONS = {
-		{ "\u00BD" }, // "1/2"
-		{ "\u2153", "\u2154"  }, // "1/3", "2/3"
-		{ "\u00BC", null, "\u00BE" }, // "1/4", null, "3/4"
-		{ "\u2155", "\u2156", "\u2157", "\u2158" }, // "1/5", "2/5", "3/5", "4/5"
-		{ "\u2159", null, null, null, "\u215A" }, // "1/6", null, null, null, "5/6"
-		null,
-		{ "\u215B", null, "\u215C", null, "\u215D", null, "\u215E" } // "1/8", null, "3/8", null, "5/8", null, "7/8"
+	private static final String[][] PRETTY_FRACTIONS = { { "\u00BD" }, // "1/2"
+			{ "\u2153", "\u2154" }, // "1/3", "2/3"
+			{ "\u00BC", null, "\u00BE" }, // "1/4", null, "3/4"
+			{ "\u2155", "\u2156", "\u2157", "\u2158" }, // "1/5", "2/5", "3/5",
+														// "4/5"
+			{ "\u2159", null, null, null, "\u215A" }, // "1/6", null, null,
+														// null, "5/6"
+			null, { "\u215B", null, "\u215C", null, "\u215D", null, "\u215E" } // "1/8",
+																				// null,
+																				// "3/8",
+																				// null,
+																				// "5/8",
+																				// null,
+																				// "7/8"
 	};
 
 	public static String prettify(Fraction frac)
 	{
-		if(!BuildConfig.DEBUG || !Settings.getBoolean(Keys.USE_PRETTY_FRACTIONS, false))
+		if(!BuildConfig.DEBUG
+				|| !Settings.getBoolean(Keys.USE_PRETTY_FRACTIONS, false))
 			return frac.toString();
 
-		// Characters for fifths and sixths are available in the unicode specs, but not in the standard
-		// Android fonts: on Gingerbread, a placeholder box icon is displayed, while Jellybean converts
+		// Characters for fifths and sixths are available in the unicode specs,
+		// but not in the standard
+		// Android fonts: on Gingerbread, a placeholder box icon is displayed,
+		// while Jellybean converts
 		// them to their simple counterparts (i.e. 1/5 instead of ⅕)
 
-		if(frac.isInteger() || (frac.denominator() > 4 && frac.denominator() != 8))
+		if(frac.isInteger()
+				|| (frac.denominator() > 4 && frac.denominator() != 8))
 			return frac.toString();
 
 		final int[] data = frac.getFractionData(true);
@@ -573,14 +607,41 @@ VULGAR FRACTION 7/8 	⅞ 	-- 	&#8542; 	&#x215E;
 		final int numerator = data[1];
 		final int denominator = data[2];
 
-		final String pretty = PRETTY_FRACTIONS[denominator-2][numerator-1];
+		final String pretty = PRETTY_FRACTIONS[denominator - 2][numerator - 1];
 		if(pretty != null)
 			return wholeNum != 0 ? (wholeNum + pretty) : pretty;
 
 		return frac.toString();
 	}
 
-	private static DisplayMetrics getDisplayMetrics() {
+	public static String visibilityToString(int visibility)
+	{
+		switch(visibility)
+		{
+			case View.VISIBLE:
+				return "VISIBLE";
+
+			case View.INVISIBLE:
+				return "INVISIBLE";
+
+			case View.GONE:
+				return "GONE";
+
+			default:
+				return "??? (" + visibility + ")";
+		}
+	}
+
+	public static String stackTraceToString(Throwable t)
+	{
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		t.printStackTrace(pw);
+		return sw.toString();
+	}
+
+	private static DisplayMetrics getDisplayMetrics()
+	{
 		return RxDroid.getContext().getResources().getDisplayMetrics();
 	}
 }

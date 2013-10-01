@@ -44,7 +44,7 @@ public final class Version
 	public static final boolean BETA = BuildConfig.DEBUG || BETA_BUILD;
 
 	public static final String[] LANGUAGES = {
-		"en", "de", "it"
+		"en", "de", "it", "el"
 	};
 
 	/**

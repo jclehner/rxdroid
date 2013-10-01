@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="_help_title_to_fraction_mode">Taking only half a tablet?</string>
+	<string name="_help_msg_to_fraction_mode">By pressing this button you can also enter values such as ½ or 1¾ as doses!</string>
+	
+	<string name="_help_title_input_fraction">Fraction mode</string>
+	<string name="_help_msg_input_fraction">
+	    To enter a value such as ¾, enter \"3\" in the left field and \"4\" in the right field.
+	    \n\nTo enter a whole number, enter that number in the left field and \"1\" in the right field.
+	</string>
+	
+	<string name="_help_title_to_mixed_mode">More than one?</string>
+	<string name="_help_msg_to_mixed_mode">If you are taking doses such as 1¾, press this button.</string>
+	
+	<string name="_help_title_input_mixed">Mixed fraction mode</string>
+	<string name="_help_msg_input_mixed">To enter a value such as 1¾, enter \"1\" in the left field,
+	    \"3\" in the middle field and \"4\" in the right field.</string>	    
+	
+    <string name="_help_msg_menu_hardware">The menu is accessible by pressing the menu key on your device.</string>
+    <string name="_help_msg_menu_ab_overflow">The menu is accessible by pressing the three-dot icon.</string>
+    
+    <string name="_title_ampoule">Ampoule</string>
+	<string name="_title_iv_bag">IV bag</string>
+	<string name="_title_pipette">Pipette</string>
+    
+</resources>

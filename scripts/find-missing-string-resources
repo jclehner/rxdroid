@@ -39,7 +39,7 @@ scan_dir()
 
 scan_string_xml()
 {
-	for f in res/values/strings.xml res/values-{de,fr}/strings.xml; do
+	for f in res/values/strings.xml res/values-{de,it,el}/strings.xml; do
 		[[ -e $f ]] || continue
 
 		echo "-- $f:"

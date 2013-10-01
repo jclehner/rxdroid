@@ -531,7 +531,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 						hasHardwareMenuKey = ViewConfiguration.get(this).hasPermanentMenuKey();
 				}
 
-				final StringBuilder sb = new StringBuilder(getString(R.string._msg_no_drugs_compact_ab));
+				final StringBuilder sb = new StringBuilder(getString(R.string._msg_no_drugs_compact_ab,
+						getString(R.string._title_add)));
 
 				if(hasHardwareMenuKey)
 					sb.append(" " + getString(R.string._help_msg_menu_hardware));

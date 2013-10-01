@@ -315,8 +315,11 @@
 	
 	<string name="_title_disabled">Deaktiviert</string>
 	
-	<string name="_msg_no_drugs_compact_ab">»%1$s« aus dem Menü auswählen, um ein Medikament hinzuzufügen</string>
-	<string name="_msg_no_drugs_extended_ab">Den »+« Button in der Aktionsleiste klicken, um ein Medikament hinzuzufügen</string>
+	<string name="_msg_no_drugs_compact_ab">»%1$s« aus dem Menü auswählen, um ein Medikament hinzuzufügen.</string>
+	<string name="_msg_no_drugs_extended_ab">Den »+« Button in der Aktionsleiste klicken, um ein Medikament hinzuzufügen.</string>
+	
+	<string name="_help_msg_menu_hardware">Das Menü kann durch Drücken der Menü-Taste auf Ihrem Gerät aufgerufen werden.</string>
+    <string name="_help_msg_menu_ab_overflow">Das Menü kann durch Drücken des Drei-Punkt-Icons aufgerufen werden.</string>
 	
 	<string name="_summary_smart_sort">Medikamente nach ihrer Wichtigkeit ordnen</string>
 	<string name="_title_smart_sort">Auto-Sortieren</string>	
@@ -357,6 +360,25 @@
 	<string name="_toast_some_due_doses_skipped">Einige fällige Dosen wegen unzureichenden Vorrats 
 	    nicht als eingenommen markiert.</string>
 	<string name="_toast_no_due_doses">Im Moment keine fälligen Dosen.</string>
+	
+	<string name="_help_title_to_fraction_mode">Nur eine halbe Tablette?</string>
+	<string name="_help_msg_to_fraction_mode">Durch drücken dieses Buttons können auch Dosen wie ½ or 1¾ angegeben werden!</string>
+	
+	<string name="_help_title_input_fraction">Bruch-Modus</string>
+	<string name="_help_msg_input_fraction">
+	    Um einen Wert wie ¾ anzugeben, muss im linken Feld »3« und im rechten Feld »4« ausgewählt werden.
+	    \n\nUm eine ganze Zahl anzugeben, diese Zahl im linken Feld eingeben, und im rechten Feld »1«.
+	</string>
+	
+	<string name="_help_title_to_mixed_mode">Mehr als eins?</string>
+	<string name="_help_msg_to_mixed_mode">Um Dosen wie 1¾ einzugeben, diesen Button drücken.</string>
+	
+	<string name="_help_title_input_mixed">Gemischter Bruch-Modus</string>
+	<string name="_help_msg_input_mixed">Um einen Wert wie 1¾ anzugeben, »1« im linken Feld,
+	    »3« im mittleren Feld und »4« im rechten Feld eingeben.</string>
+	
+	<string name="_title_use_pretty_fractions">Hübsche Brüche</string>
+	<string name="_summary_use_pretty_fractions">Brüche als »½« statt »1/2« darstellen (funktioniert nur für manche Brüche)</string>		
 	
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

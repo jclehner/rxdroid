@@ -36,6 +36,7 @@ import at.jclehner.androidutils.InstanceState.SaveState;
 import at.jclehner.rxdroid.NumberPickerWrapper.OnValueChangeListener;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.ShowcaseViews;
+import at.jclehner.rxdroid.util.Util;
 
 import com.github.espiandev.showcaseview.ShowcaseView;
 import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
@@ -326,21 +327,24 @@ public class FractionInput extends LinearLayout
 
 	private void maybeExplainCurrentState()
 	{
+		if(!mAttached || getVisibility() != View.VISIBLE)
+			return;
+
+		if(!BuildConfig.DEBUG)
+		{
+			if(Settings.getBoolean(Settings.Keys.HAS_FRACTIONS_IN_ANY_SCHEDULE, false))
+				return;
+		}
+
 		post(new Runnable() {
 
 			@Override
 			public void run()
 			{
-				if(getVisibility() != View.VISIBLE || !mAttached)
+				if(!isShown())
 					return;
 
-				if(!BuildConfig.DEBUG)
-				{
-					if(Settings.getBoolean(Settings.Keys.HAS_FRACTIONS_IN_ANY_SCHEDULE, false))
-						return;
-				}
-
-				final ShowcaseViews svs = ShowcaseViews.create(getContext());
+				final ShowcaseViews svs = new ShowcaseViews();
 
 				if(mFractionInputMode == MODE_INTEGER)
 				{
