@@ -209,6 +209,10 @@ for REPO in "${GIT_REPOS[@]}"; do
 	ZIPDIRS+="${THIRDPARTY}/${TARGET} "
 
 	android update lib-project -p "${TARGET}"
+
+	if [[ "${TARGET}" == "ShowcaseView" ]]; then
+		echo >> "${TARGET}/project.properties" "android.library.reference.1=../NineOldAndroids"
+	fi
 done
 
 cd - &> /dev/null
