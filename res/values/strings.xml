@@ -405,7 +405,7 @@
 	<string name="_help_title_drag_drop_sort">Change order.</string>
 	
 	<string name="_help_title_edit_drug">Edit drug.</string>
-	<string name="_help_msg_edit_drug">If you want to edit the drug, just click its title.</string>
+	<string name="_help_msg_edit_drug">If you want to edit a drug, click its title.</string>
 		
 	<!--  
 	<string name="_help_msg_fraction_mode">If you are not taking full doses, but 1½, ⅔, etc., click here. 
