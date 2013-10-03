@@ -216,6 +216,8 @@ public class DoseLogFragment extends ExpandableListFragment
 		final Timer t;
 		if(LOGV)
 			t = new Timer();
+		else
+			t = null;
 
 		final Drug drug = getDrug();
 		final List<EventInfo> infos = new ArrayList<EventInfo>();
