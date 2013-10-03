@@ -1,3 +1,9 @@
 [submodule "thirdparty/ActionBarSherlock"]
 	path = thirdparty/ActionBarSherlock
 	url = https://github.com/JakeWharton/ActionBarSherlock
+[submodule "thirdparty/ShowcaseView"]
+	path = thirdparty/ShowcaseView
+	url = git://github.com/jclehner/ShowcaseView.git
+[submodule "thirdparty/NumberPicker"]
+	path = thirdparty/NumberPicker
+	url = git://github.com/jclehner/numberpicker.git
