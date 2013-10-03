@@ -108,10 +108,7 @@
 	<string name="_toast_saved">Gespeichert.</string>
 	
 	<string name="_title_add">Hinzufügen</string>
-	
-	<string name="_msg_intake_normal">Dosis einnehmen und auf OK klicken.</string>
-	<string name="_msg_intake_unscheduled">Dosis wählen und auf OK klicken.</string>
-	
+		
 	<string name="_msg_intake_normal">Angegebene Dosis &lt;b&gt;%1$s&lt;/b&gt; einnehmen</string>
 	<string name="_msg_intake_unscheduled">Dosis &lt;b&gt;%1$s&lt;/b&gt; auswählen</string>
 	

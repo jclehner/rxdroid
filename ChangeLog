@@ -1,3 +1,8 @@
+0.9.18:
+	* Added help overlays
+	* Added option to show pretty fractions
+	* Fixed launcher icons on ldpi devices
+
 0.9.17.2:
 	* Fixed bug in 21 days on / 7 days off repeat mode
 
