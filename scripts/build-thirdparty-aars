@@ -1,0 +1,112 @@
+#!/bin/bash
+
+source "$(dirname "$0")/shared.sh" || exit 1
+
+create_default_build_gradle() {
+	echo "INFO: creating default build.gradle in $1"
+
+	cat > "$1/build.gradle" <<EOF
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies {
+		classpath 'com.android.tools.build:gradle:0.5.+'
+	}
+}
+
+apply plugin: 'android-library'
+
+archiveBaseName = "$2"
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
+dependencies {
+	compile 'com.android.support:support-v4:18.0.+'
+}
+
+tasks.withType(Compile) {
+	options.encoding = "UTF-8"
+}
+
+android {
+	compileSdkVersion 18
+	buildToolsVersion "18.0.1"
+
+	sourceSets {
+		main {
+			manifest.srcFile 'AndroidManifest.xml'
+			java.srcDirs = ['src']
+			res.srcDirs = ['res']
+		}
+	}
+}
+EOF
+}
+
+
+
+GIT_REPOS=( 
+	"NumberPicker git://github.com/jclehner/numberpicker.git lib"
+	"DragSortListView git://github.com/bauerca/drag-sort-listview.git library"
+	"ShowcaseView git://github.com/jclehner/ShowcaseView.git library"
+)
+
+ORIGPWD="$(pwd)"
+
+pushd "$(mktempd)" || die
+
+for REPO in "${GIT_REPOS[@]}"; do
+	
+	read -ra REPO_INFO <<< "${REPO}"
+	TARGET=${REPO_INFO[0]}
+	URL=${REPO_INFO[1]}
+	LIBDIR=${REPO_INFO[2]}
+
+	if [[ -z ${TARGET} || -z ${URL} ]]; then
+		die "No URL or LIBDIR in ${REPO_INFO[@]}"
+	fi
+
+	CLONEDIR=
+
+	if [[ -z "${LIBDIR}" ]]; then
+		CLONEDIR="${TARGET}"
+	else
+		CLONEDIR="${TARGET}Git"
+	fi
+
+	run git clone --depth 1 "${URL}" "${CLONEDIR}"
+	
+	if [[ -z "${LIBDIR}" ]]; then
+		BUILDDIR="${CLONEDIR}"
+	else
+		BUILDDIR="${CLONEDIR}/${LIBDIR}"
+	fi
+
+	if [[ ! -f "${BUILDDIR}/build.gradle" ]]; then
+		create_default_build_gradle "${BUILDDIR}" "${TARGET}"
+	fi
+
+	if [[ ! -f "${BUILDDIR}/settings.gradle" ]]; then
+		echo "rootProject.name = \"${TARGET}\"" > "${BUILDDIR}/settings.gradle"
+	fi
+
+	pushd "${BUILDDIR}" || die
+
+	echo "INFO: in ${BUILDDIR}"
+
+	run android update project -p .
+	run gradle assembleRelease
+
+	AAR="$(pwd)/build/libs/${TARGET}.aar"
+
+	pushd "${ORIGPWD}"
+	run ./scripts/add-aar-to-maven "${AAR}"
+
+	popd
+	popd
+done

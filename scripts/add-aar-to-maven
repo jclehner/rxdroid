@@ -1,0 +1,11 @@
+#!/bin/bash
+
+source "$(dirname $0)/shared.sh" || exit 1
+
+if [[ ! -f "$1" ]]; then
+	die "No such file: $1"
+fi
+
+artifactId="${2:-$(basename "$1" .aar)}"
+
+mvn install:install-file -Dfile="$1" -DgroupId=at.jclehner.rxdroid.localmaven -DartifactId="${artifactId}" -Dversion=9999 -Dpackaging=aar
