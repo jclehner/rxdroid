@@ -1,3 +1,4 @@
-To build, first run ./scripts/download-thirdparty-sources to download
-the NumberPicker library. You must then create an Eclipse Android project
-from existing source using ./thirdparty/NumberPicker as base directory.
+RxDroid - A medication reminder
+===============================
+
+See [project page](http://code.google.com/p/rxdroid) for details.
