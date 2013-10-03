@@ -13,3 +13,6 @@
 [submodule "thirdparty/drag-sort-listview"]
 	path = thirdparty/drag-sort-listview
 	url = git://github.com/bauerca/drag-sort-listview.git
+[submodule "thirdparty/NineOldAndroids"]
+	path = thirdparty/NineOldAndroids
+	url = https://github.com/JakeWharton/NineOldAndroids
