@@ -11,8 +11,8 @@ buildscript {
 }
 
 repositories {
-	mavenLocal()
 	mavenCentral()
+	mavenLocal()
 }
 
 dependencies {
@@ -29,7 +29,7 @@ dependencies {
 
 
 android {
-	buildToolsVersion "17.0"
+	buildToolsVersion "18.1"
 	compileSdkVersion 18
 
 /*
