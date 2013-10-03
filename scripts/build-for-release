@@ -4,7 +4,7 @@ source "$(dirname "$0")/shared.sh" || exit 1
 
 REPO="https://rxdroid.googlecode.com/svn"
 TMP=$(mktempd)
-BIN="bin/RxDroid-release-unsigned.apk"
+BIN="build/apk/RxDroid-release-unsigned.apk"
 RXDROID_KEYSTORE="${RXDROID_KEYSTORE:-/___IDONTEXIST__}"
 RXDROID_KEY_ALIAS="${RXDROID_KEY_ALIAS:-}"
 RXDROID_APK_OUT="${RXDROID_APK_OUT:-${HOME}/RxDroid-release.apk}"
@@ -19,7 +19,7 @@ cleanup() {
 checkout() {
 	cd "$TMP"
 	run svn co "$REPO/$1" .
-	run unzip thirdparty.zip
+#	run unzip thirdparty.zip
 }
 
 signapk() {
@@ -31,10 +31,12 @@ signapk() {
 build() {
 	run android update project -p .
 
-	run android update project -p thirdparty/NumberPicker
-	run android update project -p thirdparty/DragSortListView
-	run android update project -p thirdparty/ActionBarSherlock
-	run ant release
+	#run android update project -p thirdparty/NumberPicker
+	#run android update project -p thirdparty/DragSortListView
+	#run android update project -p thirdparty/ActionBarSherlock
+	#run ant release
+
+	run gradle assembleRelease
 
 	echo
 
