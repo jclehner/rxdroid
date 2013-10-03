@@ -1,0 +1,46 @@
+apply plugin: 'android'
+
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies {
+		classpath 'com.android.tools.build:gradle:0.5.6'
+	}
+}
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
+dependencies {
+		compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
+		compile 'com.j256.ormlite:ormlite-core:4.47'
+		compile 'com.j256.ormlite:ormlite-android:4.47'
+		compile 'com.android.support:support-v4:13.0.0'
+		compile 'at.jclehner.rxdroid.localmaven:NumberPicker:9999'
+		compile 'at.jclehner.rxdroid.localmaven:DragSortListView:9999'
+		compile 'at.jclehner.rxdroid.localmaven:ShowcaseView:9999'
+}
+
+
+android {
+	buildToolsVersion "17.0"
+	compileSdkVersion 18
+
+	sourceSets {
+		main {
+			manifest.srcFile 'AndroidManifest.xml'
+			java.srcDirs = ['src']
+			resources.srcDirs = ['src']
+			aidl.srcDirs = ['src']
+			renderscript.srcDirs = ['src']
+			res.srcDirs = ['res']
+			assets.srcDirs = ['assets']
+		}
+
+		instrumentTest.setRoot('tests')
+	}
+}
