@@ -10,3 +10,6 @@
 [submodule "thirdparty/numberpicker"]
 	path = thirdparty/numberpicker
 	url = git://github.com/jclehner/numberpicker.git
+[submodule "thirdparty/drag-sort-listview"]
+	path = thirdparty/drag-sort-listview
+	url = git://github.com/bauerca/drag-sort-listview.git
