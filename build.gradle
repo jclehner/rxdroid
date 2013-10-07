@@ -16,9 +16,9 @@ repositories {
 }
 
 dependencies {
-		compile 'com.j256.ormlite:ormlite-core:4.47'
-		compile 'com.j256.ormlite:ormlite-android:4.47'
-		compile 'com.android.support:support-v4:13.0.0'
+		compile files(':thirdpart:android-support-v4.jar')
+		compile files(':thirdparty:ormlite-core-4.47.jar')
+		compile files(':thirdparty:ormlite-android-4.47.jar')
 
 		compile project(':thirdparty:NineOldAndroids:library')
 		compile project(':thirdparty:ActionBarSherlock:actionbarsherlock')
