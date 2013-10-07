@@ -1,1 +1,7 @@
 rootProject.name = "RxDroid"
+
+include ':thirdparty:ActionBarSherlock:actionbarsherlock'
+include ':thirdparty:ShowcaseView:library'
+include ':thirdparty:numberpicker:lib'
+include ':thirdparty:NineOldAndroids:library'
+include ':thirdparty:drag-sort-listview:library'

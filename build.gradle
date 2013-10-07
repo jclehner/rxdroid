@@ -20,11 +20,11 @@ dependencies {
 		compile 'com.j256.ormlite:ormlite-android:4.47'
 		compile 'com.android.support:support-v4:13.0.0'
 
-		compile project(':thirdparty/ActionBarSherlock/actionbarsherlock')
-		compile project(':thirdparty/NineOldAndroids/library')
-		compile project(':thirdparty/numberpicker/lib')
-		compile project(':thirdparty/drag-sort-listview/library')
-		compile project(':thirdparty/ShowcaseView/library')
+		compile project(':thirdparty:NineOldAndroids:library')
+		compile project(':thirdparty:ActionBarSherlock:actionbarsherlock')
+		compile project(':thirdparty:numberpicker:lib')
+		compile project(':thirdparty:drag-sort-listview:library')
+		compile project(':thirdparty:ShowcaseView:library')
 }
 
 
