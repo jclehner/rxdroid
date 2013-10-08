@@ -415,7 +415,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-			builder.addAction(R.drawable.ic_action_tick, getString(R.string._title_take_all_due_doses), operation);
+			builder.addAction(R.drawable.ic_action_tick, getString(R.string._title_take_all_doses), operation);
 		}
 
 //		final long offset;

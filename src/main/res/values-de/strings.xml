@@ -351,7 +351,7 @@
 	<string name="_summary_skip_dose_dialog">Überspringe den Dialog nach Anklicken einer Dosis. Um ihn
 	    zu öffnen Dosis lange anklicken und »Dosis einnehmen« auswählen.</string>
 	    
-	<string name="_title_take_all_doses">Alle Dosen einnehmen</string>
+	<string name="_title_take_all_doses">Alle einnehmen</string>
 	
 	<string name="_toast_all_doses_taken">Alle Dosen als eingenommen markiert.</string>
 	<string name="_toast_some_doses_skipped">Einige Dosen wegen unzureichenden Vorrats

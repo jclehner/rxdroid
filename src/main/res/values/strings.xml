@@ -372,7 +372,7 @@
 	<string name="_summary_skip_dose_dialog">Hide the dialog that is shown when clicking a dose. To open it,
 	    long-click the dose and select \"Take dose\".</string>
 	    
-	<string name="_title_take_all_doses">Take all doses</string>
+	<string name="_title_take_all_doses">Take all</string>
 			
 	<string name="_toast_all_doses_taken">All doses marked as taken.</string>
 	<string name="_toast_some_doses_skipped">Some doses were marked as skipped due to insufficient supplies.</string>
