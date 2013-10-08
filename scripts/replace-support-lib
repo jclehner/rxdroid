@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source "$(dirname "$0")/shared.sh" || exit 1
+
+LIB="${ANDROID_HOME}"/extras/android/support/v4/android-support-v4.jar
+
+find thirdparty -name "android-support-v4.jar" -exec cp "${LIB}" '{}' \;
