@@ -32,5 +32,11 @@
 	
 	<string name="_help_title_edit_drug">Edit drug.</string>
 	<string name="_help_msg_edit_drug">If you want to edit the drug, just click its title.</string>
-    
+
+    <string name="_toast_all_doses_taken">All doses marked as taken.</string>
+    <string name="_toast_some_doses_skipped">Some doses were marked as skipped due to insufficient supplies.</string>
+    <string name="_toast_no_doses_to_take">No doses at the moment.</string>
+
+    <string name="_title_take_all_doses">Take all doses</string>
+
 </resources>

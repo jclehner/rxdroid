@@ -74,6 +74,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final String EXTRA_IS_ALARM_REPETITION = "at.jclehner.rxdroid.extra.IS_ALARM_REPETITION";
 	static final String EXTRA_FORCE_UPDATE = "at.jclehner.rxdroid.extra.FORCE_UPDATE";
 
+	private static final String ACTION_MARK_ALL_AS_TAKEN = "at.jclehner.rxdroid.ACTION_MARK_ALL_AS_TAKEN";
+
 	private static final int NOTIFICATION_NORMAL = 0;
 	private static final int NOTIFICATION_FORCE_UPDATE = 1;
 	private static final int NOTIFICATION_FORCE_SILENT = 2;
@@ -106,28 +108,37 @@ public class NotificationReceiver extends BroadcastReceiver
 		Settings.init();
 		Database.init();
 
-		final boolean isAlarmRepetition = intent.getBooleanExtra(EXTRA_IS_ALARM_REPETITION, false);
-
-		final int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Schedule.TIME_INVALID);
-		if(doseTime != Schedule.TIME_INVALID)
-		{
-			if(!isAlarmRepetition)
-			{
-				final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
-				final boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_DOSE_TIME_END, false);
-				final String eventName = isDoseTimeEnd ? "onDoseTimeEnd" : "onDoseTimeBegin";
-
-				sEventMgr.post(eventName, EVENT_HANDLER_ARG_TYPES, date, doseTime);
-			}
-		}
-
 		mContext = context;
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
-		mForceUpdate = isAlarmRepetition ? true : intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
 		mAllDrugs = Database.getAll(Drug.class);
 
-		rescheduleAlarms();
+		if(ACTION_MARK_ALL_AS_TAKEN.equals(intent.getAction()))
+		{
+			Entries.markAllNotifiedDosesAsTaken(0);
+			//
+		}
+		else
+		{
+			final boolean isAlarmRepetition = intent.getBooleanExtra(EXTRA_IS_ALARM_REPETITION, false);
+
+			final int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Schedule.TIME_INVALID);
+			if(doseTime != Schedule.TIME_INVALID)
+			{
+				if(!isAlarmRepetition)
+				{
+					final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
+					final boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_DOSE_TIME_END, false);
+					final String eventName = isDoseTimeEnd ? "onDoseTimeEnd" : "onDoseTimeBegin";
+
+					sEventMgr.post(eventName, EVENT_HANDLER_ARG_TYPES, date, doseTime);
+				}
+			}
+
+			mForceUpdate = isAlarmRepetition ? true : intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
+			rescheduleAlarms();
+		}
+
 		updateCurrentNotifications();
 	}
 
@@ -286,8 +297,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		final List<Drug> drugsWithLowSupplies = new ArrayList<Drug>();
 		final int lowSupplyDrugCount = getDrugsWithLowSupplies(date, doseTime, drugsWithLowSupplies);
-		final int missedDoseCount = getDrugsWithMissedDoses(date, doseTime, isActiveDoseTime, null);
-		final int dueDoseCount = isActiveDoseTime ? getDrugsWithDueDoses(date, doseTime, null) : 0;
+		final int missedDoseCount = getDrugsWithMissedDoses(date, doseTime, isActiveDoseTime);
+		final int dueDoseCount = isActiveDoseTime ? getDrugsWithDueDoses(date, doseTime) : 0;
 
 		int titleResId = R.string._title_notification_doses;
 		int icon = R.drawable.ic_stat_normal;
@@ -397,6 +408,16 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.setStyle(style);
 		}
 
+		if(!isShowingLowSupplyNotification)
+		{
+			Intent intent = new Intent(mContext, NotificationReceiver.class);
+			intent.setAction(ACTION_MARK_ALL_AS_TAKEN);
+
+			PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+			builder.addAction(R.drawable.ic_action_tick, getString(R.string._title_take_all_due_doses), operation);
+		}
+
 //		final long offset;
 //
 //		if(isActiveDoseTime)
@@ -484,47 +505,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		getNotificationManager().notify(R.id.notification, builder.build());
 	}
 
-	private int getDrugsWithDueDoses(Date date, int doseTime, List<Drug> outDrugs)
-	{
-		int count = 0;
-
-		for(Drug drug: mAllDrugs)
-		{
-			final Fraction dose = drug.getDose(doseTime, date);
-
-			if(!drug.isActive() || dose.isZero() || drug.hasAutoDoseEvents() || drug.getRepeatMode() == Drug.REPEAT_AS_NEEDED)
-				continue;
-
-			if(Entries.countDoseEvents(drug, date, doseTime) == 0)
-			{
-				++count;
-
-				if(outDrugs != null)
-					outDrugs.add(drug);
-			}
-		}
-
-		return count;
+	private  int getDrugsWithDueDoses(Date date, int doseTime) {
+		return Entries.getDrugsWithDueDoses(mAllDrugs, date, doseTime, null);
 	}
 
-	private int getDrugsWithMissedDoses(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime, List<Drug> outDrugs)
-	{
-		final int end;
-
-		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
-		{
-			date = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
-			end = Drug.TIME_INVALID;
-		}
-		else
-			end = activeOrNextDoseTime;
-
-		int count = 0;
-
-		for(int doseTime = Schedule.TIME_MORNING; doseTime != end; ++doseTime)
-			count += getDrugsWithDueDoses(date, doseTime, outDrugs);
-
-		return count;
+	private int getDrugsWithMissedDoses(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime) {
+		return Entries.getDrugsWithMissedDoses(mAllDrugs, date, activeOrNextDoseTime, isActiveDoseTime, null);
 	}
 
 	private int getDrugsWithLowSupplies(Date date, int doseTime, List<Drug> outDrugs)

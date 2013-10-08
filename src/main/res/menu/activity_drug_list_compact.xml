@@ -37,8 +37,8 @@
 		android:visible="false"
 	/>
 	
-	<item android:id="@+id/menuitem_take_all_pending"
-	    android:title="@string/_title_take_all_due_doses"
+	<item android:id="@+id/menuitem_take_all"
+	    android:title="@string/_title_take_all_doses"
 	    android:icon="@drawable/ic_action_tick"
 	    android:showAsAction="always"
 	/>

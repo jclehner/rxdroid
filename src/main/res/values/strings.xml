@@ -372,11 +372,11 @@
 	<string name="_summary_skip_dose_dialog">Hide the dialog that is shown when clicking a dose. To open it,
 	    long-click the dose and select \"Take dose\".</string>
 	    
-	<string name="_title_take_all_due_doses">Take all due doses</string>
+	<string name="_title_take_all_doses">Take all doses</string>
 			
-	<string name="_toast_all_due_doses_taken">All due doses marked as taken.</string>
-	<string name="_toast_some_due_doses_skipped">Some due doses were not marked as taken due to insufficient supplies.</string>
-	<string name="_toast_no_due_doses">No due doses at the moment.</string>
+	<string name="_toast_all_doses_taken">All doses marked as taken.</string>
+	<string name="_toast_some_doses_skipped">Some doses were marked as skipped due to insufficient supplies.</string>
+	<string name="_toast_no_doses_to_take">No doses at the moment.</string>
 	
 	<string name="_help_title_to_fraction_mode">Taking only half a tablet?</string>
 	<string name="_help_msg_to_fraction_mode">By pressing this button you can also enter values such as ½ or 1¾ as doses!</string>
