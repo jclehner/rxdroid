@@ -550,19 +550,20 @@ public final class Entries
 
 	public static int getDrugsWithMissedDoses(List<Drug> inDrugs, Date date, int activeOrNextDoseTime, boolean isActiveDoseTime, List<DoseEvent> outEvents)
 	{
-		final int end;
+		int begin = Schedule.TIME_MORNING;
+		int end = Schedule.TIME_INVALID;
 
 		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
 		{
 			date = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
-			end = Drug.TIME_INVALID;
+			begin = Drug.TIME_NIGHT;
 		}
 		else
 			end = activeOrNextDoseTime;
 
 		int count = 0;
 
-		for(int doseTime = Schedule.TIME_MORNING; doseTime != end; ++doseTime)
+		for(int doseTime = begin; doseTime != end; ++doseTime)
 			count += getDrugsWithDueDoses(inDrugs, date, doseTime, outEvents);
 
 		return count;
