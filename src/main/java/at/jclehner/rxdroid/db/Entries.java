@@ -21,6 +21,9 @@
 
 package at.jclehner.rxdroid.db;
 
+import android.util.Log;
+import android.widget.Toast;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,6 +34,8 @@ import java.util.List;
 
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
+import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
@@ -441,6 +446,126 @@ public final class Entries
 		}
 
 		return name;
+	}
+
+	public static void markAllNotifiedDosesAsTaken(int patientId)
+	{
+		final Settings.DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
+
+		final boolean isActiveDoseTime;
+
+		Date date = dtInfo.activeDate();
+		int doseTime = dtInfo.activeDoseTime();
+
+		if(doseTime == Schedule.TIME_INVALID)
+		{
+			isActiveDoseTime = false;
+			doseTime = dtInfo.nextDoseTime();
+			date = dtInfo.nextDoseTimeDate();
+		}
+		else
+			isActiveDoseTime = true;
+
+
+		final List<Drug> drugs = getAllDrugs(patientId);
+		final List<DoseEvent> events = new ArrayList<DoseEvent>();
+
+		if(isActiveDoseTime)
+			getDrugsWithDueDoses(drugs, date, doseTime, events);
+
+		getDrugsWithMissedDoses(drugs, date, doseTime, isActiveDoseTime, events);
+
+		int skipped = 0, taken = 0;
+
+		for(DoseEvent event : events)
+		{
+			final boolean skip;
+
+			final Drug drug = event.getDrug();
+			final Fraction dose = event.getDose();
+
+			final Fraction supply = drug.getCurrentSupply();
+			if(!supply.isZero())
+			{
+				final Fraction newSupply = supply.minus(dose);
+				if(newSupply.isNegative())
+				{
+					drug.setCurrentSupply(Fraction.ZERO);
+					event.setDose(Fraction.ZERO);
+					skip = true;
+				}
+				else
+				{
+					drug.setCurrentSupply(newSupply);
+					skip = false;
+				}
+
+				Database.update(drug);
+			}
+			else
+				skip = drug.getRefillSize() != 0;
+
+			if(skip)
+				++skipped;
+			else
+				++taken;
+
+			Database.create(event);
+
+			Log.d(TAG, "Creating event: " + event);
+		}
+
+		final int toastResId;
+
+		if(skipped != 0)
+			RxDroid.toastLong(R.string._toast_some_doses_skipped);
+		else if(taken != 0)
+			RxDroid.toastLong(R.string._toast_all_doses_taken);
+		else
+			RxDroid.toastShort(R.string._toast_no_doses_to_take);
+	}
+
+	public static int getDrugsWithDueDoses(List<Drug> inDrugs, Date date, int doseTime, List<DoseEvent> outEvents)
+	{
+		int count = 0;
+
+		for(Drug drug: inDrugs)
+		{
+			final Fraction dose = drug.getDose(doseTime, date);
+
+			if(!drug.isActive() || dose.isZero() || drug.hasAutoDoseEvents() || drug.getRepeatMode() == Drug.REPEAT_AS_NEEDED)
+				continue;
+
+			if(Entries.countDoseEvents(drug, date, doseTime) == 0)
+			{
+				++count;
+
+				if(outEvents != null)
+					outEvents.add(new DoseEvent(drug, date, doseTime, dose));
+			}
+		}
+
+		return count;
+	}
+
+	public static int getDrugsWithMissedDoses(List<Drug> inDrugs, Date date, int activeOrNextDoseTime, boolean isActiveDoseTime, List<DoseEvent> outEvents)
+	{
+		final int end;
+
+		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
+		{
+			date = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
+			end = Drug.TIME_INVALID;
+		}
+		else
+			end = activeOrNextDoseTime;
+
+		int count = 0;
+
+		for(int doseTime = Schedule.TIME_MORNING; doseTime != end; ++doseTime)
+			count += getDrugsWithDueDoses(inDrugs, date, doseTime, outEvents);
+
+		return count;
 	}
 
 	private static void getTotalDose(Drug drug, Date date, MutableFraction outTotalDose)

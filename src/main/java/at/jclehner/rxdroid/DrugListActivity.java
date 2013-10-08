@@ -291,63 +291,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			}
 			case R.id.menuitem_take_all_pending:
 			{
-				final List<Drug> drugs = Entries.getAllDrugs(mCurrentPatientId);
-				final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
-				final int activeDoseTime = dtInfo.activeDoseTime();
-				final Date activeDate = dtInfo.activeDate();
-
-				int toastResId = R.string._toast_no_due_doses;
-				int toastLength = Toast.LENGTH_SHORT;
-
-				if(activeDoseTime != Schedule.TIME_INVALID)
-				{
-					int taken = 0, skipped = 0;
-
-					for(Drug drug : drugs)
-					{
-						if(!drug.isActive())
-							continue;
-
-						if(!Entries.findDoseEvents(drug, activeDate, activeDoseTime).isEmpty())
-							continue;
-
-						final Fraction dose = drug.getDose(activeDoseTime, activeDate);
-
-						if(!dose.isZero())
-						{
-							final Fraction currentSupply = drug.getCurrentSupply();
-
-							if(!currentSupply.isZero())
-							{
-								final Fraction newSupply = currentSupply.minus(dose);
-
-								if(newSupply.isNegative())
-								{
-									++skipped;
-									continue;
-								}
-								else
-								{
-									drug.setCurrentSupply(newSupply);
-									Database.update(drug);
-								}
-							}
-
-							Database.create(new DoseEvent(drug, activeDate, activeDoseTime, dose));
-							++taken;
-						}
-					}
-
-					if(skipped != 0)
-					{
-						toastResId = R.string._toast_some_due_doses_skipped;
-						toastLength = Toast.LENGTH_LONG;
-					}
-					else if(taken != 0)
-						toastResId = R.string._toast_all_due_doses_taken;
-				}
-
-				Toast.makeText(this, toastResId, toastLength).show();
+				Entries.markAllNotifiedDosesAsTaken(mCurrentPatientId);
+				return true;
 			}
 
 		}

@@ -369,11 +369,7 @@
             πατήστε παρατεταμένα στην δόση και επιλέξτε \"Πάρτε την δόση\".</string>
             
         <string name="_title_take_all_due_doses">Πάρτε όλες τις εκκρεμείς δόσεις</string>
-                        
-        <string name="_toast_all_due_doses_taken">Όλες οι εκκρεμείς δόσεις θα χαρακτηριστούν σαν να πάρθηκαν.</string>
-        <string name="_toast_some_due_doses_skipped">Μερικές εκκρεμείς δόσεις δεν χαρακτηρίστηκαν ότι πάρθηκαν εξαιτίας ανεπαρκούς αποθέματος.</string>
-        <string name="_toast_no_due_doses">Καμμία εκκρεμής δόση για τώρα.</string>
-        
+
                 
         <!-- 
     Keep at the end of strings.xml!  
