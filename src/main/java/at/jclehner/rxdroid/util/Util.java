@@ -57,6 +57,7 @@ import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.Settings.Keys;
+import at.jclehner.rxdroid.Settings.Defaults;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
@@ -324,9 +325,7 @@ public final class Util
 				if(c - start < 26)
 					c = (char) (((c - start + 13) % 26) + start);
 				else
-					throw new IllegalStateException(
-							"Character out of range: c=" + c + "(" + (int) c
-									+ "), start=" + start);
+					throw new IllegalStateException("Character out of range: c=" + c + "(" + (int) c + "), start=" + start);
 			}
 
 			sb.append(c);
@@ -356,8 +355,7 @@ public final class Util
 
 		final Class<?> clazz = object.getClass();
 		final StringBuilder sb = new StringBuilder();
-		sb.append("dumpObjectMembers: (" + clazz.getSimpleName() + ") " + name
-				+ "\n");
+		sb.append("dumpObjectMembers: (" + clazz.getSimpleName() + ") " + name + "\n");
 
 		// for(Field f : clazz.getDeclaredFields())
 		for(Field f : Reflect.getAllFields(clazz))
@@ -367,8 +365,7 @@ public final class Util
 			if(Modifier.isStatic(m))
 				continue;
 
-			sb.append("  (" + f.getType().getSimpleName() + ") " + f.getName()
-					+ "=");
+			sb.append("  (" + f.getType().getSimpleName() + ") " + f.getName() + "=");
 
 			try
 			{
@@ -443,8 +440,7 @@ public final class Util
 				if(elemType.isArray())
 					sb.append(arrayToString(elem));
 				else if(elemType == String.class)
-					sb.append("\"" + elem.toString() + "\""); // TODO escape
-																// string?
+					sb.append("\"" + elem.toString() + "\""); // TODO escape string?
 				else
 					sb.append(elem.toString());
 			}
@@ -475,13 +471,11 @@ public final class Util
 
 	public static boolean wasInstalledViaGooglePlay()
 	{
-		final String installer = getInstallerPackageName(RxDroid.getContext()
-				.getPackageName());
+		final String installer = getInstallerPackageName(RxDroid.getContext().getPackageName());
 		if(installer == null)
 			return false;
 
-		return installer.startsWith("com.android")
-				|| installer.startsWith("com.google");
+		return installer.startsWith("com.android") || installer.startsWith("com.google");
 	}
 
 	public static String getInstallerPackageName(String packageName)
@@ -576,22 +570,15 @@ public final class Util
 	private static final String[][] PRETTY_FRACTIONS = { { "\u00BD" }, // "1/2"
 			{ "\u2153", "\u2154" }, // "1/3", "2/3"
 			{ "\u00BC", null, "\u00BE" }, // "1/4", null, "3/4"
-			{ "\u2155", "\u2156", "\u2157", "\u2158" }, // "1/5", "2/5", "3/5",
-														// "4/5"
-			{ "\u2159", null, null, null, "\u215A" }, // "1/6", null, null,
-														// null, "5/6"
-			null, { "\u215B", null, "\u215C", null, "\u215D", null, "\u215E" } // "1/8",
-																				// null,
-																				// "3/8",
-																				// null,
-																				// "5/8",
-																				// null,
-																				// "7/8"
+			{ "\u2155", "\u2156", "\u2157", "\u2158" }, // "1/5", "2/5", "3/5", "4/5"
+			{ "\u2159", null, null, null, "\u215A" }, // "1/6", null, null, null, "5/6"
+			null,
+			{ "\u215B", null, "\u215C", null, "\u215D", null, "\u215E" } // "1/8", null, "3/8", null, "5/8", null, "7/8"
 	};
 
 	public static String prettify(Fraction frac)
 	{
-		if(!Settings.getBoolean(Keys.USE_PRETTY_FRACTIONS, false))
+		if(!Settings.getBoolean(Keys.USE_PRETTY_FRACTIONS, Settings.Defaults.USE_PRETTY_FRACTIONS))
 			return frac.toString();
 
 		// Characters for fifths and sixths are available in the unicode specs,
@@ -600,8 +587,7 @@ public final class Util
 		// while Jellybean converts
 		// them to their simple counterparts (i.e. 1/5 instead of ⅕)
 
-		if(frac.isInteger()
-				|| (frac.denominator() > 4 && frac.denominator() != 8))
+		if(frac.isInteger() || (frac.denominator() > 4 && frac.denominator() != 8))
 			return frac.toString();
 
 		final int[] data = frac.getFractionData(true);
