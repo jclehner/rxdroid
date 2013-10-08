@@ -1,6 +1,9 @@
 0.9.18:
 	* Added help overlays
 	* Added option to show pretty fractions
+	* The "take all" button will now mark all doses mentioned
+	  in the current notification as taken. If supplies are
+	  insufficient, they are marked as skipped.
 	* Fixed launcher icons on ldpi devices
 
 0.9.17.2:
