@@ -5,9 +5,9 @@ source "$(dirname $_)/shared.sh"
 TEMP=$(mktempf)
 
 SEARCHDIRS=(
-	".java src"
-	".xml res"
-	".svg ../svg"
+	".java src/main/java"
+	".xml src/main/res"
+#	".svg ../svg"
 )
 
 # void insert_gpl_info(filename, extension)
