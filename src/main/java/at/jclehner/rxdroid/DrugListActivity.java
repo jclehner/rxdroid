@@ -692,7 +692,20 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 					svb.setShowcaseId(0xdeadbeef + 2);
 					svb.setRelativeAnimatedGesture(0, 200);
 
-					mShowcaseQueue.add(svb.build());
+					ShowcaseView sv = svb.build();
+					sv.addOnShowcaseEventListener(new OnShowcaseEventListener()
+					{
+						@Override
+						public void onShowcaseViewHide(ShowcaseView showcaseView) {}
+
+						@Override
+						public void onShowcaseViewShow(ShowcaseView showcaseView)
+						{
+							Settings.setDisplayedOnce(OnceIds.DRAG_DROP_SORTING);
+						}
+					});
+
+					mShowcaseQueue.add(sv);
 				}
 			}
 			else
