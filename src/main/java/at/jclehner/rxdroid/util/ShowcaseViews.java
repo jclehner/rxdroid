@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid.util;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +31,12 @@ import android.view.View;
 import com.github.espiandev.showcaseview.ShowcaseView;
 import com.github.espiandev.showcaseview.ShowcaseView.OnShowcaseEventListener;
 
+import at.jclehner.androidutils.Reflect;
+
 public final class ShowcaseViews
 {
+	private static final String TAG = ShowcaseViews.class.getSimpleName();
+
 	private final List<ShowcaseView> mViews = new ArrayList<ShowcaseView>();
 
 	private OnShowcaseEventListener mListener;
@@ -63,8 +68,14 @@ public final class ShowcaseViews
 			if(sv.getParent() == null)
 				sv.show();
 
-			//mViews.remove(0);
+			mViews.remove(0);
 		}
+	}
+
+	public void hide()
+	{
+		while(!mViews.isEmpty())
+			mViews.remove(0).hide();
 	}
 
 	public ShowcaseViews() {}
@@ -81,7 +92,6 @@ public final class ShowcaseViews
 		@Override
 		public void onShowcaseViewHide(ShowcaseView showcaseView)
 		{
-			mViews.remove(0);
 			show();
 
 			if(mListener != null)

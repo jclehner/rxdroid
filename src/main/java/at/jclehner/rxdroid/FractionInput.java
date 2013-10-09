@@ -69,6 +69,8 @@ public class FractionInput extends LinearLayout
 	private TextView mFractionBar;
 	private Button mModeSwitcher;
 
+	private final ShowcaseViews mShowcaseQueue = new ShowcaseViews();
+
 	@SaveState
 	private int mInteger = 0;
 	@SaveState
@@ -282,6 +284,7 @@ public class FractionInput extends LinearLayout
 	protected void onDetachedFromWindow()
 	{
 		super.onDetachedFromWindow();
+		mShowcaseQueue.hide();
 		mAttached = false;
 	}
 
@@ -344,28 +347,26 @@ public class FractionInput extends LinearLayout
 				if(!isShown())
 					return;
 
-				final ShowcaseViews svs = new ShowcaseViews();
-
 				if(mFractionInputMode == MODE_INTEGER)
 				{
-					svs.add(makeShowcaseView(mModeSwitcher, 0xdeadc0de,
+					mShowcaseQueue.add(makeShowcaseView(mModeSwitcher, 0xdeadc0de,
 							R.string._help_title_to_fraction_mode, R.string._help_msg_to_fraction_mode));
 				}
 				else if(mFractionInputMode == MODE_FRACTION)
 				{
-					svs.add(makeShowcaseView(null, 0xdeadc0de+1,
+					mShowcaseQueue.add(makeShowcaseView(null, 0xdeadc0de+1,
 							R.string._help_title_input_fraction, R.string._help_msg_input_fraction));
 
-					svs.add(makeShowcaseView(mModeSwitcher, 0xdeadc0de+2,
+					mShowcaseQueue.add(makeShowcaseView(mModeSwitcher, 0xdeadc0de+2,
 							R.string._help_title_to_mixed_mode, R.string._help_msg_to_mixed_mode));
 				}
 				else if(mFractionInputMode == MODE_MIXED)
 				{
-					svs.add(makeShowcaseView(null, 0xdeadc0de+3,
+					mShowcaseQueue.add(makeShowcaseView(null, 0xdeadc0de+3,
 							R.string._help_title_input_mixed, R.string._help_msg_input_mixed));
 				}
 
-				svs.show();
+				mShowcaseQueue.show();
 			}
 		});
 	}
@@ -380,19 +381,7 @@ public class FractionInput extends LinearLayout
 		svb.setShowcaseView(view);
 		svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 
-		ShowcaseView sv = svb.build();
-
-		if(true && view != null) {
-			//sv.pointTo(view);
-			int[] location = new int[2];
-			view.getLocationOnScreen(location);
-
-			float x = location[0] + view.getWidth() / 2;
-			float y = location[1] + view.getHeight() / 2;
-			sv.animateGesture(x/2, y/2, x, y);
-		}
-
-		return sv;
+		return svb.build();
 	}
 
 	private void updateModeSwitcher()

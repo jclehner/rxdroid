@@ -657,6 +657,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 				if(drugCount == 1 && !Settings.wasDisplayedOnce("date_swipe"))
 				{
+					// 1. Swipe date
+
 					ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(this);
 					svb.setText(R.string._help_title_swipe_date, R.string._help_msg_swipe_date);
 					svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
@@ -673,7 +675,9 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 					svb.setAnimatedGesture(-100, y, w, y);
 
-					mShowcaseQueue.add(svb.build());
+					mShowcaseQueue.add(tag(svb.build(), "Swipe date"));
+
+					// 2. Edit drug
 
 					svb = new ShowcaseViewBuilder2(this);
 					svb.setText(R.string._help_title_edit_drug, R.string._help_msg_edit_drug);
@@ -681,7 +685,21 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 					svb.setShowcaseId(0xdeadbeef + 1);
 					svb.setShowcaseView(R.id.drug_name, this);
 
-					mShowcaseQueue.add(svb.build());
+					svb.setShowcaseEventListener(new ShowcaseViewHelper());
+
+					mShowcaseQueue.add(tag(svb.build(), "Edit drug"));
+
+					// 3. Take dose & long press
+
+					svb = new ShowcaseViewBuilder2(this);
+					svb.setText(R.string._help_title_click_dose, R.string._help_msg_click_dose);
+					svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+					svb.setShowcaseId(0xdeadbeef + 4);
+					svb.setShowcaseView(R.id.noon, this);
+
+					svb.setShowcaseEventListener(new ShowcaseViewHelper());
+
+					mShowcaseQueue.add(tag(svb.build(), "Take dose & long press"));
 				}
 				else if(drugCount >= 2 && !Settings.wasDisplayedOnce(Settings.OnceIds.DRAG_DROP_SORTING))
 				{
@@ -692,20 +710,17 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 					svb.setShowcaseId(0xdeadbeef + 2);
 					svb.setRelativeAnimatedGesture(0, 200);
 
-					ShowcaseView sv = svb.build();
-					sv.addOnShowcaseEventListener(new OnShowcaseEventListener()
+					svb.setShowcaseEventListener(new ShowcaseViewHelper()
 					{
-						@Override
-						public void onShowcaseViewHide(ShowcaseView showcaseView) {}
-
 						@Override
 						public void onShowcaseViewShow(ShowcaseView showcaseView)
 						{
+							super.onShowcaseViewShow(showcaseView);
 							Settings.setDisplayedOnce(OnceIds.DRAG_DROP_SORTING);
 						}
 					});
 
-					mShowcaseQueue.add(sv);
+					mShowcaseQueue.add(tag(svb.build(), "Drag drop sorting"));
 				}
 			}
 			else
@@ -846,6 +861,12 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		args.putBoolean(DoseDialog.ARG_FORCE_SHOW, forceShow);
 
 		showDialog(R.id.dose_dialog, args);
+	}
+
+	private static ShowcaseView tag(ShowcaseView sv, String tag)
+	{
+		sv.setTag(tag);
+		return sv;
 	}
 
 	static class DrugFilter implements CollectionUtils.Filter<Drug>
@@ -1029,6 +1050,26 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			invalidateViewPager();
 		}
 	};
+
+	/**
+	 * Displays all drugs as long as a ShowcaseView is shown.
+	 */
+	class ShowcaseViewHelper implements OnShowcaseEventListener
+	{
+		@Override
+		public void onShowcaseViewHide(ShowcaseView showcaseView)
+		{
+			mShowingAll = false;
+			invalidateViewPager();
+		}
+
+		@Override
+		public void onShowcaseViewShow(ShowcaseView showcaseView)
+		{
+			mShowingAll = true;
+			invalidateViewPager();
+		}
+	}
 
 	static class DrugComparator implements Comparator<Drug>
 	{

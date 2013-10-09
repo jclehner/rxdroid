@@ -38,4 +38,7 @@
     <string name="_toast_no_doses_to_take">No doses at the moment.</string>
 
     <string name="_title_take_all_doses">Take all</string>
+
+    <string name="_help_title_click_dose">Take dose</string>
+    <string name="_help_msg_click_dose">To take a dose, click it. For more options, long-click it.</string>
 </resources>
