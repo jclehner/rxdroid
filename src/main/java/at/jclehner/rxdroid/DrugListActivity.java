@@ -1059,8 +1059,9 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		@Override
 		public void onShowcaseViewHide(ShowcaseView showcaseView)
 		{
-			mShowingAll = false;
-			invalidateViewPager();
+			// FIXME it's ugly, but it'll do for now...
+			//mShowingAll = false;
+			//invalidateViewPager();
 		}
 
 		@Override
