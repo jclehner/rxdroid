@@ -78,6 +78,10 @@ public final class ShowcaseViews
 			mViews.remove(0).hide();
 	}
 
+	public void clear() {
+		mViews.clear();
+	}
+
 	public ShowcaseViews() {}
 
 	private final OnShowcaseEventListener mLocalListener = new OnShowcaseEventListener() {

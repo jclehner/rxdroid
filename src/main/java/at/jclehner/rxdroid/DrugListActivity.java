@@ -657,6 +657,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 				if(drugCount == 1 && !Settings.wasDisplayedOnce("date_swipe"))
 				{
+					//mShowcaseQueue.clear();
+
 					// 1. Swipe date
 
 					ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(this);
@@ -703,6 +705,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 				}
 				else if(drugCount >= 2 && !Settings.wasDisplayedOnce(Settings.OnceIds.DRAG_DROP_SORTING))
 				{
+					mShowcaseQueue.clear();
+
 					ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(this);
 					svb.setShowcaseView(R.id.drug_icon, this);
 					svb.setText(R.string._help_title_drag_drop_sort, R.string._msg_drag_drop_sorting);
