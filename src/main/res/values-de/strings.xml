@@ -382,7 +382,7 @@
 	<string name="_help_title_edit_drug">Medikament bearbeiten.</string>
 	<string name="_help_msg_edit_drug">Den Namen eines Medikaments anklicken, um es zu bearbeiten.</string>
 
-    <string name="_help_title_click_dose">Medikament einnehmen</string>
+    <string name="_help_title_click_dose">Medikament einnehmen.</string>
     <string name="_help_msg_click_dose">Dosis anklicken, um sie einzunehmen. Weitere Optionen sind durch
         langes klicken verfügbar.</string>
 	
