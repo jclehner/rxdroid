@@ -400,6 +400,8 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setWhen(0);
 		builder.setPriority(priority);
 
+		// TODO setOngoing(false), if requested by the user
+
 		if(lineCount > 1)
 		{
 			final BigTextStyle style = new BigTextStyle();
