@@ -385,12 +385,12 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 						public boolean onMenuItemClick(android.view.MenuItem item)
 						{
 							Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, drug.getName());
-							com.google.gson.Gson gson = new com.google.gson.Gson();
 
 							GsonBuilder gb = new GsonBuilder();
 							gb.registerTypeAdapter(Fraction.class, new FractionAdapter().nullSafe());
 							gb.serializeNulls();
 							gb.setPrettyPrinting();
+							gb.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
 							Log.v(TAG, "As JSON:\n" + gb.create().toJson(drug));
 							return true;
