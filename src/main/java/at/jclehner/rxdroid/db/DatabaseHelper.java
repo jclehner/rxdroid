@@ -220,18 +220,29 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 		Log.i(TAG, "Upgrading DB v" + oldVersion + " -> v" + newVersion);
 
-		final String packageName = Database.class.getPackage().getName();
-		final String oldPackageName = packageName + ".v" + oldVersion;
-
 		int updatedDataCount = 0;
+
+		final String packageName = Database.class.getPackage().getName();
+		String oldPackageName;
+
+		// run upgradeDatabase for every version in between!
+
+		for(int version = oldVersion; version != newVersion; ++version)
+		{
+			oldPackageName = packageName + ".v" + version;
+			if(runUpgradeHelperMethodUpgradeDatabase(oldPackageName, cs))
+			{
+				Log.i(TAG, "  upgradeDatabase: v" + version);
+				++updatedDataCount;
+			}
+		}
+
+		oldPackageName = packageName + ".v" + oldVersion;
 
 		Exception ex;
 
 		try
 		{
-			if(runUpgradeHelperMethodUpgradeDatabase(oldPackageName, cs))
-				++updatedDataCount;
-
 			for(Class<?> clazz : Database.CLASSES)
 			{
 				if(upgradeTable(cs, oldVersion, newVersion, clazz))
