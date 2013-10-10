@@ -214,7 +214,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField
 	private String comment;
 
-	private Fraction[] mSimpleSchedule;
+	private transient Fraction[] mSimpleSchedule;
 
 	/**
 	 * Default constructor, required by ORMLite.
@@ -754,7 +754,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		return (repeatArg & 1 << weekday) != 0;
 	}
 
-	private final LazyValue<List<Schedule>> mSchedules = new LazyValue<List<Schedule>>() {
+	private final transient LazyValue<List<Schedule>> mSchedules = new LazyValue<List<Schedule>>() {
 
 		@Override
 		public List<Schedule> value()

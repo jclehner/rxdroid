@@ -53,7 +53,7 @@ public class SchedulePart extends Entry
 
 	@SuppressWarnings("unused")
 	@DatabaseField(foreign = true)
-	private Schedule owner;
+	private transient Schedule owner;
 
 	transient private LazyValue<Fraction[]> mDoses = new LazyValue<Fraction[]>() {
 

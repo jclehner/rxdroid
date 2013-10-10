@@ -111,7 +111,7 @@ public final class Schedule extends Entry
 
 	@SuppressWarnings("unused")
 	@DatabaseField(foreign = true)
-	private Drug owner;
+	private transient Drug owner;
 
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<SchedulePart> scheduleParts;
@@ -281,7 +281,7 @@ public final class Schedule extends Entry
 		}
 	};
 
-	private final LazyValue<Fraction[]> mDoses = new LazyValue<Fraction[]>() {
+	private transient final LazyValue<Fraction[]> mDoses = new LazyValue<Fraction[]>() {
 
 		@Override
 		public Fraction[] value()
