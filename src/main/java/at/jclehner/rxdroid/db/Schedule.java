@@ -111,7 +111,7 @@ public final class Schedule extends Entry
 
 	@SuppressWarnings("unused")
 	@DatabaseField(foreign = true)
-	private transient Drug owner;
+	/* package */ transient Drug owner;
 
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<SchedulePart> scheduleParts;
@@ -231,6 +231,17 @@ public final class Schedule extends Entry
 
 	public void setRepeatArg(int repeatArg) {
 		this.repeatArg = repeatArg;
+	}
+
+	public void setScheduleParts(SchedulePart[] parts)
+	{
+		// There's no need to fiddle with this.scheduleParts, since we set
+		// this.mSchedulePartsArray, which is what other functions use.
+
+		for(SchedulePart part : parts)
+			part.owner = this;
+
+		mSchedulePartsArray.set(parts);
 	}
 
 	@Override

@@ -53,7 +53,18 @@ public class SchedulePart extends Entry
 
 	@SuppressWarnings("unused")
 	@DatabaseField(foreign = true)
-	private transient Schedule owner;
+	/* package */ transient Schedule owner;
+
+	SchedulePart() {}
+
+	public SchedulePart(int weekdays, Fraction[] doses)
+	{
+		setWeekdays(weekdays);
+		doseMorning = doses[0];
+		doseNoon = doses[1];
+		doseEvening = doses[2];
+		doseNight = doses[3];
+	}
 
 	transient private LazyValue<Fraction[]> mDoses = new LazyValue<Fraction[]>() {
 
@@ -76,6 +87,66 @@ public class SchedulePart extends Entry
 
 	public Fraction[] getDoses() {
 		return mDoses.get();
+	}
+
+	public void setDose(int doseTime, Fraction dose)
+	{
+		switch(doseTime)
+		{
+			case Schedule.TIME_MORNING:
+				doseMorning = dose;
+				break;
+
+			case Schedule.TIME_NOON:
+				doseNoon = dose;
+				break;
+
+			case Schedule.TIME_EVENING:
+				doseEvening = dose;
+				break;
+
+			case Schedule.TIME_NIGHT:
+				doseNight = dose;
+				break;
+
+			default:
+				throw new IllegalArgumentException("doseTime=" + doseTime);
+		}
+
+		mDoses.reset();
+	}
+
+	public Fraction getDose(int doseTime)
+	{
+		switch(doseTime)
+		{
+			case Schedule.TIME_MORNING:
+				return doseMorning;
+
+			case Schedule.TIME_NOON:
+				return doseNoon;
+
+			case Schedule.TIME_EVENING:
+				return doseEvening;
+
+			case Schedule.TIME_NIGHT:
+				return doseNight;
+
+			default:
+				throw new IllegalArgumentException("doseTime=" + doseTime);
+		}
+	}
+
+	public void setWeekdays(int weekdays)
+	{
+		if(weekdays < 0 || weekdays > 0x7f)
+			throw new IllegalArgumentException("weekdays=" + Integer.toHexString(weekdays));
+
+		this.weekdays = weekdays;
+	}
+
+	public int getWeekdays() {
+		return weekdays;
 	}
 
 	@Override
