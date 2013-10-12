@@ -117,8 +117,9 @@ public class ScheduleTest extends AndroidTestCase
 		for(int doseTime : Schedule.DOSE_TIMES)
 			schedule1.setDose(doseTime, Fraction.ZERO);
 
-		schedule1.setBegin(today);
-		schedule1.setEnd(plusDays(today, 7));
+		// 9 is October - idiots...
+		schedule1.setBegin(DateTime.date(2013, 9, 14));
+		schedule1.setEnd(plusDays(schedule1.getBegin(), 6));
 		schedule1.setScheduleParts(new SchedulePart[] { part1, part2, part3 });
 
 		// WEEK 2
@@ -133,14 +134,14 @@ public class ScheduleTest extends AndroidTestCase
 		for(int doseTime : Schedule.DOSE_TIMES)
 			schedule2.setDose(doseTime, Fraction.ZERO);
 
-		schedule2.setBegin(schedule1.getEnd());
-		schedule2.setEnd(plusDays(schedule2.getBegin(), 7));
+		schedule2.setBegin(plusDays(schedule1.getEnd(), 1));
+		schedule2.setEnd(plusDays(schedule2.getBegin(), 6));
 		schedule2.setScheduleParts(new SchedulePart[] { part4, part5 });
 
 		// WEEK 3
 		final Schedule schedule3 = new Schedule();
-		schedule3.setBegin(schedule2.getEnd());
-		schedule3.setEnd(plusDays(schedule3.getBegin(), 7));
+		schedule3.setBegin(plusDays(schedule2.getEnd(), 1));
+		schedule3.setEnd(plusDays(schedule3.getBegin(), 6));
 
 		for(int doseTime : Schedule.DOSE_TIMES)
 			schedule3.setDose(doseTime, Fraction.ZERO);
