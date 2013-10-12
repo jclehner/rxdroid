@@ -21,6 +21,8 @@
 
 package at.jclehner.rxdroid.db;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -31,7 +33,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.SplashScreenActivity;
+import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
@@ -52,7 +56,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	private static final String TAG = DatabaseHelper.class.getSimpleName();
 	private static final boolean LOGV = false;
 
-	public static final int DB_VERSION = 58;
+	public static final int DB_VERSION = 59;
 	public static final String DB_NAME = "db.sqlite";
 
 	public static class DatabaseError extends RuntimeException
@@ -141,6 +145,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		if(oldVersion == newVersion)
 			return;
 
+		final File dbOrig = RxDroid.getContext().getDatabasePath(DB_NAME);
+		final File dbCopy = RxDroid.getContext().getDatabasePath("backup_" + oldVersion + ".sqlite");
+
+		try
+		{
+			Util.copyFile(dbOrig, dbCopy);
+		}
+		catch(IOException e)
+		{
+			Log.e(TAG, "Failed to create " + dbCopy, e);
+		}
+
 		SplashScreenActivity.setStatusMessage(R.string._title_db_status_upgrading);
 
 		db.beginTransaction();
@@ -149,6 +165,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		{
 			db.setTransactionSuccessful();
 			db.endTransaction();
+
+			dbCopy.delete();
+
 			return; // everything ok
 		}
 

@@ -22,6 +22,9 @@
 package at.jclehner.rxdroid.util;
 
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -29,6 +32,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -640,6 +644,40 @@ public final class Util
 			return findViewById((ViewGroup) root, id, 0);
 
 		return null;
+	}
+
+	// https://gist.github.com/mrenouf/889747
+	public static void copyFile(File sourceFile, File destFile) throws IOException {
+		if (!destFile.exists()) {
+			destFile.createNewFile();
+		}
+		FileInputStream fIn = null;
+		FileOutputStream fOut = null;
+		FileChannel source = null;
+		FileChannel destination = null;
+		try {
+			fIn = new FileInputStream(sourceFile);
+			source = fIn.getChannel();
+			fOut = new FileOutputStream(destFile);
+			destination = fOut.getChannel();
+			long transfered = 0;
+			long bytes = source.size();
+			while (transfered < bytes) {
+				transfered += destination.transferFrom(source, 0, source.size());
+				destination.position(transfered);
+			}
+		} finally {
+			if (source != null) {
+				source.close();
+			} else if (fIn != null) {
+				fIn.close();
+			}
+			if (destination != null) {
+				destination.close();
+			} else if (fOut != null) {
+				fOut.close();
+			}
+		}
 	}
 
 	private static View findViewById(ViewGroup group, int id, int level)
