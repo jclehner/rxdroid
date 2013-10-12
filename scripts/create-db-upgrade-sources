@@ -5,14 +5,14 @@ source "$(dirname $_)/shared.sh" || exit 1
 PKGPATH="$(sed -e 's/\./\//g' <<< $PKG)"
 
 if [[ $# -eq 0 ]]; then
-	CLASSES="Drug Intake Schedule"
+	CLASSES="Drug DoseEvent Schedule SchedulePart"
 else
 	CLASSES="$@"
 fi
 
-read -ra DB_VERSION <<< $(grep -o -E 'DB_VERSION = [[:digit:]]+' src/${PKGPATH}/db/DatabaseHelper.java)
+read -ra DB_VERSION <<< $(grep -o -E 'DB_VERSION = [[:digit:]]+' src/main/java/${PKGPATH}/db/DatabaseHelper.java)
 
-TARGET_DIR=src/${PKGPATH}/db/v${DB_VERSION[2]}
+TARGET_DIR=src/main/java/${PKGPATH}/db/v${DB_VERSION[2]}
 mkdir -p ${TARGET_DIR}
 
 for c in $CLASSES; do
@@ -23,11 +23,11 @@ for c in $CLASSES; do
 
 	echo -e "package $PKG.db.v${DB_VERSION[2]};\n" > ${f}
 	echo "@SuppressWarnings({ \"unused\", \"serial\" })" >> ${f}
-	run grep @DatabaseTable src/${PKGPATH}/db/$c.java >> ${f}
+	run grep @DatabaseTable src/main/java/${PKGPATH}/db/$c.java >> ${f}
 	echo "public class Old$c extends Entry" >> ${f}
 	echo "{" >> ${f}
 
-	grep @DatabaseField -A1 src/${PKGPATH}/db/$c.java | sed -E -e 's/^--//' -e 's/useGetSet = true/useGetSet = false/g' >> ${f}
+	grep @DatabaseField -A1 src/main/java/${PKGPATH}/db/$c.java | sed -E -e 's/^--//' -e 's/useGetSet = true/useGetSet = false/g' >> ${f}
 
 	cat >> ${f} <<EOF
 		
