@@ -128,8 +128,16 @@ public final class Schedule extends Entry
 		this.begin = begin;
 	}
 
+	public Date getBegin() {
+		return begin;
+	}
+
 	public void setEnd(Date end) {
 		this.end = end;
+	}
+
+	public Date getEnd() {
+		return end;
 	}
 
 	public void setOwner(Drug owner) {
