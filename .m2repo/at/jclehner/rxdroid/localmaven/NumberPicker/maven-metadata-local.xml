@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>at.jclehner.rxdroid.localmaven</groupId>
+  <artifactId>NumberPicker</artifactId>
+  <version>9999</version>
+  <versioning>
+    <versions>
+      <version>9999</version>
+    </versions>
+    <lastUpdated>20131012133247</lastUpdated>
+  </versioning>
+</metadata>
