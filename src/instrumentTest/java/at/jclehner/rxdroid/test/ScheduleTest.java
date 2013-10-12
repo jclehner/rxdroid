@@ -23,8 +23,7 @@ public class ScheduleTest extends AndroidTestCase
 			"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
 	};
 
-	Date begin;
-	Date end;
+	Date today;
 
 	@Override
 	protected void setUp()
@@ -43,13 +42,14 @@ public class ScheduleTest extends AndroidTestCase
 		Settings.init();
 		Database.setInMemoryOnly(true);
 
-		begin = DateTime.today();
-		end = DateTime.add(begin, Calendar.DAY_OF_MONTH, 14);
+		today = DateTime.today();
 	}
 
 	public void testDrugWithScheduleParts1()
 	{
 		/* Drug schedule:
+		 *
+		 * WEEK 1
 		 *
 		 * Mon	0 - 0 - 1/4 - 0
 		 * Tue	0 - 0 - 1/4 - 0
@@ -59,8 +59,52 @@ public class ScheduleTest extends AndroidTestCase
 		 * Sat	0 - 0 - 1/2 - 0
 		 * Sun	0 - 3/4 - 0	- 0
 		 *
+		 * WEEK 2
+		 *
+		 * Mon	1 - 0 		- 0 - 0
+		 * Tue	0 - 1 1/2	- 0 - 0
+		 * Wed 	1 - 0		- 0 - 0
+		 * Thu	(null)
+		 * Fri  (null)
+		 * Sat  (null)
+		 * Sun	1 - 0		- 0 - 0
+		 *
+		 * WEEK 3
+		 * (null)
+		 *
 		 * ==> 3 Parts
 		 */
+
+		final Object[][] testCases = new Object[][] {
+				// week 1
+				{ Drug.TIME_EVENING, "1/4" },
+				{ Drug.TIME_EVENING, "1/4" },
+				null,
+				{ Drug.TIME_EVENING, "1/2" },
+				null,
+				{ Drug.TIME_EVENING, "1/2" },
+				{ Drug.TIME_NOON, "3/4" },
+
+				// week 2
+				{ Drug.TIME_MORNING, "1" },
+				{ Drug.TIME_NOON, "1 1/2" },
+				{ Drug.TIME_MORNING, "1" },
+				null,
+				null,
+				null,
+				{ Drug.TIME_MORNING, "1" },
+
+				// week 3
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null
+		};
+
+		// WEEK 1
 
 		final SchedulePart part1 = new SchedulePart(
 				SchedulePart.MONDAY | SchedulePart.TUESDAY, toFractionArray(0, 0, "1/4", 0));
@@ -69,36 +113,74 @@ public class ScheduleTest extends AndroidTestCase
 		final SchedulePart part3 = new SchedulePart(
 				SchedulePart.SUNDAY, toFractionArray(0, "3/4", 0, 0));
 
-		final Schedule schedule = new Schedule();
+		final Schedule schedule1 = new Schedule();
 		for(int doseTime : Schedule.DOSE_TIMES)
-			schedule.setDose(doseTime, Fraction.ZERO);
+			schedule1.setDose(doseTime, Fraction.ZERO);
 
-		schedule.setDose(Schedule.TIME_MORNING, new Fraction(1));
+		schedule1.setBegin(today);
+		schedule1.setEnd(plusDays(today, 7));
+		schedule1.setScheduleParts(new SchedulePart[] { part1, part2, part3 });
 
-		schedule.setBegin(begin);
-		schedule.setEnd(end);
-		schedule.setScheduleParts(new SchedulePart[] { part1, part2, part3 });
+		// WEEK 2
+
+		final SchedulePart part4 = new SchedulePart(
+				SchedulePart.MONDAY | SchedulePart.WEDNESDAY | SchedulePart.SUNDAY, toFractionArray(1, 0, 0, 0));
+
+		final SchedulePart part5 = new SchedulePart(
+				SchedulePart.TUESDAY, toFractionArray(0, "1 1/2", 0, 0));
+
+		final Schedule schedule2 = new Schedule();
+		for(int doseTime : Schedule.DOSE_TIMES)
+			schedule2.setDose(doseTime, Fraction.ZERO);
+
+		schedule2.setBegin(schedule1.getEnd());
+		schedule2.setEnd(plusDays(schedule2.getBegin(), 7));
+		schedule2.setScheduleParts(new SchedulePart[] { part4, part5 });
+
+		// WEEK 3
+		final Schedule schedule3 = new Schedule();
+		schedule3.setBegin(schedule2.getEnd());
+		schedule3.setEnd(plusDays(schedule3.getBegin(), 7));
+
+		for(int doseTime : Schedule.DOSE_TIMES)
+			schedule3.setDose(doseTime, Fraction.ZERO);
+
+		////////////////////////////////
 
 		final Drug drug = new Drug();
 		drug.setName("Drug SchedulePart 1");
-		drug.addSchedule(schedule);
+		drug.addSchedule(schedule1);
+		drug.addSchedule(schedule2);
+		drug.addSchedule(schedule3);
 		drug.setRepeatMode(Drug.REPEAT_CUSTOM);
 
 		Log.d(TAG, "testDrugWithScheduleParts1");
 
-		for(Date date = begin; date.before(plusDays(end, 7)); date = nextDay(date))
-		{
-			int weekday = DateTime.getIsoWeekDayNumberIndex(date);
+		Date date = null;
 
+		for(Object[] testCase : testCases)
+		{
+			if(date == null)
+				date = schedule1.getBegin();
+			else
+				date = plusDays(date, 1);
+
+			int weekday = DateTime.getIsoWeekDayNumberIndex(date);
 			Log.d(TAG, "  " + DateTime.toDateString(date) + " " + (WEEKDAYS[weekday]));
 
-			if(drug.hasDoseOnDate(date))
+			if(testCase == null)
 			{
-				for(int doseTime : Schedule.DOSE_TIMES)
-					Log.d(TAG, "    " + doseTime + ": " + drug.getDose(doseTime, date));
+				if(drug.hasDoseOnDate(date))
+					fail("hasDoseOnDate returned true");
 			}
 			else
-				Log.d(TAG, "    (no doses)");
+			{
+				int doseTime = (Integer) testCase[0];
+				Fraction expected = Fraction.valueOf((String) testCase[1]);
+				Fraction actual = drug.getDose(doseTime, date);
+
+				assertEquals(expected, actual);
+			}
 		}
 	}
 
@@ -120,6 +202,10 @@ public class ScheduleTest extends AndroidTestCase
 		}
 
 		return ret;
+	}
+
+	private static void assertEquals(Fraction frac1, Fraction frac2) {
+		assertEquals(frac1.toString(), frac2.toString());
 	}
 
 	private static Date nextDay(Date date) {
