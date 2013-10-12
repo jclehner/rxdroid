@@ -34,6 +34,8 @@ import android.os.Parcelable;
 import android.preference.Preference.BaseSavedState;
 import android.util.Log;
 
+import at.jclehner.rxdroid.BuildConfig;
+
 /**
  * A helper class for saving Object states.
  * <p>
@@ -44,7 +46,7 @@ import android.util.Log;
 public final class InstanceState
 {
 	private static final String TAG = InstanceState.class.getSimpleName();
-	private static final boolean LOGV = false;
+	private static final boolean LOGV = BuildConfig.DEBUG;
 
 	/**
 	 * Marks object members whose value should be saved/restored.
@@ -178,7 +180,7 @@ public final class InstanceState
 			if(!f.isAnnotationPresent(SaveState.class))
 				continue;
 
-			final String mapKey = f.getName() + "@" + clazz.getName();
+			final String mapKey = f.getName() + "@" + f.getDeclaringClass().getName();
 			if(LOGV) Log.v(TAG, "  " + f.getName() + " (" + mapKey + ")");
 			f.setAccessible(true);
 			callback.invoke(o, f, mapKey);
