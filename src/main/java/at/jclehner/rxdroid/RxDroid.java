@@ -165,7 +165,7 @@ public class RxDroid extends Application
 	public static void notifyBackupDataChanged()
 	{
 		new BackupManager(getContext()).dataChanged();
-		Log.i(TAG, "notifyBackupDataChanged");
+		//Log.i(TAG, "notifyBackupDataChanged");
 	}
 
 	private static void toast(final int textResId, final int duration)
