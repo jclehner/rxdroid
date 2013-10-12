@@ -46,7 +46,7 @@ import at.jclehner.rxdroid.BuildConfig;
 public final class InstanceState
 {
 	private static final String TAG = InstanceState.class.getSimpleName();
-	private static final boolean LOGV = BuildConfig.DEBUG;
+	private static final boolean LOGV = false;
 
 	/**
 	 * Marks object members whose value should be saved/restored.
