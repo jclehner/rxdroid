@@ -66,6 +66,10 @@ public final class Schedule extends Entry
 	public static final int TIME_NIGHT   = 3;
 	public static final int TIME_INVALID = 4;
 
+	public static final int[] DOSE_TIMES = {
+			TIME_MORNING, TIME_NOON, TIME_EVENING, TIME_NIGHT
+	};
+
 	public static final int DOSE_TIME_COUNT = TIME_INVALID;
 
 	public static final int REPEAT_DAILY = 0;

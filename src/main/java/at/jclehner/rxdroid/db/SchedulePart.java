@@ -36,6 +36,14 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable
 public class SchedulePart extends Entry
 {
+	public static final int MONDAY    = 1;
+	public static final int TUESDAY   = 1 << 1;
+	public static final int WEDNESDAY = 1 << 2;
+	public static final int THURSDAY  = 1 << 3;
+	public static final int FRIDAY    = 1 << 4;
+	public static final int SATURDAY  = 1 << 5;
+	public static final int SUNDAY    = 1 << 6;
+
 	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction doseMorning;
 
