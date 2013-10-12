@@ -38,6 +38,7 @@ import android.util.Log;
 import at.jclehner.androidutils.EventDispatcher;
 import at.jclehner.androidutils.Extras;
 import at.jclehner.androidutils.Reflect;
+import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.SplashScreenActivity;
@@ -97,6 +98,8 @@ public final class Database
 	private static DatabaseHelper sHelper;
 	private static boolean sIsLoaded = false;
 
+	private static boolean sInMemoryOnly = false;
+
 	private static long sDbLoadingTimeMillis = 0;
 
 	private static volatile int sPendingDaoOperations = 0;
@@ -127,6 +130,12 @@ public final class Database
 			if(!sIsLoaded)
 				reload(context);
 		}
+	}
+
+	public static void setInMemoryOnly(boolean inMemoryOnly)
+	{
+		if(BuildConfig.DEBUG)
+			sInMemoryOnly = inMemoryOnly;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -433,6 +442,9 @@ public final class Database
 
 	private static <E extends Entry, ID> void runDaoMethodInThread(final Dao<E, ID> dao, final String methodName, final E entry)
 	{
+		if(sInMemoryOnly)
+			return;
+
 		++sPendingDaoOperations;
 
 		final Thread th = new Thread() {

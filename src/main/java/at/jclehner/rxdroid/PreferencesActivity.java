@@ -60,6 +60,7 @@ import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
 //import at.jclehner.rxdroid.ui.LayoutTestActivity;
+import at.jclehner.rxdroid.db.SchedulePart;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
@@ -500,8 +501,20 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					schedule.setDose(Schedule.TIME_MORNING, dose);
 					schedule.setDose(Schedule.TIME_EVENING, dose);
 
-					schedule.setBegin(DateTime.date(2013, 01, 01));
-					schedule.setEnd(DateTime.date(2013, 01, 14));
+					Date today = DateTime.today();
+
+					schedule.setBegin(today);
+					schedule.setEnd(DateTime.add(today, Calendar.DAY_OF_MONTH, 14));
+
+					// first four days of the week
+					SchedulePart part1 = new SchedulePart(0x78, new Fraction[]
+							{ Fraction.ZERO, Fraction.ZERO, new Fraction(1, 2), Fraction.ZERO});
+
+					// remaining three days of the week
+					SchedulePart part2 = new SchedulePart(0x7, new Fraction[]
+							{ Fraction.ZERO, Fraction.ZERO, new Fraction(1, 4), Fraction.ZERO});
+
+					schedule.setScheduleParts(new SchedulePart[] { part1, part2 });
 
 					Drug drug = new Drug();
 					drug.setName("Drug #" + (drugCount + 1));
@@ -510,8 +523,9 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					drug.setActive(true);
 
 					Database.create(drug);
-					schedule.setOwner(drug);
 					Database.create(schedule);
+					Database.create(part1);
+					Database.create(part2);
 
 					return true;
 				}

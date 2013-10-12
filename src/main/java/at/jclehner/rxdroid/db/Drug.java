@@ -214,7 +214,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField
 	private String comment;
 
-	private Fraction[] mSimpleSchedule;
+	private transient Fraction[] mSimpleSchedule;
 
 	/**
 	 * Default constructor, required by ORMLite.
@@ -537,11 +537,39 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.sortRank = sortRank;
 	}
 
-	public void addSchedule(Schedule schedule) {
+	/**
+	 * Adds the specified schedule to this drug.
+	 * <p>
+	 * WARNING: After calling this function you *must* pass
+	 * the Schedule object to Database#update(Entry), to set
+	 * the owner.
+	 * </p>
+	 *
+	 *
+	 * @param schedule
+	 */
+	public void addSchedule(Schedule schedule)
+	{
+		schedule.owner = this;
 		mSchedules.get().add(schedule);
 	}
 
-	public void setSchedules(List<Schedule> schedules) {
+	/**
+	 * Set a drug's schedules.
+	 * <p>
+	 * WARNING: After calling this function you *must* pass
+	 * the Schedule object to Database#update(Entry), to set
+	 * the owner.
+	 * </p>
+	 *
+	 *
+	 * @param schedule
+	 */
+	public void setSchedules(List<Schedule> schedules)
+	{
+		for(Schedule schedule : schedules)
+			schedule.owner = this;
+
 		mSchedules.set(schedules);
 	}
 
@@ -754,7 +782,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		return (repeatArg & 1 << weekday) != 0;
 	}
 
-	private final LazyValue<List<Schedule>> mSchedules = new LazyValue<List<Schedule>>() {
+	private final transient LazyValue<List<Schedule>> mSchedules = new LazyValue<List<Schedule>>() {
 
 		@Override
 		public List<Schedule> value()

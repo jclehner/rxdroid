@@ -90,6 +90,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.github.espiandev.showcaseview.ShowcaseView;
 import com.github.espiandev.showcaseview.ShowcaseView.OnShowcaseEventListener;
 import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
+import com.google.gson.GsonBuilder;
 import com.mobeta.android.dslv.DragSortListView;
 
 public class DrugListActivity extends SherlockFragmentActivity implements OnLongClickListener,
@@ -384,6 +385,14 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 						public boolean onMenuItemClick(android.view.MenuItem item)
 						{
 							Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, drug.getName());
+
+							GsonBuilder gb = new GsonBuilder();
+							gb.registerTypeAdapter(Fraction.class, new FractionAdapter().nullSafe());
+							gb.serializeNulls();
+							gb.setPrettyPrinting();
+							gb.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+
+							Log.v(TAG, "As JSON:\n" + gb.create().toJson(drug));
 							return true;
 						}
 					});

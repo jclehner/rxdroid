@@ -83,6 +83,10 @@ public class FractionTest extends AndroidTestCase
 			{
 				continue;
 			}
+			catch(ArithmeticException e)
+			{
+				continue;
+			}
 		}
 
 	}

@@ -66,6 +66,10 @@ public final class Schedule extends Entry
 	public static final int TIME_NIGHT   = 3;
 	public static final int TIME_INVALID = 4;
 
+	public static final int[] DOSE_TIMES = {
+			TIME_MORNING, TIME_NOON, TIME_EVENING, TIME_NIGHT
+	};
+
 	public static final int DOSE_TIME_COUNT = TIME_INVALID;
 
 	public static final int REPEAT_DAILY = 0;
@@ -111,7 +115,7 @@ public final class Schedule extends Entry
 
 	@SuppressWarnings("unused")
 	@DatabaseField(foreign = true)
-	private Drug owner;
+	/* package */ transient Drug owner;
 
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<SchedulePart> scheduleParts;
@@ -124,8 +128,16 @@ public final class Schedule extends Entry
 		this.begin = begin;
 	}
 
+	public Date getBegin() {
+		return begin;
+	}
+
 	public void setEnd(Date end) {
 		this.end = end;
+	}
+
+	public Date getEnd() {
+		return end;
 	}
 
 	public void setOwner(Drug owner) {
@@ -233,6 +245,17 @@ public final class Schedule extends Entry
 		this.repeatArg = repeatArg;
 	}
 
+	public void setScheduleParts(SchedulePart[] parts)
+	{
+		// There's no need to fiddle with this.scheduleParts, since we set
+		// this.mSchedulePartsArray, which is what other functions use.
+
+		for(SchedulePart part : parts)
+			part.owner = this;
+
+		mSchedulePartsArray.set(parts);
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		throw new UnsupportedOperationException();
@@ -281,7 +304,7 @@ public final class Schedule extends Entry
 		}
 	};
 
-	private final LazyValue<Fraction[]> mDoses = new LazyValue<Fraction[]>() {
+	private transient final LazyValue<Fraction[]> mDoses = new LazyValue<Fraction[]>() {
 
 		@Override
 		public Fraction[] value()

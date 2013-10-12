@@ -36,6 +36,14 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable
 public class SchedulePart extends Entry
 {
+	public static final int MONDAY    = 1;
+	public static final int TUESDAY   = 1 << 1;
+	public static final int WEDNESDAY = 1 << 2;
+	public static final int THURSDAY  = 1 << 3;
+	public static final int FRIDAY    = 1 << 4;
+	public static final int SATURDAY  = 1 << 5;
+	public static final int SUNDAY    = 1 << 6;
+
 	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction doseMorning;
 
@@ -53,7 +61,18 @@ public class SchedulePart extends Entry
 
 	@SuppressWarnings("unused")
 	@DatabaseField(foreign = true)
-	private Schedule owner;
+	/* package */ transient Schedule owner;
+
+	SchedulePart() {}
+
+	public SchedulePart(int weekdays, Fraction[] doses)
+	{
+		setWeekdays(weekdays);
+		doseMorning = doses[0];
+		doseNoon = doses[1];
+		doseEvening = doses[2];
+		doseNight = doses[3];
+	}
 
 	transient private LazyValue<Fraction[]> mDoses = new LazyValue<Fraction[]>() {
 
@@ -76,6 +95,66 @@ public class SchedulePart extends Entry
 
 	public Fraction[] getDoses() {
 		return mDoses.get();
+	}
+
+	public void setDose(int doseTime, Fraction dose)
+	{
+		switch(doseTime)
+		{
+			case Schedule.TIME_MORNING:
+				doseMorning = dose;
+				break;
+
+			case Schedule.TIME_NOON:
+				doseNoon = dose;
+				break;
+
+			case Schedule.TIME_EVENING:
+				doseEvening = dose;
+				break;
+
+			case Schedule.TIME_NIGHT:
+				doseNight = dose;
+				break;
+
+			default:
+				throw new IllegalArgumentException("doseTime=" + doseTime);
+		}
+
+		mDoses.reset();
+	}
+
+	public Fraction getDose(int doseTime)
+	{
+		switch(doseTime)
+		{
+			case Schedule.TIME_MORNING:
+				return doseMorning;
+
+			case Schedule.TIME_NOON:
+				return doseNoon;
+
+			case Schedule.TIME_EVENING:
+				return doseEvening;
+
+			case Schedule.TIME_NIGHT:
+				return doseNight;
+
+			default:
+				throw new IllegalArgumentException("doseTime=" + doseTime);
+		}
+	}
+
+	public void setWeekdays(int weekdays)
+	{
+		if(weekdays < 0 || weekdays > 0x7f)
+			throw new IllegalArgumentException("weekdays=" + Integer.toHexString(weekdays));
+
+		this.weekdays = weekdays;
+	}
+
+	public int getWeekdays() {
+		return weekdays;
 	}
 
 	@Override

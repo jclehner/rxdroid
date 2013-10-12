@@ -317,7 +317,11 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	 * @see Fraction#setDisplayMixedNumbers
 	 */
 	@Override
-	public String toString()
+	public String toString() {
+		return toString(true);
+	}
+
+	public String toString(boolean allowMixedNumbers)
 	{
 		if(mDenominator == 1)
 			return Integer.toString(mNumerator);
@@ -327,7 +331,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 
 		if(numerator != 0)
 		{
-			if(sDisplayMixedNumbers)
+			if(allowMixedNumbers && sDisplayMixedNumbers)
 				return (wholeNum == 0 ? "" : wholeNum + " ") + (wholeNum < 0 ? Math.abs(numerator) : numerator) + "/" + mDenominator;
 			else
 				return mNumerator + "/" + mDenominator;
