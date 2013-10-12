@@ -12,7 +12,9 @@ buildscript {
 
 repositories {
 	mavenCentral()
-	mavenLocal()
+	maven {
+		url './.m2repo'
+	}
 }
 
 dependencies {

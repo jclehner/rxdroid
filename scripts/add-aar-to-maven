@@ -8,4 +8,4 @@ fi
 
 artifactId="${2:-$(basename "$1" .aar)}"
 
-mvn install:install-file -Dfile="$1" -DgroupId=at.jclehner.rxdroid.localmaven -DartifactId="${artifactId}" -Dversion=9999 -Dpackaging=aar
+mvn install:install-file -Dfile="$1" -DgroupId=at.jclehner.rxdroid.localmaven -DartifactId="${artifactId}" -Dversion=9999 -Dpackaging=aar -DlocalRepositoryPath=.m2repo
