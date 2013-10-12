@@ -15,6 +15,6 @@ public class FractionAdapter extends TypeAdapter<Fraction>
 
 	@Override
 	public void write(JsonWriter jsonWriter, Fraction fraction) throws IOException {
-		jsonWriter.value(fraction.toString(false));
+		jsonWriter.value(fraction.toString());
 	}
 }
