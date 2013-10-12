@@ -76,6 +76,21 @@
 			</intent-filter>
 		</activity>
 
+        <activity android:name=".ImportActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+        >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="file" android:host="*"
+                      android:pathPattern=".*\\.rxdroid" />
+
+            </intent-filter>
+
+        </activity>
+
 		<activity android:name=".PreferencesActivity"
 		    android:exported="false"
 		    android:windowSoftInputMode="adjustPan"
