@@ -698,7 +698,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 					svb.setShowcaseEventListener(new ShowcaseViewHelper());
 
-					mShowcaseQueue.add(tag(svb.build(), "Edit drug"));
+					mShowcaseQueue.add(tag(svb.build(false), "Edit drug"));
 
 					// 3. Take dose & long press
 
@@ -710,7 +710,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 					svb.setShowcaseEventListener(new ShowcaseViewHelper());
 
-					mShowcaseQueue.add(tag(svb.build(), "Take dose & long press"));
+					mShowcaseQueue.add(tag(svb.build(false), "Take dose & long press"));
 				}
 				else if(drugCount >= 2 && !Settings.wasDisplayedOnce(Settings.OnceIds.DRAG_DROP_SORTING))
 				{
@@ -733,7 +733,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 						}
 					});
 
-					mShowcaseQueue.add(tag(svb.build(), "Drag drop sorting"));
+					mShowcaseQueue.add(tag(svb.build(false), "Drag drop sorting"));
 				}
 			}
 			else
@@ -878,7 +878,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 	private static ShowcaseView tag(ShowcaseView sv, String tag)
 	{
-		sv.setTag(tag);
+		if(sv != null)
+			sv.setTag(tag);
 		return sv;
 	}
 
