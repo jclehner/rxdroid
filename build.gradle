@@ -43,3 +43,11 @@ android {
 		}
 	}
 }
+
+signingConfigs {
+	release {
+		storeFile file(System.getenv("RXDROID_KEYSTORE"))
+		storePassword System.console().readLine("\n\n# Keystore password: ")
+		keyAlias System.getenv("RXDROID_KEY_ALIAS")
+	}
+}
