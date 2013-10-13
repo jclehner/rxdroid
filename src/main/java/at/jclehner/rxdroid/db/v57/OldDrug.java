@@ -99,7 +99,14 @@ public class OldDrug extends Entry
 	{
 		final Drug newDrug = new Drug();
 		Entry.copy(newDrug, this);
-		// TODO some more magic here?
+
+		// Changes:
+		// - removed schedule, added lastScheduleUpdateDate (nothing to do)
+		// - renamed Intake -> DoseEvent
+
+		newDrug.setAutoAddIntakesEnabled(autoAddIntakes);
+		newDrug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);
+
 		return newDrug;
 	}
 

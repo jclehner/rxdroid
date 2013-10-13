@@ -23,6 +23,7 @@ package at.jclehner.rxdroid.db.v55;
 
 import java.util.Date;
 
+import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
@@ -92,7 +93,10 @@ public class OldDrug extends Entry
 	{
 		final Drug newDrug = new Drug();
 		Entry.copy(newDrug, this);
-		// TODO some more magic here?
+
+		newDrug.setAutoAddIntakesEnabled(autoAddIntakes);
+		newDrug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);
+
 		return newDrug;
 	}
 

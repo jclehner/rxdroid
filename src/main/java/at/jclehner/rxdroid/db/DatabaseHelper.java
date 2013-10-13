@@ -232,6 +232,15 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 	private boolean upgrade(ConnectionSource cs, int oldVersion, int newVersion)
 	{
+		/* Upgrade strategy:
+		 * Example: v3 -> v7, OldEntry classes: v4, v5, v6
+		 *
+		 * - Get corresponding OldEntry class (if no .v3.OldEntry, try .v4, then .v5, etc.)
+		 * - Load database using OldEntry (v4 in our example)
+		 * - Conversions (in memory): v4 -> v5, v5 -> v6
+		 * - Conversion (in database): v6 -> v7
+		 */
+
 		if(oldVersion > newVersion)
 			return false;
 		else if(oldVersion == newVersion)
@@ -250,10 +259,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		{
 			oldPackageName = packageName + ".v" + version;
 			if(runUpgradeHelperMethodUpgradeDatabase(oldPackageName, cs))
-			{
-				Log.i(TAG, "  upgradeDatabase: v" + version);
 				++updatedDataCount;
-			}
 		}
 
 		oldPackageName = packageName + ".v" + oldVersion;
@@ -416,7 +422,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		try
 		{
 			method.invoke(null, args);
-			Log.i(TAG, "Invoked " + method.getName());
+			Log.i(TAG, "Invoked " + method.getName() + " in " + method.getDeclaringClass().getPackage().getName());
 			return true;
 		}
 		catch(IllegalArgumentException e)
@@ -433,6 +439,59 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 
 		return false;
+	}
+
+	private static Class<?> getEntryClass(Class<? extends Entry> clazz, int dbVersion)
+	{
+		if(dbVersion > DatabaseHelper.DB_VERSION)
+			throw new IllegalArgumentException("dbVersion=" + dbVersion);
+
+		if(dbVersion == DatabaseHelper.DB_VERSION)
+			return clazz;
+
+		final String pkgName = Database.class.getPackage().getName() + ".v" + dbVersion;
+
+		try
+		{
+			return Class.forName(pkgName + ".Old" + clazz.getSimpleName());
+		}
+		catch(ClassNotFoundException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
+	}
+
+	public static Entry toNextDatabaseVersion(Entry entry)
+	{
+		Class<? extends Entry> oldClass = entry.getClass();
+
+		if(!oldClass.getSimpleName().startsWith("Old"))
+			throw new IllegalArgumentException("Entry already at newest version");
+
+		String dbVersionStr = oldClass.getPackage().getName();
+		dbVersionStr = dbVersionStr.replace(Database.class.getPackage().getName(), "");
+
+		if(!dbVersionStr.startsWith(".v"))
+			throw new IllegalStateException("Unexpected package in " + oldClass);
+
+		int dbVersion = Integer.parseInt(dbVersionStr.substring(2));
+
+		Class<?> newClass = getEntryClass(oldClass, dbVersion);
+
+		try
+		{
+			Entry copy = (Entry) newClass.newInstance();
+			Entry.copy(copy, entry);
+			return copy;
+		}
+		catch(InstantiationException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
+		catch(IllegalAccessException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
 	}
 
 	/* package */ static class WeakObjectCache extends ReferenceObjectCache
