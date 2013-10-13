@@ -50,6 +50,8 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
+import android.text.SpannableString;
+import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -632,6 +634,33 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					return true;
 				}
 			});
+		}
+
+		p = findPreference("key_debug_test_pref_text");
+		if(p != null)
+		{
+			p.setTitle("Schedule");
+			String summary1 =
+					"Mo 1/32 - 10 1/32 - 10 1/32 - 10 1/32\n" +
+					"Tu    0 -       0 -       0 -       0\n" +
+					"We    0 -       0 -       0 -       0\n" +
+					"Th    0 -       0 -       0 -       0\n" +
+					"Fr    0 -       0 -       0 -       0\n" +
+					"Sa  1/3 -    1/32 -       1 -       1\n" +
+					"Su    0 -       0 -       0 -       0\n";
+
+			String summary2 =
+					"Mo   0    -  1/4 -    0 -    0\n" +
+					"Tu   0    -  1/2 -    0 -    0\n" +
+					"We   0    -  1/4 -    0 -    0\n" +
+					"Th   0    -  1/2 -    0 -    0\n" +
+					"Fr   0    -  1/4 -    0 -    0\n" +
+					"Sa   0    -  1/2 -    0 -    0\n" +
+					"Su   0    -    0 -    0 -    0\n";
+
+			SpannableString text = new SpannableString(summary2);
+			Util.applyStyle(text, new TypefaceSpan("monospace"));
+			p.setSummary(text);
 		}
 	}
 }

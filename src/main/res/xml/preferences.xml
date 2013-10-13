@@ -289,6 +289,11 @@
 		    /> 
 		    
 		</Preference>
+
+        <Preference android:key="key_debug_test_pref_text"
+            android:title="Foobar"
+            android:summary="Foobar"
+        />
 				    
 </PreferenceScreen>
 	
