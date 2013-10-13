@@ -73,7 +73,6 @@ public final class Schedule extends Entry
 	public static final int DOSE_TIME_COUNT = TIME_INVALID;
 
 	public static final int REPEAT_DAILY = 0;
-	public static final int REPEAT_ON_DEMAND = 1;
 	public static final int REPEAT_EVERY_N_DAYS = 2;
 	public static final int REPEAT_EVERY_6_8_12_OR_24_HOURS = 3;
 	public static final int REPEAT_WEEKDAYS = 4;
@@ -100,6 +99,9 @@ public final class Schedule extends Entry
 
 	@DatabaseField
 	private long repeatArg;
+
+	//@DatabaseField FIXME for version 59
+	private boolean asNeeded = false;
 
 	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction doseMorning;
@@ -142,6 +144,14 @@ public final class Schedule extends Entry
 
 	public void setOwner(Drug owner) {
 		this.owner = owner;
+	}
+
+	public void setAsNeeded(boolean asNeeded) {
+		this.asNeeded = asNeeded;
+	}
+
+	public boolean getAsNeeded() {
+		return asNeeded;
 	}
 
 	public boolean hasDoseOnDate(Date date)
@@ -245,6 +255,14 @@ public final class Schedule extends Entry
 		this.repeatArg = repeatArg;
 	}
 
+	public void setRepeatDailyWithPause(int cycleLength, int pauseLength)
+	{
+		if(cycleLength > 0xffff || pauseLength > 0xffff)
+			throw new IllegalArgumentException("Arguments must not exceed 0xffff");
+
+		setRepeatArg(cycleLength << 16 | pauseLength);
+	}
+
 	public void setScheduleParts(SchedulePart[] parts)
 	{
 		// There's no need to fiddle with this.scheduleParts, since we set
@@ -271,7 +289,6 @@ public final class Schedule extends Entry
 		switch(repeatMode)
 		{
 			case REPEAT_DAILY:
-			case REPEAT_ON_DEMAND:
 			case REPEAT_EVERY_6_8_12_OR_24_HOURS:
 				return true;
 
