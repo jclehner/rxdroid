@@ -66,9 +66,13 @@
 -keep enum com.j256.** { *; }
 -keep interface com.j256.** { *; }
 
+#For ActionBarSherlock
+
 -keep class com.actionbarsherlock.** { *; }
 -keep enum com.actionbarsherlock.** { *; }
 -keep interface com.actionbarsherlock.** { *; }
+
+-dontwarn com.actionbarsherlock.internal.**
 
 # For Guava
 -dontwarn sun.misc.Unsafe
