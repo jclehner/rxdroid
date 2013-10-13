@@ -35,19 +35,29 @@ android {
 	buildToolsVersion "18.1"
 	compileSdkVersion 18
 
+	signingConfigs {
+		release {
+			storeFile file(System.getenv("RXDROID_KEYSTORE"))
+			keyAlias System.getenv("RXDROID_KEY_ALIAS")
+		}
+	}
+
 	buildTypes {
 		release {
 			runProguard false
 			proguardFile getDefaultProguardFile('proguard-android.txt')
 			proguardFile 'proguard-project.txt'
+			signingConfig android.signingConfigs.release
 		}
 	}
 }
 
-signingConfigs {
-	release {
-		storeFile file(System.getenv("RXDROID_KEYSTORE"))
-		storePassword System.console().readLine("\n\n# Keystore password: ")
-		keyAlias System.getenv("RXDROID_KEY_ALIAS")
-	}
+
+task askForKeystorePassword << {
+	def pw = System.console().readLine("\n#Keystore/key password: ")
+
+	android.signingConfigs.release.storePassword = pw
+	android.signingConfigs.release.keyPassword = pw
 }
+
+assembleRelease.dependsOn askForKeystorePassword
