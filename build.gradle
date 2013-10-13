@@ -47,14 +47,21 @@ android {
 			runProguard false
 			proguardFile getDefaultProguardFile('proguard-android.txt')
 			proguardFile 'proguard-project.txt'
-			signingConfig android.signingConfigs.release
+			signingConfig signingConfigs.release
 		}
 	}
 }
 
 
 task askForKeystorePassword << {
-	def pw = System.console().readLine("\n#Keystore/key password: ")
+	def prompt = 
+			"\n==========================================================" +
+			"\nKeystore : ${android.signingConfigs.release.storeFile}"     +
+			"\nKey alias: ${android.signingConfigs.release.keyAlias}"      +
+			"\n==========================================================" +
+			"\nPassword: "
+
+	def pw = new String(System.console().readPassword(prompt))
 
 	android.signingConfigs.release.storePassword = pw
 	android.signingConfigs.release.keyPassword = pw
