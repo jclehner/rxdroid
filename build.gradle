@@ -37,8 +37,11 @@ android {
 
 	signingConfigs {
 		release {
-			storeFile file(System.getenv("RXDROID_KEYSTORE"))
-			keyAlias System.getenv("RXDROID_KEY_ALIAS")
+			def keystore = System.getenv("RXDROID_KEYSTORE")
+			if (keystore) {
+				storeFile file(keystore)
+				keyAlias System.getenv("RXDROID_KEY_ALIAS")
+			}
 		}
 	}
 
