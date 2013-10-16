@@ -64,10 +64,14 @@ task askForKeystorePassword << {
 			"\n==========================================================" +
 			"\nPassword: "
 
-	def pw = new String(System.console().readPassword(prompt))
+	def console = System.console()
+	
+	if (console) {
+		def pw = new String(console.readPassword(prompt))
 
-	android.signingConfigs.release.storePassword = pw
-	android.signingConfigs.release.keyPassword = pw
+		android.signingConfigs.release.storePassword = pw
+		android.signingConfigs.release.keyPassword = pw
+	}
 }
 
 assembleRelease.dependsOn askForKeystorePassword
