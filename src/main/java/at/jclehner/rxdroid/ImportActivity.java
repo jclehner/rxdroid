@@ -3,7 +3,7 @@ package at.jclehner.rxdroid;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.google.gson.Gson;
+//import com.google.gson.Gson;
 
 import java.io.FileReader;
 
