@@ -45,29 +45,7 @@ build() {
 
 	run gradle assembleRelease
 
-	echo
-
-	while [[ ! -f "$RXDROID_KEYSTORE" ]] ; do
-		read -p "Keystore file: " RXDROID_KEYSTORE
-	done
-
-	while [[ -z "$RXDROID_KEY_ALIAS" ]]; do
-		read -p "Key alias: " RXDROID_KEY_ALIAS
-	done
-
-	echo "======================================================"
-	echo "Keystore: $RXDROID_KEYSTORE"
-	echo "Alias   : $RXDROID_KEY_ALIAS"
-	echo "======================================================"
-
-	while ! signapk; do
-		sleep 1 || exit 1
-	done
-
-
-
-	run jarsigner -verify "$BIN"
-	run zipalign -f 4 "$BIN" "${RXDROID_APK_OUT}"
+	cp "${BIN}" "${RXDROID_APK_OUT}"
 
 	echo "======================================================"
 	echo "APK is available at ${RXDROID_APK_OUT}"
