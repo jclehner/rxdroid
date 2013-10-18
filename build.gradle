@@ -41,6 +41,8 @@ android {
 			if (keystore) {
 				storeFile file(keystore)
 				keyAlias System.getenv("RXDROID_KEY_ALIAS")
+				storePassword "****"
+				keyPassword "****"
 			}
 		}
 	}
@@ -74,4 +76,8 @@ task askForKeystorePassword << {
 	}
 }
 
-assembleRelease.dependsOn askForKeystorePassword
+tasks.whenTaskAdded { theTask ->
+	if (theTask.name.equals("packageRelease")) {
+		theTask.dependsOn "askForKeystorePassword"
+	}
+}
