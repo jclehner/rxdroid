@@ -28,6 +28,7 @@ dependencies {
 		compile 'at.jclehner.rxdroid.localmaven:NumberPicker:9999'
 		compile 'at.jclehner.rxdroid.localmaven:DragSortListView:9999'
 		compile 'at.jclehner.rxdroid.localmaven:ShowcaseView:9999'
+		compile 'at.jclehner.rxdroid.localmaven:SlidingUpPanel:9999'
 }
 
 

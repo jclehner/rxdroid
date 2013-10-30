@@ -54,6 +54,7 @@ GIT_REPOS=(
 	"NumberPicker git://github.com/jclehner/numberpicker.git lib"
 	"DragSortListView git://github.com/bauerca/drag-sort-listview.git library"
 	"ShowcaseView git://github.com/jclehner/ShowcaseView.git library"
+	"SlidingUpPanel git://github.com/umano/AndroidSlidingUpPanel.git library"
 )
 
 ORIGPWD="$(pwd)"
