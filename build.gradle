@@ -24,6 +24,12 @@ dependencies {
 		compile 'com.android.support:support-v4:13.0.0'
 		compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
 		compile 'com.nineoldandroids:library:2.4.0'
+		//compile 'de.keyboardsurfer.android.widget:crouton:1.8.1'
+
+		compile ('de.keyboardsurfer.android.widget:crouton:1.8.1') {
+				exclude module: 'support-v4'
+				compile 'com.android.support:support-v4:13.0.0'
+		}
 	
 		compile 'at.jclehner.rxdroid.localmaven:NumberPicker:9999'
 		compile 'at.jclehner.rxdroid.localmaven:DragSortListView:9999'
