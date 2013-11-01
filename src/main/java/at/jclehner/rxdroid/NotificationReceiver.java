@@ -329,7 +329,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		if(lowSupplyDrugCount != 0)
 		{
 			final String msg;
-			final String first = drugsWithLowSupplies.get(0).getName();
+			final String first = Entries.getDrugName(drugsWithLowSupplies.get(0));
 
 			icon = R.drawable.ic_stat_exclamation;
 			isShowingLowSupplyNotification = sb.length() == 0;
@@ -339,7 +339,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				msg = getString(R.string._qmsg_low_supply_single, first);
 			else
 			{
-				final String second = drugsWithLowSupplies.get(1).getName();
+				final String second = Entries.getDrugName(drugsWithLowSupplies.get(1));
 				msg = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount - 1, first, second);
 			}
 
