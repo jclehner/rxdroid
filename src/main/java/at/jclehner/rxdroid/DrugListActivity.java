@@ -87,10 +87,12 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 import com.github.espiandev.showcaseview.ShowcaseView;
 import com.github.espiandev.showcaseview.ShowcaseView.OnShowcaseEventListener;
 import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
 import com.mobeta.android.dslv.DragSortListView;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 public class DrugListActivity extends SherlockFragmentActivity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
@@ -114,6 +116,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 	public static final int TAG_DRUG_ID = R.id.tag_drug_id;
 
 	private ViewPager mPager;
+    private SlidingUpPanelLayout mPanel;
 	//private TextView mTextDate;
 
 	private Date mOriginalDate;
@@ -133,11 +136,15 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+        //requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		Components.onCreateActivity(this, 0);
 
 		setContentView(R.layout.drug_list);
 
 		mPager = (ViewPager) findViewById(R.id.drug_list_pager);
+
+        mPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_panel);
+        mPanel.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
 
 		/*mTextDate = (TextView) findViewById(R.id.text_date);
 
@@ -162,6 +169,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 	protected void onResume()
 	{
 		super.onResume();
+
+        SlidingUpPanelLayout l = null;
 
 		Components.onResumeActivity(this, 0);
 		mIsShowing = true;
@@ -637,6 +646,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			if(LOGV) Log.v(TAG, "setDate: activity is not showing; ignoring");
 			return;
 		}
+
+        mPanel.collapsePane();
 
 		if(toastIfPastMaxHistoryAge(date))
 			return;

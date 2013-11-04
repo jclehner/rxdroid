@@ -24,45 +24,41 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="vertical"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
 	android:layout_gravity="center"
->	
+    android:paddingTop="48dip"
+>
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout android:id="@+id/sliding_panel"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+    >
 		<android.support.v4.view.ViewPager android:id="@+id/drug_list_pager"
-			android:layout_width="fill_parent"
-			android:layout_height="0dip"
-			android:layout_weight="1"
-			
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
 		/>
-		
-		<!-- 
-		<TextView android:id="@+id/text_date"
-			android:layout_width="match_parent"
-			android:layout_height="40sp"
-			android:layout_gravity="center"
-			
-			android:text="9999-99-99"
-			android:textSize="24sp"
-			android:textColor="#000000"
-			android:gravity="center"			
-			android:clickable="true"
-			android:background="@color/active_text_light"
-			style="@android:style/TextAppearance.Large"
-		/>	
-		 
-		 <TextView android:id="@+id/text_date"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center"
-			
-			android:text="9999-99-99"
-			android:textSize="24dp"
-			android:textColor="#000000"
-			android:gravity="center"			
-			android:clickable="true"
-			android:background="@color/theme_dark"
-			style="@style/TextLarge"
-		/>	
-		 -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="#eee"
+        >
+            <TextView android:id="@+id/text_notification_panel"
+                android:layout_width="match_parent"
+                android:layout_height="68dip"
+                android:gravity="center"
+                android:text="Foobar"
+            />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1"
+                android:src="@drawable/ic_morning"
+            />
+        </LinearLayout>
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 	 
 </LinearLayout>
