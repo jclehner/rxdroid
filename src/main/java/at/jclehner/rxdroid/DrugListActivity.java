@@ -145,6 +145,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
         mPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_panel);
         mPanel.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
+		mPanel.setPanelHeight(getResources().getDimensionPixelSize(R.dimen.notification_panel_collapsed_height));
 
 		/*mTextDate = (TextView) findViewById(R.id.text_date);
 

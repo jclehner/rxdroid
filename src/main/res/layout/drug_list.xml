@@ -27,7 +27,6 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:layout_gravity="center"
-    android:paddingTop="48dip"
 >
     <com.sothree.slidinguppanel.SlidingUpPanelLayout android:id="@+id/sliding_panel"
         android:layout_height="match_parent"
@@ -46,7 +45,7 @@
         >
             <TextView android:id="@+id/text_notification_panel"
                 android:layout_width="match_parent"
-                android:layout_height="68dip"
+                android:layout_height="@dimen/notification_panel_collapsed_height"
                 android:gravity="center"
                 android:text="Foobar"
             />
