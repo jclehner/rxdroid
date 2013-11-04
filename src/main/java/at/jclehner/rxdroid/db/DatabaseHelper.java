@@ -148,14 +148,20 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		final File dbOrig = RxDroid.getContext().getDatabasePath(DB_NAME);
 		final File dbCopy = RxDroid.getContext().getDatabasePath("backup_" + oldVersion + ".sqlite");
 
-		try
+		if(!dbCopy.exists())
 		{
-			Util.copyFile(dbOrig, dbCopy);
+			try
+			{
+				Util.copyFile(dbOrig, dbCopy);
+			}
+			catch(IOException e)
+			{
+				Log.e(TAG, "Failed to create " + dbCopy, e);
+			}
 		}
-		catch(IOException e)
-		{
-			Log.e(TAG, "Failed to create " + dbCopy, e);
-		}
+		else
+			Log.i(TAG, dbCopy + " exists; not overwriting");
+
 
 		SplashScreenActivity.setStatusMessage(R.string._title_db_status_upgrading);
 
@@ -232,13 +238,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 	private boolean upgrade(ConnectionSource cs, int oldVersion, int newVersion)
 	{
-		/* Upgrade strategy:
+		/* Upgrade process explained:
 		 * Example: v3 -> v7, OldEntry classes: v4, v5, v6
 		 *
 		 * - Get corresponding OldEntry class (if no .v3.OldEntry, try .v4, then .v5, etc.)
 		 * - Load database using OldEntry (v4 in our example)
-		 * - Conversions (in memory): v4 -> v5, v5 -> v6
-		 * - Conversion (in database): v6 -> v7
+		 * - Conversions (in memory): v4 -> v5, v5 -> v6, v6 -> v7
+		 * - Write to database: v7
 		 */
 
 		if(oldVersion > newVersion)
