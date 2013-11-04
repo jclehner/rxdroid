@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
+import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.field.DatabaseField;
 
@@ -83,6 +84,28 @@ public abstract class Entry
 	 */
 	protected Entry convertToCurrentDatabaseFormat() {
 		throw new UnsupportedOperationException();
+	}
+
+	protected Entry convertToNextDatabaseFormat() {
+		throw new UnsupportedOperationException();
+	}
+
+	protected static void setField(Entry entry, String fieldName, Object value)
+	{
+		try
+		{
+			Field f = entry.getClass().getField(fieldName);
+			f.setAccessible(true);
+			f.set(entry, value);
+		}
+		catch(NoSuchFieldException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
+		catch(IllegalAccessException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
 	}
 
 	protected static void copy(Entry dest, Entry src)
