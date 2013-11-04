@@ -251,7 +251,7 @@ public final class Schedule extends Entry
 		this.repeatMode = repeatMode;
 	}
 
-	public void setRepeatArg(int repeatArg) {
+	public void setRepeatArg(long repeatArg) {
 		this.repeatArg = repeatArg;
 	}
 
