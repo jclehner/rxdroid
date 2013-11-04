@@ -73,7 +73,6 @@
 		
 		<item name="android:windowAnimationStyle">@null</item>
 		<item name="android:alertDialogStyle">@style/Theme.RxDroid.Dialog</item>
-		<item name="android:windowActionBarOverlay">true</item>
 		
 		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>			
 	</style>
@@ -136,8 +135,7 @@
         
         <item name="dividerColor">@color/list_divider_dark</item>
         
-		<item name="android:windowAnimationStyle">@null</item>
-		<item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
         <item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
     </style>
     
