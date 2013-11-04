@@ -1,3 +1,8 @@
+0.9.19:
+	* Fixed database errors when upgrading from previous versions
+	* Fixed issue of missing notifications when changing date, time or
+	  timezone.
+
 0.9.18.1
     * Added missing German translation
 

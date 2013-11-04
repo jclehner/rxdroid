@@ -6,7 +6,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:0.5.+'
+		classpath 'com.android.tools.build:gradle:0.5.6'
 	}
 }
 
@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-		compile 'com.google.code.gson:gson:2.2.4'
+		//compile 'com.google.code.gson:gson:2.2.4'
 		compile 'com.j256.ormlite:ormlite-core:4.47'
 		compile 'com.j256.ormlite:ormlite-android:4.47'
 		compile 'com.android.support:support-v4:13.0.0'
@@ -37,8 +37,13 @@ android {
 
 	signingConfigs {
 		release {
-			storeFile file(System.getenv("RXDROID_KEYSTORE"))
-			keyAlias System.getenv("RXDROID_KEY_ALIAS")
+			def keystore = System.getenv("RXDROID_KEYSTORE")
+			if (keystore) {
+				storeFile file(keystore)
+				keyAlias System.getenv("RXDROID_KEY_ALIAS")
+				storePassword "****"
+				keyPassword "****"
+			}
 		}
 	}
 
@@ -61,10 +66,18 @@ task askForKeystorePassword << {
 			"\n==========================================================" +
 			"\nPassword: "
 
-	def pw = new String(System.console().readPassword(prompt))
+	def console = System.console()
+	
+	if (console) {
+		def pw = new String(console.readPassword(prompt))
 
-	android.signingConfigs.release.storePassword = pw
-	android.signingConfigs.release.keyPassword = pw
+		android.signingConfigs.release.storePassword = pw
+		android.signingConfigs.release.keyPassword = pw
+	}
 }
 
-assembleRelease.dependsOn askForKeystorePassword
+tasks.whenTaskAdded { theTask ->
+	if (theTask.name.equals("packageRelease")) {
+		theTask.dependsOn "askForKeystorePassword"
+	}
+}

@@ -382,7 +382,6 @@ public class DoseLogFragment extends ExpandableListFragment
 				holder = new GroupViewHolder();
 				holder.status = (ImageView) view.findViewById(R.id.img_status);
 				holder.date = (TextView) view.findViewById(R.id.text_date);
-				holder.count = (TextView) view.findViewById(R.id.text_count);
 				view.setTag(holder);
 			}
 			else
@@ -394,14 +393,12 @@ public class DoseLogFragment extends ExpandableListFragment
 				Log.w(TAG, "Group " + groupPosition + " is empty...");
 				holder.status.setImageResource(0);
 				holder.date.setText("?");
-				holder.count.setText("(0)");
 
 				return view;
 			}
 
 			final Date date = events.get(0).date;
 			holder.date.setText(DateTime.toNativeDate(date));
-			holder.count.setText("(" + events.size() + ")");
 
 			int statusResId = Theme.getResourceAttribute(R.attr.doseStatusTaken);
 			for(EventInfo info : events)
@@ -548,7 +545,6 @@ class GroupViewHolder
 {
 	ImageView status;
 	TextView date;
-	TextView count;
 }
 
 class ChildViewHolder

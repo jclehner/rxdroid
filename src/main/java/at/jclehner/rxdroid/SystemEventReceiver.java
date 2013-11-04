@@ -25,6 +25,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.util.DateTime;
 
 public class SystemEventReceiver extends BroadcastReceiver
@@ -34,10 +36,14 @@ public class SystemEventReceiver extends BroadcastReceiver
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
-		if(Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()))
+		if(Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction())
+				|| Intent.ACTION_TIME_CHANGED.equals(intent.getAction())
+				|| Intent.ACTION_DATE_CHANGED.equals(intent.getAction()))
 		{
-			Log.i(TAG, "Timezone changed, clearing date cache");
+			Log.i(TAG, "Action: " + intent.getAction());
+
 			DateTime.clearDateCache();
+			Database.reload(context);
 		}
 
 		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(context, false);
