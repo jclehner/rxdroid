@@ -1,16 +1,25 @@
 package at.jclehner.rxdroid.db.v58;
 
+import java.lang.reflect.Field;
+import java.util.Date;
+
+import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.Fraction;
+import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class ScheduleCreator
 {
-	public void migrateToNewSchedule(OldDrug drug)
+	public static Schedule createScheduleFromDrug(Entry oldDrug)
 	{
 		final Schedule schedule = new Schedule();
 		boolean useRepeatOriginAsBegin = false;
 
-		switch(drug.repeatMode)
+		final int repeatMode = getFieldValue(oldDrug, "repeatMode");
+		final long repeatArg = getFieldValue(oldDrug, "repeatArg");
+
+		switch(repeatMode)
 		{
 			case OldDrug.REPEAT_AS_NEEDED:
 				schedule.setAsNeeded(true);
@@ -27,71 +36,67 @@ public class ScheduleCreator
 
 			case OldDrug.REPEAT_WEEKDAYS:
 				schedule.setRepeatMode(Schedule.REPEAT_WEEKDAYS);
-				schedule.setRepeatArg((int) drug.repeatArg);
+				schedule.setRepeatArg(repeatArg);
 				useRepeatOriginAsBegin = true;
 				break;
 
 			case OldDrug.REPEAT_EVERY_N_DAYS:
 				schedule.setRepeatMode(Schedule.REPEAT_EVERY_N_DAYS);
-				schedule.setRepeatArg((int) drug.repeatArg);
+				schedule.setRepeatArg(repeatArg);
 				useRepeatOriginAsBegin = true;
+				break;
 
 			case OldDrug.REPEAT_CUSTOM:
 				/* no - op */
-				return;
+				return null;
 
 			default:
-				throw new IllegalArgumentException("repeatMode=" + drug.repeatMode);
+				throw new IllegalArgumentException("repeatMode=" + repeatMode);
 		}
 
-		schedule.setBegin(useRepeatOriginAsBegin ? drug.repeatOrigin : drug.lastScheduleUpdateDate);
+		final Date repeatOrigin = getFieldValue(oldDrug, "repeatOrigin");
+		final Date lastScheduleUpdateDate = getFieldValue(oldDrug, "lastScheduleUpdateDate");
+
+		schedule.setBegin(useRepeatOriginAsBegin ? repeatOrigin : lastScheduleUpdateDate);
 
 		for(int doseTime : Schedule.DOSE_TIMES)
-			schedule.setDose(doseTime, getDose(drug, doseTime));
+			schedule.setDose(doseTime, getDose(oldDrug, doseTime));
+
+		return schedule;
 	}
 
-	private Fraction getDose(OldDrug drug, int doseTime)
+	private static Fraction getDose(Entry oldDrug, int doseTime)
 	{
 		switch(doseTime)
 		{
 			case Schedule.TIME_MORNING:
-				return drug.doseMorning;
+				return getFieldValue(oldDrug, "doseMorning");
 			case Schedule.TIME_NOON:
-				return drug.doseNoon;
+				return getFieldValue(oldDrug, "doseNoon");
 			case Schedule.TIME_EVENING:
-				return drug.doseEvening;
+				return getFieldValue(oldDrug, "doseEvening");
 			case Schedule.TIME_NIGHT:
-				return drug.doseNight;
+				return getFieldValue(oldDrug, "doseNight");
 			default:
 				throw new IllegalArgumentException();
 		}
 	}
 
-	public int toScheduleRepeatMode(int drugRepeatMode)
+	private static <T> T getFieldValue(Entry entry, String fieldName)
 	{
-		/*
-		public static final int REPEAT_DAILY = 0;
-	public static final int REPEAT_EVERY_N_DAYS = 1;
-	public static final int REPEAT_WEEKDAYS = 2;
-	public static final int REPEAT_AS_NEEDED = 3;
-	public static final int REPEAT_21_7 = 4; // for oral contraceptives, 21 days on, 7 off
-	public static final int REPEAT_CUSTOM = 5;
-	public static final int REPEAT_INVALID = 6;
-		 */
-
-		switch(drugRepeatMode)
+		try
 		{
-			case OldDrug.REPEAT_DAILY:
-				return Schedule.REPEAT_DAILY;
-
-			case OldDrug.REPEAT_EVERY_N_DAYS:
-				return Schedule.REPEAT_EVERY_N_DAYS;
-
-			case OldDrug.REPEAT_WEEKDAYS:
-				return Schedule.REPEAT_WEEKDAYS;
-
-			default:
-				throw new IllegalArgumentException("drugRepeatMode=" + drugRepeatMode);
+			Field f = entry.getClass().getField(fieldName);
+			f.setAccessible(true);
+			return (T) f.get(entry);
+		}
+		catch(NoSuchFieldException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
+		catch(IllegalAccessException e)
+		{
+			throw new WrappedCheckedException(e);
 		}
 	}
 }

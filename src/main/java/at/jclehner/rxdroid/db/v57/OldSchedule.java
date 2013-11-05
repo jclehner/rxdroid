@@ -24,7 +24,6 @@ package at.jclehner.rxdroid.db.v57;
 import java.util.Date;
 
 import at.jclehner.rxdroid.Fraction;
-import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.FractionPersister;
 import at.jclehner.rxdroid.db.Schedule;
@@ -68,7 +67,13 @@ public class OldSchedule extends Entry
 	{
 		final Schedule newSchedule = new Schedule();
 		Entry.copy(newSchedule, this);
-		// TODO some more magic here?
+
+		if(repeatMode == Schedule.REPEAT_AS_NEEDED)
+		{
+			newSchedule.setAsNeeded(true);
+			newSchedule.setRepeatMode(Schedule.REPEAT_DAILY);
+		}
+
 		return newSchedule;
 	}
 

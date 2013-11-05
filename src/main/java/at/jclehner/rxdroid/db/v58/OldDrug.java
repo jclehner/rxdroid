@@ -6,10 +6,12 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
 
 import at.jclehner.rxdroid.Fraction;
+import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.FractionPersister;
 import at.jclehner.rxdroid.db.Patient;
+import at.jclehner.rxdroid.db.Schedule;
 
 @SuppressWarnings({ "unused", "serial" })
 @DatabaseTable(tableName = "drugs")
@@ -71,9 +73,6 @@ public class OldDrug extends Entry
 	@DatabaseField
 	/* package */ Date lastScheduleUpdateDate;
 
-//	@DatabaseField
-//	/* package */ Date lastDosesClearedDate;
-
 	@DatabaseField
 	/* package */ int sortRank = Integer.MAX_VALUE;
 
@@ -85,7 +84,11 @@ public class OldDrug extends Entry
 	{
 		final Drug newDrug = new Drug();
 		Entry.copy(newDrug, this);
-		// TODO some more magic here?
+
+		Schedule schedule = ScheduleCreator.createScheduleFromDrug(this);
+		Database.createWithoutMagic(schedule);
+		newDrug.addSchedule(schedule);
+
 		return newDrug;
 	}
 

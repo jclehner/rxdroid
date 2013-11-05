@@ -25,7 +25,7 @@ public class OldSchedule extends Entry
 	/* package */ Date end;
 
 	@DatabaseField
-	private int repeatMode = Drug.REPEAT_DAILY;
+	private int repeatMode = Schedule.REPEAT_DAILY;
 
 	@DatabaseField
 	private long repeatArg;
@@ -50,7 +50,13 @@ public class OldSchedule extends Entry
 	{
 		final Schedule newSchedule = new Schedule();
 		Entry.copy(newSchedule, this);
-		// TODO some more magic here?
+
+		if(repeatMode == Schedule.REPEAT_AS_NEEDED)
+		{
+			newSchedule.setAsNeeded(true);
+			newSchedule.setRepeatMode(Schedule.REPEAT_DAILY);
+		}
+
 		return newSchedule;
 	}
 

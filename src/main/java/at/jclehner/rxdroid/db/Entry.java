@@ -86,10 +86,6 @@ public abstract class Entry
 		throw new UnsupportedOperationException();
 	}
 
-	protected Entry convertToNextDatabaseFormat() {
-		throw new UnsupportedOperationException();
-	}
-
 	protected static void setField(Entry entry, String fieldName, Object value)
 	{
 		try

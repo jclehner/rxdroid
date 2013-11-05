@@ -356,10 +356,17 @@ public final class Database
 	}
 
 	@SuppressWarnings({ "unchecked", "unused" })
-	private static <E extends Entry> void createWithoutMagic(E entry) throws SQLException
+	public static <E extends Entry> void createWithoutMagic(E entry)
 	{
 		final Dao<E, Integer> dao = (Dao<E, Integer>) getDaoChecked(entry.getClass());
-		dao.create(entry);
+		try
+		{
+			dao.create(entry);
+		}
+		catch(SQLException e)
+		{
+			throw new DatabaseError(DatabaseError.E_GENERAL, e);
+		}
 	}
 
 	private static <T> Dao<T, Integer> getDaoChecked(Class<T> clazz) {

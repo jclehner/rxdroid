@@ -447,59 +447,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		return false;
 	}
 
-	private static Class<?> getEntryClass(Class<? extends Entry> clazz, int dbVersion)
-	{
-		if(dbVersion > DatabaseHelper.DB_VERSION)
-			throw new IllegalArgumentException("dbVersion=" + dbVersion);
-
-		if(dbVersion == DatabaseHelper.DB_VERSION)
-			return clazz;
-
-		final String pkgName = Database.class.getPackage().getName() + ".v" + dbVersion;
-
-		try
-		{
-			return Class.forName(pkgName + ".Old" + clazz.getSimpleName());
-		}
-		catch(ClassNotFoundException e)
-		{
-			throw new WrappedCheckedException(e);
-		}
-	}
-
-	public static Entry toNextDatabaseVersion(Entry entry)
-	{
-		Class<? extends Entry> oldClass = entry.getClass();
-
-		if(!oldClass.getSimpleName().startsWith("Old"))
-			throw new IllegalArgumentException("Entry already at newest version");
-
-		String dbVersionStr = oldClass.getPackage().getName();
-		dbVersionStr = dbVersionStr.replace(Database.class.getPackage().getName(), "");
-
-		if(!dbVersionStr.startsWith(".v"))
-			throw new IllegalStateException("Unexpected package in " + oldClass);
-
-		int dbVersion = Integer.parseInt(dbVersionStr.substring(2));
-
-		Class<?> newClass = getEntryClass(oldClass, dbVersion);
-
-		try
-		{
-			Entry copy = (Entry) newClass.newInstance();
-			Entry.copy(copy, entry);
-			return copy;
-		}
-		catch(InstantiationException e)
-		{
-			throw new WrappedCheckedException(e);
-		}
-		catch(IllegalAccessException e)
-		{
-			throw new WrappedCheckedException(e);
-		}
-	}
-
 	/* package */ static class WeakObjectCache extends ReferenceObjectCache
 	{
 		private static final WeakObjectCache sInstance = new WeakObjectCache();

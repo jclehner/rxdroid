@@ -24,11 +24,13 @@ package at.jclehner.rxdroid.db.v57;
 import java.util.Date;
 
 import at.jclehner.rxdroid.Fraction;
+import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.FractionPersister;
 import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.db.v58.ScheduleCreator;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -103,6 +105,10 @@ public class OldDrug extends Entry
 		// Changes:
 		// - removed schedule, added lastScheduleUpdateDate (nothing to do)
 		// - renamed Intake -> DoseEvent
+
+		Schedule schedule = ScheduleCreator.createScheduleFromDrug(this);
+		Database.createWithoutMagic(schedule);
+		newDrug.addSchedule(schedule);
 
 		newDrug.setAutoAddIntakesEnabled(autoAddIntakes);
 		newDrug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);

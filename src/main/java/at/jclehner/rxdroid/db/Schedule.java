@@ -73,6 +73,8 @@ public final class Schedule extends Entry
 	public static final int DOSE_TIME_COUNT = TIME_INVALID;
 
 	public static final int REPEAT_DAILY = 0;
+	@Deprecated
+	public static final int REPEAT_AS_NEEDED = 1;
 	public static final int REPEAT_EVERY_N_DAYS = 2;
 	public static final int REPEAT_EVERY_6_8_12_OR_24_HOURS = 3;
 	public static final int REPEAT_WEEKDAYS = 4;
@@ -247,7 +249,11 @@ public final class Schedule extends Entry
 		return true;
 	}
 
-	public void setRepeatMode(int repeatMode) {
+	public void setRepeatMode(int repeatMode)
+	{
+		if(repeatMode == REPEAT_AS_NEEDED)
+			throw new IllegalArgumentException("REPEAT_AS_NEEDED is deprecated");
+
 		this.repeatMode = repeatMode;
 	}
 
