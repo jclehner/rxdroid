@@ -96,52 +96,11 @@ public class Drug extends Entry implements Comparable<Drug>
 	public static final int ICON_SPRAY = 10;
 	public static final int ICON_OTHER = 11;
 
-	public static final int TIME_MORNING = 0;
-	public static final int TIME_NOON = 1;
-	public static final int TIME_EVENING = 2;
-	public static final int TIME_NIGHT = 3;
-	/**
-	 * All dose-times &gt;= this value are considered invalid.
-	 * <p>
-	 * You can also use this value in a <code>for</code> loop, which
-	 * will guarantee that the value of <code>doseTime</code> will always
-	 * be a valid dose-time. Example:
-	 * <pre>
-	 * {@code
-	 * for(int doseTime = TIME_MORNING; doseTime != TIME_INVALD; ++doseTime) {
-	 * 	 // do something
-	 * }
-	 * }
-	 * </pre>
-	 */
-	public static final int TIME_INVALID = 4;
-
-	public static final int REPEAT_DAILY = 0;
-	public static final int REPEAT_EVERY_N_DAYS = 1;
-	public static final int REPEAT_WEEKDAYS = 2;
-	public static final int REPEAT_AS_NEEDED = 3;
-	public static final int REPEAT_21_7 = 4; // for oral contraceptives, 21 days on, 7 off
-	public static final int REPEAT_CUSTOM = 5;
-	public static final int REPEAT_INVALID = 6;
-
-	// TODO valid arguments: 6, 8, 12, with automapping to doseTimes
-	public static final int REPEAT_EVERY_N_HOURS = REPEAT_INVALID;
-
-	public static final int REPEATARG_DAY_MON = 1;
-	public static final int REPEATARG_DAY_TUE = 1 << 1;
-	public static final int REPEATARG_DAY_WED = 1 << 2;
-	public static final int REPEATARG_DAY_THU = 1 << 3;
-	public static final int REPEATARG_DAY_FRI = 1 << 4;
-	public static final int REPEATARG_DAY_SAT = 1 << 5;
-	public static final int REPEATARG_DAY_SUN = 1 << 6;
-
 	@DatabaseField(unique = true)
 	private String name;
 
-	// XXX
 	@DatabaseField(foreign = true)
-	private Patient patient;
-	// XXX
+	private transient Patient patient;
 
 	@DatabaseField
 	private int icon;
@@ -156,43 +115,6 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField(persisterClass = FractionPersister.class)
 	private Fraction currentSupply = Fraction.ZERO;
 
-	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseMorning = Fraction.ZERO;
-
-	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseNoon = Fraction.ZERO;
-
-	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseEvening = Fraction.ZERO;
-
-	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseNight = Fraction.ZERO;
-
-	@DatabaseField
-	private int repeatMode= REPEAT_DAILY;
-
-
-	@DatabaseField
-	private long repeatArg = 0;
-
-	/**
-	 * Defines the repeat origin.
-	 *
-	 *
-	 *
-	 * For every repeat other than {@link #REPEAT_DAILY}, this field holds a specific value,
-	 * allowing {@link #hasDoseOnDate(Date)} to determine whether a dose is scheduled on a specific date.
-	 *
-	 * <ul>
-	 *     <li><code>FREQ_EVERY_OTHER_DAY</code>: field is set to a date (in milliseconds) where this drug's
-	 *         intake should be set, i.e. if the date corresponds to 2011-09-07, there's an intake on that day,
-	 *         another one on 2011-09-09, and so forth.</li>
-	 *     <li><code>FREQ_WEEKLY</code>: field is set to a week day value from {@link java.util.Calendar}.</li>
-	 * </ul>
-	 */
-	@DatabaseField
-	private Date repeatOrigin;
-
 	@DatabaseField(columnName = "autoAddIntakes")
 	private boolean hasAutoDoseEvents = false;
 
@@ -201,9 +123,6 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	@DatabaseField
 	private Date lastScheduleUpdateDate;
-
-//	@DatabaseField
-//	private Date lastDosesClearedDate;
 
 	@DatabaseField
 	private int sortRank = Integer.MAX_VALUE;
@@ -221,59 +140,8 @@ public class Drug extends Entry implements Comparable<Drug>
 	 */
 	public Drug() {}
 
-	public boolean hasDoseOnDate(Date date)
-	{
-		if(repeatOrigin != null)
-		{
-			switch(repeatMode)
-			{
-				case REPEAT_EVERY_N_DAYS:
-				case REPEAT_EVERY_N_HOURS:
-				case REPEAT_21_7:
-				{
-					if(date.before(repeatOrigin))
-						return false;
-				}
-
-				default:
-					;
-			}
-		}
-
-		if(lastScheduleUpdateDate != null)
-		{
-			Date min = lastScheduleUpdateDate;
-
-//			if(repeatOrigin != null)
-//				min = DateTime.min(min, repeatOrigin);
-
-			if(date.before(min))
-				return false;
-		}
-
-		switch(repeatMode)
-		{
-			case REPEAT_DAILY:
-			case REPEAT_AS_NEEDED:
-				return true;
-
-			case REPEAT_EVERY_N_DAYS:
-				return (DateTime.diffDays(date, repeatOrigin) % repeatArg) == 0;
-
-			case REPEAT_WEEKDAYS:
-				final Calendar cal = DateTime.calendarFromDate(date);
-				return hasDoseOnWeekday(cal.get(Calendar.DAY_OF_WEEK));
-
-			case REPEAT_21_7:
-				final long diff = Math.abs(DateTime.diffDays(date, repeatOrigin)) % 28;
-				return diff < 21;
-
-			case REPEAT_CUSTOM:
-				return Schedules.hasDoseOnDate(date, mSchedules.get());
-
-			default:
-				throw new IllegalStateException("Unknown repeat mode");
-		}
+	public boolean hasDoseOnDate(Date date) {
+		return Schedules.hasDoseOnDate(date, mSchedules.get());
 	}
 
 	public String getName() {
@@ -282,44 +150,6 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public int getIcon() {
 		return icon;
-	}
-
-	/*public int getIconResourceId()
-	{
-		final boolean isDarkTheme = Theme.isDark();
-
-		switch(icon)
-		{
-			case ICON_SYRINGE:
-				return isDarkTheme ? R.drawable.ic_drug_syringe_light : R.drawable.ic_drug_syringe_dark;
-
-			case ICON_GLASS:
-				return isDarkTheme ? R.drawable.ic_drug_glass_light : R.drawable.ic_drug_glass_dark;
-
-			case ICON_TUBE:
-				return isDarkTheme ? R.drawable.ic_drug_tube_light : R.drawable.ic_drug_tube_dark;
-
-			case ICON_TABLET:
-				// fall through
-
-			default:
-				//return R.drawable.ic_drug_pill2;
-				return isDarkTheme ? R.drawable.ic_drug_tablet_light : R.drawable.ic_drug_tablet_dark;
-
-			// FIXME
-		}
-	}*/
-
-	public int getRepeatMode() {
-		return repeatMode;
-	}
-
-	public long getRepeatArg() {
-		return repeatArg;
-	}
-
-	public Date getRepeatOrigin() {
-		return repeatOrigin;
 	}
 
 	public void setAutoAddIntakesEnabled(boolean autoAddIntakes)
@@ -354,44 +184,7 @@ public class Drug extends Entry implements Comparable<Drug>
 		return currentSupply;
 	}
 
-	public Fraction[] getSimpleSchedule()
-	{
-		if(mSimpleSchedule == null)
-			mSimpleSchedule = new Fraction[] { doseMorning, doseNoon, doseEvening, doseNight };
-
-		return mSimpleSchedule;
-	}
-
-	public Fraction getDose(int doseTime)
-	{
-		if(repeatMode == REPEAT_CUSTOM)
-			throw new UnsupportedOperationException("This function cannot be used in conjunction with a custom schedule");
-
-		switch(doseTime)
-		{
-			case TIME_MORNING:
-				return doseMorning;
-			case TIME_NOON:
-				return doseNoon;
-			case TIME_EVENING:
-				return doseEvening;
-			case TIME_NIGHT:
-				return doseNight;
-			default:
-				throw new IllegalArgumentException();
-		}
-	}
-
-	public Fraction getDose(int doseTime, Date date)
-	{
-		if(repeatMode != REPEAT_CUSTOM)
-		{
-			if(!hasDoseOnDate(date))
-				return Fraction.ZERO;
-
-			return getDose(doseTime);
-		}
-
+	public Fraction getDose(int doseTime, Date date) {
 		return Schedules.getDose(date, doseTime, mSchedules.get());
 	}
 
@@ -408,74 +201,6 @@ public class Drug extends Entry implements Comparable<Drug>
 		if(icon > ICON_OTHER)
 			throw new IllegalArgumentException();
 		this.icon = icon;
-	}
-
-	public void setRepeatMode(int repeatMode)
-	{
-		if(repeatMode >= REPEAT_INVALID)
-			throw new IllegalArgumentException();
-
-		if(repeatMode == this.repeatMode)
-			return;
-
-		// the preference was changed, so reset all repeat-related settings
-		this.repeatMode = repeatMode;
-		this.repeatArg = 0;
-		this.repeatOrigin = null;
-		onScheduleUpdated();
-	}
-
-	/**
-	 * Sets the repeat mode.
-	 *
-	 * @param repeatArg the exact interpretation of this value depends on the repeat mode currently set.
-	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's repeat mode.
-	 * @throws UnsupportedOperationException if this instance's repeat mode does not expect any arguments.
-	 */
-	public void setRepeatArg(long repeatArg)
-	{
-		if(repeatMode == REPEAT_EVERY_N_DAYS)
-		{
-			if(repeatArg <= 1)
-				throw new IllegalArgumentException();
-		}
-		else if(repeatMode == REPEAT_WEEKDAYS)
-		{
-			// binary(01111111) = hex(0x7f) (all weekdays)
-			if(repeatArg <= 0 || repeatArg > 0x7f)
-				throw new IllegalArgumentException();
-		}
-		else if(repeatMode == REPEAT_EVERY_N_HOURS)
-		{
-			if(repeatArg != 6 && repeatArg != 8 && repeatArg != 12)
-				throw new IllegalArgumentException();
-		}
-		else
-		{
-			//throw new UnsupportedOperationException();
-			return;
-		}
-
-		this.repeatArg = repeatArg;
-		onScheduleUpdated();
-	}
-
-	/**
-	 * Sets the repeat origin.
-	 * @param repeatOrigin
-	 * @throws UnsupportedOperationException if this instance's repeat mode does not allow a repeat origin to be set.
-	 * @throws IllegalArgumentException if the setting is out of bounds for this instance's repeat mode.
-	 */
-	public void setRepeatOrigin(Date repeatOrigin)
-	{
-		if(repeatMode != REPEAT_EVERY_N_DAYS && repeatMode != REPEAT_EVERY_N_HOURS && repeatMode != REPEAT_21_7)
-			return;
-
-		if(repeatMode != REPEAT_EVERY_N_HOURS && DateTime.getOffsetFromMidnight(repeatOrigin) != 0)
-			throw new IllegalArgumentException();
-
-		this.repeatOrigin = repeatOrigin;
-		onScheduleUpdated();
 	}
 
 	public void setActive(boolean active) {
@@ -497,32 +222,6 @@ public class Drug extends Entry implements Comparable<Drug>
 			throw new IllegalArgumentException(currentSupply.toString());
 
 		this.currentSupply = currentSupply;
-	}
-
-	public void setDose(int doseTime, Fraction value)
-	{
-		switch(doseTime)
-		{
-			case TIME_MORNING:
-				doseMorning = value;
-				break;
-			case TIME_NOON:
-				doseNoon = value;
-				break;
-			case TIME_EVENING:
-				doseEvening = value;
-				break;
-			case TIME_NIGHT:
-				doseNight = value;
-				break;
-			default:
-				throw new IllegalArgumentException();
-		}
-
-		if(mSimpleSchedule != null)
-			mSimpleSchedule[doseTime] = value;
-
-		onScheduleUpdated();
 	}
 
 	public void setComment(String comment) {
@@ -563,7 +262,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	 * </p>
 	 *
 	 *
-	 * @param schedule
+	 * @param schedules
 	 */
 	public void setSchedules(List<Schedule> schedules)
 	{
@@ -601,43 +300,12 @@ public class Drug extends Entry implements Comparable<Drug>
 		return lastScheduleUpdateDate;
 	}
 
-//	public Date getLastDosesClearedDate() {
-//		return lastDosesClearedDate;
-//	}
-//
-//	public void setLastDosesClearedDate(Date date)
-//	{
-//		if(lastDosesClearedDate != null)
-//		{
-//			if(date == null)
-//			{
-//				if(BuildConfig.DEBUG)
-//					throw new IllegalStateException("Attempted to reset lastDosesClearedDate");
-//			}
-//			else if(!date.before(lastDosesClearedDate))
-//				return;
-//		}
-//
-//		lastDosesClearedDate = date;
-//
-//	}
+	public boolean hasNoDoses() {
+		return Schedules.hasNoDoses(mSchedules.get());
+	}
 
-//	public void setLastScheduleUpdateDate(Date lastScheduleUpdateDate) {
-//		this.lastScheduleUpdateDate = lastScheduleUpdateDate;
-//	}
-
-	public boolean hasNoDoses()
-	{
-		if(repeatMode == REPEAT_CUSTOM)
-			return Schedules.hasNoDoses(mSchedules.get());
-
-		for(Fraction dose : getSimpleSchedule())
-		{
-			if(!dose.isZero())
-				return false;
-		}
-
-		return true;
+	public Schedule getSchedule(Date date) {
+		return Schedules.getActiveSchedule(mSchedules.get(), date);
 	}
 
 	@Override
@@ -751,35 +419,14 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.active,
 			this.sortRank,
 			//this.patient,
-			this.doseMorning,
-			this.doseNoon,
-			this.doseEvening,
-			this.doseNight,
 			this.currentSupply,
 			this.refillSize,
 			this.hasAutoDoseEvents,
 			this.lastAutoDoseEventCreationDate,
-			//this.lastScheduleUpdateDate,
-			this.repeatMode,
-			this.repeatArg,
-			this.repeatOrigin,
 			this.comment
 		};
 
 		return members;
-	}
-
-	/* package */ boolean hasDoseOnWeekday(int calWeekday)
-	{
-		if(repeatMode != REPEAT_WEEKDAYS)
-			throw new IllegalStateException("repeatMode != FREQ_WEEKDAYS");
-
-		// first, translate Calendar's weekday representation to our own
-		final int weekday = CollectionUtils.indexOf(calWeekday, Constants.WEEK_DAYS);
-		if(weekday == -1)
-			throw new IllegalArgumentException("Argument " + calWeekday + " does not map to a valid weekday");
-
-		return (repeatArg & 1 << weekday) != 0;
 	}
 
 	private final transient LazyValue<List<Schedule>> mSchedules = new LazyValue<List<Schedule>>() {

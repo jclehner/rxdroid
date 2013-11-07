@@ -32,6 +32,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import at.jclehner.androidutils.Reflect;
+import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.SplashScreenActivity;
@@ -160,8 +161,24 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			}
 		}
 		else
-			Log.i(TAG, dbCopy + " exists; not overwriting");
-
+		{
+			if(BuildConfig.DEBUG)
+			{
+				try
+				{
+					Log.d(TAG, "Found backup copy " + dbCopy + "; reloading database!");
+					Util.copyFile(dbCopy, dbOrig);
+					Database.reload(RxDroid.getContext());
+					return;
+				}
+				catch(IOException e)
+				{
+					Log.e(TAG, "Failed to create " + dbOrig, e);
+				}
+			}
+			else
+				Log.i(TAG, dbCopy + " exists; not overwriting");
+		}
 
 		SplashScreenActivity.setStatusMessage(R.string._title_db_status_upgrading);
 

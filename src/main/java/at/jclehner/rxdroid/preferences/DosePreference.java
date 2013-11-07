@@ -28,6 +28,7 @@ import android.view.View;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.db.Drug;
+import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Util;
 
@@ -36,7 +37,6 @@ public class DosePreference extends FractionPreference
 	private static final String TAG = DosePreference.class.getSimpleName();
 
 	private int mDoseTime = -1;
-	private Drug mDrug;
 	private DoseView mDoseView;
 
 	public DosePreference(Context context) {
@@ -53,17 +53,6 @@ public class DosePreference extends FractionPreference
 
 		setDialogTitle(getTitle());
 		setWidgetLayoutResource(R.layout.dose_preference);
-	}
-
-	/**
-	 * Set the drug to be used by this preference.
-	 *
-	 * @param drug
-	 */
-	public void setDrug(Drug drug)
-	{
-		mDrug = drug;
-		setValue(mDrug.getDose(mDoseTime));
 	}
 
 	@Override

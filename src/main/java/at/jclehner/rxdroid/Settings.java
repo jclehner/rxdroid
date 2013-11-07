@@ -326,7 +326,7 @@ public final class Settings
 	}
 
 	public static boolean hasWrappingDoseTimeNight() {
-		return getDoseTimeEndOffset(Drug.TIME_NIGHT) != getTrueDoseTimeEndOffset(Drug.TIME_NIGHT);
+		return getDoseTimeEndOffset(Schedule.TIME_NIGHT) != getTrueDoseTimeEndOffset(Schedule.TIME_NIGHT);
 	}
 
 	public static DumbTime getDoseTimeBegin(int doseTime)
@@ -469,9 +469,9 @@ public final class Settings
 		final Calendar activeDate = DateTime.getDatePartMutable(time);
 		final int activeDoseTime = getActiveDoseTime(time);
 
-		if(activeDoseTime == Drug.TIME_NIGHT && hasWrappingDoseTimeNight())
+		if(activeDoseTime == Schedule.TIME_NIGHT && hasWrappingDoseTimeNight())
 		{
-			final DumbTime end = new DumbTime(getDoseTimeEndOffset(Drug.TIME_NIGHT));
+			final DumbTime end = new DumbTime(getDoseTimeEndOffset(Schedule.TIME_NIGHT));
 			if(DateTime.isWithinRange(time, Constants.MIDNIGHT, end))
 				activeDate.add(Calendar.DAY_OF_MONTH, -1);
 		}

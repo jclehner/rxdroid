@@ -27,6 +27,7 @@ import android.text.format.DateUtils;
 import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.db.Drug;
+import at.jclehner.rxdroid.db.Schedule;
 
 @SuppressWarnings("deprecation")
 public final class Constants
@@ -60,7 +61,7 @@ public final class Constants
 			Calendar.SUNDAY
 	};
 
-	public static final Integer[] DOSE_TIMES = { Drug.TIME_MORNING, Drug.TIME_NOON, Drug.TIME_EVENING, Drug.TIME_NIGHT };
+	public static final Integer[] DOSE_TIMES = { Schedule.TIME_MORNING, Schedule.TIME_NOON, Schedule.TIME_EVENING, Schedule.TIME_NIGHT };
 
 	public static final String[] LONG_WEEK_DAY_NAMES;
 	public static final String[] SHORT_WEEK_DAY_NAMES;

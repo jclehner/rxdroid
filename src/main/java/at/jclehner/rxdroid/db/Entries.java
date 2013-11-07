@@ -172,19 +172,28 @@ public final class Entries
 		if(date == null)
 			date = DateTime.today();
 
+		Schedule schedule = drug.getSchedule(date);
+		if(schedule == null)
+			return -1;
+
 		final MutableFraction doseLeftOnDate = new MutableFraction();
 
-		if(date.equals(DateTime.today()) && drug.hasDoseOnDate(date))
+		if(date.equals(DateTime.today()) && schedule.hasDoseOnDate(date))
 		{
 			for(int doseTime : Constants.DOSE_TIMES)
 			{
 				if(countDoseEvents(drug, date, doseTime) == 0)
-					doseLeftOnDate.add(drug.getDose(doseTime, date));
+					doseLeftOnDate.add(schedule.getDose(date, doseTime));
 			}
 		}
 
-		final double supply = drug.getCurrentSupply().doubleValue() - doseLeftOnDate.doubleValue();
-		return (int) (Math.floor(supply / getDailyDose(drug) * getSupplyCorrectionFactor(drug)));
+		// TODO loop through all schedules after the current one!
+
+		final Fraction supply = drug.getCurrentSupply().minus(doseLeftOnDate);
+		//final double supply = drug.getCurrentSupply().doubleValue() - doseLeftOnDate.doubleValue();
+
+		return supply.dividedBy(getDailyDose(schedule)).times(getSupplyCorrectionFactor(schedule)).intValue();
+		//return (int) (Math.floor(supply / getDailyDose(schedule) * getSupplyCorrectionFactor(schedule)));
 	}
 
 	public static<T extends Entry> T findInCollectionById(Collection<T> collection, int id)
@@ -292,6 +301,7 @@ public final class Entries
 		return totalDose;
 	}
 
+	/*
 	public static Fraction getTotalDoseInTimePeriod_smart(Drug drug, Date begin, Date end)
 	{
 		final int repeatMode = drug.getRepeatMode();
@@ -392,6 +402,7 @@ public final class Entries
 
 		return baseDose.times(doseMultiplier);
 	}
+	*/
 
 	public static boolean isDateAfterLastScheduleUpdateOfDrug(Date date, Drug drug)
 	{
@@ -531,9 +542,12 @@ public final class Entries
 
 		for(Drug drug: inDrugs)
 		{
-			final Fraction dose = drug.getDose(doseTime, date);
+			final Schedule schedule = drug.getSchedule(date);
+			if(!drug.isActive() || drug.hasAutoDoseEvents() || schedule == null || schedule.getAsNeeded())
+				continue;
 
-			if(!drug.isActive() || dose.isZero() || drug.hasAutoDoseEvents() || drug.getRepeatMode() == Drug.REPEAT_AS_NEEDED)
+			final Fraction dose = schedule.getDose(date, doseTime);
+			if(dose.isZero())
 				continue;
 
 			if(Entries.countDoseEvents(drug, date, doseTime) == 0)
@@ -553,10 +567,10 @@ public final class Entries
 		int begin = Schedule.TIME_MORNING;
 		int end = Schedule.TIME_INVALID;
 
-		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
+		if(!isActiveDoseTime && activeOrNextDoseTime == Schedule.TIME_MORNING)
 		{
 			date = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
-			begin = Drug.TIME_NIGHT;
+			begin = Schedule.TIME_NIGHT;
 		}
 		else
 			end = activeOrNextDoseTime;
@@ -571,51 +585,50 @@ public final class Entries
 
 	private static void getTotalDose(Drug drug, Date date, MutableFraction outTotalDose)
 	{
-		if(date != null && !drug.hasDoseOnDate(date))
-			return;
+		if(date == null)
+			throw new NullPointerException();
 
-		final int repeatMode = drug.getRepeatMode();
-		if(repeatMode == Drug.REPEAT_AS_NEEDED)
+		final Schedule schedule = drug.getSchedule(date);
+		if(schedule == null || schedule.getAsNeeded() || !schedule.hasDoseOnDate(date))
 			return;
 
 		for(int doseTime : Constants.DOSE_TIMES)
-		{
-			final Fraction dose;
-
-			if(date == null)
-				dose = drug.getDose(doseTime);
-			else
-				dose = drug.getDose(doseTime, date);
-
-			outTotalDose.add(dose);
-		}
-
-		return;
+			outTotalDose.add(schedule.getDose(date, doseTime));
 	}
 
-	private static double getDailyDose(Drug drug)
+	private static Fraction getDailyDose(Schedule schedule)
 	{
-		double dailyDose = 0.0;
+		if(schedule.isComplex())
+			throw new UnsupportedOperationException();
+
+		MutableFraction dailyDose = new MutableFraction();
 		for(int doseTime : Constants.DOSE_TIMES)
-			dailyDose += drug.getDose(doseTime).doubleValue();
+			dailyDose.add(schedule.getDose(doseTime));
+
 		return dailyDose;
 	}
 
-	private static double getSupplyCorrectionFactor(Drug drug)
+	private static Fraction getSupplyCorrectionFactor(Schedule schedule)
 	{
-		switch(drug.getRepeatMode())
+		if(schedule.isComplex())
+			throw new UnsupportedOperationException();
+
+		switch(schedule.getRepeatMode())
 		{
-			case Drug.REPEAT_EVERY_N_DAYS:
-				return drug.getRepeatArg();
+			case Schedule.REPEAT_EVERY_N_DAYS:
+				return new Fraction((int) schedule.getRepeatArg());
 
-			case Drug.REPEAT_WEEKDAYS:
-				return 7.0 / Long.bitCount(drug.getRepeatArg());
+			case Schedule.REPEAT_WEEKDAYS:
+				return new Fraction(7, Long.bitCount(schedule.getRepeatArg()));
 
-			case Drug.REPEAT_21_7:
-				return 1.0 / 0.75;
+			case Schedule.REPEAT_DAILY_WITH_PAUSE:
+				int cycleDays = schedule.getRepeatCycleDays();
+				int pauseDays = schedule.getRepeatPauseDays();
+
+				return new Fraction(cycleDays + pauseDays, pauseDays);
 
 			default:
-				return 1.0;
+				return new Fraction(1);
 		}
 	}
 

@@ -521,78 +521,12 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					Drug drug = new Drug();
 					drug.setName("Drug #" + (drugCount + 1));
 					drug.addSchedule(schedule);
-					drug.setRepeatMode(Drug.REPEAT_CUSTOM);
 					drug.setActive(true);
 
 					Database.create(drug);
 					Database.create(schedule);
 					Database.create(part1);
 					Database.create(part2);
-
-					return true;
-				}
-			});
-		}
-
-		p = findPreference("db_create_drug_with_many_dose_events");
-		if(p != null)
-		{
-			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-
-				@Override
-				public boolean onPreferenceClick(Preference preference)
-				{
-					Fraction dose = new Fraction(1, 2);
-
-					Drug drug = new Drug();
-					drug.setName("Megabite");
-					drug.setDose(Schedule.TIME_MORNING, dose);
-					drug.setRefillSize(30);
-					drug.setCurrentSupply(new Fraction(23, 1, 2));
-
-					Database.create(drug);
-
-					Date date;
-
-					for(int i = 0; i != 100; ++i)
-					{
-						date = DateTime.add(DateTime.today(), Calendar.DAY_OF_MONTH, -i);
-						Database.create(new DoseEvent(drug, date, Schedule.TIME_MORNING, dose), Database.FLAG_DONT_NOTIFY_LISTENERS);
-					}
-
-
-
-					return true;
-				}
-			});
-		}
-
-		p = findPreference("key_debug_add_5_drugs");
-		if(p != null)
-		{
-			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-
-				@Override
-				public boolean onPreferenceClick(Preference preference)
-				{
-					for(int i = 0; i != 5; ++i)
-					{
-						Drug drug = new Drug();
-						drug.setName("Drug #" + Database.countAll(Drug.class));
-						drug.setDose(Schedule.TIME_MORNING, new Fraction(1, 2));
-						drug.setDose(Schedule.TIME_EVENING, new Fraction(1));
-						drug.setRepeatMode(Drug.REPEAT_DAILY);
-						drug.setActive(true);
-
-						try
-						{
-							Database.create(drug);
-						}
-						catch(Exception e)
-						{
-							Log.w(TAG, e);
-						}
-					}
 
 					return true;
 				}

@@ -45,6 +45,7 @@ import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.DoseEvent;
+import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
@@ -97,19 +98,19 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		switch(getId())
 		{
 			case R.id.morning:
-				setDoseTime(Drug.TIME_MORNING);
+				setDoseTime(Schedule.TIME_MORNING);
 				break;
 
 			case R.id.noon:
-				setDoseTime(Drug.TIME_NOON);
+				setDoseTime(Schedule.TIME_NOON);
 				break;
 
 			case R.id.evening:
-				setDoseTime(Drug.TIME_EVENING);
+				setDoseTime(Schedule.TIME_EVENING);
 				break;
 
 			case R.id.night:
-				setDoseTime(Drug.TIME_NIGHT);
+				setDoseTime(Schedule.TIME_NIGHT);
 				break;
 
 			// XXX
@@ -135,7 +136,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		if(mDrug != null && mDoseTime != -1)
 		{
 			if(mDate == null)
-				return mDrug.getDose(mDoseTime);
+				return mDrug.getSchedule(DateTime.today()).getDose(mDoseTime);
 
 			return mDrug.getDose(mDoseTime, mDate);
 		}
@@ -145,7 +146,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	public void setDoseTime(int doseTime)
 	{
-		if(doseTime > Drug.TIME_NIGHT)
+		if(doseTime > Schedule.TIME_NIGHT)
 			throw new IllegalArgumentException();
 
 		final int drawableIds[] = { R.drawable.ic_morning, R.drawable.ic_noon, R.drawable.ic_evening, R.drawable.ic_night };
@@ -398,7 +399,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 				if(mIntakeCount == 0)
 				{
-					if(!dose.isZero() && mDrug.getRepeatMode() != Drug.REPEAT_AS_NEEDED)
+					if(!dose.isZero() && mDrug.getSchedule(mDate).getAsNeeded())
 					{
 						int offset = (int) Settings.getTrueDoseTimeEndOffset(mDoseTime);
 						Date end = DateTime.add(mDate, Calendar.MILLISECOND, offset);

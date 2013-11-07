@@ -257,16 +257,48 @@ public final class Schedule extends Entry
 		this.repeatMode = repeatMode;
 	}
 
+	public int getRepeatMode() {
+		return repeatMode;
+	}
+
 	public void setRepeatArg(long repeatArg) {
 		this.repeatArg = repeatArg;
 	}
 
-	public void setRepeatDailyWithPause(int cycleLength, int pauseLength)
-	{
-		if(cycleLength > 0xffff || pauseLength > 0xffff)
-			throw new IllegalArgumentException("Arguments must not exceed 0xffff");
+	public long getRepeatArg() {
+		return repeatArg;
+	}
 
-		setRepeatArg(cycleLength << 16 | pauseLength);
+	public void setRepeatDailyWithPause(int cycleLength, int pauseLength) {
+		setRepeatArg(makeRepeatDailyWithPauseArg(cycleLength, pauseLength));
+	}
+
+	public boolean isComplex() {
+		return scheduleParts.size() != 0;
+	}
+
+	public static long makeRepeatDailyWithPauseArg(int cycleDays, int pauseDays)
+	{
+		if(cycleDays < 0 || cycleDays > 0xffff || pauseDays < 0 || pauseDays > 0xffff)
+			throw new IllegalArgumentException("Argument out of range 0-0xffff");
+
+		return cycleDays << 16 | pauseDays;
+	}
+
+	public int getRepeatCycleDays()
+	{
+		if(repeatMode != REPEAT_DAILY_WITH_PAUSE)
+			throw new UnsupportedOperationException();
+
+		return (int) (repeatArg >> 16) & 0xffff;
+	}
+
+	public int getRepeatPauseDays()
+	{
+		if(repeatMode != REPEAT_DAILY_WITH_PAUSE)
+			throw new UnsupportedOperationException();
+
+		return (int) repeatArg & 0xffff;
 	}
 
 	public void setScheduleParts(SchedulePart[] parts)

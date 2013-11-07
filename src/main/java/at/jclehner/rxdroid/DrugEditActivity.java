@@ -100,7 +100,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 	private static final String TAG = DrugEditActivity.class.getSimpleName();
 	private static final boolean LOGV = true;
 
-	private DrugWrapper mWrapper;
+	private DrugAndScheduleWrapper mWrapper;
 	private int mDrugHash;
 
 	// if true, we're editing an existing drug; if false, we're adding a new one
@@ -114,7 +114,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 
-		final Drug drug = mWrapper.get();
+		final Drug drug = mWrapper.getDrug();
 		final String drugName = drug.getName();
 
 		if(drugName == null || drugName.length() == 0)
@@ -184,7 +184,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 		Drug drug = null;
 
-		mWrapper = new DrugWrapper();
+		mWrapper = new DrugAndScheduleWrapper();
 		mFocusOnCurrentSupply = false;
 
 		if(Intent.ACTION_EDIT.equals(action))
@@ -352,13 +352,13 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		if(id == R.id.drug_delete_dialog)
 		{
 			final AlertDialog alert = (AlertDialog) dialog;
-			alert.setTitle(getString(R.string._title_delete_drug, mWrapper.get().getName()));
+			alert.setTitle(getString(R.string._title_delete_drug, mWrapper.getDrug().getName()));
 			alert.setButton(Dialog.BUTTON_POSITIVE, getString(android.R.string.yes), new OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					Database.delete(mWrapper.get());
+					Database.delete(mWrapper.getDrug());
 					Toast.makeText(getApplicationContext(), R.string._toast_deleted, Toast.LENGTH_SHORT).show();
 					finish();
 				}
@@ -373,7 +373,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 				{
 					if(which == Dialog.BUTTON_POSITIVE)
 					{
-						Database.update(mWrapper.get());
+						Database.update(mWrapper.getDrug());
 						Toast.makeText(getApplicationContext(), R.string._toast_saved, Toast.LENGTH_SHORT).show();
 					}
 
@@ -400,7 +400,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		}
 	}
 
-	private static class DrugWrapper
+	private static class DrugAndScheduleWrapper
 	{
 		@CreatePreference
 		(
@@ -459,15 +459,24 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			order = 7,
 			type = ListPreference.class,
 			controller = RepeatModePreferenceController.class,
-			fieldDependencies = { "repeatArg", "repeatOrigin" }
+			fieldDependencies = { "repeatArg", "scheduleBegin" }
 		)
 		private int repeat;
 
 		@CreatePreference
 		(
+			title = "As needed",
+			order = 8,
+			type = CheckBoxPreference.class,
+			controller = CheckboxPreferenceController.class
+		)
+		private boolean isAsNeeded;
+
+		@CreatePreference
+		(
 			titleResId = R.string._title_icon,
 			categoryResId = R.string._title_misc,
-			order = 8,
+			order = 9,
 			type = ListPreference.class,
 			controller = FormPreferenceController.class
 		)
@@ -489,7 +498,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			type = CurrentSupplyPreference.class,
 			controller = CurrentSupplyPreferenceController.class,
 			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat"},
-			fieldDependencies = { "repeatArg", "repeatOrigin" }
+			fieldDependencies = { "repeatArg", "scheduleBegin" }
 		)
 		private Fraction currentSupply;
 
@@ -515,7 +524,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		private int id;
 
 		private long repeatArg;
-		private Date repeatOrigin;
+		private Date scheduleBegin;
 		private int sortRank;
 		private List<Schedule> schedules;
 		private Patient patient;
@@ -537,28 +546,31 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			active = drug.isActive();
 			comment = drug.getComment();
 			currentSupply = drug.getCurrentSupply();
-			doseMorning = drug.getDose(Drug.TIME_MORNING);
-			doseNoon = drug.getDose(Drug.TIME_NOON);
-			doseEvening = drug.getDose(Drug.TIME_EVENING);
-			doseNight = drug.getDose(Drug.TIME_NIGHT);
+			schedules = drug.getSchedules();
+
+			// XXX this'll do until we support multiple schedules
+			Schedule schedule = schedules.get(0);
+
+			doseMorning = schedule.getDose(Schedule.TIME_MORNING);
+			doseNoon = schedule.getDose(Schedule.TIME_NOON);
+			doseEvening = schedule.getDose(Schedule.TIME_EVENING);
+			doseNight = schedule.getDose(Schedule.TIME_NIGHT);
 			refillSize = drug.getRefillSize();
-			repeat = drug.getRepeatMode();
-			repeatArg = drug.getRepeatArg();
-			repeatOrigin = drug.getRepeatOrigin();
-			//schedule = drug.getSchedule();
+			repeat = schedule.getRepeatMode();
+			repeatArg = schedule.getRepeatArg();
+			scheduleBegin = schedule.getBegin();
 			sortRank = drug.getSortRank();
 			autoAddIntakes = drug.hasAutoDoseEvents();
 			lastAutoIntakeCreationDate = drug.getLastAutoDoseEventCreationDate();
 			patient = drug.getPatient();
-			schedules = drug.getSchedules();
 
 			name = drug.getName();
 			form = drug.getIcon();
 
-			if(LOGV) Log.v(TAG, "DrugWrapper.set: repeatOrigin=" + repeatOrigin);
+			if(LOGV) Log.v(TAG, "DrugAndScheduleWrapper.set: scheduleBegin=" + scheduleBegin);
 		}
 
-		public Drug get()
+		public Drug getDrug()
 		{
 			Drug drug = new Drug();
 			drug.setId(id);
@@ -568,25 +580,43 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			drug.setComment(comment);
 			drug.setCurrentSupply(currentSupply);
 			drug.setRefillSize(refillSize);
-			drug.setRepeatMode(repeat);
 			drug.setSortRank(sortRank);
 			//drug.setSchedule(schedule);
 			drug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);
 			drug.setAutoAddIntakesEnabled(autoAddIntakes);
 			drug.setPatient(patient);
-			drug.setSchedules(schedules);
+
+			Schedule schedule = schedules.get(0);
 
 			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };
-
 			for(int i = 0; i != doses.length; ++i)
-				drug.setDose(Constants.DOSE_TIMES[i], doses[i]);
+				schedule.setDose(Constants.DOSE_TIMES[i], doses[i]);
 
-			drug.setRepeatArg(repeatArg);
-			drug.setRepeatOrigin(repeatOrigin);
+			schedule.setRepeatMode(repeat);
+			schedule.setRepeatArg(repeatArg);
+			schedule.setBegin(scheduleBegin);
 
-			if(LOGV) Log.v(TAG, "DrugWrapper.get: repeatOrigin=" + repeatOrigin);
+			drug.setSchedules(schedules);
 
 			return drug;
+		}
+
+		public Schedule getSchedule()
+		{
+			Schedule schedule = new Schedule();
+			schedule.setId(Database.ID_VIRTUAL_ENTRY);
+
+			schedule.setOwner(getDrug());
+			schedule.setBegin(scheduleBegin);
+			schedule.setRepeatArg(repeatArg);
+			schedule.setRepeatMode(repeat);
+			schedule.setAsNeeded(isAsNeeded);
+			schedule.setDose(Schedule.TIME_MORNING, doseMorning);
+			schedule.setDose(Schedule.TIME_NOON, doseNoon);
+			schedule.setDose(Schedule.TIME_EVENING, doseEvening);
+			schedule.setDose(Schedule.TIME_NIGHT, doseNight);
+
+			return schedule;
 		}
 	}
 
@@ -622,20 +652,19 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		{
 			switch(newValue)
 			{
-				case Drug.REPEAT_EVERY_N_DAYS:
+				case Schedule.REPEAT_EVERY_N_DAYS:
 					handleEveryNDaysRepeatMode();
 					return false;
 
-				case Drug.REPEAT_WEEKDAYS:
+				case Schedule.REPEAT_WEEKDAYS:
 					handleWeekdaysRepeatMode();
 					return false;
 
-				case Drug.REPEAT_21_7:
-					handle21_7RepeatMode();
+				case Schedule.REPEAT_DAILY_WITH_PAUSE:
+					handleDailyWithPauseRepeatMode();
 					return false;
 
-				case Drug.REPEAT_DAILY:
-				case Drug.REPEAT_AS_NEEDED:
+				case Schedule.REPEAT_DAILY:
 					return super.updatePreference(preference, newValue);
 
 				default:
@@ -649,17 +678,13 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		{
 			switch(newValue)
 			{
-				case Drug.REPEAT_DAILY:
+				case Schedule.REPEAT_DAILY:
 					preference.setSummary(R.string._title_daily);
 					break;
 
-				case Drug.REPEAT_AS_NEEDED:
-					preference.setSummary(R.string._title_on_demand);
-					break;
-
-				case Drug.REPEAT_EVERY_N_DAYS:
-				case Drug.REPEAT_WEEKDAYS:
-				case Drug.REPEAT_21_7:
+				case Schedule.REPEAT_EVERY_N_DAYS:
+				case Schedule.REPEAT_WEEKDAYS:
+				case Schedule.REPEAT_DAILY_WITH_PAUSE:
 					// summary is updated from the handle<repeat mode>() functions
 					break;
 
@@ -670,19 +695,19 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 		private void handleEveryNDaysRepeatMode()
 		{
-			final Date repeatOrigin;
+			final Date scheduleBegin;
 			final long repeatArg;
 
 			int oldRepeatMode = getFieldValue();
 
-			if(oldRepeatMode != Drug.REPEAT_EVERY_N_DAYS)
+			if(oldRepeatMode != Schedule.REPEAT_EVERY_N_DAYS)
 			{
-				repeatOrigin = DateTime.today();
+				scheduleBegin = DateTime.today();
 				repeatArg = 2;
 			}
 			else
 			{
-				repeatOrigin = (Date) getFieldValue("repeatOrigin");
+				scheduleBegin = (Date) getFieldValue("scheduleBegin");
 				repeatArg = (Long) getFieldValue("repeatArg");
 			}
 
@@ -708,7 +733,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 				public void onClick(DialogInterface dialog, int which)
 				{
 					final long repeatArg = picker.getValue();
-					showRepeatOriginDateDialog(Drug.REPEAT_EVERY_N_DAYS, repeatOrigin, repeatArg);
+					showScheduleBeginDialog(Schedule.REPEAT_EVERY_N_DAYS, scheduleBegin, repeatArg);
 				}
 			});
 
@@ -717,10 +742,10 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 		private void handleWeekdaysRepeatMode()
 		{
-			if(getFieldValue() != Drug.REPEAT_WEEKDAYS)
+			if(getFieldValue() != Schedule.REPEAT_WEEKDAYS)
 			{
 				setFieldValue("repeatArg", 0);
-				setFieldValue("repeatOrigin", DateTime.today());
+				setFieldValue("scheduleBegin", DateTime.today());
 			}
 
 			long repeatArg = (Long) getFieldValue("repeatArg");
@@ -756,7 +781,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					setFieldValue(Drug.REPEAT_WEEKDAYS);
+					setFieldValue(Schedule.REPEAT_WEEKDAYS);
 					setFieldValue("repeatArg", bitset.longValue());
 
 					updateSummary();
@@ -767,25 +792,29 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			builder.show();
 		}
 
-		private void handle21_7RepeatMode()
+		private void handleDailyWithPauseRepeatMode()
 		{
-			if(getFieldValue() != Drug.REPEAT_21_7)
-				setFieldValue("repeatOrigin", DateTime.today());
+			if(getFieldValue() != Schedule.REPEAT_DAILY_WITH_PAUSE)
+			{
+				setFieldValue("scheduleBegin", DateTime.today());
+				// FIXME hack for now
+				setFieldValue("repeatArg", Schedule.makeRepeatDailyWithPauseArg(28, 7));
+			}
 
-			showRepeatOriginDateDialog(Drug.REPEAT_21_7, (Date) getFieldValue("repeatOrigin"), 0);
+			showScheduleBeginDialog(Schedule.REPEAT_DAILY_WITH_PAUSE, (Date) getFieldValue("scheduleBegin"), 0);
 		}
 
-		private void showRepeatOriginDateDialog(final int repeatMode, Date repeatOrigin, final long repeatArg)
+		private void showScheduleBeginDialog(final int repeatMode, Date scheduleBegin, final long repeatArg)
 		{
 			final OnDateSetListener onDateSetListener = new OnDateSetListener() {
 
 				@Override
 				public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
 				{
-					final Date newRepeatOrigin = DateTime.date(year, monthOfYear, dayOfMonth);
+					final Date newScheduleBegin = DateTime.date(year, monthOfYear, dayOfMonth);
 
 					setFieldValue(repeatMode);
-					setFieldValue("repeatOrigin", newRepeatOrigin);
+					setFieldValue("scheduleBegin", newScheduleBegin);
 					setFieldValue("repeatArg", repeatArg);
 
 					updateSummary();
@@ -793,9 +822,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 				}
 			};
 
-
-
-			final Calendar cal = DateTime.calendarFromDate(repeatOrigin);
+			final Calendar cal = DateTime.calendarFromDate(scheduleBegin);
 			final int year = cal.get(Calendar.YEAR);
 			final int month = cal.get(Calendar.MONTH);
 			final int day = cal.get(Calendar.DAY_OF_MONTH);
@@ -811,11 +838,11 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			//final int repeatMode = (Integer) getFieldValue("repeat");
 			final int repeatMode = getFieldValue();
 			final long repeatArg = (Long) getFieldValue("repeatArg");
-			final Date repeatOrigin = (Date) getFieldValue("repeatOrigin");
+			final Date repeatOrigin = (Date) getFieldValue("scheduleBegin");
 
 			final String summary;
 
-			if(repeatMode == Drug.REPEAT_EVERY_N_DAYS)
+			if(repeatMode == Schedule.REPEAT_EVERY_N_DAYS)
 			{
 				// FIXME change to next occurence
 				summary = mContext.getString(
@@ -824,10 +851,11 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 						DateTime.toNativeDate(repeatOrigin)
 				);
 			}
-			else if(repeatMode == Drug.REPEAT_WEEKDAYS)
+			else if(repeatMode == Schedule.REPEAT_WEEKDAYS)
 				summary = getWeekdayRepeatSummary(repeatArg);
-			else if(repeatMode == Drug.REPEAT_21_7)
+			else if(repeatMode == Schedule.REPEAT_DAILY_WITH_PAUSE)
 			{
+				// FIXME hack for now
 				summary = mContext.getString(
 						R.string._msg_freq_21days_on_7days_off,
 						DateTime.toNativeDate(repeatOrigin)
@@ -908,7 +936,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 		private String getSummary(Object value)
 		{
-			final Drug drug = ((DrugWrapper) mObject).get();
+			final Drug drug = ((DrugAndScheduleWrapper) mObject).getDrug();
 			final Fraction currentSupply = (Fraction) value;
 
 			if(currentSupply.isZero())
@@ -919,7 +947,9 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 				return "0";
 			}
 
-			if(drug.getRepeatMode() == Drug.REPEAT_AS_NEEDED || drug.hasNoDoses())
+			final Schedule schedule = ((DrugAndScheduleWrapper) mObject).getSchedule();
+
+			if(schedule.getAsNeeded() || schedule.hasNoDoses())
 			{
 				// TODO change?
 				return currentSupply.toString();

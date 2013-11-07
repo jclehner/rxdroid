@@ -25,30 +25,38 @@ import java.util.Date;
 import java.util.List;
 
 import at.jclehner.rxdroid.Fraction;
+import at.jclehner.rxdroid.util.DateTime;
 
 /* package */ final class Schedules
 {
-	static Fraction getDose(Date date, int doseTime, List<Schedule> schedules)
+	static Schedule getActiveSchedule(List<Schedule> schedules, Date date)
 	{
 		if(schedules != null)
 		{
 			for(Schedule s : schedules)
 			{
 				if(isDateWithinSchedule(date, s))
-					return s.getDose(date, doseTime);
+					return s;
 			}
 		}
+
+		return null;
+	}
+
+	static Fraction getDose(Date date, int doseTime, List<Schedule> schedules)
+	{
+		final Schedule active = getActiveSchedule(schedules, date);
+		if(active != null)
+			return active.getDose(date, doseTime);
 
 		return Fraction.ZERO;
 	}
 
 	static boolean hasDoseOnDate(Date date, List<Schedule> schedules)
 	{
-		for(Schedule s : schedules)
-		{
-			if(isDateWithinSchedule(date, s))
-				return s.hasDoseOnDate(date);
-		}
+		final Schedule active = getActiveSchedule(schedules, date);
+		if(active != null)
+			return active.hasDoseOnDate(date);
 
 		return false;
 	}

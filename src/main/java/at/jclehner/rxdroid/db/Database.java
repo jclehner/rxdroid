@@ -82,7 +82,7 @@ public final class Database
 		// XXX
 	};
 
-	static final int ID_VIRTUAL_ENTRY = 0x7fffffff;
+	public static final int ID_VIRTUAL_ENTRY = 0x7fffffff;
 
 	public static final int FLAG_DONT_NOTIFY_LISTENERS = 1;
 

@@ -171,13 +171,13 @@ public final class Util
 		switch(doseViewId)
 		{
 			case R.id.morning:
-				return Drug.TIME_MORNING;
+				return Schedule.TIME_MORNING;
 			case R.id.noon:
-				return Drug.TIME_NOON;
+				return Schedule.TIME_NOON;
 			case R.id.evening:
-				return Drug.TIME_EVENING;
+				return Schedule.TIME_EVENING;
 			case R.id.night:
-				return Drug.TIME_NIGHT;
+				return Schedule.TIME_NIGHT;
 		}
 
 		throw new IllegalArgumentException();
