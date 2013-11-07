@@ -40,11 +40,11 @@ public class SystemEventReceiver extends BroadcastReceiver
 				|| Intent.ACTION_TIME_CHANGED.equals(intent.getAction())
 				|| Intent.ACTION_DATE_CHANGED.equals(intent.getAction()))
 		{
-			Log.i(TAG, "Action: " + intent.getAction());
-
 			DateTime.clearDateCache();
 			Database.reload(context);
 		}
+
+		Log.i(TAG, "Action: " + intent.getAction());
 
 		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(context, false);
 	}
