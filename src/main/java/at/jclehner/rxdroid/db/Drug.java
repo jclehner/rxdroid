@@ -30,6 +30,8 @@ import java.util.NoSuchElementException;
 
 import android.util.Log;
 import at.jclehner.androidutils.LazyValue;
+import at.jclehner.androidutils.NonOverlappingTimePeriodMap;
+import at.jclehner.androidutils.DatePeriod;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.CollectionUtils;
@@ -308,6 +310,10 @@ public class Drug extends Entry implements Comparable<Drug>
 		return Schedules.getActiveSchedule(mSchedules.get(), date);
 	}
 
+	public NonOverlappingTimePeriodMap<Schedule> getScheduleMap() {
+		return mScheduleMap.get();
+	}
+
 	@Override
 	public boolean equals(Object o)
 	{
@@ -442,6 +448,25 @@ public class Drug extends Entry implements Comparable<Drug>
 		}
 
 	};
+
+
+
+	private transient final LazyValue<NonOverlappingTimePeriodMap<Schedule>> mScheduleMap =
+			new LazyValue<NonOverlappingTimePeriodMap<Schedule>>() {
+
+		@Override
+		public NonOverlappingTimePeriodMap<Schedule> value()
+		{
+			NonOverlappingTimePeriodMap<Schedule> scheduleMap =
+					new NonOverlappingTimePeriodMap<Schedule>();
+
+			for(Schedule schedule : mSchedules.get())
+				scheduleMap.put(new DatePeriod(schedule.begin, schedule.end), schedule);
+
+			return scheduleMap;
+		}
+	};
+
 
 	@Keep
 	/* package */ static final Callback<Drug> CALLBACK_DELETED = new Callback<Drug>() {

@@ -16,8 +16,8 @@ public class ScheduleCreator
 		final Schedule schedule = new Schedule();
 		boolean useRepeatOriginAsBegin = false;
 
-		final int repeatMode = getFieldValue(oldDrug, "repeatMode");
-		final long repeatArg = getFieldValue(oldDrug, "repeatArg");
+		final int repeatMode = (Integer) getFieldValue(oldDrug, "repeatMode");
+		final long repeatArg = (Long) getFieldValue(oldDrug, "repeatArg");
 
 		switch(repeatMode)
 		{
@@ -82,6 +82,7 @@ public class ScheduleCreator
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private static <T> T getFieldValue(Entry entry, String fieldName)
 	{
 		try

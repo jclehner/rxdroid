@@ -56,7 +56,7 @@ public class OldDrug extends Entry
 	/* package */ Fraction doseNight = Fraction.ZERO;
 
 	@DatabaseField
-	/* package */ int repeatMode= Drug.REPEAT_DAILY;
+	/* package */ int repeatMode= Schedule.REPEAT_DAILY;
 
 	@DatabaseField
 	/* package */ long repeatArg = 0;

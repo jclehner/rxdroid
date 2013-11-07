@@ -150,7 +150,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void scheduleNextAlarms()
 	{
-		if(Settings.getDoseTimeBegin(Drug.TIME_MORNING) == null)
+		if(Settings.getDoseTimeBegin(Schedule.TIME_MORNING) == null)
 		{
 			Log.w(TAG, "No dose-time settings available. Not scheduling alarms.");
 			return;

@@ -24,6 +24,7 @@ package at.jclehner.rxdroid.db;
 import java.util.Date;
 
 import at.jclehner.androidutils.LazyValue;
+import at.jclehner.androidutils.NonOverlappingTimePeriodMap;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Exceptions;

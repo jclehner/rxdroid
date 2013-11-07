@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import at.jclehner.androidutils.DatePeriod;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.R;
@@ -95,42 +96,51 @@ public final class Entries
 		if(!drug.isActive())
 			return false;
 
-		final Date lastScheduleUpdateDate = drug.getLastScheduleUpdateDate();
-		if(lastScheduleUpdateDate != null && date.before(lastScheduleUpdateDate))
+		List<Schedule> schedules = drug.getScheduleMap().getAllStartingBefore(date, false);
+
+		for(Schedule schedule : schedules)
+		{
+			// XXX we could speed this up by not caring about schedules that lie in the past
+			if(hasMissingDosesBeforeDate(schedule, date))
+				return true;
+		}
+
+		return false;
+	}
+
+	public static boolean hasMissingDosesBeforeDate(Schedule schedule, Date date)
+	{
+		if(!DatePeriod.contains(schedule.begin, schedule.end, date))
 			return false;
 
-		final int repeatMode = drug.getRepeatMode();
+		final int repeatMode = schedule.getRepeatMode();
 		switch(repeatMode)
 		{
-			case Drug.REPEAT_EVERY_N_DAYS:
-			case Drug.REPEAT_WEEKDAYS:
+			case Schedule.REPEAT_EVERY_N_DAYS:
+			case Schedule.REPEAT_WEEKDAYS:
 			{
-				if(drug.hasDoseOnDate(date))
+				if(schedule.hasDoseOnDate(date))
 					return false;
 			}
 		}
 
-		if(repeatMode == Drug.REPEAT_EVERY_N_DAYS)
+		if(repeatMode == Schedule.REPEAT_EVERY_N_DAYS)
 		{
-			long days = drug.getRepeatArg();
+			long days = schedule.getRepeatArg();
 
-			final Date origin = drug.getRepeatOrigin();
-			if(date.before(origin))
-				return false;
-
-			long elapsedDays = (date.getTime() - origin.getTime()) / Constants.MILLIS_PER_DAY;
+			long elapsedDays = (date.getTime() - schedule.begin.getTime()) / Constants.MILLIS_PER_DAY;
 
 			int offset = (int) -(elapsedDays % days);
 			if(offset == 0)
 				offset = (int) -days;
 
 			final Date lastIntakeDate = DateTime.add(date, Calendar.DAY_OF_MONTH, offset);
-			if(!isDateAfterLastScheduleUpdateOfDrug(lastIntakeDate, drug))
+			if(lastIntakeDate.before(schedule.begin))
 				return false;
 
-			return !hasAllDoseEvents(drug, lastIntakeDate);
+			return !hasAllDoseEvents(schedule.owner, lastIntakeDate);
 		}
-		else if(repeatMode == Drug.REPEAT_WEEKDAYS)
+		else if(repeatMode == Schedule.REPEAT_WEEKDAYS)
 		{
 			// FIXME this may fail to report a missed intake if
 			// the dose was taken on a later date (i.e. unscheduled)
@@ -142,15 +152,15 @@ public final class Entries
 			for(int i = 0; i != 7; ++i)
 			{
 				final Date checkDate = DateTime.add(date, Calendar.DAY_OF_MONTH, -7 + i);
-				if(!isDateAfterLastScheduleUpdateOfDrug(checkDate, drug))
+				if(checkDate.before(schedule.begin))
 					continue;
 
 				for(int doseTime : Constants.DOSE_TIMES)
 				{
-					if(!drug.getDose(doseTime, checkDate).isZero())
+					if(!schedule.getDose(checkDate, doseTime).isZero())
 					{
 						++expectedIntakeCount;
-						actualScheduledIntakeCount += countDoseEvents(drug, checkDate, doseTime);
+						actualScheduledIntakeCount += countDoseEvents(schedule.owner, checkDate, doseTime);
 					}
 				}
 			}

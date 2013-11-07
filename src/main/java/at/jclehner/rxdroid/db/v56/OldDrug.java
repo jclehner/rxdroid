@@ -68,7 +68,7 @@ public class OldDrug extends Entry
 	private Fraction doseNight = Fraction.ZERO;
 
 	@DatabaseField
-	private int repeatMode= Drug.REPEAT_DAILY;
+	private int repeatMode= Schedule.REPEAT_DAILY;
 
 	@DatabaseField
 	private long repeatArg = 0;
