@@ -57,7 +57,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	private static final String TAG = DatabaseHelper.class.getSimpleName();
 	private static final boolean LOGV = false;
 
-	public static final int DB_VERSION = 58;
+	public static final int DB_VERSION = 59;
 	public static final String DB_NAME = "db.sqlite";
 
 	public static class DatabaseError extends RuntimeException
@@ -162,7 +162,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 		else
 		{
-			if(BuildConfig.DEBUG)
+			/*if(BuildConfig.DEBUG)
 			{
 				try
 				{
@@ -176,7 +176,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 					Log.e(TAG, "Failed to create " + dbOrig, e);
 				}
 			}
-			else
+			else*/
 				Log.i(TAG, dbCopy + " exists; not overwriting");
 		}
 

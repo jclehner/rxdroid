@@ -103,7 +103,7 @@ public final class Schedule extends Entry
 	@DatabaseField
 	private long repeatArg;
 
-	//@DatabaseField FIXME for version 59
+	@DatabaseField
 	private boolean asNeeded = false;
 
 	@DatabaseField(persisterClass = FractionPersister.class)
