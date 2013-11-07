@@ -33,8 +33,8 @@ public class NonOverlappingTimePeriodMap<T> extends HashMap<DatePeriod, T>
 
 	public boolean containsPeriod(DatePeriod period)
 	{
-		final long last = period.mEnd.getTime() - 1;
-		return containsTime(period.mBegin.getTime()) || containsTime(last);
+		return containsTime(period.mBegin.getTime()) ||
+				(period.mEnd != null && containsTime(period.mEnd.getTime() - 1));
 	}
 
 	public T get(Date date)

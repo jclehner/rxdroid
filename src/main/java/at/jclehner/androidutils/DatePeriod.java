@@ -10,16 +10,20 @@ public class DatePeriod
 
 	public DatePeriod(Date begin, Date end)
 	{
-		mBegin = min(begin, end);
-		mEnd = max(begin, end);
+		if(begin == null)
+			throw new NullPointerException();
+
+		mBegin = begin;
+		mEnd = end;
 	}
 
 	public boolean contains(Date date) {
 		return contains(mBegin, mEnd, date);
 	}
 
-	public boolean contains(long time) {
-		return time >= mBegin.getTime() && time < mEnd.getTime();
+	public boolean contains(long time)
+	{
+		return time >= mBegin.getTime() && (mEnd == null || time < mEnd.getTime());
 	}
 
 	public Date begin() {
@@ -30,19 +34,8 @@ public class DatePeriod
 		return mEnd;
 	}
 
-	public long days() {
-		return daysBetween(mBegin, mEnd);
-	}
-
-	public static long daysBetween(Date date1, Date date2)
-	{
-		final Date min = min(date1, date2);
-		final Date max = max(date1, date2);
-		return (max.getTime() - min.getTime()) / Constants.MILLIS_PER_DAY;
-	}
-
 	public static boolean contains(Date begin, Date end, Date date) {
-		return date.before(end) && (date.after(begin) || date.equals(begin));
+		return (end == null || date.before(end)) && (date.after(begin) || date.equals(begin));
 	}
 
 	@Override
@@ -57,7 +50,7 @@ public class DatePeriod
 
 	@Override
 	public int hashCode() {
-		return mBegin.hashCode() ^ mEnd.hashCode();
+		return mBegin.hashCode() ^ (mEnd != null ? mEnd.hashCode() : 0);
 	}
 
 	private static Date min(Date date1, Date date2) {
