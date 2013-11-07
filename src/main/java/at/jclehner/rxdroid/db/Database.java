@@ -44,6 +44,7 @@ import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.SplashScreenActivity;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.jclehner.rxdroid.util.Timer;
+import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.dao.Dao;
@@ -73,13 +74,12 @@ public final class Database
 	/* package */ static final boolean USE_CUSTOM_CACHE = true;
 
 	static final Class<?>[] CLASSES = {
-		Drug.class,
-		DoseEvent.class,
-		Patient.class,
+
+		SchedulePart.class,
 		Schedule.class,
-		// XXX
-		SchedulePart.class
-		// XXX
+		Drug.class,
+		Patient.class,
+		DoseEvent.class
 	};
 
 	public static final int ID_VIRTUAL_ENTRY = 0x7fffffff;
@@ -524,7 +524,10 @@ public final class Database
 			--sPendingDaoOperations;
 		}*/
 
-		throw new WrappedCheckedException("Failed to run DAO method " + methodName, ex);
+		if(BuildConfig.DEBUG)
+			Util.dumpObjectMembers(TAG, Log.DEBUG, entry, "entry");
+
+		throw new WrappedCheckedException("Failed to run DAO method " + methodName + "\n  entry=" + entry, ex);
 	}
 
 	private static<T> List<T> queryForAll(Class<T> clazz)
