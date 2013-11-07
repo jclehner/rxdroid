@@ -139,17 +139,12 @@
 		    
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
-				<category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
 
 				<action android:name="android.intent.action.TIME_SET" />
-				<category android:name="android.intent.category.PREFERENCE" />
-
 				<action android:name="android.intent.action.TIMEZONE_CHANGED" />
-				<category android:name="android.intent.category.PREFERENCE" />
 				
 				<action android:name="android.intent.action.LOCALE_CHANGED" />
-				<category android:name="android.intent.category.PREFERENCE" />
-				
 			</intent-filter>
 		</receiver>
 		
