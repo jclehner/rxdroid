@@ -74,6 +74,7 @@ import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.db.SchedulePart;
 import at.jclehner.rxdroid.ui.DrugOverviewAdapter;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Components;
@@ -1042,7 +1043,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		@Override
 		public void onEntryCreated(Entry entry, int flags)
 		{
-			if(entry instanceof Drug)
+			if(entry instanceof Drug || entry instanceof Schedule || entry instanceof SchedulePart)
 				invalidateViewPager();
 			else if(entry instanceof DoseEvent)
 				supportInvalidateOptionsMenu();
