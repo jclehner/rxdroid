@@ -59,6 +59,7 @@ import at.jclehner.androidutils.otpm.DialogPreferenceController;
 import at.jclehner.androidutils.otpm.ListPreferenceWithIntController;
 import at.jclehner.androidutils.otpm.OTPM;
 import at.jclehner.androidutils.otpm.OTPM.CreatePreference;
+import at.jclehner.androidutils.otpm.ReadonlyPreferenceController;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -465,7 +466,8 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 		@CreatePreference
 		(
-			title = "As needed",
+			titleResId = R.string._title_on_demand,
+			summary = "",
 			order = 8,
 			type = CheckBoxPreference.class,
 			controller = CheckboxPreferenceController.class
@@ -521,10 +523,18 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		)
 		private boolean active;
 
+		@CreatePreference
+		(
+			title = "Begin",
+			order = 14,
+			type = Preference.class,
+			controller = ReadonlyDatePreferenceController.class
+		)
+		private Date scheduleBegin;
+
 		private int id;
 
 		private long repeatArg;
-		private Date scheduleBegin;
 		private int sortRank;
 		private List<Schedule> schedules;
 		private Patient patient;
@@ -1077,6 +1087,20 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		{
 			final int i = Integer.parseInt((String) prefValue);
 			return i == NOTIFY_SUPPLIES_ONLY;
+		}
+	}
+
+	private static class ReadonlyDatePreferenceController extends ReadonlyPreferenceController
+	{
+		public ReadonlyDatePreferenceController() {}
+
+		@Override
+		public void updateSummary(Preference preference, Object newValue)
+		{
+			if(newValue != null)
+				preference.setSummary(DateTime.toNativeDate((Date) newValue));
+			else
+				super.updateSummary(preference, newValue);
 		}
 	}
 
