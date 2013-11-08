@@ -199,10 +199,14 @@ public final class Entries
 
 		// TODO loop through all schedules after the current one!
 
-		final Fraction supply = drug.getCurrentSupply().minus(doseLeftOnDate);
+		final MutableFraction supply = drug.getCurrentSupply().mutate();
+		supply.subtract(doseLeftOnDate);
 		//final double supply = drug.getCurrentSupply().doubleValue() - doseLeftOnDate.doubleValue();
 
-		return supply.dividedBy(getDailyDose(schedule)).times(getSupplyCorrectionFactor(schedule)).intValue();
+		final Fraction divisor = getDailyDose(schedule).times(getSupplyCorrectionFactor(schedule));
+		return supply.divideBy(divisor).intValue();
+
+		//return supply.dividedBy(getDailyDose(schedule)).times(getSupplyCorrectionFactor(schedule)).intValue();
 		//return (int) (Math.floor(supply / getDailyDose(schedule) * getSupplyCorrectionFactor(schedule)));
 	}
 

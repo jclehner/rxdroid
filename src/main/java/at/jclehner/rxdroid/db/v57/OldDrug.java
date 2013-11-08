@@ -106,9 +106,7 @@ public class OldDrug extends Entry
 		// - removed schedule, added lastScheduleUpdateDate (nothing to do)
 		// - renamed Intake -> DoseEvent
 
-		Schedule schedule = ScheduleCreator.createScheduleFromDrug(this);
-		Database.createWithoutMagic(schedule);
-		newDrug.addSchedule(schedule);
+		ScheduleCreator.createScheduleFromDrug(this, newDrug);
 
 		newDrug.setAutoAddIntakesEnabled(autoAddIntakes);
 		newDrug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);

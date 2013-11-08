@@ -25,11 +25,13 @@ import java.util.Date;
 
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.Fraction;
+import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.FractionPersister;
 import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.db.v58.ScheduleCreator;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -94,6 +96,8 @@ public class OldDrug extends Entry
 	{
 		final Drug newDrug = new Drug();
 		Entry.copy(newDrug, this);
+
+		ScheduleCreator.createScheduleFromDrug(this, newDrug);
 
 		newDrug.setAutoAddIntakesEnabled(autoAddIntakes);
 		newDrug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);

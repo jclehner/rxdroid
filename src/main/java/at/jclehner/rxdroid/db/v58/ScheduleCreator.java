@@ -1,17 +1,48 @@
 package at.jclehner.rxdroid.db.v58;
 
+import android.util.Log;
+
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.Fraction;
+import at.jclehner.rxdroid.db.Database;
+import at.jclehner.rxdroid.db.DatabaseHelper;
+import at.jclehner.rxdroid.db.DoseEvent;
+import at.jclehner.rxdroid.db.Drug;
+import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class ScheduleCreator
 {
-	public static Schedule createScheduleFromDrug(Entry oldDrug)
+	private static final String TAG = ScheduleCreator.class.getSimpleName();
+
+	private static List<Runnable> sOnDbInitRunnables =
+			new ArrayList<Runnable>();
+
+	private static final Database.OnInitializedListener sOnDbInitListener =
+		new Database.OnInitializedListener() {
+				@Override
+				public void onDatabaseInitialized()
+				{
+					for(Runnable r : sOnDbInitRunnables)
+						r.run();
+
+					sOnDbInitRunnables.clear();
+				}
+	};
+
+	static {
+		Database.registerOnInitializedListener(sOnDbInitListener);
+	}
+
+	public static void createScheduleFromDrug(final Entry oldDrug, final Drug newDrug)
 	{
 		final Schedule schedule = new Schedule();
 		boolean useRepeatOriginAsBegin = false;
@@ -48,7 +79,7 @@ public class ScheduleCreator
 
 			case OldDrug.REPEAT_CUSTOM:
 				/* no - op */
-				return null;
+				return;
 
 			default:
 				throw new IllegalArgumentException("repeatMode=" + repeatMode);
@@ -57,12 +88,53 @@ public class ScheduleCreator
 		final Date repeatOrigin = getFieldValue(oldDrug, "repeatOrigin");
 		final Date lastScheduleUpdateDate = getFieldValue(oldDrug, "lastScheduleUpdateDate");
 
-		schedule.setBegin(useRepeatOriginAsBegin ? repeatOrigin : lastScheduleUpdateDate);
+		Date begin;
+
+		if(useRepeatOriginAsBegin)
+			begin = getFieldValue(oldDrug, "repeatOrigin");
+		else
+			begin = getFieldValue(oldDrug, "lastScheduleUpdateDate");
+
+		schedule.setBegin(begin);
 
 		for(int doseTime : Schedule.DOSE_TIMES)
 			schedule.setDose(doseTime, getDose(oldDrug, doseTime));
 
-		return schedule;
+		newDrug.addSchedule(schedule);
+
+		sOnDbInitRunnables.add(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if(schedule.getBegin() == null)
+				{
+					Date begin = null;
+
+					for(DoseEvent event : Entries.findDoseEvents(newDrug, null, null))
+					{
+						final Date date = event.getDate();
+
+						if(begin == null)
+							begin = event.getDate();
+						else if(date.before(begin))
+							begin = date;
+					}
+
+					if(begin == null)
+					{
+						Log.i(TAG, newDrug.getName() + ": falling back to today for schedule begin");
+						begin = DateTime.today();
+					}
+
+					Log.i(TAG, newDrug.getName() + ": setting begin to " + DateTime.toDateString(begin));
+					schedule.setBegin(begin);
+				}
+
+				//Database.create(schedule);
+				DatabaseHelper.createAfterUpgrade(schedule);
+			}
+		});
 	}
 
 	private static Fraction getDose(Entry oldDrug, int doseTime)
@@ -87,7 +159,7 @@ public class ScheduleCreator
 	{
 		try
 		{
-			Field f = entry.getClass().getField(fieldName);
+			Field f = entry.getClass().getDeclaredField(fieldName);
 			f.setAccessible(true);
 			return (T) f.get(entry);
 		}

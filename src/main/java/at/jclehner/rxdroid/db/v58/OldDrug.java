@@ -85,9 +85,7 @@ public class OldDrug extends Entry
 		final Drug newDrug = new Drug();
 		Entry.copy(newDrug, this);
 
-		Schedule schedule = ScheduleCreator.createScheduleFromDrug(this);
-		Database.createWithoutMagic(schedule);
-		newDrug.addSchedule(schedule);
+		ScheduleCreator.createScheduleFromDrug(this, newDrug);
 
 		return newDrug;
 	}
