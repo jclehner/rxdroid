@@ -35,29 +35,6 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
-/*
- * begin - end
- * repetition mode
- * pause
- * as needed?
- *
- *
- *
- */
-
-
-
-
-
-
-/**
- * Handles advanced dose schedules.
- *
- * @see ScheduleBase
- *
- * @author Joseph Lehner
- *
- */
 @DatabaseTable(tableName="schedules")
 public final class Schedule extends Entry
 {
@@ -74,12 +51,10 @@ public final class Schedule extends Entry
 	public static final int DOSE_TIME_COUNT = TIME_INVALID;
 
 	public static final int REPEAT_DAILY = 0;
-	@Deprecated
-	public static final int REPEAT_AS_NEEDED = 1;
-	public static final int REPEAT_EVERY_N_DAYS = 2;
-	public static final int REPEAT_EVERY_6_8_12_OR_24_HOURS = 3;
-	public static final int REPEAT_WEEKDAYS = 4;
-	public static final int REPEAT_DAILY_WITH_PAUSE = 5;
+	public static final int REPEAT_EVERY_N_DAYS = 1;
+	public static final int REPEAT_WEEKDAYS = 2;
+	public static final int REPEAT_DAILY_WITH_PAUSE = 3;
+	public static final int REPEAT_EVERY_6_8_12_OR_24_HOURS = 4;
 
 	private static final int MASK_REPEAT_ARG_PAUSE = 0xffff;
 	private static final int MASK_REPEAT_ARG_CYCLE_LENGTH = 0xffff0000;
@@ -253,11 +228,7 @@ public final class Schedule extends Entry
 		return true;
 	}
 
-	public void setRepeatMode(int repeatMode)
-	{
-		if(repeatMode == REPEAT_AS_NEEDED)
-			throw new IllegalArgumentException("REPEAT_AS_NEEDED is deprecated");
-
+	public void setRepeatMode(int repeatMode) {
 		this.repeatMode = repeatMode;
 	}
 

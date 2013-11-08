@@ -56,6 +56,8 @@ public class OldSchedule extends Entry
 			newSchedule.setAsNeeded(true);
 			newSchedule.setRepeatMode(Schedule.REPEAT_DAILY);
 		}
+		else
+			newSchedule.setRepeatMode(at.jclehner.rxdroid.db.v57.OldSchedule.toCurrentScheduleRepeatMode(repeatMode));
 
 		return newSchedule;
 	}

@@ -35,6 +35,13 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName="schedules")
 public class OldSchedule extends Entry
 {
+	public static final int REPEAT_DAILY = 0;
+	public static final int REPEAT_AS_NEEDED = 1;
+	public static final int REPEAT_EVERY_N_DAYS = 2;
+	public static final int REPEAT_EVERY_6_8_12_OR_24_HOURS = 3;
+	public static final int REPEAT_WEEKDAYS = 4;
+	public static final int REPEAT_DAILY_WITH_PAUSE = 5;
+
 	@DatabaseField
 	private String name;
 
@@ -73,6 +80,8 @@ public class OldSchedule extends Entry
 			newSchedule.setAsNeeded(true);
 			newSchedule.setRepeatMode(Schedule.REPEAT_DAILY);
 		}
+		else
+			newSchedule.setRepeatMode(toCurrentScheduleRepeatMode(repeatMode));
 
 		return newSchedule;
 	}
@@ -86,4 +95,29 @@ public class OldSchedule extends Entry
 	public int hashCode() {
 		throw new UnsupportedOperationException();
 	}
+
+	public static int toCurrentScheduleRepeatMode(int oldRepeatMode)
+	{
+		switch(oldRepeatMode)
+		{
+			case REPEAT_DAILY:
+				return Schedule.REPEAT_DAILY;
+
+			case REPEAT_EVERY_N_DAYS:
+				return Schedule.REPEAT_EVERY_N_DAYS;
+
+			case REPEAT_EVERY_6_8_12_OR_24_HOURS:
+				return Schedule.REPEAT_EVERY_6_8_12_OR_24_HOURS;
+
+			case REPEAT_WEEKDAYS:
+				return Schedule.REPEAT_WEEKDAYS;
+
+			case REPEAT_DAILY_WITH_PAUSE:
+				return Schedule.REPEAT_DAILY_WITH_PAUSE;
+
+			default:
+				throw new UnsupportedOperationException();
+		}
+	}
+
 }

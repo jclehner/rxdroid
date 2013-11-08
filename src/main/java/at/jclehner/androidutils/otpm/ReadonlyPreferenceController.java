@@ -25,6 +25,8 @@ import android.preference.Preference;
 
 public class ReadonlyPreferenceController extends PreferenceController<Preference, Object>
 {
+	public ReadonlyPreferenceController() {}
+
 	@Override
 	public void initPreference(Preference preference, Object fieldValue) {
 		preference.setEnabled(false);
