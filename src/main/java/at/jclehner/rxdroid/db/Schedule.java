@@ -235,10 +235,13 @@ public final class Schedule extends Entry
 	public boolean hasNoDoses()
 	{
 		final SchedulePart[] schedulePartsArray = mSchedulePartsArray.get();
-		for(SchedulePart part : schedulePartsArray)
+		if(schedulePartsArray != null)
 		{
-			if(part.hasDoses())
-				return false;
+			for(SchedulePart part : schedulePartsArray)
+			{
+				if(part.hasDoses())
+					return false;
+			}
 		}
 
 		for(Fraction dose : mDoses.get())
