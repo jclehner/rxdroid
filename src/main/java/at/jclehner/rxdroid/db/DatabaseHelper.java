@@ -26,13 +26,13 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import at.jclehner.androidutils.Reflect;
-import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.SplashScreenActivity;
@@ -57,8 +57,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	private static final String TAG = DatabaseHelper.class.getSimpleName();
 	private static final boolean LOGV = false;
 
+	private static volatile boolean sIsUpgrading = false;
+
 	public static final int DB_VERSION = 59;
 	public static final String DB_NAME = "db.sqlite";
+
+	private static final List<Entry> mCreateAfterUpgrade = new ArrayList<Entry>();
 
 	public static class DatabaseError extends RuntimeException
 	{
@@ -125,6 +129,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		super(context, DB_NAME, null, DB_VERSION);
 	}
 
+	public static void createAfterUpgrade(Entry entry)
+	{
+		if(!sIsUpgrading)
+			throw new UnsupportedOperationException("Can only be called during database upgrade");
+
+		mCreateAfterUpgrade.add(entry);
+	}
+
 	@Override
 	public void onCreate(SQLiteDatabase db, ConnectionSource cs)
 	{
@@ -142,6 +154,24 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, ConnectionSource cs, int oldVersion, int newVersion)
+	{
+		try
+		{
+			sIsUpgrading = true;
+			onUpgradeInternal(db, cs, oldVersion, newVersion);
+
+			for(Entry entry : mCreateAfterUpgrade)
+				Database.createWithoutMagic(entry);
+
+			mCreateAfterUpgrade.clear();
+		}
+		finally
+		{
+			sIsUpgrading = false;
+		}
+	}
+
+	public void onUpgradeInternal(SQLiteDatabase db, ConnectionSource cs, int oldVersion, int newVersion)
 	{
 		if(oldVersion == newVersion)
 			return;
@@ -161,24 +191,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			}
 		}
 		else
-		{
-			/*if(BuildConfig.DEBUG)
-			{
-				try
-				{
-					Log.d(TAG, "Found backup copy " + dbCopy + "; reloading database!");
-					Util.copyFile(dbCopy, dbOrig);
-					Database.reload(RxDroid.getContext());
-					return;
-				}
-				catch(IOException e)
-				{
-					Log.e(TAG, "Failed to create " + dbOrig, e);
-				}
-			}
-			else*/
-				Log.i(TAG, dbCopy + " exists; not overwriting");
-		}
+			Log.i(TAG, dbCopy + " exists; not overwriting");
+
 
 		SplashScreenActivity.setStatusMessage(R.string._title_db_status_upgrading);
 
@@ -203,14 +217,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	// !!! Do NOT @Override (crashes on API < 11) !!!
 	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		onUpgrade(db, oldVersion, newVersion);
-	}
-
-	@Override
-	public void close()
-	{
-		super.close();
-
-
 	}
 
 	public void reset()
