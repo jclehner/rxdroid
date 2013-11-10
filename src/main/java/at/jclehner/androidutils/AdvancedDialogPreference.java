@@ -142,8 +142,13 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 
 		mValue = value;
 
-		if(!mHasSummary && mAutoSummary)
+		if(mAutoSummary)
 			setSummaryInternal(value != null ? toSummaryString(value) : null);
+		else if(LOGV)
+		{
+			 Log.v(TAG, getKey() + ": setValue: mHasSummary=" + mHasSummary +
+					 ", mAutoSummary=" + mAutoSummary);
+		}
 
 		onValueSet(value);
 
@@ -193,6 +198,9 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	@Override
 	public void setSummary(CharSequence summary)
 	{
+		if(LOGV && false)
+			Log.v(TAG, "setSummary", new RuntimeException("Tracy Jordan"));
+
 		super.setSummary(summary);
 		mHasSummary = summary != null;
 	}
@@ -479,7 +487,7 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 		if(LOGV) Log.v(TAG, getKey() + ": setSummaryInternal: summary=" + summary);
 
 		super.setSummary(summary);
-		mAutoSummary = true;
+		//mAutoSummary = true;
 	}
 
 	/**
