@@ -424,15 +424,6 @@ public final class Entries
 	}
 	*/
 
-	public static boolean isDateAfterLastScheduleUpdateOfDrug(Date date, Drug drug)
-	{
-		final Date lastScheduleUpdateDate = drug.getLastScheduleUpdateDate();
-		if(lastScheduleUpdateDate == null)
-			return true;
-
-		return date.after(lastScheduleUpdateDate);
-	}
-
 	public static boolean hasLowSupplies(Drug drug)
 	{
 		if(!drug.isActive() || drug.getRefillSize() == 0 || drug.hasNoDoses())

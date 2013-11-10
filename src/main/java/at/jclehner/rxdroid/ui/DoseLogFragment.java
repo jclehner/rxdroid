@@ -50,6 +50,7 @@ import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
+import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.ui.ExpandableListFragment.OnGroupCollapseExpandListener;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
@@ -246,15 +247,8 @@ public class DoseLogFragment extends ExpandableListFragment
 		else if(date == null)
 			date = Settings.getOldestPossibleHistoryDate(mToday);
 
-		final Date lastScheduleUpdateDate = drug.getLastScheduleUpdateDate();
-
-		if(date == null)
-		{
-			if((date = lastScheduleUpdateDate) == null)
-			{
-				Log.w(TAG, "gatherEventInfos(" + flags + "): no date to begin; giving up");
-				return;
-			}
+		if(date == null) {
+			date = drug.getScheduleMap().getBegin();
 		}
 
 //		final Date lastDosesClearedDate = drug.getLastDosesClearedDate();
@@ -270,25 +264,27 @@ public class DoseLogFragment extends ExpandableListFragment
 		{
 			while(!date.after(mToday))
 			{
-				if(lastScheduleUpdateDate == null || !date.before(lastScheduleUpdateDate))
+				final Schedule schedule = drug.getSchedule(date);
+				if(schedule == null)
+					continue;
+
+				if(schedule.hasDoseOnDate(date))
 				{
-					if(drug.hasDoseOnDate(date))
+					for(int doseTime : Constants.DOSE_TIMES)
 					{
-						for(int doseTime : Constants.DOSE_TIMES)
+						if(date.equals(mToday) && doseTime == dtInfo.activeOrNextDoseTime())
+							break;
+
+						Fraction dose = schedule.getDose(date, doseTime);
+
+						if(!dose.isZero() && !containsDoseEvent(events, date, doseTime))
 						{
-							if(date.equals(mToday) && doseTime == dtInfo.activeOrNextDoseTime())
-								break;
-
-							Fraction dose = drug.getDose(doseTime, date);
-
-							if(!dose.isZero() && !containsDoseEvent(events, date, doseTime))
-							{
-								//Log.d(TAG, "Creating missed event: date=" + date + ", doseTime=" + doseTime);
-								infos.add(EventInfo.newMissedEvent(date, doseTime, dose));
-							}
+							//Log.d(TAG, "Creating missed event: date=" + date + ", doseTime=" + doseTime);
+							infos.add(EventInfo.newMissedEvent(date, doseTime, dose));
 						}
 					}
 				}
+
 
 				date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
 			}

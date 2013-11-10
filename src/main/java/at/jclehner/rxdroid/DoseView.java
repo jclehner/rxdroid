@@ -368,9 +368,9 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 				SpannableStringBuilder sb = new SpannableStringBuilder(Util.prettify(mDisplayDose));
 
-				final Date lastScheduleUpdate = mDrug.getLastScheduleUpdateDate();
+				final Date scheduleBegin = mDrug.getSchedule(mDate).getBegin();
 
-				if(lastScheduleUpdate == null || !mDate.before(lastScheduleUpdate))
+				if(!mDate.before(scheduleBegin))
 				{
 					final Fraction scheduledDose = mDrug.getDose(mDoseTime, mDate);
 					int cmp = mDisplayDose.compareTo(scheduledDose);
