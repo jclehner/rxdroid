@@ -28,7 +28,9 @@ import at.jclehner.androidutils.NonOverlappingTimePeriodMap;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Exceptions;
+import at.jclehner.rxdroid.util.Hasher;
 import at.jclehner.rxdroid.util.Keep;
+import at.jclehner.rxdroid.util.Util;
 
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
@@ -288,13 +290,48 @@ public final class Schedule extends Entry
 	}
 
 	@Override
-	public boolean equals(Object other) {
-		throw new UnsupportedOperationException();
+	public boolean equals(Object o)
+	{
+		if(o == null || !(o instanceof Schedule))
+			return false;
+
+		Object[] thisFields = getRelevantFields();
+		Object[] otherFields = ((Schedule) o).getRelevantFields();
+
+		for(int i = 0; i != thisFields.length; ++i)
+		{
+			if(!Util.equalsIgnoresNull(thisFields[i], otherFields[i]))
+				return false;
+		}
+
+		return true;
 	}
 
 	@Override
-	public int hashCode() {
-		return 0;
+	public int hashCode()
+	{
+		Hasher hasher = new Hasher();
+		for(Object field : getRelevantFields())
+			hasher.hash(field);
+
+		return hasher.getHashCode();
+	}
+
+	private Object[] getRelevantFields()
+	{
+		return new Object[] {
+				name,
+				begin,
+				end,
+				asNeeded,
+				repeatMode,
+				repeatArg,
+				doseMorning,
+				doseNoon,
+				doseEvening,
+				doseNight,
+				scheduleParts
+		};
 	}
 
 	private boolean isDosePossibleOnDate(Date date)
