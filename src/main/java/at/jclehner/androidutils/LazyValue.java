@@ -64,4 +64,9 @@ public abstract class LazyValue<T>
 	}
 
 	public abstract T value();
+
+	@Override
+	public String toString() {
+		return Objects.toString(mValue);
+	}
 }
