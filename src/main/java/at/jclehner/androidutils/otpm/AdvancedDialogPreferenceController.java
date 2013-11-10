@@ -34,4 +34,10 @@ public class AdvancedDialogPreferenceController extends PreferenceController<Adv
 		preference.setValue((Serializable) fieldValue);
 		//preference.setSummary(fieldValue.toString());
 	}
+
+	@Override
+	public void updateSummary(AdvancedDialogPreference preference, Object newValue)
+	{
+		// dummy
+	}
 }
