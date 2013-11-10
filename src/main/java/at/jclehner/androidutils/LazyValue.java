@@ -51,8 +51,8 @@ public abstract class LazyValue<T>
 		}
 	}
 
-	public synchronized void reset() {
-		mValue = null;
+	public final void reset() {
+		set(null);
 	}
 
 	public synchronized void mutate(Mutator<T> mutator)
