@@ -53,6 +53,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.TimePicker;
+
+import at.jclehner.androidutils.Objects;
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DumbTime;
@@ -376,7 +378,7 @@ public final class Util
 				Reflect.makeAccessible(f);
 
 				if(f.getType().isArray())
-					sb.append(arrayToString(f.get(object)));
+					sb.append(Objects.arrayToString(f.get(object)));
 				else
 					sb.append(f.get(object));
 			}
@@ -414,45 +416,6 @@ public final class Util
 	{
 		picker.setCurrentHour(time.getHours());
 		picker.setCurrentMinute(time.getMinutes());
-	}
-
-	public static String arrayToString(Object array)
-	{
-		if(array == null)
-			return "null";
-
-		final Class<?> type = array.getClass();
-		if(!type.isArray())
-			throw new IllegalArgumentException("Not an array");
-
-		final int length = Array.getLength(array);
-		if(length == 0)
-			return "[]";
-
-		final StringBuilder sb = new StringBuilder("[");
-
-		for(int i = 0; i != length; ++i)
-		{
-			if(i != 0)
-				sb.append(", ");
-
-			final Object elem = Array.get(array, i);
-			if(elem != null)
-			{
-				final Class<?> elemType = elem.getClass();
-
-				if(elemType.isArray())
-					sb.append(arrayToString(elem));
-				else if(elemType == String.class)
-					sb.append("\"" + elem.toString() + "\""); // TODO escape string?
-				else
-					sb.append(elem.toString());
-			}
-			else
-				sb.append("null");
-		}
-
-		return sb.append("]").toString();
 	}
 
 	public static String streamToString(InputStream is)

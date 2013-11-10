@@ -68,7 +68,7 @@ public class EventDispatcher<T>
 			final Method m = Reflect.getMethod(receiver.getClass(), eventName, argTypes);
 			if(m == null)
 			{
-				Log.w(TAG, "  no such method: " + receiver.getClass().getSimpleName() + "." + eventName + Util.arrayToString(argTypes));
+				Log.w(TAG, "  no such method: " + receiver.getClass().getSimpleName() + "." + eventName + Objects.arrayToString(argTypes));
 				continue;
 			}
 
