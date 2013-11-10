@@ -9,10 +9,12 @@ import java.util.Map;
 
 public class NonOverlappingTimePeriodMap<T> extends HashMap<DatePeriod, T>
 {
+	private Date mBegin;
+
 	public NonOverlappingTimePeriodMap() {}
 
-	/* package */ NonOverlappingTimePeriodMap(NonOverlappingTimePeriodMap<T> other) {
-		super.putAll(other);
+	public Date getBegin() {
+		return mBegin;
 	}
 
 	public boolean containsDate(Date date)
@@ -79,6 +81,9 @@ public class NonOverlappingTimePeriodMap<T> extends HashMap<DatePeriod, T>
 	{
 		if(!containsKey(key) && containsPeriod(key))
 			throw new IllegalArgumentException("Attempting to add overlapping period " + key);
+
+		if(mBegin == null || mBegin.after(key.begin()))
+			mBegin = key.begin();
 
 		return super.put(key, value);
 	}
