@@ -24,6 +24,7 @@ package at.jclehner.rxdroid.db;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -122,9 +123,6 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	@DatabaseField(columnName = "lastAutoIntakeCreationDate")
 	private Date lastAutoDoseEventCreationDate;
-
-	@DatabaseField
-	private Date lastScheduleUpdateDate;
 
 	@DatabaseField
 	private int sortRank = Integer.MAX_VALUE;
@@ -298,10 +296,6 @@ public class Drug extends Entry implements Comparable<Drug>
 		this.lastAutoDoseEventCreationDate = lastAutoDoseEventCreationDate;
 	}
 
-	public Date getLastScheduleUpdateDate() {
-		return lastScheduleUpdateDate;
-	}
-
 	public boolean hasNoDoses() {
 		return Schedules.hasNoDoses(mSchedules.get());
 	}
@@ -405,10 +399,6 @@ public class Drug extends Entry implements Comparable<Drug>
 		return drug;
 	}
 
-	private void onScheduleUpdated() {
-		lastScheduleUpdateDate = DateTime.today();
-	}
-
 	/**
 	 * Get all relevant members for comparison/hashing.
 	 *
@@ -429,7 +419,8 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.refillSize,
 			this.hasAutoDoseEvents,
 			this.lastAutoDoseEventCreationDate,
-			this.comment
+			this.comment,
+			getSchedules()
 		};
 
 		return members;
@@ -447,6 +438,12 @@ public class Drug extends Entry implements Comparable<Drug>
 			return Arrays.asList(foreignSchedules.toArray(array));
 		}
 
+		@Override
+		public synchronized void set(List<Schedule> value)
+		{
+			super.set(value);
+			mScheduleMap.reset();
+		}
 	};
 
 
@@ -463,7 +460,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			for(Schedule schedule : mSchedules.get())
 				scheduleMap.put(new DatePeriod(schedule.begin, schedule.end), schedule);
 
-			return scheduleMap;
+			return scheduleMap.toImmutableInstance();
 		}
 	};
 
