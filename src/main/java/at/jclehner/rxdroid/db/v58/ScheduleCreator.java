@@ -9,6 +9,7 @@ import java.util.List;
 
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.Fraction;
+import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.DoseEvent;
@@ -87,15 +88,19 @@ public class ScheduleCreator
 
 		final Date repeatOrigin = getFieldValue(oldDrug, "repeatOrigin");
 		final Date lastScheduleUpdateDate = getFieldValue(oldDrug, "lastScheduleUpdateDate");
+		final boolean setBeginDelayed;
 
-		Date begin;
+		final Date begin;
 
 		if(useRepeatOriginAsBegin)
 			begin = getFieldValue(oldDrug, "repeatOrigin");
 		else
 			begin = getFieldValue(oldDrug, "lastScheduleUpdateDate");
 
-		schedule.setBegin(begin);
+		if(begin == null)
+			schedule.setBegin(Settings.getActiveDate());
+		else
+			schedule.setBegin(begin);
 
 		for(int doseTime : Schedule.DOSE_TIMES)
 			schedule.setDose(doseTime, getDose(oldDrug, doseTime));
@@ -107,34 +112,35 @@ public class ScheduleCreator
 			@Override
 			public void run()
 			{
-				if(schedule.getBegin() == null)
+				if(begin == null)
 				{
-					Date begin = null;
+					Date newBegin = null;
 
 					for(DoseEvent event : Entries.findDoseEvents(newDrug, null, null))
 					{
 						final Date date = event.getDate();
 
-						if(begin == null)
-							begin = event.getDate();
-						else if(date.before(begin))
-							begin = date;
+						if(newBegin == null)
+							newBegin = event.getDate();
+						else if(date.before(newBegin))
+							newBegin = date;
 					}
 
 					if(begin == null)
 					{
 						Log.i(TAG, newDrug.getName() + ": falling back to today for schedule begin");
-						begin = DateTime.today();
+						newBegin = DateTime.today();
 					}
 
 					Log.i(TAG, newDrug.getName() + ": setting begin to " + DateTime.toDateString(begin));
-					schedule.setBegin(begin);
+					schedule.setBegin(newBegin);
 				}
 
 				//Database.create(schedule);
-				DatabaseHelper.createAfterUpgrade(schedule);
 			}
 		});
+
+		DatabaseHelper.createAfterUpgrade(schedule);
 	}
 
 	private static Fraction getDose(Entry oldDrug, int doseTime)

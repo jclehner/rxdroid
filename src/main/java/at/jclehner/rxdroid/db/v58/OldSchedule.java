@@ -51,7 +51,7 @@ public class OldSchedule extends Entry
 		final Schedule newSchedule = new Schedule();
 		Entry.copy(newSchedule, this);
 
-		if(repeatMode == Schedule.REPEAT_AS_NEEDED)
+		if(repeatMode == at.jclehner.rxdroid.db.v57.OldSchedule.REPEAT_AS_NEEDED)
 		{
 			newSchedule.setAsNeeded(true);
 			newSchedule.setRepeatMode(Schedule.REPEAT_DAILY);
