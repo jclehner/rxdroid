@@ -171,10 +171,14 @@ public final class Entries
 		return false;
 	}
 
+	public static int getSupplyDaysLeftForDrug(Drug drug, Date date) {
+		return getSupplyDaysLeftForDrug(drug, null, date);
+	}
+
 	/**
 	 * Get the number of days the drug's supply will last.
 	 */
-	public static int getSupplyDaysLeftForDrug(Drug drug, Date date)
+	public static int getSupplyDaysLeftForDrug(Drug drug, Schedule schedule, Date date)
 	{
 		// TODO this function currently does not take into account doses
 		// that were taken after the specified date.
@@ -182,7 +186,9 @@ public final class Entries
 		if(date == null)
 			date = DateTime.today();
 
-		Schedule schedule = drug.getSchedule(date);
+		if(schedule == null)
+			schedule = drug.getSchedule(date);
+
 		if(schedule == null)
 			return -1;
 
@@ -436,7 +442,11 @@ public final class Entries
 		if(minSupplyDays == 0)
 			return false;
 
-		return getSupplyDaysLeftForDrug(drug, null) < minSupplyDays;
+		int daysLeft = getSupplyDaysLeftForDrug(drug, null);
+		if(daysLeft < 0)
+			return false;
+
+		return daysLeft < minSupplyDays;
 	}
 
 	public static String getDrugName(Drug drug)

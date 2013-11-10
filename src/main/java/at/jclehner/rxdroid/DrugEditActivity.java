@@ -21,6 +21,9 @@
 
 package at.jclehner.rxdroid;
 
+import java.text.AttributedCharacterIterator;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -39,12 +42,15 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.CheckBoxPreference;
+import android.preference.DialogPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceScreen;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup.LayoutParams;
@@ -65,6 +71,7 @@ import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.preferences.DatePreference;
 import at.jclehner.rxdroid.preferences.DosePreference;
 import at.jclehner.rxdroid.preferences.DrugNamePreference2;
 import at.jclehner.rxdroid.preferences.FractionPreference;
@@ -103,6 +110,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 	private DrugAndScheduleWrapper mWrapper;
 	private int mDrugHash;
+	private int mScheduleHash;
 
 	// if true, we're editing an existing drug; if false, we're adding a new one
 	private boolean mIsEditing;
@@ -116,6 +124,8 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		final String action = intent.getAction();
 
 		final Drug drug = mWrapper.getDrug();
+		final Schedule schedule = mWrapper.getSchedule();
+
 		final String drugName = drug.getName();
 
 		if(drugName == null || drugName.length() == 0)
@@ -126,9 +136,13 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 		if(Intent.ACTION_EDIT.equals(action))
 		{
-			if(mDrugHash != drug.hashCode())
+			if(mDrugHash != drug.hashCode() || mScheduleHash != schedule.hashCode())
 			{
-				if(LOGV) Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, "drug 2");
+				if(LOGV)
+				{
+					Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, "drug 2");
+					Util.dumpObjectMembers(TAG, Log.VERBOSE, schedule, "schedule 2");
+				}
 
 				showDialog(R.id.drug_save_changes_dialog);
 				return;
@@ -136,7 +150,11 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
 		{
-			Database.create(drug, 0);
+			schedule.setOwner(drug);
+
+			Database.create(drug);
+			Database.create(schedule);
+
 			Toast.makeText(getApplicationContext(), getString(R.string._toast_saved), Toast.LENGTH_SHORT).show();
 		}
 
@@ -196,10 +214,18 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 			drug = Drug.get(drugId);
 
-			if(LOGV) Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, "drug");
-
 			mWrapper.set(drug);
 			mDrugHash = drug.hashCode();
+
+			Schedule schedule = getSchedule(drug);
+			mScheduleHash = schedule.hashCode();
+
+			if(LOGV)
+			{
+				Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, "drug");
+				Util.dumpObjectMembers(TAG, Log.VERBOSE, schedule, "schedule");
+			}
+
 			mIsEditing = true;
 
 			if(intent.getBooleanExtra(EXTRA_FOCUS_ON_CURRENT_SUPPLY, false))
@@ -375,6 +401,8 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 					if(which == Dialog.BUTTON_POSITIVE)
 					{
 						Database.update(mWrapper.getDrug());
+						Database.update(mWrapper.getSchedule());
+
 						Toast.makeText(getApplicationContext(), R.string._toast_saved, Toast.LENGTH_SHORT).show();
 					}
 
@@ -388,17 +416,35 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		}
 	}
 
-	private void performPreferenceClick(String key)
+	private Schedule getSchedule(Drug drug)
 	{
-		final PreferenceScreen ps = getPreferenceScreen();
-		for(int i = 0; i != ps.getPreferenceCount(); ++i)
+		List<Schedule> schedules = drug.getSchedules();
+		if(schedules.isEmpty())
+			return null;
+		else if(schedules.size() != 1)
+			throw new UnsupportedOperationException("schedules.size() != 1");
+
+		return schedules.get(0);
+	}
+
+	private void performPreferenceClick(final String key)
+	{
+		new Handler().post(new Runnable()
 		{
-			if(key.equals(ps.getPreference(i).getKey()))
+			@Override
+			public void run()
 			{
-				ps.onItemClick(getListView(), null, i, 0);
-				break;
+				final PreferenceScreen ps = getPreferenceScreen();
+				for(int i = 0; i != ps.getPreferenceCount(); ++i)
+				{
+					if(key.equals(ps.getPreference(i).getKey()))
+					{
+						ps.onItemClick(getListView(), null, i, 0);
+						break;
+					}
+				}
 			}
-		}
+		});
 	}
 
 	private static class DrugAndScheduleWrapper
@@ -527,12 +573,14 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		(
 			title = "Begin",
 			order = 14,
-			type = Preference.class,
-			controller = ReadonlyDatePreferenceController.class
+			type = DatePreference.class,
+			controller = AdvancedDialogPreferenceController.class
 		)
 		private Date scheduleBegin;
 
 		private int id;
+
+		private int scheduleId;
 
 		private long repeatArg;
 		private int sortRank;
@@ -558,8 +606,16 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			currentSupply = drug.getCurrentSupply();
 			schedules = drug.getSchedules();
 
+			final Schedule schedule;
+
 			// XXX this'll do until we support multiple schedules
-			Schedule schedule = schedules.get(0);
+			if(schedules.size() != 0)
+				schedule = schedules.get(0);
+			else
+			{
+				schedule = new Schedule();
+				schedules.add(schedule);
+			}
 
 			doseMorning = schedule.getDose(Schedule.TIME_MORNING);
 			doseNoon = schedule.getDose(Schedule.TIME_NOON);
@@ -569,6 +625,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			repeat = schedule.getRepeatMode();
 			repeatArg = schedule.getRepeatArg();
 			scheduleBegin = schedule.getBegin();
+			scheduleId = schedule.getId();
 			sortRank = drug.getSortRank();
 			autoAddIntakes = drug.hasAutoDoseEvents();
 			lastAutoIntakeCreationDate = drug.getLastAutoDoseEventCreationDate();
@@ -596,27 +653,15 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			drug.setAutoAddIntakesEnabled(autoAddIntakes);
 			drug.setPatient(patient);
 
-			Schedule schedule = schedules.get(0);
-
-			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };
-			for(int i = 0; i != doses.length; ++i)
-				schedule.setDose(Constants.DOSE_TIMES[i], doses[i]);
-
-			schedule.setRepeatMode(repeat);
-			schedule.setRepeatArg(repeatArg);
-			schedule.setBegin(scheduleBegin);
-
-			drug.setSchedules(schedules);
-
 			return drug;
 		}
 
 		public Schedule getSchedule()
 		{
 			Schedule schedule = new Schedule();
-			schedule.setId(Database.ID_VIRTUAL_ENTRY);
+			schedule.setId(scheduleId);
 
-			schedule.setOwner(getDrug());
+			//schedule.setOwner(getDrug());
 			schedule.setBegin(scheduleBegin);
 			schedule.setRepeatArg(repeatArg);
 			schedule.setRepeatMode(repeat);
@@ -965,7 +1010,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 				return currentSupply.toString();
 			}
 
-			final int currentSupplyDays = Math.max(Entries.getSupplyDaysLeftForDrug(drug, null), 0);
+			final int currentSupplyDays = Math.max(Entries.getSupplyDaysLeftForDrug(drug, schedule, null), 0);
 			final Date end = DateTime.add(DateTime.today(), Calendar.DAY_OF_MONTH, currentSupplyDays);
 			return mContext.getString(R.string._msg_supply, currentSupply, DateTime.toNativeDate(end));
 		}
