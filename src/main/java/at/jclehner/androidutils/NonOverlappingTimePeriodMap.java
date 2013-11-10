@@ -9,6 +9,12 @@ import java.util.Map;
 
 public class NonOverlappingTimePeriodMap<T> extends HashMap<DatePeriod, T>
 {
+	public NonOverlappingTimePeriodMap() {}
+
+	/* package */ NonOverlappingTimePeriodMap(NonOverlappingTimePeriodMap<T> other) {
+		super.putAll(other);
+	}
+
 	public boolean containsDate(Date date)
 	{
 		for(DatePeriod period : keySet())
@@ -64,10 +70,14 @@ public class NonOverlappingTimePeriodMap<T> extends HashMap<DatePeriod, T>
 		return getAllMatching(date, false, false, dateInclusive);
 	}
 
+	public NonOverlappingTimePeriodMap<T> toImmutableInstance() {
+		return new ImmutableNonOverlappingTimePeriodMap<T>(this);
+	}
+
 	@Override
 	public T put(DatePeriod key, T value)
 	{
-		if(containsPeriod(key))
+		if(!containsKey(key) && containsPeriod(key))
 			throw new IllegalArgumentException("Attempting to add overlapping period " + key);
 
 		return super.put(key, value);
@@ -97,5 +107,29 @@ public class NonOverlappingTimePeriodMap<T> extends HashMap<DatePeriod, T>
 		}
 
 		return list;
+	}
+}
+
+class ImmutableNonOverlappingTimePeriodMap<T> extends NonOverlappingTimePeriodMap<T>
+{
+	ImmutableNonOverlappingTimePeriodMap(NonOverlappingTimePeriodMap<T> other)
+	{
+		for(DatePeriod key : other.keySet())
+			super.put(key, other.get(key));
+	}
+
+	@Override
+	public T put(DatePeriod key, T value) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void clear() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public T remove(Object key) {
+		throw new UnsupportedOperationException();
 	}
 }
