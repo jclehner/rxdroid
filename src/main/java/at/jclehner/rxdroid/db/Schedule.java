@@ -251,7 +251,7 @@ public final class Schedule extends Entry
 	}
 
 	public boolean isComplex() {
-		return scheduleParts.size() != 0;
+		return scheduleParts != null && scheduleParts.size() != 0;
 	}
 
 	public static long makeRepeatDailyWithPauseArg(int cycleDays, int pauseDays)
