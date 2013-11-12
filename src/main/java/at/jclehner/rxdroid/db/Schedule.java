@@ -51,11 +51,12 @@ public final class Schedule extends Entry
 
 	public static final int DOSE_TIME_COUNT = TIME_INVALID;
 
+	public static final int REPEAT_INVALID = -1;
 	public static final int REPEAT_DAILY = 0;
 	public static final int REPEAT_EVERY_N_DAYS = 1;
 	public static final int REPEAT_WEEKDAYS = 2;
 	public static final int REPEAT_DAILY_WITH_PAUSE = 3;
-	public static final int REPEAT_EVERY_6_8_12_OR_24_HOURS = 4;
+	public static final int REPEAT_EVERY_6_8_12_OR_24_HOURS = REPEAT_INVALID;
 
 	private static final int MASK_REPEAT_ARG_PAUSE = 0xffff;
 	private static final int MASK_REPEAT_ARG_ON_LENGTH = 0xffff0000;
@@ -229,7 +230,11 @@ public final class Schedule extends Entry
 		return true;
 	}
 
-	public void setRepeatMode(int repeatMode) {
+	public void setRepeatMode(int repeatMode)
+	{
+		if(repeatMode == REPEAT_INVALID)
+			throw new IllegalArgumentException();
+
 		this.repeatMode = repeatMode;
 	}
 
