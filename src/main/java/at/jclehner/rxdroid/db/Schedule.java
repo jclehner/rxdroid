@@ -84,16 +84,16 @@ public final class Schedule extends Entry
 	private boolean asNeeded = false;
 
 	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseMorning;
+	private Fraction doseMorning = Fraction.ZERO;
 
 	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseNoon;
+	private Fraction doseNoon = Fraction.ZERO;
 
 	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseEvening;
+	private Fraction doseEvening = Fraction.ZERO;
 
 	@DatabaseField(persisterClass = FractionPersister.class)
-	private Fraction doseNight;
+	private Fraction doseNight = Fraction.ZERO;
 
 	@SuppressWarnings("unused")
 	@DatabaseField(foreign = true)
