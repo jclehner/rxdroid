@@ -22,7 +22,6 @@
 package at.jclehner.rxdroid.db;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -44,7 +43,6 @@ import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
 
@@ -637,7 +635,7 @@ public final class Entries
 				return new Fraction(7, Long.bitCount(schedule.getRepeatArg()));
 
 			case Schedule.REPEAT_DAILY_WITH_PAUSE:
-				int cycleDays = schedule.getRepeatCycleDays();
+				int cycleDays = schedule.getRepeatOnDays();
 				int pauseDays = schedule.getRepeatPauseDays();
 
 				return new Fraction(cycleDays + pauseDays, pauseDays);

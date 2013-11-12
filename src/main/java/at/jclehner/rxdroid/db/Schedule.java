@@ -24,7 +24,6 @@ package at.jclehner.rxdroid.db;
 import java.util.Date;
 
 import at.jclehner.androidutils.LazyValue;
-import at.jclehner.androidutils.NonOverlappingTimePeriodMap;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Exceptions;
@@ -59,7 +58,7 @@ public final class Schedule extends Entry
 	public static final int REPEAT_EVERY_6_8_12_OR_24_HOURS = 4;
 
 	private static final int MASK_REPEAT_ARG_PAUSE = 0xffff;
-	private static final int MASK_REPEAT_ARG_CYCLE_LENGTH = 0xffff0000;
+	private static final int MASK_REPEAT_ARG_ON_LENGTH = 0xffff0000;
 
 	private static final Fraction[] ZERO_DOSE_ARRAY = new Fraction[] {
 		Fraction.ZERO, Fraction.ZERO, Fraction.ZERO, Fraction.ZERO
@@ -246,23 +245,23 @@ public final class Schedule extends Entry
 		return repeatArg;
 	}
 
-	public void setRepeatDailyWithPause(int cycleLength, int pauseLength) {
-		setRepeatArg(makeRepeatDailyWithPauseArg(cycleLength, pauseLength));
+	public void setRepeatDailyWithPause(int onDays, int pauseDays) {
+		setRepeatArg(makeRepeatDailyWithPauseArg(onDays, pauseDays));
 	}
 
 	public boolean isComplex() {
 		return scheduleParts != null && scheduleParts.size() != 0;
 	}
 
-	public static long makeRepeatDailyWithPauseArg(int cycleDays, int pauseDays)
+	public static long makeRepeatDailyWithPauseArg(int onDays, int pauseDays)
 	{
-		if(cycleDays < 0 || cycleDays > 0xffff || pauseDays < 0 || pauseDays > 0xffff)
+		if(onDays < 0 || onDays > 0xffff || pauseDays < 0 || pauseDays > 0xffff)
 			throw new IllegalArgumentException("Argument out of range 0-0xffff");
 
-		return cycleDays << 16 | pauseDays;
+		return onDays << 16 | pauseDays;
 	}
 
-	public int getRepeatCycleDays()
+	public int getRepeatOnDays()
 	{
 		if(repeatMode != REPEAT_DAILY_WITH_PAUSE)
 			throw new UnsupportedOperationException();
@@ -350,7 +349,7 @@ public final class Schedule extends Entry
 
 			case REPEAT_DAILY_WITH_PAUSE:
 				final long pauseDays = repeatArg & MASK_REPEAT_ARG_PAUSE;
-				final long cycleLength = (repeatArg & MASK_REPEAT_ARG_CYCLE_LENGTH) >> 16;
+				final long cycleLength = (repeatArg & MASK_REPEAT_ARG_ON_LENGTH) >> 16;
 				return DateTime.diffDays(date, begin) % cycleLength < (cycleLength - pauseDays);
 
 			default:
