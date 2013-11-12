@@ -48,8 +48,8 @@ import com.j256.ormlite.stmt.Where;
 
 public final class Entries
 {
-	@SuppressWarnings("unused")
 	private static final String TAG = Entries.class.getSimpleName();
+	private static final boolean LOGV = false;
 
 	private static final Dao<DoseEvent, Integer> sDoseEventDao =
 		Database.USE_CUSTOM_CACHE ? null : Database.getHelper().getDaoChecked(DoseEvent.class);
@@ -422,18 +422,43 @@ public final class Entries
 	}
 	*/
 
-	public static boolean hasLowSupplies(Drug drug)
+	public static boolean hasLowSupplies(Drug drug) {
+		return hasLowSupplies(drug, null);
+	}
+
+	public static boolean hasLowSupplies(Drug drug, Date today)
 	{
 		if(!drug.isActive() || drug.getRefillSize() == 0 || drug.hasNoDoses())
 			return false;
+
+		if(LOGV) Log.d(TAG, "hasLowSupplies: drug=" + drug + ", today=" + today);
+
+		if(today == null)
+			today = DateTime.today();
 
 		final int minSupplyDays = Settings.getStringAsInt(Settings.Keys.LOW_SUPPLY_THRESHOLD, 10);
 		if(minSupplyDays == 0)
 			return false;
 
-		int daysLeft = getSupplyDaysLeftForDrug(drug, null);
+		int daysLeft = getSupplyDaysLeftForDrug(drug, today);
+		if(LOGV) Log.d(TAG, "  daysLeft=" + daysLeft);
 		if(daysLeft < 0)
 			return false;
+
+		final Date lastInclusiveDate = drug.getScheduleMap().getLastInclusiveDate();
+		if(lastInclusiveDate != null)
+		{
+			final Date endOfSupplyDate = DateTime.add(today, Calendar.DAY_OF_MONTH, daysLeft);
+
+			if(LOGV)
+			{
+				Log.d(TAG,
+						"  lastInclusiveDate=" + DateTime.toDateString(lastInclusiveDate) + "\n" +
+						"  endOfSupplyDate=" + DateTime.toDateString(endOfSupplyDate));
+			}
+
+			return endOfSupplyDate.before(lastInclusiveDate);
+		}
 
 		return daysLeft < minSupplyDays;
 	}
