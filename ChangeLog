@@ -1,6 +1,7 @@
 0.9.20:
 	* Medication names are now scrambled in notifications too
 	* The app now honors system-wide rotation settings
+	* Fixed autostart issues on some HTC devices
 	* Fixed some minor layout issues
 
 0.9.19:
