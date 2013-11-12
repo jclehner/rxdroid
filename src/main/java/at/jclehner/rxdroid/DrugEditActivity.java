@@ -136,14 +136,22 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 		if(Intent.ACTION_EDIT.equals(action))
 		{
-			if(mDrugHash != drug.hashCode() || mScheduleHash != schedule.hashCode())
-			{
-				if(LOGV)
-				{
-					Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, "drug 2");
-					Util.dumpObjectMembers(TAG, Log.VERBOSE, schedule, "schedule 2");
-				}
+			boolean wasChanged = false;
 
+			if(mDrugHash != drug.hashCode())
+			{
+				Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, "drug 2");
+				wasChanged = true;
+			}
+
+			if(mScheduleHash != schedule.hashCode())
+			{
+				Util.dumpObjectMembers(TAG, Log.VERBOSE, schedule, "schedule 2");
+				wasChanged = true;
+			}
+
+			if(wasChanged)
+			{
 				showDialog(R.id.drug_save_changes_dialog);
 				return;
 			}
@@ -400,8 +408,14 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 				{
 					if(which == Dialog.BUTTON_POSITIVE)
 					{
-						Database.update(mWrapper.getDrug());
-						Database.update(mWrapper.getSchedule());
+						final Drug drug = mWrapper.getDrug();
+						final Schedule schedule = mWrapper.getSchedule();
+						drug.addSchedule(schedule);
+
+						//schedule.setOwner(drug);
+
+						Database.update(drug);
+						Database.update(schedule);
 
 						Toast.makeText(getApplicationContext(), R.string._toast_saved, Toast.LENGTH_SHORT).show();
 					}
@@ -652,6 +666,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			drug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);
 			drug.setAutoAddIntakesEnabled(autoAddIntakes);
 			drug.setPatient(patient);
+			drug.setSchedules(schedules);
 
 			return drug;
 		}
