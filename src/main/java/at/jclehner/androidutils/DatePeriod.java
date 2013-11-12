@@ -34,6 +34,10 @@ public class DatePeriod
 		return mEnd;
 	}
 
+	public boolean hasEnd() {
+		return mEnd != null;
+	}
+
 	public static boolean contains(Date begin, Date end, Date date) {
 		return (end == null || date.before(end)) && (date.after(begin) || date.equals(begin));
 	}
