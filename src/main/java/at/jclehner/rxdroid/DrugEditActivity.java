@@ -158,10 +158,10 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
 		{
-			schedule.setOwner(drug);
-
 			Database.create(drug);
 			Database.create(schedule);
+
+			drug.addSchedule(schedule);
 
 			Toast.makeText(getApplicationContext(), getString(R.string._toast_saved), Toast.LENGTH_SHORT).show();
 		}
@@ -637,6 +637,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			else
 			{
 				schedule = new Schedule();
+				schedule.setBegin(DateTime.today());
 				schedules.add(schedule);
 			}
 
