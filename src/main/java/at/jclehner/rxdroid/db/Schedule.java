@@ -245,7 +245,9 @@ public final class Schedule extends Entry
 		return repeatArg;
 	}
 
-	public void setRepeatDailyWithPause(int onDays, int pauseDays) {
+	public void setRepeatDailyWithPause(int onDays, int pauseDays)
+	{
+		setRepeatMode(REPEAT_DAILY_WITH_PAUSE);
 		setRepeatArg(makeRepeatDailyWithPauseArg(onDays, pauseDays));
 	}
 
@@ -342,15 +344,15 @@ public final class Schedule extends Entry
 				return true;
 
 			case REPEAT_EVERY_N_DAYS:
-				return DateTime.diffDays(date, begin) % repeatArg == 0;
+				return Math.abs(DateTime.diffDays(date, begin)) % repeatArg == 0;
 
 			case REPEAT_WEEKDAYS:
 				return (repeatArg & (1 << DateTime.getIsoWeekDayNumberIndex(date))) != 0;
 
 			case REPEAT_DAILY_WITH_PAUSE:
 				final long pauseDays = repeatArg & MASK_REPEAT_ARG_PAUSE;
-				final long cycleLength = (repeatArg & MASK_REPEAT_ARG_ON_LENGTH) >> 16;
-				return DateTime.diffDays(date, begin) % cycleLength < (cycleLength - pauseDays);
+				final long onDays = (repeatArg & MASK_REPEAT_ARG_ON_LENGTH) >> 16;
+				return Math.abs(DateTime.diffDays(date, begin)) % (onDays + pauseDays) < onDays;
 
 			default:
 				throw new Exceptions.UnexpectedValueInSwitch(repeatMode);
