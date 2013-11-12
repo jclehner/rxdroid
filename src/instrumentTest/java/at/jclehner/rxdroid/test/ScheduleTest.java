@@ -23,6 +23,11 @@ public class ScheduleTest extends AndroidTestCase
 			"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
 	};
 
+	private static final int SEP = 8;
+	private static final int OCT = 9;
+	private static final int NOV = 10;
+	private static final int DEC = 11;
+
 	Date today;
 
 	@Override
@@ -117,8 +122,7 @@ public class ScheduleTest extends AndroidTestCase
 		for(int doseTime : Schedule.DOSE_TIMES)
 			schedule1.setDose(doseTime, Fraction.ZERO);
 
-		// 9 is October - idiots...
-		schedule1.setBegin(DateTime.date(2013, 9, 14));
+		schedule1.setBegin(DateTime.date(2013, OCT, 14));
 		schedule1.setEnd(plusDays(schedule1.getBegin(), 6));
 		schedule1.setScheduleParts(new SchedulePart[] { part1, part2, part3 });
 
@@ -181,6 +185,55 @@ public class ScheduleTest extends AndroidTestCase
 
 				assertEquals(expected, actual);
 			}
+		}
+	}
+
+	public void testDrugWithPauseSchedule()
+	{
+		final int onDays = 21;
+		final int offDays = 7;
+
+		Date date = DateTime.date(2013, SEP, 30);
+
+		Schedule schedule = new Schedule();
+		schedule.setBegin(date);
+		schedule.setRepeatDailyWithPause(onDays, offDays);
+		schedule.setDose(Schedule.TIME_MORNING, new Fraction(1));
+
+		int onDayCount = 0;
+		int offDayCount = 0;
+
+		Log.d(TAG, "testDrugWithPauseSchedule");
+
+		for(int i = 0; i != 2 * (onDays + offDays); ++i)
+		{
+			if(onDayCount < onDays)
+			{
+				if(onDayCount == onDays -1)
+					offDayCount = 0;
+
+				Log.d(TAG, "  " + DateTime.toDateString(date) + ": ON");
+
+				if(schedule.getDose(date, Schedule.TIME_MORNING).isZero())
+					fail("Expected dose on " + DateTime.toDateString(date));
+
+				++onDayCount;
+			}
+			else
+			{
+				if(offDayCount == offDays - 1)
+					onDayCount = 0;
+
+				Log.d(TAG, "  " + DateTime.toDateString(date) + ": OFF");
+
+				if(!schedule.getDose(date, Schedule.TIME_MORNING).isZero())
+					fail("No dose expected on " + DateTime.toDateString(date));
+
+
+				++offDayCount;
+			}
+
+			date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
 		}
 	}
 
