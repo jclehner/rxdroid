@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="at.jclehner.rxdroid" 
-	android:versionCode="47"
+	android:versionCode="48"
 	android:versionName="@string/version"
 	android:installLocation="internalOnly" 
 >
@@ -139,7 +139,9 @@
 		    
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+				<!-- F*ck you, HTC ! -->
+				<action android:name="android.intent.action.QUICKBOOT_POWERON" />
+				<action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
 
 				<action android:name="android.intent.action.TIME_SET" />
 				<action android:name="android.intent.action.TIMEZONE_CHANGED" />

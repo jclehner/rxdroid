@@ -574,9 +574,12 @@ public final class Settings
 		{
 			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+			if(Build.VERSION.SDK_INT >= 18)
+				activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
 		}
 		else
-			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
 	}
 
 	public static boolean wasDisplayedOnce(String onceId) {
