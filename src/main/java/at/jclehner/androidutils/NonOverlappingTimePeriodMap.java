@@ -2,10 +2,13 @@ package at.jclehner.androidutils;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import at.jclehner.rxdroid.util.DateTime;
 
 public class NonOverlappingTimePeriodMap<T> extends HashMap<DatePeriod, T>
 {
@@ -19,6 +22,17 @@ public class NonOverlappingTimePeriodMap<T> extends HashMap<DatePeriod, T>
 	}
 
 	public Date getEnd() {
+		return mEnd;
+	}
+
+	public Date getLastInclusiveDate()
+	{
+		if(mEnd == null)
+			return null;
+
+		if(DateTime.getOffsetFromMidnight(mEnd) == 0)
+			return DateTime.add(mEnd, Calendar.DAY_OF_MONTH, -1);
+
 		return mEnd;
 	}
 
