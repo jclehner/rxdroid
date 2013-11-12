@@ -574,7 +574,7 @@ public final class Settings
 		{
 			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-			
+
 			if(Build.VERSION.SDK_INT >= 18)
 				activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
 		}
