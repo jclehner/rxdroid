@@ -21,11 +21,14 @@
 
 package at.jclehner.rxdroid.db;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -42,6 +45,8 @@ import at.jclehner.rxdroid.util.Hasher;
 import at.jclehner.rxdroid.util.Keep;
 import at.jclehner.rxdroid.util.Util;
 
+import com.j256.ormlite.dao.CloseableIterator;
+import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -250,7 +255,25 @@ public class Drug extends Entry implements Comparable<Drug>
 	public void addSchedule(Schedule schedule)
 	{
 		schedule.owner = this;
-		mSchedules.get().add(schedule);
+
+		final List<Schedule> schedules = mSchedules.get();
+		Log.d(TAG, "addSchedule: " + schedules.size() + " schedules");
+
+		final Schedule oldSchedule = Entries.findInCollectionById(schedules, schedule.getId());
+		if(oldSchedule != null)
+		{
+			Log.d(TAG, "  removing old schedule with id " + oldSchedule.getId());
+			schedules.remove(oldSchedule);
+		}
+
+		Log.d(TAG, "  adding new schedule with id " + schedule.getId());
+
+		schedules.add(schedule);
+
+		if(foreignSchedules != null)
+			foreignSchedules.add(schedule);
+
+		mSchedules.set(schedules);
 	}
 
 	/**
@@ -419,8 +442,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.refillSize,
 			this.hasAutoDoseEvents,
 			this.lastAutoDoseEventCreationDate,
-			this.comment,
-			getSchedules()
+			this.comment
 		};
 
 		return members;
@@ -431,11 +453,15 @@ public class Drug extends Entry implements Comparable<Drug>
 		@Override
 		public List<Schedule> value()
 		{
-			if(foreignSchedules == null)
-				return new ArrayList<Schedule>();
+			final ArrayList<Schedule> ret = new ArrayList<Schedule>();
 
-			final Schedule[] array = new Schedule[foreignSchedules.size()];
-			return Arrays.asList(foreignSchedules.toArray(array));
+			if(foreignSchedules != null)
+			{
+				for(Schedule schedule : foreignSchedules)
+					ret.add(schedule);
+			}
+
+			return ret;
 		}
 
 		@Override
@@ -443,6 +469,8 @@ public class Drug extends Entry implements Comparable<Drug>
 		{
 			super.set(value);
 			mScheduleMap.reset();
+			// provokes an exception if something went wrong...
+			mScheduleMap.get();
 		}
 	};
 
