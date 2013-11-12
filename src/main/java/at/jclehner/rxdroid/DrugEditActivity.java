@@ -507,7 +507,6 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		(
 			titleResId = R.string._title_night,
 			key = "night",
-			endActiveCategory = true,
 			order = 6,
 			type = DosePreference.class,
 			controller = AdvancedDialogPreferenceController.class
@@ -516,8 +515,26 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 		@CreatePreference
 		(
-			titleResId = R.string._title_repeat,
+			titleResId = R.string._title_begin,
 			order = 7,
+			type = DatePreference.class,
+			controller = AdvancedDialogPreferenceController.class
+		)
+		private Date scheduleBegin;
+
+		@CreatePreference
+		(
+			titleResId = R.string._title_end,
+			order = 8,
+			type = DatePreference.class,
+			controller = AdvancedDialogPreferenceController.class
+		)
+		private Date scheduleEnd;
+
+		@CreatePreference
+		(
+			titleResId = R.string._title_repeat,
+			order = 9,
 			type = ListPreference.class,
 			controller = RepeatModePreferenceController.class,
 			fieldDependencies = { "repeatArg", "scheduleBegin" }
@@ -528,7 +545,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		(
 			titleResId = R.string._title_on_demand,
 			summary = "",
-			order = 8,
+			order = 11,
 			type = CheckBoxPreference.class,
 			controller = CheckboxPreferenceController.class
 		)
@@ -537,8 +554,9 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		@CreatePreference
 		(
 			titleResId = R.string._title_icon,
+			endActiveCategory = true,
 			categoryResId = R.string._title_misc,
-			order = 9,
+			order = 13,
 			type = ListPreference.class,
 			controller = FormPreferenceController.class
 		)
@@ -547,7 +565,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		@CreatePreference
 		(
 			titleResId = R.string._title_refill_size,
-			order = 10,
+			order = 15,
 			type = FractionPreference.class,
 			controller = RefillSizePreferenceController.class
 		)
@@ -556,7 +574,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		@CreatePreference
 		(
 			titleResId = R.string._title_current_supply,
-			order = 11,
+			order = 17,
 			type = CurrentSupplyPreference.class,
 			controller = CurrentSupplyPreferenceController.class,
 			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat"},
@@ -567,7 +585,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		@CreatePreference
 		(
 			titleResId = R.string._title_per_drug_reminders,
-			order = 12,
+			order = 19,
 			type = ListPreference.class,
 			controller = NotificationsPreferenceController.class
 		)
@@ -577,20 +595,11 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		(
 			titleResId = R.string._title_active,
 			summary = "",
-			order = 13,
+			order = 21,
 			type = CheckBoxPreference.class,
 			controller = CheckboxPreferenceController.class
 		)
 		private boolean active;
-
-		@CreatePreference
-		(
-			title = "Begin",
-			order = 14,
-			type = DatePreference.class,
-			controller = AdvancedDialogPreferenceController.class
-		)
-		private Date scheduleBegin;
 
 		private int id;
 
@@ -639,6 +648,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			repeat = schedule.getRepeatMode();
 			repeatArg = schedule.getRepeatArg();
 			scheduleBegin = schedule.getBegin();
+			scheduleEnd = schedule.getEnd();
 			scheduleId = schedule.getId();
 			sortRank = drug.getSortRank();
 			autoAddIntakes = drug.hasAutoDoseEvents();
@@ -678,6 +688,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 			//schedule.setOwner(getDrug());
 			schedule.setBegin(scheduleBegin);
+			schedule.setEnd(scheduleEnd);
 			schedule.setRepeatArg(repeatArg);
 			schedule.setRepeatMode(repeat);
 			schedule.setAsNeeded(isAsNeeded);
