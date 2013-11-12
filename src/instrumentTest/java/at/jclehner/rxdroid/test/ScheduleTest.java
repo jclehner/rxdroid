@@ -77,22 +77,22 @@ public class ScheduleTest extends AndroidTestCase
 
 		final Object[][] testCases = new Object[][] {
 				// week 1
-				{ Drug.TIME_EVENING, "1/4" },
-				{ Drug.TIME_EVENING, "1/4" },
+				{ Schedule.TIME_EVENING, "1/4" },
+				{ Schedule.TIME_EVENING, "1/4" },
 				null,
-				{ Drug.TIME_EVENING, "1/2" },
+				{ Schedule.TIME_EVENING, "1/2" },
 				null,
-				{ Drug.TIME_EVENING, "1/2" },
-				{ Drug.TIME_NOON, "3/4" },
+				{ Schedule.TIME_EVENING, "1/2" },
+				{ Schedule.TIME_NOON, "3/4" },
 
 				// week 2
-				{ Drug.TIME_MORNING, "1" },
-				{ Drug.TIME_NOON, "1 1/2" },
-				{ Drug.TIME_MORNING, "1" },
+				{ Schedule.TIME_MORNING, "1" },
+				{ Schedule.TIME_NOON, "1 1/2" },
+				{ Schedule.TIME_MORNING, "1" },
 				null,
 				null,
 				null,
-				{ Drug.TIME_MORNING, "1" },
+				{ Schedule.TIME_MORNING, "1" },
 
 				// week 3
 				null,
@@ -153,7 +153,6 @@ public class ScheduleTest extends AndroidTestCase
 		drug.addSchedule(schedule1);
 		drug.addSchedule(schedule2);
 		drug.addSchedule(schedule3);
-		drug.setRepeatMode(Drug.REPEAT_CUSTOM);
 
 		Log.d(TAG, "testDrugWithScheduleParts1");
 

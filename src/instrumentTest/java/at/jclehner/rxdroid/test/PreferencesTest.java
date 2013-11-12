@@ -65,12 +65,12 @@ public class PreferencesTest extends AndroidTestCase
 	public void testGetActiveDoseTimeAndGetNextDoseTime()
 	{
 		final int[][] testCases = {
-				{      18, 00, Drug.TIME_EVENING, Drug.TIME_NIGHT },
-				{      21, 00, Drug.TIME_INVALID, Drug.TIME_NIGHT },
-				{      23, 00, Drug.TIME_NIGHT, Drug.TIME_MORNING },
-				{ 24 + 00, 00, Drug.TIME_NIGHT, Drug.TIME_MORNING },
-				{ 24 + 00, 30, Drug.TIME_NIGHT, Drug.TIME_MORNING },
-				{ 24 + 01, 30, Drug.TIME_INVALID, Drug.TIME_MORNING }
+				{      18, 0, Schedule.TIME_EVENING, Schedule.TIME_NIGHT },
+				{      21, 0, Schedule.TIME_INVALID, Schedule.TIME_NIGHT },
+				{      23, 0, Schedule.TIME_NIGHT, Schedule.TIME_MORNING },
+				{ 24 + 0, 0, Schedule.TIME_NIGHT, Schedule.TIME_MORNING },
+				{ 24 + 0, 30, Schedule.TIME_NIGHT, Schedule.TIME_MORNING },
+				{ 24 + 1, 30, Schedule.TIME_INVALID, Schedule.TIME_MORNING }
 		};
 
 		for(int i = 0; i != testCases.length; ++i)
