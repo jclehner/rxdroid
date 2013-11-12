@@ -48,13 +48,15 @@ import com.j256.ormlite.field.DatabaseField;
  */
 public abstract class Entry
 {
+	public static final int INVALID_ID = -1;
+
 	interface Callback<E extends Entry>
 	{
 		void call(E entry);
 	}
 
 	@DatabaseField(generatedId = true)
-	protected int id = -1;
+	protected int id = INVALID_ID;
 
 	@Override
 	public abstract boolean equals(Object other);
@@ -77,6 +79,10 @@ public abstract class Entry
 	 */
 	public final void setId(int id) {
 		this.id = id;
+	}
+
+	public final boolean hasValidId() {
+		return id != INVALID_ID;
 	}
 
 	/**

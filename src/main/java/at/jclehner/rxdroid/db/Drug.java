@@ -257,16 +257,15 @@ public class Drug extends Entry implements Comparable<Drug>
 		schedule.owner = this;
 
 		final List<Schedule> schedules = mSchedules.get();
-		Log.d(TAG, "addSchedule: " + schedules.size() + " schedules");
 
-		final Schedule oldSchedule = Entries.findInCollectionById(schedules, schedule.getId());
-		if(oldSchedule != null)
+		if(schedule.hasValidId())
 		{
-			Log.d(TAG, "  removing old schedule with id " + oldSchedule.getId());
-			schedules.remove(oldSchedule);
+			final Schedule oldSchedule = Entries.findInCollectionById(schedules, schedule.getId());
+			if(oldSchedule != null)
+				schedules.remove(oldSchedule);
 		}
-
-		Log.d(TAG, "  adding new schedule with id " + schedule.getId());
+		else
+			Log.i(TAG, "Adding schedule with invalid id");
 
 		schedules.add(schedule);
 
