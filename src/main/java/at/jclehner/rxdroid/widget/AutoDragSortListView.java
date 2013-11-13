@@ -22,12 +22,18 @@
 package at.jclehner.rxdroid.widget;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+
+import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.Settings;
+import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.Version;
 
@@ -99,19 +105,21 @@ public class AutoDragSortListView extends DragSortListView
 		};
 
 		mController.setDragInitMode(DragSortController.ON_DOWN);
-		mController.setSortEnabled(true);
+		mController.setSortEnabled(isSmartSortDisabled());
 
 		mController.setBackgroundColor(color);
 
 		setOnTouchListener(mController);
 		setFloatViewManager(mController);
 		setDropListener(mDropListener);
+
+		Settings.registerOnChangeListener(mPrefListener);
 	}
 
 	public void setDragHandleId(int id)
 	{
 		mController.setDragHandleId(id);
-		setDragEnabled(true);
+		setDragEnabled(isSmartSortDisabled());
 	}
 
 	public void setOnOrderChangedListener(OnOrderChangedListener l) {
@@ -130,6 +138,23 @@ public class AutoDragSortListView extends DragSortListView
 		else
 			throw new IllegalArgumentException("Only ArrayAdapters are supported");
 	}
+
+	private boolean isSmartSortDisabled() {
+		return !Settings.getBoolean(Keys.USE_SMART_SORT, true);
+	}
+
+	private final OnSharedPreferenceChangeListener mPrefListener = new OnSharedPreferenceChangeListener()
+	{
+		@Override
+		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
+		{
+			if(Keys.USE_SMART_SORT.equals(key))
+			{
+				setDragEnabled(sharedPreferences.getBoolean(key, true));
+				mController.setSortEnabled(isSmartSortDisabled());
+			}
+		}
+	};
 
 	private final DropListener mDropListener = new DropListener() {
 
