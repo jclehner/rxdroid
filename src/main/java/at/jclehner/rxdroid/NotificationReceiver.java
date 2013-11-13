@@ -34,6 +34,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
@@ -265,7 +266,10 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		Log.i(TAG, "Alarm will go off in " + Util.millis(triggerDiffFromNow));
 
-		mAlarmMgr.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, createOperation(alarmExtras));
+		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
+			mAlarmMgr.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, createOperation(alarmExtras));
+		else
+			mAlarmMgr.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, createOperation(alarmExtras));
 	}
 
 	private void cancelAllAlarms() {
