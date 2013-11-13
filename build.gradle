@@ -33,7 +33,7 @@ dependencies {
 
 android {
 	buildToolsVersion "18.1"
-	compileSdkVersion 18
+	compileSdkVersion 19
 
 	signingConfigs {
 		release {
