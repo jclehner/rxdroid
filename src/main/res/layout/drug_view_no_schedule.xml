@@ -22,14 +22,14 @@
  */
 -->
 
-<RelativeLayout
+<LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
-	android:layout_width="fill_parent"
-	android:layout_height="48dip"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
 	android:paddingRight="5dip"
 	
-	android:orientation="vertical"
+	android:orientation="horizontal"
 	android:descendantFocusability="beforeDescendants"
 	android:focusable="true"
 	
@@ -40,10 +40,7 @@
 	<ImageView android:id="@+id/drug_icon"
 		android:layout_width="@dimen/drug_icon_width"
 		android:layout_height="match_parent"
-		
-		android:layout_alignParentLeft="true"
-		android:layout_alignParentTop="true"
-		android:layout_alignBottom="@+id/dose_container"
+
 									
 		android:scaleType="fitCenter"
 		android:padding="1dip"
@@ -51,30 +48,11 @@
 		
 		android:src="?attr/drugIconTablet"
 	/>
-	
-	<!--  
-	<TextView android:id="@+id/text_supply"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_below="@id/drug_icon"
-	    android:layout_alignParentLeft="true"
-	    android:layout_alignBottom="@+id/dose_container"
-	    android:layout_toLeftOf="@id/dose_container"
-	    
-	    android:gravity="bottom"
-	    android:textAppearance="?android:attr/textAppearanceSmall"
-	    android:textSize="10sp"
-	    android:paddingLeft="3dip"
-	    android:text="36"
-	/>
-	-->	
   
-  	<at.jclehner.rxdroid.widget.DrugNameView android:id="@id/drug_name"
+  	<at.jclehner.rxdroid.widget.DrugNameView android:id="@+id/drug_name"
   		android:layout_width="wrap_content"
   		android:layout_height="match_parent"
-  		  		
-  		android:layout_toRightOf="@id/drug_icon"
-        android:layout_toLeftOf="@+id/text_supply"
+        android:layout_weight="1"
   		
   		android:layout_alignParentTop="true"
   		  		
@@ -94,10 +72,9 @@
 
 
 
-    <at.jclehner.rxdroid.widget.DrugSupplyMonitor android:id="@id/text_supply"
+    <at.jclehner.rxdroid.widget.DrugSupplyMonitor android:id="@+id/text_supply"
 	    android:layout_width="48dip"
 	    android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/frame_history_menu"
 
         android:gravity="center"
 	    android:textAppearance="?android:attr/textAppearanceSmall"
@@ -113,8 +90,6 @@
     <FrameLayout android:id="@id/frame_history_menu"
                  android:layout_width="48dip"
                  android:layout_height="match_parent"
-                 android:layout_alignParentTop="true"
-                 android:layout_alignParentRight="true"
 
                  android:background="?attr/selectableItemBackground"
     >
@@ -141,4 +116,4 @@
 
     </FrameLayout>
 
-</RelativeLayout>
+</LinearLayout>
