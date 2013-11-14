@@ -24,7 +24,7 @@
 
 <RelativeLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
+	xmlns:custom="http://schemas.android.com/apk/res-auto"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:paddingRight="5dip"
@@ -198,7 +198,7 @@
 			    android:background="?attr/selectableItemBackground"
 			    android:clickable="true"
 			    android:onClick="onSupplyMonitorClick"
-			    rxdroid:onLongClick="onSupplyMonitorLongClick"
+			    custom:onLongClick="onSupplyMonitorLongClick"
 			    
 			    android:paddingBottom="6dip"
 			    
