@@ -152,7 +152,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	@Override
 	public int hashCode()
 	{
-		final Hasher hasher = new Hasher();
+		final Hasher hasher = Hasher.getInstance();
 
 		hasher.hash(mMillis);
 		hasher.hash(mSeconds);

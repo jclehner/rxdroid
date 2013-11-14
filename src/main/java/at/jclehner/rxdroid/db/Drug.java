@@ -666,7 +666,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	@Override
 	public int hashCode()
 	{
-		final Hasher hasher = new Hasher();
+		final Hasher hasher = Hasher.getInstance();
 		final Object[] thisMembers = this.getFieldValues();
 
 		for(Object o : thisMembers)

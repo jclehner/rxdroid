@@ -139,7 +139,7 @@ public class DoseEvent extends Entry
 	@Override
 	public int hashCode()
 	{
-		final Hasher hasher = new Hasher();
+		final Hasher hasher = Hasher.getInstance();
 
 		hasher.hash(drug);
 		hasher.hash(date);
