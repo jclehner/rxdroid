@@ -248,12 +248,15 @@ public final class Entries
 		return findDoseEvents(drug, date, doseTime).size();
 	}
 
-	public static boolean hasAllDoseEvents(Drug drug, Date date)
+	public static boolean hasAllDoseEvents(Drug drug, Date date) {
+		return hasAllDoseEvents(drug, date, Schedule.TIME_INVALID);
+	}
+
+	public static boolean hasAllDoseEvents(Drug drug, Date date, int untilDoseTime)
 	{
 		if(!drug.hasDoseOnDate(date))
 			return true;
 
-		//List<intake> events = findAll(drug, date, null);
 		for(int doseTime : Constants.DOSE_TIMES)
 		{
 			Fraction dose = drug.getDose(doseTime, date);
@@ -262,6 +265,9 @@ public final class Entries
 				if(countDoseEvents(drug, date, doseTime) == 0)
 					return false;
 			}
+
+			if(doseTime == untilDoseTime)
+				break;
 		}
 
 		return true;
