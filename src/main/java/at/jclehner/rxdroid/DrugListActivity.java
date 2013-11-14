@@ -1112,27 +1112,43 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		{
 			if(mSmartSortEnabled)
 			{
-				boolean lActive = lhs.isActive();
-				boolean rActive = rhs.isActive();
-
-				if(lActive != rActive)
-					return lActive ? -1 : 1;
-
-				boolean lHasDose = lhs.hasDoseOnDate(mDate);
-				boolean rHasDose = rhs.hasDoseOnDate(mDate);
-
-				if(lHasDose != rHasDose)
-					return lHasDose ? -1 : 1;
-
-				lHasDose = !lhs.getDose(mDoseTime, mDate).isZero();
-				rHasDose = !rhs.getDose(mDoseTime, mDate).isZero();
-
-				if(lHasDose != rHasDose)
-					return lHasDose ? -1 : 1;
+				if(getAutoSortScore(lhs) < getAutoSortScore(rhs))
+					return -1;
+				else
+					return 1;
 			}
 
 			return lhs.compareTo(rhs);
 		}
+
+		private int getAutoSortScore(Drug drug)
+		{
+			int score = 0;
+
+			if(drug.isActive())
+				score += 10000;
+
+			if(!drug.getDose(mDoseTime, mDate).isZero())
+			{
+				if(Entries.countDoseEvents(drug, mDate, mDoseTime) == 0)
+					score += 5000;
+			}
+
+			if(Entries.hasLowSupplies(drug))
+				score += 1000;
+
+			if(DateTime.isToday(mDate))
+			{
+				if(Entries.hasMissingDosesBeforeDate(drug, mDate))
+					score += 1000;
+			}
+
+			if(drug.hasDoseOnDate(mDate))
+				score += 100;
+
+			return score;
+		}
+
 	}
 }
 
