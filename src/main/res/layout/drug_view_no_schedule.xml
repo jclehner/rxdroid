@@ -50,7 +50,7 @@
 	/>
   
   	<at.jclehner.rxdroid.widget.DrugNameView android:id="@+id/drug_name"
-  		android:layout_width="wrap_content"
+  		android:layout_width="0dip"
   		android:layout_height="match_parent"
         android:layout_weight="1"
   		
