@@ -57,6 +57,9 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 	private static final String TAG = DrugOverviewAdapter.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
 
+	private static final int TYPE_WITH_SCHEDULE = 0;
+	private static final int TYPE_WITHOUT_SCHEDULE = 1;
+
 	private final Timer mTimer;
 
 	public DrugOverviewAdapter(Activity activity, List<Drug> items, Date date, int activeDoseTime)
@@ -73,11 +76,13 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			mTimer.restart();
 
 		final Drug drug = getItem(position);
+		final boolean hasSchedule = getItemViewType(position) == TYPE_WITH_SCHEDULE;
 		final DoseViewHolder holder;
 
 		if(v == null)
 		{
-			v = mActivity.getLayoutInflater().inflate(R.layout.drug_view, null);
+			v = mActivity.getLayoutInflater().inflate(
+					hasSchedule ? R.layout.drug_view : R.layout.drug_view_no_schedule, null);
 
 			holder = new DoseViewHolder();
 
@@ -89,14 +94,17 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 //			holder.lowSupplyIndicator = v.findViewById(R.id.low_supply_indicator);
 			holder.currentSupply = (DrugSupplyMonitor) v.findViewById(R.id.text_supply);
 
-			for(int i = 0; i != holder.doseViews.length; ++i)
+			if(hasSchedule)
 			{
-				final int doseViewId = Constants.DOSE_VIEW_IDS[i];
-				holder.doseViews[i] = (DoseView) v.findViewById(doseViewId);
-				mActivity.registerForContextMenu(holder.doseViews[i]);
-			}
+				for(int i = 0; i != holder.doseViews.length; ++i)
+				{
+					final int doseViewId = Constants.DOSE_VIEW_IDS[i];
+					holder.doseViews[i] = (DoseView) v.findViewById(doseViewId);
+					mActivity.registerForContextMenu(holder.doseViews[i]);
+				}
 
-			holder.setDividersFromLayout(v);
+				holder.setDividersFromLayout(v);
+			}
 
 			v.setTag(holder);
 		}
@@ -140,32 +148,35 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		holder.currentSupply.setVisibility(isCurrentSupplyVisible ? View.VISIBLE : View.INVISIBLE);
 
-		int doseTime = Schedule.TIME_MORNING;
-
-		for(DoseView doseView : holder.doseViews)
+		if(hasSchedule)
 		{
-			if(!doseView.hasInfo(mAdapterDate, drug))
-				doseView.setDoseFromDrugAndDate(mAdapterDate, drug);
+			int doseTime = Schedule.TIME_MORNING;
 
-			if(isToday && mActiveDoseTime != Schedule.TIME_INVALID)
-				doseView.setDimmed(doseTime != mActiveDoseTime);
+			for(DoseView doseView : holder.doseViews)
+			{
+				if(!doseView.hasInfo(mAdapterDate, drug))
+					doseView.setDoseFromDrugAndDate(mAdapterDate, drug);
+
+				if(isToday && mActiveDoseTime != Schedule.TIME_INVALID)
+					doseView.setDimmed(doseTime != mActiveDoseTime);
+				else
+					doseView.setDimmed(false);
+
+				++doseTime;
+			}
+
+			final int dividerVisibility;
+			if(v.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+				dividerVisibility = View.GONE;
 			else
-				doseView.setDimmed(false);
+				dividerVisibility = View.VISIBLE;
 
-			++doseTime;
-		}
-
-		final int dividerVisibility;
-		if(v.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-			dividerVisibility = View.GONE;
-		else
-			dividerVisibility = View.VISIBLE;
-
-		for(int i = 0; i != holder.dividers.length; ++i)
-		{
-			final View divider = holder.dividers[i];
-			if(divider != null)
-				divider.setVisibility(dividerVisibility);
+			for(int i = 0; i != holder.dividers.length; ++i)
+			{
+				final View divider = holder.dividers[i];
+				if(divider != null)
+					divider.setVisibility(dividerVisibility);
+			}
 		}
 
 		if(LOGV && position == getCount() - 1)
@@ -184,5 +195,23 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		}
 
 		return v;
+	}
+
+	@Override
+	public int getItemViewType(int position)
+	{
+		final Drug drug = getItem(position);
+		if(!drug.hasDoseOnDate(mAdapterDate))
+		{
+			if(Entries.countDoseEvents(drug, mAdapterDate, null) == 0)
+				return TYPE_WITHOUT_SCHEDULE;
+		}
+
+		return TYPE_WITH_SCHEDULE;
+	}
+
+	@Override
+	public int getViewTypeCount() {
+		return 2;
 	}
 }
