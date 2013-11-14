@@ -408,6 +408,8 @@ public class DoseLogFragment extends ExpandableListFragment
 					statusResId = Theme.getResourceAttribute(R.attr.doseStatusMissed);
 					break;
 				}
+				else if(info.status == EventInfo.STAT_SKIPPED)
+					statusResId = Theme.getResourceAttribute(R.attr.doseStatusIgnored);
 			}
 
 			holder.status.setImageResource(statusResId);
