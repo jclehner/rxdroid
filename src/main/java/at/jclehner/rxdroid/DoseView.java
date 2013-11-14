@@ -60,6 +60,13 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	private static final String TAG = DoseView.class.getSimpleName();
 	private static final boolean LOGV = false;
 
+	private static final int[] DOSE_TIME_DRAWABLES = {
+			R.drawable.ic_morning,
+			R.drawable.ic_noon,
+			R.drawable.ic_evening,
+			R.drawable.ic_night
+	};
+
 	public static final int STATUS_INDETERMINATE = 0;
 	public static final int STATUS_TAKEN = 1;
 	public static final int STATUS_MISSED = 2;
@@ -68,6 +75,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	private final ImageView mIntakeStatus;
 	private final TextView mDoseText;
 	private final ImageView mDoseTimeIcon;
+
 
 	private int mDoseTime = -1;
 
@@ -148,9 +156,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		if(doseTime > Drug.TIME_NIGHT)
 			throw new IllegalArgumentException();
 
-		final int drawableIds[] = { R.drawable.ic_morning, R.drawable.ic_noon, R.drawable.ic_evening, R.drawable.ic_night };
-
-		mDoseTimeIcon.setImageResource(drawableIds[doseTime]);
+		mDoseTimeIcon.setImageResource(DOSE_TIME_DRAWABLES[doseTime]);
 		mDoseTime = doseTime;
 	}
 
