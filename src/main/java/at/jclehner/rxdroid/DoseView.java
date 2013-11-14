@@ -221,6 +221,19 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		return mStatus == STATUS_TAKEN;
 	}
 
+	public void setDimmed(boolean dimmed)
+	{
+		setDoseTimeIconAlpha(dimmed ? 0x7f : 0xff);
+		mDoseText.setEnabled(!dimmed);
+	}
+
+	@Override
+	public void setEnabled(boolean enabled)
+	{
+		super.setEnabled(enabled);
+		setDimmed(!enabled);
+	}
+
 	@TargetApi(16)
 	@SuppressWarnings("deprecation")
 	public void setDoseTimeIconAlpha(int alpha)
@@ -229,15 +242,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			mDoseTimeIcon.setImageAlpha(alpha);
 		else
 			mDoseTimeIcon.setAlpha(alpha);
-	}
-
-	@Override
-	public void setEnabled(boolean enabled)
-	{
-		super.setEnabled(enabled);
-
-		setDoseTimeIconAlpha(enabled ? 0xff : 0x7f);
-		mDoseText.setEnabled(enabled);
 	}
 
 	@Override

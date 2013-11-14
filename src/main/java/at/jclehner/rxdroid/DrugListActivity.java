@@ -118,6 +118,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 	private Date mOriginalDate;
 	private Date mCurrentDate;
+	private int mCurrentDoseTime;
 
 	private boolean mShowingAll = false;
 	private int mCurrentPatientId = Patient.DEFAULT_PATIENT_ID;
@@ -167,13 +168,15 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		mIsShowing = true;
 
 		final Intent intent = getIntent();
-		Date date = null;
+		/*Date date = null;
 
 		if(intent != null)
 			date = (Date) intent.getSerializableExtra(EXTRA_DATE);
 
-		if(date == null)
-			date = Settings.getActiveDate();
+		if(date == null)*/
+		DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
+		Date date = dtInfo.activeDate();
+		mCurrentDoseTime = dtInfo.activeDoseTime();
 
 		setDate(date, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
@@ -795,7 +798,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			Collections.sort(drugs);
 		}
 
-		final DrugOverviewAdapter adapter = new DrugOverviewAdapter(this, drugs, date);
+		final DrugOverviewAdapter adapter = new DrugOverviewAdapter(this, drugs, date, mCurrentDoseTime);
 		adapter.setFilter(mShowingAll ? null : new DrugFilter(date));
 
 		listView.setAdapter(adapter);
@@ -1054,12 +1057,15 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		@Override
 		public void onDoseTimeBegin(Date date, int doseTime)
 		{
+			mCurrentDoseTime = doseTime;
+
 			if(!date.equals(mCurrentDate))
 				setDate(date, PAGER_INIT);
 		}
 
 		public void onDoseTimeEnd(Date date, int doseTime)
 		{
+			mCurrentDoseTime = Schedule.TIME_INVALID;
 			invalidateViewPager();
 		}
 	};

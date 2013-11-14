@@ -44,14 +44,16 @@ public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 	protected final Activity mActivity;
 	protected ArrayList<Drug> mItems;
 	protected final Date mAdapterDate;
+	protected final int mActiveDoseTime;
 
-	public AbsDrugAdapter(Activity activity, List<Drug> items, Date date)
+	public AbsDrugAdapter(Activity activity, List<Drug> items, Date date, int activeDoseTime)
 	{
 		super(activity.getApplicationContext(), 0, items);
 
 		mActivity = activity;
 		mAllItems = mItems = new ArrayList<Drug>(items);
 		mAdapterDate = new Date(date.getTime());
+		mActiveDoseTime = activeDoseTime;
 	}
 
 	public void setFilter(CollectionUtils.Filter<Drug> filter)
