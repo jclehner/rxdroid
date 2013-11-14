@@ -61,6 +61,13 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	private static final String TAG = DoseView.class.getSimpleName();
 	private static final boolean LOGV = false;
 
+	private static final int[] DOSE_TIME_DRAWABLES = {
+			R.drawable.ic_morning,
+			R.drawable.ic_noon,
+			R.drawable.ic_evening,
+			R.drawable.ic_night
+	};
+
 	public static final int STATUS_INDETERMINATE = 0;
 	public static final int STATUS_TAKEN = 1;
 	public static final int STATUS_MISSED = 2;
@@ -69,6 +76,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	private final ImageView mIntakeStatus;
 	private final TextView mDoseText;
 	private final ImageView mDoseTimeIcon;
+
 
 	private int mDoseTime = -1;
 
@@ -149,9 +157,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		if(doseTime > Schedule.TIME_NIGHT)
 			throw new IllegalArgumentException();
 
-		final int drawableIds[] = { R.drawable.ic_morning, R.drawable.ic_noon, R.drawable.ic_evening, R.drawable.ic_night };
-
-		mDoseTimeIcon.setImageResource(drawableIds[doseTime]);
+		mDoseTimeIcon.setImageResource(DOSE_TIME_DRAWABLES[doseTime]);
 		mDoseTime = doseTime;
 	}
 
@@ -216,6 +222,19 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		return mStatus == STATUS_TAKEN;
 	}
 
+	public void setDimmed(boolean dimmed)
+	{
+		setDoseTimeIconAlpha(dimmed ? 0x7f : 0xff);
+		mDoseText.setEnabled(!dimmed);
+	}
+
+	@Override
+	public void setEnabled(boolean enabled)
+	{
+		super.setEnabled(enabled);
+		setDimmed(!enabled);
+	}
+
 	@TargetApi(16)
 	@SuppressWarnings("deprecation")
 	public void setDoseTimeIconAlpha(int alpha)
@@ -224,15 +243,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 			mDoseTimeIcon.setImageAlpha(alpha);
 		else
 			mDoseTimeIcon.setAlpha(alpha);
-	}
-
-	@Override
-	public void setEnabled(boolean enabled)
-	{
-		super.setEnabled(enabled);
-
-		setDoseTimeIconAlpha(enabled ? 0xff : 0x7f);
-		mDoseText.setEnabled(enabled);
 	}
 
 	@Override

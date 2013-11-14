@@ -102,7 +102,7 @@ public final class Version
 		{
 			final Context c = RxDroid.getContext();
 			sVersion = c.getString(R.string.version);
-			sRevision = c.getString(R.string.vcs_revision);
+			sRevision = c.getString(R.string.git_hash);
 			sAppName = c.getString(R.string.app_name);
 
 			final StringTokenizer st = new StringTokenizer(sRevision);
@@ -110,7 +110,7 @@ public final class Version
 				return;
 
 			st.nextToken(); // discard
-			sRevision = st.nextToken();
+			sRevision = st.nextToken().substring(0, 8);
 		}
 	}
 

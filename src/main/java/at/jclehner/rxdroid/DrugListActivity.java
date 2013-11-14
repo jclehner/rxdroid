@@ -119,6 +119,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 	private Date mOriginalDate;
 	private Date mCurrentDate;
+	private int mCurrentDoseTime;
 
 	private boolean mShowingAll = false;
 	private int mCurrentPatientId = Patient.DEFAULT_PATIENT_ID;
@@ -168,13 +169,15 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		mIsShowing = true;
 
 		final Intent intent = getIntent();
-		Date date = null;
+		/*Date date = null;
 
 		if(intent != null)
 			date = (Date) intent.getSerializableExtra(EXTRA_DATE);
 
-		if(date == null)
-			date = Settings.getActiveDate();
+		if(date == null)*/
+		DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
+		Date date = dtInfo.activeDate();
+		mCurrentDoseTime = dtInfo.activeDoseTime();
 
 		setDate(date, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
@@ -796,7 +799,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			Collections.sort(drugs);
 		}
 
-		final DrugOverviewAdapter adapter = new DrugOverviewAdapter(this, drugs, date);
+		final DrugOverviewAdapter adapter = new DrugOverviewAdapter(this, drugs, date, mCurrentDoseTime);
 		adapter.setFilter(mShowingAll ? null : new DrugFilter(date));
 
 		listView.setAdapter(adapter);
@@ -1055,12 +1058,15 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		@Override
 		public void onDoseTimeBegin(Date date, int doseTime)
 		{
+			mCurrentDoseTime = doseTime;
+
 			if(!date.equals(mCurrentDate))
 				setDate(date, PAGER_INIT);
 		}
 
 		public void onDoseTimeEnd(Date date, int doseTime)
 		{
+			mCurrentDoseTime = Schedule.TIME_INVALID;
 			invalidateViewPager();
 		}
 	};
@@ -1113,27 +1119,43 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		{
 			if(mSmartSortEnabled)
 			{
-				boolean lActive = lhs.isActive();
-				boolean rActive = rhs.isActive();
-
-				if(lActive != rActive)
-					return lActive ? -1 : 1;
-
-				boolean lHasDose = lhs.hasDoseOnDate(mDate);
-				boolean rHasDose = rhs.hasDoseOnDate(mDate);
-
-				if(lHasDose != rHasDose)
-					return lHasDose ? -1 : 1;
-
-				lHasDose = !lhs.getDose(mDoseTime, mDate).isZero();
-				rHasDose = !rhs.getDose(mDoseTime, mDate).isZero();
-
-				if(lHasDose != rHasDose)
-					return lHasDose ? -1 : 1;
+				if(getAutoSortScore(lhs) < getAutoSortScore(rhs))
+					return -1;
+				else
+					return 1;
 			}
 
 			return lhs.compareTo(rhs);
 		}
+
+		private int getAutoSortScore(Drug drug)
+		{
+			int score = 0;
+
+			if(drug.isActive())
+				score += 10000;
+
+			if(!drug.getDose(mDoseTime, mDate).isZero())
+			{
+				if(Entries.countDoseEvents(drug, mDate, mDoseTime) == 0)
+					score += 5000;
+			}
+
+			if(Entries.hasLowSupplies(drug))
+				score += 1000;
+
+			if(DateTime.isToday(mDate))
+			{
+				if(Entries.hasMissingDosesBeforeDate(drug, mDate))
+					score += 1000;
+			}
+
+			if(drug.hasDoseOnDate(mDate))
+				score += 100;
+
+			return score;
+		}
+
 	}
 }
 

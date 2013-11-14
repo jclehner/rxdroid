@@ -43,6 +43,7 @@ import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.Version;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
+import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Extras;
@@ -58,9 +59,9 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 	private final Timer mTimer;
 
-	public DrugOverviewAdapter(Activity activity, List<Drug> items, Date date)
+	public DrugOverviewAdapter(Activity activity, List<Drug> items, Date date, int activeDoseTime)
 	{
-		super(activity, items, date);
+		super(activity, items, date, activeDoseTime);
 
 		mTimer = LOGV ? new Timer() : null;
 	}
@@ -111,10 +112,11 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		holder.currentSupply.setDrugAndDate(drug, mAdapterDate);
 
 		final Date today = DateTime.today();
+		final boolean isToday = today.equals(mAdapterDate);
 		final boolean isCurrentSupplyVisible;
 		boolean isMissingDoseIndicatorVisible = false;
 
-		if(today.equals(mAdapterDate))
+		if(isToday)
 		{
 			if(Entries.hasMissingDosesBeforeDate(drug, mAdapterDate))
 				isMissingDoseIndicatorVisible = true;
@@ -138,10 +140,19 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		holder.currentSupply.setVisibility(isCurrentSupplyVisible ? View.VISIBLE : View.INVISIBLE);
 
+		int doseTime = Schedule.TIME_MORNING;
+
 		for(DoseView doseView : holder.doseViews)
 		{
 			if(!doseView.hasInfo(mAdapterDate, drug))
 				doseView.setDoseFromDrugAndDate(mAdapterDate, drug);
+
+			if(isToday && mActiveDoseTime != Schedule.TIME_INVALID)
+				doseView.setDimmed(doseTime != mActiveDoseTime);
+			else
+				doseView.setDimmed(false);
+
+			++doseTime;
 		}
 
 		final int dividerVisibility;
