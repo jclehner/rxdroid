@@ -21,7 +21,7 @@ dependencies {
 		//compile 'com.google.code.gson:gson:2.2.4'
 		compile 'com.j256.ormlite:ormlite-core:4.47'
 		compile 'com.j256.ormlite:ormlite-android:4.47'
-		compile 'com.android.support:support-v4:13.0.0'
+		compile 'com.android.support:support-v4:19.0.0'
 		compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
 		compile 'com.nineoldandroids:library:2.4.0'
 	
