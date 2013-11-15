@@ -43,6 +43,10 @@ public class SystemEventReceiver extends BroadcastReceiver
 			DateTime.clearDateCache();
 			Database.reload(context);
 		}
+		else if(Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction()))
+		{
+			Settings.putLong(Settings.Keys.BOOT_COMPLETED_TIMESTAMP, RxDroid.getBootTimestamp());
+		}
 
 		Log.i(TAG, "Action: " + intent.getAction());
 

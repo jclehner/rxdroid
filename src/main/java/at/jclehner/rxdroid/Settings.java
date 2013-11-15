@@ -92,6 +92,7 @@ public final class Settings
 		public static final String LOG_SHOW_MISSED = "log_show_missed";
 		public static final String LOG_IS_ALL_COLLAPSED = "log_is_all_collapsed";
 		public static final String HAS_FRACTIONS_IN_ANY_SCHEDULE = "has_fractions_in_any_schedule";
+		public static final String BOOT_COMPLETED_TIMESTAMP = "last_boot_completed_timestamp";
 	}
 
 	public static class Enums
@@ -248,6 +249,14 @@ public final class Settings
 
 	public static void putInt(String key, int value) {
 		sSharedPrefs.edit().putInt(key, value).commit();
+	}
+
+	public static long getLong(String key, int defValue) {
+		return sSharedPrefs.getLong(key, defValue);
+	}
+
+	public static void putLong(String key, long value) {
+		sSharedPrefs.edit().putLong(key, value).commit();
 	}
 
 	public static Date getOldestPossibleHistoryDate(Date reference)

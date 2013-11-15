@@ -21,6 +21,27 @@
 
 package at.jclehner.rxdroid.util;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Build;
+import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.text.Html;
+import android.text.Spannable;
+import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.TimePicker;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,32 +57,13 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.text.Html;
-import android.text.Spannable;
-import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.widget.TimePicker;
 import at.jclehner.androidutils.Reflect;
-import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.Settings.Keys;
-import at.jclehner.rxdroid.Settings.Defaults;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
@@ -78,6 +80,10 @@ public final class Util
 			return a.equals(b);
 		else
 			return false;
+	}
+
+	public static boolean equalsLong(long long1, long long2, long epsilon) {
+		return Math.abs(long1 - long2) < epsilon;
 	}
 
 	public static void detachFromParent(View v)

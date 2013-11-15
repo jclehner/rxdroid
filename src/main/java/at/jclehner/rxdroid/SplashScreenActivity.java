@@ -119,6 +119,32 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 		setTheme(Theme.get());
 		setContentView(R.layout.loader);
 
+		final long bootCompletedTimestamp = Settings.getLong(Settings.Keys.BOOT_COMPLETED_TIMESTAMP, 0);
+		final long bootTimestamp = RxDroid.getBootTimestamp();
+
+		// getBootTimestamp() does not return a constant value if using the fallback
+		// method, so we allow the times to be off by +/- 100ms
+		if(!Util.equalsLong(bootCompletedTimestamp, bootTimestamp, 100))
+		{
+			final long lastUpdateTimestamp = RxDroid.getLastUpdateTimestamp();
+			if(lastUpdateTimestamp != 0 && lastUpdateTimestamp > bootTimestamp)
+			{
+				Log.w(TAG, "Notification service was not runnning because the app was updated");
+			}
+			else
+			{
+				Log.w(TAG, "Notification service was not started on boot: " +
+					bootCompletedTimestamp + " vs " + bootTimestamp);
+			}
+		}
+		else if(BuildConfig.DEBUG)
+		{
+			Log.d(TAG,
+					"onCreate:" +
+					"\n  bootCompletedTimestamp=" + bootCompletedTimestamp +
+					"\n           bootTimestamp=" + bootTimestamp);
+		}
+
 		mDate = Settings.getActiveDate();
 
 		final SpannableString dateString = new SpannableString(DateTime.toNativeDate(mDate));
