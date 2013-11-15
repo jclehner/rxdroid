@@ -219,29 +219,10 @@
             android:title="@string/_title_smart_sort"
             android:summary="@string/_summary_smart_sort"
         />
-		
-		<CheckBoxPreference android:key="@string/key_skip_dose_dialog"
-		    android:title="Skip DoseDialog"
-		    android:defaultValue="false"
-		/>
-		
-		<PreferenceScreen android:key="prefscreen_development_test"
-		    android:title="PreferenceScreen"
-		>
-		    
-		    <Preference 
-		        android:title="Go away!"
-		    />	    
-		</PreferenceScreen>
-	    
-		<Preference android:key="db_create_drug_with_schedule"
-			android:title="Custom schedule drug"
-		/>
-		
-		<EditTextPreference android:key="doseview_zero"
-		    android:title="DoseView zero"
-		    android:defaultValue="-"
-		/>   
+
+        <Preference android:key="boot_info"
+                android:title="Boot info"
+        />
 		
 		<Preference android:key="db_create_drug_with_many_dose_events"
 		    android:title="Create drug with many dose events"

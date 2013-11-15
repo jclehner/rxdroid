@@ -43,6 +43,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -50,6 +51,8 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
+import android.text.SpannableString;
+import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -632,6 +635,18 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					return true;
 				}
 			});
+		}
+
+		p = findPreference("boot_info");
+		if(p != null)
+		{
+			SpannableString summary = new SpannableString(
+					"boot timestamp  : " + RxDroid.getBootTimestamp() + "\n" +
+					"BOOT_COMPLETED  : " + Settings.getLong(Keys.BOOT_COMPLETED_TIMESTAMP, 0) + "\n" +
+					"update timestamp: " + RxDroid.getLastUpdateTimestamp()
+			);
+			Util.applyStyle(summary, new TypefaceSpan("monospace"));
+			p.setSummary(summary);
 		}
 	}
 }
