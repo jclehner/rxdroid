@@ -365,7 +365,9 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		if(mDrug != null)
 		{
-			if(!mDisplayDose.isZero())
+			if(!mDrug.isActive())
+				mDoseText.setText("0");
+			else if(!mDisplayDose.isZero())
 			{
 				setStatus(STATUS_TAKEN);
 
