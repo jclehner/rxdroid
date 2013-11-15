@@ -1154,7 +1154,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			}
 
 			if(drug.hasDoseOnDate(mDate))
-				score -= 100;
+				score -= 2500;
 
 			return score;
 		}
