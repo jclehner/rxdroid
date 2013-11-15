@@ -39,7 +39,7 @@
 		
 	<ImageView android:id="@+id/drug_icon"
 		android:layout_width="@dimen/drug_icon_width"
-		android:layout_height="match_parent"
+		android:layout_height="?android:attr/listPreferredItemHeight"
 
 									
 		android:scaleType="fitCenter"
