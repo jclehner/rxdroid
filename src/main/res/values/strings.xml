@@ -416,7 +416,19 @@
 	    -->
 	    
 	<string name="_title_use_pretty_fractions">Pretty fractions</string>
-	<string name="_summary_use_pretty_fractions">Display fractions as \"½\" instead of \"1/2\" (only works for some fractions)</string>		
+	<string name="_summary_use_pretty_fractions">Display fractions as \"½\" instead of \"1/2\" (only works for some fractions)</string>
+
+    <string name="_msg_not_started_on_boot">
+    <![CDATA[
+        <p>RxDroid was not automatically started at boot. A few possible reasons are listed below:</p>
+        <p>&bull; The app was moved to external storage</p>
+        <p>&bull; Auto-start was disabled for RxDroid (this is a feature found on some devices)</p>
+        <p>&bull; The <tt>RECEIVE_BOOT_COMPLETED</tt> has been revoked</p>
+    ]]>
+    </string>
+
+    <string name="_btn_report">Report</string>
+    <string name="_btn_continue">Continue</string>
 		
 	<!-- 
     Keep at the end of strings.xml!  

@@ -43,6 +43,7 @@ import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import at.jclehner.rxdroid.db.Database;
@@ -107,6 +108,7 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 
 	private final BroadcastReceiver mReceiver = new DatabaseStatusReceiver();
 	private Date mDate;
+	private boolean mLaunchMainActivity = true;
 
 	private WrappedCheckedException mException = null;
 
@@ -117,7 +119,6 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 		Settings.init();
 
 		setTheme(Theme.get());
-		setContentView(R.layout.loader);
 
 		final long bootCompletedTimestamp = Settings.getLong(Settings.Keys.BOOT_COMPLETED_TIMESTAMP, 0);
 		final long bootTimestamp = RxDroid.getBootTimestamp();
@@ -126,6 +127,8 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 		// method, so we allow the times to be off by +/- 100ms
 		if(!Util.equalsLong(bootCompletedTimestamp, bootTimestamp, 100))
 		{
+			mLaunchMainActivity = false;
+
 			final long lastUpdateTimestamp = RxDroid.getLastUpdateTimestamp();
 			if(lastUpdateTimestamp != 0 && lastUpdateTimestamp > bootTimestamp)
 			{
@@ -136,6 +139,18 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 				Log.w(TAG, "Notification service was not started on boot: " +
 					bootCompletedTimestamp + " vs " + bootTimestamp);
 			}
+
+			setContentView(R.layout.splash_screen_warning);
+
+			findViewById(R.id.btn_continue).setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View view)
+				{
+					setContentView(R.layout.loader);
+					loadDatabaseAndLaunchMainActivity();
+				}
+			});
 		}
 		else if(BuildConfig.DEBUG)
 		{
@@ -144,6 +159,10 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 					"\n  bootCompletedTimestamp=" + bootCompletedTimestamp +
 					"\n           bootTimestamp=" + bootTimestamp);
 		}
+
+
+		if(mLaunchMainActivity)
+			setContentView(R.layout.loader);
 
 		mDate = Settings.getActiveDate();
 
@@ -171,7 +190,8 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 	{
 		//registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_MAIN));
 		RxDroid.getLocalBroadcastManager().registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_MAIN));
-		loadDatabaseAndLaunchMainActivity();
+		if(mLaunchMainActivity)
+			loadDatabaseAndLaunchMainActivity();
 		super.onResume();
 	}
 
