@@ -33,6 +33,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseHistoryActivity;
@@ -89,9 +90,8 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			holder.name = (DrugNameView) v.findViewById(R.id.drug_name);
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
 			holder.missedDoseIndicator = (ImageView) v.findViewById(R.id.img_missed_dose_warning);
-			//holder.log = (ImageView) v.findViewById(R.id.img_drug_menu);
+			holder.historyMenuFrame = (FrameLayout) v.findViewById(R.id.frame_history_menu);
 			holder.historyMenu = v.findViewById(R.id.frame_history_menu);
-//			holder.lowSupplyIndicator = v.findViewById(R.id.low_supply_indicator);
 			holder.currentSupply = (DrugSupplyMonitor) v.findViewById(R.id.text_supply);
 
 			if(hasSchedule)
@@ -147,6 +147,15 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		});
 
 		holder.currentSupply.setVisibility(isCurrentSupplyVisible ? View.VISIBLE : View.INVISIBLE);
+
+		if(!hasSchedule && isToday && drug.isActive())
+		{
+			// Active drugs without a schedule are displayed for notification purposes. We hide
+			// the menu items that are not relevant
+
+			holder.historyMenuFrame.setVisibility(isMissingDoseIndicatorVisible ? View.VISIBLE : View.GONE);
+			holder.currentSupply.setVisibility(holder.currentSupply.hasLowSupplies() ? View.VISIBLE : View.GONE);
+		}
 
 		if(hasSchedule)
 		{

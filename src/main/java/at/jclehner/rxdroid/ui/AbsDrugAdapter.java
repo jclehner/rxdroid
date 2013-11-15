@@ -114,6 +114,7 @@ public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 		DrugNameView name;
 		ImageView icon;
 		//DoseView[] doseViews = new DoseView[4];
+		FrameLayout historyMenuFrame;
 		ImageView missedDoseIndicator;
 		//View lowSupplyIndicator;
 		DrugSupplyMonitor currentSupply;

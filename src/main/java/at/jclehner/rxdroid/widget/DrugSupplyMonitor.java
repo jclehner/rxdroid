@@ -50,6 +50,8 @@ public class DrugSupplyMonitor extends TextView implements
 	private Drug mDrug;
 	private Date mDate;
 
+	private boolean mHasLowSupplies;
+
 	public DrugSupplyMonitor(Context context) {
 		super(context);
 	}
@@ -87,6 +89,10 @@ public class DrugSupplyMonitor extends TextView implements
 
 	public Drug getDrug() {
 		return mDrug;
+	}
+
+	public boolean hasLowSupplies() {
+		return mHasLowSupplies;
 	}
 
 	@Override
@@ -146,6 +152,7 @@ public class DrugSupplyMonitor extends TextView implements
 	{
 		int typeface = Typeface.NORMAL;
 		float textScaleX = 1.0f;
+		mHasLowSupplies = false;
 
 		if(drug != null)
 		{
@@ -164,6 +171,7 @@ public class DrugSupplyMonitor extends TextView implements
 				{
 					typeface = Typeface.BOLD_ITALIC;
 					textScaleX = 1.25f;
+					mHasLowSupplies = true;
 				}
 			}
 
