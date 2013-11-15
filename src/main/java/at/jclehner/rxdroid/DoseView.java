@@ -28,6 +28,7 @@ import java.util.List;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Rect;
+import android.support.v4.view.ViewCompat;
 import android.text.SpannableStringBuilder;
 import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;
@@ -223,7 +224,10 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	public void setDimmed(boolean dimmed)
 	{
-		setDoseTimeIconAlpha(dimmed ? 0x7f : 0xff);
+		final int alpha = dimmed ? 0x7f : 0xff;
+		setImageAlpha(mDoseTimeIcon, alpha);
+		setImageAlpha(mIntakeStatus, alpha);
+
 		mDoseText.setEnabled(!dimmed);
 	}
 
@@ -232,16 +236,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	{
 		super.setEnabled(enabled);
 		setDimmed(!enabled);
-	}
-
-	@TargetApi(16)
-	@SuppressWarnings("deprecation")
-	public void setDoseTimeIconAlpha(int alpha)
-	{
-		if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
-			mDoseTimeIcon.setImageAlpha(alpha);
-		else
-			mDoseTimeIcon.setAlpha(alpha);
 	}
 
 	@Override
@@ -461,5 +455,15 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		}
 
 		mIntakeStatus.setImageResource(imageResId);
+	}
+
+	@TargetApi(16)
+	@SuppressWarnings("deprecation")
+	private static void setImageAlpha(ImageView image, int alpha)
+	{
+		if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
+			image.setImageAlpha(alpha);
+		else
+			image.setAlpha(alpha);
 	}
 }
