@@ -149,11 +149,11 @@ public class DrugSupplyMonitor extends TextView implements
 
 		if(drug != null)
 		{
-			final Date today = DateTime.today();
 			MutableFraction currentSupply = drug.getCurrentSupply().mutate();
 
-			if(date != null)
+			if(drug.isActive() && date != null)
 			{
+				final Date today = DateTime.today();
 				if(date.after(today))
 				{
 					//Fraction doseInTimePeriod_smart = Entries.getTotalDoseInTimePeriod_smart(drug, today, date);
