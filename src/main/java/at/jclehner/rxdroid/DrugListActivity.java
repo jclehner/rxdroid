@@ -1136,12 +1136,12 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			int score = 0;
 
 			if(!Entries.hasAllDoseEvents(drug, mDate, mDoseTime))
-				score -= 5000;
+				score -= 3000;
 
 			if(!drug.getDose(mDoseTime, mDate).isZero())
 			{
 				if(Entries.countDoseEvents(drug, mDate, mDoseTime) == 0)
-					score -= 3000;
+					score -= 5000;
 			}
 
 			if(Entries.hasLowSupplies(drug))
