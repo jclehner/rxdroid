@@ -385,8 +385,8 @@
     <string name="_help_msg_click_dose">Dosis anklicken, um sie einzunehmen. Weitere Optionen sind durch
         langes klicken verfügbar.</string>
 
-    <string name="_help_title_swipe_date">Swipe to change date.</string>
-	<string name="_help_msg_swipe_date">The derzeit angezeigte Datum ist in der Titelleiste ersichtlich. Durch Wischen
+    <string name="_help_title_swipe_date">Wischen um Datum zu wechseln.</string>
+	<string name="_help_msg_swipe_date">Das derzeit angezeigte Datum ist in der Titelleiste ersichtlich. Durch Wischen
         nach links oder rechts kann das angezeigte Datum geändert werden.</string>
 
 	<!-- 
