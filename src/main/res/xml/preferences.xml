@@ -80,7 +80,12 @@
 	     
 	    <PreferenceCategory 
 	    	android:title="@string/_title_show_in_list" 
-	    >    
+	    >
+            <CheckBoxPreference android:key="@string/key_use_smart_sort"
+		        android:title="@string/_title_smart_sort"
+		        android:summary="@string/_summary_smart_sort"
+		        android:defaultValue="false"
+		    />
 		
 			<CheckBoxPreference android:key="@string/key_skip_dose_dialog"
 			    android:title="@string/_title_skip_dose_dialog"
@@ -100,13 +105,6 @@
 			    android:summary="@string/_summary_scramble_names"
 			    android:defaultValue="false"
 			/>
-		    
-		    <CheckBoxPreference android:key="@string/key_use_smart_sort"
-		        android:title="@string/_title_smart_sort"
-		        android:summary="@string/_summary_smart_sort"
-		        android:defaultValue="false"
-		        android:enabled="false"
-		    />
 	   
 	    </PreferenceCategory>	 
 	
@@ -214,11 +212,6 @@
 	        android:defaultValue=""
 	        android:enabled="false"
 	    />
-
-        <CheckBoxPreference android:key="@string/key_use_smart_sort"
-            android:title="@string/_title_smart_sort"
-            android:summary="@string/_summary_smart_sort"
-        />
 
         <Preference android:key="boot_info"
                 android:title="Boot info"
