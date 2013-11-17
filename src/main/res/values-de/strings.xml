@@ -392,11 +392,10 @@
 
     <string name="_msg_not_started_on_boot">
     <![CDATA[
-        <p>RxDroid war nicht gestartet. Mögliche Ursachen: </p>
-        <p>&bull; Die App wurde vom Benutzer oder einer Task-killer App beendet</p>
+        <p>RxDroid wurde beim Hochfahren nicht gestartet. Mögliche Ursachen: </p>
         <p>&bull; Die App wurde auf einen externen Speicher verschoben</p>
-        <p>&bull; Autostart wurde für RxDroid deaktiviert (einige Apps sowie bestimmte Versionen
-        von Android bieten dieses Feature)</p>
+        <p>&bull; Autostart für RxDroid wurde deaktiviert in den Android Einstellungen deaktiviert (nur bestimmte Android-Versionen)</p>
+        <p>&bull; Autostart für RxDroid wurde durch eine App deaktiviert<p>
         <br/>
         <p>Wenn keine der genannten Ursachen zutrifft, den »[@string/_btn_report]«-Button drücken.</p>
         ]]>

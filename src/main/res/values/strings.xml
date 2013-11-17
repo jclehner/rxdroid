@@ -420,11 +420,10 @@
 
     <string name="_msg_not_started_on_boot">
     <![CDATA[
-        <p>RxDroid was not running. It may have been killed A few possible reasons are listed below:</p>
-        <p>&bull; The app was forced to close by the user or a task-killer app</p>
+        <p>RxDroid was not started at boot. A few possible reasons are listed below:</p>
         <p>&bull; The app was moved to external storage</p>
-        <p>&bull; Auto-start at boot was disabled for RxDroid (some apps and certain flavours of Android
-        offer this feature)</p>
+        <p>&bull; Auto-start for RxDroid was disabled in Android settings (certain flavours of Android only)</p>
+        <p>&bull; Auto-start for RxDroid was disabled by an app</p>
         <br/>
         <p>If none of the above applies to you, please click the \"[@string/_btn_report]\" button.</p>
     ]]>
