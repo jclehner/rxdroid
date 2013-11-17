@@ -146,46 +146,46 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 				{
 					Log.w(TAG, "Notification service was not started on boot: " +
 						bootCompletedTimestamp + " vs " + bootTimestamp);
+
+					setContentView(R.layout.splash_screen_warning);
+
+					findViewById(R.id.btn_continue).setOnClickListener(new View.OnClickListener()
+					{
+						@Override
+						public void onClick(View view)
+						{
+							setContentView(R.layout.loader);
+							loadDatabaseAndLaunchMainActivity();
+						}
+					});
+
+					findViewById(R.id.btn_report).setOnClickListener(new View.OnClickListener()
+					{
+						@Override
+						public void onClick(View view)
+						{
+							view.setEnabled(false);
+
+							final Intent intent = new Intent();
+							intent.setAction(Intent.ACTION_SEND);
+							intent.setType("plain/text");
+							intent.putExtra(Intent.EXTRA_EMAIL, "josephclehner+rxdroid-issue@gmail.com");
+							intent.putExtra(Intent.EXTRA_SUBJECT, "[ISSUE] " + Build.MODEL + " auto-start");
+							intent.putExtra(Intent.EXTRA_TEXT,
+									"MANUFACTURER: " + Build.MANUFACTURER + "\n" +
+											"PRODUCT     : " + Build.PRODUCT + "\n" +
+											"MODEL       : " + Build.MODEL + "\n" +
+											"DEVICE      : " + Build.DEVICE + "\n" +
+											"DISPLAY     : " + Build.DISPLAY + "\n" +
+											"RELEASE     : " + Build.VERSION.RELEASE + "\n" +
+											"SDK_INT     : " + Build.VERSION.SDK_INT + "\n" +
+											"=========================\n\n"
+							);
+
+							startActivity(Intent.createChooser(intent, getString(R.string._btn_report)));
+						}
+					});
 				}
-
-				setContentView(R.layout.splash_screen_warning);
-
-				findViewById(R.id.btn_continue).setOnClickListener(new View.OnClickListener()
-				{
-					@Override
-					public void onClick(View view)
-					{
-						setContentView(R.layout.loader);
-						loadDatabaseAndLaunchMainActivity();
-					}
-				});
-
-				findViewById(R.id.btn_report).setOnClickListener(new View.OnClickListener()
-				{
-					@Override
-					public void onClick(View view)
-					{
-						view.setEnabled(false);
-
-						final Intent intent = new Intent();
-						intent.setAction(Intent.ACTION_SEND);
-						intent.setType("plain/text");
-						intent.putExtra(Intent.EXTRA_EMAIL, "josephclehner+rxdroid-issue@gmail.com");
-						intent.putExtra(Intent.EXTRA_SUBJECT, "[ISSUE] " + Build.MODEL + " auto-start");
-						intent.putExtra(Intent.EXTRA_TEXT,
-								"MANUFACTURER: " + Build.MANUFACTURER + "\n" +
-								"PRODUCT     : " + Build.PRODUCT + "\n" +
-								"MODEL       : " + Build.MODEL + "\n" +
-								"DEVICE      : " + Build.DEVICE + "\n" +
-							    "DISPLAY     : " + Build.DISPLAY + "\n" +
-								"RELEASE     : " + Build.VERSION.RELEASE + "\n" +
-								"SDK_INT     : " + Build.VERSION.SDK_INT + "\n" +
-								"=========================\n\n"
-						);
-
-						startActivity(Intent.createChooser(intent, getString(R.string._btn_report)));
-					}
-				});
 			}
 		}
 		else if(BuildConfig.DEBUG)
