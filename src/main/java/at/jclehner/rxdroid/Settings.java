@@ -92,7 +92,10 @@ public final class Settings
 		public static final String LOG_SHOW_MISSED = "log_show_missed";
 		public static final String LOG_IS_ALL_COLLAPSED = "log_is_all_collapsed";
 		public static final String HAS_FRACTIONS_IN_ANY_SCHEDULE = "has_fractions_in_any_schedule";
-		public static final String BOOT_COMPLETED_TIMESTAMP = "last_boot_completed_timestamp";
+		public static final String BOOT_COMPLETED_TIMESTAMP = "boot_completed_timestamp";
+		public static final String LAST_NOT_STARTED_WARNING_TIMESTAMP = "last_not_started_timestamp";
+
+		public static final String DEBUG_FORCE_SPLASH_WARNING = "debug_force_splash_warning";
 	}
 
 	public static class Enums

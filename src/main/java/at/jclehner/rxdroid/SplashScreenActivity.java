@@ -34,6 +34,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -122,35 +123,70 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 
 		final long bootCompletedTimestamp = Settings.getLong(Settings.Keys.BOOT_COMPLETED_TIMESTAMP, 0);
 		final long bootTimestamp = RxDroid.getBootTimestamp();
+		final boolean forceSplashWarning =
+				BuildConfig.DEBUG && Settings.getBoolean(Settings.Keys.DEBUG_FORCE_SPLASH_WARNING, false);
 
-		// getBootTimestamp() does not return a constant value if using the fallback
+		// getBootTimestamp() does not return a constant value when using the fallback
 		// method, so we allow the times to be off by +/- 100ms
-		if(!Util.equalsLong(bootCompletedTimestamp, bootTimestamp, 100))
+		if(!Util.equalsLong(bootCompletedTimestamp, bootTimestamp, 100) || forceSplashWarning)
 		{
-			mLaunchMainActivity = false;
-
-			final long lastUpdateTimestamp = RxDroid.getLastUpdateTimestamp();
-			if(lastUpdateTimestamp != 0 && lastUpdateTimestamp > bootTimestamp)
+			if(bootTimestamp != Settings.getLong(Settings.Keys.LAST_NOT_STARTED_WARNING_TIMESTAMP, 0)
+					|| forceSplashWarning)
 			{
-				Log.w(TAG, "Notification service was not runnning because the app was updated");
-			}
-			else
-			{
-				Log.w(TAG, "Notification service was not started on boot: " +
-					bootCompletedTimestamp + " vs " + bootTimestamp);
-			}
+				Settings.putLong(Settings.Keys.LAST_NOT_STARTED_WARNING_TIMESTAMP, bootTimestamp);
 
-			setContentView(R.layout.splash_screen_warning);
+				mLaunchMainActivity = false;
 
-			findViewById(R.id.btn_continue).setOnClickListener(new View.OnClickListener()
-			{
-				@Override
-				public void onClick(View view)
+				final long lastUpdateTimestamp = RxDroid.getLastUpdateTimestamp();
+				if(lastUpdateTimestamp != 0 && lastUpdateTimestamp > bootTimestamp)
 				{
-					setContentView(R.layout.loader);
-					loadDatabaseAndLaunchMainActivity();
+					Log.w(TAG, "Notification service was not runnning because the app was updated");
 				}
-			});
+				else
+				{
+					Log.w(TAG, "Notification service was not started on boot: " +
+						bootCompletedTimestamp + " vs " + bootTimestamp);
+				}
+
+				setContentView(R.layout.splash_screen_warning);
+
+				findViewById(R.id.btn_continue).setOnClickListener(new View.OnClickListener()
+				{
+					@Override
+					public void onClick(View view)
+					{
+						setContentView(R.layout.loader);
+						loadDatabaseAndLaunchMainActivity();
+					}
+				});
+
+				findViewById(R.id.btn_report).setOnClickListener(new View.OnClickListener()
+				{
+					@Override
+					public void onClick(View view)
+					{
+						view.setEnabled(false);
+
+						final Intent intent = new Intent();
+						intent.setAction(Intent.ACTION_SEND);
+						intent.setType("plain/text");
+						intent.putExtra(Intent.EXTRA_EMAIL, "josephclehner+rxdroid-issue@gmail.com");
+						intent.putExtra(Intent.EXTRA_SUBJECT, "[ISSUE] " + Build.MODEL + " auto-start");
+						intent.putExtra(Intent.EXTRA_TEXT,
+								"MANUFACTURER: " + Build.MANUFACTURER + "\n" +
+								"PRODUCT     : " + Build.PRODUCT + "\n" +
+								"MODEL       : " + Build.MODEL + "\n" +
+								"DEVICE      : " + Build.DEVICE + "\n" +
+							    "DISPLAY     : " + Build.DISPLAY + "\n" +
+								"RELEASE     : " + Build.VERSION.RELEASE + "\n" +
+								"SDK_INT     : " + Build.VERSION.SDK_INT + "\n" +
+								"=========================\n\n"
+						);
+
+						startActivity(Intent.createChooser(intent, getString(R.string._btn_report)));
+					}
+				});
+			}
 		}
 		else if(BuildConfig.DEBUG)
 		{

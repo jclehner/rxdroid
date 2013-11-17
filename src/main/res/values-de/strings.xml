@@ -389,6 +389,22 @@
 	<string name="_help_msg_swipe_date">Das derzeit angezeigte Datum ist in der Titelleiste ersichtlich. Durch Wischen
         nach links oder rechts kann das angezeigte Datum geändert werden.</string>
 
+
+    <string name="_msg_not_started_on_boot">
+    <![CDATA[
+        <p>RxDroid war nicht gestartet. Mögliche Ursachen: </p>
+        <p>&bull; Die App wurde vom Benutzer oder einer Task-killer App beendet</p>
+        <p>&bull; Die App wurde auf einen externen Speicher verschoben</p>
+        <p>&bull; Autostart wurde für RxDroid deaktiviert (einige Apps sowie bestimmte Versionen
+        von Android bieten dieses Feature)</p>
+        <br/>
+        <p>Wenn keine der genannten Ursachen zutrifft, den »[@string/_btn_report]«-Button drücken.</p>
+        ]]>
+    </string>
+
+    <string name="_btn_report">Melden</string>
+    <string name="_btn_continue">Weiter</string>
+
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.
