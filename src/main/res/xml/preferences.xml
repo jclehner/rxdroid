@@ -223,6 +223,15 @@
         <Preference android:key="boot_info"
                 android:title="Boot info"
         />
+
+        <Preference android:key="dump_build"
+                android:title="Dump android.os.Build"
+        />
+
+        <CheckBoxPreference android:key="debug_force_splash_warning"
+                android:title="Force splash warning"
+                android:defaultValue="false"
+        />
 		
 		<Preference android:key="db_create_drug_with_many_dose_events"
 		    android:title="Create drug with many dose events"

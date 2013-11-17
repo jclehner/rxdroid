@@ -24,6 +24,8 @@ package at.jclehner.rxdroid;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -647,6 +649,52 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			);
 			Util.applyStyle(summary, new TypefaceSpan("monospace"));
 			p.setSummary(summary);
+		}
+
+		p = findPreference("dump_build");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener()
+			{
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					try
+					{
+						final StringBuilder sb = new StringBuilder();
+						final String[] classes = { "android.os.Build", "android.os.Build$VERSION" };
+
+						for(String className : classes)
+						{
+							Class<?> clazz = Class.forName(className);
+
+							sb.append(clazz.getName() + "\n");
+							for(Field f : clazz.getDeclaredFields())
+							{
+								int m = f.getModifiers();
+
+								if(Modifier.isStatic(m) && Modifier.isPublic(m) &&Modifier.isFinal(m))
+								{
+									sb.append("  " + f.getName() + ": " + f.get(null) + "\n");
+								}
+							}
+							sb.append("\n");
+						}
+
+						Log.d(TAG, sb.toString());
+					}
+					catch(ClassNotFoundException e)
+					{
+						Log.w(TAG, e);
+					}
+					catch(IllegalAccessException e)
+					{
+						Log.w(TAG, e);
+					}
+
+					return true;
+				}
+			});
 		}
 	}
 }
