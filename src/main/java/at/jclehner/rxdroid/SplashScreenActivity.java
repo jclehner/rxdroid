@@ -47,6 +47,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import at.jclehner.androidutils.RefString;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
@@ -318,7 +320,7 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 			else
 				sb.append(getString(R.string._msg_db_error_general));
 
-			sb.append(" " + getString(R.string._msg_db_error_footer, getString(R.string._btn_reset)));
+			sb.append(" " + RefString.resolve(this, R.string._msg_db_error_footer));
 			((AlertDialog) dialog).setMessage(sb);
 		}
 		else

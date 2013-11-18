@@ -60,6 +60,8 @@ import android.view.ViewStub;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import at.jclehner.androidutils.RefString;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.jclehner.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
@@ -493,8 +495,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 						hasHardwareMenuKey = ViewConfiguration.get(this).hasPermanentMenuKey();
 				}
 
-				final StringBuilder sb = new StringBuilder(getString(R.string._msg_no_drugs_compact_ab,
-						getString(R.string._title_add)));
+				final StringBuilder sb = new StringBuilder(
+						RefString.resolve(this, R.string._msg_no_drugs_compact_ab));
 
 				if(hasHardwareMenuKey)
 					sb.append(" " + getString(R.string._help_msg_menu_hardware));

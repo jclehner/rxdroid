@@ -175,7 +175,7 @@
 	<string name="_msg_db_error_upgrade">Errore aggiornamento database.</string>
 	<string name="_msg_db_error_downgrade">Versione database incompatibile.</string>
 		
-	<string name="_msg_db_error_footer">Clicca %1$s per resettare il database.</string>	
+	<string name="_msg_db_error_footer">Clicca [@string/_btn_reset] per resettare il database.</string>
 	
 	<string name="_btn_reset">Reset</string>
 	
@@ -321,7 +321,7 @@
 	
 	<string name="_title_disabled">Disattivato</string>	
 	
-    <string name="_msg_no_drugs_compact_ab">Seleziona \"%1$s\" dal menu per aggiungere un medicinale</string>
+    <string name="_msg_no_drugs_compact_ab">Seleziona \"[@string/_title_add]\" dal menu per aggiungere un medicinale</string>
     <string name="_msg_no_drugs_extended_ab">Premi il bottone \"+\" nella barra per aggiungere un medicinale</string>
     
     <string name="_summary_smart_sort">Seleziona medicinali per importanza</string>

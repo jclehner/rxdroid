@@ -180,7 +180,7 @@
 	<string name="_msg_db_error_upgrade">Database upgrade error.</string>
 	<string name="_msg_db_error_downgrade">Incompatible database version.</string>
 		
-	<string name="_msg_db_error_footer">Click %1$s to reset the database.</string>	
+	<string name="_msg_db_error_footer">Click [@string/_btn_reset] to reset the database.</string>
 	
 	<string name="_btn_reset">Reset</string>
 	
@@ -330,7 +330,7 @@
 	
 	<string name="_title_disabled">Disabled</string>	
 	
-    <string name="_msg_no_drugs_compact_ab">Select \"%1$s\" from the menu to add a drug.</string>
+    <string name="_msg_no_drugs_compact_ab">Select \"[@string/_title_add]\" from the menu to add a drug.</string>
     <string name="_msg_no_drugs_extended_ab">Press the \"+\" button in the action bar to add a drug.</string>
     
     <string name="_help_msg_menu_hardware">The menu is accessible by pressing the menu key on your device.</string>
