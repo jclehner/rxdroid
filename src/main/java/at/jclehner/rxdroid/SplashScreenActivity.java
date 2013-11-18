@@ -135,8 +135,6 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 			{
 				Settings.putLong(Settings.Keys.LAST_NOT_STARTED_WARNING_TIMESTAMP, bootTimestamp);
 
-				mLaunchMainActivity = false;
-
 				final long lastUpdateTimestamp = RxDroid.getLastUpdateTimestamp();
 				if(lastUpdateTimestamp != 0 && lastUpdateTimestamp > bootTimestamp)
 				{
@@ -144,6 +142,8 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 				}
 				else
 				{
+					mLaunchMainActivity = false;
+
 					Log.w(TAG, "Notification service was not started on boot: " +
 						bootCompletedTimestamp + " vs " + bootTimestamp);
 
