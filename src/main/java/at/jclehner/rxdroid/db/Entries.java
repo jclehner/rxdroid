@@ -408,7 +408,7 @@ public final class Entries
 		return date.after(lastScheduleUpdateDate);
 	}
 
-	public static boolean hasLowSupplies(Drug drug)
+	public static boolean hasLowSupplies(Drug drug, Date date)
 	{
 		if(!drug.isActive() || drug.getRefillSize() == 0 || drug.hasNoDoses())
 			return false;
@@ -417,7 +417,7 @@ public final class Entries
 		if(minSupplyDays == 0)
 			return false;
 
-		return getSupplyDaysLeftForDrug(drug, null) < minSupplyDays;
+		return getSupplyDaysLeftForDrug(drug, date) < minSupplyDays;
 	}
 
 	public static String getDrugName(Drug drug)

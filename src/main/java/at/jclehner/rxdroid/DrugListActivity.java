@@ -905,7 +905,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 			if(drug.hasAutoDoseEvents())
 			{
-				if(Entries.hasLowSupplies(drug))
+				if(Entries.hasLowSupplies(mFilterDate))
 					return true;
 
 				return mShowSupplyMonitors;
@@ -917,7 +917,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			if(Entries.countDoseEvents(drug, mFilterDate, null) != 0)
 				return true;
 
-			if(Entries.hasLowSupplies(drug))
+			if(Entries.hasLowSupplies(drug, mFilterDate))
 				return true;
 
 			if(DateTime.isToday(mFilterDate) && Entries.hasMissingDosesBeforeDate(drug, mFilterDate))
@@ -1146,7 +1146,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 					score -= 5000;
 			}
 
-			if(Entries.hasLowSupplies(drug))
+			if(Entries.hasLowSupplies(drug, mDate))
 				score -= 1000;
 
 			if(DateTime.isToday(mDate))
