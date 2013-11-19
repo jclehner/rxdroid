@@ -40,6 +40,7 @@ import at.jclehner.rxdroid.DoseHistoryActivity;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.Version;
 import at.jclehner.rxdroid.db.Drug;
@@ -62,12 +63,14 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 	private static final int TYPE_WITHOUT_SCHEDULE = 1;
 
 	private final Timer mTimer;
+	private final boolean mDimDoseViews;
 
 	public DrugOverviewAdapter(Activity activity, List<Drug> items, Date date, int activeDoseTime)
 	{
 		super(activity, items, date, activeDoseTime);
 
 		mTimer = LOGV ? new Timer() : null;
+		mDimDoseViews = Settings.getBoolean(Settings.Keys.DIM_DOSE_VIEWS, true);
 	}
 
 	@Override
@@ -166,10 +169,13 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 				if(!doseView.hasInfo(mAdapterDate, drug))
 					doseView.setDoseFromDrugAndDate(mAdapterDate, drug);
 
-				if(isToday && mActiveDoseTime != Schedule.TIME_INVALID)
-					doseView.setDimmed(doseTime != mActiveDoseTime);
-				else
-					doseView.setDimmed(false);
+				if(mDimDoseViews)
+				{
+					if(isToday && mActiveDoseTime != Schedule.TIME_INVALID)
+						doseView.setDimmed(doseTime != mActiveDoseTime);
+					else
+						doseView.setDimmed(false);
+				}
 
 				++doseTime;
 			}
