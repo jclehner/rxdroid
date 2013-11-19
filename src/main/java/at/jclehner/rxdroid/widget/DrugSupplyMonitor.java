@@ -167,7 +167,7 @@ public class DrugSupplyMonitor extends TextView implements
 					Fraction doseInTimePeriod_dumb = Entries.getTotalDoseInTimePeriod_dumb(drug, today, date, true);
 					currentSupply.subtract(doseInTimePeriod_dumb);
 				}
-				else if(date.equals(today) && Entries.hasLowSupplies(drug))
+				else if(date.equals(today) && Entries.hasLowSupplies(drug, date))
 				{
 					typeface = Typeface.BOLD_ITALIC;
 					textScaleX = 1.25f;

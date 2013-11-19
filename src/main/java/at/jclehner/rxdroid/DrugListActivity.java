@@ -905,7 +905,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 			if(drug.hasAutoDoseEvents())
 			{
-				if(Entries.hasLowSupplies(mFilterDate))
+				if(Entries.hasLowSupplies(drug, mFilterDate))
 					return true;
 
 				return mShowSupplyMonitors;
