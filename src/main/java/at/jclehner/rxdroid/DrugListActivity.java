@@ -65,6 +65,7 @@ import at.jclehner.androidutils.RefString;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.jclehner.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
+import at.jclehner.rxdroid.SystemEventReceiver.OnSystemTimeChangeListener;
 import at.jclehner.rxdroid.Settings.Defaults;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.Settings.Keys;
@@ -95,7 +96,7 @@ import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
 import com.mobeta.android.dslv.DragSortListView;
 
 public class DrugListActivity extends SherlockFragmentActivity implements OnLongClickListener,
-		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
+		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory, OnSystemTimeChangeListener
 {
 	private static final String TAG = DrugListActivity.class.getSimpleName();
 	private static final boolean LOGV = false;
@@ -445,6 +446,13 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			if(!Keys.LAST_MSG_HASH.equals(key))
 				invalidateViewPager();
 		}
+	}
+
+	@Override
+	public void onTimeChanged(int type)
+	{
+		Log.d(TAG, "onTimeChanged: type=" + type);
+		finish();
 	}
 
 	@Override
