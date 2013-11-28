@@ -42,6 +42,7 @@ public class BackupAgent extends BackupAgentHelper
 
 	private static final String KEY_DATABASE = "database";
 	private static final String KEY_PREFS = "preferences";
+	private static final String KEY_SHOWCASE_VIEW = "showcase_view";
 
 	@Override
 	public void onCreate()
@@ -53,6 +54,7 @@ public class BackupAgent extends BackupAgentHelper
 
 		addHelper(KEY_DATABASE, new FileBackupHelper(this, "../databases/" + DatabaseHelper.DB_NAME));
 		addHelper(KEY_PREFS, new DefaultSharedPreferencesBackupHelper(this));
+		addHelper(KEY_SHOWCASE_VIEW, new SharedPreferencesBackupHelper(this, "showcase_internal"));
 
 		Log.i(TAG, "Created BackupAgent");
 	}
