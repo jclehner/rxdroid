@@ -45,6 +45,19 @@ public class HasherTest extends AndroidTestCase
 			fail("Alice.hashCode1() returned 0");
 	}
 
+	public void testHasherReset()
+	{
+		Hasher hasher = Hasher.getInstance();
+		hasher.hash("Steak!");
+
+		int firstHash = hasher.getHashCode();
+
+		hasher.reset().hash("Steak!");
+
+		if(hasher.getHashCode() != firstHash)
+			fail("First and second hashes differ!");
+	}
+
 	private static class Alice
 	{
 		Alice(int a, int b, String c)
@@ -56,7 +69,7 @@ public class HasherTest extends AndroidTestCase
 
 		public int hashCode1()
 		{
-			Hasher hasher = new Hasher();
+			Hasher hasher = Hasher.getInstance();
 			hasher.hash(a);
 			hasher.hash(b);
 			hasher.hash(c);
@@ -66,7 +79,7 @@ public class HasherTest extends AndroidTestCase
 
 		public int hashCode2()
 		{
-			Hasher hasher = new Hasher();
+			Hasher hasher = Hasher.getInstance();
 			hasher.hash(b);
 			hasher.hash(a);
 			hasher.hash(c);
@@ -90,7 +103,7 @@ public class HasherTest extends AndroidTestCase
 
 		public int hashCode1()
 		{
-			Hasher hasher = new Hasher();
+			Hasher hasher = Hasher.getInstance();
 			hasher.hash(a);
 			hasher.hash(b);
 			hasher.hash(c);
