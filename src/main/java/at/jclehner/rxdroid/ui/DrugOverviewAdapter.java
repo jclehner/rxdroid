@@ -171,8 +171,10 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 				if(mDimDoseViews)
 				{
-					if(isToday && mActiveDoseTime != Schedule.TIME_INVALID && !doseView.getDose().isZero())
-						doseView.setDimmed(doseTime != mActiveDoseTime);
+					final boolean hasDose = !drug.getDose(doseTime, mAdapterDate).isZero();
+
+					if(isToday && mActiveDoseTime != Schedule.TIME_INVALID)
+						doseView.setDimmed(doseTime != mActiveDoseTime || !hasDose);
 					else
 						doseView.setDimmed(false);
 				}

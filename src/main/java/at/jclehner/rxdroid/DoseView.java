@@ -33,6 +33,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -97,7 +98,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		super(context, attrs);
 
 		LayoutInflater.from(context).inflate(R.layout.dose_view, this, true);
-		//setBackgroundResource(R.drawable.generic_background);
 
 		mIntakeStatus = (ImageView) findViewById(R.id.icon_intake_status);
 		mDoseText = (TextView) findViewById(R.id.text_dose);
