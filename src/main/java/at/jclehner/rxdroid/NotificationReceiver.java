@@ -38,7 +38,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
-import android.support.v4.app.NotificationCompat.InboxStyle;
 import android.text.Html;
 import android.util.Log;
 import at.jclehner.androidutils.EventDispatcher;
@@ -49,12 +48,21 @@ import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.Millis;
 import at.jclehner.rxdroid.util.Util;
 
 public class NotificationReceiver extends BroadcastReceiver
 {
 	private static final String TAG = NotificationReceiver.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
+
+	// REPEAT_ALWAYS ensures that the notifications are updated at least every 2 hours. This
+	// might be useful when the user has disabled notification repetition and the app is
+	// updated. In that case the app will not post any notifications until the next
+	// dose-time's begin or end, which in turn might cause the user to miss a dose - a problem
+	// if timing is essential for that medication (even if just from the user's standpoint).
+
+	private static final boolean REPEAT_ALWAYS = true;
 
 	private static final int LED_CYCLE_MS = 5000;
 	private static final int LED_ON_MS = 500;
@@ -136,7 +144,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				}
 			}
 
-			mForceUpdate = isAlarmRepetition ? true : intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
+			mForceUpdate = /*isAlarmRepetition ? true :*/ intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
 			rescheduleAlarms();
 		}
 
@@ -217,12 +225,20 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		long triggerAtMillis = time.getTimeInMillis() + offset;
 
-		final long alarmRepeatMins = Settings.getStringAsInt(Settings.Keys.ALARM_REPEAT, 0);
-		final long alarmRepeatMillis = alarmRepeatMins == -1 ? 10000 : alarmRepeatMins * 60000;
+		final int alarmRepeatMins = Settings.getStringAsInt(Settings.Keys.ALARM_REPEAT, 0);
+		long alarmRepeatMillis = alarmRepeatMins == -1 ? Millis.seconds(10) : Millis.minutes(alarmRepeatMins);
 
-		if(alarmRepeatMillis > 0)
+		if(REPEAT_ALWAYS || alarmRepeatMillis > 0)
 		{
-			alarmExtras.putBoolean(EXTRA_FORCE_UPDATE, true);
+			if(REPEAT_ALWAYS)
+			{
+				alarmExtras.putBoolean(EXTRA_FORCE_UPDATE, alarmRepeatMillis != 0);
+
+				if(alarmRepeatMillis == 0)
+					alarmRepeatMillis = Millis.hours(2);
+			}
+			else
+				alarmExtras.putBoolean(EXTRA_FORCE_UPDATE, true);
 
 			final long base = dtInfo.activeDate().getTime();
 			int i = 0;
@@ -246,7 +262,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		final long triggerDiffFromNow = triggerAtMillis - System.currentTimeMillis();
 		if(triggerDiffFromNow < 0)
 		{
-			if(triggerDiffFromNow < -50000)
+			if(triggerDiffFromNow < Millis.seconds(-5))
 				Log.w(TAG, "Alarm time is in the past by less than 5 seconds.");
 			else
 			{
