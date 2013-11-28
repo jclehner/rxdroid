@@ -97,6 +97,7 @@
 	<!-- second line: dose views android:layout_alignBottom="@id/drug_icon" -->
   	
   	<include layout="@layout/drug_schedule"
+        android:id="@id/dose_container"
   	    android:layout_height="wrap_content"
   	    android:layout_width="match_parent"
   	
