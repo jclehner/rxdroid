@@ -56,14 +56,6 @@ public class NotificationReceiver extends BroadcastReceiver
 	private static final String TAG = NotificationReceiver.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
 
-	// REPEAT_ALWAYS ensures that the notifications are updated at least every 2 hours. This
-	// might be useful when the user has disabled notification repetition and the app is
-	// updated. In that case the app will not post any notifications until the next
-	// dose-time's begin or end, which in turn might cause the user to miss a dose - a problem
-	// if timing is essential for that medication (even if just from the user's standpoint).
-
-	private static final boolean REPEAT_ALWAYS = true;
-
 	private static final int LED_CYCLE_MS = 5000;
 	private static final int LED_ON_MS = 500;
 	private static final int LED_OFF_MS = LED_CYCLE_MS - LED_ON_MS;
@@ -144,7 +136,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				}
 			}
 
-			mForceUpdate = /*isAlarmRepetition ? true :*/ intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
+			mForceUpdate = isAlarmRepetition ? true : intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
 			rescheduleAlarms();
 		}
 
@@ -226,19 +218,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		long triggerAtMillis = time.getTimeInMillis() + offset;
 
 		final int alarmRepeatMins = Settings.getStringAsInt(Settings.Keys.ALARM_REPEAT, 0);
-		long alarmRepeatMillis = alarmRepeatMins == -1 ? Millis.seconds(10) : Millis.minutes(alarmRepeatMins);
+		final long alarmRepeatMillis = alarmRepeatMins == -1 ? Millis.seconds(10) : Millis.minutes(alarmRepeatMins);
 
-		if(REPEAT_ALWAYS || alarmRepeatMillis > 0)
+		if(alarmRepeatMillis > 0)
 		{
-			if(REPEAT_ALWAYS)
-			{
-				alarmExtras.putBoolean(EXTRA_FORCE_UPDATE, alarmRepeatMillis != 0);
-
-				if(alarmRepeatMillis == 0)
-					alarmRepeatMillis = Millis.hours(2);
-			}
-			else
-				alarmExtras.putBoolean(EXTRA_FORCE_UPDATE, true);
+			alarmExtras.putBoolean(EXTRA_FORCE_UPDATE, true);
 
 			final long base = dtInfo.activeDate().getTime();
 			int i = 0;
