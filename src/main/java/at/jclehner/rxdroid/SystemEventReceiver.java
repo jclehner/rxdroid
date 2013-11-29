@@ -57,6 +57,9 @@ public class SystemEventReceiver extends BroadcastReceiver
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
+		Log.i(TAG, "Action: " + intent.getAction());
+		boolean postSilent = false;
+
 		if(Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction())
 				|| Intent.ACTION_TIME_CHANGED.equals(intent.getAction())
 				|| Intent.ACTION_DATE_CHANGED.equals(intent.getAction()))
@@ -71,10 +74,15 @@ public class SystemEventReceiver extends BroadcastReceiver
 			Settings.init();
 			Settings.putLong(Settings.Keys.BOOT_COMPLETED_TIMESTAMP, RxDroid.getBootTimestamp());
 		}
+		else if(Intent.ACTION_PACKAGE_REPLACED.equals(intent.getAction())
+				|| Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction()))
+		{
+			// FIXME gracefully handle db errors (notification)
+			Database.reload(context);
+			postSilent = true;
+		}
 
-		Log.i(TAG, "Action: " + intent.getAction());
-
-		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(context, false);
+		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(context, postSilent);
 	}
 
 	private static int actionToListenerType(String action)

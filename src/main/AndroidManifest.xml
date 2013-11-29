@@ -115,24 +115,10 @@
 			android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
 		
-		<activity android:name=".HelpActivity"
-			android:exported="false"
-		/>
-		
 		<activity android:name=".AdvancedScheduleActivity"
 		    android:exported="false"
 		/>
-		
-		<activity android:name=".ui.LayoutTestActivity"
-		    android:exported="false"
-		/>
 
-		<uses-library android:name="android.test.runner" />
-
-		<service android:name=".NotificationService" 
-		    android:exported="false"
-		/>
-		
 		<receiver android:name=".SystemEventReceiver"
 			android:exported="false"    
 		>
@@ -147,9 +133,14 @@
 				<action android:name="android.intent.action.TIMEZONE_CHANGED" />
 				
 				<action android:name="android.intent.action.LOCALE_CHANGED" />
-				<category android:name="android.intent.category.PREFERENCE" />
-				
 			</intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <data android:scheme="package" android:path="at.jclehner.rxdroid" />
+            </intent-filter>
+
 		</receiver>
 		
 		<receiver android:name=".NotificationReceiver" 
@@ -157,9 +148,4 @@
 		/>
 
 	</application>
-
-	
-	<instrumentation android:targetPackage="at.jclehner.rxdroid" android:label="RxDroid Tests" android:name="android.test.InstrumentationTestRunner"/>
-	
-	  
-	</manifest> 
+</manifest>
