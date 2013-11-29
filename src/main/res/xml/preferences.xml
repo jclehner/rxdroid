@@ -87,12 +87,11 @@
 		        android:defaultValue="false"
 		    />
 		
-			<CheckBoxPreference android:key="@string/key_skip_dose_dialog"
+			<at.jclehner.rxdroid.preferences.RefSummaryCheckBoxPreference android:key="@string/key_skip_dose_dialog"
 			    android:title="@string/_title_skip_dose_dialog"
 			    android:summary="@string/_summary_skip_dose_dialog"
 			    android:defaultValue="false"
 			/>
-	        
 	    
 	        <CheckBoxPreference android:key="@string/key_show_supply_monitors"
 	            android:title="@string/_title_show_supply_monitors"

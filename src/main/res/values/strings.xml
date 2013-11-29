@@ -180,13 +180,13 @@
 	<string name="_msg_db_error_upgrade">Database upgrade error.</string>
 	<string name="_msg_db_error_downgrade">Incompatible database version.</string>
 		
-	<string name="_msg_db_error_footer">Click [@string/_btn_reset] to reset the database.</string>
+	<string name="_msg_db_error_footer">Click \"[@string/_btn_reset]\" to reset the database.</string>
 	
 	<string name="_btn_reset">Reset</string>
 	
 	<string name="_msg_footer_insufficient_supplies">
     <![CDATA[
-        Insufficient supplies for this dose. Press [@android:string/ok] to ignore, [@android:string/cancel] to edit the dose,
+        Insufficient supplies for this dose. Press \"[@android:string/ok]\" to ignore, \"[@android:string/cancel]\" to edit the dose,
         or touch this text to edit <b>%1$s</b>.
     ]]>
     </string>
@@ -372,7 +372,7 @@
 	
 	<string name="_title_skip_dose_dialog">Skip dialog</string>
 	<string name="_summary_skip_dose_dialog">Hide the dialog that is shown when clicking a dose. To open it,
-	    long-click the dose and select \"Take dose\".</string>
+	    long-click the dose and select \"[@string/_title_mark_taken]\".</string>
 	    
 	<string name="_title_take_all_doses">Take all</string>
 			

@@ -352,7 +352,7 @@
 	
 	<string name="_title_skip_dose_dialog">Dialog überspringen</string>
 	<string name="_summary_skip_dose_dialog">Überspringe den Dialog nach Anklicken einer Dosis. Um ihn
-	    zu öffnen Dosis lange anklicken und »Dosis einnehmen« auswählen.</string>
+	    zu öffnen Dosis lange anklicken und »[@string/_title_mark_taken]« auswählen.</string>
 	    
 	<string name="_title_take_all_doses">Alle einnehmen</string>
 	

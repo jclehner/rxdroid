@@ -371,7 +371,7 @@
         
         <string name="_title_skip_dose_dialog">Παράλειψη διαλόγου</string>
         <string name="_summary_skip_dose_dialog">Απόκρυψη του διαλόγου που εμφανίζεται όταν πατάτε σε μία δόση. Για να τον ανοίξετε,
-            πατήστε παρατεταμένα στην δόση και επιλέξτε \"Πάρτε την δόση\".</string>
+            πατήστε παρατεταμένα στην δόση και επιλέξτε \"[@string/_title_mark_taken]\".</string>
             
         <!-- 
     Keep at the end of strings.xml!  
