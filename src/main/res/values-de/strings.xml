@@ -166,12 +166,16 @@
 	<string name="_msg_db_error_upgrade">Datenbankupgrade fehlgeschlagen.</string>
 	<string name="_msg_db_error_downgrade">Inkompatible Datenbankversion.</string>
 	
-	<string name="_msg_db_error_footer">Auf [@string/_btn_reset] klicken, um die Datenbank zurückzusetzen.</string>
+	<string name="_msg_db_error_footer">Auf »[@string/_btn_reset]« klicken, um die Datenbank zurückzusetzen.</string>
 	
 	<string name="_btn_reset">Zurücksetzen</string>
-	
-	<string name="_msg_footer_insufficient_supplies">Ungenügender Vorrat für diese Dosis. %2$s klicken, um
-		zu ignorieren, oder diesen Text berühren, um &lt;b&gt;%3$s&lt;/b&gt; zu bearbeiten.</string>
+
+    <string name="_msg_footer_insufficient_supplies">
+    <![CDATA[
+        Ungenügender Vorrat für diese Dosis. »[@android:string/ok]« klicken, um zu ignorieren, »[@android:string/cancel]« um die Dosis
+        zu ändern, oder diesen Text berühren, um <b>%1$s</b> zu bearbeiten.
+    ]]>
+    </string>
 		
 	<string name="_title_weekdays">Wochentage</string>
 	

@@ -184,8 +184,12 @@
 	
 	<string name="_btn_reset">Reset</string>
 	
-	<string name="_msg_footer_insufficient_supplies">Insufficient supplies for this dose. 
-		Press %2$s to ignore, cancel to edit the dose, or touch this text to edit &lt;b&gt;%3$s&lt;/b&gt;.</string>
+	<string name="_msg_footer_insufficient_supplies">
+    <![CDATA[
+        Insufficient supplies for this dose. Press [@android:string/ok] to ignore, [@android:string/cancel] to edit the dose,
+        or touch this text to edit <b>%1$s</b>.
+    ]]>
+    </string>
 		
 	<string name="_title_weekdays">Weekdays</string>
 	
