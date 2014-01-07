@@ -77,6 +77,9 @@ public class SystemEventReceiver extends BroadcastReceiver
 		else if(Intent.ACTION_PACKAGE_REPLACED.equals(intent.getAction())
 				|| Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction()))
 		{
+			if(!context.getApplicationInfo().packageName.equals(intent.getData().getSchemeSpecificPart()))
+				return;
+
 			// FIXME gracefully handle db errors (notification)
 			Database.reload(context);
 			postSilent = true;
