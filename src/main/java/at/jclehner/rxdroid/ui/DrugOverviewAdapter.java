@@ -176,7 +176,12 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			final int maxDoseTimeForNoDim;
 
 			if(mActiveDoseTime == Schedule.TIME_INVALID)
-				maxDoseTimeForNoDim = DoseTime.before(mNextDoseTime);
+			{
+				if(mNextDoseTime == Schedule.TIME_MORNING)
+					maxDoseTimeForNoDim = Schedule.TIME_MORNING - 1;
+				else
+					maxDoseTimeForNoDim = DoseTime.before(mNextDoseTime);
+			}
 			else
 				maxDoseTimeForNoDim = mActiveDoseTime;
 
