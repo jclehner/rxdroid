@@ -184,7 +184,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			}
 			else
 			{
-				uriString = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=joseph%2ec%2elehner%40gmail%2ecom&lc=AT&item_name=Beer&amount=3%2e00&currency_code=EUR&button_subtype=services&bn=PP%2dBuyNowBF%3abtn_buynowCC_LG%2egif%3aNonHosted";
+				uriString = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=joseph%2ec%2elehner%40gmail%2ecom&lc=AT&item_name=RxDroid&amount=5%2e00&currency_code=EUR&button_subtype=services&bn=PP%2dBuyNowBF%3abtn_buynowCC_LG%2egif%3aNonHosted";
 				titleResId = R.string._title_donate;
 				summary = null;
 			}
