@@ -1,3 +1,11 @@
+0.9.21:
+	* Added option for smart-sorting based on importance entries
+	* After an update, notifications will be refreshed immediately
+	* The currently active doses are highlighted
+	* More compat layout for non-active medications
+	* Several smaller bugs fixed
+
+
 0.9.20:
 	* Medication names are now scrambled in notifications too
 	* The app now honors system-wide rotation settings
