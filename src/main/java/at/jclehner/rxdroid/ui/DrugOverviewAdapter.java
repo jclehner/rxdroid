@@ -64,13 +64,15 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 	private final Timer mTimer;
 	private final boolean mDimDoseViews;
+	private final boolean mShowingAll;
 
-	public DrugOverviewAdapter(Activity activity, List<Drug> items, Date date, int activeDoseTime)
+	public DrugOverviewAdapter(Activity activity, List<Drug> items, Date date, int activeDoseTime, boolean showingAll)
 	{
 		super(activity, items, date, activeDoseTime);
 
 		mTimer = LOGV ? new Timer() : null;
 		mDimDoseViews = Settings.getBoolean(Settings.Keys.DIM_DOSE_VIEWS, true);
+		mShowingAll = showingAll;
 	}
 
 	@Override
@@ -155,9 +157,12 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		{
 			// Active drugs without a schedule are displayed for notification purposes. We hide
 			// the menu items that are not relevant
-
-			holder.historyMenuFrame.setVisibility(isMissingDoseIndicatorVisible ? View.VISIBLE : View.GONE);
-			holder.currentSupply.setVisibility(holder.currentSupply.hasLowSupplies() ? View.VISIBLE : View.GONE);
+			if(!mShowingAll)
+			{
+				holder.historyMenuFrame.setVisibility(isMissingDoseIndicatorVisible ? View.VISIBLE : View.GONE);
+				holder.currentSupply.setVisibility(holder.currentSupply.hasLowSupplies() ? View.VISIBLE : View.GONE);
+			}
+			//el
 		}
 
 		if(hasSchedule)
@@ -171,12 +176,17 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 				if(mDimDoseViews)
 				{
-					final boolean hasDose = !drug.getDose(doseTime, mAdapterDate).isZero();
+					boolean dimmed = false;
 
-					if(isToday && mActiveDoseTime != Schedule.TIME_INVALID)
-						doseView.setDimmed(doseTime != mActiveDoseTime || !hasDose);
-					else
-						doseView.setDimmed(false);
+					if(isToday)
+					{
+						if(doseTime <= mActiveDoseTime && !drug.getDose(doseTime, mAdapterDate).isZero())
+							dimmed = Entries.countDoseEvents(drug, mAdapterDate, doseView.getDoseTime()) != 0;
+						else
+							dimmed = true;
+					}
+
+					doseView.setDimmed(dimmed);
 				}
 
 				++doseTime;
@@ -218,7 +228,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 	public int getItemViewType(int position)
 	{
 		final Drug drug = getItem(position);
-		if(!drug.hasDoseOnDate(mAdapterDate))
+		if(!drug.isActive() || !drug.hasDoseOnDate(mAdapterDate))
 		{
 			if(Entries.countDoseEvents(drug, mAdapterDate, null) == 0)
 				return TYPE_WITHOUT_SCHEDULE;
