@@ -96,6 +96,24 @@ public final class Version
 		return sRevision;
 	}
 
+	public static int versionCodeBeta(int minor, int patch)
+	{
+		if(minor > 99)
+			throw new IllegalArgumentException("minor > 99: " + minor);
+		else if(patch > 9)
+			throw new IllegalArgumentException("patch > 9: " + patch);
+
+		//  9210 = 0.9.21
+		//  9211 = 0.9.21.1
+		// 10000 = 1.0.0
+		// 10101 = 1.1.1
+		// 11003 = 1.10.3
+		//
+		//
+
+		return 9000 + minor * 10 + patch;
+	}
+
 	private static synchronized void init()
 	{
 		if(sVersion == null)

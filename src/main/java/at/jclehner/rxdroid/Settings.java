@@ -131,6 +131,8 @@ public final class Settings
 	private static final String DOSE_TIME_KEYS[] = { "time_morning", "time_noon", "time_evening", "time_night" };
 
 	private static SharedPreferences sSharedPrefs = null;
+	private static boolean sIsFirstLaunchOfThisVersion = false;
+	private static int sPreviousLaunchVersion = 0;
 
 	public static synchronized void init()
 	{
@@ -145,6 +147,26 @@ public final class Settings
 				final Map<String, ?> prefs = sSharedPrefs.getAll();
 				for(String key : prefs.keySet())
 					Log.d(TAG, "  " + key + "=" + prefs.get(key));
+			}
+
+			final int lastLaunchVersion = Settings.getInt("last_launch_version");
+			final int thisLaunchVersion = RxDroid.getPackageInfo().versionCode;
+
+			if(lastLaunchVersion != thisLaunchVersion)
+			{
+				Log.i(TAG, "First launch of version " + thisLaunchVersion);
+				sIsFirstLaunchOfThisVersion = true;
+				Settings.putInt("last_launch_version", thisLaunchVersion);
+			}
+			else
+				sIsFirstLaunchOfThisVersion = false;
+
+			if(lastLaunchVersion != 0)
+				sPreviousLaunchVersion = lastLaunchVersion;
+			else
+			{
+				// 0.9.21 introduced this mechanism, so everything before will be assumed to be 0.9.20
+				sPreviousLaunchVersion = Version.versionCodeBeta(20, 0);
 			}
 
 			registerOnChangeListener(sBackupNotifier);
@@ -582,6 +604,18 @@ public final class Settings
 		return defValue;
 	}
 
+	public static boolean isFirstLaunchOfVersion(int versionCode) {
+		return sIsFirstLaunchOfThisVersion && Settings.getInt("last_launch_version") == versionCode;
+	}
+
+	public static boolean isFirstLaunchOfVersionOrLater(int versionCode) {
+		return sIsFirstLaunchOfThisVersion && sPreviousLaunchVersion < versionCode;
+	}
+
+	public static boolean isFirstLaunchOfThisVersion() {
+		return sIsFirstLaunchOfThisVersion;
+	}
+
 	public static void maybeLockInPortraitMode(Activity activity)
 	{
 		if(!Settings.getBoolean(Keys.ENABLE_LANDSCAPE, Defaults.ENABLE_LANDSCAPE))
@@ -705,6 +739,11 @@ public final class Settings
 
 			remove(Keys.USE_LED);
 		}
+
+		if(isFirstLaunchOfVersionOrLater(Version.versionCodeBeta(21, 0))) {
+			putBoolean(Keys.USE_SMART_SORT, true);
+		}
+
 	}
 
 	private static void fixSettings()

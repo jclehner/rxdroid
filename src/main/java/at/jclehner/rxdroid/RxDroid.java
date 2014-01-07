@@ -45,6 +45,7 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.util.Components;
+import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 
 public class RxDroid extends Application
@@ -93,6 +94,19 @@ public class RxDroid extends Application
 		if(c == null && !allowNullContext)
 			throw new IllegalStateException("Context is null");
 		return c;
+	}
+
+	public static PackageInfo getPackageInfo()
+	{
+		try
+		{
+			final PackageManager pm = getContext().getPackageManager();
+			return pm.getPackageInfo(getContext().getApplicationInfo().packageName, 0);
+		}
+		catch(PackageManager.NameNotFoundException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
 	}
 
 	public static void toastShort(int textResId) {
