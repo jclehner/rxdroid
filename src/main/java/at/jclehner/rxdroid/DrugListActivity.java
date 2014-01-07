@@ -706,7 +706,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 					svb.setText(R.string._help_title_edit_drug, R.string._help_msg_edit_drug);
 					svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 					svb.setShowcaseId(0xdeadbeef + 1);
-					svb.setShowcaseView(R.id.drug_name, this);
+					//svb.setShowcaseView(R.id.drug_name, this);
 
 					svb.setShowcaseEventListener(new ShowcaseViewHelper());
 
@@ -726,26 +726,29 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 				}
 				else if(drugCount >= 2 && !Settings.wasDisplayedOnce(Settings.OnceIds.DRAG_DROP_SORTING))
 				{
-					mShowcaseQueue.clear();
-
-					ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(this);
-					svb.setShowcaseView(R.id.drug_icon, this);
-					svb.setText(R.string._help_title_drag_drop_sort, R.string._msg_drag_drop_sorting);
-					svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
-					svb.setShowcaseId(0xdeadbeef + 2);
-					svb.setRelativeAnimatedGesture(0, 200);
-
-					svb.setShowcaseEventListener(new ShowcaseViewHelper()
+					if(false)
 					{
-						@Override
-						public void onShowcaseViewShow(ShowcaseView showcaseView)
-						{
-							super.onShowcaseViewShow(showcaseView);
-							Settings.setDisplayedOnce(OnceIds.DRAG_DROP_SORTING);
-						}
-					});
+						mShowcaseQueue.clear();
 
-					mShowcaseQueue.add(tag(svb.build(false), "Drag drop sorting"));
+						ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(this);
+						svb.setShowcaseView(R.id.drug_icon, this);
+						svb.setText(R.string._help_title_drag_drop_sort, R.string._msg_drag_drop_sorting);
+						svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+						svb.setShowcaseId(0xdeadbeef + 2);
+						svb.setRelativeAnimatedGesture(0, 200);
+
+						svb.setShowcaseEventListener(new ShowcaseViewHelper()
+						{
+							@Override
+							public void onShowcaseViewShow(ShowcaseView showcaseView)
+							{
+								super.onShowcaseViewShow(showcaseView);
+								Settings.setDisplayedOnce(OnceIds.DRAG_DROP_SORTING);
+							}
+						});
+
+						mShowcaseQueue.add(tag(svb.build(false), "Drag drop sorting"));
+					}
 				}
 			}
 			else

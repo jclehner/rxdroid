@@ -84,7 +84,7 @@
             <CheckBoxPreference android:key="@string/key_use_smart_sort"
 		        android:title="@string/_title_smart_sort"
 		        android:summary="@string/_summary_smart_sort"
-		        android:defaultValue="false"
+		        android:defaultValue="true"
 		    />
 		
 			<at.jclehner.rxdroid.preferences.RefSummaryCheckBoxPreference android:key="@string/key_skip_dose_dialog"
