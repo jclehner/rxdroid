@@ -545,17 +545,34 @@ public class NotificationReceiver extends BroadcastReceiver
 		return (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 
+	/* package */ static void cancelNotifications()
+	{
+		final NotificationManager nm = (NotificationManager) RxDroid.getContext()
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		nm.cancel(R.id.notification);
+	}
+
 	/* package */ static void rescheduleAlarmsAndUpdateNotification(boolean silent) {
 		rescheduleAlarmsAndUpdateNotification(null, silent);
 	}
 
-	/* package */ static void rescheduleAlarmsAndUpdateNotification(Context context, boolean silent)
+	/* package */ static void rescheduleAlarmsAndUpdateNotification(boolean silent, boolean forceUpdate) {
+		rescheduleAlarmsAndUpdateNotification(null, silent, forceUpdate);
+	}
+
+	/* package */ static void rescheduleAlarmsAndUpdateNotification(Context context, boolean silent) {
+		rescheduleAlarmsAndUpdateNotification(context, silent, false);
+	}
+
+	/* package */ static void rescheduleAlarmsAndUpdateNotification(Context context, boolean silent, boolean forceUpdate)
 	{
 		if(context == null)
 			context = RxDroid.getContext();
 		final Intent intent = new Intent(context, NotificationReceiver.class);
 		intent.setAction(Intent.ACTION_MAIN);
-		intent.putExtra(NotificationReceiver.EXTRA_SILENT, silent);
+		intent.putExtra(EXTRA_SILENT, silent);
+		intent.putExtra(EXTRA_FORCE_UPDATE, forceUpdate);
 		context.sendBroadcast(intent);
 	}
 }

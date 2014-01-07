@@ -435,7 +435,8 @@
     <string name="_btn_continue">Continue</string>
 
     <string name="_title_use_safe_mode">Safe mode</string>
-    <string name="_summary_use_safe_mode">Disable the \"[@string/_title_take_all_doses]\" feature</string>
+    <string name="_summary_use_safe_mode">Disable unsafe features such as \"[@string/_title_take_all_doses]\" or
+            \"[@string/_title_skip_dose_dialog]\"</string>
 
     <!--
     Keep at the end of strings.xml!  

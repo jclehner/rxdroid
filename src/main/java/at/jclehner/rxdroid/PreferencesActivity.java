@@ -209,6 +209,13 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		removeDisabledPreferences(getPreferenceScreen());
 		setPreferenceListeners();
 
+		if(Settings.getBoolean(Keys.USE_SAFE_MODE, false))
+		{
+			p = findPreference(Keys.SKIP_DOSE_DIALOG);
+			if(p != null)
+				p.setEnabled(false);
+		}
+
 		if(!BuildConfig.DEBUG)
 		{
 			p = findPreference("prefscreen_development");
@@ -266,6 +273,15 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		{
 			if(Settings.getStringAsInt(Settings.Keys.HISTORY_SIZE, -1) >= Settings.Enums.HISTORY_SIZE_6M)
 				Toast.makeText(getApplicationContext(), R.string._toast_large_history_size, Toast.LENGTH_LONG).show();
+		}
+		else if(Keys.USE_SAFE_MODE.equals(key))
+		{
+			final boolean useSafeMode = sharedPreferences.getBoolean(key, false);
+			findPreference(Keys.SKIP_DOSE_DIALOG).setEnabled(!useSafeMode);
+			if(useSafeMode)
+				sharedPreferences.edit().putBoolean(Keys.SKIP_DOSE_DIALOG, false).commit();
+
+			NotificationReceiver.cancelNotifications();
 		}
 		else if(Settings.Keys.LAST_MSG_HASH.equals(key))
 			return;
