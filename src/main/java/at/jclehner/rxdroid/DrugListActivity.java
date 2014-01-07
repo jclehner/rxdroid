@@ -811,7 +811,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			Collections.sort(drugs);
 		}
 
-		final DrugOverviewAdapter adapter = new DrugOverviewAdapter(this, drugs, date, mCurrentDoseTime);
+		final DrugOverviewAdapter adapter = new DrugOverviewAdapter(this, drugs, date, mCurrentDoseTime, mShowingAll);
 		adapter.setFilter(mShowingAll ? null : new DrugFilter(date));
 
 		listView.setAdapter(adapter);
@@ -1148,13 +1148,13 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 			int score = 0;
 
-			if(!Entries.hasAllDoseEvents(drug, mDate, mDoseTime))
-				score -= 3000;
+			if(!Entries.hasAllDoseEvents(drug, mDate, mDoseTime, false))
+				score -= 5000;
 
 			if(!drug.getDose(mDoseTime, mDate).isZero())
 			{
 				if(Entries.countDoseEvents(drug, mDate, mDoseTime) == 0)
-					score -= 5000;
+					score -= 3000;
 			}
 
 			if(Entries.hasLowSupplies(drug, mDate))

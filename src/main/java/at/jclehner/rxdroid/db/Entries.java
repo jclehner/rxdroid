@@ -252,8 +252,16 @@ public final class Entries
 		return hasAllDoseEvents(drug, date, Schedule.TIME_INVALID);
 	}
 
-	public static boolean hasAllDoseEvents(Drug drug, Date date, int untilDoseTime)
+	public static boolean hasAllDoseEvents(Drug drug, Date date, int untilDoseTime) {
+		return hasAllDoseEvents(drug, date, untilDoseTime, true);
+	}
+
+	public static boolean hasAllDoseEvents(Drug drug, Date date, int untilDoseTime, boolean inclusiveUntilDoseTime)
 	{
+		final int lastDoseTime = inclusiveUntilDoseTime ? untilDoseTime : untilDoseTime - 1;
+		if(lastDoseTime < Schedule.TIME_MORNING)
+			return true;
+
 		if(!drug.hasDoseOnDate(date))
 			return true;
 
@@ -266,7 +274,7 @@ public final class Entries
 					return false;
 			}
 
-			if(doseTime == untilDoseTime)
+			if(doseTime == lastDoseTime)
 				break;
 		}
 
