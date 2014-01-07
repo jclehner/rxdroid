@@ -116,6 +116,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		final Intent intent = new Intent(getActivity(), DrugListActivity.class);
 		intent.putExtra(DrugListActivity.EXTRA_DATE, date);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 		return true;
 	}
