@@ -78,12 +78,6 @@
 		    android:defaultValue="@bool/pref_default_use_pretty_fractions"
 		/>
 
-        <at.jclehner.rxdroid.preferences.RefSummaryCheckBoxPreference android:key="@string/key_use_safe_mode"
-		    android:title="@string/_title_use_safe_mode"
-            android:summary="@string/_summary_use_safe_mode"
-            android:defaultValue="false"
-        />
-	     
 	    <PreferenceCategory 
 	    	android:title="@string/_title_show_in_list" 
 	    >
@@ -211,6 +205,12 @@
 	<PreferenceScreen android:key="prefscreen_development"
 	    android:title="Development"
 	>
+         <at.jclehner.rxdroid.preferences.RefSummaryCheckBoxPreference android:key="@string/key_use_safe_mode"
+            android:title="@string/_title_use_safe_mode"
+            android:summary="@string/_summary_use_safe_mode"
+            android:defaultValue="false"
+         />
+
 		<at.jclehner.rxdroid.preferences.LanguagePreference 
 	        android:key="@string/key_language"
 	        android:title="@string/_title_language"
