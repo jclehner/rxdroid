@@ -39,7 +39,7 @@ scan_dir()
 
 scan_string_xml()
 {
-	for f in res/values/strings.xml res/values-{de,it,el}/strings.xml; do
+	for f in src/main/res/values/strings.xml src/main/res/values-{de,it,el}/strings.xml; do
 		[[ -e $f ]] || continue
 
 		echo "-- $f:"
@@ -49,14 +49,14 @@ scan_string_xml()
 
 			if [[ $dir != "values" ]]; then
 
-				if ! grep -q $t "res/values/strings.xml" && grep -q $t "$f"; then
+				if ! grep -q $t src/main/res/values/strings.xml && grep -q $t "$f"; then
 					echo >&2
 					echo "!!! Resource R.string.$t exists in $f but not in res/values/strings.xml" >&2
 					echo "!!! This is known to cause exceptions in Context.getString()" >&2
 					echo "!!! Affected files: "
 					echo >&2
 
-					grep --include=*.{xml,java} -R -l "$t" src res | grep -v "$f"
+					grep --include=*.{xml,java} -R -l "$t" src/main/java src/main/res | grep -v "$f"
 
 					exit 1
 				fi
@@ -66,7 +66,7 @@ scan_string_xml()
 				if [[ $dir == "values" ]]; then
 					echo "<string name=\"$t\"> !!EMPTY!! </string>"
 				else
-					grep "\"$t\"" res/values/strings.xml | sed -e 's/^[[:blank:]]*//'
+					grep "\"$t\"" src/main/res/values/strings.xml | sed -e 's/^[[:blank:]]*//'
 				fi
 			fi
 		done
@@ -75,9 +75,9 @@ scan_string_xml()
 	done
 }
 
-scan_dir src
-scan_dir res
-scan_file AndroidManifest.xml
+scan_dir src/main/java
+scan_dir src/main/res
+scan_file src/main/AndroidManifest.xml
 
 scan_string_xml
 
