@@ -37,6 +37,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseHistoryActivity;
+import at.jclehner.rxdroid.DoseTime;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
@@ -65,14 +66,17 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 	private final Timer mTimer;
 	private final boolean mDimDoseViews;
 	private final boolean mShowingAll;
+	private final int mNextDoseTime;
 
-	public DrugOverviewAdapter(Activity activity, List<Drug> items, Date date, int activeDoseTime, boolean showingAll)
+	public DrugOverviewAdapter(Activity activity, List<Drug> items, Date date, int activeDoseTime, int nextDoseTime, boolean showingAll)
 	{
 		super(activity, items, date, activeDoseTime);
+
 
 		mTimer = LOGV ? new Timer() : null;
 		mDimDoseViews = Settings.getBoolean(Settings.Keys.DIM_DOSE_VIEWS, true);
 		mShowingAll = showingAll;
+		mNextDoseTime = nextDoseTime;
 	}
 
 	@Override
@@ -169,6 +173,13 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		{
 			int doseTime = Schedule.TIME_MORNING;
 
+			final int maxDoseTimeForNoDim;
+
+			if(mActiveDoseTime == Schedule.TIME_INVALID)
+				maxDoseTimeForNoDim = DoseTime.before(mNextDoseTime);
+			else
+				maxDoseTimeForNoDim = mActiveDoseTime;
+
 			for(DoseView doseView : holder.doseViews)
 			{
 				if(!doseView.hasInfo(mAdapterDate, drug))
@@ -180,7 +191,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 					if(isToday)
 					{
-						if(doseTime <= mActiveDoseTime && !drug.getDose(doseTime, mAdapterDate).isZero())
+						if(doseTime <= maxDoseTimeForNoDim && !drug.getDose(doseTime, mAdapterDate).isZero())
 							dimmed = Entries.countDoseEvents(drug, mAdapterDate, doseView.getDoseTime()) != 0;
 						else
 							dimmed = true;

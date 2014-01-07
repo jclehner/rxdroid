@@ -122,6 +122,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 	private Date mOriginalDate;
 	private Date mCurrentDate;
 	private int mCurrentDoseTime;
+	private int mNextDoseTime;
 
 	private boolean mShowingAll = false;
 	private int mCurrentPatientId = Patient.DEFAULT_PATIENT_ID;
@@ -182,6 +183,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			date = dtInfo.activeDate();
 
 		mCurrentDoseTime = dtInfo.activeDoseTime();
+		mNextDoseTime = dtInfo.nextDoseTime();
 
 		setDate(date, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
@@ -819,7 +821,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			Collections.sort(drugs);
 		}
 
-		final DrugOverviewAdapter adapter = new DrugOverviewAdapter(this, drugs, date, mCurrentDoseTime, mShowingAll);
+		final DrugOverviewAdapter adapter = new DrugOverviewAdapter(this, drugs, date,
+				mCurrentDoseTime, mNextDoseTime, mShowingAll);
 		adapter.setFilter(mShowingAll ? null : new DrugFilter(date));
 
 		listView.setAdapter(adapter);
@@ -1079,6 +1082,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		public void onDoseTimeBegin(Date date, int doseTime)
 		{
 			mCurrentDoseTime = doseTime;
+			mNextDoseTime = DoseTime.after(doseTime);
 
 			if(!date.equals(mCurrentDate))
 				setDate(date, PAGER_INIT);
