@@ -245,6 +245,9 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 		new MenuInflater(this).inflate(menuResId, menu);
 
+		if(Settings.getBoolean(Keys.USE_SAFE_MODE, false))
+			menu.removeItem(R.id.menuitem_take_all);
+
 		return true;
 	}
 
@@ -254,7 +257,10 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		final int titleResId = isShowingCurrentDate() ? R.string._title_go_to_date : R.string._title_today;
 		menu.findItem(R.id.menuitem_date).setTitle(titleResId);
 		menu.findItem(R.id.menuitem_toggle_filtering).setTitle(mShowingAll ? R.string._title_filter : R.string._title_show_all);
-		menu.findItem(R.id.menuitem_take_all).setEnabled(isShowingCurrentDate());
+
+		final MenuItem item = menu.findItem(R.id.menuitem_take_all);
+		if(item != null)
+			item.setEnabled(isShowingCurrentDate());
 
 		return true;
 	}

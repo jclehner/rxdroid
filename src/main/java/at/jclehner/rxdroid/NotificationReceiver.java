@@ -414,7 +414,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.setStyle(style);
 		}
 
-		if(!isShowingLowSupplyNotification)
+		if(!isShowingLowSupplyNotification && !Settings.getBoolean(Settings.Keys.USE_SAFE_MODE, false))
 		{
 			Intent intent = new Intent(mContext, NotificationReceiver.class);
 			intent.setAction(ACTION_MARK_ALL_AS_TAKEN);

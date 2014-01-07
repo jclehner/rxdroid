@@ -433,8 +433,11 @@
 
     <string name="_btn_report">Report</string>
     <string name="_btn_continue">Continue</string>
-		
-	<!-- 
+
+    <string name="_title_use_safe_mode">Safe mode</string>
+    <string name="_summary_use_safe_mode">Disable the \"[@string/_title_take_all_doses]\" feature</string>
+
+    <!--
     Keep at the end of strings.xml!  
      -->
     <string name="dialog_set_number">@string/_btn_set</string>
