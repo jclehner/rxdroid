@@ -171,14 +171,16 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		mIsShowing = true;
 
 		final Intent intent = getIntent();
-		/*Date date = null;
+		Date date = null;
 
 		if(intent != null)
 			date = (Date) intent.getSerializableExtra(EXTRA_DATE);
 
-		if(date == null)*/
-		DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
-		Date date = dtInfo.activeDate();
+		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
+
+		if(date == null)
+			date = dtInfo.activeDate();
+
 		mCurrentDoseTime = dtInfo.activeDoseTime();
 
 		setDate(date, PAGER_INIT);
