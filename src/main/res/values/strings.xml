@@ -438,6 +438,8 @@
     <string name="_summary_use_safe_mode">Disable unsafe features such as \"[@string/_title_take_all_doses]\" or
             \"[@string/_title_skip_dose_dialog]\"</string>
 
+    <string name="_title_remind_tomorrow">Remind tomorrow</string>
+
     <!--
     Keep at the end of strings.xml!  
      -->

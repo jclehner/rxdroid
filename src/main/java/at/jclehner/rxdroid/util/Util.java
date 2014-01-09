@@ -303,10 +303,9 @@ public final class Util
 		pref.setEntryValues(values);
 	}
 
-	public static String millis(long millis)
-	{
-		return millis + "ms ("
-				+ new DumbTime(millis, true).toString(true, true) + ")";
+	@Deprecated
+	public static String millis(long millis) {
+		return Millis.toString(millis);
 	}
 
 	/**

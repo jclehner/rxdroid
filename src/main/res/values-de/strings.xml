@@ -412,6 +412,8 @@
     <string name="_summary_use_safe_mode">Unsichere Funktionen wie »[@string/_title_take_all_doses]« oder
             »[@string/_title_skip_dose_dialog]« deaktivieren</string>
 
+    <string name="_title_remind_tomorrow">Morgen erinnern</string>
+
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.
