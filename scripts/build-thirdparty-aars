@@ -51,9 +51,10 @@ EOF
 
 
 GIT_REPOS=( 
-	"NumberPicker git://github.com/jclehner/numberpicker.git lib"
-	"DragSortListView git://github.com/jclehner/drag-sort-listview.git library"
-	"ShowcaseView git://github.com/jclehner/ShowcaseView.git library"
+#	"NumberPicker git://github.com/jclehner/numberpicker.git lib"
+#	"DragSortListView git://github.com/jclehner/drag-sort-listview.git library"
+#	"ShowcaseView git://github.com/jclehner/ShowcaseView.git library"
+	"SherlockNavigationDrawer git://github.com/nicolasjafelle/SherlockNavigationDrawer.git AndroidStudio/SherlockNavigationDrawerProject/SherlockNavigationDrawer"
 )
 
 ORIGPWD="$(pwd)"

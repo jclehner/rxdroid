@@ -222,6 +222,10 @@
                 android:title="Boot info"
         />
 
+        <Preference android:key="reset_refill_reminder_date"
+                android:title="Reset refill reminder date"
+        />
+
         <Preference android:key="dump_build"
                 android:title="Dump android.os.Build"
         />

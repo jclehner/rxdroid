@@ -667,6 +667,20 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			p.setSummary(summary);
 		}
 
+		p = findPreference("reset_refill_reminder_date");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener()
+			{
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					Settings.putDate(Keys.NEXT_REFILL_REMINDER_DATE, null);
+					return true;
+				}
+			});
+		}
+
 		p = findPreference("dump_build");
 		if(p != null)
 		{

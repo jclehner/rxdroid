@@ -24,7 +24,9 @@ package at.jclehner.rxdroid;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import android.app.AlarmManager;
@@ -75,6 +77,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final String EXTRA_IS_DOSE_TIME_END = "at.jclehner.rxdroid.extra.IS_DOSE_TIME_END";
 	static final String EXTRA_IS_ALARM_REPETITION = "at.jclehner.rxdroid.extra.IS_ALARM_REPETITION";
 	static final String EXTRA_FORCE_UPDATE = "at.jclehner.rxdroid.extra.FORCE_UPDATE";
+	static final String EXTRA_DRUG_ID_LIST = "drug_id_list";
 
 	private static final String ACTION_MARK_ALL_AS_TAKEN = "at.jclehner.rxdroid.ACTION_MARK_ALL_AS_TAKEN";
 
@@ -92,6 +95,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	 *
 	 */
 	private static final String ACTION_SNOOZE_REFILL_REMINDER = "snooze";
+	// Drugs affected by the refill reminder's snoozing
+	private static final String REFILL_REMINDER_SNOOZE_DRUGS = "refill_reminder_snooze_drugs";
 
 	private static final int NOTIFICATION_NORMAL = 0;
 	private static final int NOTIFICATION_FORCE_UPDATE = 1;
@@ -473,11 +478,27 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 		else if(isShowingLowSupplyNotificationOnly)
 		{
+			final Set<String> drugIds = new HashSet<String>();
+
+
+
+
+
+
+
 			Intent intent = new Intent(mContext, NotificationReceiver.class);
 			intent.setAction(ACTION_SNOOZE_REFILL_REMINDER);
 
 			PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-			builder.addAction(R.drawable.ic_action_snooze, getString(R.string._title_remind_tomorrow), operation);
+
+			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
+				builder.addAction(R.drawable.ic_action_snooze, getString(R.string._title_remind_tomorrow), operation);
+			else
+			{
+				builder.setDeleteIntent(operation);
+				// Technically it's ongoing, but you cannot delete ongoing notifications
+				builder.setOngoing(false);
+			}
 		}
 
 		final int currentHash = message.hashCode();
@@ -490,7 +511,6 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 		else
 			builder.setOnlyAlertOnce(true);
-
 
 		// Prevents low supplies from constantly annoying the user with
 		// notification's sound and/or vibration if alarms are repeated.
