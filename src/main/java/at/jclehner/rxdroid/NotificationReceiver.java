@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -77,7 +76,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final String EXTRA_IS_DOSE_TIME_END = "at.jclehner.rxdroid.extra.IS_DOSE_TIME_END";
 	static final String EXTRA_IS_ALARM_REPETITION = "at.jclehner.rxdroid.extra.IS_ALARM_REPETITION";
 	static final String EXTRA_FORCE_UPDATE = "at.jclehner.rxdroid.extra.FORCE_UPDATE";
-	static final String EXTRA_DRUG_ID_LIST = "drug_id_list";
+	static final String EXTRA_REFILL_SNOOZE_DRUGS = "drug_id_list";
 
 	private static final String ACTION_MARK_ALL_AS_TAKEN = "at.jclehner.rxdroid.ACTION_MARK_ALL_AS_TAKEN";
 
@@ -135,6 +134,8 @@ public class NotificationReceiver extends BroadcastReceiver
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
 		mAllDrugs = Database.getAll(Drug.class);
 
+		final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
+
 		if(ACTION_MARK_ALL_AS_TAKEN.equals(intent.getAction()))
 		{
 			Entries.markAllNotifiedDosesAsTaken(0);
@@ -142,8 +143,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 		else if(ACTION_SNOOZE_REFILL_REMINDER.equals(intent.getAction()))
 		{
-			final Date tomorrow = DateTime.add(DateTime.today(), Calendar.DAY_OF_MONTH, 1);
+			final Date tomorrow = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
 			Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, tomorrow);
+
+			final String drugIds = Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, "");
+			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, drugIds + " " +
+					intent.getStringExtra(EXTRA_REFILL_SNOOZE_DRUGS));
 		}
 		else
 		{
@@ -154,7 +159,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			{
 				if(!isAlarmRepetition)
 				{
-					final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
+
 					final boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_DOSE_TIME_END, false);
 					final String eventName = isDoseTimeEnd ? "onDoseTimeEnd" : "onDoseTimeBegin";
 
@@ -406,15 +411,37 @@ public class NotificationReceiver extends BroadcastReceiver
 
 				Log.d(TAG, "Showing refill reminder only; nextRefillReminderDate=" + nextRefillReminderDate);
 
-				cancelNotification = nextRefillReminderDate != null && today.before(nextRefillReminderDate);
-
-				if(cancelNotification)
-					Log.d(TAG, "  date is in the future; will cancel notification");
-				else if(nextRefillReminderDate != null)
+				if(nextRefillReminderDate != null && today.before(nextRefillReminderDate))
 				{
-					// We have a reminder date, but it's already in the past. Clear it.
-					Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
-					Log.d(TAG, "  date is in the past; setting to null");
+					Log.d(TAG, "  date is in the future, now checking drugs");
+
+					// The date indicates that we should skip the notification, but we must check
+					// whether all drugs in drugsWithLowSupply were indeed snoozed.
+
+					final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
+					boolean areAllDrugsSnoozed = true;
+					for(Drug drug : drugsWithLowSupplies)
+					{
+						if(!snoozedDrugIds.contains(drug.getId()))
+						{
+							Log.d(TAG, "    " + drug + " is not snoozing!");
+							areAllDrugsSnoozed = false;
+							break;
+						}
+					}
+
+					cancelNotification = areAllDrugsSnoozed;
+				}
+				else
+				{
+					if(nextRefillReminderDate != null)
+					{
+						// We have a reminder date, but it's already in the past. Clear it.
+						Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
+						Log.d(TAG, "  date is in the past; setting to null");
+					}
+
+					cancelNotification = false;
 				}
 			}
 			else
@@ -478,21 +505,26 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 		else if(isShowingLowSupplyNotificationOnly)
 		{
-			final Set<String> drugIds = new HashSet<String>();
+			// Use simple string like "1 33 56 10231"
+			final StringBuilder drugIds = new StringBuilder();
+			for(Drug drug : drugsWithLowSupplies)
+			{
+				drugIds.append(drug.getId());
+				drugIds.append(' ');
+			}
 
-
-
-
-
-
-
-			Intent intent = new Intent(mContext, NotificationReceiver.class);
+			final Intent intent = new Intent(mContext, NotificationReceiver.class);
 			intent.setAction(ACTION_SNOOZE_REFILL_REMINDER);
+			intent.putExtra(EXTRA_REFILL_SNOOZE_DRUGS, drugIds.toString());
+			intent.putExtra(EXTRA_DATE, date);
 
 			PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
 			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
-				builder.addAction(R.drawable.ic_action_snooze, getString(R.string._title_remind_tomorrow), operation);
+			{
+				builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string._title_remind_tomorrow), operation);
+				//builder.addAction(R.drawable.ic_action_snooze, getString(R.string._title_remind_tomorrow), operation);
+			}
 			else
 			{
 				builder.setDeleteIntent(operation);
@@ -644,5 +676,17 @@ public class NotificationReceiver extends BroadcastReceiver
 		intent.putExtra(EXTRA_SILENT, silent);
 		intent.putExtra(EXTRA_FORCE_UPDATE, forceUpdate);
 		context.sendBroadcast(intent);
+	}
+
+	private static Set<Integer> toIntSet(String str)
+	{
+		final Set<Integer> intSet = new HashSet<Integer>();
+		for(String element : str.split(" "))
+		{
+			if(element.length() != 0)
+				intSet.add(Integer.valueOf(element, 10));
+		}
+
+		return intSet;
 	}
 }
