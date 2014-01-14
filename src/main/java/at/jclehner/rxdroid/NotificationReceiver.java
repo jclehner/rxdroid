@@ -522,10 +522,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
 			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
-			{
-				builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string._title_remind_tomorrow), operation);
-				//builder.addAction(R.drawable.ic_action_snooze, getString(R.string._title_remind_tomorrow), operation);
-			}
+				builder.addAction(R.drawable.ic_action_snooze, getString(R.string._title_remind_tomorrow), operation);
 			else
 			{
 				builder.setDeleteIntent(operation);
