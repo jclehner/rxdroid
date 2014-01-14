@@ -1,7 +1,6 @@
 package at.jclehner.rxdroid;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -61,6 +60,8 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 
 				holder.history.setOnClickListener((View.OnClickListener) mFragment);
 				holder.supply.setOnClickListener((View.OnClickListener) mFragment);
+
+				view.findViewById(R.id.img_missed_dose_warning).setVisibility(View.GONE);
 
 				holder.setDoseViewsAndDividersFromLayout(view);
 
@@ -267,9 +268,16 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 	{
 		super.setArguments(args);
 
-		mPatientId = getArguments().getInt(ARG_PATIENT_ID);
+		mPatientId = getArguments().getInt(ARG_PATIENT_ID, -1);
 		mDate = (Date) getArguments().getSerializable(ARG_DATE);
 		mDtInfo = (Settings.DoseTimeInfo) getArguments().getSerializable(ARG_DOSE_TIME_INFO);
+
+		if(mDate == null)
+			throw new NullPointerException(ARG_DATE);
+		else if(mDtInfo == null)
+			throw new NullPointerException(ARG_DOSE_TIME_INFO);
+		else if(mPatientId == -1)
+			throw new IllegalArgumentException(ARG_PATIENT_ID);
 	}
 
 	@Override
