@@ -218,7 +218,7 @@ public final class Util
 		return RxDroid.getContext().getString(resId);
 	}
 
-	public static int getDrugIconDrawable(Context context, int icon)
+	public static int getDrugIconDrawable(int icon)
 	{
 		switch(icon)
 		{

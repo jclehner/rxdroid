@@ -125,7 +125,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
 
 		//holder.icon.setImageResource(drug.getIconResourceId());
-		holder.icon.setImageResource(Util.getDrugIconDrawable(getContext(), drug.getIcon()));
+		holder.icon.setImageResource(Util.getDrugIconDrawable(drug.getIcon()));
 		holder.currentSupply.setDrugAndDate(drug, mAdapterDate);
 
 		final Date today = DateTime.today();
