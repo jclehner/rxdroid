@@ -438,6 +438,7 @@ public class NotificationReceiver extends BroadcastReceiver
 					{
 						// We have a reminder date, but it's already in the past. Clear it.
 						Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
+						Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, null);
 						Log.d(TAG, "  date is in the past; setting to null");
 					}
 
