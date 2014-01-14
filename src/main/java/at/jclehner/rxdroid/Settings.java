@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -405,7 +406,7 @@ public final class Settings
 		return TimePeriod.fromString(value);
 	}
 
-	public static class DoseTimeInfo
+	public static class DoseTimeInfo implements Serializable
 	{
 		private static final ThreadLocal<DoseTimeInfo> INSTANCES = new ThreadLocal<Settings.DoseTimeInfo>() {
 
@@ -419,6 +420,10 @@ public final class Settings
 
 		public Calendar currentTime() {
 			return mCurrentTime;
+		}
+
+		public Date currentDate() {
+			return mCurrentDate;
 		}
 
 		public Date activeDate() {
@@ -446,6 +451,7 @@ public final class Settings
 		}
 
 		private Calendar mCurrentTime;
+		private Date mCurrentDate;
 		private Date mActiveDate;
 		private Date mNextDoseTimeDate;
 		private int mActiveDoseTime;
@@ -463,6 +469,7 @@ public final class Settings
 		final DoseTimeInfo dtInfo = DoseTimeInfo.INSTANCES.get();
 
 		dtInfo.mCurrentTime = currentTime;
+		dtInfo.mCurrentDate = DateTime.getDatePart(currentTime).getTime();
 		dtInfo.mActiveDate = getActiveDate(dtInfo.mCurrentTime);
 		dtInfo.mActiveDoseTime = getActiveDoseTime(dtInfo.mCurrentTime);
 		dtInfo.mNextDoseTime = getNextDoseTime(dtInfo.mCurrentTime);
