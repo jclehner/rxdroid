@@ -191,7 +191,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		{
 			final int drugId = intent.getIntExtra(EXTRA_DRUG_ID, -1);
 			if(drugId == -1)
-				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG");
+				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG_ID");
 
 			drug = Drug.get(drugId);
 
