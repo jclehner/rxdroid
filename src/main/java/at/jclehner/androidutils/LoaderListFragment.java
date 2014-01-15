@@ -105,6 +105,10 @@ public abstract class LoaderListFragment<T> extends SherlockListFragment impleme
 			return mData.get(position);
 		}
 
+		public <E extends LLFLoader.ItemHolder<T>> E getItemHolder(int position) {
+			return (E) mData.get(position);
+		}
+
 		@Override
 		public long getItemId(int position) {
 			return position;
