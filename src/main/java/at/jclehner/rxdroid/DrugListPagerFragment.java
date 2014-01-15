@@ -2,15 +2,14 @@ package at.jclehner.rxdroid;
 
 
 import android.app.DatePickerDialog;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
-import android.text.style.ScaleXSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,11 +58,13 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 
 	private static final String TAG = DrugListPagerFragment.class.getSimpleName();
 
-	public static String ARG_PATIENT_ID = DrugListFragment.ARG_PATIENT_ID;
-	public static String ARG_DATE = DrugListFragment.ARG_DATE;
+	public static final String ARG_PATIENT_ID = DrugListFragment.ARG_PATIENT_ID;
+	public static final String ARG_DATE = DrugListFragment.ARG_DATE;
 
-	public static int ADAPTER_ITEMS = 101;
-	public static int CENTER_ITEM = 1 + (ADAPTER_ITEMS / 2);
+	public static final int ITEMS_PER_SIDE = 50;
+	public static final int ADAPTER_ITEMS = 1 + 2 * ITEMS_PER_SIDE;
+	public static final int CENTER_ITEM = 1 + ITEMS_PER_SIDE;
+	public static final int OFFSCREEN_PAGES = 2;
 
 	private ViewPager mPager;
 
@@ -87,6 +88,8 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 
 		mPager.getAdapter().notifyDataSetChanged();
 		mPager.setCurrentItem(CENTER_ITEM, false);
+
+		updateActionBarDate();
 	}
 
 	@Override
@@ -123,7 +126,11 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 		}
 
 		inflater.inflate(menuResId, menu);
+	}
 
+	@Override
+	public void onPrepareOptionsMenu(Menu menu)
+	{
 		if(Settings.getBoolean(Settings.Keys.USE_SAFE_MODE, false))
 			menu.removeItem(R.id.menuitem_take_all);
 	}
@@ -139,7 +146,9 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 				f.show(getFragmentManager(), "date");
 			}
 			else
+			{
 				setDate(mDtInfo.activeDate(), true);
+			}
 
 			return true;
 		}
@@ -157,9 +166,10 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 	{
 		final View view = inflater.inflate(R.layout.fragment_drug_list_pager, container, false);
 		mPager = ((ViewPager) view.findViewById(R.id.pager));
-		mPager.setOffscreenPageLimit(1);
+		mPager.setOffscreenPageLimit(OFFSCREEN_PAGES);
 		mPager.setOnPageChangeListener(mPageListener);
 		mPager.setAdapter(new MyPagerAdapter(getFragmentManager()));
+		mPager.setPageMargin(Util.pixelsFromDips(getActivity(), 48));
 
 		setDate(mDateOrigin, true);
 
@@ -194,7 +204,7 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 		return DateTime.add(mDateOrigin, Calendar.DAY_OF_MONTH, page - CENTER_ITEM);
 	}
 
-	private void updateDateString()
+	private void updateActionBarDate()
 	{
 		final SpannableString dateStr = new SpannableString(DateTime.toNativeDate(mDisplayedDate));
 		Util.applyStyle(dateStr, new RelativeSizeSpan(0.75f));
@@ -202,7 +212,8 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 		if(mDtInfo.activeDate().equals(mDisplayedDate))
 			Util.applyStyle(dateStr, new UnderlineSpan());
 
-		((SherlockFragmentActivity) getActivity()).getSupportActionBar().setSubtitle(dateStr);
+		getSherlockActivity().getSupportActionBar().setSubtitle(dateStr);
+		//getSherlockActivity().supportInvalidateOptionsMenu();
 	}
 
 	private final ViewPager.OnPageChangeListener mPageListener = new ViewPager.SimpleOnPageChangeListener()
@@ -211,7 +222,7 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 		public void onPageSelected(int page)
 		{
 			mDisplayedDate = getDateForPage(page);
-			updateDateString();
+			updateActionBarDate();
 			Log.d(TAG, "onPageSelected: page=" + page + ", date=" + mDisplayedDate);
 		}
 	};
