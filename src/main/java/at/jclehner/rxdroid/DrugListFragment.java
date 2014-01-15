@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,6 +21,7 @@ import java.util.List;
 
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.rxdroid.db.Database;
+import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Schedule;
@@ -58,6 +63,7 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 				holder.supply = (DrugSupplyMonitor) view.findViewById(R.id.text_supply);
 				holder.history = view.findViewById(R.id.frame_history_menu);
 
+				holder.name.setOnClickListener((View.OnClickListener) mFragment);
 				holder.history.setOnClickListener((View.OnClickListener) mFragment);
 				holder.supply.setOnClickListener((View.OnClickListener) mFragment);
 
@@ -66,16 +72,21 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 				holder.setDoseViewsAndDividersFromLayout(view);
 
 				for(DoseView doseView : holder.doseViews)
+				{
 					doseView.setOnClickListener((View.OnClickListener) mFragment);
+					doseView.setOnCreateContextMenuListener(mFragment);
+				}
 
 				view.setTag(holder);
 			}
 			else
 				holder = (ViewHolder) view.getTag();
 
-			Loader.DrugWrapper wrapper = (Loader.DrugWrapper) getItem(position);
+			Loader.DrugWrapper wrapper = getItemHolder(position);
 
 			holder.name.setText(wrapper.item.getName());
+			holder.name.setTag(wrapper.item.getId());
+
 			holder.icon.setImageResource(Util.getDrugIconDrawable(wrapper.item.getIcon()));
 			holder.supply.setDrugAndDate(wrapper.item, wrapper.date);
 			holder.supply.setVisibility(wrapper.isSupplyVisible ? View.VISIBLE : View.INVISIBLE);
@@ -301,6 +312,88 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 			dialog.setArgs(args);
 			dialog.show();
 		}
+		else if(view.getId() == R.id.drug_name)
+		{
+			Intent intent = new Intent(getActivity(), DrugEditActivity.class);
+			intent.setAction(Intent.ACTION_EDIT);
+			intent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, (Integer) view.getTag());
+
+			startActivity(intent);
+		}
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, final View v, ContextMenu.ContextMenuInfo menuInfo)
+	{
+		new MenuInflater(getActivity()).inflate(R.menu.dose_view_context_menu, menu);
+
+		final DoseView doseView = (DoseView) v;
+		final Drug drug = doseView.getDrug();
+		final int doseTime = doseView.getDoseTime();
+
+		//menu.setHeaderIcon(Util.getDrugIconDrawable(drug.getIcon()));
+		menu.setHeaderTitle(drug.getName());
+
+		if(doseView.wasDoseTaken())
+		{
+			menu.removeItem(R.id.menuitem_skip);
+			menu.findItem(R.id.menuitem_remove_dose).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+			{
+				@Override
+				public boolean onMenuItemClick(MenuItem menuItem)
+				{
+					final Fraction.MutableFraction dose = new Fraction.MutableFraction();
+					for(DoseEvent intake : Entries.findDoseEvents(drug, mDate, doseTime))
+					{
+						dose.add(intake.getDose());
+						Database.delete(intake);
+					}
+
+					drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
+					Database.update(drug);
+
+					return true;
+				}
+			});
+
+		}
+		else
+		{
+			menu.removeItem(R.id.menuitem_remove_dose);
+			menu.findItem(R.id.menuitem_skip).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+			{
+				@Override
+				public boolean onMenuItemClick(MenuItem menuItem)
+				{
+					Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
+					return true;
+				}
+			});
+		}
+
+		menu.findItem(R.id.menuitem_take).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+		{
+			@Override
+			public boolean onMenuItemClick(MenuItem menuItem)
+			{
+				// FIXME
+				doseView.performClick();
+				return true;
+			}
+		});
+
+		menu.findItem(R.id.menuitem_edit).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+		{
+			@Override
+			public boolean onMenuItemClick(MenuItem menuItem)
+			{
+				final Intent intent = new Intent(Intent.ACTION_EDIT);
+				intent.setClass(getActivity(), DrugEditActivity.class);
+				intent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, drug.getId());
+				startActivity(intent);
+				return true;
+			}
+		});
 	}
 
 	@Override
