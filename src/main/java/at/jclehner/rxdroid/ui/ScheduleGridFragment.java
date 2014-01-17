@@ -25,14 +25,20 @@ import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+
+import java.util.Arrays;
+
+import at.jclehner.androidutils.ArrayOfParcelables;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.FractionInputDialog;
@@ -44,15 +50,23 @@ import at.jclehner.rxdroid.util.SimpleBitSet;
 import at.jclehner.rxdroid.util.Util;
 
 public class ScheduleGridFragment extends ListFragment implements
-		ListAdapter, OnClickListener, OnCheckedChangeListener
+		OnClickListener, OnCheckedChangeListener
 {
 	private static final String TAG = ScheduleGridFragment.class.getSimpleName();
 
 	private static final int NO_WEEKDAY = -1;
 
-	private ViewHolder[] mHolders = new ViewHolder[8];
-	// private View[] mViews = new View[8];
-	private SimpleBitSet mDayStatus = new SimpleBitSet(0);
+	// Day is enabled, i.e. defines its own schedule
+	private static final int STATE_ENABLED = 0;
+	// Day is set to inherit, i.e. it inherits the schedule
+	// of the NO_WEEKDAY schedule.
+	private static final int STATE_INHERIT = 1;
+	// Day is disabled, i.e. all doses set to zero
+	private static final int STATE_DISABLED = 2;
+
+
+	private SimpleBitSet mStates = new SimpleBitSet(0);
+	private Fraction[][] mDoses = new Fraction[8][Constants.DOSE_TIMES.length];
 
 	@SuppressWarnings("unused")
 	private Schedule mSchedule;
@@ -60,68 +74,21 @@ public class ScheduleGridFragment extends ListFragment implements
 	@Override
 	public void onCreate(Bundle icicle)
 	{
+		Log.d(TAG, "onCreate: icicle=" + icicle);
 		super.onCreate(icicle);
-		//mSchedule = Database.get(Schedule.class, getArguments().getInt("drug_id"));
 
-		for(int i = 0; i != mHolders.length; ++i)
+		if(icicle != null)
 		{
-			final int weekDay = i - 1;
-
-			final ViewHolder holder = mHolders[i] = new ViewHolder();
-			final View v = mHolders[i].view = getLayoutInflater(icicle).inflate(R.layout.schedule_day, null);
-
-			holder.setDoseViewsAndDividersFromLayout(v);
-
-			holder.dayContainer = (ViewGroup) v.findViewById(R.id.day_container);
-			holder.dayChecked = (CheckBox) v.findViewById(R.id.day_checked);
-			holder.dayName = (TextView) v.findViewById(R.id.day_name);
-
-			holder.dayChecked.setOnCheckedChangeListener(this);
-
-			if(weekDay != NO_WEEKDAY)
-				holder.dayName.setText(Constants.SHORT_WEEK_DAY_NAMES[i - 1]);
-
-			holder.dayContainer.setVisibility(i == 0 ? View.INVISIBLE : View.VISIBLE);
-
-			for(DoseView dv : holder.doseViews)
-			{
-				dv.setDose(Fraction.ZERO);
-				dv.setOnClickListener(this);
-				dv.setTag(weekDay);
-			}
-
-			for(View divider : holder.dividers)
-				divider.setVisibility(View.GONE);
-
-			holder.dayChecked.setTag(weekDay);
-		}
-
-		onRestoreInstanceState(icicle);
-
-		setListAdapter(this);
-	}
-
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent)
-	{
-		final ViewHolder holder = mHolders[position];
-
-		final int weekDay = position - 1;
-
-		if(weekDay != NO_WEEKDAY)
-		{
-			final boolean enabled = mDayStatus.get(weekDay);
-			holder.dayChecked.setChecked(enabled);
-			//holder.doseContainer.setEnabled(enabled);
-			setDoseViewsEnabled(weekDay, enabled);
+			mDoses = ((ArrayOfParcelables<Fraction>) icicle.getParcelable("doses")).get();
+			mStates.set(icicle.getLong("states"));
 		}
 		else
 		{
-			//holder.doseContainer.setEnabled(mEnabled.cardinality() < 7);
-			setDoseViewsEnabled(NO_WEEKDAY, !areAllDaysEnabled());
+			for(int i = 0; i != mDoses.length; ++i)
+				mDoses[i] = new Fraction[] { Fraction.ZERO, Fraction.ZERO, Fraction.ZERO, Fraction.ZERO };
 		}
 
-		return holder.view;
+		setListAdapter(mAdapter);
 	}
 
 	@Override
@@ -168,150 +135,129 @@ public class ScheduleGridFragment extends ListFragment implements
 			return;
 		}
 
-		setWeekDayEnabled(weekDay, isChecked);
+		mStates.set(weekDay + 1, isChecked);
+
+		if(areAllDaysEnabled())
+			mAdapter.notifyDataSetInvalidated();
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState)
 	{
+		Log.d(TAG, "onSaveInstanceState");
+
 		super.onSaveInstanceState(outState);
 
-		//final Fraction[][] doses = new Fraction[mHolders.length][4];
-
-		for(int i = 0; i != mHolders.length; ++i)
-		{
-			final Fraction[] doses = new Fraction[Schedule.DOSE_TIME_COUNT];
-
-			for(int j = 0; j != Schedule.DOSE_TIME_COUNT; ++j)
-				doses[j] = mHolders[i].doseViews[j].getDose();
-
-			outState.putParcelableArray("doses_" + i, doses);
-		}
-
-		outState.putLong("day_status", mDayStatus.longValue());
+		outState.putParcelable("doses", new ArrayOfParcelables(mDoses));
+		outState.putLong("states", mStates.longValue());
 	}
 
-	@Override
-	public void registerDataSetObserver(DataSetObserver observer) {}
-
-	@Override
-	public void unregisterDataSetObserver(DataSetObserver observer) {}
-
-	@Override
-	public int getCount() {
-		return 8;
-	}
-
-	@Override
-	public Object getItem(int position) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
-
-	@Override
-	public boolean hasStableIds() {
-		return false;
-	}
-
-	@Override
-	public int getItemViewType(int position) {
-		return 0;
-	}
-
-	@Override
-	public int getViewTypeCount() {
-		return 1;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return false;
-	}
-
-	@Override
-	public boolean areAllItemsEnabled() {
-		return true;
-	}
-
-	@Override
-	public boolean isEnabled(int position) {
-		return true;
-	}
-
-	private void onRestoreInstanceState(Bundle state)
-	{
-		if(state == null)
-			return;
-
-		for(int i = 0; i != mHolders.length; ++i)
-		{
-			Fraction[] doses = (Fraction[]) state.getParcelableArray("doses_" + i);
-			if(doses != null)
-			{
-				for(int j = 0; j != doses.length; ++j)
-					mHolders[i].doseViews[j].setDose(doses[j]);
-			}
-		}
-
-		mDayStatus.set(state.getLong("day_status"));
-	}
-
-	private boolean areAllDaysEnabled()
-	{
-		return mDayStatus.cardinality() == 7;
+	private boolean areAllDaysEnabled() {
+		return mStates.cardinality() == 7;
 	}
 
 	private void setDose(int weekDay, int doseTime, Fraction dose)
 	{
-		final ViewHolder holder = mHolders[weekDay + 1];
-		holder.doseViews[doseTime].setDose(dose);
+		final int index = weekDayToPosition(weekDay);
+		mDoses[index][doseTime] = dose;
 
 		if(weekDay == NO_WEEKDAY && !areAllDaysEnabled())
 		{
-			for(int i = 1; i != mHolders.length; ++i)
+			for(int i = 1; i != mDoses.length; ++i)
 			{
-				final DoseView dv = mHolders[i].doseViews[doseTime];
-				if(!dv.isEnabled())
-					dv.setDose(dose);
+				if(!mStates.get(i))
+					mDoses[i][doseTime] = dose;
 			}
 		}
 	}
 
-	private void setDoseViewsEnabled(int weekDay, boolean enabled)
-	{
-		Log.d(TAG, "setDoseViewsEnabled(" + weekDay + ", " + enabled + ")");
+	private final BaseAdapter mAdapter = new BaseAdapter() {
 
-		final ViewHolder holder = mHolders[weekDay + 1];
-		for(DoseView dv : holder.doseViews)
-		{
-			dv.setEnabled(enabled);
-			dv.setDoseTimeIconVisible(enabled);
+		@Override
+		public int getCount() {
+			return 8;
 		}
+
+		@Override
+		public Object getItem(int position) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View view, ViewGroup parent)
+		{
+			final ViewHolder holder;
+
+			if(view == null)
+			{
+				view = LayoutInflater.from(getActivity()).inflate(R.layout.schedule_day, parent, false);
+				holder = new ViewHolder();
+
+				holder.setDoseViewsAndDividersFromLayout(view);
+
+				holder.dayContainer = (ViewGroup) view.findViewById(R.id.day_container);
+				holder.dayChecked = (CheckBox) view.findViewById(R.id.day_checked);
+				holder.dayName = (TextView) view.findViewById(R.id.day_name);
+
+				holder.dayChecked.setOnCheckedChangeListener(ScheduleGridFragment.this);
+
+				for(DoseView dv : holder.doseViews)
+				{
+					dv.setDose(Fraction.ZERO);
+					dv.setOnClickListener(ScheduleGridFragment.this);
+				}
+
+				for(View divider : holder.dividers)
+					divider.setVisibility(View.GONE);
+
+				view.setTag(holder);
+			}
+			else
+				holder = (ViewHolder) view.getTag();
+
+			view.setVisibility(View.VISIBLE);
+
+			final boolean enabled = mStates.get(position);
+			final int weekDay = positionToWeekDay(position);
+
+			for(int i = 0; i != mDoses[position].length; ++i)
+			{
+				holder.doseViews[i].setDose(mDoses[position][i]);
+				holder.doseViews[i].setTag(weekDay);
+				holder.doseViews[i].setEnabled(enabled);
+				holder.doseViews[i].setDoseTimeIconVisible(enabled);
+			}
+
+			if(weekDay != NO_WEEKDAY)
+			{
+				holder.dayChecked.setChecked(enabled);
+				holder.dayChecked.setTag(weekDay);
+				holder.dayName.setText(Constants.SHORT_WEEK_DAY_NAMES[weekDay]);
+				holder.dayContainer.setVisibility(View.VISIBLE);
+			}
+			else
+			{
+				holder.dayContainer.setVisibility(View.INVISIBLE);
+
+				if(areAllDaysEnabled())
+					view.setVisibility(View.GONE);
+			}
+
+			return view;
+		}
+	};
+
+	private static int positionToWeekDay(int position) {
+		return position - 1;
 	}
 
-	private void setWeekDayEnabled(int weekDay, boolean enabled)
-	{
-		Log.d(TAG, "setWeekDayEnabled(" + weekDay + ", " + enabled + ")");
-
-		final ViewHolder holder = mHolders[weekDay + 1];
-		setDoseViewsEnabled(weekDay, enabled);
-		mDayStatus.set(weekDay, enabled);
-
-		if(!enabled)
-		{
-			// restore the DoseView's dose to the default value
-			for(DoseView dv : holder.doseViews)
-			{
-				final int doseTime = dv.getDoseTime();
-				dv.setDose(mHolders[0].doseViews[doseTime].getDose());
-			}
-		}
-
-		setDoseViewsEnabled(NO_WEEKDAY, !areAllDaysEnabled());
+	private static int weekDayToPosition(int weekDay) {
+		return weekDay + 1;
 	}
 }
 

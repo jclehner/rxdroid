@@ -124,6 +124,7 @@
 		
 		<activity android:name=".AdvancedScheduleActivity"
 		    android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
 
 		<receiver android:name=".SystemEventReceiver"
