@@ -2,6 +2,7 @@ package at.jclehner.rxdroid;
 
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,7 @@ import com.actionbarsherlock.view.MenuItem;
 import java.util.Calendar;
 import java.util.Date;
 
+import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
@@ -138,19 +140,51 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		if(item.getItemId() == R.id.menuitem_date)
+		switch(item.getItemId())
 		{
-			if(mDtInfo.activeDate().equals(mDisplayedDate))
+			case R.id.menuitem_date:
 			{
-				DatePickerFragment f = DatePickerFragment.newInstance(mDisplayedDate, this);
-				f.show(getFragmentManager(), "date");
-			}
-			else
-			{
-				setDate(mDtInfo.activeDate(), true);
-			}
+				if(mDtInfo.activeDate().equals(mDisplayedDate))
+				{
+					DatePickerFragment f = DatePickerFragment.newInstance(mDisplayedDate, this);
+					f.show(getFragmentManager(), "date");
+				}
+				else
+				{
+					setDate(mDtInfo.activeDate(), true);
+				}
 
-			return true;
+				return true;
+			}
+			case R.id.menuitem_patient:
+			{
+
+			}
+			case R.id.menuitem_add:
+			{
+				Intent intent = new Intent(Intent.ACTION_INSERT);
+				intent.setClass(getActivity(), DrugEditActivity.class);
+				startActivity(intent);
+				return true;
+			}
+			case R.id.menuitem_preferences:
+			{
+				Intent intent = new Intent();
+				intent.setClass(getActivity(), PreferencesActivity.class);
+				startActivity(intent);
+				return true;
+			}
+			case R.id.menuitem_toggle_filtering:
+			{
+				/*mShowingAll = !mShowingAll;
+				invalidateViewPager();*/
+				return true;
+			}
+			case R.id.menuitem_take_all:
+			{
+				Entries.markAllNotifiedDosesAsTaken(mPatientId);
+				return true;
+			}
 		}
 
 		return super.onOptionsItemSelected(item);
