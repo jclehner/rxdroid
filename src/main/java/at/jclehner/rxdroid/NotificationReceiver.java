@@ -149,6 +149,11 @@ public class NotificationReceiver extends BroadcastReceiver
 			final String drugIds = Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, "");
 			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, drugIds + " " +
 					intent.getStringExtra(EXTRA_REFILL_SNOOZE_DRUGS));
+
+			// Pre-Jellybean has no actions, so we let the user know what he just did
+			// by showing a Toast.
+			if(!Version.SDK_IS_JELLYBEAN_OR_NEWER)
+				RxDroid.toastLong(R.string._toast_remind_tomorrow);
 		}
 		else
 		{

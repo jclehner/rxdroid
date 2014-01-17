@@ -439,6 +439,7 @@
             \"[@string/_title_skip_dose_dialog]\"</string>
 
     <string name="_title_remind_tomorrow">Remind tomorrow</string>
+    <string name="_toast_remind_tomorrow">Hiding notification until tomorrow.</string>
 
     <!--
     Keep at the end of strings.xml!  
