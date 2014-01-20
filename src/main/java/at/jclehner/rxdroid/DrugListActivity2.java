@@ -2,6 +2,8 @@ package at.jclehner.rxdroid;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
@@ -24,6 +26,9 @@ public class DrugListActivity2 extends SherlockFragmentActivity
 		args.putInt(DrugListFragment.ARG_PATIENT_ID, Patient.DEFAULT_PATIENT_ID);
 		f.setArguments(args);
 
-		getSupportFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
+		final FragmentManager fm = getSupportFragmentManager();
+
+		if(!(fm.findFragmentById(android.R.id.content) instanceof DrugListPagerFragment))
+			fm.beginTransaction().add(android.R.id.content, f).commit();
 	}
 }
