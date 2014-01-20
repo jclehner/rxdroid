@@ -44,6 +44,7 @@ import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.FractionInputDialog;
 import at.jclehner.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.SimpleBitSet;
@@ -54,19 +55,13 @@ public class ScheduleGridFragment extends ListFragment implements
 {
 	private static final String TAG = ScheduleGridFragment.class.getSimpleName();
 
-	private static final int NO_WEEKDAY = -1;
-
-	// Day is enabled, i.e. defines its own schedule
-	private static final int STATE_ENABLED = 0;
-	// Day is set to inherit, i.e. it inherits the schedule
-	// of the NO_WEEKDAY schedule.
-	private static final int STATE_INHERIT = 1;
-	// Day is disabled, i.e. all doses set to zero
-	private static final int STATE_DISABLED = 2;
-
+	private static final int NO_WEEKDAY_IDX = 0;
+	private static final int NO_WEEKDAY = positionToWeekDay(NO_WEEKDAY_IDX);
 
 	private SimpleBitSet mStates = new SimpleBitSet(0);
 	private Fraction[][] mDoses = new Fraction[8][Constants.DOSE_TIMES.length];
+
+	private int mDrugId = -1;
 
 	@SuppressWarnings("unused")
 	private Schedule mSchedule;
@@ -82,6 +77,7 @@ public class ScheduleGridFragment extends ListFragment implements
 			final ArrayOfParcelables array = icicle.getParcelable("doses");
 			mDoses = array.get(Fraction.CREATOR, mDoses);
 			mStates.set(icicle.getLong("states"));
+			mDrugId = icicle.getInt("drug_id", -1);
 		}
 		else
 		{
@@ -138,10 +134,12 @@ public class ScheduleGridFragment extends ListFragment implements
 			return;
 		}
 
-		mStates.set(weekDay + 1, isChecked);
+		final int position = weekDayToPosition(weekDay);
+
+		mStates.set(position, isChecked);
 
 		if(!isChecked)
-			mDoses[weekDay] = mDoses[NO_WEEKDAY];
+			mDoses[position] = mDoses[NO_WEEKDAY_IDX];
 
 		mAdapter.notifyDataSetChanged();
 	}
@@ -155,6 +153,7 @@ public class ScheduleGridFragment extends ListFragment implements
 
 		outState.putParcelable("doses", new ArrayOfParcelables(mDoses));
 		outState.putLong("states", mStates.longValue());
+		outState.putInt("drug_id", mDrugId);
 	}
 
 	private boolean areAllDaysEnabled() {
