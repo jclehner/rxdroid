@@ -79,7 +79,8 @@ public class ScheduleGridFragment extends ListFragment implements
 
 		if(icicle != null)
 		{
-			mDoses = ((ArrayOfParcelables<Fraction>) icicle.getParcelable("doses")).get();
+			final ArrayOfParcelables array = icicle.getParcelable("doses");
+			mDoses = array.get(Fraction.CREATOR, mDoses);
 			mStates.set(icicle.getLong("states"));
 		}
 		else
@@ -127,8 +128,10 @@ public class ScheduleGridFragment extends ListFragment implements
 	@Override
 	public void onCheckedChanged(CompoundButton v, boolean isChecked)
 	{
-		final int weekDay = (Integer) v.getTag();
+		if(v.getTag() == null)
+			return;
 
+		final int weekDay = (Integer) v.getTag();
 		if(weekDay == NO_WEEKDAY)
 		{
 			Log.w(TAG, "onCheckedChanged: weekDay == NO_WEEKDAY");
@@ -137,8 +140,10 @@ public class ScheduleGridFragment extends ListFragment implements
 
 		mStates.set(weekDay + 1, isChecked);
 
-		if(areAllDaysEnabled())
-			mAdapter.notifyDataSetInvalidated();
+		if(!isChecked)
+			mDoses[weekDay] = mDoses[NO_WEEKDAY];
+
+		mAdapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -169,6 +174,8 @@ public class ScheduleGridFragment extends ListFragment implements
 					mDoses[i][doseTime] = dose;
 			}
 		}
+
+		mAdapter.notifyDataSetChanged();
 	}
 
 	private final BaseAdapter mAdapter = new BaseAdapter() {
@@ -195,7 +202,7 @@ public class ScheduleGridFragment extends ListFragment implements
 
 			if(view == null)
 			{
-				view = LayoutInflater.from(getActivity()).inflate(R.layout.schedule_day, parent, false);
+				view = LayoutInflater.from(getActivity()).inflate(R.layout.schedule_day, null, false);
 				holder = new ViewHolder();
 
 				holder.setDoseViewsAndDividersFromLayout(view);
@@ -229,16 +236,27 @@ public class ScheduleGridFragment extends ListFragment implements
 			{
 				holder.doseViews[i].setDose(mDoses[position][i]);
 				holder.doseViews[i].setTag(weekDay);
-				holder.doseViews[i].setEnabled(enabled);
-				holder.doseViews[i].setDoseTimeIconVisible(enabled);
+
+				if(weekDay != NO_WEEKDAY)
+				{
+					holder.doseViews[i].setEnabled(enabled);
+					holder.doseViews[i].setDoseTimeIconVisible(enabled);
+				}
+				else
+				{
+					holder.doseViews[i].setEnabled(true);
+					holder.doseViews[i].setDoseTimeIconVisible(true);
+				}
 			}
+
+			holder.dayChecked.setTag(null);
+			holder.dayChecked.setChecked(enabled);
+			holder.dayChecked.setTag(weekDay);
 
 			if(weekDay != NO_WEEKDAY)
 			{
-				holder.dayChecked.setChecked(enabled);
-				holder.dayChecked.setTag(weekDay);
-				holder.dayName.setText(Constants.SHORT_WEEK_DAY_NAMES[weekDay]);
 				holder.dayContainer.setVisibility(View.VISIBLE);
+				holder.dayName.setText(Constants.SHORT_WEEK_DAY_NAMES[weekDay]);
 			}
 			else
 			{
@@ -263,7 +281,6 @@ public class ScheduleGridFragment extends ListFragment implements
 
 class ViewHolder extends ScheduleViewHolder
 {
-	View view;
 	ViewGroup dayContainer;
 	CheckBox dayChecked;
 	TextView dayName;
