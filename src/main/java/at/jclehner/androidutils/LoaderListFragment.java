@@ -12,6 +12,8 @@ import android.widget.BaseAdapter;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class LoaderListFragment<T> extends SherlockListFragment implements LoaderManager.LoaderCallbacks<List<LoaderListFragment.LLFLoader.ItemHolder<T>>>
@@ -27,8 +29,12 @@ public abstract class LoaderListFragment<T> extends SherlockListFragment impleme
 			public final T item;
 		}
 
+		static final List<?> EXCEPTION_IN_LOADER = Collections.unmodifiableList(new ArrayList<Object>(0));
+
 		protected final Context mContext;
 		private List<? extends ItemHolder<T>> mData;
+
+		private volatile RuntimeException mException = null;
 
 		public LLFLoader(Context context)
 		{
@@ -44,6 +50,27 @@ public abstract class LoaderListFragment<T> extends SherlockListFragment impleme
 			if(isStarted())
 				super.deliverResult(data);
 		}
+
+		@Override
+		public final List<? extends ItemHolder<T>> loadInBackground()
+		{
+			try
+			{
+				mException = null;
+				return onLoadInBackground();
+			}
+			catch(RuntimeException e)
+			{
+				mException = e;
+				return (List<? extends ItemHolder<T>>) EXCEPTION_IN_LOADER;
+			}
+		}
+
+		public RuntimeException getException() {
+			return mException;
+		}
+
+		public abstract List<? extends ItemHolder<T>> onLoadInBackground();
 
 		@Override
 		protected void onStartLoading()
@@ -69,9 +96,6 @@ public abstract class LoaderListFragment<T> extends SherlockListFragment impleme
 			onStopLoading();
 			mData = null;
 		}
-
-		@Override
-		public abstract List<? extends ItemHolder<T>> loadInBackground();
 	}
 
 	public static abstract class LLFAdapter<T> extends BaseAdapter
@@ -142,6 +166,9 @@ public abstract class LoaderListFragment<T> extends SherlockListFragment impleme
 	@Override
 	public final void onLoadFinished(Loader<List<LLFLoader.ItemHolder<T>>> loader, List<LLFLoader.ItemHolder<T>> data)
 	{
+		if(data == LLFLoader.EXCEPTION_IN_LOADER)
+			onLoaderException(((LLFLoader) loader).getException());
+
 		mAdapter.setData(data);
 
 		if(isResumed())
@@ -157,4 +184,8 @@ public abstract class LoaderListFragment<T> extends SherlockListFragment impleme
 
 	protected abstract LLFAdapter<T> onCreateAdapter();
 	protected abstract LLFLoader<T> onCreateLoader();
+
+	protected void onLoaderException(RuntimeException e) {
+		throw e;
+	}
 }
