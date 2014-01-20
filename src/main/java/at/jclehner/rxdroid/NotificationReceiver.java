@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -24,7 +24,9 @@ package at.jclehner.rxdroid;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -38,7 +40,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
-import android.support.v4.app.NotificationCompat.InboxStyle;
 import android.text.Html;
 import android.util.Log;
 import at.jclehner.androidutils.EventDispatcher;
@@ -49,6 +50,7 @@ import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.Millis;
 import at.jclehner.rxdroid.util.Util;
 
 public class NotificationReceiver extends BroadcastReceiver
@@ -74,8 +76,26 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final String EXTRA_IS_DOSE_TIME_END = "at.jclehner.rxdroid.extra.IS_DOSE_TIME_END";
 	static final String EXTRA_IS_ALARM_REPETITION = "at.jclehner.rxdroid.extra.IS_ALARM_REPETITION";
 	static final String EXTRA_FORCE_UPDATE = "at.jclehner.rxdroid.extra.FORCE_UPDATE";
+	static final String EXTRA_REFILL_SNOOZE_DRUGS = "drug_id_list";
 
 	private static final String ACTION_MARK_ALL_AS_TAKEN = "at.jclehner.rxdroid.ACTION_MARK_ALL_AS_TAKEN";
+
+	/**
+	 * Refill-reminder snooze concept:
+	 *
+	 * - If displaying *only* the refill reminder (no dose notifications),
+	 *   add an action to "remind tomorrow".
+	 * - If the action is clicked, store the date that is "tomorrow", and
+	 *   update notifications.
+	 * - When updating notifications, check the date against the stored date
+	 *   and skip the refill reminder if applicable.
+	 * - For now (and simplicity's sake) clear that date when changing system
+	 *   date/time/timezone).
+	 *
+	 */
+	private static final String ACTION_SNOOZE_REFILL_REMINDER = "snooze";
+	// Drugs affected by the refill reminder's snoozing
+	private static final String REFILL_REMINDER_SNOOZE_DRUGS = "refill_reminder_snooze_drugs";
 
 	private static final int NOTIFICATION_NORMAL = 0;
 	private static final int NOTIFICATION_FORCE_UPDATE = 1;
@@ -114,10 +134,26 @@ public class NotificationReceiver extends BroadcastReceiver
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
 		mAllDrugs = Database.getAll(Drug.class);
 
+		final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
+
 		if(ACTION_MARK_ALL_AS_TAKEN.equals(intent.getAction()))
 		{
 			Entries.markAllNotifiedDosesAsTaken(0);
 			//
+		}
+		else if(ACTION_SNOOZE_REFILL_REMINDER.equals(intent.getAction()))
+		{
+			final Date tomorrow = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
+			Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, tomorrow);
+
+			final String drugIds = Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, "");
+			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, drugIds + " " +
+					intent.getStringExtra(EXTRA_REFILL_SNOOZE_DRUGS));
+
+			// Pre-Jellybean has no actions, so we let the user know what he just did
+			// by showing a Toast.
+			if(!Version.SDK_IS_JELLYBEAN_OR_NEWER)
+				RxDroid.toastLong(R.string._toast_remind_tomorrow);
 		}
 		else
 		{
@@ -128,7 +164,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			{
 				if(!isAlarmRepetition)
 				{
-					final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
+
 					final boolean isDoseTimeEnd = intent.getBooleanExtra(EXTRA_IS_DOSE_TIME_END, false);
 					final String eventName = isDoseTimeEnd ? "onDoseTimeEnd" : "onDoseTimeBegin";
 
@@ -217,8 +253,8 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		long triggerAtMillis = time.getTimeInMillis() + offset;
 
-		final long alarmRepeatMins = Settings.getStringAsInt(Settings.Keys.ALARM_REPEAT, 0);
-		final long alarmRepeatMillis = alarmRepeatMins == -1 ? 10000 : alarmRepeatMins * 60000;
+		final int alarmRepeatMins = Settings.getStringAsInt(Settings.Keys.ALARM_REPEAT, 0);
+		final long alarmRepeatMillis = alarmRepeatMins == -1 ? Millis.seconds(10) : Millis.minutes(alarmRepeatMins);
 
 		if(alarmRepeatMillis > 0)
 		{
@@ -246,7 +282,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		final long triggerDiffFromNow = triggerAtMillis - System.currentTimeMillis();
 		if(triggerDiffFromNow < 0)
 		{
-			if(triggerDiffFromNow < -50000)
+			if(triggerDiffFromNow < Millis.seconds(-5))
 				Log.w(TAG, "Alarm time is in the past by less than 5 seconds.");
 			else
 			{
@@ -266,10 +302,15 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		Log.i(TAG, "Alarm will go off in " + Util.millis(triggerDiffFromNow));
 
+		setAlarm(triggerAtMillis, createOperation(alarmExtras));
+	}
+
+	private void setAlarm(long triggerAtMillis, PendingIntent operation)
+	{
 		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
-			mAlarmMgr.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, createOperation(alarmExtras));
+			mAlarmMgr.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, operation);
 		else
-			mAlarmMgr.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, createOperation(alarmExtras));
+			mAlarmMgr.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, operation);
 	}
 
 	private void cancelAllAlarms() {
@@ -328,7 +369,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			lines[1] = "<b>" + getString(R.string._title_notification_doses) + "</b> " + Util.escapeHtml(sb.toString());
 		}
 
-		final boolean isShowingLowSupplyNotification;
+		final boolean isShowingLowSupplyNotificationOnly;
 
 		if(lowSupplyDrugCount != 0)
 		{
@@ -336,7 +377,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			final String first = Entries.getDrugName(drugsWithLowSupplies.get(0));
 
 			icon = R.drawable.ic_stat_exclamation;
-			isShowingLowSupplyNotification = sb.length() == 0;
+			isShowingLowSupplyNotificationOnly = sb.length() == 0;
 			//titleResId = R.string._title_notification_low_supplies;
 
 			if(lowSupplyDrugCount == 1)
@@ -347,7 +388,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				msg = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount - 1, first, second);
 			}
 
-			if(isShowingLowSupplyNotification)
+			if(isShowingLowSupplyNotificationOnly)
 			{
 				sb.append(msg);
 				titleResId = R.string._title_notification_low_supplies;
@@ -356,22 +397,67 @@ public class NotificationReceiver extends BroadcastReceiver
 			lines[0] = "<b>" + getString(R.string._title_notification_low_supplies) + "</b> " + Util.escapeHtml(msg);
 		}
 		else
-			isShowingLowSupplyNotification = false;
+			isShowingLowSupplyNotificationOnly = false;
 
 		final int priority;
-		if(isShowingLowSupplyNotification)
+		if(isShowingLowSupplyNotificationOnly)
 			priority = NotificationCompat.PRIORITY_DEFAULT;
 		else
 			priority = NotificationCompat.PRIORITY_HIGH;
 
 		final String message = sb.toString();
-		final int currentHash = message.hashCode();
-		final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
-
-		if(message.length() == 0)
+		if(message.length() == 0 || isShowingLowSupplyNotificationOnly)
 		{
-			getNotificationManager().cancel(R.id.notification);
-			return;
+			final boolean cancelNotification;
+			if(isShowingLowSupplyNotificationOnly)
+			{
+				final Date today = DateTime.today();
+				final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
+
+				Log.d(TAG, "Showing refill reminder only; nextRefillReminderDate=" + nextRefillReminderDate);
+
+				if(nextRefillReminderDate != null && today.before(nextRefillReminderDate))
+				{
+					Log.d(TAG, "  date is in the future, now checking drugs");
+
+					// The date indicates that we should skip the notification, but we must check
+					// whether all drugs in drugsWithLowSupply were indeed snoozed.
+
+					final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
+					boolean areAllDrugsSnoozed = true;
+					for(Drug drug : drugsWithLowSupplies)
+					{
+						if(!snoozedDrugIds.contains(drug.getId()))
+						{
+							Log.d(TAG, "    " + drug + " is not snoozing!");
+							areAllDrugsSnoozed = false;
+							break;
+						}
+					}
+
+					cancelNotification = areAllDrugsSnoozed;
+				}
+				else
+				{
+					if(nextRefillReminderDate != null)
+					{
+						// We have a reminder date, but it's already in the past. Clear it.
+						Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
+						Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, null);
+						Log.d(TAG, "  date is in the past; setting to null");
+					}
+
+					cancelNotification = false;
+				}
+			}
+			else
+				cancelNotification = true;
+
+			if(cancelNotification)
+			{
+				getNotificationManager().cancel(R.id.notification);
+				return;
+			}
 		}
 
 		final StringBuilder source = new StringBuilder();
@@ -414,7 +500,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.setStyle(style);
 		}
 
-		if(!isShowingLowSupplyNotification)
+		if(!isShowingLowSupplyNotificationOnly && !Settings.getBoolean(Settings.Keys.USE_SAFE_MODE, false))
 		{
 			Intent intent = new Intent(mContext, NotificationReceiver.class);
 			intent.setAction(ACTION_MARK_ALL_AS_TAKEN);
@@ -423,15 +509,35 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			builder.addAction(R.drawable.ic_action_tick, getString(R.string._title_take_all_doses), operation);
 		}
+		else if(isShowingLowSupplyNotificationOnly)
+		{
+			// Use simple string like "1 33 56 10231"
+			final StringBuilder drugIds = new StringBuilder();
+			for(Drug drug : drugsWithLowSupplies)
+			{
+				drugIds.append(drug.getId());
+				drugIds.append(' ');
+			}
 
-//		final long offset;
-//
-//		if(isActiveDoseTime)
-//			offset = Settings.getDoseTimeBeginOffset(doseTime);
-//		else
-//			offset = Settings.getTrueDoseTimeEndOffset(doseTime);
-//
-//		builder.setWhen(date.getTime() + offset);
+			final Intent intent = new Intent(mContext, NotificationReceiver.class);
+			intent.setAction(ACTION_SNOOZE_REFILL_REMINDER);
+			intent.putExtra(EXTRA_REFILL_SNOOZE_DRUGS, drugIds.toString());
+			intent.putExtra(EXTRA_DATE, date);
+
+			PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
+				builder.addAction(R.drawable.ic_action_snooze, getString(R.string._title_remind_tomorrow), operation);
+			else
+			{
+				builder.setDeleteIntent(operation);
+				// Technically it's ongoing, but you cannot delete ongoing notifications
+				builder.setOngoing(false);
+			}
+		}
+
+		final int currentHash = message.hashCode();
+		final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
 
 		if(mode == NOTIFICATION_FORCE_UPDATE || currentHash != lastHash)
 		{
@@ -441,10 +547,9 @@ public class NotificationReceiver extends BroadcastReceiver
 		else
 			builder.setOnlyAlertOnce(true);
 
-
 		// Prevents low supplies from constantly annoying the user with
 		// notification's sound and/or vibration if alarms are repeated.
-		if(isShowingLowSupplyNotification)
+		if(isShowingLowSupplyNotificationOnly)
 			mode = NOTIFICATION_FORCE_SILENT;
 
 		int defaults = 0;
@@ -525,7 +630,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		for(Drug drug : mAllDrugs)
 		{
-			if(Entries.hasLowSupplies(drug))
+			if(Entries.hasLowSupplies(drug, date))
 			{
 				++count;
 
@@ -545,17 +650,46 @@ public class NotificationReceiver extends BroadcastReceiver
 		return (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 
+	/* package */ static void cancelNotifications()
+	{
+		final NotificationManager nm = (NotificationManager) RxDroid.getContext()
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		nm.cancel(R.id.notification);
+	}
+
 	/* package */ static void rescheduleAlarmsAndUpdateNotification(boolean silent) {
 		rescheduleAlarmsAndUpdateNotification(null, silent);
 	}
 
-	/* package */ static void rescheduleAlarmsAndUpdateNotification(Context context, boolean silent)
+	/* package */ static void rescheduleAlarmsAndUpdateNotification(boolean silent, boolean forceUpdate) {
+		rescheduleAlarmsAndUpdateNotification(null, silent, forceUpdate);
+	}
+
+	/* package */ static void rescheduleAlarmsAndUpdateNotification(Context context, boolean silent) {
+		rescheduleAlarmsAndUpdateNotification(context, silent, false);
+	}
+
+	/* package */ static void rescheduleAlarmsAndUpdateNotification(Context context, boolean silent, boolean forceUpdate)
 	{
 		if(context == null)
 			context = RxDroid.getContext();
 		final Intent intent = new Intent(context, NotificationReceiver.class);
 		intent.setAction(Intent.ACTION_MAIN);
-		intent.putExtra(NotificationReceiver.EXTRA_SILENT, silent);
+		intent.putExtra(EXTRA_SILENT, silent);
+		intent.putExtra(EXTRA_FORCE_UPDATE, forceUpdate);
 		context.sendBroadcast(intent);
+	}
+
+	private static Set<Integer> toIntSet(String str)
+	{
+		final Set<Integer> intSet = new HashSet<Integer>();
+		for(String element : str.split(" "))
+		{
+			if(element.length() != 0)
+				intSet.add(Integer.valueOf(element, 10));
+		}
+
+		return intSet;
 	}
 }

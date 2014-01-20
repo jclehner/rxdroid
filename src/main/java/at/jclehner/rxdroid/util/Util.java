@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -21,25 +21,13 @@
 
 package at.jclehner.rxdroid.util;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.nio.channels.FileChannel;
-import java.util.Arrays;
-import java.util.Scanner;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -55,15 +43,26 @@ import android.view.ViewParent;
 import android.widget.TimePicker;
 
 import at.jclehner.androidutils.Objects;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.nio.channels.FileChannel;
+import java.util.Arrays;
+import java.util.Scanner;
 import at.jclehner.androidutils.Reflect;
-import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.Settings.Keys;
-import at.jclehner.rxdroid.Settings.Defaults;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
@@ -80,6 +79,10 @@ public final class Util
 			return a.equals(b);
 		else
 			return false;
+	}
+
+	public static boolean equalsLong(long long1, long long2, long epsilon) {
+		return Math.abs(long1 - long2) < epsilon;
 	}
 
 	public static void detachFromParent(View v)
@@ -214,7 +217,7 @@ public final class Util
 		return RxDroid.getContext().getString(resId);
 	}
 
-	public static int getDrugIconDrawable(Context context, int icon)
+	public static int getDrugIconDrawable(int icon)
 	{
 		switch(icon)
 		{
@@ -299,10 +302,9 @@ public final class Util
 		pref.setEntryValues(values);
 	}
 
-	public static String millis(long millis)
-	{
-		return millis + "ms ("
-				+ new DumbTime(millis, true).toString(true, true) + ")";
+	@Deprecated
+	public static String millis(long millis) {
+		return Millis.toString(millis);
 	}
 
 	/**

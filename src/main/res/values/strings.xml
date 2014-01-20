@@ -180,12 +180,16 @@
 	<string name="_msg_db_error_upgrade">Database upgrade error.</string>
 	<string name="_msg_db_error_downgrade">Incompatible database version.</string>
 		
-	<string name="_msg_db_error_footer">Click %1$s to reset the database.</string>	
+	<string name="_msg_db_error_footer">Click \"[@string/_btn_reset]\" to reset the database.</string>
 	
 	<string name="_btn_reset">Reset</string>
 	
-	<string name="_msg_footer_insufficient_supplies">Insufficient supplies for this dose. 
-		Press %2$s to ignore, cancel to edit the dose, or touch this text to edit &lt;b&gt;%3$s&lt;/b&gt;.</string>
+	<string name="_msg_footer_insufficient_supplies">
+    <![CDATA[
+        Insufficient supplies for this dose. Press \"[@android:string/ok]\" to ignore, \"[@android:string/cancel]\" to edit the dose,
+        or touch this text to edit <b>%1$s</b>.
+    ]]>
+    </string>
 		
 	<string name="_title_weekdays">Weekdays</string>
 	
@@ -330,7 +334,7 @@
 	
 	<string name="_title_disabled">Disabled</string>	
 	
-    <string name="_msg_no_drugs_compact_ab">Select \"%1$s\" from the menu to add a drug.</string>
+    <string name="_msg_no_drugs_compact_ab">Select \"[@string/_title_add]\" from the menu to add a drug.</string>
     <string name="_msg_no_drugs_extended_ab">Press the \"+\" button in the action bar to add a drug.</string>
     
     <string name="_help_msg_menu_hardware">The menu is accessible by pressing the menu key on your device.</string>
@@ -342,10 +346,8 @@
 	<string name="_title_language">Language</string>
 	
 	<string name="_title_use_backup_framework">Back up data</string>
-	<string name="_summary_use_backup_framework">Back up up data using services such as Google\'s \"Backup &amp; Restore\".</string>
-	
-	<string name="_msg_swipe_to_change_date">You can change the displayed date by swiping left or right</string>
-	
+	<string name="_summary_use_backup_framework">Back up data using services such as Google\'s \"Backup &amp; Restore\".</string>
+
 	<string name="_title_view">View</string>
 	
 	<string name="_title_missed">Missed</string>
@@ -370,7 +372,7 @@
 	
 	<string name="_title_skip_dose_dialog">Skip dialog</string>
 	<string name="_summary_skip_dose_dialog">Hide the dialog that is shown when clicking a dose. To open it,
-	    long-click the dose and select \"Take dose\".</string>
+	    long-click the dose and select \"[@string/_title_mark_taken]\".</string>
 	    
 	<string name="_title_take_all_doses">Take all</string>
 			
@@ -416,9 +418,30 @@
 	    -->
 	    
 	<string name="_title_use_pretty_fractions">Pretty fractions</string>
-	<string name="_summary_use_pretty_fractions">Display fractions as \"½\" instead of \"1/2\" (only works for some fractions)</string>		
-		
-	<!-- 
+	<string name="_summary_use_pretty_fractions">Display fractions as \"½\" instead of \"1/2\" (only works for some fractions)</string>
+
+    <string name="_msg_not_started_on_boot">
+    <![CDATA[
+        <p>RxDroid was not started at boot. A few possible reasons are listed below:</p>
+        <p>&bull; The app was moved to external storage</p>
+        <p>&bull; Auto-start for RxDroid was disabled in Android settings (certain flavours of Android only)</p>
+        <p>&bull; Auto-start for RxDroid was disabled by an app</p>
+        <br/>
+        <p>If none of the above applies to you, please click the \"[@string/_btn_report]\" button.</p>
+    ]]>
+    </string>
+
+    <string name="_btn_report">Report</string>
+    <string name="_btn_continue">Continue</string>
+
+    <string name="_title_use_safe_mode">Safe mode</string>
+    <string name="_summary_use_safe_mode">Disable unsafe features such as \"[@string/_title_take_all_doses]\" or
+            \"[@string/_title_skip_dose_dialog]\"</string>
+
+    <string name="_title_remind_tomorrow">Remind tomorrow</string>
+    <string name="_toast_remind_tomorrow">Hiding notification until tomorrow.</string>
+
+    <!--
     Keep at the end of strings.xml!  
      -->
     <string name="dialog_set_number">@string/_btn_set</string>

@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -33,6 +33,7 @@ import at.jclehner.rxdroid.LockscreenActivity;
 import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.Settings.Keys;
+import at.jclehner.rxdroid.SystemEventReceiver;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.db.Database;
 
@@ -95,6 +96,8 @@ public final class Components
 					Log.d(TAG, "Language '" + lang + "' already set");
 			}
 		}
+
+		SystemEventReceiver.registerOnSystemTimeChangeListener(activity);
 	}
 
 	public static void onResumeActivity(Activity activity, int flags)

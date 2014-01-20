@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -33,12 +33,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseHistoryActivity;
+import at.jclehner.rxdroid.DoseTime;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.Version;
 import at.jclehner.rxdroid.db.Drug;
@@ -57,13 +60,23 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 	private static final String TAG = DrugOverviewAdapter.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
 
-	private final Timer mTimer;
+	private static final int TYPE_WITH_SCHEDULE = 0;
+	private static final int TYPE_WITHOUT_SCHEDULE = 1;
 
-	public DrugOverviewAdapter(Activity activity, List<Drug> items, Date date, int activeDoseTime)
+	private final Timer mTimer;
+	private final boolean mDimDoseViews;
+	private final boolean mShowingAll;
+	private final int mNextDoseTime;
+
+	public DrugOverviewAdapter(Activity activity, List<Drug> items, Date date, int activeDoseTime, int nextDoseTime, boolean showingAll)
 	{
 		super(activity, items, date, activeDoseTime);
 
+
 		mTimer = LOGV ? new Timer() : null;
+		mDimDoseViews = Settings.getBoolean(Settings.Keys.DIM_DOSE_VIEWS, true);
+		mShowingAll = showingAll;
+		mNextDoseTime = nextDoseTime;
 	}
 
 	@Override
@@ -73,30 +86,34 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			mTimer.restart();
 
 		final Drug drug = getItem(position);
+		final boolean hasSchedule = getItemViewType(position) == TYPE_WITH_SCHEDULE;
 		final DoseViewHolder holder;
 
 		if(v == null)
 		{
-			v = mActivity.getLayoutInflater().inflate(R.layout.drug_view, null);
+			v = mActivity.getLayoutInflater().inflate(
+					hasSchedule ? R.layout.drug_view : R.layout.drug_view_no_schedule, null);
 
 			holder = new DoseViewHolder();
 
 			holder.name = (DrugNameView) v.findViewById(R.id.drug_name);
 			holder.icon = (ImageView) v.findViewById(R.id.drug_icon);
 			holder.missedDoseIndicator = (ImageView) v.findViewById(R.id.img_missed_dose_warning);
-			//holder.log = (ImageView) v.findViewById(R.id.img_drug_menu);
+			holder.historyMenuFrame = (FrameLayout) v.findViewById(R.id.frame_history_menu);
 			holder.historyMenu = v.findViewById(R.id.frame_history_menu);
-//			holder.lowSupplyIndicator = v.findViewById(R.id.low_supply_indicator);
 			holder.currentSupply = (DrugSupplyMonitor) v.findViewById(R.id.text_supply);
 
-			for(int i = 0; i != holder.doseViews.length; ++i)
+			if(hasSchedule)
 			{
-				final int doseViewId = Constants.DOSE_VIEW_IDS[i];
-				holder.doseViews[i] = (DoseView) v.findViewById(doseViewId);
-				mActivity.registerForContextMenu(holder.doseViews[i]);
-			}
+				for(int i = 0; i != holder.doseViews.length; ++i)
+				{
+					final int doseViewId = Constants.DOSE_VIEW_IDS[i];
+					holder.doseViews[i] = (DoseView) v.findViewById(doseViewId);
+					mActivity.registerForContextMenu(holder.doseViews[i]);
+				}
 
-			holder.setDividersFromLayout(v);
+				holder.setDividersFromLayout(v);
+			}
 
 			v.setTag(holder);
 		}
@@ -108,7 +125,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
 
 		//holder.icon.setImageResource(drug.getIconResourceId());
-		holder.icon.setImageResource(Util.getDrugIconDrawable(getContext(), drug.getIcon()));
+		holder.icon.setImageResource(Util.getDrugIconDrawable(drug.getIcon()));
 		holder.currentSupply.setDrugAndDate(drug, mAdapterDate);
 
 		final Date today = DateTime.today();
@@ -140,32 +157,69 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		holder.currentSupply.setVisibility(isCurrentSupplyVisible ? View.VISIBLE : View.INVISIBLE);
 
-		int doseTime = Schedule.TIME_MORNING;
-
-		for(DoseView doseView : holder.doseViews)
+		if(!hasSchedule && isToday && drug.isActive())
 		{
-			if(!doseView.hasInfo(mAdapterDate, drug))
-				doseView.setDoseFromDrugAndDate(mAdapterDate, drug);
-
-			if(isToday && mActiveDoseTime != Schedule.TIME_INVALID)
-				doseView.setDimmed(doseTime != mActiveDoseTime);
-			else
-				doseView.setDimmed(false);
-
-			++doseTime;
+			// Active drugs without a schedule are displayed for notification purposes. We hide
+			// the menu items that are not relevant
+			if(!mShowingAll)
+			{
+				holder.historyMenuFrame.setVisibility(isMissingDoseIndicatorVisible ? View.VISIBLE : View.GONE);
+				holder.currentSupply.setVisibility(holder.currentSupply.hasLowSupplies() ? View.VISIBLE : View.GONE);
+			}
+			//el
 		}
 
-		final int dividerVisibility;
-		if(v.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-			dividerVisibility = View.GONE;
-		else
-			dividerVisibility = View.VISIBLE;
-
-		for(int i = 0; i != holder.dividers.length; ++i)
+		if(hasSchedule)
 		{
-			final View divider = holder.dividers[i];
-			if(divider != null)
-				divider.setVisibility(dividerVisibility);
+			int doseTime = Schedule.TIME_MORNING;
+
+			final int maxDoseTimeForNoDim;
+
+			if(mActiveDoseTime == Schedule.TIME_INVALID)
+			{
+				if(mNextDoseTime == Schedule.TIME_MORNING)
+					maxDoseTimeForNoDim = Schedule.TIME_MORNING - 1;
+				else
+					maxDoseTimeForNoDim = DoseTime.before(mNextDoseTime);
+			}
+			else
+				maxDoseTimeForNoDim = mActiveDoseTime;
+
+			for(DoseView doseView : holder.doseViews)
+			{
+				if(!doseView.hasInfo(mAdapterDate, drug))
+					doseView.setDoseFromDrugAndDate(mAdapterDate, drug);
+
+				if(mDimDoseViews)
+				{
+					boolean dimmed = false;
+
+					if(isToday)
+					{
+						if(doseTime <= maxDoseTimeForNoDim && !drug.getDose(doseTime, mAdapterDate).isZero())
+							dimmed = Entries.countDoseEvents(drug, mAdapterDate, doseView.getDoseTime()) != 0;
+						else
+							dimmed = true;
+					}
+
+					doseView.setDimmed(dimmed);
+				}
+
+				++doseTime;
+			}
+
+			final int dividerVisibility;
+			if(v.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+				dividerVisibility = View.GONE;
+			else
+				dividerVisibility = View.VISIBLE;
+
+			for(int i = 0; i != holder.dividers.length; ++i)
+			{
+				final View divider = holder.dividers[i];
+				if(divider != null)
+					divider.setVisibility(dividerVisibility);
+			}
 		}
 
 		if(LOGV && position == getCount() - 1)
@@ -184,5 +238,23 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		}
 
 		return v;
+	}
+
+	@Override
+	public int getItemViewType(int position)
+	{
+		final Drug drug = getItem(position);
+		if(!drug.isActive() || !drug.hasDoseOnDate(mAdapterDate))
+		{
+			if(Entries.countDoseEvents(drug, mAdapterDate, null) == 0)
+				return TYPE_WITHOUT_SCHEDULE;
+		}
+
+		return TYPE_WITH_SCHEDULE;
+	}
+
+	@Override
+	public int getViewTypeCount() {
+		return 2;
 	}
 }

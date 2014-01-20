@@ -177,12 +177,17 @@
         <string name="_msg_db_error_upgrade">Σφάλμα αναβάθμισης βάσης δεδομένων.</string>
         <string name="_msg_db_error_downgrade">Ασύμβατη έκδοση βάσης δεδομένων.</string>
                 
-        <string name="_msg_db_error_footer">Πατήστε %1$s για επαναφορά της βάσης δεδομένων.</string>  
+        <string name="_msg_db_error_footer">Πατήστε \"[@string/_btn_reset]\" για επαναφορά της βάσης δεδομένων.</string>
         
         <string name="_btn_reset">Επαναφορά</string>
         
-        <string name="_msg_footer_insufficient_supplies">Ανεπαρκής ποσότητα για την δόση. 
-                Πατήστε %2$s για να το αγνοήσετε, άκυρο για επεξεργασία της δόσης, ή αγγίξτε το κείμενο για επεξεργασία &lt;b&gt;%3$s&lt;/b&gt;.</string>
+        <string name="_msg_footer_insufficient_supplies">
+        <![CDATA[
+            Ανεπαρκής ποσότητα για την δόση.
+            Πατήστε \"[@android:string/ok]\" για να το αγνοήσετε, \"[@android:string/cancel]\" για επεξεργασία
+            της δόσης, ή αγγίξτε το κείμενο για επεξεργασία <b>%1$s</b>
+        ]]>
+        </string>
                 
         <string name="_title_weekdays">Ημέρες εβδομάδας</string>
         
@@ -329,7 +334,7 @@
         
         <string name="_title_disabled">Απενεργοποιημένο</string>        
         
-    <string name="_msg_no_drugs_compact_ab">Επιλέξτε \"%1$s\" από το μενού για να προσθέσετε φάρμακο</string>
+    <string name="_msg_no_drugs_compact_ab">Επιλέξτε \"[@string/_title_add]\" από το μενού για να προσθέσετε φάρμακο</string>
     <string name="_msg_no_drugs_extended_ab">Πατήστε το κουμπί \"+\" στην μπάρα ενεργειών για να προσθέσετε ένα φάρμακο</string>
     
     <string name="_summary_smart_sort">Ταξινόμηση των φαρμάκων βάση της σημαντικότητας</string>
@@ -366,7 +371,7 @@
         
         <string name="_title_skip_dose_dialog">Παράλειψη διαλόγου</string>
         <string name="_summary_skip_dose_dialog">Απόκρυψη του διαλόγου που εμφανίζεται όταν πατάτε σε μία δόση. Για να τον ανοίξετε,
-            πατήστε παρατεταμένα στην δόση και επιλέξτε \"Πάρτε την δόση\".</string>
+            πατήστε παρατεταμένα στην δόση και επιλέξτε \"[@string/_title_mark_taken]\".</string>
             
         <!-- 
     Keep at the end of strings.xml!  

@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -33,6 +33,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
+
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.ui.DoseLogFragment;
@@ -74,7 +76,8 @@ import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
  *
  */
 
-public class DoseHistoryActivity extends SherlockFragmentActivity
+public class DoseHistoryActivity extends SherlockFragmentActivity implements
+		SystemEventReceiver.OnSystemTimeChangeListener
 {
 	private Drug mDrug;
 
@@ -133,6 +136,11 @@ public class DoseHistoryActivity extends SherlockFragmentActivity
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onTimeChanged(int type) {
+		finish();
 	}
 
 	void updateLogFragment()

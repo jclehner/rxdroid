@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -218,7 +218,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		{
 			final int drugId = intent.getIntExtra(EXTRA_DRUG_ID, -1);
 			if(drugId == -1)
-				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG");
+				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG_ID");
 
 			drug = Drug.get(drugId);
 

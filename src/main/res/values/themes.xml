@@ -171,6 +171,7 @@
 	
 	<style name="Theme.RxDroid.BottomBar">
 -		<item name="android:background">@android:drawable/bottom_bar</item>
+        <item name="android:padding">8dip</item>
 -	</style>		
 	
 	<style name="TextAppearance.Large.Clickable" parent="@android:style/TextAppearance.Large">

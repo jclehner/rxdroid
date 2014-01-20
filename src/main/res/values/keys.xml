@@ -51,4 +51,6 @@
 	<item type="string" name="key_use_backup_framework">use_backup_framework</item>
 	<item type="string" name="key_skip_dose_dialog">skip_dose_dialog</item>
 	<item type="string" name="key_use_pretty_fractions">use_pretty_fractions</item>
+    <item type="string" name="key_dim_dose_views">dim_dose_views</item>
+    <item type="string" name="key_use_safe_mode">use_safe_mode</item>
 </resources>

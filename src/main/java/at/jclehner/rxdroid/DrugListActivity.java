@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -60,9 +60,12 @@ import android.view.ViewStub;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import at.jclehner.androidutils.RefString;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.InfiniteViewPagerAdapter.ViewFactory;
 import at.jclehner.rxdroid.NotificationReceiver.OnDoseTimeChangeListener;
+import at.jclehner.rxdroid.SystemEventReceiver.OnSystemTimeChangeListener;
 import at.jclehner.rxdroid.Settings.Defaults;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.Settings.Keys;
@@ -94,7 +97,7 @@ import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
 import com.mobeta.android.dslv.DragSortListView;
 
 public class DrugListActivity extends SherlockFragmentActivity implements OnLongClickListener,
-		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory
+		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory, OnSystemTimeChangeListener
 {
 	private static final String TAG = DrugListActivity.class.getSimpleName();
 	private static final boolean LOGV = false;
@@ -120,6 +123,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 	private Date mOriginalDate;
 	private Date mCurrentDate;
 	private int mCurrentDoseTime;
+	private int mNextDoseTime;
 
 	private boolean mShowingAll = false;
 	private int mCurrentPatientId = Patient.DEFAULT_PATIENT_ID;
@@ -169,15 +173,18 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		mIsShowing = true;
 
 		final Intent intent = getIntent();
-		/*Date date = null;
+		Date date = null;
 
 		if(intent != null)
 			date = (Date) intent.getSerializableExtra(EXTRA_DATE);
 
-		if(date == null)*/
-		DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
-		Date date = dtInfo.activeDate();
+		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
+
+		if(date == null)
+			date = dtInfo.activeDate();
+
 		mCurrentDoseTime = dtInfo.activeDoseTime();
+		mNextDoseTime = dtInfo.nextDoseTime();
 
 		setDate(date, PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
@@ -241,6 +248,9 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 		new MenuInflater(this).inflate(menuResId, menu);
 
+		if(Settings.getBoolean(Keys.USE_SAFE_MODE, false))
+			menu.removeItem(R.id.menuitem_take_all);
+
 		return true;
 	}
 
@@ -250,7 +260,10 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		final int titleResId = isShowingCurrentDate() ? R.string._title_go_to_date : R.string._title_today;
 		menu.findItem(R.id.menuitem_date).setTitle(titleResId);
 		menu.findItem(R.id.menuitem_toggle_filtering).setTitle(mShowingAll ? R.string._title_filter : R.string._title_show_all);
-		menu.findItem(R.id.menuitem_take_all).setEnabled(isShowingCurrentDate());
+
+		final MenuItem item = menu.findItem(R.id.menuitem_take_all);
+		if(item != null)
+			item.setEnabled(isShowingCurrentDate());
 
 		return true;
 	}
@@ -447,6 +460,13 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 	}
 
 	@Override
+	public void onTimeChanged(int type)
+	{
+		Log.d(TAG, "onTimeChanged: type=" + type);
+		finish();
+	}
+
+	@Override
 	public View makeView(int offset)
 	{
 		if(offset <= -(InfiniteViewPagerAdapter.MAX/2))
@@ -494,8 +514,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 						hasHardwareMenuKey = ViewConfiguration.get(this).hasPermanentMenuKey();
 				}
 
-				final StringBuilder sb = new StringBuilder(getString(R.string._msg_no_drugs_compact_ab,
-						getString(R.string._title_add)));
+				final StringBuilder sb = new StringBuilder(
+						RefString.resolve(this, R.string._msg_no_drugs_compact_ab));
 
 				if(hasHardwareMenuKey)
 					sb.append(" " + getString(R.string._help_msg_menu_hardware));
@@ -697,7 +717,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 					svb.setText(R.string._help_title_edit_drug, R.string._help_msg_edit_drug);
 					svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 					svb.setShowcaseId(0xdeadbeef + 1);
-					svb.setShowcaseView(R.id.drug_name, this);
+					//svb.setShowcaseView(R.id.drug_name, this);
 
 					svb.setShowcaseEventListener(new ShowcaseViewHelper());
 
@@ -717,26 +737,29 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 				}
 				else if(drugCount >= 2 && !Settings.wasDisplayedOnce(Settings.OnceIds.DRAG_DROP_SORTING))
 				{
-					mShowcaseQueue.clear();
-
-					ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(this);
-					svb.setShowcaseView(R.id.drug_icon, this);
-					svb.setText(R.string._help_title_drag_drop_sort, R.string._msg_drag_drop_sorting);
-					svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
-					svb.setShowcaseId(0xdeadbeef + 2);
-					svb.setRelativeAnimatedGesture(0, 200);
-
-					svb.setShowcaseEventListener(new ShowcaseViewHelper()
+					if(false)
 					{
-						@Override
-						public void onShowcaseViewShow(ShowcaseView showcaseView)
-						{
-							super.onShowcaseViewShow(showcaseView);
-							Settings.setDisplayedOnce(OnceIds.DRAG_DROP_SORTING);
-						}
-					});
+						mShowcaseQueue.clear();
 
-					mShowcaseQueue.add(tag(svb.build(false), "Drag drop sorting"));
+						ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(this);
+						svb.setShowcaseView(R.id.drug_icon, this);
+						svb.setText(R.string._help_title_drag_drop_sort, R.string._msg_drag_drop_sorting);
+						svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+						svb.setShowcaseId(0xdeadbeef + 2);
+						svb.setRelativeAnimatedGesture(0, 200);
+
+						svb.setShowcaseEventListener(new ShowcaseViewHelper()
+						{
+							@Override
+							public void onShowcaseViewShow(ShowcaseView showcaseView)
+							{
+								super.onShowcaseViewShow(showcaseView);
+								Settings.setDisplayedOnce(OnceIds.DRAG_DROP_SORTING);
+							}
+						});
+
+						mShowcaseQueue.add(tag(svb.build(false), "Drag drop sorting"));
+					}
 				}
 			}
 			else
@@ -799,7 +822,8 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			Collections.sort(drugs);
 		}
 
-		final DrugOverviewAdapter adapter = new DrugOverviewAdapter(this, drugs, date, mCurrentDoseTime);
+		final DrugOverviewAdapter adapter = new DrugOverviewAdapter(this, drugs, date,
+				mCurrentDoseTime, mNextDoseTime, mShowingAll);
 		adapter.setFilter(mShowingAll ? null : new DrugFilter(date));
 
 		listView.setAdapter(adapter);
@@ -904,7 +928,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 
 			if(drug.hasAutoDoseEvents())
 			{
-				if(Entries.hasLowSupplies(drug))
+				if(Entries.hasLowSupplies(drug, mFilterDate))
 					return true;
 
 				return mShowSupplyMonitors;
@@ -916,7 +940,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			if(Entries.countDoseEvents(drug, mFilterDate, null) != 0)
 				return true;
 
-			if(Entries.hasLowSupplies(drug))
+			if(Entries.hasLowSupplies(drug, mFilterDate))
 				return true;
 
 			if(DateTime.isToday(mFilterDate) && Entries.hasMissingDosesBeforeDate(drug, mFilterDate))
@@ -1059,6 +1083,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		public void onDoseTimeBegin(Date date, int doseTime)
 		{
 			mCurrentDoseTime = doseTime;
+			mNextDoseTime = DoseTime.after(doseTime);
 
 			if(!date.equals(mCurrentDate))
 				setDate(date, PAGER_INIT);
@@ -1119,7 +1144,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		{
 			if(mSmartSortEnabled)
 			{
-				if(getAutoSortScore(lhs) < getAutoSortScore(rhs))
+				if(getSmartSortScore(lhs) < getSmartSortScore(rhs))
 					return -1;
 				else
 					return 1;
@@ -1128,30 +1153,34 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			return lhs.compareTo(rhs);
 		}
 
-		private int getAutoSortScore(Drug drug)
+		// lower score is better (higher up)
+		private int getSmartSortScore(Drug drug)
 		{
+			if(!drug.isActive())
+				return 10000 + drug.getId();
+
 			int score = 0;
 
-			if(drug.isActive())
-				score += 10000;
+			if(!Entries.hasAllDoseEvents(drug, mDate, mDoseTime, false))
+				score -= 5000;
 
 			if(!drug.getDose(mDoseTime, mDate).isZero())
 			{
 				if(Entries.countDoseEvents(drug, mDate, mDoseTime) == 0)
-					score += 5000;
+					score -= 3000;
 			}
 
-			if(Entries.hasLowSupplies(drug))
-				score += 1000;
+			if(Entries.hasLowSupplies(drug, mDate))
+				score -= 1000;
 
 			if(DateTime.isToday(mDate))
 			{
 				if(Entries.hasMissingDosesBeforeDate(drug, mDate))
-					score += 1000;
+					score -= 1000;
 			}
 
 			if(drug.hasDoseOnDate(mDate))
-				score += 100;
+				score -= 2500;
 
 			return score;
 		}

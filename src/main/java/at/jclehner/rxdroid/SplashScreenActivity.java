@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -34,6 +34,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -43,8 +44,11 @@ import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import at.jclehner.androidutils.RefString;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
@@ -107,6 +111,7 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 
 	private final BroadcastReceiver mReceiver = new DatabaseStatusReceiver();
 	private Date mDate;
+	private boolean mLaunchMainActivity = true;
 
 	private WrappedCheckedException mException = null;
 
@@ -117,7 +122,85 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 		Settings.init();
 
 		setTheme(Theme.get());
-		setContentView(R.layout.loader);
+
+		final long bootCompletedTimestamp = Settings.getLong(Settings.Keys.BOOT_COMPLETED_TIMESTAMP, 0);
+		final long bootTimestamp = RxDroid.getBootTimestamp();
+		final boolean forceSplashWarning =
+				BuildConfig.DEBUG && Settings.getBoolean(Settings.Keys.DEBUG_FORCE_SPLASH_WARNING, false);
+
+		// getBootTimestamp() does not return a constant value when using the fallback
+		// method, so we allow the times to be off by +/- 100ms
+		if(!Util.equalsLong(bootCompletedTimestamp, bootTimestamp, 100) || forceSplashWarning)
+		{
+			if(bootTimestamp != Settings.getLong(Settings.Keys.LAST_NOT_STARTED_WARNING_TIMESTAMP, 0)
+					|| forceSplashWarning)
+			{
+				Settings.putLong(Settings.Keys.LAST_NOT_STARTED_WARNING_TIMESTAMP, bootTimestamp);
+
+				final long lastUpdateTimestamp = RxDroid.getLastUpdateTimestamp();
+				if(lastUpdateTimestamp != 0 && lastUpdateTimestamp > bootTimestamp)
+				{
+					Log.w(TAG, "Notification service was not runnning because the app was updated");
+				}
+				else
+				{
+					mLaunchMainActivity = false;
+
+					Log.w(TAG, "Notification service was not started on boot: " +
+						bootCompletedTimestamp + " vs " + bootTimestamp);
+
+					setContentView(R.layout.splash_screen_warning);
+
+					findViewById(R.id.btn_continue).setOnClickListener(new View.OnClickListener()
+					{
+						@Override
+						public void onClick(View view)
+						{
+							setContentView(R.layout.loader);
+							loadDatabaseAndLaunchMainActivity();
+						}
+					});
+
+					findViewById(R.id.btn_report).setOnClickListener(new View.OnClickListener()
+					{
+						@Override
+						public void onClick(View view)
+						{
+							view.setEnabled(false);
+
+							final Intent intent = new Intent();
+							intent.setAction(Intent.ACTION_SEND);
+							intent.setType("plain/text");
+							intent.putExtra(Intent.EXTRA_EMAIL, "josephclehner+rxdroid-issue@gmail.com");
+							intent.putExtra(Intent.EXTRA_SUBJECT, "[ISSUE] " + Build.MODEL + " auto-start");
+							intent.putExtra(Intent.EXTRA_TEXT,
+									"MANUFACTURER: " + Build.MANUFACTURER + "\n" +
+											"PRODUCT     : " + Build.PRODUCT + "\n" +
+											"MODEL       : " + Build.MODEL + "\n" +
+											"DEVICE      : " + Build.DEVICE + "\n" +
+											"DISPLAY     : " + Build.DISPLAY + "\n" +
+											"RELEASE     : " + Build.VERSION.RELEASE + "\n" +
+											"SDK_INT     : " + Build.VERSION.SDK_INT + "\n" +
+											"=========================\n\n"
+							);
+
+							startActivity(Intent.createChooser(intent, getString(R.string._btn_report)));
+						}
+					});
+				}
+			}
+		}
+		else if(BuildConfig.DEBUG)
+		{
+			Log.d(TAG,
+					"onCreate:" +
+					"\n  bootCompletedTimestamp=" + bootCompletedTimestamp +
+					"\n           bootTimestamp=" + bootTimestamp);
+		}
+
+
+		if(mLaunchMainActivity)
+			setContentView(R.layout.loader);
 
 		mDate = Settings.getActiveDate();
 
@@ -145,7 +228,8 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 	{
 		//registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_MAIN));
 		RxDroid.getLocalBroadcastManager().registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_MAIN));
-		loadDatabaseAndLaunchMainActivity();
+		if(mLaunchMainActivity)
+			loadDatabaseAndLaunchMainActivity();
 		super.onResume();
 	}
 
@@ -236,7 +320,7 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 			else
 				sb.append(getString(R.string._msg_db_error_general));
 
-			sb.append(" " + getString(R.string._msg_db_error_footer, getString(R.string._btn_reset)));
+			sb.append(" " + RefString.resolve(this, R.string._msg_db_error_footer));
 			((AlertDialog) dialog).setMessage(sb);
 		}
 		else

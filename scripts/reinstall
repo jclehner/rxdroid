@@ -6,7 +6,7 @@ BAKBASE=".backup"
 BAKDB="$BAKBASE.sqlite"
 BAKCFG="$BAKBASE.config"
 
-APK="${1:-bin/RxDroid.apk}"
+APK="${1:-build/apk/RxDroid-debug-unaligned.apk}"
 
 if [[ ! -f "$APK" ]]; then
 	die "$APK does not exist"

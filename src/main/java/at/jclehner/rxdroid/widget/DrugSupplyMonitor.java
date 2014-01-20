@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -50,6 +50,8 @@ public class DrugSupplyMonitor extends TextView implements
 	private Drug mDrug;
 	private Date mDate;
 
+	private boolean mHasLowSupplies;
+
 	public DrugSupplyMonitor(Context context) {
 		super(context);
 	}
@@ -87,6 +89,10 @@ public class DrugSupplyMonitor extends TextView implements
 
 	public Drug getDrug() {
 		return mDrug;
+	}
+
+	public boolean hasLowSupplies() {
+		return mHasLowSupplies;
 	}
 
 	@Override
@@ -146,24 +152,26 @@ public class DrugSupplyMonitor extends TextView implements
 	{
 		int typeface = Typeface.NORMAL;
 		float textScaleX = 1.0f;
+		mHasLowSupplies = false;
 
 		if(drug != null)
 		{
-			final Date today = DateTime.today();
 			MutableFraction currentSupply = drug.getCurrentSupply().mutate();
 
-			if(date != null)
+			if(drug.isActive() && date != null)
 			{
+				final Date today = DateTime.today();
 				if(date.after(today))
 				{
 					//Fraction doseInTimePeriod_smart = Entries.getTotalDoseInTimePeriod_smart(drug, today, date);
 					Fraction doseInTimePeriod_dumb = Entries.getTotalDoseInTimePeriod_dumb(drug, today, date, true);
 					currentSupply.subtract(doseInTimePeriod_dumb);
 				}
-				else if(date.equals(today) && Entries.hasLowSupplies(drug))
+				else if(date.equals(today) && Entries.hasLowSupplies(drug, date))
 				{
 					typeface = Typeface.BOLD_ITALIC;
 					textScaleX = 1.25f;
+					mHasLowSupplies = true;
 				}
 			}
 

@@ -77,17 +77,21 @@
 		    android:summary="@string/_summary_use_pretty_fractions"
 		    android:defaultValue="@bool/pref_default_use_pretty_fractions"
 		/>
-	     
+
 	    <PreferenceCategory 
 	    	android:title="@string/_title_show_in_list" 
-	    >    
+	    >
+            <CheckBoxPreference android:key="@string/key_use_smart_sort"
+		        android:title="@string/_title_smart_sort"
+		        android:summary="@string/_summary_smart_sort"
+		        android:defaultValue="true"
+		    />
 		
-			<CheckBoxPreference android:key="@string/key_skip_dose_dialog"
+			<at.jclehner.rxdroid.preferences.RefSummaryCheckBoxPreference android:key="@string/key_skip_dose_dialog"
 			    android:title="@string/_title_skip_dose_dialog"
 			    android:summary="@string/_summary_skip_dose_dialog"
 			    android:defaultValue="false"
 			/>
-	        
 	    
 	        <CheckBoxPreference android:key="@string/key_show_supply_monitors"
 	            android:title="@string/_title_show_supply_monitors"
@@ -100,13 +104,6 @@
 			    android:summary="@string/_summary_scramble_names"
 			    android:defaultValue="false"
 			/>
-		    
-		    <CheckBoxPreference android:key="@string/key_use_smart_sort"
-		        android:title="@string/_title_smart_sort"
-		        android:summary="@string/_summary_smart_sort"
-		        android:defaultValue="false"
-		        android:enabled="false"
-		    />
 	   
 	    </PreferenceCategory>	 
 	
@@ -208,6 +205,12 @@
 	<PreferenceScreen android:key="prefscreen_development"
 	    android:title="Development"
 	>
+         <at.jclehner.rxdroid.preferences.RefSummaryCheckBoxPreference android:key="@string/key_use_safe_mode"
+            android:title="@string/_title_use_safe_mode"
+            android:summary="@string/_summary_use_safe_mode"
+            android:defaultValue="false"
+         />
+
 		<at.jclehner.rxdroid.preferences.LanguagePreference 
 	        android:key="@string/key_language"
 	        android:title="@string/_title_language"
@@ -215,33 +218,22 @@
 	        android:enabled="false"
 	    />
 
-        <CheckBoxPreference android:key="@string/key_use_smart_sort"
-            android:title="@string/_title_smart_sort"
-            android:summary="@string/_summary_smart_sort"
+        <Preference android:key="boot_info"
+                android:title="Boot info"
         />
-		
-		<CheckBoxPreference android:key="@string/key_skip_dose_dialog"
-		    android:title="Skip DoseDialog"
-		    android:defaultValue="false"
-		/>
-		
-		<PreferenceScreen android:key="prefscreen_development_test"
-		    android:title="PreferenceScreen"
-		>
-		    
-		    <Preference 
-		        android:title="Go away!"
-		    />	    
-		</PreferenceScreen>
-	    
-		<Preference android:key="db_create_drug_with_schedule"
-			android:title="Custom schedule drug"
-		/>
-		
-		<EditTextPreference android:key="doseview_zero"
-		    android:title="DoseView zero"
-		    android:defaultValue="-"
-		/>   
+
+        <Preference android:key="reset_refill_reminder_date"
+                android:title="Reset refill reminder date"
+        />
+
+        <Preference android:key="dump_build"
+                android:title="Dump android.os.Build"
+        />
+
+        <CheckBoxPreference android:key="debug_force_splash_warning"
+                android:title="Force splash warning"
+                android:defaultValue="false"
+        />
 		
 		<Preference android:key="db_create_drug_with_many_dose_events"
 		    android:title="Create drug with many dose events"

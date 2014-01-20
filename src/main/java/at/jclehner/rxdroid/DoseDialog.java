@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -35,6 +35,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import at.jclehner.androidutils.RefString;
 import at.jclehner.rxdroid.FractionInput.OnChangedListener;
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Database;
@@ -380,11 +382,7 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 
 		if(state == STATE_INSUFFICIENT_SUPPLIES)
 		{
-			final Context context = getContext();
-			final String okStr = context.getString(android.R.string.ok);
-			final String text = context.getString(R.string._msg_footer_insufficient_supplies,
-					mDrug.getCurrentSupply(), okStr, mDrug.getName());
-
+			final String text = RefString.resolve(getContext(), R.string._msg_footer_insufficient_supplies, mDrug.getName());
 			mInsufficientSupplyText.setText(Html.fromHtml(text));
 		}
 	}

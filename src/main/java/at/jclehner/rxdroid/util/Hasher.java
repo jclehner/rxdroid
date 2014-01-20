@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -52,7 +52,10 @@ import java.lang.reflect.Array;
  */
 public class Hasher
 {
-	private int mHash = 23;
+	private static final int PRIME = 37;
+	private static final int INITIAL_HASH = 23;
+
+	private int mHash = INITIAL_HASH;
 	private int mHashedCount = 0;
 
 	public void hash(boolean b) {
@@ -101,9 +104,38 @@ public class Hasher
 		return mHash;
 	}
 
+	public Hasher reset()
+	{
+		mHash = INITIAL_HASH;
+		mHashedCount = 0;
+		return this;
+	}
+
+	@Override
+	public int hashCode() {
+		throw new UnsupportedOperationException("Call getHashCode() to obtain the calculated hash");
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		throw new UnsupportedOperationException();
+	}
+
+	public static Hasher getInstance() {
+		return sHashers.get().reset();
+	}
+
 	private int term() {
 		return PRIME * mHash;
 	}
 
-	private static final int PRIME = 37;
+	private static final ThreadLocal<Hasher> sHashers = new ThreadLocal<Hasher>() {
+		@Override
+		protected Hasher initialValue()
+		{
+			return new Hasher();
+		}
+	};
+
+	private Hasher() {}
 }

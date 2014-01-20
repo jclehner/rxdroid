@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="48dip"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/dose_view_height"
     android:orientation="horizontal"
     android:padding="8dip"
 >
@@ -26,7 +27,9 @@
         />
     </LinearLayout>
     
-    <include layout="@layout/drug_schedule" />
-       
+    <include layout="@layout/drug_schedule"
+             android:layout_height="@dimen/dose_view_height"
+             android:layout_width="match_parent"
+            />
 
 </LinearLayout>

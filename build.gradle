@@ -6,7 +6,8 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:0.5.6'
+		classpath 'com.android.tools.build:gradle:0.7.+'
+		//classpath 'com.android.tools.build:gradle:0.6.3+'
 	}
 }
 
@@ -21,10 +22,11 @@ dependencies {
 		//compile 'com.google.code.gson:gson:2.2.4'
 		compile 'com.j256.ormlite:ormlite-core:4.47'
 		compile 'com.j256.ormlite:ormlite-android:4.47'
-		compile 'com.android.support:support-v4:13.0.0'
+		compile 'com.android.support:support-v4:19.0.0'
 		compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
 		compile 'com.nineoldandroids:library:2.4.0'
 	
+		//compile 'at.jclehner.rxdroid.localmaven:SherlockNavigationDrawer:1.0'
 		compile 'at.jclehner.rxdroid.localmaven:NumberPicker:9999'
 		compile 'at.jclehner.rxdroid.localmaven:DragSortListView:9999'
 		compile 'at.jclehner.rxdroid.localmaven:ShowcaseView:9999'

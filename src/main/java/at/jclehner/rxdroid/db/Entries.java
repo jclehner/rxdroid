@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -275,12 +275,23 @@ public final class Entries
 		return findDoseEvents(drug, date, doseTime).size();
 	}
 
-	public static boolean hasAllDoseEvents(Drug drug, Date date)
+	public static boolean hasAllDoseEvents(Drug drug, Date date) {
+		return hasAllDoseEvents(drug, date, Schedule.TIME_INVALID);
+	}
+
+	public static boolean hasAllDoseEvents(Drug drug, Date date, int untilDoseTime) {
+		return hasAllDoseEvents(drug, date, untilDoseTime, true);
+	}
+
+	public static boolean hasAllDoseEvents(Drug drug, Date date, int untilDoseTime, boolean inclusiveUntilDoseTime)
 	{
+		final int lastDoseTime = inclusiveUntilDoseTime ? untilDoseTime : untilDoseTime - 1;
+		if(lastDoseTime < Schedule.TIME_MORNING)
+			return true;
+
 		if(!drug.hasDoseOnDate(date))
 			return true;
 
-		//List<intake> events = findAll(drug, date, null);
 		for(int doseTime : Constants.DOSE_TIMES)
 		{
 			Fraction dose = drug.getDose(doseTime, date);
@@ -289,6 +300,9 @@ public final class Entries
 				if(countDoseEvents(drug, date, doseTime) == 0)
 					return false;
 			}
+
+			if(doseTime == lastDoseTime)
+				break;
 		}
 
 		return true;
@@ -426,21 +440,21 @@ public final class Entries
 		return hasLowSupplies(drug, null);
 	}
 
-	public static boolean hasLowSupplies(Drug drug, Date today)
+	public static boolean hasLowSupplies(Drug drug, Date date)
 	{
 		if(!drug.isActive() || drug.getRefillSize() == 0 || drug.hasNoDoses())
 			return false;
 
-		if(LOGV) Log.d(TAG, "hasLowSupplies: drug=" + drug + ", today=" + today);
+		if(LOGV) Log.d(TAG, "hasLowSupplies: drug=" + drug + ", date=" + date);
 
-		if(today == null)
-			today = DateTime.today();
+		if(date == null)
+			date = DateTime.today();
 
 		final int minSupplyDays = Settings.getStringAsInt(Settings.Keys.LOW_SUPPLY_THRESHOLD, 10);
 		if(minSupplyDays == 0)
 			return false;
 
-		int daysLeft = getSupplyDaysLeftForDrug(drug, today);
+		int daysLeft = getSupplyDaysLeftForDrug(drug, date);
 		if(LOGV) Log.d(TAG, "  daysLeft=" + daysLeft);
 		if(daysLeft < 0)
 			return false;
@@ -448,7 +462,7 @@ public final class Entries
 		final Date lastInclusiveDate = drug.getScheduleMap().getLastInclusiveDate();
 		if(lastInclusiveDate != null)
 		{
-			final Date endOfSupplyDate = DateTime.add(today, Calendar.DAY_OF_MONTH, daysLeft);
+			final Date endOfSupplyDate = DateTime.add(date, Calendar.DAY_OF_MONTH, daysLeft);
 
 			if(LOGV)
 			{

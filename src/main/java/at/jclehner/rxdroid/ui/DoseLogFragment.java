@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -117,6 +117,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		final Intent intent = new Intent(getActivity(), DrugListActivity.class);
 		intent.putExtra(DrugListActivity.EXTRA_DATE, date);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 		return true;
 	}
@@ -404,6 +405,8 @@ public class DoseLogFragment extends ExpandableListFragment
 					statusResId = Theme.getResourceAttribute(R.attr.doseStatusMissed);
 					break;
 				}
+				else if(info.status == EventInfo.STAT_SKIPPED)
+					statusResId = Theme.getResourceAttribute(R.attr.doseStatusIgnored);
 			}
 
 			holder.status.setImageResource(statusResId);

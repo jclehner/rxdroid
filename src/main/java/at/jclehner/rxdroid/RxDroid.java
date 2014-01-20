@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -21,26 +21,31 @@
 
 package at.jclehner.rxdroid;
 
-import java.lang.ref.WeakReference;
-import java.util.WeakHashMap;
-
 import android.app.Activity;
 import android.app.Application;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
-import android.preference.PreferenceManager;
+import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
-import at.jclehner.androidutils.AdvancedDialogPreference;
+
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
+import java.util.WeakHashMap;
+
 import at.jclehner.rxdroid.db.Database;
-import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.DoseEvent;
-import at.jclehner.rxdroid.preferences.LanguagePreference;
+import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.util.Components;
+import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 
 public class RxDroid extends Application
@@ -89,6 +94,19 @@ public class RxDroid extends Application
 		if(c == null && !allowNullContext)
 			throw new IllegalStateException("Context is null");
 		return c;
+	}
+
+	public static PackageInfo getPackageInfo()
+	{
+		try
+		{
+			final PackageManager pm = getContext().getPackageManager();
+			return pm.getPackageInfo(getContext().getApplicationInfo().packageName, 0);
+		}
+		catch(PackageManager.NameNotFoundException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
 	}
 
 	public static void toastShort(int textResId) {
@@ -166,6 +184,61 @@ public class RxDroid extends Application
 	{
 		new BackupManager(getContext()).dataChanged();
 		//Log.i(TAG, "notifyBackupDataChanged");
+	}
+
+	public static long getBootTimestamp()
+	{
+		try
+		{
+			// Try to get the method SystemProperties.get(String key, String defValue)
+
+			Class<?> systemPropertiesClass = Class.forName("android.os.SystemProperties");
+			Method getMethod = systemPropertiesClass.getMethod("get", String.class, String.class);
+			String value = (String) getMethod.invoke(null, "ro.runtime.firstboot", null);
+			if(value != null && value.length() != 0)
+			{
+				long timestamp = Long.parseLong(value);
+				if(BuildConfig.DEBUG)
+					Log.d(TAG, "ro.runtime.firstboot=" + timestamp);
+
+				return timestamp;
+			}
+		}
+		catch(Exception t)
+		{
+			Log.w(TAG, t);
+		}
+
+		if(BuildConfig.DEBUG)
+			Log.d(TAG, "getBootTimestamp: falling back to hackish method");
+
+		return System.currentTimeMillis() - SystemClock.elapsedRealtime();
+	}
+
+	public static long getLastUpdateTimestamp()
+	{
+		final Context context = sContextRef.get();
+		final PackageManager pm = context.getPackageManager();
+		final String pkgName = context.getPackageName();
+		try
+		{
+			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+			{
+				final PackageInfo info = pm.getPackageInfo(pkgName, 0);
+				return info.lastUpdateTime;
+			}
+			else
+			{
+				final ApplicationInfo info = pm.getApplicationInfo(pkgName, 0);
+				return new File(info.sourceDir).lastModified();
+			}
+		}
+		catch(PackageManager.NameNotFoundException e)
+		{
+			Log.w(TAG, e);
+		}
+
+		return 0;
 	}
 
 	private static void toast(final int textResId, final int duration)

@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -152,7 +152,7 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 	@Override
 	public int hashCode()
 	{
-		final Hasher hasher = new Hasher();
+		final Hasher hasher = Hasher.getInstance();
 
 		hasher.hash(mMillis);
 		hasher.hash(mSeconds);

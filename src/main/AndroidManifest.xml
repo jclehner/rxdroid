@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="at.jclehner.rxdroid" 
-	android:versionCode="48"
+	android:versionCode="9210"
 	android:versionName="@string/version"
 	android:installLocation="internalOnly" 
 >
@@ -49,6 +49,13 @@
 				
 		<activity android:name=".DrugListActivity"
 		    android:exported="false"
+		    android:uiOptions="none"
+		    android:launchMode="singleTop"
+		    android:configChanges="orientation|screenSize|keyboardHidden"
+		/>
+
+        <activity android:name=".DrugListActivity2"
+		    android:exported="true"
 		    android:uiOptions="none"
 		    android:launchMode="singleTop"
 		    android:configChanges="orientation|screenSize|keyboardHidden"
@@ -115,24 +122,11 @@
 			android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
 		
-		<activity android:name=".HelpActivity"
-			android:exported="false"
-		/>
-		
 		<activity android:name=".AdvancedScheduleActivity"
 		    android:exported="false"
-		/>
-		
-		<activity android:name=".ui.LayoutTestActivity"
-		    android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
 
-		<uses-library android:name="android.test.runner" />
-
-		<service android:name=".NotificationService" 
-		    android:exported="false"
-		/>
-		
 		<receiver android:name=".SystemEventReceiver"
 			android:exported="false"    
 		>
@@ -148,6 +142,13 @@
 				
 				<action android:name="android.intent.action.LOCALE_CHANGED" />
 			</intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <data android:scheme="package" android:path="at.jclehner.rxdroid" />
+            </intent-filter>
+
 		</receiver>
 		
 		<receiver android:name=".NotificationReceiver" 
@@ -155,9 +156,4 @@
 		/>
 
 	</application>
-
-	
-	<instrumentation android:targetPackage="at.jclehner.rxdroid" android:label="RxDroid Tests" android:name="android.test.InstrumentationTestRunner"/>
-	
-	  
-	</manifest> 
+</manifest>

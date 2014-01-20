@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -114,6 +114,7 @@ public abstract class AbsDrugAdapter extends ArrayAdapter<Drug>
 		DrugNameView name;
 		ImageView icon;
 		//DoseView[] doseViews = new DoseView[4];
+		FrameLayout historyMenuFrame;
 		ImageView missedDoseIndicator;
 		//View lowSupplyIndicator;
 		DrugSupplyMonitor currentSupply;

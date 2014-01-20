@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -28,10 +28,12 @@ import java.util.List;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Rect;
+import android.support.v4.view.ViewCompat;
 import android.text.SpannableStringBuilder;
 import android.text.style.SuperscriptSpan;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -97,7 +99,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		super(context, attrs);
 
 		LayoutInflater.from(context).inflate(R.layout.dose_view, this, true);
-		//setBackgroundResource(R.drawable.generic_background);
 
 		mIntakeStatus = (ImageView) findViewById(R.id.icon_intake_status);
 		mDoseText = (TextView) findViewById(R.id.text_dose);
@@ -224,7 +225,10 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	public void setDimmed(boolean dimmed)
 	{
-		setDoseTimeIconAlpha(dimmed ? 0x7f : 0xff);
+		final int alpha = dimmed ? 0x7f : 0xff;
+		setImageAlpha(mDoseTimeIcon, alpha);
+		setImageAlpha(mIntakeStatus, alpha);
+
 		mDoseText.setEnabled(!dimmed);
 	}
 
@@ -233,16 +237,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	{
 		super.setEnabled(enabled);
 		setDimmed(!enabled);
-	}
-
-	@TargetApi(16)
-	@SuppressWarnings("deprecation")
-	public void setDoseTimeIconAlpha(int alpha)
-	{
-		if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
-			mDoseTimeIcon.setImageAlpha(alpha);
-		else
-			mDoseTimeIcon.setAlpha(alpha);
 	}
 
 	@Override
@@ -372,7 +366,9 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		if(mDrug != null)
 		{
-			if(!mDisplayDose.isZero())
+			if(!mDrug.isActive())
+				mDoseText.setText("0");
+			else if(!mDisplayDose.isZero())
 			{
 				setStatus(STATUS_TAKEN);
 
@@ -462,5 +458,15 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		}
 
 		mIntakeStatus.setImageResource(imageResId);
+	}
+
+	@TargetApi(16)
+	@SuppressWarnings("deprecation")
+	private static void setImageAlpha(ImageView image, int alpha)
+	{
+		if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
+			image.setImageAlpha(alpha);
+		else
+			image.setAlpha(alpha);
 	}
 }

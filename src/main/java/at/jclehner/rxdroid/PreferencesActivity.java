@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -24,6 +24,8 @@ package at.jclehner.rxdroid;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,6 +45,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -136,7 +139,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			}
 
 			sb.append("\n" +
-					"Copyright (C) 2011-2013 Joseph Lehner\n" +
+					"Copyright (C) 2011-2014 Joseph Lehner\n" +
 					"<joseph.c.lehner@gmail.com>");
 
 			final String translator = getString(R.string.translator);
@@ -181,7 +184,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			}
 			else
 			{
-				uriString = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=joseph%2ec%2elehner%40gmail%2ecom&lc=AT&item_name=Beer&amount=3%2e00&currency_code=EUR&button_subtype=services&bn=PP%2dBuyNowBF%3abtn_buynowCC_LG%2egif%3aNonHosted";
+				uriString = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=joseph%2ec%2elehner%40gmail%2ecom&lc=AT&item_name=RxDroid&amount=5%2e00&currency_code=EUR&button_subtype=services&bn=PP%2dBuyNowBF%3abtn_buynowCC_LG%2egif%3aNonHosted";
 				titleResId = R.string._title_donate;
 				summary = null;
 			}
@@ -205,6 +208,13 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 
 		removeDisabledPreferences(getPreferenceScreen());
 		setPreferenceListeners();
+
+		if(Settings.getBoolean(Keys.USE_SAFE_MODE, false))
+		{
+			p = findPreference(Keys.SKIP_DOSE_DIALOG);
+			if(p != null)
+				p.setEnabled(false);
+		}
 
 		if(!BuildConfig.DEBUG)
 		{
@@ -263,6 +273,15 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		{
 			if(Settings.getStringAsInt(Settings.Keys.HISTORY_SIZE, -1) >= Settings.Enums.HISTORY_SIZE_6M)
 				Toast.makeText(getApplicationContext(), R.string._toast_large_history_size, Toast.LENGTH_LONG).show();
+		}
+		else if(Keys.USE_SAFE_MODE.equals(key))
+		{
+			final boolean useSafeMode = sharedPreferences.getBoolean(key, false);
+			findPreference(Keys.SKIP_DOSE_DIALOG).setEnabled(!useSafeMode);
+			if(useSafeMode)
+				sharedPreferences.edit().putBoolean(Keys.SKIP_DOSE_DIALOG, false).commit();
+
+			NotificationReceiver.cancelNotifications();
 		}
 		else if(Settings.Keys.LAST_MSG_HASH.equals(key))
 			return;
@@ -521,12 +540,78 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					Drug drug = new Drug();
 					drug.setName("Drug #" + (drugCount + 1));
 					drug.addSchedule(schedule);
+					drug.setRepeatMode(Drug.REPEAT_CUSTOM);
 					drug.setActive(true);
 
 					Database.create(drug);
 					Database.create(schedule);
 					Database.create(part1);
 					Database.create(part2);
+
+					return true;
+				}
+			});
+		}
+
+		p = findPreference("db_create_drug_with_many_dose_events");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					Fraction dose = new Fraction(1, 2);
+
+					Drug drug = new Drug();
+					drug.setName("Megabite");
+					drug.setDose(Schedule.TIME_MORNING, dose);
+					drug.setRefillSize(30);
+					drug.setCurrentSupply(new Fraction(23, 1, 2));
+
+					Database.create(drug);
+
+					Date date;
+
+					for(int i = 0; i != 100; ++i)
+					{
+						date = DateTime.add(DateTime.today(), Calendar.DAY_OF_MONTH, -i);
+						Database.create(new DoseEvent(drug, date, Schedule.TIME_MORNING, dose), Database.FLAG_DONT_NOTIFY_LISTENERS);
+					}
+
+
+
+					return true;
+				}
+			});
+		}
+
+		p = findPreference("key_debug_add_5_drugs");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					for(int i = 0; i != 5; ++i)
+					{
+						Drug drug = new Drug();
+						drug.setName("Drug #" + Database.countAll(Drug.class));
+						drug.setDose(Schedule.TIME_MORNING, new Fraction(1, 2));
+						drug.setDose(Schedule.TIME_EVENING, new Fraction(1));
+						drug.setRepeatMode(Drug.REPEAT_DAILY);
+						drug.setActive(true);
+
+						try
+						{
+							Database.create(drug);
+						}
+						catch(Exception e)
+						{
+							Log.w(TAG, e);
+						}
+					}
 
 					return true;
 				}
@@ -570,31 +655,76 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			});
 		}
 
-		p = findPreference("key_debug_test_pref_text");
+		p = findPreference("boot_info");
 		if(p != null)
 		{
-			p.setTitle("Schedule");
-			String summary1 =
-					"Mo 1/32 - 10 1/32 - 10 1/32 - 10 1/32\n" +
-					"Tu    0 -       0 -       0 -       0\n" +
-					"We    0 -       0 -       0 -       0\n" +
-					"Th    0 -       0 -       0 -       0\n" +
-					"Fr    0 -       0 -       0 -       0\n" +
-					"Sa  1/3 -    1/32 -       1 -       1\n" +
-					"Su    0 -       0 -       0 -       0\n";
+			SpannableString summary = new SpannableString(
+					"boot timestamp  : " + RxDroid.getBootTimestamp() + "\n" +
+					"BOOT_COMPLETED  : " + Settings.getLong(Keys.BOOT_COMPLETED_TIMESTAMP, 0) + "\n" +
+					"update timestamp: " + RxDroid.getLastUpdateTimestamp()
+			);
+			Util.applyStyle(summary, new TypefaceSpan("monospace"));
+			p.setSummary(summary);
+		}
 
-			String summary2 =
-					"Mo   0    -  1/4 -    0 -    0\n" +
-					"Tu   0    -  1/2 -    0 -    0\n" +
-					"We   0    -  1/4 -    0 -    0\n" +
-					"Th   0    -  1/2 -    0 -    0\n" +
-					"Fr   0    -  1/4 -    0 -    0\n" +
-					"Sa   0    -  1/2 -    0 -    0\n" +
-					"Su   0    -    0 -    0 -    0\n";
+		p = findPreference("reset_refill_reminder_date");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener()
+			{
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					Settings.putDate(Keys.NEXT_REFILL_REMINDER_DATE, null);
+					return true;
+				}
+			});
+		}
 
-			SpannableString text = new SpannableString(summary2);
-			Util.applyStyle(text, new TypefaceSpan("monospace"));
-			p.setSummary(text);
+		p = findPreference("dump_build");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener()
+			{
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					try
+					{
+						final StringBuilder sb = new StringBuilder();
+						final String[] classes = { "android.os.Build", "android.os.Build$VERSION" };
+
+						for(String className : classes)
+						{
+							Class<?> clazz = Class.forName(className);
+
+							sb.append(clazz.getName() + "\n");
+							for(Field f : clazz.getDeclaredFields())
+							{
+								int m = f.getModifiers();
+
+								if(Modifier.isStatic(m) && Modifier.isPublic(m) &&Modifier.isFinal(m))
+								{
+									sb.append("  " + f.getName() + ": " + f.get(null) + "\n");
+								}
+							}
+							sb.append("\n");
+						}
+
+						Log.d(TAG, sb.toString());
+					}
+					catch(ClassNotFoundException e)
+					{
+						Log.w(TAG, e);
+					}
+					catch(IllegalAccessException e)
+					{
+						Log.w(TAG, e);
+					}
+
+					return true;
+				}
+			});
 		}
 	}
 }
