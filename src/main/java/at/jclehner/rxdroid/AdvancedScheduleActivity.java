@@ -22,6 +22,7 @@
 package at.jclehner.rxdroid;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -36,8 +37,7 @@ public class AdvancedScheduleActivity extends SherlockFragmentActivity
 	{
 		super.onCreate(savedInstanceState);
 
-		getSupportFragmentManager().beginTransaction()
-				.add(android.R.id.content, new ScheduleGridFragment()).commit();
+		setContentView(R.layout.activity_advanced_schedule);
 	}
 }
 
