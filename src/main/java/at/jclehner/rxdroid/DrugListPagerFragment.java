@@ -95,21 +95,17 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 	}
 
 	@Override
-	public void setArguments(Bundle args)
+	public void onCreate(Bundle icicle)
 	{
-		super.setArguments(args);
-
-		mPatientId = args.getInt(ARG_PATIENT_ID);
-		mDateOrigin = mDisplayedDate = (Date) args.getSerializable(ARG_DATE);
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
+		super.onCreate(icicle);
 
 		setHasOptionsMenu(true);
 		setMenuVisibility(true);
+
+		final Bundle args = icicle != null ? icicle : getArguments();
+
+		mPatientId = args.getInt(ARG_PATIENT_ID);
+		mDateOrigin = mDisplayedDate = (Date) args.getSerializable(ARG_DATE);
 	}
 
 	@Override
@@ -232,6 +228,15 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 	@Override
 	public void onDoseTimeEnd(Date date, int doseTime) {
 		setDate(date, true);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+
+		outState.putInt(ARG_PATIENT_ID, mPatientId);
+		outState.putSerializable(ARG_DATE, mDisplayedDate);
 	}
 
 	private Date getDateForPage(int page) {

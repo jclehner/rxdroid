@@ -275,9 +275,9 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 	}
 
 	@Override
-	public void setArguments(Bundle args)
+	public void onCreate(Bundle savedInstanceState)
 	{
-		super.setArguments(args);
+		super.onCreate(savedInstanceState);
 
 		mPatientId = getArguments().getInt(ARG_PATIENT_ID, -1);
 		mDate = (Date) getArguments().getSerializable(ARG_DATE);
