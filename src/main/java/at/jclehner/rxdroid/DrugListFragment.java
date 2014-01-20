@@ -343,7 +343,7 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 		if(doseView.wasDoseTaken())
 		{
 			menu.removeItem(R.id.menuitem_skip);
-			menu.findItem(R.id.menuitem_remove_dose).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+			menu.getItem(R.id.menuitem_remove_dose).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
 			{
 				@Override
 				public boolean onMenuItemClick(MenuItem menuItem)
@@ -366,7 +366,7 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 		else
 		{
 			menu.removeItem(R.id.menuitem_remove_dose);
-			menu.findItem(R.id.menuitem_skip).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+			menu.getItem(R.id.menuitem_skip).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
 			{
 				@Override
 				public boolean onMenuItemClick(MenuItem menuItem)
@@ -377,7 +377,7 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 			});
 		}
 
-		menu.findItem(R.id.menuitem_take).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+		menu.getItem(R.id.menuitem_take).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
 		{
 			@Override
 			public boolean onMenuItemClick(MenuItem menuItem)
@@ -388,7 +388,7 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 			}
 		});
 
-		menu.findItem(R.id.menuitem_edit).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+		menu.getItem(R.id.menuitem_edit).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
 		{
 			@Override
 			public boolean onMenuItemClick(MenuItem menuItem)
