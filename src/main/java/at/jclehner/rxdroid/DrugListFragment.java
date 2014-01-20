@@ -35,7 +35,7 @@ import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
 public class DrugListFragment extends LoaderListFragment<Drug> implements View.OnClickListener
 {
-	public static class Adapter extends LLFAdapter<Drug>
+	static class Adapter extends LLFAdapter<Drug>
 	{
 		static class ViewHolder extends ScheduleViewHolder
 		{
@@ -118,7 +118,7 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 		}
 	}
 
-	public static class Loader extends LLFLoader<Drug>
+	static class Loader extends LLFLoader<Drug>
 	{
 		public static class DrugWrapper extends ItemHolder<Drug>
 		{
@@ -137,12 +137,15 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 		private final Settings.DoseTimeInfo mDtInfo;
 		private final Date mDate;
 
-		public Loader(Context context, int patientId, Date date, Settings.DoseTimeInfo dtInfo)
+		public Loader(Context context, Bundle args)
 		{
 			super(context);
-			mPatientId = patientId;
-			mDate = date;
-			mDtInfo = dtInfo;
+
+			checkArgs(args);
+
+			mDate = (Date) args.getSerializable(ARG_DATE);
+			mDtInfo = (Settings.DoseTimeInfo) args.getSerializable(ARG_DOSE_TIME_INFO);
+			mPatientId = args.getInt(ARG_PATIENT_ID);
 		}
 
 		@Override
@@ -275,20 +278,23 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState)
+	public void onCreate(Bundle icicle)
 	{
-		super.onCreate(savedInstanceState);
+		super.onCreate(icicle);
 
-		mPatientId = getArguments().getInt(ARG_PATIENT_ID, -1);
-		mDate = (Date) getArguments().getSerializable(ARG_DATE);
-		mDtInfo = (Settings.DoseTimeInfo) getArguments().getSerializable(ARG_DOSE_TIME_INFO);
+		final Bundle args = icicle != null ? icicle : getArguments();
+		checkArgs(args);
 
-		if(mDate == null)
-			throw new NullPointerException(ARG_DATE);
-		else if(mDtInfo == null)
-			throw new NullPointerException(ARG_DOSE_TIME_INFO);
-		else if(mPatientId == -1)
-			throw new IllegalArgumentException(ARG_PATIENT_ID);
+		mPatientId = args.getInt(ARG_PATIENT_ID, -1);
+		mDate = (Date) args.getSerializable(ARG_DATE);
+		mDtInfo = (Settings.DoseTimeInfo) args.getSerializable(ARG_DOSE_TIME_INFO);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+		outState.putAll(getCurrentArguments());
 	}
 
 	@Override
@@ -403,6 +409,24 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 
 	@Override
 	protected LLFLoader<Drug> onCreateLoader() {
-		return new Loader(getActivity(), mPatientId, mDate, mDtInfo);
+		return new Loader(getActivity(), getCurrentArguments());
+	}
+
+	private Bundle getCurrentArguments()
+	{
+		final Bundle args = new Bundle();
+		args.putInt(ARG_PATIENT_ID, mPatientId);
+		args.putSerializable(ARG_DATE, mDate);
+		args.putSerializable(ARG_DOSE_TIME_INFO, mDtInfo);
+
+		return args;
+	}
+
+	private static void checkArgs(Bundle args)
+	{
+		if(!args.containsKey(ARG_DATE) || !args.containsKey(ARG_PATIENT_ID)
+				|| !args.containsKey(ARG_DOSE_TIME_INFO)) {
+			throw new IllegalArgumentException();
+		}
 	}
 }
