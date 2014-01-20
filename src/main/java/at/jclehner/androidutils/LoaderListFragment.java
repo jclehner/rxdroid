@@ -105,6 +105,7 @@ public abstract class LoaderListFragment<T> extends SherlockListFragment impleme
 			return mData.get(position);
 		}
 
+		@SuppressWarnings("unchecked")
 		public <E extends LLFLoader.ItemHolder<T>> E getItemHolder(int position) {
 			return (E) mData.get(position);
 		}
