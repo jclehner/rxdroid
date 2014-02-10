@@ -21,6 +21,7 @@ import java.util.List;
 
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.rxdroid.db.Database;
+import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -30,6 +31,7 @@ import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Extras;
 import at.jclehner.rxdroid.util.Util;
+import at.jclehner.rxdroid.util.WrappedCheckedException;
 import at.jclehner.rxdroid.widget.DrugNameView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
@@ -137,6 +139,8 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 		private final Settings.DoseTimeInfo mDtInfo;
 		private final Date mDate;
 
+		private volatile RuntimeException mException = null;
+
 		public Loader(Context context, Bundle args)
 		{
 			super(context);
@@ -149,7 +153,7 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 		}
 
 		@Override
-		public List<DrugWrapper> loadInBackground()
+		public List<DrugWrapper> onLoadInBackground()
 		{
 			Database.init();
 
@@ -400,6 +404,16 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 				return true;
 			}
 		});
+	}
+
+	@Override
+	protected void onLoaderException(RuntimeException e)
+	{
+		if(e instanceof DatabaseHelper.DatabaseError)
+		{
+			// FIXME hack
+			getActivity().setContentView(R.layout.database_error);
+		}
 	}
 
 	@Override
