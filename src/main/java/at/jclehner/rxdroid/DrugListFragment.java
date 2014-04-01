@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,8 +21,10 @@ import java.util.Date;
 import java.util.List;
 
 import at.jclehner.androidutils.LoaderListFragment;
+import at.jclehner.androidutils.RefString;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
+import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -177,13 +180,16 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 					// this doesn't matter since it just dims all doses
 					final int maxDoseTimeForNoDim = mDtInfo.nextDoseTime() - 1;
 
-					for(int i = 0; i != wrapper.doseViewDimmed.length; ++i)
+					if(maxDoseTimeForNoDim >= Schedule.TIME_MORNING && mDtInfo.activeDoseTime() != Schedule.TIME_INVALID)
 					{
-						final int doseTime = Schedule.TIME_MORNING + i;
-						if(doseTime <= maxDoseTimeForNoDim && !drug.getDose(doseTime, mDate).isZero())
-							wrapper.doseViewDimmed[i] = Entries.countDoseEvents(drug, mDate, doseTime) != 0;
-						else
-							wrapper.doseViewDimmed[i] = true;
+						for(int i = 0; i != wrapper.doseViewDimmed.length; ++i)
+						{
+							final int doseTime = Schedule.TIME_MORNING + i;
+							if(doseTime <= maxDoseTimeForNoDim && !drug.getDose(doseTime, mDate).isZero())
+								wrapper.doseViewDimmed[i] = Entries.countDoseEvents(drug, mDate, doseTime) != 0;
+							else
+								wrapper.doseViewDimmed[i] = true;
+						}
 					}
 				}
 
@@ -409,11 +415,37 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 	@Override
 	protected void onLoaderException(RuntimeException e)
 	{
-		if(e instanceof DatabaseHelper.DatabaseError)
+		final DatabaseError error;
+
+		if(e instanceof WrappedCheckedException && ((WrappedCheckedException) e).getCauseType() == DatabaseError.class)
+			error = (DatabaseError) e.getCause();
+		else if(e instanceof DatabaseError)
+			error = (DatabaseError) e;
+		else
+			throw e;
+
+		final StringBuilder sb = new StringBuilder();
+
+		switch(error.getType())
 		{
-			// FIXME hack
-			getActivity().setContentView(R.layout.database_error);
+			case DatabaseError.E_GENERAL:
+				sb.append(getString(R.string._msg_db_error_general));
+				break;
+
+			case DatabaseError.E_UPGRADE:
+				sb.append(getString(R.string._msg_db_error_upgrade));
+				break;
+
+			case DatabaseError.E_DOWNGRADE:
+				sb.append(getString(R.string._msg_db_error_downgrade));
+				break;
 		}
+
+		sb.append(" " + RefString.resolve(getActivity(), R.string._msg_db_error_footer));
+
+		getActivity().setContentView(R.layout.database_error);
+		final TextView errMsg = (TextView) getActivity().findViewById(R.id.message);
+		errMsg.setText(sb);
 	}
 
 	@Override
