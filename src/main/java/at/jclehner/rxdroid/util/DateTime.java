@@ -312,7 +312,7 @@ public final class DateTime
 
 	public static long diffDays(Date date1, Date date2)
 	{
-		return (date2.getTime() - date1.getTime()) / Constants.MILLIS_PER_DAY;
+		return Math.round((date2.getTime() - date1.getTime()) / (double) Constants.MILLIS_PER_DAY);
 	}
 
 	public static int getIsoWeekDayNumberIndex(Date date)
