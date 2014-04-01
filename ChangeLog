@@ -1,3 +1,6 @@
+0.9.21.1:
+	* Fix date calculation error for 'Every N days' mode
+
 0.9.21:
 	* Added option for smart-sorting based on importance entries
 	* After an update, notifications will be refreshed immediately
