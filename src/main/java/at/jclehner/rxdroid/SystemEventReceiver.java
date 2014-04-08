@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -26,9 +26,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import java.util.TimeZone;
+
 import at.jclehner.androidutils.EventDispatcher;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.Settings.Keys;
 
 public class SystemEventReceiver extends BroadcastReceiver
 {
@@ -66,6 +69,14 @@ public class SystemEventReceiver extends BroadcastReceiver
 		{
 			DateTime.clearDateCache();
 			Database.reload(context);
+
+			Settings.init();
+
+			if(Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction())) {
+				Settings.putLong(Keys.TIMEZONE_OFFSET, TimeZone.getDefault().getRawOffset());
+			}
+
+			Settings.putDate(Keys.NEXT_REFILL_REMINDER_DATE, null);
 
 			sListeners.post("onTimeChanged", new Class<?>[] { int.class }, actionToListenerType(intent.getAction()));
 		}

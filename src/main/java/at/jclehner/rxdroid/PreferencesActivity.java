@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -139,7 +139,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			}
 
 			sb.append("\n" +
-					"Copyright (C) 2011-2013 Joseph Lehner\n" +
+					"Copyright (C) 2011-2014 Joseph Lehner\n" +
 					"<joseph.c.lehner@gmail.com>");
 
 			final String translator = getString(R.string.translator);
@@ -665,6 +665,19 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			);
 			Util.applyStyle(summary, new TypefaceSpan("monospace"));
 			p.setSummary(summary);
+		}
+
+		p = findPreference("reset_refill_reminder_date");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					Settings.putDate(Keys.NEXT_REFILL_REMINDER_DATE, null);
+					return true;
+				}
+			}
 		}
 
 		p = findPreference("key_debug_create_backup");

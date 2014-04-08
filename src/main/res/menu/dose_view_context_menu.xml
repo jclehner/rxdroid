@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+<item android:id="@+id/menuitem_remove_dose"
+    android:title="@string/_title_mark_not_taken"
+/>
+
+<item android:id="@+id/menuitem_skip"
+    android:title="@string/_title_ignore_dose"
+/>
+
+<item android:id="@+id/menuitem_take"
+    android:title="@string/_title_mark_taken"
+/>
+
+<item android:id="@+id/menuitem_edit"
+    android:title="@string/_title_edit_drug"
+/>
+
+</menu>

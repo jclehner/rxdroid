@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -28,6 +29,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import android.app.Activity;
 import android.content.Context;
@@ -45,6 +47,7 @@ import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.Millis;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public final class Settings
@@ -81,13 +84,18 @@ public final class Settings
 		public static final String USE_PRETTY_FRACTIONS = key(R.string.key_use_pretty_fractions);
 		public static final String DIM_DOSE_VIEWS = key(R.string.key_dim_dose_views);
 		public static final String USE_SAFE_MODE = key(R.string.key_use_safe_mode);
+		public static final String SKIP_DOSE_DIALOG = key(R.string.key_skip_dose_dialog);
 		@Deprecated
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
 		public static final String DISPLAYED_ONCE = "displayed_once";
 		public static final String IS_FIRST_LAUNCH = "is_first_launch";
 		public static final String OLDEST_POSSIBLE_DOSE_EVENT_TIME = "oldest_possible_dose_event_time";
 
-		public static final String SKIP_DOSE_DIALOG = key(R.string.key_skip_dose_dialog);
+		public static final String TIMEZONE_OFFSET = "timezone_offset";
+		/**
+		 * @see at.jclehner.rxdroid.NotificationReceiver.ACTION_SNOOZE_REFILL_REMINDER
+		 */
+		public static final String NEXT_REFILL_REMINDER_DATE = "next_refill_reminder_date";
 
 		public static final String LOG_SHOW_TAKEN = "log_show_taken";
 		public static final String LOG_SHOW_SKIPPED = "log_show_skipped";
@@ -398,7 +406,7 @@ public final class Settings
 		return TimePeriod.fromString(value);
 	}
 
-	public static class DoseTimeInfo
+	public static class DoseTimeInfo implements Serializable
 	{
 		private static final ThreadLocal<DoseTimeInfo> INSTANCES = new ThreadLocal<Settings.DoseTimeInfo>() {
 
@@ -412,6 +420,10 @@ public final class Settings
 
 		public Calendar currentTime() {
 			return mCurrentTime;
+		}
+
+		public Date currentDate() {
+			return mCurrentDate;
 		}
 
 		public Date activeDate() {
@@ -439,6 +451,7 @@ public final class Settings
 		}
 
 		private Calendar mCurrentTime;
+		private Date mCurrentDate;
 		private Date mActiveDate;
 		private Date mNextDoseTimeDate;
 		private int mActiveDoseTime;
@@ -456,6 +469,7 @@ public final class Settings
 		final DoseTimeInfo dtInfo = DoseTimeInfo.INSTANCES.get();
 
 		dtInfo.mCurrentTime = currentTime;
+		dtInfo.mCurrentDate = DateTime.getDatePart(currentTime).getTime();
 		dtInfo.mActiveDate = getActiveDate(dtInfo.mCurrentTime);
 		dtInfo.mActiveDoseTime = getActiveDoseTime(dtInfo.mCurrentTime);
 		dtInfo.mNextDoseTime = getNextDoseTime(dtInfo.mCurrentTime);
@@ -744,6 +758,9 @@ public final class Settings
 			putBoolean(Keys.USE_SMART_SORT, true);
 		}
 
+		if(!contains(Keys.TIMEZONE_OFFSET)) {
+			putLong(Keys.TIMEZONE_OFFSET, TimeZone.getDefault().getRawOffset());
+		}
 	}
 
 	private static void fixSettings()

@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -125,7 +125,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		holder.name.setTag(DrugListActivity.TAG_DRUG_ID, drug.getId());
 
 		//holder.icon.setImageResource(drug.getIconResourceId());
-		holder.icon.setImageResource(Util.getDrugIconDrawable(getContext(), drug.getIcon()));
+		holder.icon.setImageResource(Util.getDrugIconDrawable(drug.getIcon()));
 		holder.currentSupply.setDrugAndDate(drug, mAdapterDate);
 
 		final Date today = DateTime.today();
@@ -176,7 +176,12 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			final int maxDoseTimeForNoDim;
 
 			if(mActiveDoseTime == Schedule.TIME_INVALID)
-				maxDoseTimeForNoDim = DoseTime.before(mNextDoseTime);
+			{
+				if(mNextDoseTime == Schedule.TIME_MORNING)
+					maxDoseTimeForNoDim = Schedule.TIME_MORNING - 1;
+				else
+					maxDoseTimeForNoDim = DoseTime.before(mNextDoseTime);
+			}
 			else
 				maxDoseTimeForNoDim = mActiveDoseTime;
 

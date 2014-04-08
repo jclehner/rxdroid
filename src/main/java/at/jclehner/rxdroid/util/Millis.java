@@ -1,6 +1,8 @@
 package at.jclehner.rxdroid.util;
 
 
+import at.jclehner.rxdroid.DumbTime;
+
 public class Millis
 {
 	public static long days(int days) {
@@ -17,5 +19,10 @@ public class Millis
 
 	public static long seconds(int seconds) {
 		return seconds * 1000;
+	}
+
+	public static String toString(long millis) {
+		return millis + "ms ("
+				+ new DumbTime(millis, true).toString(true, true) + ")";
 	}
 }

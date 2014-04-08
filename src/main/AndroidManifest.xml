@@ -54,6 +54,13 @@
 		    android:launchMode="singleTop"
 		    android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
+
+        <activity android:name=".DrugListActivity2"
+		    android:exported="true"
+		    android:uiOptions="none"
+		    android:launchMode="singleTop"
+		    android:configChanges="orientation|screenSize|keyboardHidden"
+		/>
 		
 		<activity android:name=".DoseHistoryActivity"
 		    android:exported="false"
@@ -118,6 +125,7 @@
 		
 		<activity android:name=".AdvancedScheduleActivity"
 		    android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
 
 		<receiver android:name=".SystemEventReceiver"

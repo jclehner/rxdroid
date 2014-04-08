@@ -1,6 +1,6 @@
 /**
  * RxDroid - A Medication Reminder
- * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ * Copyright (C) 2011-2014 Joseph Lehner <joseph.c.lehner@gmail.com>
  *
  *
  * RxDroid is free software: you can redistribute it and/or modify
@@ -218,7 +218,7 @@ public final class Util
 		return RxDroid.getContext().getString(resId);
 	}
 
-	public static int getDrugIconDrawable(Context context, int icon)
+	public static int getDrugIconDrawable(int icon)
 	{
 		switch(icon)
 		{
@@ -303,10 +303,9 @@ public final class Util
 		pref.setEntryValues(values);
 	}
 
-	public static String millis(long millis)
-	{
-		return millis + "ms ("
-				+ new DumbTime(millis, true).toString(true, true) + ")";
+	@Deprecated
+	public static String millis(long millis) {
+		return Millis.toString(millis);
 	}
 
 	/**
