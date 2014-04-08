@@ -7,6 +7,7 @@
 >
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="19" />
 	<uses-configuration android:reqTouchScreen="stylus" />
@@ -85,7 +86,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="file" android:host="*"
-                      android:pathPattern=".*\\.rxdroid" />
+                      android:pathPattern=".*\\.rxdbak" />
 
             </intent-filter>
 

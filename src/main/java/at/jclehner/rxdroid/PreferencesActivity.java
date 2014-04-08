@@ -667,6 +667,20 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			p.setSummary(summary);
 		}
 
+		p = findPreference("key_debug_create_backup");
+		if(p != null)
+		{
+			p.setOnPreferenceClickListener(new OnPreferenceClickListener()
+			{
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					Backup.createBackup(null);
+					return true;
+				}
+			});
+		}
+
 		p = findPreference("dump_build");
 		if(p != null)
 		{
