@@ -6,6 +6,10 @@ import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,42 +26,30 @@ public class Backup
 {
 	private static final String TAG = Backup.class.getSimpleName();
 
-	public static void createBackup(File outFile)
+	public static void createBackup(File outFile) throws ZipException
 	{
 		if(outFile == null)
 			outFile = new File(Environment.getExternalStorageDirectory(), "RxDroid/" + System.currentTimeMillis() + ".rxdbak");
 		synchronized(Database.LOCK_DATA)
 		{
-			ZipOutputStream zos = null;
+			final ZipFile zip = new ZipFile(outFile);
+			final File dataDir = new File(RxDroid.getPackageInfo().applicationInfo.dataDir);
 
-			try
+
+
+			for(int i = 0; i != FILES.length; ++i)
 			{
-				final File dir = new File(RxDroid.getPackageInfo().applicationInfo.dataDir);
-				final FileOutputStream os = new FileOutputStream(outFile);
-				zos = new ZipOutputStream(new BufferedOutputStream(os));
+				final File file = new File(dataDir, FILES[i]);
+				if(!file.exists())
+					continue;
 
-				zos.setComment("rxdbak1:" + System.currentTimeMillis() + ":DBv" + DatabaseHelper.DB_VERSION);
+				final ZipParameters zp = new ZipParameters();
+				zp.setFileNameInZip(FILES[i]);
 
-				for(int i = 0; i != FILES.length; ++i)
-				{
-					final File file = new File(dir, FILES[i]);
-					if(!file.exists())
-						continue;
+				zip.addFile(file, zp);
+			}
 
-					final ZipEntry ze = new ZipEntry(FILES[i]);
-					zos.putNextEntry(ze);
-					zos.write(getFileBytes(file));
-					zos.closeEntry();
-				}
-			}
-			catch(IOException e)
-			{
-				Log.w(TAG, e);
-			}
-			finally
-			{
-				Util.closeQuietly(zos);
-			}
+			zip.setComment("rxdbak1:" + System.currentTimeMillis() + ":DBv" + DatabaseHelper.DB_VERSION);
 
 			final Intent target = new Intent(Intent.ACTION_SEND);
 			target.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(outFile));
@@ -75,13 +67,4 @@ public class Backup
 			"shared_prefs/at.jclehner.rxdroid_preferences.xml",
 			"shared_prefs/showcase_internal.xml"
 	};
-
-	private static byte[] getFileBytes(File file) throws IOException
-	{
-
-		final RandomAccessFile f = new RandomAccessFile(file, "r");
-		byte[] b = new byte[(int)f.length()];
-		f.read(b);
-		return b;
-	}
 }

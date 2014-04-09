@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -58,6 +59,8 @@ import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.webkit.WebView;
 import android.widget.Toast;
+
+import at.jclehner.androidutils.PreferenceActivity;
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
@@ -72,6 +75,8 @@ import at.jclehner.rxdroid.util.Util;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+
+import net.lingala.zip4j.exception.ZipException;
 
 @SuppressWarnings("deprecation")
 public class PreferencesActivity extends PreferenceActivityBase implements
@@ -677,7 +682,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					Settings.putDate(Keys.NEXT_REFILL_REMINDER_DATE, null);
 					return true;
 				}
-			}
+			});
 		}
 
 		p = findPreference("key_debug_create_backup");
@@ -688,7 +693,15 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				@Override
 				public boolean onPreferenceClick(Preference preference)
 				{
-					Backup.createBackup(null);
+					try
+					{
+						Backup.createBackup(null);
+					}
+					catch(ZipException e)
+					{
+						Log.w(TAG, e);
+						Toast.makeText(PreferencesActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+					}
 					return true;
 				}
 			});

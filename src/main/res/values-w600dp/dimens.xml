@@ -1,4 +1,4 @@
 <resources>
     <dimen name="mockup_width_firstcolumn">200dip</dimen>
-        
+    <dimen name="dialogue_like_width">600dip</dimen>
 </resources>

@@ -86,14 +86,51 @@
 
         <activity android:name=".ImportActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
+            android:launchMode="singleTop"
         >
+            <!-- Intent filter WITH mimeType -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
 
-                <data android:scheme="file" android:host="*"
-                      android:pathPattern=".*\\.rxdbak" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:host="*" />
+
+                <data android:pathPattern=".*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
+            </intent-filter>
+
+            <!-- Intent filter WITHOUT mimeType -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
+
+                <data android:scheme="file" />
+                <data android:host="*" />
+
+                <data android:pathPattern=".*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
 
             </intent-filter>
 

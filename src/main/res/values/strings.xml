@@ -411,7 +411,7 @@
 
     <string name="_help_title_click_dose">Take dose.</string>
     <string name="_help_msg_click_dose">To take a dose, click it. For more options, long-click it.</string>
-		
+
 	<!--  
 	<string name="_help_msg_fraction_mode">If you are not taking full doses, but 1½, ⅔, etc., click here. 
 	    This switches to fraction mode.</string>
@@ -440,6 +440,11 @@
 
     <string name="_title_remind_tomorrow">Remind tomorrow</string>
     <string name="_toast_remind_tomorrow">Hiding notification until tomorrow.</string>
+
+    <string name="_msg_restore_backup_warning">This operation will restore data from a backup created on %1$s. All current data
+            will be deleted. This action cannot be undone!</string>
+
+     <string name="_msg_restore_backup_error">Error while restoring data from backup.</string>
 
     <!--
     Keep at the end of strings.xml!  
