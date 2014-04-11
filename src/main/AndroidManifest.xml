@@ -86,6 +86,7 @@
 
         <activity android:name=".ImportActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
+            android:noHistory="true"
             android:launchMode="singleTop"
         >
             <!-- Intent filter WITH mimeType -->

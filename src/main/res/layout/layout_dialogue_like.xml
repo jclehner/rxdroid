@@ -47,21 +47,23 @@
             android:layout_gravity="bottom"
             android:orientation="horizontal"
             android:gravity="center"
-            style="@style/Theme.RxDroid.BottomBar">
+            style="?android:attr/buttonBarStyle">
 
         <Button android:id="@+id/btn_left"
                 android:layout_height="match_parent"
                 android:layout_width="0dip"
                 android:layout_weight="1"
                 android:maxWidth="200dip"
-                android:text="@android:string/cancel"/>
+                android:text="@android:string/cancel"
+                style="?android:attr/buttonBarButtonStyle"/>
 
         <Button android:id="@+id/btn_right"
                 android:layout_height="match_parent"
                 android:layout_width="0dip"
                 android:layout_weight="1"
                 android:maxWidth="200dip"
-                android:text="@android:string/ok"/>
+                android:text="@android:string/ok"
+                style="?android:attr/buttonBarButtonStyle"/>
 
 
     </LinearLayout>

@@ -19,6 +19,7 @@ import java.util.Date;
 
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.ui.DialogueLike;
+import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.DateTime;
 
 public class ImportActivity extends SherlockFragmentActivity
@@ -103,6 +104,7 @@ public class ImportActivity extends SherlockFragmentActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		setTheme(Theme.get());
 		super.onCreate(savedInstanceState);
 
 		getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
