@@ -48,7 +48,7 @@
 		android:layout_height="wrap_content"
 		android:orientation="horizontal"
 		android:gravity="center"
-		style="@style/Theme.RxDroid.BottomBar"
+		style="?buttonBarStyle"
 	>		
 		<Button
 			android:layout_width="wrap_content"

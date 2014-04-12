@@ -35,9 +35,9 @@ public class ImportActivity extends SherlockFragmentActivity
 		}
 
 		@Override
-		public void onCreate(Bundle savedInstanceState)
+		public void onResume()
 		{
-			super.onCreate(savedInstanceState);
+			super.onResume();
 
 			setTitle(R.string._title_warning);
 
@@ -54,8 +54,6 @@ public class ImportActivity extends SherlockFragmentActivity
 					setDetail(file.substring(extDir.length()));
 				else
 					setDetail(file);
-
-				Log.d(TAG, "extDir=" + extDir);
 			}
 			catch(ZipException e)
 			{
@@ -74,6 +72,7 @@ public class ImportActivity extends SherlockFragmentActivity
 					{
 						mZip.extractAll(RxDroid.getPackageInfo().applicationInfo.dataDir);
 						Database.reload(getActivity());
+						Settings.init(true);
 
 						startActivity(getPackageManager().getLaunchIntentForPackage(RxDroid.getPackageInfo().packageName));
 					}
@@ -92,7 +91,8 @@ public class ImportActivity extends SherlockFragmentActivity
 			Log.w(TAG, e);
 
 			setTitle(R.string._title_error);
-			setDetail(mZip.getFile() + "\n" + e.getMessage());
+			setMessage(R.string._msg_restore_backup_error, e.getLocalizedMessage());
+			setDetail(mZip.getFile().toString());
 
 			getButton(BUTTON_POSITIVE).setVisibility(View.GONE);
 			setNegativeButtonText(android.R.string.ok);
@@ -104,10 +104,17 @@ public class ImportActivity extends SherlockFragmentActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		setTheme(Theme.get());
+		Components.onCreateActivity(this, Components.NO_DATABASE_INIT);
 		super.onCreate(savedInstanceState);
 
 		getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
 				new Dialogish()).commit();
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent)
+	{
+		super.onNewIntent(intent);
+		setIntent(intent);
 	}
 }

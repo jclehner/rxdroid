@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.RxDroid.ButtonBarButton" parent="@android:style/Widget.Holo.Button.Borderless">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+    <style name="Theme.RxDroid.ButtonBarButton.Dark" parent="@android:style/Widget.Holo.Button.Borderless" />
+</resources>

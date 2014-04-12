@@ -142,9 +142,13 @@ public final class Settings
 	private static boolean sIsFirstLaunchOfThisVersion = false;
 	private static int sPreviousLaunchVersion = 0;
 
-	public static synchronized void init()
+	public static synchronized void init() {
+		init(false);
+	}
+
+	public static synchronized void init(boolean force)
 	{
-		if(sSharedPrefs == null)
+		if(sSharedPrefs == null || force)
 		{
 			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(RxDroid.getContext());
 

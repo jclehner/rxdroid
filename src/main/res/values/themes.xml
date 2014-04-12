@@ -74,7 +74,10 @@
 		<item name="android:windowAnimationStyle">@null</item>
 		<item name="android:alertDialogStyle">@style/Theme.RxDroid.Dialog</item>
 		
-		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>			
+		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
+
+        <item name="buttonBarStyle">@style/Theme.RxDroid.ButtonBar</item>
+        <item name="buttonBarButtonStyle">@style/Theme.RxDroid.ButtonBarButton</item>
 	</style>
 	
 	<style name="Theme.RxDroid.NewIcons" parent="@style/Theme.RxDroid">
@@ -137,6 +140,9 @@
         
         <item name="android:windowAnimationStyle">@null</item>
         <item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
+
+        <item name="buttonBarStyle">@style/Theme.RxDroid.ButtonBar.Dark</item>
+        <item name="buttonBarButtonStyle">@style/Theme.RxDroid.ButtonBarButton.Dark</item>
     </style>
     
 	<style name="Theme.RxDroid.Dark.NewIcons" parent="@style/Theme.RxDroid.Dark">
@@ -168,11 +174,15 @@
 	<style name="Theme.RxDroid.Dialog" parent="@android:style/Theme.Dialog">
 	   <item name="android:textColor">?android:attr/textColorPrimaryInverseDisableOnly</item>
 	</style>
-	
-	<style name="Theme.RxDroid.BottomBar">
+
+    <style name="Theme.RxDroid.ButtonBar">
 -		<item name="android:background">@android:drawable/bottom_bar</item>
         <item name="android:padding">8dip</item>
--	</style>		
+-	</style>
+
+    <style name="Theme.RxDroid.ButtonBar.Dark" parent="Theme.RxDroid.ButtonBar" />
+    <style name="Theme.RxDroid.ButtonBarButton" />
+    <style name="Theme.RxDroid.ButtonBarButton.Dark"/>
 	
 	<style name="TextAppearance.Large.Clickable" parent="@android:style/TextAppearance.Large">
 		<item name="android:textColor">?attr/textColorClickable</item>

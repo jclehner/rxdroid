@@ -444,7 +444,7 @@
     <string name="_msg_restore_backup_warning">This operation will restore data from a backup created on %1$s. All current data
             will be deleted. This action cannot be undone!</string>
 
-     <string name="_msg_restore_backup_error">Error while restoring data from backup.</string>
+     <string name="_msg_restore_backup_error">Cannot import data from this file: %1$s</string>
 
     <!--
     Keep at the end of strings.xml!  

@@ -9,6 +9,7 @@ import android.util.Log;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -35,8 +36,6 @@ public class Backup
 			final ZipFile zip = new ZipFile(outFile);
 			final File dataDir = new File(RxDroid.getPackageInfo().applicationInfo.dataDir);
 
-
-
 			for(int i = 0; i != FILES.length; ++i)
 			{
 				final File file = new File(dataDir, FILES[i]);
@@ -45,6 +44,14 @@ public class Backup
 
 				final ZipParameters zp = new ZipParameters();
 				zp.setFileNameInZip(FILES[i]);
+
+				if(false)
+				{
+					zp.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
+					zp.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
+					zp.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+					zp.setPassword("foobar");
+				}
 
 				zip.addFile(file, zp);
 			}
