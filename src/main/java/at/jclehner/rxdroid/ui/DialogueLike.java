@@ -38,6 +38,10 @@ public abstract class DialogueLike extends Fragment
 
 	public abstract void onButtonClick(View button, int which);
 
+	public DialogueLike() {
+		setArguments(new Bundle());
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{

@@ -57,15 +57,6 @@ public class Backup
 			}
 
 			zip.setComment("rxdbak1:" + System.currentTimeMillis() + ":DBv" + DatabaseHelper.DB_VERSION);
-
-			final Intent target = new Intent(Intent.ACTION_SEND);
-			target.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(outFile));
-			target.setType("application/octet-stream");
-
-			final Intent i = Intent.createChooser(target, "Backup");
-			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-			RxDroid.doStartActivity(i);
 		}
 	}
 

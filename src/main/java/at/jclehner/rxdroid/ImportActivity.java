@@ -1,6 +1,7 @@
 package at.jclehner.rxdroid;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -26,12 +27,15 @@ public class ImportActivity extends SherlockFragmentActivity
 {
 	private static final String TAG = ImportActivity.class.getSimpleName();
 
-	class Dialogish extends DialogueLike
+	public static class Dialogish extends DialogueLike
 	{
 		private ZipFile mZip;
 
-		Dialogish() {
-			setArguments(new Bundle());
+		public static Dialogish newInstance(String file)
+		{
+			final Dialogish instance = new Dialogish();
+			instance.getArguments().putString("file", file);
+			return instance;
 		}
 
 		@Override
@@ -43,7 +47,7 @@ public class ImportActivity extends SherlockFragmentActivity
 
 			try
 			{
-				mZip = new ZipFile(getIntent().getData().getSchemeSpecificPart());
+				mZip = new ZipFile(getBackupFile());
 				final Date cDate = new Date(Long.parseLong(mZip.getComment().split(":")[1]));
 
 				setMessage(R.string._msg_restore_backup_warning, DateTime.toNativeDateAndTime(cDate));
@@ -74,16 +78,35 @@ public class ImportActivity extends SherlockFragmentActivity
 						Database.reload(getActivity());
 						Settings.init(true);
 
-						startActivity(getPackageManager().getLaunchIntentForPackage(RxDroid.getPackageInfo().packageName));
+						startActivity(getActivity().getPackageManager().getLaunchIntentForPackage(RxDroid.getPackageInfo().packageName));
 					}
-				}
-				catch(ZipException e)
+				} catch(ZipException e)
 				{
 					handleZipException(e);
 				}
-			}
 
-			finish();
+				getActivity().finish();
+			}
+			else if(which == BUTTON_NEGATIVE)
+			{
+				if(getActivity() instanceof ImportActivity)
+					getActivity().finish();
+				else
+					getFragmentManager().popBackStack();
+			}
+		}
+
+		private String getBackupFile()
+		{
+			final String arg = getArguments().getString("file");
+			if(arg != null)
+				return arg;
+
+			final Uri data = getActivity().getIntent().getData();
+			if(data != null)
+				return data.getSchemeSpecificPart();
+
+			throw new IllegalStateException("No 'file' argument given and no data in hosting Activity");
 		}
 
 		private void handleZipException(ZipException e)
@@ -98,8 +121,6 @@ public class ImportActivity extends SherlockFragmentActivity
 			setNegativeButtonText(android.R.string.ok);
 		}
 	}
-
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)

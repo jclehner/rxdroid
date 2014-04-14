@@ -69,6 +69,13 @@
 		    android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
 
+        <activity android:name=".BackupActivity"
+                  android:exported="true"
+                  android:uiOptions="none"
+                  android:launchMode="singleTop"
+                  android:configChanges="orientation|screenSize|keyboardHidden"
+        />
+
 		<activity android:name=".DrugEditActivity"
 		    android:exported="false"
 		    android:windowSoftInputMode="adjustPan"		    
