@@ -510,7 +510,10 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
 				builder.addAction(R.drawable.ic_action_tick, getString(R.string._title_take_all_doses), operation);
 			else if(Settings.getBoolean(Settings.Keys.SWIPE_TO_TAKE_ALL, false))
+			{
 				builder.setDeleteIntent(operation);
+				builder.setOngoing(false);
+			}
 		}
 		else if(isShowingLowSupplyNotificationOnly)
 		{
