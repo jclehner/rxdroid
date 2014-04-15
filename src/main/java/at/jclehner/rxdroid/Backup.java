@@ -72,6 +72,8 @@ public class Backup
 			Database.reload(RxDroid.getContext());
 			Settings.init(true);
 		}
+
+		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
 	}
 
 	private static final String[] FILES = {
