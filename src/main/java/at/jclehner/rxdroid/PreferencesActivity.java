@@ -695,7 +695,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 				{
 					try
 					{
-						Backup.createBackup(null);
+						Backup.createBackup(null, "foobar");
 					}
 					catch(ZipException e)
 					{

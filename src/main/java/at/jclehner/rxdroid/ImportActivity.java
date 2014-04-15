@@ -1,12 +1,18 @@
 package at.jclehner.rxdroid;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 //import com.google.gson.Gson;
@@ -48,7 +54,14 @@ public class ImportActivity extends SherlockFragmentActivity
 			try
 			{
 				mZip = new ZipFile(getBackupFile());
-				final Date cDate = new Date(Long.parseLong(mZip.getComment().split(":")[1]));
+
+				final String[] info = mZip.getComment() != null ?
+						mZip.getComment().split(":") : null;
+
+				if(info == null || info.length == 0 || !"rxdbak1".equals(info[0]))
+					throw new ZipException("Not an RxDroid backup file");
+
+				final Date cDate = new Date(Long.parseLong(info[1]));
 
 				setMessage(R.string._msg_restore_backup_warning, DateTime.toNativeDateAndTime(cDate));
 
@@ -72,14 +85,34 @@ public class ImportActivity extends SherlockFragmentActivity
 			{
 				try
 				{
-					Backup.restoreBackup(mZip);
-					startActivity(getActivity().getPackageManager().getLaunchIntentForPackage(RxDroid.getPackageInfo().packageName));
+					if(mZip.isEncrypted())
+					{
+						final EditText edit = new EditText(getActivity());
+						edit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+						edit.setHint(R.string._title_password);
+						//edit.setImeOptions(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
+
+						final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+						//ab.setMessage("Enter password to decrypt backup file");
+						ab.setView(edit);
+						ab.setCancelable(false);
+						ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+								restoreBackup(edit.getText().toString());
+							}
+						});
+						ab.show();
+					}
+					else
+						restoreBackup(null);
+
 				} catch(ZipException e)
 				{
 					handleZipException(e);
 				}
-
-				getActivity().finish();
 			}
 			else if(which == BUTTON_NEGATIVE)
 			{
@@ -87,6 +120,23 @@ public class ImportActivity extends SherlockFragmentActivity
 					getActivity().finish();
 				else
 					getFragmentManager().popBackStack();
+			}
+		}
+
+		private void restoreBackup(String password)
+		{
+			try
+			{
+				if(password != null)
+					mZip.setPassword(password);
+
+				Backup.restoreBackup(mZip);
+				startActivity(getActivity().getPackageManager().getLaunchIntentForPackage(RxDroid.getPackageInfo().packageName));
+				getActivity().finish();
+			}
+			catch(ZipException e)
+			{
+				handleZipException(e);
 			}
 		}
 

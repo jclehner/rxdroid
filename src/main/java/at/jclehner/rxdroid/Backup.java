@@ -32,7 +32,7 @@ public class Backup
 {
 	private static final String TAG = Backup.class.getSimpleName();
 
-	public static void createBackup(File outFile) throws ZipException
+	public static void createBackup(File outFile, String password) throws ZipException
 	{
 		if(outFile == null)
 		{
@@ -54,9 +54,18 @@ public class Backup
 
 				final ZipParameters zp = new ZipParameters();
 				zp.setRootFolderInZip(new File(FILES[i]).getParent());
-				//zp.setFileNameInZip(FILES[i]);
 				zp.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
 				zp.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+
+				if(password != null)
+				{
+					zp.setPassword(password);
+					zp.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
+					zp.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
+					zp.setEncryptFiles(true);
+					//zp.setCompressionMethod(Zip4jConstants.COMP_AES_ENC);
+				}
+
 				zip.addFile(file, zp);
 			}
 

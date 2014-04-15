@@ -457,6 +457,8 @@
     <string name="_title_swipe_to_take_all">Clearable</string>
     <string name="_summary_swipe_to_take_all">Clear or swipe dose notifications to mark all as taken.</string>
 
+    <string name="_title_password">Password</string>
+
     <!--
     Keep at the end of strings.xml!  
      -->
