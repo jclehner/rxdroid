@@ -179,7 +179,7 @@ public class DoseHistoryActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	class ViewOptionsDialogFragment extends DialogFragment
+	public static class ViewOptionsDialogFragment extends DialogFragment
 	{
 		private boolean[] mChecked;
 		private boolean mWasChanged;
@@ -238,7 +238,7 @@ public class DoseHistoryActivity extends SherlockFragmentActivity implements
 				public void onClick(DialogInterface dialog, int which)
 				{
 					if(mWasChanged)
-						updateLogFragment();
+						((DoseHistoryActivity) getActivity()).updateLogFragment();
 				}
 			});
 

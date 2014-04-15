@@ -47,10 +47,11 @@ public class DatePickerFragment extends DialogFragment implements OnShowListener
 
 	public static DatePickerFragment newInstance(Date date, OnDateSetListener listener)
 	{
-		final DatePickerFragment r = new DatePickerFragment(listener);
+		final DatePickerFragment r = new DatePickerFragment();
 		final Bundle args = new Bundle();
 		args.putSerializable(ARG_DATE, date);
 		r.setArguments(args);
+		r.mListener = listener;
 		return r;
 	}
 
@@ -98,9 +99,5 @@ public class DatePickerFragment extends DialogFragment implements OnShowListener
 				}
 			});
 		}
-	}
-
-	protected DatePickerFragment(OnDateSetListener listener) {
-		mListener = listener;
 	}
 }

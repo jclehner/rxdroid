@@ -32,7 +32,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import at.jclehner.androidutils.AlertDialogFragmentBuilder;
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.androidutils.PopupMenuCompatBuilder;
 import at.jclehner.rxdroid.util.DateTime;

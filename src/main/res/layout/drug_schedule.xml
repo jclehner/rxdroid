@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout 
     	xmlns:android="http://schemas.android.com/apk/res/android"
-		xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
 		android:id="@+id/dose_container"
 		android:layout_height="@dimen/dose_view_height"
 		android:layout_width="wrap_content"

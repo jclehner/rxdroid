@@ -38,6 +38,10 @@ android {
 	buildToolsVersion '19.0.1'
 	compileSdkVersion 19
 
+	lintOptions {
+		warning 'MissingTranslation'
+	}
+
 	signingConfigs {
 		release {
 			def keystore = System.getenv("RXDROID_KEYSTORE")

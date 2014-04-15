@@ -344,9 +344,7 @@
         
         <string name="_title_use_backup_framework">Αντίγραφο ασφαλείας των δεδομένων</string>
         <string name="_summary_use_backup_framework">Δημιουργείστε αντίγραφο ασφαλείας χρησιμοποιώντας υπηρεσίες όπως το Google\'s \"Backup &amp; Restore\".</string>
-        
-        <string name="_msg_swipe_to_change_date">Μπορείτε να αλλάξετε την ημέρα που εμφανίζεται πατώντας δεξιά ή αριστερά</string>
-        
+
         <string name="_title_view">Εμφάνιση</string>
         
         <string name="_title_missed">Δεν πάρθηκαν</string>
