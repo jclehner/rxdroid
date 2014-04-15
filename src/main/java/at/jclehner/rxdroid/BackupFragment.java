@@ -36,6 +36,7 @@ import at.jclehner.androidutils.AlertDialogFragmentBuilder;
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.androidutils.PopupMenuCompatBuilder;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.Util;
 
 public class BackupFragment extends LoaderListFragment<File>
 {
@@ -151,7 +152,7 @@ public class BackupFragment extends LoaderListFragment<File>
 					{
 						try
 						{
-							Backup.createBackup(null);
+							Backup.createBackup(null, null);
 							getLoaderManager().restartLoader(0, null, BackupFragment.this);
 						}
 						catch(ZipException e)
@@ -205,7 +206,7 @@ public class BackupFragment extends LoaderListFragment<File>
 		ab.setCancelable(true);
 
 		ab.setMessage(Html.fromHtml("<tt>" + e.getClass().getSimpleName() + "</tt><br/>"
-				+ Html.escapeHtml(e.getMessage())));
+				+ Util.escapeHtml(e.getMessage())));
 
 		//ab.show(getFragmentManager(), "create_error");
 		ab.show();
