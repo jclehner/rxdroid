@@ -70,7 +70,7 @@
 		/>
 
         <activity android:name=".BackupActivity"
-                  android:exported="true"
+                  android:exported="false"
                   android:uiOptions="none"
                   android:launchMode="singleTop"
                   android:configChanges="orientation|screenSize|keyboardHidden"
