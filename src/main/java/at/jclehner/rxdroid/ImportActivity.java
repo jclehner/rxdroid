@@ -72,14 +72,8 @@ public class ImportActivity extends SherlockFragmentActivity
 			{
 				try
 				{
-					synchronized(Database.LOCK_DATA)
-					{
-						mZip.extractAll(RxDroid.getPackageInfo().applicationInfo.dataDir);
-						Database.reload(getActivity());
-						Settings.init(true);
-
-						startActivity(getActivity().getPackageManager().getLaunchIntentForPackage(RxDroid.getPackageInfo().packageName));
-					}
+					Backup.restoreBackup(mZip);
+					startActivity(getActivity().getPackageManager().getLaunchIntentForPackage(RxDroid.getPackageInfo().packageName));
 				} catch(ZipException e)
 				{
 					handleZipException(e);

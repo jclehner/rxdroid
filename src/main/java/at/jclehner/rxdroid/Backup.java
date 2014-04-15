@@ -8,6 +8,8 @@ import android.util.Log;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -50,13 +53,24 @@ public class Backup
 					continue;
 
 				final ZipParameters zp = new ZipParameters();
-				zp.setFileNameInZip(FILES[i]);
+				zp.setRootFolderInZip(new File(FILES[i]).getParent());
+				//zp.setFileNameInZip(FILES[i]);
 				zp.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
 				zp.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
 				zip.addFile(file, zp);
 			}
 
 			zip.setComment("rxdbak1:" + System.currentTimeMillis() + ":DBv" + DatabaseHelper.DB_VERSION);
+		}
+	}
+
+	public static void restoreBackup(ZipFile zipFile) throws ZipException
+	{
+		synchronized(Database.LOCK_DATA)
+		{
+			zipFile.extractAll(RxDroid.getPackageInfo().applicationInfo.dataDir);
+			Database.reload(RxDroid.getContext());
+			Settings.init(true);
 		}
 	}
 
