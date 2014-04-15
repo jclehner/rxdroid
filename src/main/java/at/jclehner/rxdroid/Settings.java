@@ -85,6 +85,7 @@ public final class Settings
 		public static final String DIM_DOSE_VIEWS = key(R.string.key_dim_dose_views);
 		public static final String USE_SAFE_MODE = key(R.string.key_use_safe_mode);
 		public static final String SKIP_DOSE_DIALOG = key(R.string.key_skip_dose_dialog);
+		public static final String SWIPE_TO_TAKE_ALL = key(R.string.key_swipe_to_take_all);
 		@Deprecated
 		public static final String DISPLAYED_HELP_SUFFIXES = "displayed_help_suffixes";
 		public static final String DISPLAYED_ONCE = "displayed_once";

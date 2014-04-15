@@ -507,7 +507,10 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-			builder.addAction(R.drawable.ic_action_tick, getString(R.string._title_take_all_doses), operation);
+			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
+				builder.addAction(R.drawable.ic_action_tick, getString(R.string._title_take_all_doses), operation);
+			else if(Settings.getBoolean(Settings.Keys.SWIPE_TO_TAKE_ALL, false))
+				builder.setDeleteIntent(operation);
 		}
 		else if(isShowingLowSupplyNotificationOnly)
 		{

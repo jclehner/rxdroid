@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="pref_visibility_swipe_to_take_all" type="bool">false</item>
+</resources>

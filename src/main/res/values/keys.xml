@@ -53,4 +53,5 @@
 	<item type="string" name="key_use_pretty_fractions">use_pretty_fractions</item>
     <item type="string" name="key_dim_dose_views">dim_dose_views</item>
     <item type="string" name="key_use_safe_mode">use_safe_mode</item>
+    <item type="string" name="key_swipe_to_take_all">swipe_to_take_all</item>
 </resources>

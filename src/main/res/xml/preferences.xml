@@ -132,6 +132,13 @@
 			android:inputType="number"
 			android:selectAllOnFocus="true"
 		/>
+
+        <CheckBoxPreference android:key="@string/key_swipe_to_take_all"
+            android:title="@string/_title_swipe_to_take_all"
+            android:summary="@string/_summary_swipe_to_take_all"
+            android:enabled="@bool/pref_visibility_swipe_to_take_all"
+            android:defaultValue="false"
+        />
 		
 		<at.jclehner.rxdroid.preferences.TogglableTimePeriodPreference 
 		    android:key="@string/key_quiet_hours"
@@ -193,6 +200,16 @@
 	        android:summary="@string/_summary_use_backup_framework"
 	        android:defaultValue="true"
 	    />
+
+        <Preference android:key="backup_restore"
+                    android:title="@string/_title_backup_restore">
+                    <intent
+                        android:action="android.intent.action.MAIN"
+                        android:targetPackage="at.jclehner.rxdroid"
+                        android:targetClass="at.jclehner.rxdroid.BackupActivity"
+                    />
+        </Preference>
+
 		
 		<Preference android:key="@string/key_db_stats"
 			android:title="@string/_title_db_stats"

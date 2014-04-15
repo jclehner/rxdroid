@@ -1,5 +1,6 @@
 package at.jclehner.rxdroid;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -8,6 +9,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Html;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +32,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import at.jclehner.androidutils.AlertDialogFragmentBuilder;
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.androidutils.PopupMenuCompatBuilder;
 import at.jclehner.rxdroid.util.DateTime;
@@ -54,7 +58,8 @@ public class BackupFragment extends LoaderListFragment<File>
 		}
 
 		@Override
-		public int compareTo(BackupFile another) {
+		public int compareTo(BackupFile another)
+		{
 			return (int) (another.item.lastModified() - this.item.lastModified());
 		}
 
@@ -65,12 +70,13 @@ public class BackupFragment extends LoaderListFragment<File>
 
 	static class Loader extends LLFLoader<File> implements FilenameFilter
 	{
-		Loader(Context context) {
+		Loader(Context context)
+		{
 			super(context);
 		}
 
 		@Override
-		public List<? extends ItemHolder<File>> onLoadInBackground()
+		public List<? extends ItemHolder<File>> loadInBackground()
 		{
 			final File dir = new File(Environment.getExternalStorageDirectory(), "RxDroid");
 			if(!dir.exists())
@@ -78,6 +84,8 @@ public class BackupFragment extends LoaderListFragment<File>
 				dir.mkdir();
 				return Collections.emptyList();
 			}
+			else if(!dir.isDirectory())
+				throw new IllegalStateException(dir + ": not a directory");
 
 			final List<BackupFile> data = new ArrayList<BackupFile>();
 
@@ -90,14 +98,16 @@ public class BackupFragment extends LoaderListFragment<File>
 		}
 
 		@Override
-		public boolean accept(File dir, String filename) {
+		public boolean accept(File dir, String filename)
+		{
 			return filename.endsWith(".rxdbak");
 		}
 	}
 
 	class Adapter extends LLFAdapter<File>
 	{
-		Adapter() {
+		Adapter()
+		{
 			super(BackupFragment.this);
 		}
 
@@ -133,7 +143,7 @@ public class BackupFragment extends LoaderListFragment<File>
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
 		final MenuItem item = menu.add(getString(R.string._title_create_backup))
-				.setIcon(R.drawable.ic_menu_new)
+				.setIcon(R.drawable.ic_action_add)
 				.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
 				{
 					@Override
@@ -143,9 +153,10 @@ public class BackupFragment extends LoaderListFragment<File>
 						{
 							Backup.createBackup(null);
 							getLoaderManager().restartLoader(0, null, BackupFragment.this);
-						} catch(ZipException e)
+						}
+						catch(ZipException e)
 						{
-							Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+							showExceptionDialog(e);
 						}
 
 						return true;
@@ -162,14 +173,44 @@ public class BackupFragment extends LoaderListFragment<File>
 	}
 
 	@Override
-	protected LLFLoader<File> onCreateLoader() {
+	public void onActivityCreated(Bundle savedInstanceState)
+	{
+		super.onActivityCreated(savedInstanceState);
+		setEmptyText(getString(R.string._msg_no_backups_available));
+	}
+
+	@Override
+	protected LLFLoader<File> onCreateLoader()
+	{
 		return new Loader(getActivity());
 	}
 
 	@Override
-	protected LLFAdapter<File> onCreateAdapter() {
+	protected LLFAdapter<File> onCreateAdapter()
+	{
 		return new Adapter();
 	}
+
+	@Override
+	protected void onLoaderException(RuntimeException e) {
+		showExceptionDialog(e);
+	}
+
+	private void showExceptionDialog(Exception e)
+	{
+		final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+		ab.setTitle(R.string._title_error);
+		ab.setIcon(android.R.drawable.ic_dialog_alert);
+		ab.setPositiveButton(android.R.string.ok, null);
+		ab.setCancelable(true);
+
+		ab.setMessage(Html.fromHtml("<tt>" + e.getClass().getSimpleName() + "</tt><br/>"
+				+ Html.escapeHtml(e.getMessage())));
+
+		//ab.show(getFragmentManager(), "create_error");
+		ab.show();
+	}
+
 
 	private View.OnClickListener mMenuListener = new View.OnClickListener()
 	{
@@ -206,7 +247,7 @@ public class BackupFragment extends LoaderListFragment<File>
 					else if(item.getItemId() == R.id.menuitem_share)
 					{
 						final Intent target = new Intent(Intent.ACTION_SEND);
-						target.putExtra(Intent.EXTRA_STREAM, Uri.fromFile((File) v.getTag()));
+						target.putExtra(Intent.EXTRA_STREAM, file.uri);
 						target.setType("application/octet-stream");
 
 						final Intent intent = Intent.createChooser(target, getString(R.string._title_share));

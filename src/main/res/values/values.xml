@@ -39,6 +39,7 @@
 	<item name="pref_visibility_theme_is_dark" type="bool">false</item>
 	<item name="pref_visibility_landscape_enabled" type="bool">true</item>
 	<item name="pref_visibility_compact_action_bar" type="bool">false</item>
+    <item name="pref_visibility_swipe_to_take_all" type="bool">true</item>
 	
 	<item name="is_drug_list_activity_date_menu_item_visible" type="bool">false</item>
 	

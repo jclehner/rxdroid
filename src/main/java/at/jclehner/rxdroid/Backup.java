@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -30,7 +32,12 @@ public class Backup
 	public static void createBackup(File outFile) throws ZipException
 	{
 		if(outFile == null)
-			outFile = new File(Environment.getExternalStorageDirectory(), "RxDroid/" + System.currentTimeMillis() + ".rxdbak");
+		{
+			final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+			outFile = new File(Environment.getExternalStorageDirectory(),
+					"RxDroid/" + sdf.format(new Date()) + ".rxdbak");
+		}
+
 		synchronized(Database.LOCK_DATA)
 		{
 			final ZipFile zip = new ZipFile(outFile);
@@ -44,15 +51,8 @@ public class Backup
 
 				final ZipParameters zp = new ZipParameters();
 				zp.setFileNameInZip(FILES[i]);
-
-				if(false)
-				{
-					zp.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
-					zp.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
-					zp.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
-					zp.setPassword("foobar");
-				}
-
+				zp.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+				zp.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
 				zip.addFile(file, zp);
 			}
 
