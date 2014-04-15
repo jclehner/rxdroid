@@ -1,3 +1,8 @@
+0.9.22:
+	* Add option to create/restore backups
+	* Swipe/clear notifications on pre-JellyBean to 'take all'
+	* Bug fixes
+
 0.9.21.1:
 	* Fix date calculation error for 'Every N days' mode
 
