@@ -156,7 +156,7 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 		}
 
 		@Override
-		public List<DrugWrapper> onLoadInBackground()
+		public List<DrugWrapper> loadInBackground()
 		{
 			Database.init();
 

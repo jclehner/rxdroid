@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,12 +53,12 @@ public abstract class LoaderListFragment<T> extends SherlockListFragment impleme
 		}
 
 		@Override
-		public final List<? extends ItemHolder<T>> loadInBackground()
+		public final List<? extends ItemHolder<T>> onLoadInBackground()
 		{
 			try
 			{
 				mException = null;
-				return onLoadInBackground();
+				return loadInBackground();
 			}
 			catch(RuntimeException e)
 			{
@@ -70,7 +71,7 @@ public abstract class LoaderListFragment<T> extends SherlockListFragment impleme
 			return mException;
 		}
 
-		public abstract List<? extends ItemHolder<T>> onLoadInBackground();
+		public abstract List<? extends ItemHolder<T>> loadInBackground();
 
 		@Override
 		protected void onStartLoading()
