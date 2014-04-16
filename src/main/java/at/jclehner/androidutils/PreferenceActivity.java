@@ -100,6 +100,13 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 	}
 
 	@Override
+	public void addPreferencesFromResource(int preferencesResId)
+	{
+		getPreferenceManager().setSharedPreferencesMode(MODE_MULTI_PROCESS);
+		super.addPreferencesFromResource(preferencesResId);
+	}
+
+	@Override
 	public void setPreferenceScreen(PreferenceScreen preferenceScreen)
 	{
 		if(!mIgnoreNextSetPreferenceScreenCall)

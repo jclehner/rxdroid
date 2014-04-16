@@ -9,22 +9,15 @@ import android.os.Environment;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-//import com.google.gson.Gson;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Date;
 
-import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.ui.DialogueLike;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.DateTime;
@@ -131,7 +124,15 @@ public class ImportActivity extends SherlockFragmentActivity
 					mZip.setPassword(password);
 
 				Backup.restoreBackup(mZip);
-				startActivity(getActivity().getPackageManager().getLaunchIntentForPackage(RxDroid.getPackageInfo().packageName));
+
+
+				final Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage(RxDroid.getPackageInfo().packageName);
+				if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				else
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+				startActivity(intent);
 				getActivity().finish();
 			}
 			catch(ZipException e)
