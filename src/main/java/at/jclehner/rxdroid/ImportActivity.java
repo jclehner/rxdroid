@@ -1,14 +1,20 @@
 package at.jclehner.rxdroid;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -83,10 +89,8 @@ public class ImportActivity extends SherlockFragmentActivity
 						final EditText edit = new EditText(getActivity());
 						edit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 						edit.setHint(R.string._title_password);
-						//edit.setImeOptions(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
 
 						final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-						//ab.setMessage("Enter password to decrypt backup file");
 						ab.setView(edit);
 						ab.setCancelable(false);
 						ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
@@ -97,7 +101,50 @@ public class ImportActivity extends SherlockFragmentActivity
 								restoreBackup(edit.getText().toString());
 							}
 						});
-						ab.show();
+
+						final AlertDialog dialog = ab.create();
+						dialog.setOnShowListener(new DialogInterface.OnShowListener()
+						{
+							@Override
+							public void onShow(DialogInterface dialogInterface)
+							{
+								final Button b = dialog.getButton(Dialog.BUTTON_POSITIVE);
+								if(b != null)
+									b.setEnabled(false);
+
+								final Window w = dialog.getWindow();
+								if(w != null)
+								{
+									w.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
+													| WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
+									);
+								}
+							}
+						});
+
+						edit.addTextChangedListener(new TextWatcher()
+						{
+							@Override
+							public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+							@Override
+							public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+							@Override
+							public void afterTextChanged(Editable s)
+							{
+								final Button b = dialog.getButton(Dialog.BUTTON_POSITIVE);
+								if(b == null)
+									return;
+
+								if(s == null || s.length() == 0)
+									b.setEnabled(false);
+								else
+									b.setEnabled(true);
+							}
+						});
+
+						dialog.show();
 					}
 					else
 						restoreBackup(null);
