@@ -96,7 +96,7 @@
             android:noHistory="true"
             android:launchMode="singleTop"
         >
-            <!-- Intent filter WITH mimeType -->
+            <!-- IntentFilter WITH mimeType -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -119,7 +119,7 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
             </intent-filter>
 
-            <!-- Intent filter WITHOUT mimeType -->
+            <!-- IntentFilter WITHOUT mimeType -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -140,6 +140,20 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.rxdbak" />
 
+            </intent-filter>
+
+            <!-- IntentFilter for stuff like mail attachments -->
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
+
+                <data android:scheme="content" />
+                <!-- This is much to broad, but necessary since pathPattern will be
+                useless on the content:// URIs provided by mail clients. -->
+                <data android:mimeType="application/*" />
             </intent-filter>
 
         </activity>

@@ -48,6 +48,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
@@ -506,6 +507,18 @@ public final class Util
 		{
 			// ignore
 		}
+	}
+
+	public static void copy(InputStream in, OutputStream out) throws IOException
+	{
+		byte[] buf = new byte[10*1024];
+		int len;
+
+		while((len = in.read(buf)) > 0)
+			out.write(buf, 0, len);
+
+		closeQuietly(in);
+		closeQuietly(out);
 	}
 
 	public static String capitalize(String str)

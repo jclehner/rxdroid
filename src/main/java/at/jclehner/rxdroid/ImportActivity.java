@@ -2,6 +2,7 @@ package at.jclehner.rxdroid;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -21,12 +22,21 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.ZipInputStream;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 
 import at.jclehner.rxdroid.ui.DialogueLike;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.Util;
+import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class ImportActivity extends SherlockFragmentActivity
 {
@@ -172,7 +182,6 @@ public class ImportActivity extends SherlockFragmentActivity
 
 				Backup.restoreBackup(mZip);
 
-
 				final Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage(RxDroid.getPackageInfo().packageName);
 				if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -196,9 +205,35 @@ public class ImportActivity extends SherlockFragmentActivity
 
 			final Uri data = getActivity().getIntent().getData();
 			if(data != null)
-				return data.getSchemeSpecificPart();
+			{
+				if(!ContentResolver.SCHEME_CONTENT.equals(data.getScheme()))
+					return data.getSchemeSpecificPart();
+
+				return createBackupFileFromContentStream(data);
+			}
 
 			throw new IllegalStateException("No 'file' argument given and no data in hosting Activity");
+		}
+
+		private String createBackupFileFromContentStream(Uri uri)
+		{
+			try
+			{
+				final File tempFile = new File(getActivity().getCacheDir(), "temp.rxdbak");
+				final InputStream in = getActivity().getContentResolver().openInputStream(uri);
+				final OutputStream out = new FileOutputStream(tempFile);
+				Util.copy(in, out);
+
+				return tempFile.getAbsolutePath();
+			}
+			catch(FileNotFoundException e)
+			{
+				throw new WrappedCheckedException(e);
+			}
+			catch(IOException e)
+			{
+				throw new WrappedCheckedException(e);
+			}
 		}
 
 		private void handleZipException(ZipException e)
