@@ -279,7 +279,7 @@ public final class DateTime
 	}
 
 	public static Date getMidnightDate(Date date) {
-		return obtainImmutableCachedDateInstance(date.getTime() - getOffsetFromMidnight(date)).date;
+		return new Date(date.getTime() - getOffsetFromMidnight(date));
 	}
 
 	public static boolean isWithinRange(Calendar time, DumbTime begin, DumbTime end)
