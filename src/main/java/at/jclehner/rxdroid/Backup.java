@@ -79,8 +79,8 @@ public class Backup
 		synchronized(Database.LOCK_DATA)
 		{
 			zipFile.extractAll(RxDroid.getPackageInfo().applicationInfo.dataDir);
-			Database.reload(RxDroid.getContext());
 			Settings.init(true);
+			Database.reload(RxDroid.getContext());
 		}
 
 		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
