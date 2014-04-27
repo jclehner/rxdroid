@@ -278,6 +278,10 @@ public final class DateTime
 		return getOffsetFromMidnight(cal);
 	}
 
+	public static Date getMidnightDate(Date date) {
+		return new Date(date.getTime() - getOffsetFromMidnight(date));
+	}
+
 	public static boolean isWithinRange(Calendar time, DumbTime begin, DumbTime end)
 	{
 		final DumbTime theTime = DumbTime.fromCalendar(time);
