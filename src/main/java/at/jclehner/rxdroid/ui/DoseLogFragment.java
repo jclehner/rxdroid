@@ -661,8 +661,9 @@ class EventInfo
 			timestamp = DateTime.add(date, Calendar.MILLISECOND, (int) offset);
 		}
 
+		final Date dateOfTimestamp = DateTime.getMidnightDate(timestamp);
 		final StringBuilder sb = new StringBuilder(DateTime.toNativeTime(timestamp, false));
-		long diffDays = DateTime.diffDays(date, timestamp);
+		long diffDays = DateTime.diffDays(date, dateOfTimestamp);
 
 		if(diffDays != 0)
 		{
@@ -679,7 +680,7 @@ class EventInfo
 
 	private EventInfo(DoseEvent intake)
 	{
-		timestamp = intake.getTimestamp();
+		timestamp = new Date(intake.getTimestamp().getTime());
 		date = intake.getDate();
 		doseTime = intake.getDoseTime();
 

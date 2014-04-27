@@ -314,8 +314,7 @@ public final class DateTime
 		return copy;
 	}
 
-	public static long diffDays(Date date1, Date date2)
-	{
+	public static long diffDays(Date date1, Date date2) {
 		return Math.round((date2.getTime() - date1.getTime()) / (double) Constants.MILLIS_PER_DAY);
 	}
 
