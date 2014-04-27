@@ -278,6 +278,10 @@ public final class DateTime
 		return getOffsetFromMidnight(cal);
 	}
 
+	public static Date getMidnightDate(Date date) {
+		return obtainImmutableCachedDateInstance(date.getTime() - getOffsetFromMidnight(date)).date;
+	}
+
 	public static boolean isWithinRange(Calendar time, DumbTime begin, DumbTime end)
 	{
 		final DumbTime theTime = DumbTime.fromCalendar(time);
@@ -310,8 +314,7 @@ public final class DateTime
 		return copy;
 	}
 
-	public static long diffDays(Date date1, Date date2)
-	{
+	public static long diffDays(Date date1, Date date2) {
 		return Math.round((date2.getTime() - date1.getTime()) / (double) Constants.MILLIS_PER_DAY);
 	}
 
