@@ -23,10 +23,12 @@ package at.jclehner.androidutils;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 
@@ -34,6 +36,8 @@ import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
+
+import at.jclehner.rxdroid.Settings;
 
 @SuppressWarnings("deprecation")
 public abstract class PreferenceActivity extends SherlockPreferenceActivity
@@ -67,6 +71,10 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 
 		super.onCreate(savedInstanceState);
 
+		final PreferenceManager pm = getPreferenceManager();
+		pm.setSharedPreferencesMode(MODE_MULTI_PROCESS);
+		pm.setSharedPreferencesName(Settings.getDefaultSharedPreferencesName(this));
+
 		final Intent intent = getIntent();
 		final int resId = intent.getIntExtra(EXTRA_PREFERENCES_RES_ID, 0);
 		final String key = intent.getStringExtra(EXTRA_PREFERENCE_SCREEN_KEY);
@@ -97,13 +105,6 @@ public abstract class PreferenceActivity extends SherlockPreferenceActivity
 
 	public void enqueuePreferencesFromResource(int preferencesResId) {
 		mEnqueuedPreferencesResId = preferencesResId;
-	}
-
-	@Override
-	public void addPreferencesFromResource(int preferencesResId)
-	{
-		getPreferenceManager().setSharedPreferencesMode(MODE_MULTI_PROCESS);
-		super.addPreferencesFromResource(preferencesResId);
 	}
 
 	@Override

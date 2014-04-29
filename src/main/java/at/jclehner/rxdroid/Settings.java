@@ -22,6 +22,8 @@
 package at.jclehner.rxdroid;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -143,6 +145,41 @@ public final class Settings
 	private static boolean sIsFirstLaunchOfThisVersion = false;
 	private static int sPreviousLaunchVersion = 0;
 
+	public static SharedPreferences getDefaultSharedPreferences(Context context)
+	{
+		if(Version.SDK_IS_PRE_HONEYCOMB)
+			return PreferenceManager.getDefaultSharedPreferences(context);
+
+		return context.getSharedPreferences(getDefaultSharedPreferencesName(context),
+				Context.MODE_MULTI_PROCESS);
+	}
+
+	public static String getDefaultSharedPreferencesName(Context context)
+	{
+		try
+		{
+			final Method m = PreferenceManager.class.getMethod(
+					"getDefaultSharedPreferencesName", Context.class);
+
+			m.setAccessible(true);
+			return (String) m.invoke(null, context);
+		}
+		catch(NoSuchMethodException e)
+		{
+			Log.w(TAG, e);
+		}
+		catch(IllegalAccessException e)
+		{
+			Log.w(TAG, e);
+		}
+		catch(InvocationTargetException e)
+		{
+			Log.w(TAG, e);
+		}
+
+		return context.getPackageName() + "_preferences";
+	}
+
 	public static synchronized void init() {
 		init(false);
 	}
@@ -151,7 +188,7 @@ public final class Settings
 	{
 		if(sSharedPrefs == null || force)
 		{
-			sSharedPrefs = PreferenceManager.getDefaultSharedPreferences(RxDroid.getContext());
+			sSharedPrefs = getDefaultSharedPreferences(RxDroid.getContext());
 
 			if(LOGV)
 			{
