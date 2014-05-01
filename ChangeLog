@@ -3,6 +3,10 @@
 	* Swipe/clear notifications on pre-JellyBean to 'take all'
 	* Bug fixes
 
+0.9.21.2:
+	* Fixes bug where times were erroneously suffixed 
+	  with +<number> in the dose log
+
 0.9.21.1:
 	* Fix date calculation error for 'Every N days' mode
 
