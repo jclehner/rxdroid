@@ -50,6 +50,7 @@ import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
+import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.ui.ExpandableListFragment.OnGroupCollapseExpandListener;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
@@ -303,7 +304,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		{
 			date = infos.get(i).date;
 
-			final List<EventInfo> group = new ArrayList<EventInfo>();
+			List<EventInfo> group = new ArrayList<EventInfo>();
 
 			while(i < infos.size() && date.equals(infos.get(i).date))
 			{
@@ -315,6 +316,16 @@ public class DoseLogFragment extends ExpandableListFragment
 			if(!group.isEmpty())
 			{
 				Collections.sort(group, EventInfoByDoseTimeComparator.INSTANCE);
+				mGroupedEvents.add(group);
+			}
+
+			// if i == infos.size() this is the last entry, in which case it's not
+			// neccessary to confuse the user with the lastScheduleUpdateDate message
+			// (it only matters if taken doses exist before this date)
+			if(date.equals(lastScheduleUpdateDate) && i != infos.size())
+			{
+				group = new ArrayList<EventInfo>();
+				group.add(EventInfo.newScheduleUpdatedEvent(date));
 				mGroupedEvents.add(group);
 			}
 		}
@@ -411,6 +422,8 @@ public class DoseLogFragment extends ExpandableListFragment
 				}
 				else if(info.status == EventInfo.STAT_SKIPPED)
 					statusResId = Theme.getResourceAttribute(R.attr.doseStatusIgnored);
+				else if(info.status == EventInfo.STAT_SCHEDULE_UPDATED)
+					statusResId = Theme.getResourceAttribute(R.attr.iconWarning);
 			}
 
 			holder.status.setImageResource(statusResId);
@@ -448,8 +461,10 @@ public class DoseLogFragment extends ExpandableListFragment
 
 				final EventInfo info = mGroupedEvents.get(groupPosition).get(childPosition);
 
-				holder.time.setText(info.getTimeString());
-				holder.dose.setDose(info.dose);
+				if(info.status != EventInfo.STAT_SCHEDULE_UPDATED)
+				{
+
+				}
 
 				final int timeColorAttr;
 				final int textResId;
@@ -477,15 +492,29 @@ public class DoseLogFragment extends ExpandableListFragment
 					timeColorAttr = R.attr.colorStatusMissed;
 				}
 
-				final StringBuilder sb = new StringBuilder();
-				sb.append(getString(textResId) + ": ");
-				sb.append(getString(DOSE_NAME_IDS[info.doseTime]));
-				holder.text.setText(sb.toString());
 
-				final int color = Theme.getColorAttribute(timeColorAttr);
+				if(info.doseTime != Schedule.TIME_INVALID)
+				{
+					holder.time.setText(info.getTimeString());
+					holder.dose.setDose(info.dose);
 
-//				final int color = getResources().getColor(Theme.getColorAttribute(timeColorAttr));
-				holder.time.setTextColor(color);
+					final StringBuilder sb = new StringBuilder();
+					sb.append(getString(textResId) + ": ");
+					sb.append(getString(DOSE_NAME_IDS[info.doseTime]));
+					holder.text.setText(sb.toString());
+
+					final int color = Theme.getColorAttribute(timeColorAttr);
+
+					holder.time.setText(info.getTimeString());
+					holder.time.setTextColor(color);
+				}
+				else
+				{
+					holder.gotoDate.setVisibility(View.GONE);
+					holder.dose.setVisibility(View.GONE);
+					holder.time.setVisibility(View.GONE);
+					holder.text.setText(R.string._msg_schedule_changed);
+				}
 			}
 			else
 			{
@@ -591,6 +620,7 @@ class EventInfo
 	static final int STAT_TAKEN = 0;
 	static final int STAT_MISSED = 1;
 	static final int STAT_SKIPPED = 2;
+	static final int STAT_SCHEDULE_UPDATED = 3;
 
 	Date timestamp;
 	final Date date;
@@ -606,6 +636,10 @@ class EventInfo
 
 	static EventInfo newMissedEvent(Date date, int doseTime, Fraction dose) {
 		return new EventInfo(date, doseTime, dose);
+	}
+
+	static EventInfo newScheduleUpdatedEvent(Date date) {
+		return new EventInfo(date);
 	}
 
 	@Override
@@ -626,6 +660,9 @@ class EventInfo
 			case STAT_SKIPPED:
 				statusStr = "skipped";
 				break;
+
+			case STAT_SCHEDULE_UPDATED:
+				return "EventInfo{ " + DateTime.toDateString(date) + ", schedule updated }";
 
 			default:
 				statusStr = "???";
@@ -706,6 +743,16 @@ class EventInfo
 		this.dose = dose;
 
 		status = STAT_MISSED;
+		intake = null;
+	}
+
+	private EventInfo(Date date)
+	{
+		this.date = date;
+		status = STAT_SCHEDULE_UPDATED;
+
+		doseTime = Schedule.TIME_INVALID;
+		dose = null;
 		intake = null;
 	}
 }

@@ -458,6 +458,8 @@
     <string name="_summary_swipe_to_take_all">Clear or swipe dose notifications to mark all as taken.</string>
 
     <string name="_title_password">Password</string>
+    <string name="_msg_schedule_changed">This drug\'s dosing schedule was changed on this date.
+            Missed doses before this date cannot be displayed!</string>
 
     <!--
     Keep at the end of strings.xml!  
