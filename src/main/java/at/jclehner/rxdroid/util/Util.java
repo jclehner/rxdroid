@@ -40,15 +40,20 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
@@ -695,6 +700,48 @@ public final class Util
 			} else if (fOut != null) {
 				fOut.close();
 			}
+		}
+	}
+
+	public static String runCommand(String cmdline)
+	{
+		try
+		{
+			Process process = Runtime.getRuntime().exec(cmdline);
+			BufferedReader bufferedReader = new BufferedReader(
+					new InputStreamReader(process.getInputStream()));
+
+			StringBuilder log = new StringBuilder();
+			String line;
+			while ((line = bufferedReader.readLine()) != null) {
+				log.append(line + "\n");
+			}
+
+			return log.toString();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static boolean writeToFile(File file, String data)
+	{
+		try
+		{
+			OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(file));
+			osw.write(data);
+			osw.close();
+			return true;
+		}
+		catch(FileNotFoundException e)
+		{
+			return false;
+		}
+		catch(IOException e)
+		{
+			return false;
 		}
 	}
 

@@ -158,7 +158,7 @@ public final class Settings
 	{
 		try
 		{
-			final Method m = PreferenceManager.class.getMethod(
+			final Method m = PreferenceManager.class.getDeclaredMethod(
 					"getDefaultSharedPreferencesName", Context.class);
 
 			m.setAccessible(true);

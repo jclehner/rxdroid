@@ -22,29 +22,45 @@
 package at.jclehner.rxdroid;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
+import android.app.Dialog;
 import android.app.backup.BackupManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
 import android.util.Log;
+import android.view.Window;
 import android.widget.Toast;
 
 import java.io.File;
+
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.WeakHashMap;
 
+import at.jclehner.androidutils.RefString;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.util.Components;
+import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 
@@ -63,6 +79,8 @@ public class RxDroid extends Application
 	public void onCreate()
 	{
 		setContext(getApplicationContext());
+
+		Thread.setDefaultUncaughtExceptionHandler(sExceptionHandler);
 
 		DoseEventJanitor.registerSelf();
 		Database.registerEventListener(sNotificationUpdater);
@@ -241,6 +259,83 @@ public class RxDroid extends Application
 		return 0;
 	}
 
+	public static Intent getErrorEmailIntent(Context context, String tag, Throwable t, boolean includeLogcat)
+	{
+		final File dir = true ? context.getCacheDir()
+				: new File(Environment.getExternalStorageDirectory(), "RxDroid");
+
+		final Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_SEND);
+		intent.setType("plain/text");
+		intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "josephclehner+rxdroid@gmail.com" });
+		intent.putExtra(Intent.EXTRA_SUBJECT, "[" + tag + "] " + Version.get());
+
+		final StringBuilder text = new StringBuilder(
+				"================== DEVICE INFO ==================\n" +
+				"MANUFACTURER: " + Build.MANUFACTURER + "\n" +
+				"PRODUCT     : " + Build.PRODUCT + "\n" +
+				"MODEL       : " + Build.MODEL + "\n" +
+				"DEVICE      : " + Build.DEVICE + "\n" +
+				"DISPLAY     : " + Build.DISPLAY + "\n" +
+				"RELEASE     : " + Build.VERSION.RELEASE + "\n" +
+				"SDK_INT     : " + Build.VERSION.SDK_INT + "\n" +
+				"LOCALE      : " + Locale.getDefault().toString() + "\n" +
+				"PID         : " + android.os.Process.myPid() + "\n"
+		);
+
+		final ArrayList<Uri> attachments = new ArrayList<Uri>();
+
+		if(t != null)
+		{
+			final String data = Util.stackTraceToString(t);
+			final File file = new File(dir, "stacktrace.txt");
+			if(Util.writeToFile(file, data))
+			{
+				file.setReadable(true, false);
+				attachments.add(Uri.fromFile(file));
+			}
+			else
+			{
+				text.append(
+						"================== STACK TRACE ==================\n" +
+								data + "\n"
+				);
+			}
+		}
+
+		if(includeLogcat)
+		{
+			final String data = Util.runCommand("logcat -d");
+			final File file = new File(dir, "logcat.txt");
+			if(Util.writeToFile(file, data))
+			{
+				file.setReadable(true, false);
+				attachments.add(Uri.fromFile(file));
+			}
+			else
+			{
+				text.append(
+						"===================== LOGCAT ====================\n" +
+								data + "\n"
+				);
+			}
+		}
+
+		text.append("================== USER MESSAGE ==================\n");
+
+		intent.putExtra(Intent.EXTRA_TEXT, text.toString());
+
+		if(attachments.size() != 0)
+		{
+			intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+			intent.setFlags(intent.getFlags() | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, attachments);
+		}
+
+		return Intent.createChooser(intent, context.getString(R.string._btn_report));
+	}
+
+
 	private static void toast(final int textResId, final int duration)
 	{
 		runInMainThread(new Runnable() {
@@ -269,4 +364,62 @@ public class RxDroid extends Application
 			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(entry instanceof DoseEvent);
 		}
 	};
+
+	private static final UncaughtExceptionHandler sExceptionHandler = new UncaughtExceptionHandler() {
+
+		@Override
+		public void uncaughtException(Thread thread, final Throwable ex)
+		{
+			ex.printStackTrace();
+
+			final int pid = android.os.Process.myPid();
+
+			final Intent intent = new Intent("at.jclehner.rxdroid.REPORT_EXCEPTION");
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.putExtra("exception", ex);
+			intent.putExtra("pid", pid);
+
+			doStartActivity(intent);
+			android.os.Process.killProcess(pid);
+		}
+	};
+
+	public static class ExceptionHandlerActivity extends Activity
+	{
+		@Override
+		protected void onCreate(Bundle savedInstanceState)
+		{
+			super.onCreate(savedInstanceState);
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+			final Throwable t = (Throwable) getIntent().getSerializableExtra("exception");
+			final int pid = getIntent().getIntExtra("pid", 0);
+
+			final String exClassName = t.getClass().getName();
+			final CharSequence msg = Html.fromHtml(
+					"<p>" + Util.escapeHtml(RefString.resolve(this, R.string._msg_uncaught_exception)) +
+							"</p><p><tt>" + exClassName + "</tt></p>");
+
+			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
+			ab.setTitle(R.string._title_error);
+			ab.setIcon(R.drawable.ic_launcher);
+			ab.setMessage(msg);
+			ab.setCancelable(false);
+			ab.setNegativeButton(android.R.string.cancel, null);
+			ab.setPositiveButton(R.string._btn_report, new DialogInterface.OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					if(which == Dialog.BUTTON_POSITIVE)
+						startActivity(getErrorEmailIntent(getApplicationContext(), "BUG", t, true));
+
+					finish();
+				}
+			});
+
+			ab.show();
+		}
+	}
+
 }

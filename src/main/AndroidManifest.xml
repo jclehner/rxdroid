@@ -158,6 +158,18 @@
 
         </activity>
 
+        <activity android:name=".RxDroid$ExceptionHandlerActivity"
+                  android:windowSoftInputMode="stateHidden"
+                  android:configChanges="orientation|screenSize|keyboardHidden"
+                  android:theme="@style/Transparent"
+                  android:process=":exceptionhandler"
+        >
+            <intent-filter>
+                <action android:name="at.jclehner.rxdroid.REPORT_EXCEPTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
 		<activity android:name=".PreferencesActivity"
 		    android:exported="false"
 		    android:windowSoftInputMode="adjustPan"

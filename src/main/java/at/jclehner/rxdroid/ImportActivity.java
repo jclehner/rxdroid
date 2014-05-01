@@ -44,6 +44,7 @@ public class ImportActivity extends SherlockFragmentActivity
 
 	public static class Dialogish extends DialogueLike
 	{
+		private boolean mHasZipException = false;
 		private ZipFile mZip;
 
 		public static Dialogish newInstance(String file)
@@ -238,11 +239,14 @@ public class ImportActivity extends SherlockFragmentActivity
 
 		private void handleZipException(ZipException e)
 		{
+			mHasZipException = true;
 			Log.w(TAG, e);
 
 			setTitle(R.string._title_error);
 			setMessage(R.string._msg_restore_backup_error, e.getLocalizedMessage());
 			setDetail(mZip.getFile().toString());
+
+			setNegativeButtonText(R.string._btn_report);
 
 			getButton(BUTTON_POSITIVE).setVisibility(View.GONE);
 			setNegativeButtonText(android.R.string.ok);

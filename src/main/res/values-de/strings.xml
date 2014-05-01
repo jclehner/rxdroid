@@ -419,8 +419,7 @@
              wieder her (erstellt: %1$s). Alle aktuellen Daten werden überschrieben. Dieser
              Vorgang kann nicht rückgängig gemacht werden!</string>
 
-    <string name="_msg_restore_backup_error">Daten dieser Sicherungskopie können nicht
-            wieder hergestellt werden: %1$s</string>
+    <string name="_msg_restore_backup_error">Fehler beim Wiederherstellen von Daten aus %1$s</string>
 
     <string name="_title_share">Teilen</string>
     <string name="_title_restore">Wiederherstellen</string>
@@ -437,6 +436,10 @@
     <string name="_title_password">Passwort</string>
      <string name="_msg_schedule_changed">Der Einnahmeplan dieses Medikaments wurde an diesem
              Tag geändert. Vergessene Dosen vor diesem Tag können nicht angezeigt werden!</string>
+
+     <string name="_msg_uncaught_exception">RxDroid hat einen Fehler verursacht und wird
+             geschlossen. Bitte melden Sie diesen Fehler, um die App zu verbessern!
+     </string>
 
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
