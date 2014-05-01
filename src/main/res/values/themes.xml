@@ -184,7 +184,7 @@
     <style name="Theme.RxDroid.ButtonBarButton" />
     <style name="Theme.RxDroid.ButtonBarButton.Dark"/>
 
-    <style name="Transparent">
+    <style name="Theme.RxDroid.Transparent" parent="Theme.RxDroid">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
         <item name="android:windowBackground">@android:color/transparent</item>

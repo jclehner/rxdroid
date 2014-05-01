@@ -161,8 +161,7 @@
         <activity android:name=".RxDroid$ExceptionHandlerActivity"
                   android:windowSoftInputMode="stateHidden"
                   android:configChanges="orientation|screenSize|keyboardHidden"
-                  android:theme="@style/Transparent"
-                  android:process=":exceptionhandler"
+                  android:theme="@style/Theme.RxDroid.Transparent"
         >
             <intent-filter>
                 <action android:name="at.jclehner.rxdroid.REPORT_EXCEPTION" />
@@ -226,6 +225,18 @@
 		<receiver android:name=".NotificationReceiver" 
 		    android:exported="false" 
 		/>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="at.jclehner.rxdroid.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths"
+            />
+        </provider>
+
 
 	</application>
 </manifest>

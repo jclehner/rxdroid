@@ -32,6 +32,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
@@ -261,17 +263,21 @@ public class RxDroid extends Application
 
 	public static Intent getErrorEmailIntent(Context context, String tag, Throwable t, boolean includeLogcat)
 	{
-		final File dir = true ? context.getCacheDir()
+		final File dir = true ? new File(context.getCacheDir(), "crash")
 				: new File(Environment.getExternalStorageDirectory(), "RxDroid");
+
+		dir.mkdirs();
 
 		final Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_SEND);
-		intent.setType("plain/text");
+		intent.setType("text/plain");
 		intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "josephclehner+rxdroid@gmail.com" });
 		intent.putExtra(Intent.EXTRA_SUBJECT, "[" + tag + "] " + Version.get());
 
-		final StringBuilder text = new StringBuilder(
-				"================== DEVICE INFO ==================\n" +
+		final StringBuilder text = new StringBuilder();
+		final ArrayList<Uri> attachments = new ArrayList<Uri>();
+
+		final String deviceInfo =
 				"MANUFACTURER: " + Build.MANUFACTURER + "\n" +
 				"PRODUCT     : " + Build.PRODUCT + "\n" +
 				"MODEL       : " + Build.MODEL + "\n" +
@@ -281,60 +287,67 @@ public class RxDroid extends Application
 				"SDK_INT     : " + Build.VERSION.SDK_INT + "\n" +
 				"LOCALE      : " + Locale.getDefault().toString() + "\n" +
 				"PID         : " + android.os.Process.myPid() + "\n"
-		);
+		;
 
-		final ArrayList<Uri> attachments = new ArrayList<Uri>();
+		attachOrAppend(context, "DEVICE INFO", deviceInfo, new File(dir, "info.txt"), attachments, text);
 
 		if(t != null)
 		{
-			final String data = Util.stackTraceToString(t);
-			final File file = new File(dir, "stacktrace.txt");
-			if(Util.writeToFile(file, data))
-			{
-				file.setReadable(true, false);
-				attachments.add(Uri.fromFile(file));
-			}
-			else
-			{
-				text.append(
-						"================== STACK TRACE ==================\n" +
-								data + "\n"
-				);
-			}
+			attachOrAppend(context, "STACK TRACE", Util.stackTraceToString(t), new File(dir, "stacktrace.txt"),
+					attachments, text);
 		}
 
 		if(includeLogcat)
 		{
-			final String data = Util.runCommand("logcat -d");
-			final File file = new File(dir, "logcat.txt");
-			if(Util.writeToFile(file, data))
-			{
-				file.setReadable(true, false);
-				attachments.add(Uri.fromFile(file));
-			}
-			else
-			{
-				text.append(
-						"===================== LOGCAT ====================\n" +
-								data + "\n"
-				);
-			}
+			attachOrAppend(context, "LOGCAT", Util.runCommand("logcat -d -v time"), new File(dir, "logcat.txt"),
+					attachments, text);
 		}
-
-		text.append("================== USER MESSAGE ==================\n");
 
 		intent.putExtra(Intent.EXTRA_TEXT, text.toString());
 
 		if(attachments.size() != 0)
 		{
 			intent.setAction(Intent.ACTION_SEND_MULTIPLE);
-			intent.setFlags(intent.getFlags() | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, attachments);
+
+			final List<ResolveInfo> rInfos = context.getPackageManager().queryIntentActivities(intent,
+					PackageManager.MATCH_DEFAULT_ONLY);
+
+			for(ResolveInfo rInfo : rInfos)
+			{
+				final String pkgName = rInfo.activityInfo.packageName;
+
+				for(Uri uri : attachments)
+					context.grantUriPermission(pkgName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			}
 		}
+		else
+			text.append("================== USER MESSAGE ==================\n");
 
 		return Intent.createChooser(intent, context.getString(R.string._btn_report));
 	}
 
+	private static boolean attachOrAppend(Context context, String header, String data, File file, ArrayList<Uri> outAttachments,
+			StringBuilder outText)
+	{
+		if(Util.writeToFile(file, data))
+		{
+			//file.setReadable(true, false);
+			outAttachments.add(FileProvider.getUriForFile(
+					context, "at.jclehner.rxdroid.fileprovider", file));
+			return true;
+		}
+		else
+		{
+			outText.append(
+					"===================== " + header + " ====================\n" +
+							data + "\n"
+			);
+
+			return false;
+		}
+	}
 
 	private static void toast(final int textResId, final int duration)
 	{
@@ -381,6 +394,7 @@ public class RxDroid extends Application
 
 			doStartActivity(intent);
 			android.os.Process.killProcess(pid);
+			System.exit(1);
 		}
 	};
 
@@ -420,6 +434,4 @@ public class RxDroid extends Application
 
 			ab.show();
 		}
-	}
-
-}
+	}}

@@ -708,6 +708,7 @@ public final class Util
 		try
 		{
 			Process process = Runtime.getRuntime().exec(cmdline);
+			process.waitFor();
 			BufferedReader bufferedReader = new BufferedReader(
 					new InputStreamReader(process.getInputStream()));
 
@@ -720,6 +721,11 @@ public final class Util
 			return log.toString();
 		}
 		catch(IOException e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+		catch(InterruptedException e)
 		{
 			e.printStackTrace();
 			return null;
