@@ -1,6 +1,6 @@
 0.9.21.2:
 	* Fixes bug where times were erroneously suffixed 
-	  with +<number>
+	  with +<number> in the dose log
 
 0.9.21.1:
 	* Fix date calculation error for 'Every N days' mode
