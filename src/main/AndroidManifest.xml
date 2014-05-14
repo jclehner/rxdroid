@@ -158,17 +158,6 @@
 
         </activity>
 
-        <activity android:name=".RxDroid$ExceptionHandlerActivity"
-                  android:windowSoftInputMode="stateHidden"
-                  android:configChanges="orientation|screenSize|keyboardHidden"
-                  android:theme="@style/Theme.RxDroid.Transparent"
-        >
-            <intent-filter>
-                <action android:name="at.jclehner.rxdroid.REPORT_EXCEPTION" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
 		<activity android:name=".PreferencesActivity"
 		    android:exported="false"
 		    android:windowSoftInputMode="adjustPan"
@@ -197,6 +186,12 @@
 		    android:exported="false"
             android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
+
+        <activity android:name="org.acra.CrashReportDialog"
+                  android:theme="@style/Theme.RxDroid.CrashDialog"
+                  android:launchMode="singleInstance"
+                  android:excludeFromRecents="true"
+                  android:finishOnTaskLaunch="true" />
 
 		<receiver android:name=".SystemEventReceiver"
 			android:exported="false"    
@@ -228,7 +223,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="at.jclehner.rxdroid.fileprovider"
+            android:authorities="at.jclehner.rxdroid.logs"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

@@ -24,6 +24,7 @@
 
 <resources>	
 	<style name="Theme.RxDroid.Dialog" parent="@android:style/Theme.Holo.Light.Dialog" />
+    <style name="Theme.RxDroid.CrashDialog" parent="@android:style/Theme.Holo.Dialog" />
 
     <style name="Theme.RxDroid.ButtonBar" parent="@android:style/Holo.Light.ButtonBar" />
     <style name="Theme.RxDroid.ButtonBar.Dark" parent="@android:style/Holo.ButtonBar" />

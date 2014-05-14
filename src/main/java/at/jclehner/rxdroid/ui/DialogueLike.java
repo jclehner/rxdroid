@@ -30,13 +30,7 @@ public abstract class DialogueLike extends Fragment
 	private Button mPositiveBtn;
 	private Button mNegativeBtn;
 
-	private String mTitleText;
-	private String mMessageText;
-
-	private String mPosBtnText;
-	private String mNegBtnText;
-
-	public abstract void onButtonClick(View button, int which);
+	public abstract void onButtonClick(Button button, int which);
 
 	public DialogueLike() {
 		setArguments(new Bundle());
@@ -161,7 +155,7 @@ public abstract class DialogueLike extends Fragment
 		@Override
 		public void onClick(View v)
 		{
-			onButtonClick(v, v == mPositiveBtn ? BUTTON_POSITIVE : BUTTON_NEGATIVE);
+			onButtonClick((Button) v, v == mPositiveBtn ? BUTTON_POSITIVE : BUTTON_NEGATIVE);
 		}
 	};
 }

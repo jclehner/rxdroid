@@ -89,7 +89,7 @@ public class ImportActivity extends SherlockFragmentActivity
 		}
 
 		@Override
-		public void onButtonClick(View button, int which)
+		public void onButtonClick(Button button, int which)
 		{
 			if(which == BUTTON_POSITIVE)
 			{
@@ -183,13 +183,7 @@ public class ImportActivity extends SherlockFragmentActivity
 
 				Backup.restoreBackup(mZip);
 
-				final Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage(RxDroid.getPackageInfo().packageName);
-				if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				else
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-				startActivity(intent);
+				startActivity(RxDroid.getLaunchIntent());
 				getActivity().finish();
 			}
 			catch(ZipException e)

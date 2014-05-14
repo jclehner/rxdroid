@@ -437,9 +437,11 @@
      <string name="_msg_schedule_changed">Der Einnahmeplan dieses Medikaments wurde an diesem
              Tag geändert. Vergessene Dosen vor diesem Tag können nicht angezeigt werden!</string>
 
-     <string name="_msg_uncaught_exception">RxDroid hat einen Fehler verursacht und wird
-             geschlossen. Bitte melden Sie diesen Fehler, um die App zu verbessern!
-     </string>
+    <string name="_msg_crash_dialog_text">
+        \"RxDroid\" wurde beendet.
+    </string>
+
+    <string name="_msg_comment">Optionaler Kommentar:</string>
 
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

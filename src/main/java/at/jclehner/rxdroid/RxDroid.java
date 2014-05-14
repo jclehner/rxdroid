@@ -34,11 +34,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.SystemClock;
+import android.os.*;
+import android.os.Process;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
@@ -46,6 +43,10 @@ import android.text.Html;
 import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
+
+import org.acra.ACRA;
+import org.acra.ReportingInteractionMode;
+import org.acra.annotation.ReportsCrashes;
 
 import java.io.File;
 
@@ -62,10 +63,22 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.util.Components;
+import at.jclehner.rxdroid.util.EmailIntentSender;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
-
+@ReportsCrashes(
+		formKey = "",
+		mailTo = "josephclehner+rxdbug@gmail.com",
+		mode = ReportingInteractionMode.DIALOG,
+		//resDialogTitle = R.string._title_error,
+		//resDialogIcon = android.R.drawable.ic_dialog_alert,
+		resDialogText = R.string._msg_crash_dialog_text,
+		resDialogReportButtonText = R.string._btn_report,
+		resDialogCancelButtonText = android.R.string.ok,
+		switchDialogButtonPositions = true
+		//resDialogCommentPrompt = R.string._msg_comment
+)
 public class RxDroid extends Application
 {
 	private static final String TAG = RxDroid.class.getSimpleName();
@@ -82,8 +95,6 @@ public class RxDroid extends Application
 	{
 		setContext(getApplicationContext());
 
-		Thread.setDefaultUncaughtExceptionHandler(sExceptionHandler);
-
 		DoseEventJanitor.registerSelf();
 		Database.registerEventListener(sNotificationUpdater);
 
@@ -93,6 +104,8 @@ public class RxDroid extends Application
 		Components.onCreate(getContext(), Components.NO_DATABASE_INIT | Components.NO_SETTINGS_INIT);
 
 		super.onCreate();
+		ACRA.init(this);
+		ACRA.getErrorReporter().setReportSender(new EmailIntentSender(this));
 	}
 
 	public static void setContext(Context context)
@@ -102,7 +115,7 @@ public class RxDroid extends Application
 	}
 
 	/**
-	 * Calls {@link GlobalContext#get(boolean)} with <code>allowNullContext=false</code>.
+	 * Calls {@link  GlobalContext#get(boolean)} with <code>allowNullContext=false</code>.
 	 */
 	public static Context getContext() {
 		return getContext(false);
@@ -261,92 +274,17 @@ public class RxDroid extends Application
 		return 0;
 	}
 
-	public static Intent getErrorEmailIntent(Context context, String tag, Throwable t, boolean includeLogcat)
+	public static Intent getLaunchIntent()
 	{
-		final File dir = true ? new File(context.getCacheDir(), "crash")
-				: new File(Environment.getExternalStorageDirectory(), "RxDroid");
+		final Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(
+				getPackageInfo().packageName);
 
-		dir.mkdirs();
-
-		final Intent intent = new Intent();
-		intent.setAction(Intent.ACTION_SEND);
-		intent.setType("text/plain");
-		intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "josephclehner+rxdroid@gmail.com" });
-		intent.putExtra(Intent.EXTRA_SUBJECT, "[" + tag + "] " + Version.get());
-
-		final StringBuilder text = new StringBuilder();
-		final ArrayList<Uri> attachments = new ArrayList<Uri>();
-
-		final String deviceInfo =
-				"MANUFACTURER: " + Build.MANUFACTURER + "\n" +
-				"PRODUCT     : " + Build.PRODUCT + "\n" +
-				"MODEL       : " + Build.MODEL + "\n" +
-				"DEVICE      : " + Build.DEVICE + "\n" +
-				"DISPLAY     : " + Build.DISPLAY + "\n" +
-				"RELEASE     : " + Build.VERSION.RELEASE + "\n" +
-				"SDK_INT     : " + Build.VERSION.SDK_INT + "\n" +
-				"LOCALE      : " + Locale.getDefault().toString() + "\n" +
-				"PID         : " + android.os.Process.myPid() + "\n"
-		;
-
-		attachOrAppend(context, "DEVICE INFO", deviceInfo, new File(dir, "info.txt"), attachments, text);
-
-		if(t != null)
-		{
-			attachOrAppend(context, "STACK TRACE", Util.stackTraceToString(t), new File(dir, "stacktrace.txt"),
-					attachments, text);
-		}
-
-		if(includeLogcat)
-		{
-			attachOrAppend(context, "LOGCAT", Util.runCommand("logcat -d -v time"), new File(dir, "logcat.txt"),
-					attachments, text);
-		}
-
-		intent.putExtra(Intent.EXTRA_TEXT, text.toString());
-
-		if(attachments.size() != 0)
-		{
-			intent.setAction(Intent.ACTION_SEND_MULTIPLE);
-			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-			intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, attachments);
-
-			final List<ResolveInfo> rInfos = context.getPackageManager().queryIntentActivities(intent,
-					PackageManager.MATCH_DEFAULT_ONLY);
-
-			for(ResolveInfo rInfo : rInfos)
-			{
-				final String pkgName = rInfo.activityInfo.packageName;
-
-				for(Uri uri : attachments)
-					context.grantUriPermission(pkgName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-			}
-		}
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		else
-			text.append("================== USER MESSAGE ==================\n");
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-		return Intent.createChooser(intent, context.getString(R.string._btn_report));
-	}
-
-	private static boolean attachOrAppend(Context context, String header, String data, File file, ArrayList<Uri> outAttachments,
-			StringBuilder outText)
-	{
-		if(Util.writeToFile(file, data))
-		{
-			//file.setReadable(true, false);
-			outAttachments.add(FileProvider.getUriForFile(
-					context, "at.jclehner.rxdroid.fileprovider", file));
-			return true;
-		}
-		else
-		{
-			outText.append(
-					"===================== " + header + " ====================\n" +
-							data + "\n"
-			);
-
-			return false;
-		}
+		return intent;
 	}
 
 	private static void toast(final int textResId, final int duration)
@@ -377,61 +315,4 @@ public class RxDroid extends Application
 			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(entry instanceof DoseEvent);
 		}
 	};
-
-	private static final UncaughtExceptionHandler sExceptionHandler = new UncaughtExceptionHandler() {
-
-		@Override
-		public void uncaughtException(Thread thread, final Throwable ex)
-		{
-			ex.printStackTrace();
-
-			final int pid = android.os.Process.myPid();
-
-			final Intent intent = new Intent("at.jclehner.rxdroid.REPORT_EXCEPTION");
-			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			intent.putExtra("exception", ex);
-			intent.putExtra("pid", pid);
-
-			doStartActivity(intent);
-			android.os.Process.killProcess(pid);
-			System.exit(1);
-		}
-	};
-
-	public static class ExceptionHandlerActivity extends Activity
-	{
-		@Override
-		protected void onCreate(Bundle savedInstanceState)
-		{
-			super.onCreate(savedInstanceState);
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-			final Throwable t = (Throwable) getIntent().getSerializableExtra("exception");
-			final int pid = getIntent().getIntExtra("pid", 0);
-
-			final String exClassName = t.getClass().getName();
-			final CharSequence msg = Html.fromHtml(
-					"<p>" + Util.escapeHtml(RefString.resolve(this, R.string._msg_uncaught_exception)) +
-							"</p><p><tt>" + exClassName + "</tt></p>");
-
-			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
-			ab.setTitle(R.string._title_error);
-			ab.setIcon(R.drawable.ic_launcher);
-			ab.setMessage(msg);
-			ab.setCancelable(false);
-			ab.setNegativeButton(android.R.string.cancel, null);
-			ab.setPositiveButton(R.string._btn_report, new DialogInterface.OnClickListener()
-			{
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					if(which == Dialog.BUTTON_POSITIVE)
-						startActivity(getErrorEmailIntent(getApplicationContext(), "BUG", t, true));
-
-					finish();
-				}
-			});
-
-			ab.show();
-		}
-	}}
+}

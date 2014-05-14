@@ -23,6 +23,7 @@ package at.jclehner.rxdroid;
 
 import java.io.File;
 import java.util.Date;
+import java.util.UUID;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -167,8 +168,8 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 						public void onClick(View view)
 						{
 							view.setEnabled(false);
-							startActivity(RxDroid.getErrorEmailIntent(
-									getApplicationContext(), "ISSUE", null, true));
+
+							// FIXME
 						}
 					});
 				}

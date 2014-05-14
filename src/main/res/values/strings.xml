@@ -461,9 +461,11 @@
     <string name="_msg_schedule_changed">This drug\'s dosing schedule was changed on this date.
             Missed doses before this date cannot be displayed!</string>
 
-    <string name="_msg_uncaught_exception">RxDroid has encountered an error and needs to close. Please use the
-        \"[@string/_btn_report]\" button to help improve the app!
+    <string name="_msg_crash_dialog_text">
+        Unfortunately, RxDroid has stopped.
     </string>
+
+    <string name="_msg_comment">Optional comment:</string>
 
     <!--
     Keep at the end of strings.xml!  
