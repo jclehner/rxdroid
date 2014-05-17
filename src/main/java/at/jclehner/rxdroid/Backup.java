@@ -33,6 +33,89 @@ public class Backup
 {
 	private static final String TAG = Backup.class.getSimpleName();
 
+	public static class BackupFile
+	{
+		private ZipFile mZip = null;
+		private String mPath;
+
+		private String[] mInfo;
+		private Date mTimestamp;
+		private int mVersion;
+		private boolean mIsEncrypted;
+
+		public BackupFile(String path)
+		{
+			mPath = path;
+
+			try
+			{
+				mZip = new ZipFile(path);
+				mIsEncrypted = mZip.isEncrypted();
+
+				if(mZip.getComment() == null)
+					return;
+
+				mInfo = mZip.getComment().split(":");
+			}
+			catch(ZipException e)
+			{
+				Log.w(TAG, e);
+				return;
+			}
+
+			if(mInfo.length < 2 || !mInfo[0].startsWith("rxdbak"))
+				return;
+
+			mVersion = Integer.parseInt(mInfo[0].substring("rxdbak".length()));
+			mTimestamp = new Date(Long.parseLong(mInfo[1]));
+		}
+
+		public boolean isValid() {
+			return mZip != null && mVersion != 0;
+		}
+
+		public boolean isEncrypted() {
+			return mIsEncrypted;
+		}
+
+		public int version() {
+			return mVersion;
+		}
+
+		public String getPath() {
+			return mPath;
+		}
+
+		public Date getTimestamp() {
+			return mTimestamp;
+		}
+
+		public String getLocation()
+		{
+			final String file = new File(mPath).getAbsolutePath();
+			final String extDir = Environment.getExternalStorageDirectory().getAbsolutePath();
+			if(file.startsWith(extDir))
+				return file.substring(extDir.length() + 1);
+			else
+				return file;
+		}
+
+		public void restore(String password) throws ZipException
+		{
+			if(password != null)
+				mZip.setPassword(password);
+
+			synchronized(Database.LOCK_DATA)
+			{
+				mZip.extractAll(RxDroid.getPackageInfo().applicationInfo.dataDir);
+				Settings.init(true);
+				Database.reload(RxDroid.getContext());
+			}
+
+			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
+		}
+	}
+
 	public static void createBackup(File outFile, String password) throws ZipException
 	{
 		if(outFile == null)
@@ -72,18 +155,6 @@ public class Backup
 
 			zip.setComment("rxdbak1:" + System.currentTimeMillis() + ":DBv" + DatabaseHelper.DB_VERSION);
 		}
-	}
-
-	public static void restoreBackup(ZipFile zipFile) throws ZipException
-	{
-		synchronized(Database.LOCK_DATA)
-		{
-			zipFile.extractAll(RxDroid.getPackageInfo().applicationInfo.dataDir);
-			Settings.init(true);
-			Database.reload(RxDroid.getContext());
-		}
-
-		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
 	}
 
 	private static final String[] FILES = {

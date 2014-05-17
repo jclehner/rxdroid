@@ -169,7 +169,23 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 						{
 							view.setEnabled(false);
 
-							// FIXME
+							final Intent intent = new Intent();
+							intent.setAction(Intent.ACTION_SEND);
+							intent.setType("plain/text");
+							intent.putExtra(Intent.EXTRA_EMAIL, "josephclehner+rxdroid-issue@gmail.com");
+							intent.putExtra(Intent.EXTRA_SUBJECT, "[ISSUE] " + Build.MODEL + " auto-start");
+							intent.putExtra(Intent.EXTRA_TEXT,
+									"MANUFACTURER: " + Build.MANUFACTURER + "\n" +
+											"PRODUCT : " + Build.PRODUCT + "\n" +
+											"MODEL : " + Build.MODEL + "\n" +
+											"DEVICE : " + Build.DEVICE + "\n" +
+											"DISPLAY : " + Build.DISPLAY + "\n" +
+											"RELEASE : " + Build.VERSION.RELEASE + "\n" +
+											"SDK_INT : " + Build.VERSION.SDK_INT + "\n" +
+											"=========================\n\n"
+							);
+
+							startActivity(Intent.createChooser(intent, getString(R.string._btn_report)));
 						}
 					});
 				}

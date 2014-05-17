@@ -445,6 +445,7 @@
             will be deleted. This action cannot be undone!</string>
 
     <string name="_msg_restore_backup_error">Error while restoring data from %1$s</string>
+	<string name="_msg_invalid_backup_file">File is not a valid backup file.</string>
 
     <string name="_title_share">Share</string>
     <string name="_title_restore">Restore</string>

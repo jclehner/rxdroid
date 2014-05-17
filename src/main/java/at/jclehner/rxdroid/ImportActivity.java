@@ -44,8 +44,8 @@ public class ImportActivity extends SherlockFragmentActivity
 
 	public static class Dialogish extends DialogueLike
 	{
-		private boolean mHasZipException = false;
-		private ZipFile mZip;
+		private boolean mCanRestore = false;
+		private Backup.BackupFile mFile;
 
 		public static Dialogish newInstance(String file)
 		{
@@ -59,113 +59,37 @@ public class ImportActivity extends SherlockFragmentActivity
 		{
 			super.onResume();
 
-			setTitle(R.string._title_warning);
+			mFile = new Backup.BackupFile(getBackupFilePath());
+			mCanRestore = mFile.isValid();
 
-			try
+			if(mCanRestore)
 			{
-				mZip = new ZipFile(getBackupFile());
-
-				final String[] info = mZip.getComment() != null ?
-						mZip.getComment().split(":") : null;
-
-				if(info == null || info.length == 0 || !"rxdbak1".equals(info[0]))
-					throw new ZipException("Not an RxDroid backup file");
-
-				final Date cDate = new Date(Long.parseLong(info[1]));
-
-				setMessage(R.string._msg_restore_backup_warning, DateTime.toNativeDateAndTime(cDate));
-
-				final String file = mZip.getFile().toString();
-				final String extDir = Environment.getExternalStorageDirectory().toString();
-				if(file.startsWith(extDir))
-					setDetail(file.substring(extDir.length()));
-				else
-					setDetail(file);
+				getButton(BUTTON_NEGATIVE).setVisibility(View.VISIBLE);
+				setTitle(R.string._title_warning);
+				setMessage(R.string._msg_restore_backup_warning,
+						DateTime.toNativeDateAndTime(mFile.getTimestamp()));
 			}
-			catch(ZipException e)
+			else
 			{
-				handleZipException(e);
+				getButton(BUTTON_NEGATIVE).setVisibility(View.GONE);
+				setTitle(R.string._title_error);
+				setMessage(R.string._msg_invalid_backup_file);
 			}
+
+			setDetail(mFile.getLocation());
 		}
 
 		@Override
 		public void onButtonClick(Button button, int which)
 		{
-			if(which == BUTTON_POSITIVE)
+			if(which == BUTTON_POSITIVE && mCanRestore)
 			{
-				try
-				{
-					if(mZip.isEncrypted())
-					{
-						final EditText edit = new EditText(getActivity());
-						edit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-						edit.setHint(R.string._title_password);
-
-						final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-						ab.setView(edit);
-						ab.setCancelable(false);
-						ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(DialogInterface dialog, int which)
-							{
-								restoreBackup(edit.getText().toString());
-							}
-						});
-
-						final AlertDialog dialog = ab.create();
-						dialog.setOnShowListener(new DialogInterface.OnShowListener()
-						{
-							@Override
-							public void onShow(DialogInterface dialogInterface)
-							{
-								final Button b = dialog.getButton(Dialog.BUTTON_POSITIVE);
-								if(b != null)
-									b.setEnabled(false);
-
-								final Window w = dialog.getWindow();
-								if(w != null)
-								{
-									w.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
-													| WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
-									);
-								}
-							}
-						});
-
-						edit.addTextChangedListener(new TextWatcher()
-						{
-							@Override
-							public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-							@Override
-							public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-							@Override
-							public void afterTextChanged(Editable s)
-							{
-								final Button b = dialog.getButton(Dialog.BUTTON_POSITIVE);
-								if(b == null)
-									return;
-
-								if(s == null || s.length() == 0)
-									b.setEnabled(false);
-								else
-									b.setEnabled(true);
-							}
-						});
-
-						dialog.show();
-					}
-					else
-						restoreBackup(null);
-
-				} catch(ZipException e)
-				{
-					handleZipException(e);
-				}
+				if(!mFile.isEncrypted())
+					showPasswordDialog();
+				else
+					restoreBackup(null);
 			}
-			else if(which == BUTTON_NEGATIVE)
+			else
 			{
 				if(getActivity() instanceof ImportActivity)
 					getActivity().finish();
@@ -174,25 +98,84 @@ public class ImportActivity extends SherlockFragmentActivity
 			}
 		}
 
+		private void showPasswordDialog()
+		{
+			final EditText edit = new EditText(getActivity());
+			edit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+			edit.setHint(R.string._title_password);
+
+			final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+			ab.setView(edit);
+			//ab.setCancelable(false);
+			ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					restoreBackup(edit.getText().toString());
+				}
+			});
+
+			final AlertDialog dialog = ab.create();
+			dialog.setOnShowListener(new DialogInterface.OnShowListener()
+			{
+				@Override
+				public void onShow(DialogInterface dialogInterface)
+				{
+					final Button b = dialog.getButton(Dialog.BUTTON_POSITIVE);
+					if(b != null)
+						b.setEnabled(false);
+
+					final Window w = dialog.getWindow();
+					if(w != null)
+					{
+						w.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
+										| WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
+						);
+					}
+				}
+			});
+
+			edit.addTextChangedListener(new TextWatcher()
+			{
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+				@Override
+				public void afterTextChanged(Editable s)
+				{
+					final Button b = dialog.getButton(Dialog.BUTTON_POSITIVE);
+					if(b == null)
+						return;
+
+					if(s == null || s.length() == 0)
+						b.setEnabled(false);
+					else
+						b.setEnabled(true);
+				}
+			});
+
+			dialog.show();
+		}
+
 		private void restoreBackup(String password)
 		{
 			try
 			{
-				if(password != null)
-					mZip.setPassword(password);
-
-				Backup.restoreBackup(mZip);
-
+				mFile.restore(password);
 				startActivity(RxDroid.getLaunchIntent());
 				getActivity().finish();
 			}
 			catch(ZipException e)
 			{
-				handleZipException(e);
+				throw new WrappedCheckedException(e);
 			}
 		}
 
-		private String getBackupFile()
+		private String getBackupFilePath()
 		{
 			final String arg = getArguments().getString("file");
 			if(arg != null)
@@ -229,21 +212,6 @@ public class ImportActivity extends SherlockFragmentActivity
 			{
 				throw new WrappedCheckedException(e);
 			}
-		}
-
-		private void handleZipException(ZipException e)
-		{
-			mHasZipException = true;
-			Log.w(TAG, e);
-
-			setTitle(R.string._title_error);
-			setMessage(R.string._msg_restore_backup_error, e.getLocalizedMessage());
-			setDetail(mZip.getFile().toString());
-
-			setNegativeButtonText(R.string._btn_report);
-
-			getButton(BUTTON_POSITIVE).setVisibility(View.GONE);
-			setNegativeButtonText(android.R.string.ok);
 		}
 	}
 

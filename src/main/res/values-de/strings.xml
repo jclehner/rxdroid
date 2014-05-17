@@ -420,6 +420,7 @@
              Vorgang kann nicht rückgängig gemacht werden!</string>
 
     <string name="_msg_restore_backup_error">Fehler beim Wiederherstellen von Daten aus %1$s</string>
+	<string name="_msg_invalid_backup_file">Datei ist keine gültige Sicherungsdatei.</string>
 
     <string name="_title_share">Teilen</string>
     <string name="_title_restore">Wiederherstellen</string>
