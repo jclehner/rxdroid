@@ -1,9 +1,13 @@
 package at.jclehner.rxdroid;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
+
+import java.io.File;
 
 import at.jclehner.rxdroid.util.Components;
 
@@ -19,6 +23,21 @@ public class BackupActivity extends SherlockFragmentActivity
 
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		if(!Backup.DIRECTORY.exists())
+			Backup.DIRECTORY.mkdirs();
+		else if(!Backup.DIRECTORY.isDirectory())
+		{
+			// Hackish, but simple - a full blown AlertDialog would be
+			// overkill...
+
+			final File newFile = new File(Backup.DIRECTORY + "___");
+
+			Backup.DIRECTORY.renameTo(newFile);
+			Backup.DIRECTORY.mkdirs();
+
+			Toast.makeText(this, Backup.DIRECTORY + " -> " + newFile, Toast.LENGTH_LONG).show();
+		}
 
 		getSupportFragmentManager().beginTransaction().replace(
 				android.R.id.content, new BackupFragment()).commit();
