@@ -33,6 +33,9 @@ public class Backup
 {
 	private static final String TAG = Backup.class.getSimpleName();
 
+	public static final File DIRECTORY =
+			new File(Environment.getExternalStorageDirectory(), "RxDroid");
+
 	public static class BackupFile
 	{
 		private ZipFile mZip = null;

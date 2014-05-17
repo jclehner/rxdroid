@@ -45,27 +45,31 @@ public class BackupFragment extends LoaderListFragment<File>
 		{
 			super(file);
 
-			this.uri = Uri.fromFile(file);
+			final Backup.BackupFile bf = new Backup.BackupFile(file.getAbsolutePath());
 
-			final String fileStr = file.getAbsolutePath();
-			final String extDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-			if(fileStr.startsWith(extDir))
-				location = fileStr.substring(extDir.length() + 1);
+			uri = Uri.fromFile(file);
+			location = bf.getLocation();
+			isValid = bf.isValid();
+
+			if(isValid)
+				mTimestamp = bf.getTimestamp();
 			else
-				location = fileStr;
+				mTimestamp = new Date(file.lastModified());
 
-			dateTime = DateTime.toNativeDateAndTime(new Date(file.lastModified()));
+			dateTime = DateTime.toNativeDateAndTime(mTimestamp);
 		}
 
 		@Override
-		public int compareTo(BackupFile another)
-		{
-			return (int) (another.item.lastModified() - this.item.lastModified());
+		public int compareTo(BackupFile another) {
+			return (int) (another.mTimestamp.getTime() - this.mTimestamp.getTime());
 		}
+
+		private final Date mTimestamp;
 
 		final Uri uri;
 		final String location;
 		final String dateTime;
+		final boolean isValid;
 	}
 
 	static class Loader extends LLFLoader<File> implements FilenameFilter
@@ -230,12 +234,20 @@ public class BackupFragment extends LoaderListFragment<File>
 
 					if(item.getItemId() == R.id.menuitem_restore)
 					{
-						final FragmentManager fm = getFragmentManager();
-						final FragmentTransaction ft = fm.beginTransaction();
-						ft.replace(android.R.id.content, ImportActivity.Dialogish.newInstance(file.item.toString()));
-						ft.addToBackStack(null);
+						if(file.isValid)
+						{
+							final FragmentManager fm = getFragmentManager();
+							final FragmentTransaction ft = fm.beginTransaction();
+							ft.replace(android.R.id.content, ImportActivity.Dialogish.newInstance(file.item.toString()));
+							ft.addToBackStack(null);
 
-						ft.commit();
+							ft.commit();
+						}
+						else
+						{
+							Toast.makeText(getActivity(), R.string._msg_invalid_backup_file,
+									Toast.LENGTH_LONG).show();
+						}
 					}
 					else if(item.getItemId() == R.id.menuitem_delete)
 					{
