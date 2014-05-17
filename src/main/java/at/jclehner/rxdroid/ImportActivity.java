@@ -105,7 +105,7 @@ public class ImportActivity extends SherlockFragmentActivity
 		{
 			if(which == BUTTON_POSITIVE && mCanRestore)
 			{
-				if(!mFile.isEncrypted())
+				if(mFile.isEncrypted())
 					showPasswordDialog();
 				else
 					restoreBackup(null);
