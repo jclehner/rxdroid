@@ -163,10 +163,7 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 
 					final Fragment f = new AutostartIssueDialog();
 					getSupportFragmentManager().beginTransaction().add(android.R.id.content,
-							f).commitAllowingStateLoss();
-
-					//getSupportFragmentManager().beginTransaction().replace(
-					//		android.R.id.content, new AutostartIssueDialog()).commit();
+							f).commit();
 				}
 			}
 		}

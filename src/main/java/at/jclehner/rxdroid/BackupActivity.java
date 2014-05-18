@@ -107,12 +107,7 @@ public class BackupActivity extends SherlockFragmentActivity
 					restoreBackup(null);
 			}
 			else
-			{
-				if(Intent.ACTION_VIEW.equals(getActivity().getIntent().getAction()))
-					getActivity().finish();
-				else
-					getFragmentManager().popBackStack();
-			}
+				finishOrPopBack();
 		}
 
 		private void showPasswordDialog()
@@ -123,13 +118,14 @@ public class BackupActivity extends SherlockFragmentActivity
 
 			final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
 			ab.setView(edit);
-			//ab.setCancelable(false);
-			ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+			// null listener since we're using a View.OnClickListener on the Button itself
+			ab.setPositiveButton(android.R.string.ok, null);
+			ab.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
 			{
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					restoreBackup(edit.getText().toString());
+					finishOrPopBack();
 				}
 			});
 
@@ -141,7 +137,20 @@ public class BackupActivity extends SherlockFragmentActivity
 				{
 					final Button b = dialog.getButton(Dialog.BUTTON_POSITIVE);
 					if(b != null)
+					{
 						b.setEnabled(false);
+						b.setOnClickListener(new View.OnClickListener()
+						{
+							@Override
+							public void onClick(View v)
+							{
+								if(!restoreBackup(edit.getText().toString()))
+									edit.setError(getString(R.string._title_error));
+								else
+									dialog.dismiss();
+							}
+						});
+					}
 				}
 			});
 
@@ -164,6 +173,8 @@ public class BackupActivity extends SherlockFragmentActivity
 						b.setEnabled(false);
 					else
 						b.setEnabled(true);
+
+					edit.setError(null);
 				}
 			});
 
@@ -185,18 +196,24 @@ public class BackupActivity extends SherlockFragmentActivity
 			dialog.show();
 		}
 
-		private void restoreBackup(String password)
+		private void finishOrPopBack()
 		{
-			try
+			if(Intent.ACTION_VIEW.equals(getActivity().getIntent().getAction()))
+				getActivity().finish();
+			else
+				getFragmentManager().popBackStack();
+		}
+
+		private boolean restoreBackup(String password)
+		{
+			if(mFile.restore(password))
 			{
-				mFile.restore(password);
 				startActivity(RxDroid.getLaunchIntent());
 				getActivity().finish();
+				return true;
 			}
-			catch(ZipException e)
-			{
-				throw new WrappedCheckedException(e);
-			}
+
+			return false;
 		}
 
 		private String getBackupFilePath()

@@ -43,12 +43,14 @@ import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.util.Util;
+import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class Backup
 {
@@ -124,19 +126,33 @@ public class Backup
 				return file;
 		}
 
-		public void restore(String password) throws ZipException
+		public boolean restore(String password)
 		{
-			if(password != null)
-				mZip.setPassword(password);
-
 			synchronized(Database.LOCK_DATA)
 			{
-				mZip.extractAll(RxDroid.getPackageInfo().applicationInfo.dataDir);
+				try
+				{
+					if(password != null)
+						mZip.setPassword(password);
+
+					mZip.extractAll(RxDroid.getPackageInfo().applicationInfo.dataDir);
+				}
+				catch(ZipException e)
+				{
+					final String msg = e.getMessage().toLowerCase(Locale.US);
+
+					if(password != null && msg.contains("password"))
+						return false;
+
+					throw new WrappedCheckedException(e);
+				}
+
 				Settings.init(true);
 				Database.reload(RxDroid.getContext());
 			}
 
 			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
+			return true;
 		}
 	}
 
