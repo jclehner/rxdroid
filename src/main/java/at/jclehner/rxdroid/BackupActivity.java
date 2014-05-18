@@ -142,14 +142,6 @@ public class BackupActivity extends SherlockFragmentActivity
 					final Button b = dialog.getButton(Dialog.BUTTON_POSITIVE);
 					if(b != null)
 						b.setEnabled(false);
-
-					final Window w = dialog.getWindow();
-					if(w != null)
-					{
-						w.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
-										| WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
-						);
-					}
 				}
 			});
 
@@ -172,6 +164,21 @@ public class BackupActivity extends SherlockFragmentActivity
 						b.setEnabled(false);
 					else
 						b.setEnabled(true);
+				}
+			});
+
+			edit.setOnFocusChangeListener(new View.OnFocusChangeListener()
+			{
+				@Override
+				public void onFocusChange(View v, boolean hasFocus)
+				{
+					if(hasFocus)
+					{
+						dialog.getWindow().setSoftInputMode(
+								WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
+								| WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
+						);
+					}
 				}
 			});
 
