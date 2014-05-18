@@ -800,6 +800,10 @@ public final class Settings
 			putBoolean(Keys.USE_SMART_SORT, true);
 		}
 
+		if(isFirstLaunchOfVersionOrLater(Version.versionCodeBeta(22, 1))) {
+			putBoolean(Keys.USE_BACKUP_FRAMEWORK, false);
+		}
+
 		if(!contains(Keys.TIMEZONE_OFFSET)) {
 			putLong(Keys.TIMEZONE_OFFSET, TimeZone.getDefault().getRawOffset());
 		}

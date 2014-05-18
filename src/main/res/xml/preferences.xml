@@ -198,7 +198,7 @@
 		<CheckBoxPreference android:key="@string/key_use_backup_framework"
 	        android:title="@string/_title_use_backup_framework"
 	        android:summary="@string/_summary_use_backup_framework"
-	        android:defaultValue="true"
+	        android:defaultValue="false"
 	    />
 
         <Preference android:key="backup_restore"
