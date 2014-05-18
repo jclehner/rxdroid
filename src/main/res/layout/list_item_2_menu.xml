@@ -5,7 +5,7 @@
                 android:layout_height="?android:attr/listPreferredItemHeight"
                 android:minHeight="?android:attr/listPreferredItemHeight"
                 android:paddingLeft="16dip"
-                android:paddingRight="16dip"
+                android:paddingRight="12dip"
                 >
 
     <TextView android:id="@android:id/text1"
