@@ -95,7 +95,7 @@ public class Backup
 		}
 
 		public boolean isValid() {
-			return mZip != null && mVersion != 0;
+			return mZip != null && mVersion == 1;
 		}
 
 		public boolean isEncrypted() {
