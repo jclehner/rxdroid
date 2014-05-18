@@ -463,7 +463,7 @@
             Missed doses before this date cannot be displayed!</string>
 
     <string name="_msg_crash_dialog_text">
-        Unfortunately, RxDroid has stopped.
+        Unfortunately, RxDroid has stopped. Please report this issue to help fix the app.
     </string>
 
     <string name="_msg_comment">Optional comment:</string>

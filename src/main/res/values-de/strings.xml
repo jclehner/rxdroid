@@ -439,7 +439,7 @@
              Tag geändert. Vergessene Dosen vor diesem Tag können nicht angezeigt werden!</string>
 
     <string name="_msg_crash_dialog_text">
-        \"RxDroid\" wurde beendet.
+        \"RxDroid\" wurde beendet. Bitte diesen Fehler zu melden, um die App verbessern zu können.
     </string>
 
     <string name="_msg_comment">Optionaler Kommentar:</string>
