@@ -6,41 +6,47 @@
              android:layout_height="match_parent"
              android:layout_gravity="center">
 
-    <LinearLayout
+    <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
             android:paddingLeft="16dip"
             android:paddingRight="16dip"
-            android:orientation="vertical"
-            android:gravity="center">
+			android:layout_marginBottom="48dip"
+           >
 
-            <TextView android:id="@+id/title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="#ff4444"
-                    android:text="@string/_title_warning"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-             />
+				<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="match_parent"
+						android:layout_gravity="center"
+						android:orientation="vertical"
+						android:gravity="center">
 
-            <TextView android:id="@+id/message"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/_msg_restore_backup_warning" />
+				<TextView android:id="@+id/title"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textAppearance="?android:attr/textAppearanceLarge"
+						android:textColor="#ff4444"
+						android:text="@string/_title_warning"
+						android:textStyle="bold"
+						android:textAllCaps="true" />
 
-            <TextView android:id="@+id/detail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="16dip"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:typeface="monospace"
-                    android:visibility="visible"
-                    android:text="RxDroid/20140409_190731.rxdbak" />
+				<TextView android:id="@+id/message"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textAppearance="?android:attr/textAppearanceMedium"
+						android:text="@string/_msg_restore_backup_warning" />
 
-    </LinearLayout>
+				<TextView android:id="@+id/detail"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:paddingTop="16dip"
+						android:textAppearance="?android:attr/textAppearanceMedium"
+						android:typeface="monospace"
+						android:visibility="visible"
+						android:text="RxDroid/20140409_190731.rxdbak" />
+
+			</LinearLayout>
+    </ScrollView>
 
     <LinearLayout
             android:layout_height="wrap_content"

@@ -43,6 +43,10 @@ public abstract class DialogueLike extends Fragment
 	public static final int BUTTON_POSITIVE = DialogInterface.BUTTON_POSITIVE;
 	public static final int BUTTON_NEGATIVE = DialogInterface.BUTTON_NEGATIVE;
 
+	public static final int TEXT_DEFAULT = 0;
+	public static final int TEXT_HTML = 1;
+	public static final int TEXT_REFSTRING = 2;
+
 	private TextView mTitle;
 	private TextView mMessage;
 	private TextView mDetail;
@@ -102,13 +106,25 @@ public abstract class DialogueLike extends Fragment
 
 	public void setTitle(int resId, Object... formatArgs)
 	{
-		getArguments().putString("title", getString(resId, formatArgs));
+		getArguments().putCharSequence("title", getString(resId, formatArgs));
+		applyArguments();
+	}
+
+	public void setTitle(CharSequence title)
+	{
+		getArguments().putCharSequence("title", title);
 		applyArguments();
 	}
 
 	public void setMessage(int resId, Object... formatArgs)
 	{
-		getArguments().putString("message", getString(resId, formatArgs));
+		getArguments().putCharSequence("message", getString(resId, formatArgs));
+		applyArguments();
+	}
+
+	public void setMessage(CharSequence message)
+	{
+		getArguments().putCharSequence("message", message);
 		applyArguments();
 	}
 
@@ -151,8 +167,8 @@ public abstract class DialogueLike extends Fragment
 		if(mTitle == null)
 			return;
 
-		mTitle.setText(getArguments().getString("title"));
-		mMessage.setText(getArguments().getString("message"));
+		mTitle.setText(getArguments().getCharSequence("title"));
+		mMessage.setText(getArguments().getCharSequence("message"));
 		mIcon.setImageResource(getArguments().getInt("icon"));
 		mPositiveBtn.setText(getArguments().getString("pos"));
 		mNegativeBtn.setText(getArguments().getString("neg"));

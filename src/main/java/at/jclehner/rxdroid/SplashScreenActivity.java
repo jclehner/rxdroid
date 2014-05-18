@@ -40,12 +40,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,13 +57,20 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.jclehner.rxdroid.db.Drug;
+import at.jclehner.rxdroid.ui.DialogueLike;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.EmailIntentSender;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-public class SplashScreenActivity extends SherlockActivity implements OnClickListener
+import org.acra.ACRA;
+import org.acra.collector.CrashReportData;
+import org.acra.collector.CrashReportDataFactory;
+
+public class SplashScreenActivity extends SherlockFragmentActivity implements OnClickListener
 {
 	@SuppressWarnings("unused")
 	private static final boolean USE_MSG_HANDLER = BuildConfig.DEBUG;
@@ -123,6 +133,7 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 		Settings.init();
 
 		setTheme(Theme.get());
+		super.onCreate(savedInstanceState);
 
 		final long bootCompletedTimestamp = Settings.getLong(Settings.Keys.BOOT_COMPLETED_TIMESTAMP, 0);
 		final long bootTimestamp = RxDroid.getBootTimestamp();
@@ -139,7 +150,7 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 				Settings.putLong(Settings.Keys.LAST_NOT_STARTED_WARNING_TIMESTAMP, bootTimestamp);
 
 				final long lastUpdateTimestamp = RxDroid.getLastUpdateTimestamp();
-				if(lastUpdateTimestamp != 0 && lastUpdateTimestamp > bootTimestamp)
+				if(lastUpdateTimestamp != 0 && lastUpdateTimestamp > bootTimestamp && !forceSplashWarning)
 				{
 					Log.w(TAG, "Notification service was not runnning because the app was updated");
 				}
@@ -150,44 +161,12 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 					Log.w(TAG, "Notification service was not started on boot: " +
 						bootCompletedTimestamp + " vs " + bootTimestamp);
 
-					setContentView(R.layout.splash_screen_warning);
+					final Fragment f = new AutostartIssueDialog();
+					getSupportFragmentManager().beginTransaction().add(android.R.id.content,
+							f).commitAllowingStateLoss();
 
-					findViewById(R.id.btn_continue).setOnClickListener(new View.OnClickListener()
-					{
-						@Override
-						public void onClick(View view)
-						{
-							setContentView(R.layout.loader);
-							loadDatabaseAndLaunchMainActivity();
-						}
-					});
-
-					findViewById(R.id.btn_report).setOnClickListener(new View.OnClickListener()
-					{
-						@Override
-						public void onClick(View view)
-						{
-							view.setEnabled(false);
-
-							final Intent intent = new Intent();
-							intent.setAction(Intent.ACTION_SEND);
-							intent.setType("plain/text");
-							intent.putExtra(Intent.EXTRA_EMAIL, "josephclehner+rxdroid-issue@gmail.com");
-							intent.putExtra(Intent.EXTRA_SUBJECT, "[ISSUE] " + Build.MODEL + " auto-start");
-							intent.putExtra(Intent.EXTRA_TEXT,
-									"MANUFACTURER: " + Build.MANUFACTURER + "\n" +
-											"PRODUCT : " + Build.PRODUCT + "\n" +
-											"MODEL : " + Build.MODEL + "\n" +
-											"DEVICE : " + Build.DEVICE + "\n" +
-											"DISPLAY : " + Build.DISPLAY + "\n" +
-											"RELEASE : " + Build.VERSION.RELEASE + "\n" +
-											"SDK_INT : " + Build.VERSION.SDK_INT + "\n" +
-											"=========================\n\n"
-							);
-
-							startActivity(Intent.createChooser(intent, getString(R.string._btn_report)));
-						}
-					});
+					//getSupportFragmentManager().beginTransaction().replace(
+					//		android.R.id.content, new AutostartIssueDialog()).commit();
 				}
 			}
 		}
@@ -220,8 +199,6 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 		{
 			throw new WrappedCheckedException("NumberPicker library is missing", e);
 		}
-
-		super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -328,7 +305,7 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 			super.onPrepareDialog(id, dialog, args);
 	}
 
-	private void loadDatabaseAndLaunchMainActivity() {
+	/* package */ void loadDatabaseAndLaunchMainActivity() {
 		new DatabaseIntializerTask().execute(0);
 	}
 
@@ -440,6 +417,50 @@ public class SplashScreenActivity extends SherlockActivity implements OnClickLis
 				args.putSerializable(ARG_EXCEPTION, result);
 				showDialog(R.id.db_error_dialog, args);
 			}
+		}
+	}
+}
+
+class AutostartIssueDialog extends DialogueLike
+{
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+
+		setTitle(R.string._title_warning);
+		setMessage(Html.fromHtml(RefString.resolve(getActivity(), R.string._msg_not_started_on_boot)));
+		setIcon(Theme.getResourceAttribute(R.attr.iconWarning));
+		setNegativeButtonText(R.string._btn_report);
+	}
+
+	@Override
+	public void onButtonClick(Button button, int which)
+	{
+		if(which == BUTTON_POSITIVE)
+		{
+			getActivity().setContentView(R.layout.loader);
+			((SplashScreenActivity) getActivity()).loadDatabaseAndLaunchMainActivity();
+		}
+		else
+		{
+			final Intent intent = new Intent();
+			intent.setAction(Intent.ACTION_SEND);
+			intent.setType("plain/text");
+			intent.putExtra(Intent.EXTRA_EMAIL, "josephclehner+rxdroid-issue@gmail.com");
+			intent.putExtra(Intent.EXTRA_SUBJECT, "[ISSUE] " + Build.MODEL + " auto-start");
+			intent.putExtra(Intent.EXTRA_TEXT,
+					"MANUFACTURER: " + Build.MANUFACTURER + "\n" +
+							"PRODUCT : " + Build.PRODUCT + "\n" +
+							"MODEL : " + Build.MODEL + "\n" +
+							"DEVICE : " + Build.DEVICE + "\n" +
+							"DISPLAY : " + Build.DISPLAY + "\n" +
+							"RELEASE : " + Build.VERSION.RELEASE + "\n" +
+							"SDK_INT : " + Build.VERSION.SDK_INT + "\n" +
+							"=========================\n\n"
+			);
+
+			startActivity(Intent.createChooser(intent, getString(R.string._btn_report)));
 		}
 	}
 }
