@@ -1,4 +1,4 @@
-0.9.22:
+0.9.22.1:
 	* Add option to create/restore backups
 	* Swipe/clear notifications on pre-JellyBean to 'take all'
 	* Bug fixes
@@ -30,7 +30,7 @@
 	  timezone.
 
 0.9.18.1
-    * Added missing German translation
+	* Added missing German translation
 
 0.9.18:
 	* Added help overlays
