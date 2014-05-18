@@ -259,7 +259,7 @@ public class BackupFragment extends LoaderListFragment<File>
 						{
 							final FragmentManager fm = getFragmentManager();
 							final FragmentTransaction ft = fm.beginTransaction();
-							ft.replace(android.R.id.content, ImportActivity.Dialogish.newInstance(file.item.toString()));
+							ft.replace(android.R.id.content, BackupActivity.ImportDialog.newInstance(file.item.toString()));
 							ft.addToBackStack(null);
 
 							ft.commit();

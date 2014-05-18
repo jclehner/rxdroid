@@ -69,13 +69,6 @@
 		    android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
 
-        <activity android:name=".BackupActivity"
-                  android:exported="false"
-                  android:uiOptions="none"
-                  android:launchMode="singleTop"
-                  android:configChanges="orientation|screenSize|keyboardHidden"
-        />
-
 		<activity android:name=".DrugEditActivity"
 		    android:exported="false"
 		    android:windowSoftInputMode="adjustPan"		    
@@ -91,7 +84,7 @@
 			</intent-filter>
 		</activity>
 
-        <activity android:name=".ImportActivity"
+        <activity android:name=".BackupActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:noHistory="true"
             android:launchMode="singleTop"
@@ -220,18 +213,6 @@
 		<receiver android:name=".NotificationReceiver" 
 		    android:exported="false" 
 		/>
-
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="at.jclehner.rxdroid.logs"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_provider_paths"
-            />
-        </provider>
-
 
 	</application>
 </manifest>
