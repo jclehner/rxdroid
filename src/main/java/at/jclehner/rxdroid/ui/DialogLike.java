@@ -38,8 +38,27 @@ import android.widget.TextView;
 
 import at.jclehner.rxdroid.R;
 
-public abstract class DialogueLike extends Fragment
+public abstract class DialogLike extends Fragment
 {
+	public static class SimpleDialogLike extends DialogLike
+	{
+		@Override
+		public void onCreate(Bundle savedInstanceState)
+		{
+			super.onCreate(savedInstanceState);
+			setPositiveButtonText(0);
+			setNegativeButtonText(0);
+		}
+
+		@Override
+		public void onButtonClick(Button button, int which)
+		{
+			// won't be called unless a button text is set on any
+			// button
+			getActivity().finish();
+		}
+	}
+
 	public static final int BUTTON_POSITIVE = DialogInterface.BUTTON_POSITIVE;
 	public static final int BUTTON_NEGATIVE = DialogInterface.BUTTON_NEGATIVE;
 
@@ -57,7 +76,7 @@ public abstract class DialogueLike extends Fragment
 
 	public abstract void onButtonClick(Button button, int which);
 
-	public DialogueLike() {
+	public DialogLike() {
 		setArguments(new Bundle());
 	}
 

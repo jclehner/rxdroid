@@ -1,5 +1,6 @@
 0.9.22.1:
-	* Add option to create/restore backups
+	* Add option to create/restore backups (requires permission
+	  to read/write external storage!)
 	* Swipe/clear notifications on pre-JellyBean to 'take all'
 	* Bug fixes
 

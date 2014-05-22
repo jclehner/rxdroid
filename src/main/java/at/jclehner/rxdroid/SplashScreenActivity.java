@@ -23,7 +23,6 @@ package at.jclehner.rxdroid;
 
 import java.io.File;
 import java.util.Date;
-import java.util.UUID;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -47,7 +46,6 @@ import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,18 +55,12 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.jclehner.rxdroid.db.Drug;
-import at.jclehner.rxdroid.ui.DialogueLike;
+import at.jclehner.rxdroid.ui.DialogLike;
 import at.jclehner.rxdroid.util.DateTime;
-import at.jclehner.rxdroid.util.EmailIntentSender;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-import org.acra.ACRA;
-import org.acra.collector.CrashReportData;
-import org.acra.collector.CrashReportDataFactory;
 
 public class SplashScreenActivity extends SherlockFragmentActivity implements OnClickListener
 {
@@ -418,7 +410,7 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 	}
 }
 
-class AutostartIssueDialog extends DialogueLike
+class AutostartIssueDialog extends DialogLike
 {
 	@Override
 	public void onCreate(Bundle savedInstanceState)

@@ -23,17 +23,20 @@ package at.jclehner.rxdroid;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,8 +45,6 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 
-import net.lingala.zip4j.exception.ZipException;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -51,7 +52,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import at.jclehner.rxdroid.ui.DialogueLike;
+import at.jclehner.rxdroid.ui.DialogLike;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
@@ -59,7 +60,69 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class BackupActivity extends SherlockFragmentActivity
 {
-	public static class ImportDialog extends DialogueLike
+	public static abstract class StorageStateListener extends BroadcastReceiver
+	{
+		private static final IntentFilter INTENT_FILTER = new IntentFilter();
+
+		private boolean mReadable;
+		private boolean mWriteable;
+
+		@Override
+		public final void onReceive(Context context, Intent intent)
+		{
+			final String storageState = Environment.getExternalStorageState();
+			update(storageState);
+			onStateChanged(storageState, intent);
+		}
+
+		public void register(Context context) {
+			context.registerReceiver(this, INTENT_FILTER);
+		}
+
+		public void unregister(Context context) {
+			context.unregisterReceiver(this);
+		}
+
+		public abstract void onStateChanged(String storageState, Intent intent);
+
+		public boolean isReadable() {
+			return mReadable;
+		}
+
+		public boolean isWriteable() {
+			return mWriteable;
+		}
+
+		public static boolean isReadable(String storageState)
+		{
+			return Environment.MEDIA_MOUNTED_READ_ONLY.equals(storageState)
+					|| Environment.MEDIA_MOUNTED.equals(storageState);
+		}
+
+		public static boolean isWriteable(String storageState) {
+			return Environment.MEDIA_MOUNTED.equals(storageState);
+		}
+
+		private void update(String storageState)
+		{
+			mReadable = isReadable(storageState);
+			mWriteable = isWriteable(storageState);
+		}
+
+		private StorageStateListener() {
+			update(Environment.getExternalStorageState());
+		}
+
+		static
+		{
+			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_MOUNTED);
+			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_EJECT);
+			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_REMOVED);
+		}
+	}
+
+	public static class ImportDialog extends DialogLike
 	{
 		private boolean mCanRestore = false;
 		private Backup.BackupFile mFile;
@@ -256,7 +319,6 @@ public class BackupActivity extends SherlockFragmentActivity
 		}
 	}
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -264,35 +326,21 @@ public class BackupActivity extends SherlockFragmentActivity
 		super.onCreate(savedInstanceState);
 
 		setTitle(R.string._title_backup_restore);
-		final Fragment content;
+		setContentFragment(Environment.getExternalStorageState());
+	}
 
-		if(!Intent.ACTION_VIEW.equals(getIntent().getAction()))
-		{
-			content = new BackupFragment();
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		mStorageListener.register(this);
+	}
 
-			getSupportActionBar().setDisplayShowHomeEnabled(true);
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-			if(!Backup.DIRECTORY.exists())
-				Backup.DIRECTORY.mkdirs();
-			else if(!Backup.DIRECTORY.isDirectory())
-			{
-				// Hackish, but simple - a full blown AlertDialog would be
-				// overkill...
-
-				final File newFile = new File(Backup.DIRECTORY + "___");
-
-				Backup.DIRECTORY.renameTo(newFile);
-				Backup.DIRECTORY.mkdirs();
-
-				Toast.makeText(this, Backup.DIRECTORY + " -> " + newFile, Toast.LENGTH_LONG).show();
-			}
-		}
-		else
-			content = new ImportDialog();
-
-		getSupportFragmentManager().beginTransaction().replace(
-				android.R.id.content, content).commit();
+	@Override
+	protected void onPause()
+	{
+		mStorageListener.unregister(this);
+		super.onPause();
 	}
 
 	@Override
@@ -310,4 +358,57 @@ public class BackupActivity extends SherlockFragmentActivity
 
 		return super.onOptionsItemSelected(item);
 	}
+
+	private void setContentFragment(String storageState)
+	{
+		final Fragment content;
+
+		if(!Intent.ACTION_VIEW.equals(getIntent().getAction()))
+		{
+			getSupportActionBar().setDisplayShowHomeEnabled(true);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+			if(StorageStateListener.isReadable(storageState))
+			{
+				content = new BackupFragment();
+
+				if(!Backup.DIRECTORY.exists())
+					Backup.DIRECTORY.mkdirs();
+				else if(!Backup.DIRECTORY.isDirectory())
+				{
+					// Hackish, but simple - a full blown AlertDialog would be
+					// overkill...
+
+					final File newFile = new File(Backup.DIRECTORY + "___");
+
+					Backup.DIRECTORY.renameTo(newFile);
+					Backup.DIRECTORY.mkdirs();
+
+					Toast.makeText(this, Backup.DIRECTORY + " -> " + newFile, Toast.LENGTH_LONG).show();
+				}
+			}
+			else
+			{
+				final DialogLike dialog = new DialogLike.SimpleDialogLike();
+				dialog.setMessage("External storage is not accessible. No backups can be created" +
+								"or restored");
+
+				content = dialog;
+			}
+		}
+		else
+			content = new ImportDialog();
+
+		getSupportFragmentManager().beginTransaction().replace(
+				android.R.id.content, content).commit();
+	}
+
+	private final StorageStateListener mStorageListener = new StorageStateListener()
+	{
+		@Override
+		public void onStateChanged(String storageState, Intent intent)
+		{
+			setContentFragment(storageState);
+		}
+	};
 }
