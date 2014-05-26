@@ -48,7 +48,7 @@
 			</LinearLayout>
     </ScrollView>
 
-    <LinearLayout
+    <LinearLayout android:id="@+id/button_bar"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_gravity="bottom"

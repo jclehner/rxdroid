@@ -164,6 +164,8 @@ public class BackupFragment extends LoaderListFragment<File>
 		}
 	}
 
+	private boolean mShowDialogIfNotWriteable = true;
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
@@ -174,14 +176,36 @@ public class BackupFragment extends LoaderListFragment<File>
 					@Override
 					public boolean onMenuItemClick(MenuItem menuItem)
 					{
-						try
+						final String storageState = Backup.getStorageState();
+						if(Backup.StorageStateListener.isWriteable(storageState))
 						{
-							Backup.createBackup(null, null);
-							getLoaderManager().restartLoader(0, null, BackupFragment.this);
+							try
+							{
+								Backup.createBackup(null, null);
+								getLoaderManager().restartLoader(0, null, BackupFragment.this);
+							} catch(ZipException e)
+							{
+								showExceptionDialog(e);
+							}
 						}
-						catch(ZipException e)
+						else
 						{
-							showExceptionDialog(e);
+							if(mShowDialogIfNotWriteable)
+							{
+								final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+								ab.setPositiveButton(android.R.string.ok, null);
+								ab.setMessage(R.string._msg_external_storage_not_writeable);
+								ab.setTitle(R.string._title_error);
+								ab.setIcon(android.R.drawable.ic_dialog_alert);
+
+								ab.show();
+								mShowDialogIfNotWriteable = false;
+							}
+							else
+							{
+								Toast.makeText(getActivity(), R.string._msg_external_storage_not_writeable,
+										Toast.LENGTH_LONG);
+							}
 						}
 
 						return true;
@@ -195,6 +219,13 @@ public class BackupFragment extends LoaderListFragment<File>
 	{
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		mShowDialogIfNotWriteable = true;
 	}
 
 	@Override

@@ -466,6 +466,10 @@
         Unfortunately, RxDroid has stopped. Please report this issue to help fix the app.
     </string>
 
+	<string name="_msg_external_storage_not_writeable">
+		External storage is mounted read-only. Cannot create backup.
+	</string>
+
     <string name="_msg_comment">Optional comment:</string>
 
     <!--

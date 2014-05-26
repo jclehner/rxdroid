@@ -73,6 +73,7 @@ public abstract class DialogLike extends Fragment
 
 	private Button mPositiveBtn;
 	private Button mNegativeBtn;
+	private View mButtonBar;
 
 	public abstract void onButtonClick(Button button, int which);
 
@@ -98,6 +99,7 @@ public abstract class DialogLike extends Fragment
 		mMessage = (TextView) v.findViewById(R.id.message);
 		mDetail = (TextView) v.findViewById(R.id.detail);
 		mIcon = (ImageView) v.findViewById(R.id.icon);
+		mButtonBar = v.findViewById(R.id.button_bar);
 
 		final int posBtn, negBtn;
 
@@ -161,13 +163,13 @@ public abstract class DialogLike extends Fragment
 
 	public void setNegativeButtonText(int resId)
 	{
-		getArguments().putString("neg", getString(resId));
+		getArguments().putString("neg", getStringInternal(resId));
 		applyArguments();
 	}
 
 	public void setPositiveButtonText(int resId)
 	{
-		getArguments().putString("pos", getString(resId));
+		getArguments().putString("pos", getStringInternal(resId));
 		applyArguments();
 	}
 
@@ -181,6 +183,10 @@ public abstract class DialogLike extends Fragment
 		throw new IllegalArgumentException();
 	}
 
+	private String getStringInternal(int resId) {
+		return resId != 0 ? getString(resId) : null;
+	}
+
 	private void applyArguments()
 	{
 		if(mTitle == null)
@@ -189,8 +195,22 @@ public abstract class DialogLike extends Fragment
 		mTitle.setText(getArguments().getCharSequence("title"));
 		mMessage.setText(getArguments().getCharSequence("message"));
 		mIcon.setImageResource(getArguments().getInt("icon"));
-		mPositiveBtn.setText(getArguments().getString("pos"));
-		mNegativeBtn.setText(getArguments().getString("neg"));
+
+		boolean hideButtonBar = true;
+
+		String btnText = getArguments().getString("pos");
+		mPositiveBtn.setVisibility(btnText != null ? View.VISIBLE : View.GONE);
+		mPositiveBtn.setText(btnText);
+
+		hideButtonBar |= btnText != null;
+
+		btnText = getArguments().getString("pos");
+		mNegativeBtn.setVisibility(btnText != null ? View.VISIBLE : View.GONE);
+		mNegativeBtn.setText(btnText);
+
+		hideButtonBar |= btnText != null;
+
+		mButtonBar.setVisibility(hideButtonBar ? View.GONE : View.VISIBLE);
 
 		final CharSequence detail = getArguments().getCharSequence("detail");
 		mDetail.setVisibility(detail != null ? View.VISIBLE : View.GONE);

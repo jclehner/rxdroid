@@ -60,68 +60,6 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class BackupActivity extends SherlockFragmentActivity
 {
-	public static abstract class StorageStateListener extends BroadcastReceiver
-	{
-		private static final IntentFilter INTENT_FILTER = new IntentFilter();
-
-		private boolean mReadable;
-		private boolean mWriteable;
-
-		@Override
-		public final void onReceive(Context context, Intent intent)
-		{
-			final String storageState = Environment.getExternalStorageState();
-			update(storageState);
-			onStateChanged(storageState, intent);
-		}
-
-		public void register(Context context) {
-			context.registerReceiver(this, INTENT_FILTER);
-		}
-
-		public void unregister(Context context) {
-			context.unregisterReceiver(this);
-		}
-
-		public abstract void onStateChanged(String storageState, Intent intent);
-
-		public boolean isReadable() {
-			return mReadable;
-		}
-
-		public boolean isWriteable() {
-			return mWriteable;
-		}
-
-		public static boolean isReadable(String storageState)
-		{
-			return Environment.MEDIA_MOUNTED_READ_ONLY.equals(storageState)
-					|| Environment.MEDIA_MOUNTED.equals(storageState);
-		}
-
-		public static boolean isWriteable(String storageState) {
-			return Environment.MEDIA_MOUNTED.equals(storageState);
-		}
-
-		private void update(String storageState)
-		{
-			mReadable = isReadable(storageState);
-			mWriteable = isWriteable(storageState);
-		}
-
-		private StorageStateListener() {
-			update(Environment.getExternalStorageState());
-		}
-
-		static
-		{
-			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_MOUNTED);
-			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
-			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_EJECT);
-			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_REMOVED);
-		}
-	}
-
 	public static class ImportDialog extends DialogLike
 	{
 		private boolean mCanRestore = false;
@@ -368,7 +306,7 @@ public class BackupActivity extends SherlockFragmentActivity
 			getSupportActionBar().setDisplayShowHomeEnabled(true);
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-			if(StorageStateListener.isReadable(storageState))
+			if(Backup.StorageStateListener.isReadable(storageState))
 			{
 				content = new BackupFragment();
 
@@ -403,7 +341,7 @@ public class BackupActivity extends SherlockFragmentActivity
 				android.R.id.content, content).commit();
 	}
 
-	private final StorageStateListener mStorageListener = new StorageStateListener()
+	private final Backup.StorageStateListener mStorageListener = new Backup.StorageStateListener()
 	{
 		@Override
 		public void onStateChanged(String storageState, Intent intent)

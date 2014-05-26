@@ -442,6 +442,10 @@
         \"RxDroid\" wurde beendet. Bitte diesen Fehler zu melden, um die App verbessern zu können.
     </string>
 
+	<string name="_msg_external_storage_not_writeable">
+		Externer Speicher ist schreibgeschützt. Kann Sicherung nicht erstellen.
+	</string>
+
     <string name="_msg_comment">Optionaler Kommentar:</string>
 
 	<!-- 

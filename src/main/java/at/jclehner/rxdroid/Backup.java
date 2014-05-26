@@ -21,9 +21,12 @@
 
 package at.jclehner.rxdroid;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
@@ -58,6 +61,68 @@ public class Backup
 
 	public static final File DIRECTORY =
 			new File(Environment.getExternalStorageDirectory(), "RxDroid");
+
+	public static abstract class StorageStateListener extends BroadcastReceiver
+	{
+		private static final IntentFilter INTENT_FILTER = new IntentFilter();
+
+		private boolean mReadable;
+		private boolean mWriteable;
+
+		@Override
+		public final void onReceive(Context context, Intent intent)
+		{
+			final String storageState = getStorageState();
+			update(storageState);
+			onStateChanged(storageState, intent);
+		}
+
+		public void register(Context context) {
+			context.registerReceiver(this, INTENT_FILTER);
+		}
+
+		public void unregister(Context context) {
+			context.unregisterReceiver(this);
+		}
+
+		public abstract void onStateChanged(String storageState, Intent intent);
+
+		public boolean isReadable() {
+			return mReadable;
+		}
+
+		public boolean isWriteable() {
+			return mWriteable;
+		}
+
+		public static boolean isReadable(String storageState)
+		{
+			return Environment.MEDIA_MOUNTED_READ_ONLY.equals(storageState)
+					|| Environment.MEDIA_MOUNTED.equals(storageState);
+		}
+
+		public static boolean isWriteable(String storageState) {
+			return Environment.MEDIA_MOUNTED.equals(storageState);
+		}
+
+		private void update(String storageState)
+		{
+			mReadable = isReadable(storageState);
+			mWriteable = isWriteable(storageState);
+		}
+
+		public StorageStateListener() {
+			update(getStorageState());
+		}
+
+		static
+		{
+			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_MOUNTED);
+			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_EJECT);
+			INTENT_FILTER.addAction(Intent.ACTION_MEDIA_REMOVED);
+		}
+	}
 
 	public static class BackupFile
 	{
@@ -154,6 +219,26 @@ public class Backup
 			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
 			return true;
 		}
+	}
+
+	public static String getStorageState()
+	{
+		final String state;
+
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+			state = Environment.getStorageState(DIRECTORY);
+		else
+			state = Environment.getExternalStorageState();
+
+		if(Environment.MEDIA_MOUNTED.equals(state) && !DIRECTORY.canWrite())
+		{
+			Log.d(TAG, "Storage state reported as MEDIA_MOUNTED, but " +
+					DIRECTORY + " is not writeable");
+
+			return Environment.MEDIA_MOUNTED_READ_ONLY;
+		}
+
+		return state;
 	}
 
 	public static void createBackup(File outFile, String password) throws ZipException
