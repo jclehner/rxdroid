@@ -505,7 +505,6 @@ public final class Entries
 				if(newSupply.isNegative())
 				{
 					drug.setCurrentSupply(Fraction.ZERO);
-					event.setDose(Fraction.ZERO);
 					skip = true;
 				}
 				else
@@ -520,7 +519,10 @@ public final class Entries
 				skip = drug.getRefillSize() != 0;
 
 			if(skip)
+			{
 				++skipped;
+				event.setDose(Fraction.ZERO);
+			}
 			else
 				++taken;
 
