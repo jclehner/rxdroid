@@ -1,3 +1,7 @@
+0.9.21.3:
+	* Fixes bug where doses were marked as taken even
+	  though supply was at zero
+
 0.9.21.2:
 	* Fixes bug where times were erroneously suffixed 
 	  with +<number>

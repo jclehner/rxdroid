@@ -6,8 +6,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:0.6.+'
-		//classpath 'com.android.tools.build:gradle:0.6.3+'
+		classpath 'com.android.tools.build:gradle:0.9.+'
 	}
 }
 
@@ -19,7 +18,6 @@ repositories {
 }
 
 dependencies {
-		//compile 'com.google.code.gson:gson:2.2.4'
 		compile 'com.j256.ormlite:ormlite-core:4.47'
 		compile 'com.j256.ormlite:ormlite-android:4.47'
 		compile 'com.android.support:support-v4:19.0.0'
@@ -33,7 +31,7 @@ dependencies {
 
 
 android {
-	buildToolsVersion "18.1"
+	buildToolsVersion "19.0.1"
 	compileSdkVersion 19
 
 	signingConfigs {
