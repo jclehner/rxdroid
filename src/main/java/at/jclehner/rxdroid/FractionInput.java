@@ -56,7 +56,7 @@ public class FractionInput extends LinearLayout
 	private static final String TAG = FractionInput.class.getSimpleName();
 	private static final boolean LOGV = false;
 
-	private static final String[] MODE_SWITCHER_LABELS = { "1", "1\u00BE", "\u00BE" };
+	private static final String[] MODE_SWITCHER_LABELS = { "1", "1\u00BD", "\u00BD" };
 
 	public static final int MODE_INTEGER = 0;
 	public static final int MODE_MIXED = 1;
