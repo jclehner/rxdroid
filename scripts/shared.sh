@@ -97,7 +97,7 @@ adb-shell() {
 
 	local tmp="${DTEMP}/.exitstatus"
 	#adb shell "su -c '$@; echo $? > $tmp'"
-	adb shell "$@; echo $? > $tmp"
+	adb shell "$@; echo \$? > $tmp"
 	local status=$(adb shell cat $tmp | tr -d "\r\n")
 	let status=$status+0
 
