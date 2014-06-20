@@ -49,7 +49,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -60,9 +59,9 @@ import at.jclehner.rxdroid.util.Util;
 
 public class BackupFragment extends LoaderListFragment<File>
 {
-	static class BackupFile extends LLFLoader.ItemHolder<File> implements Comparable<BackupFile>
+	static class BackupFileHolder extends LLFLoader.ItemHolder<File> implements Comparable<BackupFileHolder>
 	{
-		BackupFile(File file)
+		BackupFileHolder(File file)
 		{
 			super(file);
 
@@ -81,8 +80,8 @@ public class BackupFragment extends LoaderListFragment<File>
 		}
 
 		@Override
-		public int compareTo(BackupFile another) {
-			return (int) (another.mTimestamp.getTime() - this.mTimestamp.getTime());
+		public int compareTo(BackupFileHolder another) {
+			return another.mTimestamp.compareTo(mTimestamp);
 		}
 
 		private final Date mTimestamp;
@@ -112,10 +111,10 @@ public class BackupFragment extends LoaderListFragment<File>
 			else if(!dir.isDirectory())
 				throw new IllegalStateException(dir + ": not a directory");
 
-			final List<BackupFile> data = new ArrayList<BackupFile>();
+			final List<BackupFileHolder> data = new ArrayList<BackupFileHolder>();
 
 			for(File file : dir.listFiles(this))
-				data.add(new BackupFile(file));
+				data.add(new BackupFileHolder(file));
 
 			Collections.sort(data);
 
@@ -145,7 +144,7 @@ public class BackupFragment extends LoaderListFragment<File>
 						R.layout.list_item_2_menu, parent, false);
 			}
 
-			final BackupFile data = getItemHolder(position);
+			final BackupFileHolder data = getItemHolder(position);
 
 			final TextView text1 = (TextView) view.findViewById(android.R.id.text1);
 			final TextView text2 = (TextView) view.findViewById(android.R.id.text2);
@@ -273,7 +272,7 @@ public class BackupFragment extends LoaderListFragment<File>
 		@Override
 		public void onClick(final View v)
 		{
-			final BackupFile file = (BackupFile) v.getTag();
+			final BackupFileHolder file = (BackupFileHolder) v.getTag();
 
 			final PopupMenuCompatBuilder builder = new PopupMenuCompatBuilder(getActivity(), v);
 			builder.setMenuResId(R.menu.backup);
