@@ -21,16 +21,8 @@
 
 package at.jclehner.rxdroid;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -40,8 +32,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import at.jclehner.androidutils.EventDispatcher;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.db.Database;
@@ -485,7 +486,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setContentText(message);
 		builder.setTicker(getString(R.string._msg_new_notification));
 		builder.setSmallIcon(icon);
-		builder.setOngoing(true);
+		builder.setOngoing(false);
 		builder.setUsesChronometer(false);
 		builder.setWhen(0);
 		builder.setPriority(priority);
@@ -508,8 +509,15 @@ public class NotificationReceiver extends BroadcastReceiver
 			PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
 			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
-				builder.addAction(R.drawable.ic_action_tick, getString(R.string._title_take_all_doses), operation);
-			else if(Settings.getBoolean(Settings.Keys.SWIPE_TO_TAKE_ALL, false))
+            {
+                NotificationCompat.Action action = new NotificationCompat.Action.Builder(
+                        R.drawable.ic_action_tick, getString(R.string._title_take_all_doses), operation).build();
+                builder.addAction(action);
+                NotificationCompat.Action wearAction = new NotificationCompat.Action.Builder(
+                        R.drawable.ic_action_star, getString(R.string._title_take_all_doses), operation).build();
+                builder.extend(new NotificationCompat.WearableExtender().addAction(wearAction));
+            }
+            else if(Settings.getBoolean(Settings.Keys.SWIPE_TO_TAKE_ALL, false))
 			{
 				builder.setDeleteIntent(operation);
 				builder.setOngoing(false);
@@ -652,15 +660,13 @@ public class NotificationReceiver extends BroadcastReceiver
 		return mContext.getString(resId, formatArgs);
 	}
 
-	private NotificationManager getNotificationManager() {
-		return (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+	private NotificationManagerCompat getNotificationManager() {
+        return NotificationManagerCompat.from(mContext);
 	}
 
 	/* package */ static void cancelNotifications()
 	{
-		final NotificationManager nm = (NotificationManager) RxDroid.getContext()
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-
+		final NotificationManagerCompat nm = NotificationManagerCompat.from(RxDroid.getContext());
 		nm.cancel(R.id.notification);
 	}
 
