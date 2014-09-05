@@ -127,6 +127,7 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 		setTheme(Theme.get());
 		super.onCreate(savedInstanceState);
 
+		/*
 		final long bootCompletedTimestamp = Settings.getLong(Settings.Keys.BOOT_COMPLETED_TIMESTAMP, 0);
 		final long bootTimestamp = RxDroid.getBootTimestamp();
 		final boolean forceSplashWarning =
@@ -166,7 +167,7 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 					"\n  bootCompletedTimestamp=" + bootCompletedTimestamp +
 					"\n           bootTimestamp=" + bootTimestamp);
 		}
-
+		*/
 
 		if(mLaunchMainActivity)
 			setContentView(R.layout.loader);
@@ -410,6 +411,7 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 	}
 }
 
+/*
 class AutostartIssueDialog extends DialogLike
 {
 	@Override
@@ -453,3 +455,4 @@ class AutostartIssueDialog extends DialogLike
 		}
 	}
 }
+*/
