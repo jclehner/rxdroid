@@ -328,8 +328,7 @@ public class BackupActivity extends SherlockFragmentActivity
 			else
 			{
 				final DialogLike dialog = new DialogLike.SimpleDialogLike();
-				dialog.setMessage("External storage is not accessible. No backups can be created" +
-								"or restored");
+				dialog.setMessage(getString(R.string._msg_external_storage_not_readable));
 
 				content = dialog;
 			}

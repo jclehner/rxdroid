@@ -470,6 +470,10 @@
 		External storage is mounted read-only. Cannot create backup.
 	</string>
 
+	<string name="_msg_external_storage_not_readable">
+		External storage is not readable. Cannot create or restore backups.
+	</string>
+
     <string name="_msg_comment">Optional comment:</string>
 
     <!--

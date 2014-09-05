@@ -446,6 +446,11 @@
 		Externer Speicher ist schreibgeschützt. Kann Sicherung nicht erstellen.
 	</string>
 
+	<string name="_msg_external_storage_not_readable">
+		Externer Speicher ist nicht lesbar. Sicherungen können nicht erstellt oder
+		wiederhergestellt werden.
+	</string>
+
     <string name="_msg_comment">Optionaler Kommentar:</string>
 
 	<!-- 
