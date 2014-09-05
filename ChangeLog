@@ -1,16 +1,15 @@
-0.9.21.3:
-	* Fixes bug where doses were marked as taken even
-	though supply was at zero
-
-0.9.21.2:
-	* Fixes bug where times were erroneously suffixed
-	with +<number>
-
-0.9.22.1:
+0.9.23:
 	* Add option to create/restore backups (requires permission
 	  to read/write external storage!)
 	* Swipe/clear notifications on pre-JellyBean to 'take all'
+	* Add 'Eye dropper' icon
 	* Bug fixes
+
+0.9.22: (not released)
+
+0.9.21.3:
+	* Fixes bug where doses were marked as taken even
+	though supply was at zero
 
 0.9.21.2:
 	* Fixes bug where times were erroneously suffixed 
