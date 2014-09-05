@@ -104,8 +104,8 @@ public class RxDroid extends Application
 		Components.onCreate(getContext(), Components.NO_DATABASE_INIT | Components.NO_SETTINGS_INIT);
 
 		super.onCreate();
-		ACRA.init(this);
-		ACRA.getErrorReporter().setReportSender(new EmailIntentSender(this));
+		//ACRA.init(this);
+		//ACRA.getErrorReporter().setReportSender(new EmailIntentSender(this));
 	}
 
 	public static void setContext(Context context)
