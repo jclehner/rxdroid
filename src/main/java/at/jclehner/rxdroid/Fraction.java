@@ -102,8 +102,8 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 
 	private static boolean sDisplayMixedNumbers = true;
 
-	private int mNumerator = 0;
-	private int mDenominator = 1;
+	protected int mNumerator = 0;
+	protected int mDenominator = 1;
 
 	/**
 	 * A zero value, just for convenience.
@@ -432,7 +432,7 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 		}
 	};
 
-	private void init(int integer, int numerator, int denominator)
+	protected void init(int integer, int numerator, int denominator)
 	{
 		if(denominator == 0)
 			throw new ArithmeticException("Division by zero");
