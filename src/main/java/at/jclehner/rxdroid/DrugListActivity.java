@@ -240,7 +240,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		else
 		{
 			if(!BuildConfig.DEBUG)
-				menuResId = R.id.menu_default_drug_list_activity;
+				menuResId = R.menu.menu_default_drug_list_activity;
 			else
 				menuResId = R.menu.activity_drug_list_extended;
 		}
