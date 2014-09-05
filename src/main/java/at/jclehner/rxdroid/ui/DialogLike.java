@@ -33,6 +33,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -71,6 +72,8 @@ public abstract class DialogLike extends Fragment
 	private TextView mDetail;
 	private ImageView mIcon;
 
+	private View mCustomView;
+
 	private Button mPositiveBtn;
 	private Button mNegativeBtn;
 	private View mButtonBar;
@@ -80,6 +83,8 @@ public abstract class DialogLike extends Fragment
 	public DialogLike() {
 		setArguments(new Bundle());
 	}
+
+	public void onBindCustomView(View view) {}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -120,6 +125,14 @@ public abstract class DialogLike extends Fragment
 		mPositiveBtn.setOnClickListener(mBtnListener);
 		mNegativeBtn.setOnClickListener(mBtnListener);
 
+		final int customView = getArguments().getInt("custom_view");
+		if(customView != 0)
+		{
+			final FrameLayout customViewFrame = (FrameLayout) v.findViewById(R.id.custom);
+			mCustomView = inflater.inflate(customView, customViewFrame, true);
+			onBindCustomView(mCustomView);
+		}
+
 		applyArguments();
 
 		return v;
@@ -146,6 +159,12 @@ public abstract class DialogLike extends Fragment
 	public void setMessage(CharSequence message)
 	{
 		getArguments().putCharSequence("message", message);
+		applyArguments();
+	}
+
+	public void setCustomView(int resId)
+	{
+		getArguments().putInt("custom_view", resId);
 		applyArguments();
 	}
 
