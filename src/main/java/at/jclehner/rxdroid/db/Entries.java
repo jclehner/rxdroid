@@ -502,18 +502,14 @@ public final class Entries
 			if(!supply.isZero())
 			{
 				final Fraction newSupply = supply.minus(dose);
-				if(newSupply.isNegative())
-				{
-					drug.setCurrentSupply(Fraction.ZERO);
-					skip = true;
-				}
-				else
+				if(!newSupply.isNegative())
 				{
 					drug.setCurrentSupply(newSupply);
+					Database.update(drug);
 					skip = false;
 				}
-
-				Database.update(drug);
+				else
+					skip = true;
 			}
 			else
 				skip = drug.getRefillSize() != 0;
@@ -530,8 +526,6 @@ public final class Entries
 
 			Log.d(TAG, "Creating event: " + event);
 		}
-
-		final int toastResId;
 
 		if(skipped != 0)
 			RxDroid.toastLong(R.string._toast_some_doses_skipped);
