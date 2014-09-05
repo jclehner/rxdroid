@@ -215,21 +215,21 @@ public abstract class DialogLike extends Fragment
 		mMessage.setText(getArguments().getCharSequence("message"));
 		mIcon.setImageResource(getArguments().getInt("icon"));
 
-		boolean hideButtonBar = true;
+		boolean showButtonBar = false;
 
 		String btnText = getArguments().getString("pos");
 		mPositiveBtn.setVisibility(btnText != null ? View.VISIBLE : View.GONE);
 		mPositiveBtn.setText(btnText);
 
-		hideButtonBar |= btnText != null;
+		showButtonBar |= btnText != null;
 
-		btnText = getArguments().getString("pos");
+		btnText = getArguments().getString("neg");
 		mNegativeBtn.setVisibility(btnText != null ? View.VISIBLE : View.GONE);
 		mNegativeBtn.setText(btnText);
 
-		hideButtonBar |= btnText != null;
+		showButtonBar |= btnText != null;
 
-		mButtonBar.setVisibility(hideButtonBar ? View.GONE : View.VISIBLE);
+		mButtonBar.setVisibility(showButtonBar ? View.VISIBLE : View.GONE);
 
 		final CharSequence detail = getArguments().getCharSequence("detail");
 		mDetail.setVisibility(detail != null ? View.VISIBLE : View.GONE);
