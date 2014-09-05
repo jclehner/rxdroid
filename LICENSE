@@ -1,2 +1,8 @@
 LICENSE-GPLv3: Source code and XML files
 LICENSE-CC: SVG graphics
+
+The following third-party icons are licensed 
+under a Creative Commons License:
+
+src/main/res/drawable*/ic_pipette_*.png:
+Outline Icons by DesignContest
