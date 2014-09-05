@@ -67,16 +67,17 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 	private final boolean mDimDoseViews;
 	private final boolean mShowingAll;
 	private final int mNextDoseTime;
+	private final Date mActiveDate;
 
 	public DrugOverviewAdapter(Activity activity, List<Drug> items, Date date, int activeDoseTime, int nextDoseTime, boolean showingAll)
 	{
 		super(activity, items, date, activeDoseTime);
 
-
 		mTimer = LOGV ? new Timer() : null;
 		mDimDoseViews = Settings.getBoolean(Settings.Keys.DIM_DOSE_VIEWS, true);
 		mShowingAll = showingAll;
 		mNextDoseTime = nextDoseTime;
+		mActiveDate = Settings.getActiveDate();
 	}
 
 	@Override
@@ -128,12 +129,12 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 		holder.icon.setImageResource(Util.getDrugIconDrawable(drug.getIcon()));
 		holder.currentSupply.setDrugAndDate(drug, mAdapterDate);
 
-		final Date today = DateTime.today();
-		final boolean isToday = today.equals(mAdapterDate);
+		//final Date today = DateTime.today();
+		final boolean isActiveDate = mAdapterDate.equals(mActiveDate);
 		final boolean isCurrentSupplyVisible;
 		boolean isMissingDoseIndicatorVisible = false;
 
-		if(isToday)
+		if(isActiveDate)
 		{
 			if(Entries.hasMissingDosesBeforeDate(drug, mAdapterDate))
 				isMissingDoseIndicatorVisible = true;
@@ -141,7 +142,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 			isCurrentSupplyVisible = drug.getRefillSize() != 0 || !drug.getCurrentSupply().isZero();
 		}
 		else
-			isCurrentSupplyVisible = mAdapterDate.after(today);
+			isCurrentSupplyVisible = mAdapterDate.after(mActiveDate);
 
 		holder.missedDoseIndicator.setVisibility(isMissingDoseIndicatorVisible ? View.VISIBLE : View.GONE);
 		holder.historyMenu.setOnClickListener(new OnClickListener() {
@@ -157,7 +158,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 
 		holder.currentSupply.setVisibility(isCurrentSupplyVisible ? View.VISIBLE : View.INVISIBLE);
 
-		if(!hasSchedule && isToday && drug.isActive())
+		if(!hasSchedule && isActiveDate && drug.isActive())
 		{
 			// Active drugs without a schedule are displayed for notification purposes. We hide
 			// the menu items that are not relevant
@@ -194,7 +195,7 @@ public class DrugOverviewAdapter extends AbsDrugAdapter
 				{
 					boolean dimmed = false;
 
-					if(isToday)
+					if(isActiveDate)
 					{
 						if(doseTime <= maxDoseTimeForNoDim && !drug.getDose(doseTime, mAdapterDate).isZero())
 							dimmed = Entries.countDoseEvents(drug, mAdapterDate, doseView.getDoseTime()) != 0;

@@ -171,21 +171,12 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		Components.onResumeActivity(this, 0);
 		mIsShowing = true;
 
-		final Intent intent = getIntent();
-		Date date = null;
-
-		if(intent != null)
-			date = (Date) intent.getSerializableExtra(EXTRA_DATE);
-
 		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
-
-		if(date == null)
-			date = dtInfo.activeDate();
 
 		mCurrentDoseTime = dtInfo.activeDoseTime();
 		mNextDoseTime = dtInfo.nextDoseTime();
 
-		setDate(date, PAGER_INIT);
+		setDate(dtInfo.activeDate(), PAGER_INIT);
 		NotificationReceiver.registerOnDoseTimeChangeListener(mDoseTimeListener);
 
 		if(Version.BETA)
@@ -256,13 +247,13 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
-		final int titleResId = isShowingCurrentDate() ? R.string._title_go_to_date : R.string._title_today;
+		final int titleResId = isShowingActiveDate() ? R.string._title_go_to_date : R.string._title_today;
 		menu.findItem(R.id.menuitem_date).setTitle(titleResId);
 		menu.findItem(R.id.menuitem_toggle_filtering).setTitle(mShowingAll ? R.string._title_filter : R.string._title_show_all);
 
 		final MenuItem item = menu.findItem(R.id.menuitem_take_all);
 		if(item != null)
-			item.setEnabled(isShowingCurrentDate());
+			item.setEnabled(isShowingActiveDate());
 
 		return true;
 	}
@@ -274,7 +265,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		{
 			case R.id.menuitem_date:
 			{
-				if(isShowingCurrentDate())
+				if(isShowingActiveDate())
 					mDateClickListener.onLongClick(null);
 				else
 					mDateClickListener.onClick(null);
@@ -803,8 +794,10 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		updateDateString();
 	}
 
-	private boolean isShowingCurrentDate() {
-		return DateTime.isToday(mCurrentDate);
+	private boolean isShowingActiveDate()
+	{
+		final DoseTimeInfo dtInfo = Settings.getDoseTimeInfo();
+		return dtInfo.activeDate().equals(mCurrentDate);
 	}
 
 	private void updateListAdapter(DragSortListView listView, Date date, List<Drug> drugs)
@@ -843,7 +836,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		final SpannableString dateString =
 				new SpannableString(DateFormat.getDateFormat(this).format(mCurrentDate.getTime()));
 
-		if(isShowingCurrentDate())
+		if(isShowingActiveDate())
 			Util.applyStyle(dateString, new UnderlineSpan());
 
 		Util.applyStyle(dateString, new RelativeSizeSpan(0.75f));
