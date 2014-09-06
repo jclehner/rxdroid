@@ -306,7 +306,6 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
 			ab.setIcon(android.R.drawable.ic_dialog_alert);
 			ab.setMessage(R.string._msg_delete_drug);
-			ab.setTitle("Foo");
 
 			ab.setNegativeButton(android.R.string.no, null);
 			ab.setPositiveButton(android.R.string.yes, null);
@@ -317,8 +316,8 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		{
 			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
 			//builder.setTitle(R.string._title_warning);
-			ab.setIcon(android.R.drawable.ic_dialog_alert);
-			ab.setTitle(R.string._msg_err_empty_drug_name);
+			//ab.setIcon(android.R.drawable.ic_dialog_alert);
+			ab.setMessage(R.string._msg_err_empty_drug_name);
 			ab.setNegativeButton(android.R.string.cancel, null);
 			ab.setPositiveButton(android.R.string.ok, new OnClickListener() {
 
@@ -334,8 +333,8 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		else if(id == R.id.drug_save_changes_dialog)
 		{
 			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
-			ab.setTitle(R.string._title_save_chanes);
-			ab.setIcon(android.R.drawable.ic_dialog_info);
+			//ab.setTitle(R.string._title_save_chanes);
+			//ab.setIcon(android.R.drawable.ic_dialog_info);
 			ab.setMessage(R.string._msg_save_drug_changes);
 
 			ab.setNegativeButton(R.string._btn_discard, null);
@@ -351,8 +350,11 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 	{
 		if(id == R.id.drug_delete_dialog)
 		{
+			final String message = getString(R.string._title_delete_drug, mWrapper.get().getName())
+					+ " " + getString(R.string._msg_delete_drug);
+
 			final AlertDialog alert = (AlertDialog) dialog;
-			alert.setTitle(getString(R.string._title_delete_drug, mWrapper.get().getName()));
+			alert.setMessage(message);
 			alert.setButton(Dialog.BUTTON_POSITIVE, getString(android.R.string.yes), new OnClickListener() {
 
 				@Override
