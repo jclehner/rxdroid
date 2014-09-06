@@ -26,7 +26,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
@@ -50,6 +53,52 @@ public class DoseTimePreferenceActivity extends PreferenceActivityBase
 			setContentView(R.layout.activity_dose_time_settings);
 
 		addPreferencesFromResource(R.xml.dose_times);
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+
+		if(!Settings.wasDisplayedOnce("license_info"))
+		{
+			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
+			ab.setCancelable(false);
+			ab.setMessage(Html.fromHtml(
+					"<center><h1>RxDroid</h1></center>\n" +
+					"<small><p>&copy; 2011&ndash;2014&nbsp;&nbsp;Joseph C. Lehner</p>\n" +
+					"<p><tt>This program comes with ABSOLUTELY NO WARRANTY.\n" +
+					"This is free software, and you are welcome to redistribute it\n" +
+					"under the terms of the <a href=\"http://www.gnu.org/licenses/gpl-3.0.html\">" +
+					"GNU GPLv3</a>.</tt></p></small>"));
+			ab.setPositiveButton(android.R.string.ok, new OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					Settings.setDisplayedOnce("license_info");
+				}
+			});
+
+			final AlertDialog d = ab.create();
+			d.setOnShowListener(new DialogInterface.OnShowListener()
+			{
+				@Override
+				public void onShow(DialogInterface dialog)
+				{
+					try
+					{
+						((TextView) d.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
+					}
+					catch(RuntimeException e)
+					{
+						// ignore
+					}
+				}
+			});
+
+			d.show();
+		}
 	}
 
 	@Override
