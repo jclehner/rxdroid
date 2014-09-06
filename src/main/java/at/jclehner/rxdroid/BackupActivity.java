@@ -58,7 +58,7 @@ import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
-public class BackupActivity extends SherlockFragmentActivity
+public class BackupActivity extends SherlockFragmentActivity implements DialogLike.OnButtonClickListener
 {
 	public static class ImportDialog extends DialogLike
 	{
@@ -98,7 +98,7 @@ public class BackupActivity extends SherlockFragmentActivity
 		}
 
 		@Override
-		public void onButtonClick(Button button, int which)
+		public void onButtonClick(DialogLike dialogLike, int which)
 		{
 			if(which == BUTTON_POSITIVE && mCanRestore)
 			{
@@ -297,6 +297,11 @@ public class BackupActivity extends SherlockFragmentActivity
 		return super.onOptionsItemSelected(item);
 	}
 
+	@Override
+	public void onButtonClick(DialogLike dialogLike, int which) {
+		finish();
+	}
+
 	private void setContentFragment(String storageState)
 	{
 		final Fragment content;
@@ -327,7 +332,7 @@ public class BackupActivity extends SherlockFragmentActivity
 			}
 			else
 			{
-				final DialogLike dialog = new DialogLike.SimpleDialogLike();
+				final DialogLike dialog = new DialogLike();
 				dialog.setMessage(getString(R.string._msg_external_storage_not_readable));
 
 				content = dialog;

@@ -46,6 +46,7 @@ import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,15 +63,11 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-public class SplashScreenActivity extends SherlockFragmentActivity implements OnClickListener
+public class SplashScreenActivity extends SherlockFragmentActivity implements DialogLike.OnButtonClickListener
 {
-	@SuppressWarnings("unused")
-	private static final boolean USE_MSG_HANDLER = BuildConfig.DEBUG;
-
 	public class DatabaseStatusReceiver extends BroadcastReceiver
 	{
 		public static final String EXTRA_MESSAGE = "at.jclehner.rxdroid.extra.MESSAGE";
-		public static final String EXTRA_PROGRESS = "at.jclehner.rxdroid.extra.PROGRESS";
 
 		@Override
 		public void onReceive(Context context, Intent intent)
@@ -84,28 +81,6 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 
 			final int msgResId = intent.getIntExtra(EXTRA_MESSAGE, R.string._title_db_status_loading);
 			msg.setText(getString(R.string._title_database) + ": " + getString(msgResId));
-		}
-	}
-
-	public class DatabaseStatusHandler extends Handler
-	{
-		public static final int MSG_SET_TEXT = 0;
-
-		@Override
-		public void handleMessage(Message msg)
-		{
-			if(msg.what == MSG_SET_TEXT)
-			{
-				final TextView text = (TextView) findViewById(R.id.text_loading);
-				if(text != null)
-				{
-					final int textResId = msg.arg1;
-					text.setText(getString(R.string._title_database) + ": " + getString(textResId));
-					return;
-				}
-			}
-
-			super.handleMessage(msg);
 		}
 	}
 
@@ -180,15 +155,6 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 		Util.applyStyle(dateString, new UnderlineSpan());
 
 		getSupportActionBar().setSubtitle(dateString);
-
-		try
-		{
-			Class.forName(com.michaelnovakjr.numberpicker.NumberPicker.class.getName());
-		}
-		catch(ClassNotFoundException e)
-		{
-			throw new WrappedCheckedException("NumberPicker library is missing", e);
-		}
 	}
 
 	@Override
@@ -209,9 +175,9 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 	}
 
 	@Override
-	public void onClick(DialogInterface dialog, int which)
+	public void onButtonClick(DialogLike dialogLike, int which)
 	{
-		if(which == Dialog.BUTTON_POSITIVE)
+		if(which == DialogLike.BUTTON_POSITIVE)
 		{
 			if(deleteDatabase())
 			{
@@ -221,7 +187,7 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 			else
 				Toast.makeText(this, R.string._toast_db_reset_failure, Toast.LENGTH_LONG).show();
 		}
-		else if(which == Dialog.BUTTON_NEGATIVE && mException != null)
+		else if(which == DialogLike.BUTTON_NEGATIVE && mException != null)
 			throw mException;
 
 		finish();
@@ -236,63 +202,6 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 
 		LocalBroadcastManager bm = RxDroid.getLocalBroadcastManager();
 		bm.sendBroadcast(intent);
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	protected Dialog onCreateDialog(int id, Bundle args)
-	{
-		if(id == R.id.db_error_dialog)
-		{
-			final AlertDialog.Builder ab = new AlertDialog.Builder(SplashScreenActivity.this);
-			ab.setTitle(R.string._title_error);
-			ab.setIcon(android.R.drawable.ic_dialog_alert);
-			ab.setCancelable(false);
-			ab.setNegativeButton(R.string._btn_exit, SplashScreenActivity.this);
-			ab.setPositiveButton(R.string._btn_reset, SplashScreenActivity.this);
-			ab.setMessage("");
-
-			return ab.create();
-		}
-		return super.onCreateDialog(id, args);
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	protected void onPrepareDialog(int id, Dialog dialog, Bundle args)
-	{
-		if(id == R.id.db_error_dialog)
-		{
-//			final WrappedCheckedException exception =
-			mException = (WrappedCheckedException) args.getSerializable(ARG_EXCEPTION);
-
-			final StringBuilder sb = new StringBuilder();
-
-			if(mException.getCauseType() == DatabaseError.class)
-			{
-				switch(((DatabaseError) mException.getCause()).getType())
-				{
-					case DatabaseError.E_GENERAL:
-						sb.append(getString(R.string._msg_db_error_general));
-						break;
-
-					case DatabaseError.E_UPGRADE:
-						sb.append(getString(R.string._msg_db_error_upgrade));
-						break;
-
-					case DatabaseError.E_DOWNGRADE:
-						sb.append(getString(R.string._msg_db_error_downgrade));
-						break;
-				}
-			}
-			else
-				sb.append(getString(R.string._msg_db_error_general));
-
-			sb.append(" " + RefString.resolve(this, R.string._msg_db_error_footer));
-			((AlertDialog) dialog).setMessage(sb);
-		}
-		else
-			super.onPrepareDialog(id, dialog, args);
 	}
 
 	/* package */ void loadDatabaseAndLaunchMainActivity() {
@@ -364,6 +273,45 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 		}).start();
 	}
 
+	private void showDatabaseErrorDialog(WrappedCheckedException e)
+	{
+		mException = e;
+
+		final DialogLike d = new DialogLike();
+		d.setTitle(getString(R.string._title_error));
+		d.setIcon(android.R.drawable.ic_dialog_alert);
+		d.setNegativeButtonText(getString(R.string._btn_exit));
+		d.setPositiveButtonText(getString(R.string._btn_reset));
+
+		final StringBuilder sb = new StringBuilder();
+
+		if(e.getCauseType() == DatabaseError.class)
+		{
+			switch(((DatabaseError) e.getCause()).getType())
+			{
+				case DatabaseError.E_GENERAL:
+					sb.append(getString(R.string._msg_db_error_general));
+					break;
+
+				case DatabaseError.E_UPGRADE:
+					sb.append(getString(R.string._msg_db_error_upgrade));
+					break;
+
+				case DatabaseError.E_DOWNGRADE:
+					sb.append(getString(R.string._msg_db_error_downgrade));
+					break;
+			}
+		}
+		else
+			sb.append(getString(R.string._msg_db_error_general));
+
+		sb.append(" " + RefString.resolve(this, R.string._msg_db_error_footer));
+		d.setMessage(sb);
+
+		findViewById(R.id.loader).setVisibility(View.GONE);
+		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, d).commit();
+	}
+
 	private class DatabaseIntializerTask extends AsyncTask<Integer, Void, WrappedCheckedException>
 	{
 		//private boolean mAttemptedDatabaseReload = false;
@@ -402,10 +350,7 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements On
 			else
 			{
 				Log.w(TAG, result.getRootCause());
-
-				Bundle args = new Bundle();
-				args.putSerializable(ARG_EXCEPTION, result);
-				showDialog(R.id.db_error_dialog, args);
+				showDatabaseErrorDialog(result);
 			}
 		}
 	}

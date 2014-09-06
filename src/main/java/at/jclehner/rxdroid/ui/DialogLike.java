@@ -22,6 +22,7 @@
 package at.jclehner.rxdroid.ui;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,6 +30,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,35 +39,18 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.R;
 
-public abstract class DialogLike extends Fragment
+public class DialogLike extends Fragment
 {
-	public static class SimpleDialogLike extends DialogLike
+	public interface OnButtonClickListener
 	{
-		@Override
-		public void onCreate(Bundle savedInstanceState)
-		{
-			super.onCreate(savedInstanceState);
-			setPositiveButtonText(0);
-			setNegativeButtonText(0);
-		}
-
-		@Override
-		public void onButtonClick(Button button, int which)
-		{
-			// won't be called unless a button text is set on any
-			// button
-			getActivity().finish();
-		}
+		abstract void onButtonClick(DialogLike dialogLike, int which);
 	}
 
 	public static final int BUTTON_POSITIVE = DialogInterface.BUTTON_POSITIVE;
 	public static final int BUTTON_NEGATIVE = DialogInterface.BUTTON_NEGATIVE;
-
-	public static final int TEXT_DEFAULT = 0;
-	public static final int TEXT_HTML = 1;
-	public static final int TEXT_REFSTRING = 2;
 
 	private TextView mTitle;
 	private TextView mMessage;
@@ -78,21 +63,34 @@ public abstract class DialogLike extends Fragment
 	private Button mNegativeBtn;
 	private View mButtonBar;
 
-	public abstract void onButtonClick(Button button, int which);
-
 	public DialogLike() {
 		setArguments(new Bundle());
 	}
 
-	public void onBindCustomView(View view) {}
+	public void onButtonClick(DialogLike dialogLike, int which)
+	{
+		try
+		{
+			((OnButtonClickListener) getActivity()).onButtonClick(dialogLike, which);
+		}
+		catch(ClassCastException e)
+		{
+			throw new IllegalStateException("Fragment must override DialogLike.onButtonClick(...) or hosting Activity " +
+					"must implement DialogLike.OnButtonClickListener");
+		}
+	}
+
+	public void onBindCustomView(View view)
+	{
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		setPositiveButtonText(android.R.string.ok);
-		setNegativeButtonText(android.R.string.cancel);
+		//setPositiveButtonText(android.R.string.ok);
+		//setNegativeButtonText(android.R.string.cancel);
 	}
 
 	@Override
@@ -180,15 +178,27 @@ public abstract class DialogLike extends Fragment
 		applyArguments();
 	}
 
+	public void setNegativeButtonText(CharSequence text)
+	{
+		getArguments().putCharSequence("neg", text);
+		applyArguments();
+	}
+
 	public void setNegativeButtonText(int resId)
 	{
-		getArguments().putString("neg", getStringInternal(resId));
+		getArguments().putCharSequence("neg", getStringInternal(resId));
+		applyArguments();
+	}
+
+	public void setPositiveButtonText(CharSequence text)
+	{
+		getArguments().putCharSequence("pos", text);
 		applyArguments();
 	}
 
 	public void setPositiveButtonText(int resId)
 	{
-		getArguments().putString("pos", getStringInternal(resId));
+		getArguments().putCharSequence("pos", getStringInternal(resId));
 		applyArguments();
 	}
 
@@ -217,13 +227,13 @@ public abstract class DialogLike extends Fragment
 
 		boolean showButtonBar = false;
 
-		String btnText = getArguments().getString("pos");
+		CharSequence btnText = getArguments().getCharSequence("pos");
 		mPositiveBtn.setVisibility(btnText != null ? View.VISIBLE : View.GONE);
 		mPositiveBtn.setText(btnText);
 
 		showButtonBar |= btnText != null;
 
-		btnText = getArguments().getString("neg");
+		btnText = getArguments().getCharSequence("neg");
 		mNegativeBtn.setVisibility(btnText != null ? View.VISIBLE : View.GONE);
 		mNegativeBtn.setText(btnText);
 
@@ -250,7 +260,7 @@ public abstract class DialogLike extends Fragment
 		@Override
 		public void onClick(View v)
 		{
-			onButtonClick((Button) v, v == mPositiveBtn ? BUTTON_POSITIVE : BUTTON_NEGATIVE);
+			onButtonClick(DialogLike.this, v == mPositiveBtn ? BUTTON_POSITIVE : BUTTON_NEGATIVE);
 		}
 	};
 }
