@@ -183,7 +183,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			{
 				// Google Play doesn't allow donations using PayPal,
 				// so we show a link to the project's website instead.
-				uriString = "http://code.google.com/p/rxdroid";
+				uriString = "https://github.com/jclehner/rxdroid";
 				titleResId = R.string._title_website;
 				summary = uriString;
 			}
