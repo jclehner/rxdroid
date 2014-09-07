@@ -6,7 +6,7 @@
  * RxDroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option) any later version. Additional terms apply (see LICENSE).
  *
  * RxDroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -260,7 +260,7 @@ public class SplashScreenActivity extends SherlockFragmentActivity implements Di
 				else
 					isFirstLaunch = Settings.getBoolean(Settings.Keys.IS_FIRST_LAUNCH, true);
 
-				final Class<?> intentClass = isFirstLaunch ? DoseTimePreferenceActivity.class : DrugListActivity.class;
+				final Class<?> intentClass = isFirstLaunch ? DoseTimePreferenceActivity.class : DrugListActivity2.class;
 
 				Intent intent = new Intent(getBaseContext(), intentClass);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);

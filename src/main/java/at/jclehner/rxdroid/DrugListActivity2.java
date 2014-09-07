@@ -6,7 +6,7 @@
  * RxDroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option) any later version. Additional terms apply (see LICENSE).
  *
  * RxDroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.View;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
@@ -51,5 +52,13 @@ public class DrugListActivity2 extends SherlockFragmentActivity
 
 		if(!(fm.findFragmentById(android.R.id.content) instanceof DrugListPagerFragment))
 			fm.beginTransaction().add(android.R.id.content, f).commit();
+	}
+
+	public void onDrugSupplyMonitorClick(View view) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void onDrugSupplyMonitorLongClick(View view) {
+		throw new UnsupportedOperationException();
 	}
 }
