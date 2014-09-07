@@ -6,7 +6,7 @@
  * RxDroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option) any later version. Additional terms apply (see LICENSE).
  *
  * RxDroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,8 +34,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -59,7 +61,8 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 import at.jclehner.rxdroid.widget.DrugNameView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
-public class DrugListFragment extends LoaderListFragment<Drug> implements View.OnClickListener
+public class DrugListFragment extends LoaderListFragment<Drug> implements View.OnClickListener,
+		View.OnLongClickListener
 {
 	static class Adapter extends LLFAdapter<Drug>
 	{
@@ -92,6 +95,8 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 				holder.name.setOnClickListener((View.OnClickListener) mFragment);
 				holder.history.setOnClickListener((View.OnClickListener) mFragment);
 				holder.supply.setOnClickListener((View.OnClickListener) mFragment);
+
+				holder.supply.setOnLongClickListener((View.OnLongClickListener) mFragment);
 
 				view.findViewById(R.id.img_missed_dose_warning).setVisibility(View.GONE);
 
@@ -322,6 +327,12 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 	}
 
 	@Override
+	public void onResume()
+	{
+		super.onResume();
+	}
+
+	@Override
 	public void onSaveInstanceState(Bundle outState)
 	{
 		super.onSaveInstanceState(outState);
@@ -357,6 +368,35 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 
 			startActivity(intent);
 		}
+		else if(view instanceof DrugSupplyMonitor)
+		{
+			final Drug drug = ((DrugSupplyMonitor) view).getDrug();
+			if(drug != null)
+			{
+				//final Date today = DateTime.today();
+
+				final int daysLeft = Entries.getSupplyDaysLeftForDrug(drug, mDate);
+				final String dateString = DateTime.toNativeDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, daysLeft));
+
+				Toast.makeText(getActivity(), getString(R.string._toast_low_supplies, dateString), Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+
+	@Override
+	public boolean onLongClick(View view)
+	{
+		if(view instanceof DrugSupplyMonitor)
+		{
+			final Drug drug = ((DrugSupplyMonitor) view).getDrug();
+			if(drug != null)
+			{
+				final DrugSupplyEditFragment dialog = DrugSupplyEditFragment.newInstance(drug);
+				dialog.show(getFragmentManager(), "supply_edit_dialog");
+			}
+		}
+
+		return true;
 	}
 
 	@Override
