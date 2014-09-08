@@ -513,9 +513,6 @@ public class NotificationReceiver extends BroadcastReceiver
                 NotificationCompat.Action action = new NotificationCompat.Action.Builder(
                         R.drawable.ic_action_tick, getString(R.string._title_take_all_doses), operation).build();
                 builder.addAction(action);
-                NotificationCompat.Action wearAction = new NotificationCompat.Action.Builder(
-                        R.drawable.ic_action_star, getString(R.string._title_take_all_doses), operation).build();
-                builder.extend(new NotificationCompat.WearableExtender().addAction(wearAction));
             }
             else if(Settings.getBoolean(Settings.Keys.SWIPE_TO_TAKE_ALL, false))
 			{
