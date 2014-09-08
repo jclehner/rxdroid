@@ -113,9 +113,9 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 			else
 				holder = (ViewHolder) view.getTag();
 
-			Loader.DrugWrapper wrapper = getItemHolder(position);
+			final Loader.DrugWrapper wrapper = getItemHolder(position);
 
-			holder.name.setText(wrapper.item.getName());
+			holder.name.setDrug(wrapper.item);
 			holder.name.setTag(wrapper.item.getId());
 
 			holder.icon.setImageResource(Util.getDrugIconDrawable(wrapper.item.getIcon()));
@@ -167,8 +167,6 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 		private final int mPatientId;
 		private final Settings.DoseTimeInfo mDtInfo;
 		private final Date mDate;
-
-		private volatile RuntimeException mException = null;
 
 		public Loader(Context context, Bundle args)
 		{
