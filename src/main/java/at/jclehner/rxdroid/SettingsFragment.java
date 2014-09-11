@@ -34,9 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -46,7 +44,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -78,10 +75,10 @@ import at.jclehner.rxdroid.util.Util;
 import net.lingala.zip4j.exception.ZipException;
 
 @SuppressWarnings("deprecation")
-public class PreferencesActivity extends PreferenceFragment implements
+public class SettingsFragment extends PreferenceFragment implements
 		OnSharedPreferenceChangeListener, OnPreferenceClickListener, OnPreferenceChangeListener
 {
-	private static final String TAG = PreferencesActivity.class.getSimpleName();
+	private static final String TAG = SettingsFragment.class.getSimpleName();
 
 	private static final String[] KEEP_DISABLED = {
 		Settings.Keys.VERSION, Settings.Keys.DB_STATS

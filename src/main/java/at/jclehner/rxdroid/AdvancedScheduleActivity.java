@@ -22,15 +22,9 @@
 package at.jclehner.rxdroid;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 
-
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-import at.jclehner.rxdroid.ui.ScheduleGridFragment;
-
-
-public class AdvancedScheduleActivity extends SherlockFragmentActivity
+public class AdvancedScheduleActivity extends ActionBarActivity
 {
 	@Override
 	protected void onCreate(Bundle savedInstanceState)

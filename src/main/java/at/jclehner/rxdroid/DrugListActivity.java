@@ -286,7 +286,7 @@ public class DrugListActivity extends ActionBarActivity implements OnLongClickLi
 			case R.id.menuitem_preferences:
 			{
 				Intent intent = new Intent();
-				intent.setClass(this, PreferencesActivity.class);
+				intent.setClass(this, SettingsFragment.class);
 				startActivity(intent);
 				return true;
 			}

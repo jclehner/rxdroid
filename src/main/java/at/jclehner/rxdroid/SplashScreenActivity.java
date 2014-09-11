@@ -25,30 +25,20 @@ import java.io.File;
 import java.util.Date;
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
-import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -259,11 +249,11 @@ public class SplashScreenActivity extends ActionBarActivity implements DialogLik
 				else
 					isFirstLaunch = Settings.getBoolean(Settings.Keys.IS_FIRST_LAUNCH, true);
 
-				final Class<?> intentClass = isFirstLaunch ? DoseTimePreferenceActivity.class : DrugListActivity2.class;
+				final Class<?> intentClass = isFirstLaunch ? DoseTimePreferenceFragment.class : DrugListActivity2.class;
 
 				Intent intent = new Intent(getBaseContext(), intentClass);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-				intent.putExtra(DoseTimePreferenceActivity.EXTRA_IS_FIRST_LAUNCH, isFirstLaunch);
+				intent.putExtra(DrugEditActivity2.EXTRA_IS_FIRST_LAUNCH, isFirstLaunch);
 				intent.putExtra(DrugListActivity.EXTRA_DATE, mDate);
 				startActivity(intent);
 

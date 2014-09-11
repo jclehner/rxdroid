@@ -177,14 +177,14 @@ public class DrugListPagerFragment extends Fragment implements DatePickerDialog.
 			case R.id.menuitem_add:
 			{
 				Intent intent = new Intent(Intent.ACTION_INSERT);
-				intent.setClass(getActivity(), DrugEditFragment.class);
+				intent.setClass(getActivity(), DrugEditActivity2.class);
 				startActivity(intent);
 				return true;
 			}
 			case R.id.menuitem_preferences:
 			{
 				Intent intent = new Intent();
-				intent.setClass(getActivity(), PreferencesActivity.class);
+				intent.setClass(getActivity(), SettingsActivity.class);
 				startActivity(intent);
 				return true;
 			}
