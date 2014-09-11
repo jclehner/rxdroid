@@ -1,5 +1,5 @@
-RxDroid Source Code License Notice
-==================================
+RxDroid
+=======
 
 Copyright (C) 2011-2014 Joseph C. Lehner
 
@@ -25,8 +25,8 @@ along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
   versions of the program must be marked as such and not identified
   as the original program.
 
-RxDroid Artwork License Notice
-==============================
+Artwork
+=======
 
 Unless otherwise stated, all artwork is licensed under a Creative
 Commons Attribution-NonCommercial-ShareAlike 3.0 license.
@@ -51,5 +51,4 @@ Third Party Works Included in RxDroid
 
 ## Artwork
 
-* ic_pipette_*.png: based on [Outline Icons]
-  (http://www.iconarchive.com/show/outline-icons-by-designcontest.html)
+* <tt>ic_pipette_*.png</tt>: based on [Outline Icons](http://www.iconarchive.com/show/outline-icons-by-designcontest.html)
