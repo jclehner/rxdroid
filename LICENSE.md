@@ -39,7 +39,6 @@ Third Party Works Included in RxDroid
 ## Libraries
 
 * [ORMLite](http://ormlite.com) by Gray Watson
-* [ActionBarSherlock](http://actionbarsherlock.com) by Jake Wharton
 * [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids) by
   Jake Wharton
 * [NumberPicker](https://github.com/jclehner/numberpicker) by Mike Novak
