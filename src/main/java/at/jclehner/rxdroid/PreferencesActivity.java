@@ -54,32 +54,31 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
+import android.support.v4.preference.PreferenceFragment;
 import android.text.SpannableString;
 import android.text.style.TypefaceSpan;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.webkit.WebView;
 import android.widget.Toast;
 
-import at.jclehner.androidutils.PreferenceActivity;
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
-//import at.jclehner.rxdroid.ui.LayoutTestActivity;
 import at.jclehner.rxdroid.db.SchedulePart;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-
 import net.lingala.zip4j.exception.ZipException;
 
 @SuppressWarnings("deprecation")
-public class PreferencesActivity extends PreferenceActivityBase implements
+public class PreferencesActivity extends PreferenceFragment implements
 		OnSharedPreferenceChangeListener, OnPreferenceClickListener, OnPreferenceChangeListener
 {
 	private static final String TAG = PreferencesActivity.class.getSimpleName();
@@ -104,12 +103,11 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 
 	@TargetApi(11)
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	public void onCreate(Bundle savedInstanceState)
 	{
-		enqueuePreferencesFromResource(R.xml.preferences);
 		super.onCreate(savedInstanceState);
 
-		//addPreferencesFromResource(R.xml.preferences);
+		addPreferencesFromResource(R.xml.preferences);
 
 		Settings.registerOnChangeListener(this);
 
@@ -134,7 +132,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			{
 				try
 				{
-					final String apkModDate = new Date(new File(getPackageCodePath()).lastModified()).toString();
+					final String apkModDate = new Date(new File(getActivity().getPackageCodePath()).lastModified()).toString();
 					sb.append("\n(" + apkModDate + ")");
 				}
 				catch(NullPointerException e)
@@ -232,7 +230,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 	}
 
 	@Override
-	protected void onResume()
+	public void onResume()
 	{
 		super.onResume();
 		updateLowSupplyThresholdPreferenceSummary();
@@ -240,7 +238,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 
 	@TargetApi(11)
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
 		if(BuildConfig.DEBUG && false)
 		{
@@ -250,7 +248,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		}
 
-		return super.onCreateOptionsMenu(menu);
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	@Override
@@ -259,7 +257,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		switch(item.getItemId())
 		{
 			case MENU_RESTORE_DEFAULTS:
-				showDialog(R.id.preference_reset_dialog);
+				showPreferenceResetDialog();
 				return true;
 
 			default:
@@ -277,7 +275,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		else if(Settings.Keys.HISTORY_SIZE.equals(key))
 		{
 			if(Settings.getStringAsInt(Settings.Keys.HISTORY_SIZE, -1) >= Settings.Enums.HISTORY_SIZE_6M)
-				Toast.makeText(getApplicationContext(), R.string._toast_large_history_size, Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), R.string._toast_large_history_size, Toast.LENGTH_LONG).show();
 		}
 		else if(Keys.USE_SAFE_MODE.equals(key))
 		{
@@ -301,7 +299,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 
 		if(Settings.Keys.LICENSES.equals(key))
 		{
-			showDialog(R.id.licenses_dialog);
+			showLicensesDialog();
 			return true;
 		}
 		else if(Settings.Keys.VERSION.equals(key))
@@ -344,7 +342,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 			RxDroid.doStartActivity(intent);
 
-			finish();
+			//finish();
 		}
 		else if(Settings.Keys.NOTIFICATION_LIGHT_COLOR.equals(key))
 		{
@@ -357,11 +355,6 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					Settings.setDisplayedOnce("custom_led_color");
 				}
 			}
-		}
-		else if(Settings.Keys.LANGUAGE.equals(key))
-		{
-			finish();
-			//new Handler().po
 		}
 		else if(Keys.LOW_SUPPLY_THRESHOLD.equals(key))
 		{
@@ -383,74 +376,56 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 		return true;
 	}
 
-	@Override
-	protected Dialog onCreateDialog(int id)
+	private void showLicensesDialog()
 	{
-		if(id == R.id.licenses_dialog)
+		String license;
+		InputStream is = null;
+
+		try
 		{
-			String license;
-			InputStream is = null;
+			final AssetManager aMgr = getResources().getAssets();
+			is = aMgr.open("licenses.html", AssetManager.ACCESS_BUFFER);
 
-			try
-			{
-				final AssetManager aMgr = getResources().getAssets();
-				is = aMgr.open("licenses.html", AssetManager.ACCESS_BUFFER);
-
-				license = Util.streamToString(is);
-			}
-			catch(IOException e)
-			{
-				Log.w(TAG, e);
-				license = "Licensed under the GNU GPLv3";
-			}
-			finally
-			{
-				Util.closeQuietly(is);
-			}
-
-			final WebView wv = new WebView(this);
-			wv.loadDataWithBaseURL("file", license, "text/html", null, null);
-
-			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
-			ab.setTitle(R.string._title_licenses);
-			ab.setView(wv);
-			ab.setPositiveButton(android.R.string.ok, null);
-
-			return ab.create();
+			license = Util.streamToString(is);
 		}
-		else if(id == R.id.preference_reset_dialog)
+		catch(IOException e)
 		{
-			final AlertDialog.Builder ab= new AlertDialog.Builder(this);
-			ab.setIcon(android.R.drawable.ic_dialog_alert);
-			ab.setTitle(R.string._title_restore_default_settings);
-			ab.setNegativeButton(android.R.string.cancel, null);
-			/////////////////////
-			ab.setPositiveButton(android.R.string.ok, new OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					Settings.clear();
-				}
-			});
-
-			return ab.create();
+			Log.w(TAG, e);
+			license = "Licensed under the GNU GPLv3";
+		}
+		finally
+		{
+			Util.closeQuietly(is);
 		}
 
-		return super.onCreateDialog(id);
+		final WebView wv = new WebView(getActivity());
+		wv.loadDataWithBaseURL("file", license, "text/html", null, null);
+
+		final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+		ab.setTitle(R.string._title_licenses);
+		ab.setView(wv);
+		ab.setPositiveButton(android.R.string.ok, null);
+
+		ab.show();
 	}
 
-	@Override
-	protected Intent getHomeButtonIntent()
+	private void showPreferenceResetDialog()
 	{
-		Intent intent = new Intent(getBaseContext(), DrugListActivity.class);
-		intent.setAction(Intent.ACTION_MAIN);
-		return intent;
-	}
+		final AlertDialog.Builder ab= new AlertDialog.Builder(getActivity());
+		ab.setIcon(android.R.drawable.ic_dialog_alert);
+		ab.setTitle(R.string._title_restore_default_settings);
+		ab.setNegativeButton(android.R.string.cancel, null);
+		/////////////////////
+		ab.setPositiveButton(android.R.string.ok, new OnClickListener() {
 
-	@Override
-	protected boolean shouldHideOptionsMenuInSubscreens() {
-		return true;
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				Settings.clear();
+			}
+		});
+
+		ab.show();
 	}
 
 	private void updateLowSupplyThresholdPreferenceSummary()
@@ -700,7 +675,7 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 					catch(ZipException e)
 					{
 						Log.w(TAG, e);
-						Toast.makeText(PreferencesActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+						Toast.makeText(getActivity(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
 					}
 					return true;
 				}

@@ -24,26 +24,23 @@ package at.jclehner.rxdroid;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
-
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -52,7 +49,7 @@ import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
-public class DrugListPagerFragment extends SherlockFragment implements DatePickerDialog.OnDateSetListener,
+public class DrugListPagerFragment extends Fragment implements DatePickerDialog.OnDateSetListener,
 		NotificationReceiver.OnDoseTimeChangeListener
 {
 	private class MyPagerAdapter extends FragmentStatePagerAdapter
@@ -180,7 +177,7 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 			case R.id.menuitem_add:
 			{
 				Intent intent = new Intent(Intent.ACTION_INSERT);
-				intent.setClass(getActivity(), DrugEditActivity.class);
+				intent.setClass(getActivity(), DrugEditFragment.class);
 				startActivity(intent);
 				return true;
 			}
@@ -272,8 +269,7 @@ public class DrugListPagerFragment extends SherlockFragment implements DatePicke
 		if(mDtInfo.activeDate().equals(mDisplayedDate))
 			Util.applyStyle(dateStr, new UnderlineSpan());
 
-		getSherlockActivity().getSupportActionBar().setSubtitle(dateStr);
-		//getSherlockActivity().supportInvalidateOptionsMenu();
+		((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(dateStr);
 	}
 
 	private final ViewPager.OnPageChangeListener mPageListener = new ViewPager.SimpleOnPageChangeListener()

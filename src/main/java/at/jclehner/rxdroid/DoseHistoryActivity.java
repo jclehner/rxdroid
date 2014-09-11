@@ -33,7 +33,12 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Drug;
@@ -41,12 +46,6 @@ import at.jclehner.rxdroid.ui.DoseLogFragment;
 import at.jclehner.rxdroid.ui.ExpandableListFragment;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.Extras;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
 /*
  * TODO
@@ -76,7 +75,7 @@ import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
  *
  */
 
-public class DoseHistoryActivity extends SherlockFragmentActivity implements
+public class DoseHistoryActivity extends ActionBarActivity implements
 		SystemEventReceiver.OnSystemTimeChangeListener
 {
 	private Drug mDrug;
@@ -110,7 +109,7 @@ public class DoseHistoryActivity extends SherlockFragmentActivity implements
 	{
 		MenuItem item = menu.add(0, MENU_VIEW, 0, R.string._title_view)
 				.setIcon(R.drawable.ic_action_eye_white)
-				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
 					@Override
 					public boolean onMenuItemClick(MenuItem item)
@@ -121,7 +120,7 @@ public class DoseHistoryActivity extends SherlockFragmentActivity implements
 					}
 				});
 
-		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
 		return super.onCreateOptionsMenu(menu);
 	}

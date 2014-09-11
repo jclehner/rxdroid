@@ -69,7 +69,7 @@
 		    android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
 
-		<activity android:name=".DrugEditActivity"
+		<activity android:name=".DrugEditActivity2"
 		    android:exported="false"
 		    android:windowSoftInputMode="adjustPan"		    
 			android:launchMode="singleTop"

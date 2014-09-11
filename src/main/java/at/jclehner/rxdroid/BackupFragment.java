@@ -30,18 +30,18 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 
 import net.lingala.zip4j.exception.ZipException;
 
@@ -210,7 +210,8 @@ public class BackupFragment extends LoaderListFragment<File>
 						return true;
 					}
 				});
-		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+		MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 	}
 
 	@Override

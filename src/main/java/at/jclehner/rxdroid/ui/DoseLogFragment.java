@@ -30,8 +30,12 @@ import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -56,12 +60,6 @@ import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Timer;
 import at.jclehner.rxdroid.util.Util;
-
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
 public class DoseLogFragment extends ExpandableListFragment
 		implements OnGroupCollapseExpandListener
@@ -142,7 +140,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		if(!isAllCollapsed())
 		{
 			if(++mCollapsedCount == mGroupedEvents.size())
-				invalidateOptionsMenu();
+				getActivity().supportInvalidateOptionsMenu();
 		}
 	}
 
@@ -152,7 +150,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		if(mCollapsedCount != 0)
 		{
 			if(--mCollapsedCount == 0)
-				invalidateOptionsMenu();
+				getActivity().supportInvalidateOptionsMenu();
 		}
 	}
 
@@ -164,7 +162,7 @@ public class DoseLogFragment extends ExpandableListFragment
 
 		MenuItem item = menu.add(0, MENU_COLLAPSE_EXPAND, 0, titleResId)
 		.setIcon(Theme.getResourceAttribute(iconAttr))
-		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item)
@@ -184,13 +182,9 @@ public class DoseLogFragment extends ExpandableListFragment
 		});
 
 		item.setVisible(!getListAdapter().isEmpty());
-		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		super.onCreateOptionsMenu(menu, inflater);
-	}
-
-	private void invalidateOptionsMenu() {
-		((SherlockFragmentActivity) getActivity()).invalidateOptionsMenu();
 	}
 
 	private boolean isAllCollapsed() {

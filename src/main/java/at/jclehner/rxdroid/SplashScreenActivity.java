@@ -41,6 +41,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
@@ -61,9 +62,7 @@ import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-public class SplashScreenActivity extends SherlockFragmentActivity implements DialogLike.OnButtonClickListener
+public class SplashScreenActivity extends ActionBarActivity implements DialogLike.OnButtonClickListener
 {
 	public class DatabaseStatusReceiver extends BroadcastReceiver
 	{

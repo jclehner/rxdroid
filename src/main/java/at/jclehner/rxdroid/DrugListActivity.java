@@ -41,6 +41,7 @@ import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v7.app.ActionBarActivity;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
@@ -50,6 +51,9 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -86,16 +90,12 @@ import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.widget.AutoDragSortListView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.github.espiandev.showcaseview.ShowcaseView;
 import com.github.espiandev.showcaseview.ShowcaseView.OnShowcaseEventListener;
 import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
 import com.mobeta.android.dslv.DragSortListView;
 
-public class DrugListActivity extends SherlockFragmentActivity implements OnLongClickListener,
+public class DrugListActivity extends ActionBarActivity implements OnLongClickListener,
 		OnDateSetListener, OnSharedPreferenceChangeListener, ViewFactory, OnSystemTimeChangeListener
 {
 	private static final String TAG = DrugListActivity.class.getSimpleName();
@@ -279,7 +279,7 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			case R.id.menuitem_add:
 			{
 				Intent intent = new Intent(Intent.ACTION_INSERT);
-				intent.setClass(this, DrugEditActivity.class);
+				intent.setClass(this, DrugEditFragment.class);
 				startActivity(intent);
 				return true;
 			}
@@ -377,9 +377,9 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 		});
 
 
-		final Intent editIntent = new Intent(this, DrugEditActivity.class);
+		final Intent editIntent = new Intent(this, DrugEditFragment.class);
 		editIntent.setAction(Intent.ACTION_EDIT);
-		editIntent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, drug.getId());
+		editIntent.putExtra(DrugEditActivity2.EXTRA_DRUG_ID, drug.getId());
 		menu.add(0, CMENU_EDIT_DRUG, 0, R.string._title_edit_drug).setIntent(editIntent);
 
 		if(BuildConfig.DEBUG)
@@ -410,10 +410,10 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 	public void onDrugNameClick(View view)
 	{
 		Intent intent = new Intent(Intent.ACTION_EDIT);
-		intent.setClass(this, DrugEditActivity.class);
+		intent.setClass(this, DrugEditFragment.class);
 
 		Drug drug = Drug.get((Integer) view.getTag(TAG_DRUG_ID));
-		intent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, drug.getId());
+		intent.putExtra(DrugEditActivity2.EXTRA_DRUG_ID, drug.getId());
 		intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 
 		//startActivityForResult(intent, 0);

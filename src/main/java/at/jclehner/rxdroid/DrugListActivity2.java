@@ -21,19 +21,16 @@
 
 package at.jclehner.rxdroid;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.DateTime;
 
-public class DrugListActivity2 extends SherlockFragmentActivity
+public class DrugListActivity2 extends ActionBarActivity
 {
 	@Override
 	protected void onCreate(Bundle savedInstanceState)

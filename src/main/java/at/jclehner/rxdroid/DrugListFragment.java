@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -46,7 +45,6 @@ import java.util.List;
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.androidutils.RefString;
 import at.jclehner.rxdroid.db.Database;
-import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
@@ -360,9 +358,9 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 		}
 		else if(view.getId() == R.id.drug_name)
 		{
-			Intent intent = new Intent(getActivity(), DrugEditActivity.class);
+			Intent intent = new Intent(getActivity(), DrugEditFragment.class);
 			intent.setAction(Intent.ACTION_EDIT);
-			intent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, (Integer) view.getTag());
+			intent.putExtra(DrugEditActivity2.EXTRA_DRUG_ID, (Integer) view.getTag());
 
 			startActivity(intent);
 		}
@@ -463,8 +461,8 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 			public boolean onMenuItemClick(MenuItem menuItem)
 			{
 				final Intent intent = new Intent(Intent.ACTION_EDIT);
-				intent.setClass(getActivity(), DrugEditActivity.class);
-				intent.putExtra(DrugEditActivity.EXTRA_DRUG_ID, drug.getId());
+				intent.setClass(getActivity(), DrugEditFragment.class);
+				intent.putExtra(DrugEditActivity2.EXTRA_DRUG_ID, drug.getId());
 				startActivity(intent);
 				return true;
 			}

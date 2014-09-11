@@ -23,23 +23,20 @@ package at.jclehner.androidutils;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Environment;
+import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.actionbarsherlock.app.SherlockListFragment;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class LoaderListFragment<T> extends SherlockListFragment implements LoaderManager.LoaderCallbacks<List<LoaderListFragment.LLFLoader.ItemHolder<T>>>
+public abstract class LoaderListFragment<T> extends ListFragment implements LoaderManager.LoaderCallbacks<List<LoaderListFragment.LLFLoader.ItemHolder<T>>>
 {
 	public static abstract class LLFLoader<T> extends AsyncTaskLoader<List<? extends LLFLoader.ItemHolder<T>>>
 	{

@@ -22,30 +22,31 @@
  */
 -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto">
 	
     <item android:id="@+id/menuitem_take_all"
 	    android:title="@string/_title_take_all_doses"
 	    android:icon="@drawable/ic_action_tick"
-	    android:showAsAction="always"
+			app:showAsAction="always"
 	/>
     	
 	<item android:id="@+id/menuitem_add"
 		android:title="@string/_title_add"
 		android:icon="@drawable/ic_menu_new"
-		android:showAsAction="always"		
+			app:showAsAction="always"
 	/>	
 	
 	<item android:id="@+id/menuitem_toggle_filtering"
 		android:title="@string/_title_show_all"
 		android:icon="@drawable/ic_action_eye_white"
-		android:showAsAction="always"
+			app:showAsAction="always"
 	/>
 	
 	<item android:id="@+id/menuitem_patient"
 		android:title="@string/_title_patient"
 		android:icon="@drawable/ic_menu_patient"
-		android:showAsAction="always"
+			app:showAsAction="always"
 		android:visible="false"
 	/>
 		
@@ -53,13 +54,13 @@
 		android:title="@string/_title_select_date"
 		android:icon="@drawable/ic_menu_calendar_light"
 		android:visible="@bool/is_drug_list_activity_date_menu_item_visible"
-		android:showAsAction="always"
+			app:showAsAction="always"
 	/>
 	
 	<item android:id="@+id/menuitem_preferences"
 		android:title="@string/_title_preferences"
 		android:icon="@drawable/ic_action_settings"
-		android:showAsAction="always"
+			app:showAsAction="always"
 	/>
 
 </menu>

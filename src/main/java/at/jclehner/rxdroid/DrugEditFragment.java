@@ -45,8 +45,15 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceScreen;
+import android.support.v4.preference.PreferenceFragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -68,36 +75,23 @@ import at.jclehner.rxdroid.preferences.DosePreference;
 import at.jclehner.rxdroid.preferences.DrugNamePreference2;
 import at.jclehner.rxdroid.preferences.FractionPreference;
 import at.jclehner.rxdroid.util.CollectionUtils;
-import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.SimpleBitSet;
 import at.jclehner.rxdroid.util.Util;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 
 /**
  * Edit a drug's database entry.
  * @author Joseph Lehner
  *
  */
-
-@SuppressWarnings("deprecation")
-public class DrugEditActivity extends SherlockPreferenceActivity implements OnPreferenceClickListener
+public class DrugEditFragment extends PreferenceFragment implements OnPreferenceClickListener
 {
-	//public static final String EXTRA_DRUG = "drug";
-	public static final String EXTRA_DRUG_ID = "drug_id";
-	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
-	public static final String EXTRA_DISALLOW_DELETE = "disallow_delete";
-
 	private static final int MENU_DELETE = 0;
 
 	//private static final String ARG_DRUG = "drug";
 
-	private static final String TAG = DrugEditActivity.class.getSimpleName();
+	private static final String TAG = DrugEditFragment.class.getSimpleName();
 	private static final boolean LOGV = true;
 
 	private DrugWrapper mWrapper;
@@ -108,10 +102,9 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 	private boolean mFocusOnCurrentSupply = false;
 
-	@Override
 	public void onBackPressed()
 	{
-		final Intent intent = getIntent();
+		final Intent intent = getActivity().getIntent();
 		final String action = intent.getAction();
 
 		final Drug drug = mWrapper.get();
@@ -119,7 +112,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 		if(drugName == null || drugName.length() == 0)
 		{
-			showDialog(R.id.drug_discard_dialog);
+			showDrugDiscardDialog();
 			return;
 		}
 
@@ -129,17 +122,17 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			{
 				if(LOGV) Util.dumpObjectMembers(TAG, Log.VERBOSE, drug, "drug 2");
 
-				showDialog(R.id.drug_save_changes_dialog);
+				showSaveChangesDialog();
 				return;
 			}
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
 		{
 			Database.create(drug, 0);
-			Toast.makeText(getApplicationContext(), getString(R.string._toast_saved), Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), getString(R.string._toast_saved), Toast.LENGTH_SHORT).show();
 		}
 
-		finish();
+		getActivity().finish();
 	}
 
 	@Override
@@ -147,8 +140,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 	{
 		if(preference.getKey().equals("delete"))
 		{
-			showDialog(R.id.drug_delete_dialog);
-
+			showDrugDeleteDialog();
 			return true;
 		}
 
@@ -157,29 +149,26 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 	@TargetApi(11)
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	public void onCreate(Bundle savedInstanceState)
 	{
-		Components.onCreateActivity(this, 0);
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.empty);
 
-		final ActionBar ab = getSupportActionBar();
+		final ActionBar ab = ((ActionBarActivity) getActivity()).getSupportActionBar();
 		ab.setDisplayShowHomeEnabled(true);
 		ab.setDisplayHomeAsUpEnabled(true);
 
 		final ListView list = getListView();
 		if(list != null)
-			list.setSelector(Theme.getResourceAttribute(com.actionbarsherlock.R.attr.selectableItemBackground));
+			list.setSelector(Theme.getResourceAttribute(R.attr.selectableItemBackground));
 	}
 
 	@Override
-	protected void onResume()
+	public void onResume()
 	{
 		super.onResume();
 
-		Components.onResumeActivity(this, 0);
-
-		Intent intent = getIntent();
+		Intent intent = getActivity().getIntent();
 		String action = intent.getAction();
 
 		Drug drug = null;
@@ -189,7 +178,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 
 		if(Intent.ACTION_EDIT.equals(action))
 		{
-			final int drugId = intent.getIntExtra(EXTRA_DRUG_ID, -1);
+			final int drugId = intent.getIntExtra(DrugEditActivity2.EXTRA_DRUG_ID, -1);
 			if(drugId == -1)
 				throw new IllegalStateException("ACTION_EDIT requires EXTRA_DRUG_ID");
 
@@ -201,16 +190,16 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			mDrugHash = drug.hashCode();
 			mIsEditing = true;
 
-			if(intent.getBooleanExtra(EXTRA_FOCUS_ON_CURRENT_SUPPLY, false))
+			if(intent.getBooleanExtra(DrugEditActivity2.EXTRA_FOCUS_ON_CURRENT_SUPPLY, false))
 				mFocusOnCurrentSupply = true;
 
-			setTitle(drug.getName());
+			getActivity().setTitle(drug.getName());
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
 		{
 			mIsEditing = false;
 			mWrapper.set(new Drug());
-			setTitle(R.string._title_new_drug);
+			getActivity().setTitle(R.string._title_new_drug);
 		}
 		else
 			throw new IllegalArgumentException("Unhandled action " + action);
@@ -233,34 +222,21 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 			performPreferenceClick("currentSupply");
 		}
 
-		supportInvalidateOptionsMenu();
+		getActivity().supportInvalidateOptionsMenu();
 	}
 
 	@Override
-	protected void onPause()
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-		super.onStop();
-		Components.onPauseActivity(this, 0);
-	}
-
-	@TargetApi(11)
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		if(mIsEditing && !getIntent().getBooleanExtra(EXTRA_DISALLOW_DELETE, false))
+		if(mIsEditing && !getActivity().getIntent().getBooleanExtra(DrugEditActivity2.EXTRA_DISALLOW_DELETE, false))
 		{
 			MenuItem item = menu.add(0, MENU_DELETE, 0, R.string._title_delete)
 					.setIcon(R.drawable.ic_action_delete_white);
 
-			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 		}
 
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		return mIsEditing;
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	@Override
@@ -277,7 +253,7 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		}
 		else if(itemId == MENU_DELETE)
 		{
-			showDialog(R.id.drug_delete_dialog);
+			showDrugDeleteDialog();
 			return true;
 		}
 
@@ -293,100 +269,71 @@ public class DrugEditActivity extends SherlockPreferenceActivity implements OnPr
 		// thus not restoring their original state.
 	}
 
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		return onCreateDialog(id, null);
+	private void showDrugDeleteDialog()
+	{
+		final String message = getString(R.string._title_delete_drug, mWrapper.get().getName())
+				+ " " + getString(R.string._msg_delete_drug);
+
+		final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+
+		ab.setIcon(android.R.drawable.ic_dialog_alert);
+		ab.setMessage(message);
+		ab.setNegativeButton(android.R.string.no, null);
+		ab.setPositiveButton(android.R.string.yes, new OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				Database.delete(mWrapper.get());
+				Toast.makeText(getActivity(), R.string._toast_deleted, Toast.LENGTH_SHORT).show();
+				getActivity().finish();
+			}
+		});
+
+		ab.show();
 	}
 
-	@Override
-	protected Dialog onCreateDialog(int id, Bundle args)
+	private void showDrugDiscardDialog()
 	{
-		if(id == R.id.drug_delete_dialog)
-		{
-			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
-			ab.setIcon(android.R.drawable.ic_dialog_alert);
-			ab.setMessage(R.string._msg_delete_drug);
+		final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+		ab.setMessage(R.string._msg_err_empty_drug_name);
+		ab.setNegativeButton(android.R.string.cancel, null);
+		ab.setPositiveButton(android.R.string.ok, new OnClickListener() {
 
-			ab.setNegativeButton(android.R.string.no, null);
-			ab.setPositiveButton(android.R.string.yes, null);
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				getActivity().finish();
+			}
+		});
 
-			return ab.create();
-		}
-		else if(id == R.id.drug_discard_dialog)
-		{
-			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
-			//builder.setTitle(R.string._title_warning);
-			//ab.setIcon(android.R.drawable.ic_dialog_alert);
-			ab.setMessage(R.string._msg_err_empty_drug_name);
-			ab.setNegativeButton(android.R.string.cancel, null);
-			ab.setPositiveButton(android.R.string.ok, new OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					finish();
-				}
-			});
-
-			return ab.create();
-		}
-		else if(id == R.id.drug_save_changes_dialog)
-		{
-			final AlertDialog.Builder ab = new AlertDialog.Builder(this);
-			//ab.setTitle(R.string._title_save_chanes);
-			//ab.setIcon(android.R.drawable.ic_dialog_info);
-			ab.setMessage(R.string._msg_save_drug_changes);
-
-			ab.setNegativeButton(R.string._btn_discard, null);
-			ab.setPositiveButton(R.string._btn_save, null);
-			return ab.create();
-		}
-
-		return super.onCreateDialog(id, args);
+		ab.show();
 	}
 
-	@Override
-	protected void onPrepareDialog(int id, Dialog dialog, Bundle args)
+	private void showSaveChangesDialog()
 	{
-		if(id == R.id.drug_delete_dialog)
-		{
-			final String message = getString(R.string._title_delete_drug, mWrapper.get().getName())
-					+ " " + getString(R.string._msg_delete_drug);
+		final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+		ab.setMessage(R.string._msg_save_drug_changes);
 
-			final AlertDialog alert = (AlertDialog) dialog;
-			alert.setMessage(message);
-			alert.setButton(Dialog.BUTTON_POSITIVE, getString(android.R.string.yes), new OnClickListener() {
+		final DialogInterface.OnClickListener l = new DialogInterface.OnClickListener() {
 
-				@Override
-				public void onClick(DialogInterface dialog, int which)
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				if(which == Dialog.BUTTON_POSITIVE)
 				{
-					Database.delete(mWrapper.get());
-					Toast.makeText(getApplicationContext(), R.string._toast_deleted, Toast.LENGTH_SHORT).show();
-					finish();
+					Database.update(mWrapper.get());
+					Toast.makeText(getActivity(), R.string._toast_saved, Toast.LENGTH_SHORT).show();
 				}
-			});
-		}
-		else if(id == R.id.drug_save_changes_dialog)
-		{
-			final DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
 
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					if(which == Dialog.BUTTON_POSITIVE)
-					{
-						Database.update(mWrapper.get());
-						Toast.makeText(getApplicationContext(), R.string._toast_saved, Toast.LENGTH_SHORT).show();
-					}
+				getActivity().finish();
+			}
+		};
 
-					finish();
-				}
-			};
+		ab.setNegativeButton(R.string._btn_discard, l);
+		ab.setPositiveButton(R.string._btn_save, l);
 
-			final AlertDialog alert = (AlertDialog) dialog;
-			alert.setButton(Dialog.BUTTON_POSITIVE, getString(R.string._btn_save), onClickListener);
-			alert.setButton(Dialog.BUTTON_NEGATIVE, getString(R.string._btn_discard), onClickListener);
-		}
+		ab.show();
 	}
 
 	private void performPreferenceClick(String key)
