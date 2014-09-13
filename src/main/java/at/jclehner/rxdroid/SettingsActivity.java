@@ -395,7 +395,7 @@ public class SettingsActivity extends ActionBarActivity
 			wv.loadDataWithBaseURL("file", license, "text/html", null, null);
 
 			final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-			ab.setTitle(R.string._title_licenses);
+			//ab.setTitle(R.string._title_licenses);
 			ab.setView(wv);
 			ab.setPositiveButton(android.R.string.ok, null);
 

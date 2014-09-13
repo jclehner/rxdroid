@@ -1,6 +1,7 @@
 RxDroid
 =======
 
+<small>
 Copyright (C) 2011-2014 Joseph C. Lehner
 
 RxDroid is free software: you can redistribute it and/or modify
@@ -16,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
 
-### Additional Terms (Section 7, GNU GPLv3)
+**Additional Terms (Section 7, GNU GPLv3)**
 
 * Any propagation or conveyance of this program must include this
   copyright notice and these terms.
@@ -25,18 +26,18 @@ along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
   versions of the program must be marked as such and not identified
   as the original program.
 
-Artwork
-=======
+**Artwork**
 
 Unless otherwise stated, all artwork is licensed under a Creative
 Commons Attribution-NonCommercial-ShareAlike 3.0 license.
+</small>
 
 ---------------------------------------
 
-Third Party Works Included in RxDroid
-=====================================
+Third Party Works
+=================
 
-## Libraries
+#### Libraries
 
 * [ORMLite](http://ormlite.com) by Gray Watson
 * [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids) by
@@ -48,6 +49,6 @@ Third Party Works Included in RxDroid
   modified by Joseph C. Lehner
 * [ACRA](https://github.com/jclehner/acra) by Kevin Gaudin
 
-## Artwork
+#### Artwork
 
 * <tt>ic_pipette_*.png</tt>: based on [Outline Icons](http://www.iconarchive.com/show/outline-icons-by-designcontest.html)
