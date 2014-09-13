@@ -20,9 +20,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.SpannableString;
 import android.text.style.TypefaceSpan;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.webkit.WebView;
 import android.widget.Toast;
 
@@ -111,8 +108,6 @@ public class SettingsActivity extends ActionBarActivity
 			Settings.Keys.LOW_SUPPLY_THRESHOLD,
 			Settings.Keys.LANGUAGE
 		};
-
-		private static final int MENU_RESTORE_DEFAULTS = 0;
 
 		public static SettingsFragment newInstance(int preferenceResId)
 		{
@@ -264,37 +259,6 @@ public class SettingsActivity extends ActionBarActivity
 			updateLowSupplyThresholdPreferenceSummary();
 
 			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(getPreferenceScreen().getTitle());
-		}
-
-		@TargetApi(11)
-		@Override
-		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-		{
-			if(BuildConfig.DEBUG && false)
-			{
-				MenuItem item = menu.add(0, MENU_RESTORE_DEFAULTS, 0, R.string._title_factory_reset)
-						.setIcon(R.drawable.ic_action_undo);
-
-				item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
-
-			super.onCreateOptionsMenu(menu, inflater);
-		}
-
-		@Override
-		public boolean onOptionsItemSelected(MenuItem item)
-		{
-			switch(item.getItemId())
-			{
-				case MENU_RESTORE_DEFAULTS:
-					showPreferenceResetDialog();
-					return true;
-
-				default:
-					// ignore
-			}
-
-			return super.onOptionsItemSelected(item);
 		}
 
 		@Override
