@@ -28,8 +28,7 @@
 
     <style name="Theme.RxDroid.ButtonBar" parent="@android:style/Holo.Light.ButtonBar" />
     <style name="Theme.RxDroid.ButtonBar.Dark" parent="@android:style/Holo.ButtonBar" />
-    <!--
-    <style name="Theme.RxDroid.ButtonBarButton" parent="@android:style/Widget.Holo.Light.Button.Borderless" />
-    <style name="Theme.RxDroid.ButtonBarButton.Dark" parent="@android:style/Widget.Holo.Button.Borderless" />
-    -->
+
+	<style name="_ApiSpecificLightTheme" parent="Theme.AppCompat.Light.DarkActionBar" />
+	<style name="_ApiSpecificDarkTheme" parent="Theme.AppCompat" />
 </resources>

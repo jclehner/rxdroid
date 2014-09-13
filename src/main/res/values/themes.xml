@@ -23,7 +23,7 @@
 -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-	<style name="Theme.RxDroid" parent="_LightTheme">
+	<style name="Theme.RxDroid" parent="_ApiSpecificLightTheme">
 		<item name="drugIconTablet">@drawable/ic_drug_tablet_black</item>
 		<item name="drugIconTube">@drawable/ic_drug_tube_black</item>
 		<item name="drugIconGlass">@drawable/ic_drug_glass_black</item>
@@ -69,7 +69,6 @@
 		
 		<item name="android:windowAnimationStyle">@null</item>
 		<item name="android:alertDialogStyle">@style/Theme.RxDroid.Dialog</item>
-		<item name="android:listViewStyle">@style/ListViewStyle</item>
 		
 		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 
@@ -91,7 +90,7 @@
 		<item name="drugIconPipette">@drawable/ic_drug_pipette2_black</item>
 	</style>
 	
-	<style name="Theme.RxDroid.Dark" parent="_DarkTheme">
+	<style name="Theme.RxDroid.Dark" parent="_ApiSpecificDarkTheme">
 		<item name="drugIconTablet">@drawable/ic_drug_tablet_white</item>
 		<item name="drugIconTube">@drawable/ic_drug_tube_white</item>
         <item name="drugIconGlass">@drawable/ic_drug_glass_white</item>
@@ -136,7 +135,6 @@
         <item name="dividerColor">@color/list_divider_dark</item>
         
         <item name="android:windowAnimationStyle">@null</item>
-		<item name="android:listViewStyle">@style/ListViewStyle</item>
         <item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 
         <item name="buttonBarStyle">@style/Theme.RxDroid.ButtonBar.Dark</item>
@@ -195,10 +193,19 @@
 		<item name="android:textColor">?attr/textColorClickable</item>
 	</style>
 
-	<style name="ListViewStyle" parent="android:Widget.ListView">
+	<style name="ListViewStyleDark" parent="android:Widget.ListView">
 		<item name="android:listSelector">?selectableItemBackground</item>
 	</style>
 
-	<style name="_LightTheme" parent="Theme.AppCompat.Light.DarkActionBar" />
-	<style name="_DarkTheme" parent="Theme.AppCompat" />
+	<style name="ListViewStyleLight" parent="android:Widget.ListView.White">
+		<item name="android:listSelector">?selectableItemBackground</item>
+	</style>
+
+	<style name="_ApiSpecificLightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+		<item name="android:listViewStyle">@style/ListViewStyleLight</item>"
+	</style>
+
+	<style name="_ApiSpecificDarkTheme" parent="Theme.AppCompat">
+		<item name="android:listViewStyle">@style/ListViewStyleDark</item>"
+	</style>
 </resources>
