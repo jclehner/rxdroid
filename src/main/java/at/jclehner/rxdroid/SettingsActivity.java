@@ -402,25 +402,6 @@ public class SettingsActivity extends ActionBarActivity
 			ab.show();
 		}
 
-		private void showPreferenceResetDialog()
-		{
-			final AlertDialog.Builder ab= new AlertDialog.Builder(getActivity());
-			ab.setIcon(android.R.drawable.ic_dialog_alert);
-			ab.setTitle(R.string._title_restore_default_settings);
-			ab.setNegativeButton(android.R.string.cancel, null);
-			/////////////////////
-			ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					Settings.clear();
-				}
-			});
-
-			ab.show();
-		}
-
 		private void updateLowSupplyThresholdPreferenceSummary()
 		{
 			Preference p = findPreference(Settings.Keys.LOW_SUPPLY_THRESHOLD);

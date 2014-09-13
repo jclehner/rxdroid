@@ -21,7 +21,7 @@
 			android:title="@string/_title_compact_action_bar"
 			android:summary="@string/_summary_compact_action_bar"
 			android:defaultValue="@bool/pref_default_compact_action_bar"
-			android:enabled="@bool/pref_visibility_compact_action_bar"
+			android:enabled="false"
 			/>
 
 
@@ -29,6 +29,7 @@
 			android:title="@string/_title_use_pretty_fractions"
 			android:summary="@string/_summary_use_pretty_fractions"
 			android:defaultValue="@bool/pref_default_use_pretty_fractions"
+			android:enabled="false"
 			/>
 
 	<PreferenceCategory
@@ -44,6 +45,7 @@
 				android:title="@string/_title_skip_dose_dialog"
 				android:summary="@string/_summary_skip_dose_dialog"
 				android:defaultValue="false"
+				android:enabled="false"
 				/>
 
 		<CheckBoxPreference android:key="@string/key_show_supply_monitors"

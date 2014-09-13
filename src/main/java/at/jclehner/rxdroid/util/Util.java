@@ -605,8 +605,8 @@ public final class Util
 
 	public static String prettify(Fraction frac)
 	{
-		if(!Settings.getBoolean(Keys.USE_PRETTY_FRACTIONS, Settings.Defaults.USE_PRETTY_FRACTIONS))
-			return frac.toString();
+		/*if(!Settings.getBoolean(Keys.USE_PRETTY_FRACTIONS, Settings.Defaults.USE_PRETTY_FRACTIONS))
+			return frac.toString();*/
 
 		// Characters for fifths and sixths are available in the unicode specs,
 		// but not in the standard

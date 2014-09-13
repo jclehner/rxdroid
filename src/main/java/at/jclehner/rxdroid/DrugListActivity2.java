@@ -182,7 +182,8 @@ public class DrugListActivity2 extends ActionBarActivity
 		{
 			final int menuResId;
 
-			if(Settings.getBoolean(Settings.Keys.COMPACT_ACTION_BAR, Settings.Defaults.COMPACT_ACTION_BAR))
+			//if(Settings.getBoolean(Settings.Keys.COMPACT_ACTION_BAR, Settings.Defaults.COMPACT_ACTION_BAR))
+			if(true)
 				menuResId = R.menu.activity_drug_list_compact;
 			else
 			{
