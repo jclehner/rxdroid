@@ -31,6 +31,7 @@ import android.os.Environment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.PopupMenu;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -277,10 +278,9 @@ public class BackupFragment extends LoaderListFragment<File>
 		{
 			final BackupFileHolder file = (BackupFileHolder) v.getTag();
 
-			final PopupMenuCompatBuilder builder = new PopupMenuCompatBuilder(getActivity(), v);
-			builder.setMenuResId(R.menu.backup);
-			builder.setTitle(file.dateTime);
-			builder.setOnMenuItemClickListener(new PopupMenuCompatBuilder.OnMenuItemClickListener()
+			final PopupMenu pm = new PopupMenu(getActivity(), v);
+			pm.inflate(R.menu.backup);
+			pm.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
 			{
 				@Override
 				public boolean onMenuItemClick(android.view.MenuItem item)
@@ -326,7 +326,7 @@ public class BackupFragment extends LoaderListFragment<File>
 				}
 			});
 
-			builder.show();
+			pm.show();
 		}
 	};
 }
