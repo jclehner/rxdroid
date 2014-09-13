@@ -298,9 +298,8 @@ public class SettingsActivity extends ActionBarActivity
 			}
 			else if(Settings.Keys.VERSION.equals(key))
 			{
-				final Intent intent = new Intent(Intent.ACTION_SEND);
-				intent.setType("plain/text");
-				intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "josephclehner+rxdroid-feedback@gmail.com" });
+				final Intent intent = new Intent(Intent.ACTION_SENDTO);
+				intent.setData(Uri.fromParts("mailto", "josephclehner+rxdroid-feedback@gmail.com", null));
 				intent.putExtra(Intent.EXTRA_SUBJECT, "RxDroid");
 
 				try
