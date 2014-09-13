@@ -78,7 +78,7 @@
 
 	<Preference
 			android:title="@string/_title_database"
-			android:icon="?attr/iconWarning">
+			android:icon="?attr/iconStorage">
 		<intent
 				android:action="android.intent.action.VIEW"
 				android:targetPackage="at.jclehner.rxdroid"

@@ -22,12 +22,8 @@
  */
 -->
 
-<resources xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
-	xmlns:abs="http://schemas.android.com/apk/res/com.actionbarsherlock"
-	xmlns:scv="http://schemas.android.com/apk/res/com.github.espiandev.showcaseview"
->	
-	<style name="Theme.RxDroid" parent="Theme.AppCompat.Light.DarkActionBar">
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+	<style name="Theme.RxDroid" parent="_LightTheme">
 		<item name="drugIconTablet">@drawable/ic_drug_tablet_black</item>
 		<item name="drugIconTube">@drawable/ic_drug_tube_black</item>
 		<item name="drugIconGlass">@drawable/ic_drug_glass_black</item>
@@ -94,7 +90,7 @@
 		<item name="drugIconPipette">@drawable/ic_drug_pipette2_black</item>
 	</style>
 	
-	<style name="Theme.RxDroid.Dark" parent="Theme.AppCompat">
+	<style name="Theme.RxDroid.Dark" parent="_DarkTheme">
 		<item name="drugIconTablet">@drawable/ic_drug_tablet_white</item>
 		<item name="drugIconTube">@drawable/ic_drug_tube_white</item>
         <item name="drugIconGlass">@drawable/ic_drug_glass_white</item>
@@ -196,5 +192,14 @@
 	<style name="TextAppearance.Large.Clickable" parent="@android:style/TextAppearance.Large">
 		<item name="android:textColor">?attr/textColorClickable</item>
 	</style>
-	
+
+	<style name="_LightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+		<item name="android:colorPrimary">#ff5722</item>
+		<item name="android:colorPrimaryDark">#dd2c00</item>
+	</style>
+
+	<style name="_DarkTheme" parent="Theme.AppCompat">
+		<item name="android:colorPrimary">#ff5722</item>
+		<item name="android:colorPrimaryDark">#dd2c00</item>
+	</style>
 </resources>
