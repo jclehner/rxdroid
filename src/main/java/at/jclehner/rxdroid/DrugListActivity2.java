@@ -32,6 +32,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.PopupMenu;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
@@ -386,7 +387,8 @@ public class DrugListActivity2 extends ActionBarActivity
 					for(DoseView doseView : holder.doseViews)
 					{
 						doseView.setOnClickListener((View.OnClickListener) mFragment);
-						doseView.setOnCreateContextMenuListener(mFragment);
+						doseView.setOnLongClickListener((View.OnLongClickListener) mFragment);
+						//doseView.setOnCreateContextMenuListener(mFragment);
 					}
 
 					view.setTag(holder);
@@ -674,82 +676,83 @@ public class DrugListActivity2 extends ActionBarActivity
 					dialog.show(getFragmentManager(), "supply_edit_dialog");
 				}
 			}
+			else if(view instanceof DoseView)
+			{
+				final PopupMenu pm = new PopupMenu(getActivity(), view);
+				pm.inflate(R.menu.dose_view_context_menu);
+
+				final Menu menu = pm.getMenu();
+
+				final DoseView doseView = (DoseView) view;
+				final Drug drug = doseView.getDrug();
+				final int doseTime = doseView.getDoseTime();
+
+				if(doseView.wasDoseTaken())
+				{
+					menu.removeItem(R.id.menuitem_skip);
+					menu.findItem(R.id.menuitem_remove_dose).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+					{
+						@Override
+						public boolean onMenuItemClick(MenuItem menuItem)
+						{
+							final Fraction.MutableFraction dose = new Fraction.MutableFraction();
+							for(DoseEvent intake : Entries.findDoseEvents(drug, mDate, doseTime))
+							{
+								dose.add(intake.getDose());
+								Database.delete(intake);
+							}
+
+							drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
+							Database.update(drug);
+
+							return true;
+						}
+					});
+
+				}
+				else
+				{
+					menu.removeItem(R.id.menuitem_remove_dose);
+					menu.findItem(R.id.menuitem_skip).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+					{
+						@Override
+						public boolean onMenuItemClick(MenuItem menuItem)
+						{
+							Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
+							return true;
+						}
+					});
+				}
+
+				menu.findItem(R.id.menuitem_take).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+				{
+					@Override
+					public boolean onMenuItemClick(MenuItem menuItem)
+					{
+						// FIXME
+						doseView.performClick();
+						return true;
+					}
+				});
+
+				pm.show();
+
+				doseView.setConstantBackgroundResource(R.drawable.generic_pressed);
+				//doseView.setSelected(true);
+
+				pm.setOnDismissListener(new PopupMenu.OnDismissListener()
+				{
+					@Override
+					public void onDismiss(PopupMenu popupMenu)
+					{
+						doseView.setConstantBackgroundResource(0);
+						//doseView.setSelected(false);
+					}
+				});
+			}
+
 
 			return true;
-		}
-
-		@Override
-		public void onCreateContextMenu(ContextMenu menu, final View v, ContextMenu.ContextMenuInfo menuInfo)
-		{
-			new MenuInflater(getActivity()).inflate(R.menu.dose_view_context_menu, menu);
-
-			final DoseView doseView = (DoseView) v;
-			final Drug drug = doseView.getDrug();
-			final int doseTime = doseView.getDoseTime();
-
-			//menu.setHeaderIcon(Util.getDrugIconDrawable(drug.getIcon()));
-			menu.setHeaderTitle(drug.getName());
-
-			if(doseView.wasDoseTaken())
-			{
-				menu.removeItem(R.id.menuitem_skip);
-				menu.findItem(R.id.menuitem_remove_dose).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
-				{
-					@Override
-					public boolean onMenuItemClick(MenuItem menuItem)
-					{
-						final Fraction.MutableFraction dose = new Fraction.MutableFraction();
-						for(DoseEvent intake : Entries.findDoseEvents(drug, mDate, doseTime))
-						{
-							dose.add(intake.getDose());
-							Database.delete(intake);
-						}
-
-						drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
-						Database.update(drug);
-
-						return true;
-					}
-				});
-
-			}
-			else
-			{
-				menu.removeItem(R.id.menuitem_remove_dose);
-				menu.findItem(R.id.menuitem_skip).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
-				{
-					@Override
-					public boolean onMenuItemClick(MenuItem menuItem)
-					{
-						Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
-						return true;
-					}
-				});
-			}
-
-			menu.findItem(R.id.menuitem_take).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
-			{
-				@Override
-				public boolean onMenuItemClick(MenuItem menuItem)
-				{
-					// FIXME
-					doseView.performClick();
-					return true;
-				}
-			});
-
-			menu.findItem(R.id.menuitem_edit).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
-			{
-				@Override
-				public boolean onMenuItemClick(MenuItem menuItem)
-				{
-					final Intent intent = new Intent(Intent.ACTION_EDIT);
-					intent.setClass(getActivity(), DrugEditFragment.class);
-					intent.putExtra(DrugEditActivity2.EXTRA_DRUG_ID, drug.getId());
-					startActivity(intent);
-					return true;
-				}
-			});
 		}
 
 		@Override

@@ -62,6 +62,8 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	private static final String TAG = DoseView.class.getSimpleName();
 	private static final boolean LOGV = false;
 
+	private static final boolean USE_BACKGROUND_HACK = true;
+
 	private static final int[] DOSE_TIME_DRAWABLES = {
 			R.drawable.ic_morning,
 			R.drawable.ic_noon,
@@ -78,6 +80,8 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	private final TextView mDoseText;
 	private final ImageView mDoseTimeIcon;
 
+
+	private boolean mIsConstantBackground = false;
 
 	private int mDoseTime = -1;
 
@@ -98,6 +102,9 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		super(context, attrs);
 
 		LayoutInflater.from(context).inflate(R.layout.dose_view, this, true);
+
+		if(!USE_BACKGROUND_HACK)
+			setBackgroundResource(Theme.getResourceAttribute(R.attr.selectableItemBackground));
 
 		mIntakeStatus = (ImageView) findViewById(R.id.icon_intake_status);
 		mDoseText = (TextView) findViewById(R.id.text_dose);
@@ -231,6 +238,13 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		mDoseText.setEnabled(!dimmed);
 	}
 
+	public void setConstantBackgroundResource(int resId)
+	{
+		mIsConstantBackground = resId != 0;
+		setBackgroundResource(resId);
+		setPadding(0, 0, 0, 0);
+	}
+
 	@Override
 	public void setEnabled(boolean enabled)
 	{
@@ -342,6 +356,9 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	private void changeBackground(int resId)
 	{
+		if(!USE_BACKGROUND_HACK || mIsConstantBackground)
+			return;
+
 		setBackgroundResource(resId);
 		setPadding(0, 0, 0, 0);
 	}
