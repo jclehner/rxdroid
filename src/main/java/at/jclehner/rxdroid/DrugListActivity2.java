@@ -25,6 +25,7 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -313,12 +314,20 @@ public class DrugListActivity2 extends ActionBarActivity
 		private void updateActionBarDate()
 		{
 			final SpannableString dateStr = new SpannableString(DateTime.toNativeDate(mDisplayedDate));
-			Util.applyStyle(dateStr, new RelativeSizeSpan(0.75f));
 
 			if(mDtInfo.activeDate().equals(mDisplayedDate))
 				Util.applyStyle(dateStr, new UnderlineSpan());
 
-			((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(dateStr);
+			if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT)
+			{
+				Util.applyStyle(dateStr, new RelativeSizeSpan(0.75f));
+				((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(dateStr);
+			}
+			else
+			{
+				((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(dateStr);
+			}
+
 		}
 
 		private final ViewPager.OnPageChangeListener mPageListener = new ViewPager.SimpleOnPageChangeListener()
