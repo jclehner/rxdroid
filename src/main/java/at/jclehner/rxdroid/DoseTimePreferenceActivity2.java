@@ -130,8 +130,6 @@ public class DoseTimePreferenceActivity2 extends ActionBarActivity
 				public boolean onMenuItemClick(MenuItem item)
 				{
 					final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-					ab.setIcon(android.R.drawable.ic_dialog_alert);
-					ab.setTitle(R.string._title_warning);
 					ab.setMessage(R.string._title_restore_default_settings);
 					ab.setNegativeButton(android.R.string.cancel, null);
 					/////////////////////
