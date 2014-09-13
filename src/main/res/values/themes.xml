@@ -196,10 +196,12 @@
 	<style name="_LightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
 		<item name="android:colorPrimary">#ff5722</item>
 		<item name="android:colorPrimaryDark">#dd2c00</item>
+		<item name="android:colorAccent">#ffffa70b</item>
 	</style>
 
 	<style name="_DarkTheme" parent="Theme.AppCompat">
 		<item name="android:colorPrimary">#ff5722</item>
 		<item name="android:colorPrimaryDark">#dd2c00</item>
+		<item name="android:colorAccent">#ffffa70b</item>
 	</style>
 </resources>

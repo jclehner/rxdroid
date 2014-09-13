@@ -153,10 +153,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 	{
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.empty);
-
-		final ActionBar ab = ((ActionBarActivity) getActivity()).getSupportActionBar();
-		ab.setDisplayShowHomeEnabled(true);
-		ab.setDisplayHomeAsUpEnabled(true);
+		setHasOptionsMenu(true);
 
 		//final ListView list = getListView();
 		//if(list != null)

@@ -314,8 +314,8 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 
 		if(!Intent.ACTION_VIEW.equals(getIntent().getAction()))
 		{
-			getSupportActionBar().setDisplayShowHomeEnabled(true);
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			//getSupportActionBar().setDisplayShowHomeEnabled(true);
+			//getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 			if(Backup.StorageStateListener.isReadable(storageState))
 			{

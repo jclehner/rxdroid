@@ -443,7 +443,7 @@ public class DrugListActivity2 extends ActionBarActivity
 			if(doseView.wasDoseTaken())
 			{
 				menu.removeItem(R.id.menuitem_skip);
-				menu.getItem(R.id.menuitem_remove_dose).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+				menu.findItem(R.id.menuitem_remove_dose).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
 				{
 					@Override
 					public boolean onMenuItemClick(MenuItem menuItem)
@@ -466,7 +466,7 @@ public class DrugListActivity2 extends ActionBarActivity
 			else
 			{
 				menu.removeItem(R.id.menuitem_remove_dose);
-				menu.getItem(R.id.menuitem_skip).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+				menu.findItem(R.id.menuitem_skip).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
 				{
 					@Override
 					public boolean onMenuItemClick(MenuItem menuItem)
@@ -477,7 +477,7 @@ public class DrugListActivity2 extends ActionBarActivity
 				});
 			}
 
-			menu.getItem(R.id.menuitem_take).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+			menu.findItem(R.id.menuitem_take).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
 			{
 				@Override
 				public boolean onMenuItemClick(MenuItem menuItem)
@@ -488,7 +488,7 @@ public class DrugListActivity2 extends ActionBarActivity
 				}
 			});
 
-			menu.getItem(R.id.menuitem_edit).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+			menu.findItem(R.id.menuitem_edit).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
 			{
 				@Override
 				public boolean onMenuItemClick(MenuItem menuItem)

@@ -1,7 +1,9 @@
 package at.jclehner.rxdroid;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.Menu;
 
 import at.jclehner.rxdroid.util.Components;
@@ -24,7 +26,7 @@ public class DrugEditActivity2 extends ActionBarActivity
 		if(savedInstanceState == null)
 		{
 			getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
-					new DrugEditFragment()).commit();
+					new DrugEditFragment(), "content").commit();
 		}
 	}
 
@@ -33,5 +35,18 @@ public class DrugEditActivity2 extends ActionBarActivity
 	{
 		Components.onResumeActivity(this, 0);
 		super.onResume();
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+		if(keyCode == KeyEvent.KEYCODE_BACK)
+		{
+			final DrugEditFragment f = (DrugEditFragment) getSupportFragmentManager().findFragmentByTag("content");
+			f.onBackPressed();
+			return true;
+		}
+
+		return super.onKeyDown(keyCode, event);
 	}
 }
