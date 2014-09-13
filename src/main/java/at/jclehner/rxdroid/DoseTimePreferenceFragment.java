@@ -39,7 +39,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 
-public class DoseTimePreferenceFragment extends PreferenceFragment
+public class DoseTimePreferenceFragment extends PreferenceFragment implements View.OnClickListener
 {
 	private boolean mIsFirstLaunch;
 
@@ -47,7 +47,7 @@ public class DoseTimePreferenceFragment extends PreferenceFragment
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
+		setHasOptionsMenu(true);
 		mIsFirstLaunch = getActivity().getIntent().getBooleanExtra(DrugEditActivity2.EXTRA_IS_FIRST_LAUNCH, false);
 		addPreferencesFromResource(R.xml.dose_times);
 	}
@@ -56,7 +56,10 @@ public class DoseTimePreferenceFragment extends PreferenceFragment
 	public View onCreateView(LayoutInflater inflater, ViewGroup root, Bundle paramBundle)
 	{
 		if(mIsFirstLaunch)
-			return inflater.inflate(R.layout.activity_dose_time_settings, root, false);
+		{
+			final View v = inflater.inflate(R.layout.activity_dose_time_settings, root, false);
+			v.findViewById(R.id.btn_save).setOnClickListener(this);
+		}
 
 		return super.onCreateView(inflater, root, paramBundle);
 	}
@@ -145,7 +148,7 @@ public class DoseTimePreferenceFragment extends PreferenceFragment
 			}
 		});
 
-		if(Version.SDK_IS_PRE_HONEYCOMB && true)
+		if(Version.SDK_IS_PRE_HONEYCOMB)
 		{
 			item.setIcon(R.drawable.ic_action_undo);
 			MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
@@ -154,7 +157,8 @@ public class DoseTimePreferenceFragment extends PreferenceFragment
 			MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_NEVER);
 	}
 
-	public void onSaveButtonClicked(View view)
+	@Override
+	public void onClick(View v)
 	{
 		Settings.putBoolean(Settings.Keys.IS_FIRST_LAUNCH, false);
 

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * RxDroid - A Medication Reminder
+ * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ *
+ *
+ * RxDroid is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version. Additional terms apply (see LICENSE).
+ *
+ * RxDroid is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
+-->
+
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
+  android:title="@string/_title_preferences"
+  android:orderingFromXml="true"  
+>
+	
+	<!-- Times -->
+
+	<Preference
+		android:title="@string/_title_prefscreen_times"
+		android:icon="?attr/iconTime"
+	>
+		<intent 
+			android:action="android.intent.action.VIEW"
+			android:targetPackage="at.jclehner.rxdroid"
+			android:targetClass="at.jclehner.rxdroid.DoseTimePreferenceActivity2"
+		>
+			<!-- <extra android:name="at.jclehner.rxroid.extras.IS_FIRST_LAUNCH" android:value="true" />  -->
+		</intent>		
+		
+	</Preference>
+	
+	<!-- Appearance -->
+
+	
+	<Preference
+		android:title="@string/_title_prefscreen_display"
+		android:icon="?attr/iconPicture">
+		<intent
+			android:action="android.intent.action.VIEW"
+			android:targetPackage="at.jclehner.rxdroid"
+			android:targetClass="at.jclehner.rxdroid.SettingsActivity">
+
+			<extra android:name="rxdroid:preference_screen" android:value="xml/settings_appearance" />
+		</intent>
+	</Preference>
+	
+	<!-- Notifications -->
+
+	<Preference
+			android:title="@string/_title_prefscreen_notifications"
+			android:icon="?attr/iconWarning">
+		<intent
+				android:action="android.intent.action.VIEW"
+				android:targetPackage="at.jclehner.rxdroid"
+				android:targetClass="at.jclehner.rxdroid.SettingsActivity">
+
+			<extra android:name="rxdroid:preference_screen" android:value="xml/settings_notifications" />
+		</intent>
+	</Preference>
+
+	<!-- Database -->
+
+	<Preference
+			android:title="@string/_title_database"
+			android:icon="?attr/iconWarning">
+		<intent
+				android:action="android.intent.action.VIEW"
+				android:targetPackage="at.jclehner.rxdroid"
+				android:targetClass="at.jclehner.rxdroid.SettingsActivity">
+
+			<extra android:name="rxdroid:preference_screen" android:value="xml/settings_database" />
+		</intent>
+	</Preference>
+
+	<!-- Development -->
+
+	<Preference
+			android:key="prefscreen_development"
+			android:title="Development">
+		<intent
+				android:action="android.intent.action.VIEW"
+				android:targetPackage="at.jclehner.rxdroid"
+				android:targetClass="at.jclehner.rxdroid.SettingsActivity">
+
+			<extra android:name="rxdroid:preference_screen" android:value="xml/settings_development" />
+		</intent>
+	</Preference>
+	
+	<PreferenceCategory 
+		android:title="@string/_title_about"		
+	>
+	
+		<Preference android:key="@string/key_version"
+			android:title="@string/_title_version"
+			android:icon="@null"
+		/>
+		
+		<Preference android:key="@string/key_licenses"
+			android:title="@string/_title_licenses"
+			android:icon="@null"
+		/>
+		
+		<Preference android:key="@string/key_donate"
+		    android:title="@string/_title_donate"
+		    android:enabled="false"
+		/>
+	
+	</PreferenceCategory>
+	
+</PreferenceScreen>

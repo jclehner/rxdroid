@@ -33,12 +33,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -261,9 +263,14 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 	{
 		Components.onCreateActivity(this, Components.NO_DATABASE_INIT);
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.simple_activity);
 
 		setTitle(R.string._title_backup_restore);
-		setContentFragment(Environment.getExternalStorageState());
+
+		if(savedInstanceState == null)
+			setContentFragment(Environment.getExternalStorageState(), true);
+		else
+			mStorageListener.onStateChanged(Environment.getExternalStorageState(), null);
 	}
 
 	@Override
@@ -301,7 +308,7 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 		finish();
 	}
 
-	private void setContentFragment(String storageState)
+	private void setContentFragment(String storageState, boolean calledFromOnCreate)
 	{
 		final Fragment content;
 
@@ -340,8 +347,24 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 		else
 			content = new ImportDialog();
 
-		getSupportFragmentManager().beginTransaction().replace(
-				android.R.id.content, content).commit();
+		//setContentView(R.layout.simple_activity);
+
+		final Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("content");
+		final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+		if(currentFragment != null)
+		{
+			//ft.detach(currentFragment);
+			ft.remove(currentFragment);
+		}
+
+		ft.replace(android.R.id.content, content, "content");
+
+		if(!calledFromOnCreate)
+			ft.addToBackStack(null);
+
+		ft.commit();
+		supportInvalidateOptionsMenu();
 	}
 
 	private final Backup.StorageStateListener mStorageListener = new Backup.StorageStateListener()
@@ -349,7 +372,7 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 		@Override
 		public void onStateChanged(String storageState, Intent intent)
 		{
-			setContentFragment(storageState);
+			setContentFragment(storageState, false);
 		}
 	};
 }

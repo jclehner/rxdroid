@@ -38,17 +38,19 @@ public class DrugListActivity2 extends ActionBarActivity
 		Components.onCreateActivity(this, Components.NO_DATABASE_INIT);
 
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.simple_activity);
 
-		final DrugListPagerFragment f = new DrugListPagerFragment();
-		final Bundle args = new Bundle();
-		args.putSerializable(DrugListFragment.ARG_DATE, DateTime.today());
-		args.putInt(DrugListFragment.ARG_PATIENT_ID, Patient.DEFAULT_PATIENT_ID);
-		f.setArguments(args);
 
-		final FragmentManager fm = getSupportFragmentManager();
+		if(savedInstanceState == null)
+		{
+			final DrugListPagerFragment f = new DrugListPagerFragment();
+			final Bundle args = new Bundle();
+			args.putSerializable(DrugListFragment.ARG_DATE, DateTime.today());
+			args.putInt(DrugListFragment.ARG_PATIENT_ID, Patient.DEFAULT_PATIENT_ID);
+			f.setArguments(args);
 
-		if(!(fm.findFragmentById(android.R.id.content) instanceof DrugListPagerFragment))
-			fm.beginTransaction().add(android.R.id.content, f).commit();
+			getSupportFragmentManager().beginTransaction().replace(android.R.id.content, f).commit();
+		}
 	}
 
 	public void onDrugSupplyMonitorClick(View view) {

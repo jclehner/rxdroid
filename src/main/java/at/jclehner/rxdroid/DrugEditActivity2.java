@@ -19,9 +19,13 @@ public class DrugEditActivity2 extends ActionBarActivity
 	{
 		Components.onCreateActivity(this, 0);
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.simple_activity);
 
-		getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
-				new DrugEditFragment()).commit();
+		if(savedInstanceState == null)
+		{
+			getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
+					new DrugEditFragment()).commit();
+		}
 	}
 
 	@Override

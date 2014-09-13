@@ -157,7 +157,7 @@ public class DoseHistoryActivity extends ActionBarActivity implements
 		final FragmentTransaction ft = fm.beginTransaction();
 		final DoseLogFragment f = DoseLogFragment.newInstance(mDrug, flags);
 
-		ft.replace(android.R.id.content, f, "log");
+		ft.add(android.R.id.content, f, "log");
 		ft.commit();
 
 		if(!Settings.getBoolean(Keys.LOG_IS_ALL_COLLAPSED, true))

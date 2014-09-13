@@ -358,7 +358,7 @@ public class DrugListFragment extends LoaderListFragment<Drug> implements View.O
 		}
 		else if(view.getId() == R.id.drug_name)
 		{
-			Intent intent = new Intent(getActivity(), DrugEditFragment.class);
+			Intent intent = new Intent(getActivity(), DrugEditActivity2.class);
 			intent.setAction(Intent.ACTION_EDIT);
 			intent.putExtra(DrugEditActivity2.EXTRA_DRUG_ID, (Integer) view.getTag());
 

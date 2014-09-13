@@ -35,6 +35,7 @@ import java.util.Locale;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -52,12 +53,14 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.support.v4.preference.PreferenceFragment;
+import android.support.v7.app.ActionBarActivity;
 import android.text.SpannableString;
 import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.Window;
 import android.webkit.WebView;
 import android.widget.Toast;
 
@@ -80,6 +83,8 @@ public class SettingsFragment extends PreferenceFragment implements
 {
 	private static final String TAG = SettingsFragment.class.getSimpleName();
 
+	private static final String ARG_RESOURCE = "rxdroid:preference_resource";
+
 	private static final String[] KEEP_DISABLED = {
 		Settings.Keys.VERSION, Settings.Keys.DB_STATS
 	};
@@ -98,13 +103,24 @@ public class SettingsFragment extends PreferenceFragment implements
 
 	private static final int MENU_RESTORE_DEFAULTS = 0;
 
+	public static SettingsFragment newInstance(int preferenceResId)
+	{
+		final Bundle args = new Bundle();
+		args.putInt(ARG_RESOURCE, preferenceResId);
+
+		final SettingsFragment f = new SettingsFragment();
+		f.setArguments(args);
+
+		return f;
+	}
+
 	@TargetApi(11)
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		addPreferencesFromResource(R.xml.preferences);
+		addPreferencesFromResource(getArguments().getInt(ARG_RESOURCE));
 
 		Settings.registerOnChangeListener(this);
 
@@ -231,6 +247,8 @@ public class SettingsFragment extends PreferenceFragment implements
 	{
 		super.onResume();
 		updateLowSupplyThresholdPreferenceSummary();
+
+		((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(getPreferenceScreen().getTitle());
 	}
 
 	@TargetApi(11)
@@ -443,7 +461,7 @@ public class SettingsFragment extends PreferenceFragment implements
 		{
 			final Preference p = root.getPreference(i);
 
-			if(CollectionUtils.contains(KEEP_DISABLED, p.getKey()))
+			if(p == null || CollectionUtils.contains(KEEP_DISABLED, p.getKey()))
 				continue;
 
 			if(p instanceof PreferenceGroup)
@@ -463,7 +481,8 @@ public class SettingsFragment extends PreferenceFragment implements
 		for(int i = 0; i != ps.getPreferenceCount(); ++i)
 		{
 			final Preference p = ps.getPreference(i);
-			p.setOnPreferenceChangeListener(this);
+			if(p != null)
+				p.setOnPreferenceChangeListener(this);
 			//p.setOnPreferenceClickListener(this);
 		}
 	}

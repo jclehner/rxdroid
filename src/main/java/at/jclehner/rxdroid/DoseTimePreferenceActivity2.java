@@ -12,9 +12,13 @@ public class DoseTimePreferenceActivity2 extends ActionBarActivity
 	{
 		Components.onCreateActivity(this, 0);
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.simple_activity);
 
-		getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
-				new DoseTimePreferenceFragment()).commit();
+		if(savedInstanceState == null)
+		{
+			getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
+					new DoseTimePreferenceFragment()).commit();
+		}
 	}
 
 	@Override

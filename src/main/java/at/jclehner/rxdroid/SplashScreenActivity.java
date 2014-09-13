@@ -298,7 +298,7 @@ public class SplashScreenActivity extends ActionBarActivity implements DialogLik
 		d.setMessage(sb);
 
 		findViewById(R.id.loader).setVisibility(View.GONE);
-		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, d).commit();
+		getSupportFragmentManager().beginTransaction().add(android.R.id.content, d).commit();
 	}
 
 	private class DatabaseIntializerTask extends AsyncTask<Integer, Void, WrappedCheckedException>

@@ -50,7 +50,7 @@
 		android:gravity="center"
 		style="?buttonBarStyle"
 	>		
-		<Button
+		<Button android:id="@+id/btn_save"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			
@@ -58,10 +58,9 @@
 			android:paddingRight="96dip"
 			
 			android:text="@android:string/ok"
-			
-			android:onClick="onSaveButtonClicked"
-			
+
 			android:visibility="visible"
+			style="?buttonBarButtonStyle"
 		/>				
 		
 	</LinearLayout>

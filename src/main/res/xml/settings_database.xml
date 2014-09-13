@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:title="@string/_title_database"
+		android:icon="?attr/iconStorage"
+		>
+
+	<ListPreference android:key="@string/key_history_size"
+			android:title="@string/_title_history_age"
+			android:summary="@string/_summary_history_age"
+			android:entries="@array/history_size"
+			android:defaultValue="1"
+			/>
+
+	<CheckBoxPreference android:key="@string/key_use_backup_framework"
+			android:title="@string/_title_use_backup_framework"
+			android:summary="@string/_summary_use_backup_framework"
+			android:defaultValue="false"
+			/>
+
+	<Preference android:key="backup_restore"
+			android:title="@string/_title_backup_restore">
+		<intent
+				android:action="android.intent.action.MAIN"
+				android:targetPackage="at.jclehner.rxdroid"
+				android:targetClass="at.jclehner.rxdroid.BackupActivity"
+				/>
+	</Preference>
+
+
+	<Preference android:key="@string/key_db_stats"
+			android:title="@string/_title_db_stats"
+			android:summary="@string/_msg_db_stats"
+			android:enabled="false"
+			/>
+
+</PreferenceScreen>

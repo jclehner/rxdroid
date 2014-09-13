@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:key="prefscreen_notifications"
+		android:title="@string/_title_prefscreen_notifications"
+		android:icon="?attr/iconWarning"
+		>
+	<ListPreference android:key="@string/key_alarm_mode"
+			android:title="@string/_title_repeat_alarm"
+			android:summary="@string/_summary_repeat_alarm"
+			android:defaultValue="0"
+			android:entries="@array/alarm_repeat_times"
+			android:entryValues="@array/alarm_repeat_times_values"
+			/>
+
+	<at.jclehner.rxdroid.preferences.EditTextPreference android:key="@string/key_low_supply_threshold"
+			android:title="@string/_title_min_supply_days"
+			android:summary="@string/_summary_min_supply_days"
+
+			android:defaultValue="10"
+			android:inputType="number"
+			android:selectAllOnFocus="true"
+			/>
+
+	<CheckBoxPreference android:key="@string/key_swipe_to_take_all"
+			android:title="@string/_title_swipe_to_take_all"
+			android:summary="@string/_summary_swipe_to_take_all"
+			android:enabled="@bool/pref_visibility_swipe_to_take_all"
+			android:defaultValue="false"
+			/>
+
+	<at.jclehner.rxdroid.preferences.TogglableTimePeriodPreference
+			android:key="@string/key_quiet_hours"
+			android:title="@string/_title_quiet_hours"
+			android:defaultValue="@string/pref_default_quiet_hours"
+			/>
+
+	<PreferenceCategory
+			android:title="@string/_title_pref_notification_methods"
+			>
+
+		<at.jclehner.rxdroid.preferences.SmartRingtonePreference android:key="@string/key_notification_sound"
+				android:title="@string/_title_notification_sound"
+				android:ringtoneType="notification"
+				android:showDefault="true"
+				android:showSilent="true"
+				android:defaultValue="default"
+				/>
+
+		<at.jclehner.rxdroid.preferences.AutoSummaryListPreference
+				android:key="@string/key_notification_light_color"
+				android:title="@string/_title_pref_use_led"
+				android:entries="@array/led_colors"
+				android:entryValues="@array/led_color_values"
+				android:defaultValue=""
+				/>
+
+		<CheckBoxPreference android:key="@string/key_use_vibrator"
+				android:title="@string/_title_pref_use_vibrator"
+				android:defaultValue="true"
+				/>
+
+	</PreferenceCategory>
+</PreferenceScreen>

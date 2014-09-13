@@ -182,7 +182,8 @@ public class BackupFragment extends LoaderListFragment<File>
 							{
 								Backup.createBackup(null, null);
 								getLoaderManager().restartLoader(0, null, BackupFragment.this);
-							} catch(ZipException e)
+							}
+							catch(ZipException e)
 							{
 								showExceptionDialog(e);
 							}
@@ -212,6 +213,7 @@ public class BackupFragment extends LoaderListFragment<File>
 				});
 
 		MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	@Override

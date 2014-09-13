@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:title="Development"
+		>
+	<at.jclehner.rxdroid.preferences.RefSummaryCheckBoxPreference android:key="@string/key_use_safe_mode"
+			android:title="@string/_title_use_safe_mode"
+			android:summary="@string/_summary_use_safe_mode"
+			android:defaultValue="false"
+			/>
+
+	<at.jclehner.rxdroid.preferences.LanguagePreference
+			android:key="@string/key_language"
+			android:title="@string/_title_language"
+			android:defaultValue=""
+			android:enabled="false"
+			/>
+
+	<Preference android:key="boot_info"
+			android:title="Boot info"
+			/>
+
+	<Preference android:key="reset_refill_reminder_date"
+			android:title="Reset refill reminder date"
+			/>
+
+	<Preference android:key="dump_build"
+			android:title="Dump android.os.Build"
+			/>
+
+	<CheckBoxPreference android:key="debug_force_splash_warning"
+			android:title="Force splash warning"
+			android:defaultValue="false"
+			/>
+
+	<Preference android:key="db_create_drug_with_many_dose_events"
+			android:title="Create drug with many dose events"
+			/>
+
+	<Preference
+			android:title="Advanced schedule"
+			>
+		<intent
+				android:action="android.intent.action.VIEW"
+				android:targetPackage="at.jclehner.rxdroid"
+				android:targetClass="at.jclehner.rxdroid.AdvancedScheduleActivity"
+				/>
+
+	</Preference>
+
+	<CheckBoxPreference android:key="@string/key_use_pretty_fractions"
+			android:title="@string/_title_use_pretty_fractions"
+			android:summary="@string/_summary_use_pretty_fractions"
+			android:defaultValue="false"
+			/>
+
+	<Preference android:key="key_debug_create_backup"
+			android:title="Create backup"
+			/>
+
+	<Preference android:key="key_debug_add_5_drugs"
+			android:title="Add 5 drugs"
+			/>
+
+	<Preference android:key="key_debug_crash_app"
+			android:title="Crash app"
+			/>
+
+	<Preference android:key="key_debug_tablet_layout"
+			android:title="Tablet layout"
+			/>
+
+	<CheckBoxPreference android:key="@string/key_compact_action_bar"
+			android:title="Compact ActionBar"
+			android:defaultValue="@bool/pref_default_compact_action_bar"
+			/>
+
+	<CheckBoxPreference android:key="use_lockscreen"
+			android:title="Enable lockscreen"
+			android:defaultValue="false"
+			/>
+
+	<Preference android:title="Beta link"
+			android:summary="https://play.google.com/apps/testing/at.jclehner.rxdroid"
+			>
+		<intent android:action="android.intent.action.VIEW"
+				android:data="https://play.google.com/apps/testing/at.jclehner.rxdroid"
+				/>
+
+	</Preference>
+</PreferenceScreen>

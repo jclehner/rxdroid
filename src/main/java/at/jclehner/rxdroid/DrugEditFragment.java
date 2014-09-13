@@ -158,9 +158,9 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		ab.setDisplayShowHomeEnabled(true);
 		ab.setDisplayHomeAsUpEnabled(true);
 
-		final ListView list = getListView();
-		if(list != null)
-			list.setSelector(Theme.getResourceAttribute(R.attr.selectableItemBackground));
+		//final ListView list = getListView();
+		//if(list != null)
+		//	list.setSelector(Theme.getResourceAttribute(R.attr.selectableItemBackground));
 	}
 
 	@Override

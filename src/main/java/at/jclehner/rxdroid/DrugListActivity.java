@@ -139,7 +139,7 @@ public class DrugListActivity extends ActionBarActivity implements OnLongClickLi
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		Components.onCreateActivity(this, 0);
-
+		super.onCreate(savedInstanceState);
 		setContentView(R.layout.drug_list);
 
 		mPager = (ViewPager) findViewById(R.id.drug_list_pager);
@@ -160,7 +160,6 @@ public class DrugListActivity extends ActionBarActivity implements OnLongClickLi
 		Database.registerEventListener(mDatabaseListener);
 		Settings.registerOnChangeListener(this);
 
-		super.onCreate(savedInstanceState);
 	}
 
 	@Override
