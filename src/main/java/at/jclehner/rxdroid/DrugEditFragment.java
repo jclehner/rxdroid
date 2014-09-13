@@ -190,13 +190,13 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			if(intent.getBooleanExtra(DrugEditActivity2.EXTRA_FOCUS_ON_CURRENT_SUPPLY, false))
 				mFocusOnCurrentSupply = true;
 
-			getActivity().setTitle(drug.getName());
+			setActivityTitle(drug.getName());
 		}
 		else if(Intent.ACTION_INSERT.equals(action))
 		{
 			mIsEditing = false;
 			mWrapper.set(new Drug());
-			getActivity().setTitle(R.string._title_new_drug);
+			setActivityTitle(R.string._title_new_drug);
 		}
 		else
 			throw new IllegalArgumentException("Unhandled action " + action);
@@ -264,6 +264,14 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		// This activity will not be restarted when the screen orientation changes, otherwise
 		// the OTPM stuff in onCreate() would reinitialize the Preferences in the hierarchy,
 		// thus not restoring their original state.
+	}
+
+	private void setActivityTitle(String title) {
+		((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(title);
+	}
+
+	private void setActivityTitle(int resId) {
+		((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(resId);
 	}
 
 	private void showDrugDeleteDialog()
@@ -353,7 +361,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			titleResId = R.string._title_drug_name,
 			order = 1,
 			type = DrugNamePreference2.class,
-			controller = AdvancedDialogPreferenceController.class
+			controller = DrugNamePreferenceController.class
 		)
 		private String name;
 
@@ -533,6 +541,26 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			if(LOGV) Log.v(TAG, "DrugWrapper.get: repeatOrigin=" + repeatOrigin);
 
 			return drug;
+		}
+	}
+
+	private static class DrugNamePreferenceController extends AdvancedDialogPreferenceController
+	{
+		public DrugNamePreferenceController() {}
+
+		@Override
+		public boolean updatePreference(AdvancedDialogPreference preference, Object newValue)
+		{
+			try
+			{
+				((ActionBarActivity) preference.getContext()).getSupportActionBar().setTitle((String) newValue);
+			}
+			catch(ClassCastException e)
+			{
+				e.printStackTrace();
+			}
+
+			return super.updatePreference(preference, newValue);
 		}
 	}
 
