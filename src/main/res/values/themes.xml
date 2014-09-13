@@ -69,6 +69,7 @@
 		
 		<item name="android:windowAnimationStyle">@null</item>
 		<item name="android:alertDialogStyle">@style/Theme.RxDroid.Dialog</item>
+		<item name="android:listViewStyle">@style/ListViewStyle</item>
 		
 		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 
@@ -129,12 +130,13 @@
         <item name="iconOverflow">@drawable/ic_menu_overflow_white</item>
         <item name="iconList">@drawable/ic_list_white</item>
         
-       <item name="actionIconExpandAll">@drawable/ic_action_expand_all</item>
+		<item name="actionIconExpandAll">@drawable/ic_action_expand_all</item>
 		<item name="actionIconCollapseAll">@drawable/ic_action_collapse_all</item>
         
         <item name="dividerColor">@color/list_divider_dark</item>
         
         <item name="android:windowAnimationStyle">@null</item>
+		<item name="android:listViewStyle">@style/ListViewStyle</item>
         <item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 
         <item name="buttonBarStyle">@style/Theme.RxDroid.ButtonBar.Dark</item>
@@ -191,6 +193,10 @@
 	
 	<style name="TextAppearance.Large.Clickable" parent="@android:style/TextAppearance.Large">
 		<item name="android:textColor">?attr/textColorClickable</item>
+	</style>
+
+	<style name="ListViewStyle" parent="android:Widget.ListView">
+		<item name="android:listSelector">?selectableItemBackground</item>
 	</style>
 
 	<style name="_LightTheme" parent="Theme.AppCompat.Light.DarkActionBar" />
