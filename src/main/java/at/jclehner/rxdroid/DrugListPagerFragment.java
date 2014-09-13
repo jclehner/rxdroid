@@ -62,7 +62,7 @@ public class DrugListPagerFragment extends Fragment implements DatePickerDialog.
 		public Fragment getItem(int position)
 		{
 			final Date date = getDateForPage(position);
-			return DrugListFragment.newInstance(date, mPatientId, mDtInfo);
+			return DrugListActivity2.DrugListFragment.newInstance(date, mPatientId, mDtInfo);
 		}
 
 		@Override
@@ -78,8 +78,8 @@ public class DrugListPagerFragment extends Fragment implements DatePickerDialog.
 
 	private static final String TAG = DrugListPagerFragment.class.getSimpleName();
 
-	public static final String ARG_PATIENT_ID = DrugListFragment.ARG_PATIENT_ID;
-	public static final String ARG_DATE = DrugListFragment.ARG_DATE;
+	public static final String ARG_PATIENT_ID = DrugListActivity2.DrugListFragment.ARG_PATIENT_ID;
+	public static final String ARG_DATE = DrugListActivity2.DrugListFragment.ARG_DATE;
 
 	public static final int ITEMS_PER_SIDE = 50;
 	public static final int ADAPTER_ITEMS = 1 + 2 * ITEMS_PER_SIDE;

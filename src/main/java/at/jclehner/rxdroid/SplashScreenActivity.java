@@ -249,7 +249,7 @@ public class SplashScreenActivity extends ActionBarActivity implements DialogLik
 				else
 					isFirstLaunch = Settings.getBoolean(Settings.Keys.IS_FIRST_LAUNCH, true);
 
-				final Class<?> intentClass = isFirstLaunch ? DoseTimePreferenceFragment.class : DrugListActivity2.class;
+				final Class<?> intentClass = isFirstLaunch ? DoseTimePreferenceActivity2.DoseTimePreferenceFragment.class : DrugListActivity2.class;
 
 				Intent intent = new Intent(getBaseContext(), intentClass);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
