@@ -688,12 +688,16 @@ public class DrugListActivity2 extends ActionBarActivity
 				final int doseTime = doseView.getDoseTime();
 
 				if(doseView.wasDoseTaken())
-				{
 					menu.removeItem(R.id.menuitem_skip);
-					menu.findItem(R.id.menuitem_remove_dose).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
+				else
+					menu.removeItem(R.id.menuitem_remove_dose);
+
+				pm.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+				{
+					@Override
+					public boolean onMenuItemClick(MenuItem menuItem)
 					{
-						@Override
-						public boolean onMenuItemClick(MenuItem menuItem)
+						if(menuItem.getItemId() == R.id.menuitem_remove_dose)
 						{
 							final Fraction.MutableFraction dose = new Fraction.MutableFraction();
 							for(DoseEvent intake : Entries.findDoseEvents(drug, mDate, doseTime))
@@ -704,33 +708,14 @@ public class DrugListActivity2 extends ActionBarActivity
 
 							drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
 							Database.update(drug);
-
-							return true;
 						}
-					});
-
-				}
-				else
-				{
-					menu.removeItem(R.id.menuitem_remove_dose);
-					menu.findItem(R.id.menuitem_skip).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
-					{
-						@Override
-						public boolean onMenuItemClick(MenuItem menuItem)
-						{
+						else if(menuItem.getItemId() == R.id.menuitem_take)
+							doseView.performClick();
+						else if(menuItem.getItemId() == R.id.menuitem_skip)
 							Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
-							return true;
-						}
-					});
-				}
+						else
+							return false;
 
-				menu.findItem(R.id.menuitem_take).setOnMenuItemClickListener(new OnContextMenuItemClickListener()
-				{
-					@Override
-					public boolean onMenuItemClick(MenuItem menuItem)
-					{
-						// FIXME
-						doseView.performClick();
 						return true;
 					}
 				});
