@@ -76,6 +76,8 @@ public class DoseTimePreferenceActivity2 extends ActionBarActivity
 		{
 			super.onResume();
 
+			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(getPreferenceScreen().getTitle());
+
 			if(!Settings.wasDisplayedOnce("license_info"))
 			{
 				final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
