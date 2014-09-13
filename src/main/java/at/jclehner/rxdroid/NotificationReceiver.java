@@ -331,7 +331,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private PendingIntent createDrugListIntent(Date date)
 	{
-		final Intent intent = new Intent(mContext, DrugListActivity.class);
+		final Intent intent = new Intent(mContext, DrugListActivity2.class);
 		intent.putExtra(DrugListActivity.EXTRA_STARTED_FROM_NOTIFICATION, true);
 		intent.putExtra(DrugListActivity.EXTRA_DATE, date);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -491,8 +491,6 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setWhen(0);
 		builder.setPriority(priority);
 
-		// TODO setOngoing(false), if requested by the user
-
 		if(lineCount > 1)
 		{
 			final BigTextStyle style = new BigTextStyle();
@@ -538,7 +536,11 @@ public class NotificationReceiver extends BroadcastReceiver
 			PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
 			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
-				builder.addAction(R.drawable.ic_action_snooze, getString(R.string._title_remind_tomorrow), operation);
+			{
+				NotificationCompat.Action action = new NotificationCompat.Action.Builder(
+						R.drawable.ic_action_snooze, getString(R.string._title_remind_tomorrow), operation).build();
+				builder.addAction(action);
+			}
 			else
 			{
 				builder.setDeleteIntent(operation);
