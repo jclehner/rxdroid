@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.preference.PreferenceFragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -51,6 +52,9 @@ public class DoseTimePreferenceActivity2 extends ActionBarActivity
 		{
 			super.onCreate(savedInstanceState);
 			setHasOptionsMenu(true);
+			final PreferenceManager pm = getPreferenceManager();
+			pm.setSharedPreferencesMode(MODE_MULTI_PROCESS);
+			pm.setSharedPreferencesName(Settings.getDefaultSharedPreferencesName(getActivity()));
 			mIsFirstLaunch = getActivity().getIntent().getBooleanExtra(DrugEditActivity2.EXTRA_IS_FIRST_LAUNCH, false);
 			addPreferencesFromResource(R.xml.dose_times);
 		}

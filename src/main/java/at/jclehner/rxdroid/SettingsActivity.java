@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceGroup;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.preference.PreferenceFragment;
 import android.support.v7.app.ActionBarActivity;
@@ -129,6 +130,10 @@ public class SettingsActivity extends ActionBarActivity
 		public void onCreate(Bundle savedInstanceState)
 		{
 			super.onCreate(savedInstanceState);
+
+			final PreferenceManager pm = getPreferenceManager();
+			pm.setSharedPreferencesMode(MODE_MULTI_PROCESS);
+			pm.setSharedPreferencesName(Settings.getDefaultSharedPreferencesName(getActivity()));
 
 			addPreferencesFromResource(getArguments().getInt(ARG_RESOURCE));
 
