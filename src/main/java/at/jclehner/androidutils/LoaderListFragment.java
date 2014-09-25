@@ -178,6 +178,10 @@ public abstract class LoaderListFragment<T> extends ListFragment implements Load
 		getLoaderManager().initLoader(0, null, this);
 	}
 
+	public void restartLoader() {
+		getLoaderManager().restartLoader(0, null, this);
+	}
+
 	@Override
 	public final Loader onCreateLoader(int i, Bundle bundle) {
 		return onCreateLoader();
