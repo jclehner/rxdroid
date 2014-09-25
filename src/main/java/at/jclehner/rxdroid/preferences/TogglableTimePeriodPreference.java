@@ -39,7 +39,7 @@ public class TogglableTimePeriodPreference extends TimePeriodPreference
 
 	public TogglableTimePeriodPreference(Context context, AttributeSet attrs)
 	{
-		super(context, attrs);
+		super(context, attrs, android.R.attr.dialogPreferenceStyle);
 		setWidgetLayoutResource(R.layout.toggler);
 	}
 
@@ -47,7 +47,9 @@ public class TogglableTimePeriodPreference extends TimePeriodPreference
 	protected void onBindView(View view)
 	{
 		super.onBindView(view);
-		mToggler = (CompoundButton) view.findViewById(R.id.toggler);
+		mToggler = (CompoundButton) view.findViewById(android.R.id.checkbox);
+		mToggler.setClickable(true);
+		mToggler.setFocusable(true);
 		mToggler.setChecked(mChecked);
 		mToggler.setOnCheckedChangeListener(mToggleListener);
 	}

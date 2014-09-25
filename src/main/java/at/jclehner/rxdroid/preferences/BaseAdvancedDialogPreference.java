@@ -31,6 +31,10 @@ import at.jclehner.rxdroid.Version;
 
 public abstract class BaseAdvancedDialogPreference<T extends Serializable> extends AdvancedDialogPreference<T>
 {
+	public BaseAdvancedDialogPreference(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+	}
+
 	public BaseAdvancedDialogPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}

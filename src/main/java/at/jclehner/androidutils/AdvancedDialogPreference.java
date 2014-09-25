@@ -96,12 +96,12 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	//private static final String KEY_DIALOG_VALUE = TAG + ".dialog_value";
 
 	public AdvancedDialogPreference(Context context, AttributeSet attrs, int defStyle) {
-		this(context, attrs);
+		super(context, attrs, defStyle);
 	}
 
 	public AdvancedDialogPreference(Context context, AttributeSet attrs)
 	{
-		super(context, attrs, android.R.attr.preferenceStyle);
+		this(context, attrs, android.R.attr.preferenceStyle);
 		handleAttributes(attrs);
 
 		if(LOGV) Log.d(TAG, "ctor: key=" + getKey());

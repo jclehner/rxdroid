@@ -136,12 +136,12 @@ public class TimePeriodPreference extends BaseAdvancedDialogPreference<TimePerio
 	private final int mPageCount = 2;
 
 	public TimePeriodPreference(Context context, AttributeSet attrs, int defStyle) {
-		this(context, attrs);
+		super(context, attrs, defStyle);
 	}
 
 	public TimePeriodPreference(Context context, AttributeSet attrs)
 	{
-		super(context, attrs);
+		this(context, attrs, android.R.attr.preferenceStyle);
 
 		handleAttributes(context, attrs);
 
