@@ -145,7 +145,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 	public Fraction getDose()
 	{
-		if(mDisplayDose != null)
+		if(mDisplayDose != null && !mDisplayDose.isZero())
 			return mDisplayDose;
 
 		if(mDrug != null && mDoseTime != -1)
@@ -202,7 +202,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		mDisplayDose = new MutableFraction();
 
-		List<DoseEvent> events = Entries.findDoseEvents(mDrug, mDate, mDoseTime);
+		final List<DoseEvent> events = Entries.findDoseEvents(mDrug, mDate, mDoseTime);
 		for(DoseEvent intake : events)
 		{
 			mDisplayDose.add(intake.getDose());
