@@ -45,6 +45,7 @@ import android.widget.TextView;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity;
+import at.jclehner.rxdroid.DrugListActivity2;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Settings;
@@ -112,10 +113,10 @@ public class DoseLogFragment extends ExpandableListFragment
 		if(date == null)
 			return false;
 
-		final Intent intent = new Intent(getActivity(), DrugListActivity.class);
-		intent.putExtra(DrugListActivity.EXTRA_DATE, date);
+		final Intent intent = new Intent(getActivity(), DrugListActivity2.class);
+		intent.putExtra(DrugListActivity2.EXTRA_DATE, date);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
 		startActivity(intent);
 		return true;
 	}
