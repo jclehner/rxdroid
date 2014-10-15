@@ -30,7 +30,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 
-import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.Settings.Keys;

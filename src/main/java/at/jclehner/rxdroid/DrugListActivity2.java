@@ -64,6 +64,7 @@ import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.ui.DialogLike;
 import at.jclehner.rxdroid.ui.ScheduleViewHolder;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Components;
@@ -77,6 +78,7 @@ import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 public class DrugListActivity2 extends ActionBarActivity
 {
 	public static final String EXTRA_DATE = "rxdroid:date";
+	public static final String EXTRA_STARTED_FROM_NOTIFICATION = "rxdroid:started_from_notification";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -812,9 +814,11 @@ public class DrugListActivity2 extends ActionBarActivity
 
 			sb.append(" " + RefString.resolve(getActivity(), R.string._msg_db_error_footer));
 
-			getActivity().setContentView(R.layout.database_error);
-			final TextView errMsg = (TextView) getActivity().findViewById(R.id.message);
-			errMsg.setText(sb);
+			final DialogLike dialog = new DialogLike();
+			dialog.setTitle(getString(R.string._title_database));
+			dialog.setMessage(sb);
+
+			getFragmentManager().beginTransaction().replace(android.R.id.content, dialog).commit();
 		}
 
 		@Override

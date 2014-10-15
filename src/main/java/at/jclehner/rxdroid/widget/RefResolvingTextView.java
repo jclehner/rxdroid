@@ -42,7 +42,11 @@ public class RefResolvingTextView extends HtmlTextView
 	}
 
 	@Override
-	public void setText(CharSequence text, BufferType type) {
-		super.setText(RefString.resolve(getContext(), text), type);
+	public void setText(CharSequence text, BufferType type)
+	{
+		if(!isInEditMode())
+			super.setText(RefString.resolve(getContext(), text), type);
+		else
+			super.setText(text, type);
 	}
 }

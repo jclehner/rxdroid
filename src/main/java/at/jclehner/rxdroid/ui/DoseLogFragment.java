@@ -44,7 +44,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseView;
-import at.jclehner.rxdroid.DrugListActivity;
 import at.jclehner.rxdroid.DrugListActivity2;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.R;
