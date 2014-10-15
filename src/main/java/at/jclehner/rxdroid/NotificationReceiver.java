@@ -339,10 +339,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	}
 
+	// FIXME cleanup this mess of a function
 	public void updateNotification(Date date, int doseTime, boolean isActiveDoseTime, int mode)
 	{
 		final List<Drug> drugsWithLowSupplies = new ArrayList<Drug>();
-		final int lowSupplyDrugCount = getDrugsWithLowSupplies(date, doseTime, drugsWithLowSupplies);
+		int lowSupplyDrugCount = getDrugsWithLowSupplies(date, doseTime, drugsWithLowSupplies);
 		final int missedDoseCount = getDrugsWithMissedDoses(date, doseTime, isActiveDoseTime);
 		final int dueDoseCount = isActiveDoseTime ? getDrugsWithDueDoses(date, doseTime) : 0;
 
@@ -351,8 +352,6 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		final StringBuilder sb = new StringBuilder();
 		final String[] lines = new String[2];
-
-		int lineCount = 0;
 
 		if(missedDoseCount != 0 || dueDoseCount != 0)
 		{
@@ -371,31 +370,51 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 
 		final boolean isShowingLowSupplyNotificationOnly;
+		// this value is only valid if isShowingLowSupplyNotificationOnly == true
+		boolean areAllDrugsSnoozed = true;
 
 		if(lowSupplyDrugCount != 0)
 		{
-			final String msg;
-			final String first = Entries.getDrugName(drugsWithLowSupplies.get(0));
-
-			icon = R.drawable.ic_stat_exclamation;
 			isShowingLowSupplyNotificationOnly = sb.length() == 0;
-			//titleResId = R.string._title_notification_low_supplies;
 
-			if(lowSupplyDrugCount == 1)
-				msg = getString(R.string._qmsg_low_supply_single, first);
-			else
+			final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
+			for(int i = 0; i < drugsWithLowSupplies.size(); ++i)
 			{
-				final String second = Entries.getDrugName(drugsWithLowSupplies.get(1));
-				msg = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount - 1, first, second);
+				if(snoozedDrugIds.contains(drugsWithLowSupplies.get(i).getId()))
+				{
+					drugsWithLowSupplies.remove(i);
+					--i;
+				}
 			}
 
-			if(isShowingLowSupplyNotificationOnly)
-			{
-				sb.append(msg);
-				titleResId = R.string._title_notification_low_supplies;
-			}
+			lowSupplyDrugCount = drugsWithLowSupplies.size();
+			areAllDrugsSnoozed = lowSupplyDrugCount == 0;
 
-			lines[0] = "<b>" + getString(R.string._title_notification_low_supplies) + "</b> " + Util.escapeHtml(msg);
+			if(lowSupplyDrugCount > 0)
+			{
+				final String msg;
+				final String first = Entries.getDrugName(drugsWithLowSupplies.get(0));
+
+				icon = R.drawable.ic_stat_exclamation;
+
+				//titleResId = R.string._title_notification_low_supplies;
+
+				if(lowSupplyDrugCount == 1)
+					msg = getString(R.string._qmsg_low_supply_single, first);
+				else
+				{
+					final String second = Entries.getDrugName(drugsWithLowSupplies.get(1));
+					msg = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount - 1, first, second);
+				}
+
+				if(isShowingLowSupplyNotificationOnly)
+				{
+					sb.append(msg);
+					titleResId = R.string._title_notification_low_supplies;
+				}
+
+				lines[0] = "<b>" + getString(R.string._title_notification_low_supplies) + "</b> " + Util.escapeHtml(msg);
+			}
 		}
 		else
 			isShowingLowSupplyNotificationOnly = false;
@@ -424,17 +443,6 @@ public class NotificationReceiver extends BroadcastReceiver
 					// The date indicates that we should skip the notification, but we must check
 					// whether all drugs in drugsWithLowSupply were indeed snoozed.
 
-					final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
-					boolean areAllDrugsSnoozed = true;
-					for(Drug drug : drugsWithLowSupplies)
-					{
-						if(!snoozedDrugIds.contains(drug.getId()))
-						{
-							Log.d(TAG, "    " + drug + " is not snoozing!");
-							areAllDrugsSnoozed = false;
-							break;
-						}
-					}
 
 					cancelNotification = areAllDrugsSnoozed;
 				}
@@ -466,6 +474,8 @@ public class NotificationReceiver extends BroadcastReceiver
 //		final InboxStyle inboxStyle = new InboxStyle();
 //		inboxStyle.setBigContentTitle(getString(R.string.app_name) +
 //				" (" + (dueDoseCount + missedDoseCount + lowSupplyDrugCount) + ")");
+
+		int lineCount = 0;
 
 		for(String line : lines)
 		{
