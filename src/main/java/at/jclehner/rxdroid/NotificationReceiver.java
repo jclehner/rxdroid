@@ -102,6 +102,9 @@ public class NotificationReceiver extends BroadcastReceiver
 	private static final int NOTIFICATION_FORCE_UPDATE = 1;
 	private static final int NOTIFICATION_FORCE_SILENT = 2;
 
+	private static final int ID_NORMAL = R.id.notification;
+	private static final int ID_WEARABLE = 1;
+
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
 
@@ -464,7 +467,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			if(cancelNotification)
 			{
-				getNotificationManager().cancel(R.id.notification);
+				cancelNotifications();
 				return;
 			}
 		}
@@ -496,10 +499,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setContentText(message);
 		builder.setTicker(getString(R.string._msg_new_notification));
 		builder.setSmallIcon(icon);
-		builder.setOngoing(false);
-		builder.setUsesChronometer(false);
 		builder.setWhen(0);
 		builder.setPriority(priority);
+		builder.setCategory(NotificationCompat.CATEGORY_ALARM);
+		builder.setGroup("rxdroid");
+		builder.setGroupSummary(true);
 		builder.setColor(0xff5722);
 
 		boolean noClear = true;
@@ -522,8 +526,9 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
             {
                 NotificationCompat.Action action = new NotificationCompat.Action.Builder(
-                        R.drawable.ic_action_tick, getString(R.string._title_take_all_doses), operation).build();
-                builder.addAction(action);
+                       R.drawable.ic_action_tick_enabled, getString(R.string._title_take_all_doses), operation).build();
+				builder.addAction(action);
+				builder.extend(new NotificationCompat.WearableExtender().addAction(action));
             }
             else if(Settings.getBoolean(Settings.Keys.SWIPE_TO_TAKE_ALL, false))
 			{
@@ -553,6 +558,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				NotificationCompat.Action action = new NotificationCompat.Action.Builder(
 						R.drawable.ic_action_snooze, getString(R.string._title_remind_tomorrow), operation).build();
 				builder.addAction(action);
+				builder.extend(new NotificationCompat.WearableExtender().addAction(action));
 			}
 			else
 			{
@@ -638,11 +644,18 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		builder.setDefaults(defaults);
 
-		final Notification n = builder.build();
-		if(noClear)
-			n.flags |= Notification.FLAG_NO_CLEAR;
+		final Notification notification = builder.build();
 
-		getNotificationManager().notify(R.id.notification, n);
+		if(noClear)
+		{
+			notification.flags |= Notification.FLAG_NO_CLEAR;
+
+			builder.setOngoing(false);
+			builder.setGroupSummary(false);
+			getNotificationManager().notify(ID_WEARABLE, builder.build());
+		}
+
+		getNotificationManager().notify(ID_NORMAL, notification);
 	}
 
 	private  int getDrugsWithDueDoses(Date date, int doseTime) {
@@ -682,7 +695,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	/* package */ static void cancelNotifications()
 	{
 		final NotificationManagerCompat nm = NotificationManagerCompat.from(RxDroid.getContext());
-		nm.cancel(R.id.notification);
+		nm.cancel(ID_NORMAL);
+		nm.cancel(ID_WEARABLE);
 	}
 
 	/* package */ static void rescheduleAlarmsAndUpdateNotification(boolean silent) {
