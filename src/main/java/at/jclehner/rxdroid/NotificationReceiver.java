@@ -500,6 +500,9 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setUsesChronometer(false);
 		builder.setWhen(0);
 		builder.setPriority(priority);
+		builder.setColor(0xff5722);
+
+		boolean noClear = true;
 
 		if(lineCount > 1)
 		{
@@ -525,7 +528,7 @@ public class NotificationReceiver extends BroadcastReceiver
             else if(Settings.getBoolean(Settings.Keys.SWIPE_TO_TAKE_ALL, false))
 			{
 				builder.setDeleteIntent(operation);
-				builder.setOngoing(false);
+				noClear = false;
 			}
 		}
 		else if(isShowingLowSupplyNotificationOnly)
@@ -554,8 +557,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			else
 			{
 				builder.setDeleteIntent(operation);
-				// Technically it's ongoing, but you cannot delete ongoing notifications
-				builder.setOngoing(false);
+				noClear = false;
 			}
 		}
 
@@ -636,7 +638,11 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		builder.setDefaults(defaults);
 
-		getNotificationManager().notify(R.id.notification, builder.build());
+		final Notification n = builder.build();
+		if(noClear)
+			n.flags |= Notification.FLAG_NO_CLEAR;
+
+		getNotificationManager().notify(R.id.notification, n);
 	}
 
 	private  int getDrugsWithDueDoses(Date date, int doseTime) {

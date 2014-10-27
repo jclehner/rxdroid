@@ -23,17 +23,26 @@
 -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-	<!--
-	<style name="_LightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+	<style name="_ApiSpecificLightTheme" parent="Theme.Mater">
 		<item name="android:colorPrimary">#ff5722</item>
 		<item name="android:colorPrimaryDark">#dd2c00</item>
 		<item name="android:colorAccent">#ffffa70b</item>
 	</style>
 
-	<style name="_DarkTheme" parent="Theme.AppCompat">
+	<style name="_ApiSpecificDarkTheme" parent="Theme.AppCompat">
 		<item name="android:colorPrimary">#ff5722</item>
 		<item name="android:colorPrimaryDark">#dd2c00</item>
 		<item name="android:colorAccent">#ffffa70b</item>
 	</style>
 	-->
+
+	<style name="Theme.RxDroid.Dialog" parent="@android:style/Theme.Holo.Light.Dialog" />
+	<style name="Theme.RxDroid.CrashDialog" parent="@android:style/Theme.Holo.Dialog" />
+
+	<style name="Theme.RxDroid.ButtonBar" parent="@android:style/Holo.Light.ButtonBar" />
+	<style name="Theme.RxDroid.ButtonBar.Dark" parent="@android:style/Holo.ButtonBar" />
+
+	<style name="_ApiSpecificLightTheme" parent="Theme.AppCompat.Light.DarkActionBar" />
+	<style name="_ApiSpecificDarkTheme" parent="Theme.AppCompat" />
 </resources>
