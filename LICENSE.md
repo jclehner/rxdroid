@@ -43,6 +43,8 @@ Third Party Works
   Android Open Source Project
 * [appcompat-v7](http://developer.android.com/tools/support-library) by
   Android Open Source Project
+* [cardview-v7](http://developer.android.com/tools/support-library) by
+  Android Open Source Project
 * [ORMLite](http://ormlite.com) by Gray Watson
 * [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids) by
   Jake Wharton
@@ -52,6 +54,9 @@ Third Party Works
 * [ShowcaseView](https://github.com/jclehner/ShowcaseView) by Alex Curran,
   modified by Joseph C. Lehner
 * [ACRA](https://github.com/jclehner/acra) by Kevin Gaudin
+* [android-support-v4-PreferenceFragment](https://github.com/kolavar/android-support-v4-preferencefragment)
+  by Android Open Source Project
+* [zip4j](http://www.lingala.net/zip4j) by Srikanth Reddy Lingala
 
 #### Artwork
 
