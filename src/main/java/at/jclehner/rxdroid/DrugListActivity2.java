@@ -31,6 +31,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.SpannableString;
@@ -87,6 +88,11 @@ public class DrugListActivity2 extends ActionBarActivity
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.simple_activity);
+
+		final ActionBar ab = getSupportActionBar();
+		ab.setDisplayShowHomeEnabled(true);
+		ab.setDisplayUseLogoEnabled(true);
+		ab.setLogo(R.drawable.ic_logo_padded);
 
 		if(savedInstanceState == null)
 		{
@@ -159,7 +165,7 @@ public class DrugListActivity2 extends ActionBarActivity
 			final Bundle args = icicle != null ? icicle : getArguments();
 			mPatientId = args.getInt(ARG_PATIENT_ID);
 
-			if(icicle != null)
+			if(icicle != null && !getArguments().containsKey("date"))
 			{
 				mLastActiveDoseTime = icicle.getInt("last_active_dose_time", -1);
 				mLastActiveDate = (Date) icicle.getSerializable("last_active_date");
@@ -186,7 +192,13 @@ public class DrugListActivity2 extends ActionBarActivity
 			else if(mDisplayedDate != null)
 				setDate(mDisplayedDate, false);
 			else
-				setDate((Date) getArguments().getSerializable("date"), true);
+			{
+				Date date = (Date) getArguments().getSerializable("date");
+				if(date == null)
+					date = mDtInfo.activeDate();
+
+				setDate(date, true);
+			}
 
 			NotificationReceiver.registerOnDoseTimeChangeListener(this);
 			SystemEventReceiver.registerOnSystemTimeChangeListener(this);
@@ -365,13 +377,9 @@ public class DrugListActivity2 extends ActionBarActivity
 			if(mDtInfo.activeDate().equals(mDisplayedDate))
 				Util.applyStyle(dateStr, new UnderlineSpan());
 
-			if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT)
-			{
-				Util.applyStyle(dateStr, new RelativeSizeSpan(0.75f));
-				((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(dateStr);
-			}
-			else
-				((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(dateStr);
+			Util.applyStyle(dateStr, new RelativeSizeSpan(0.75f));
+
+			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(dateStr);
 		}
 
 		private final ViewPager.OnPageChangeListener mPageListener = new ViewPager.SimpleOnPageChangeListener()
@@ -379,9 +387,12 @@ public class DrugListActivity2 extends ActionBarActivity
 			@Override
 			public void onPageSelected(int page)
 			{
-				mDisplayedDate = getDateForPage(page);
-				updateActionBar();
-				Log.d(TAG, "onPageSelected: page=" + page + ", date=" + mDisplayedDate);
+				if(mReferenceDate != null)
+				{
+					mDisplayedDate = getDateForPage(page);
+					updateActionBar();
+					Log.d(TAG, "onPageSelected: page=" + page + ", date=" + mDisplayedDate);
+				}
 			}
 		};
 	}

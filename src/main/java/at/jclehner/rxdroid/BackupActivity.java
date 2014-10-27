@@ -34,6 +34,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.InputType;
@@ -80,6 +81,8 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 
 			mFile = new Backup.BackupFile(getBackupFilePath());
 			mCanRestore = mFile.isValid();
+
+			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_restore);
 
 			if(mCanRestore)
 			{
@@ -340,6 +343,7 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 			{
 				final DialogLike dialog = new DialogLike();
 				dialog.setMessage(getString(R.string._msg_external_storage_not_readable));
+				dialog.setPositiveButtonText(getString(android.R.string.ok));
 
 				content = dialog;
 			}

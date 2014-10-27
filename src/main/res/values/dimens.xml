@@ -39,4 +39,8 @@
     <dimen name="fraction_wholenum_margin">0dip</dimen>
 
     <dimen name="dialogue_like_width">-1px</dimen>
+
+	<dimen name="logo_padding">12dip</dimen>
+	<dimen name="logo_padding_left">0dip</dimen>
+	<dimen name="logo_padding_right">@dimen/logo_padding</dimen>
 </resources>

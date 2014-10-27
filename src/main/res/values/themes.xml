@@ -72,8 +72,14 @@
 		
 		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 
+		<item name="colorPrimary">#ff5722</item>
+		<item name="colorPrimaryDark">#dd2c00</item>
+		<item name="colorAccent">#ffffa70b</item>
+
+		<!--
         <item name="buttonBarStyle">@style/Theme.RxDroid.ButtonBar</item>
         <item name="buttonBarButtonStyle">@style/Theme.RxDroid.ButtonBarButton</item>
+        -->
 	</style>
 	
 	<style name="Theme.RxDroid.NewIcons" parent="@style/Theme.RxDroid">
@@ -137,8 +143,14 @@
         <item name="android:windowAnimationStyle">@null</item>
         <item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 
+		<item name="colorPrimary">#ff5722</item>
+		<item name="colorPrimaryDark">#dd2c00</item>
+		<item name="colorAccent">#ffffa70b</item>
+
+		<!--
         <item name="buttonBarStyle">@style/Theme.RxDroid.ButtonBar.Dark</item>
         <item name="buttonBarButtonStyle">@style/Theme.RxDroid.ButtonBarButton.Dark</item>
+        -->
     </style>
     
 	<style name="Theme.RxDroid.Dark.NewIcons" parent="@style/Theme.RxDroid.Dark">

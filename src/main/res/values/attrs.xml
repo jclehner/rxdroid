@@ -97,6 +97,8 @@
     
     <attr name="actionBarOrTitleBarStyle" format="reference" />
 
+	<!--
     <attr name="buttonBarStyle" format="reference" />
     <attr name="buttonBarButtonStyle" format="reference" />
+    -->
 </resources>

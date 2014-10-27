@@ -65,7 +65,10 @@ public class DialogLike extends Fragment
 	private Button mNegativeBtn;
 	private View mButtonBar;
 
-	public DialogLike() {
+	private boolean mAutoInitializeButtons = true;
+
+	public DialogLike()
+	{
 		setArguments(new Bundle());
 	}
 
@@ -82,8 +85,7 @@ public class DialogLike extends Fragment
 		}
 	}
 
-	public void onBindCustomView(View view)
-	{
+	public void onBindCustomView(View view) {
 	}
 
 	@Override
@@ -91,8 +93,11 @@ public class DialogLike extends Fragment
 	{
 		super.onCreate(savedInstanceState);
 
-		setPositiveButtonText(android.R.string.ok);
-		setNegativeButtonText(android.R.string.cancel);
+		if(mAutoInitializeButtons)
+		{
+			setPositiveButtonText(android.R.string.ok);
+			setNegativeButtonText(android.R.string.cancel);
+		}
 	}
 
 	@Override
@@ -184,24 +189,22 @@ public class DialogLike extends Fragment
 	{
 		getArguments().putCharSequence("neg", text);
 		applyArguments();
+		mAutoInitializeButtons = false;
 	}
 
-	public void setNegativeButtonText(int resId)
-	{
-		getArguments().putCharSequence("neg", getStringInternal(resId));
-		applyArguments();
+	public void setNegativeButtonText(int resId) {
+		setNegativeButtonText(getStringInternal(resId));
 	}
 
 	public void setPositiveButtonText(CharSequence text)
 	{
 		getArguments().putCharSequence("pos", text);
 		applyArguments();
+		mAutoInitializeButtons = false;
 	}
 
-	public void setPositiveButtonText(int resId)
-	{
-		getArguments().putCharSequence("pos", getStringInternal(resId));
-		applyArguments();
+	public void setPositiveButtonText(int resId) {
+		setPositiveButtonText(getStringInternal(resId));
 	}
 
 	public Button getButton(int which)
