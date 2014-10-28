@@ -23,6 +23,7 @@ package at.jclehner.rxdroid;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -172,7 +173,7 @@ public class BackupFragment extends LoaderListFragment<File>
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
 		final MenuItem item = menu.add(getString(R.string._title_create_backup))
-				.setIcon(R.drawable.ic_action_add)
+				.setIcon(R.drawable.ic_action_add_box_white)
 				.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
 				{
 					@Override
@@ -309,10 +310,21 @@ public class BackupFragment extends LoaderListFragment<File>
 					}
 					else if(item.getItemId() == R.id.menuitem_delete)
 					{
-						if(!file.item.delete())
-							Toast.makeText(getActivity(), R.string._title_error, Toast.LENGTH_SHORT).show();
+						final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+						ab.setMessage(getString(R.string._title_delete_drug, file.item.getName()));
+						ab.setNegativeButton(android.R.string.cancel, null);
+						ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which)
+								{
+									if(!file.item.delete())
+										Toast.makeText(getActivity(), R.string._title_error, Toast.LENGTH_SHORT).show();
 
-						getLoaderManager().restartLoader(0, null, BackupFragment.this);
+									getLoaderManager().restartLoader(0, null, BackupFragment.this);
+								}
+						});
+
+						ab.show();
 					}
 					else if(item.getItemId() == R.id.menuitem_share)
 					{
