@@ -47,7 +47,6 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceScreen;
 import android.support.v4.preference.PreferenceFragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -57,7 +56,6 @@ import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.ListView;
 import android.widget.Toast;
 import at.jclehner.androidutils.AdvancedDialogPreference;
 import at.jclehner.androidutils.otpm.AdvancedDialogPreferenceController;
@@ -276,7 +274,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 
 	private void showDrugDeleteDialog()
 	{
-		final String message = getString(R.string._title_delete_drug, mWrapper.get().getName())
+		final String message = getString(R.string._title_delete_item, mWrapper.get().getName())
 				+ " " + getString(R.string._msg_delete_drug);
 
 		final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());

@@ -191,7 +191,7 @@
 	
 	<string name="_title_on_demand">In base alle esigenze</string>
 	
-	<string name="_title_delete_drug">Elimina %1$s?</string>
+	<string name="_title_delete_item">Elimina %1$s?</string>
 	<string name="_msg_delete_drug">Questa operazione non può essere annullata!</string>
 	
 	<string name="_toast_db_reset_success">Database resettato con successo.</string>

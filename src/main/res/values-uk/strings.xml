@@ -134,7 +134,7 @@
     </string>
   <string name="_title_weekdays">Будні</string>
   <string name="_title_on_demand">При потребі</string>
-  <string name="_title_delete_drug">Справді видалити %1$s?</string>
+  <string name="_title_delete_item">Справді видалити %1$s?</string>
   <string name="_msg_delete_drug">Це не можна відмінити!</string>
   <string name="_toast_db_reset_success">Базу даних успішно скинуто.</string>
   <string name="_toast_db_reset_failure">Скидання бази даних невдале. Перевстановіть програму.</string>

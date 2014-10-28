@@ -181,7 +181,7 @@
 	
 	<string name="_title_on_demand">Bei Bedarf</string>
 	
-	<string name="_title_delete_drug">%1$s wirklich löschen?</string>
+	<string name="_title_delete_item">%1$s wirklich löschen?</string>
 	<string name="_msg_delete_drug">Dies kann nicht rückgängig gemacht werden!</string>
 	
 	<string name="_toast_db_reset_success">Zurücksetzen der Datenbank erfolgreich.</string>

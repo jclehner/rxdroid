@@ -131,7 +131,7 @@
     </string>
   <string name="_title_weekdays">Viikonpäivät</string>
   <string name="_title_on_demand">Tarvittaessa</string>
-  <string name="_title_delete_drug">Poistetaanko %1$s?</string>
+  <string name="_title_delete_item">Poistetaanko %1$s?</string>
   <string name="_msg_delete_drug">Toimintoa ei voi peruuttaa!</string>
   <string name="_toast_db_reset_success">Tietokannan palautus onnistui.</string>
   <string name="_toast_db_reset_failure">Tietokannan palautus epäonnistui. Asenna uudelleen.</string>

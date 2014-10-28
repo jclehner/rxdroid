@@ -32,11 +32,9 @@ import android.os.Environment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.Html;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -57,7 +55,6 @@ import java.util.Date;
 import java.util.List;
 
 import at.jclehner.androidutils.LoaderListFragment;
-import at.jclehner.androidutils.PopupMenuCompatBuilder;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
@@ -311,7 +308,7 @@ public class BackupFragment extends LoaderListFragment<File>
 					else if(item.getItemId() == R.id.menuitem_delete)
 					{
 						final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-						ab.setMessage(getString(R.string._title_delete_drug, file.item.getName()));
+						ab.setMessage(getString(R.string._title_delete_item, file.item.getName()));
 						ab.setNegativeButton(android.R.string.cancel, null);
 						ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 								@Override

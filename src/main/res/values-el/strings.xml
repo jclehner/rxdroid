@@ -193,7 +193,7 @@
         
         <string name="_title_on_demand">Όπως απαιτείται</string>
         
-        <string name="_title_delete_drug">Σίγουρα διαγραφή του %1$s?</string>
+        <string name="_title_delete_item">Σίγουρα διαγραφή του %1$s?</string>
         <string name="_msg_delete_drug">Αυτό δεν μπορεί να αναιρεθεί!</string>
         
         <string name="_toast_db_reset_success">Επιτυχής επαναφορά της βάσης δεδομένων.</string>

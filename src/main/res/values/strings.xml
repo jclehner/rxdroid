@@ -195,7 +195,7 @@
 	
 	<string name="_title_on_demand">As needed</string>
 	
-	<string name="_title_delete_drug">Really delete %1$s?</string>
+	<string name="_title_delete_item">Really delete %1$s?</string>
 	<string name="_msg_delete_drug">This cannot be undone!</string>
 	
 	<string name="_toast_db_reset_success">Successfully reset database.</string>
