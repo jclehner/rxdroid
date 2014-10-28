@@ -1,7 +1,9 @@
 package at.jclehner.rxdroid;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +17,7 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.v4.content.IntentCompat;
 import android.support.v4.preference.PreferenceFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.text.SpannableString;
@@ -332,10 +335,19 @@ public class SettingsActivity extends ActionBarActivity
 
 				final PackageManager pm = context.getPackageManager();
 				final Intent intent = pm.getLaunchIntentForPackage(context.getPackageName());
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-				RxDroid.doStartActivity(intent);
 
-				//finish();
+				if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
+				{
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+					getActivity().startActivity(intent);
+				}
+				else
+				{
+					final PendingIntent operation = PendingIntent.getActivity(getActivity(), 0, intent, 0);
+					final AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+					am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, operation);
+					System.exit(0);
+				}
 			}
 			else if(Settings.Keys.NOTIFICATION_LIGHT_COLOR.equals(key))
 			{
