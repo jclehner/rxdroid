@@ -51,7 +51,6 @@
 		<item name="bgColorLogChild">@android:color/transparent</item>
 		
 		<item name="iconLowSupplies">@drawable/ic_low_supply_warning</item>
-		<item name="iconMissedDose">@drawable/ic_warning</item>
 		<item name="iconArrowRight">@drawable/ic_arrow_right_black</item>		
 		<item name="iconLock">@drawable/ic_menu_lock_black</item>
 		<item name="iconTime">@drawable/ic_menu_time_black</item>
@@ -66,7 +65,7 @@
 		
 		<item name="android:windowAnimationStyle">@null</item>
 		<item name="android:alertDialogStyle">@style/Theme.RxDroid.Dialog</item>
-		
+
 		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 
 		<item name="colorPrimary">#ff5722</item>
@@ -121,7 +120,6 @@
         <item name="bgColorLogChild">#111</item>
         
         <item name="iconLowSupplies">@drawable/ic_low_supply_warning_white</item>
-        <item name="iconMissedDose">@drawable/ic_warning_white</item>
         <item name="iconArrowRight">@drawable/ic_arrow_right_white</item>
         <item name="iconLock">@drawable/ic_menu_lock_white</item>
         <item name="iconTime">@drawable/ic_menu_time_white</item>
