@@ -100,7 +100,7 @@ public final class Entries
 			return false;
 
 		final int repeatMode = drug.getRepeatMode();
-		switch(repeatMode)
+		/*switch(repeatMode)
 		{
 			case Drug.REPEAT_EVERY_N_DAYS:
 			case Drug.REPEAT_WEEKDAYS:
@@ -108,7 +108,7 @@ public final class Entries
 				if(drug.hasDoseOnDate(date))
 					return false;
 			}
-		}
+		}*/
 
 		if(repeatMode == Drug.REPEAT_EVERY_N_DAYS)
 		{
@@ -125,8 +125,11 @@ public final class Entries
 				offset = (int) -days;
 
 			final Date lastIntakeDate = DateTime.add(date, Calendar.DAY_OF_MONTH, offset);
-			if(!isDateAfterLastScheduleUpdateOfDrug(lastIntakeDate, drug))
+			if(lastIntakeDate.compareTo(drug.getLastScheduleUpdateDate()) == -1)
 				return false;
+
+			//if(!isDateAfterLastScheduleUpdateOfDrug(lastIntakeDate, drug))
+			//	return false;
 
 			return !hasAllDoseEvents(drug, lastIntakeDate);
 		}
