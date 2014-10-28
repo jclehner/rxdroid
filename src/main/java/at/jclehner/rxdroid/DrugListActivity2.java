@@ -604,8 +604,14 @@ public class DrugListActivity2 extends ActionBarActivity
 					if(Entries.countDoseEvents(drug, mDate, null) != 0)
 						return true;
 
-					if(Entries.hasMissingDosesBeforeDate(drug, mDate))
-						return true;
+					if(mDtInfo.activeDate().equals(mDate))
+					{
+						if(Entries.hasMissingDosesBeforeDate(drug, mDate))
+							return true;
+
+						if(Entries.hasLowSupplies(drug, mDate))
+							return true;
+					}
 
 					if(!drug.hasDoseOnDate(mDate))
 						return false;
