@@ -520,6 +520,82 @@ public class SettingsActivity extends ActionBarActivity
 				});
 			}
 
+			p = findPreference("key_debug_drug_with_missed_doses");
+			if(p != null)
+			{
+				p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+					@Override
+					public boolean onPreferenceClick(Preference preference)
+					{
+						Fraction dose = new Fraction(1, 2);
+
+						Drug drug = new Drug();
+						drug.setName("Missing No");
+						drug.setDose(Schedule.TIME_MORNING, dose);
+						drug.setRefillSize(30);
+						drug.setCurrentSupply(new Fraction(23, 1, 2));
+						drug.setRepeatMode(Drug.REPEAT_EVERY_N_DAYS);
+						drug.setRepeatArg(3);
+						drug.setRepeatOrigin(DateTime.add(DateTime.today(), Calendar.DAY_OF_MONTH, -2));
+						drug.setLastScheduleUpdateDate(drug.getRepeatOrigin());
+
+						Database.create(drug);
+
+						return true;
+					}
+				});
+			}
+
+			p = findPreference("key_debug_delete_drugs");
+			if(p != null)
+			{
+				p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+				{
+					@Override
+					public boolean onPreferenceClick(Preference preference)
+					{
+						final List<Drug> drugs = Database.getAll(Drug.class);
+						final CharSequence[] names = new CharSequence[drugs.size()];
+						final boolean[] checked = new boolean[drugs.size()];
+
+						for(int i = 0; i != drugs.size(); ++i)
+						{
+							names[i] = drugs.get(i).getName();
+							checked[i] = false;
+						}
+
+						final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+						ab.setNegativeButton(android.R.string.cancel, null);
+						ab.setTitle("Delete drugs");
+						ab.setMultiChoiceItems(names, checked, new DialogInterface.OnMultiChoiceClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface dialog, int which, boolean isChecked)
+							{
+								checked[which] = isChecked;
+							}
+						});
+						ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+								for(int i = 0; i != drugs.size(); ++i)
+								{
+									if(checked[i])
+										Database.delete(drugs.get(i), Database.FLAG_DONT_NOTIFY_LISTENERS);
+								}
+							}
+						});
+
+						ab.show();
+
+						return true;
+					}
+				});
+			}
+
 			p = findPreference("db_create_drug_with_many_dose_events");
 			if(p != null)
 			{
@@ -545,8 +621,6 @@ public class SettingsActivity extends ActionBarActivity
 							date = DateTime.add(DateTime.today(), Calendar.DAY_OF_MONTH, -i);
 							Database.create(new DoseEvent(drug, date, Schedule.TIME_MORNING, dose), Database.FLAG_DONT_NOTIFY_LISTENERS);
 						}
-
-
 
 						return true;
 					}

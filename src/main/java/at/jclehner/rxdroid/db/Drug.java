@@ -605,6 +605,10 @@ public class Drug extends Entry implements Comparable<Drug>
 		return lastScheduleUpdateDate;
 	}
 
+	public void setLastScheduleUpdateDate(Date date) {
+		lastScheduleUpdateDate = date;
+	}
+
 //	public Date getLastDosesClearedDate() {
 //		return lastDosesClearedDate;
 //	}

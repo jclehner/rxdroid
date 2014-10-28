@@ -28,6 +28,7 @@ import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Exceptions;
 import at.jclehner.rxdroid.util.Keep;
+import at.jclehner.rxdroid.util.Util;
 
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
@@ -257,8 +258,41 @@ public final class Schedule extends Entry
 	}
 
 	@Override
-	public boolean equals(Object other) {
-		throw new UnsupportedOperationException();
+	public boolean equals(Object other)
+	{
+		if(other == null || !(other instanceof Schedule))
+			return false;
+
+		if(other == this)
+			return true;
+
+		if(!Util.equalsIgnoresNull(doseMorning, ((Schedule) other).doseMorning))
+			return false;
+
+		if(!Util.equalsIgnoresNull(doseNoon, ((Schedule) other).doseNoon))
+			return false;
+
+		if(!Util.equalsIgnoresNull(doseEvening, ((Schedule) other).doseEvening))
+			return false;
+
+		if(!Util.equalsIgnoresNull(doseNight, ((Schedule) other).doseNight))
+			return false;
+
+		if(!Util.equalsIgnoresNull(begin, ((Schedule) other).begin))
+			return false;
+
+		if(!Util.equalsIgnoresNull(end, ((Schedule) other).end))
+			return false;
+
+		if(repeatMode != ((Schedule) other).repeatMode)
+			return false;
+
+		if(repeatArg != ((Schedule) other).repeatArg)
+			return false;
+
+		// FIXME currently ignoring owner and name
+
+		return true;
 	}
 
 	@Override

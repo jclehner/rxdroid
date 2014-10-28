@@ -70,6 +70,12 @@
 			android:title="Tablet layout"
 			/>
 
+	<Preference android:key="key_debug_drug_with_missed_doses"
+			android:title="Create drug with missed doses" />
+
+	<Preference android:key="key_debug_delete_drugs"
+			android:title="Delete drugs" />
+
 	<CheckBoxPreference android:key="@string/key_compact_action_bar"
 			android:title="Compact ActionBar"
 			android:defaultValue="@bool/pref_default_compact_action_bar"
