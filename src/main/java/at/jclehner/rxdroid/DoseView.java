@@ -28,6 +28,8 @@ import java.util.List;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.support.v4.view.ViewCompat;
 import android.text.SpannableStringBuilder;
 import android.text.style.SuperscriptSpan;
@@ -62,8 +64,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	private static final String TAG = DoseView.class.getSimpleName();
 	private static final boolean LOGV = false;
 
-	private static final boolean USE_BACKGROUND_HACK = true;
-
 	private static final int[] DOSE_TIME_DRAWABLES = {
 			R.drawable.ic_morning,
 			R.drawable.ic_noon,
@@ -79,7 +79,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	private final ImageView mIntakeStatus;
 	private final TextView mDoseText;
 	private final ImageView mDoseTimeIcon;
-
 
 	private boolean mIsConstantBackground = false;
 
@@ -103,8 +102,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		LayoutInflater.from(context).inflate(R.layout.dose_view, this, true);
 
-		if(!USE_BACKGROUND_HACK)
-			setBackgroundResource(Theme.getResourceAttribute(R.attr.selectableItemBackground));
+		setBackgroundResource(Theme.getResourceAttribute(R.attr.selectableItemBackground));
 
 		mIntakeStatus = (ImageView) findViewById(R.id.icon_intake_status);
 		mDoseText = (TextView) findViewById(R.id.text_dose);
@@ -238,46 +236,11 @@ public class DoseView extends FrameLayout implements OnChangeListener
 		mDoseText.setEnabled(!dimmed);
 	}
 
-	public void setConstantBackgroundResource(int resId)
-	{
-		mIsConstantBackground = resId != 0;
-		setBackgroundResource(resId);
-		setPadding(0, 0, 0, 0);
-	}
-
 	@Override
 	public void setEnabled(boolean enabled)
 	{
 		super.setEnabled(enabled);
 		setDimmed(!enabled);
-	}
-
-	@Override
-	public boolean onTouchEvent(MotionEvent event)
-	{
-		if(isClickable() && isEnabled())
-		{
-			// This background change could of course be handled more elegantly
-			// using a drawable selector, but state_pressed is much less responsive
-			// than this method here.
-
-			final int action = event.getAction() & MotionEvent.ACTION_MASK;
-
-			switch(action)
-			{
-				case MotionEvent.ACTION_DOWN:
-					changeBackground(R.drawable.generic_pressed);
-					break;
-
-				case MotionEvent.ACTION_UP:
-				case MotionEvent.ACTION_CANCEL:
-				case MotionEvent.ACTION_OUTSIDE:
-					changeBackground(0);
-					break;
-			}
-		}
-
-		return super.onTouchEvent(event);
 	}
 
 	@Override
@@ -327,9 +290,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	protected void onAttachedToWindow()
 	{
 		super.onAttachedToWindow();
-
-		changeBackground(0);
-
 		if(mDrug != null)
 			Database.registerEventListener(this);
 	}
@@ -338,29 +298,7 @@ public class DoseView extends FrameLayout implements OnChangeListener
 	protected void onDetachedFromWindow()
 	{
 		super.onDetachedFromWindow();
-
-		changeBackground(0);
 		Database.unregisterEventListener(this);
-	}
-
-	@Override
-	protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect)
-	{
-		super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
-
-		if(gainFocus)
-			changeBackground(R.drawable.generic_pressed);
-		else
-			changeBackground(0);
-	}
-
-	private void changeBackground(int resId)
-	{
-		if(!USE_BACKGROUND_HACK || mIsConstantBackground)
-			return;
-
-		setBackgroundResource(resId);
-		setPadding(0, 0, 0, 0);
 	}
 
 	private boolean isApplicableDoseEvent(DoseEvent intake)

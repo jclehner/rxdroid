@@ -119,7 +119,7 @@ public class DrugListActivity2 extends ActionBarActivity
 			public Fragment getItem(int position)
 			{
 				final Date date = getDateForPage(position);
-				return DrugListFragment.newInstance(date, mDtInfo.currentTime(), mPatientId);
+				return DrugListFragment.newInstance(date, mDtInfo.currentTime(), mPatientId, mShowingAll);
 			}
 
 			@Override
@@ -149,7 +149,10 @@ public class DrugListActivity2 extends ActionBarActivity
 		private Date mDisplayedDate;
 		private Date mReferenceDate;
 
+		private boolean mShowingAll = false;
+
 		private Settings.DoseTimeInfo mDtInfo;
+		private boolean mHasExplicitDateRequest = false;
 
 		private int mLastActiveDoseTime;
 		private Date mLastActiveDate;
@@ -164,8 +167,10 @@ public class DrugListActivity2 extends ActionBarActivity
 
 			final Bundle args = icicle != null ? icicle : getArguments();
 			mPatientId = args.getInt(ARG_PATIENT_ID);
+			mDisplayedDate = (Date) getArguments().getSerializable(ARG_DATE);
+			mHasExplicitDateRequest = mDisplayedDate != null;
 
-			if(icicle != null && !getArguments().containsKey("date"))
+			if(icicle != null && mDisplayedDate == null)
 			{
 				mLastActiveDoseTime = icicle.getInt("last_active_dose_time", -1);
 				mLastActiveDate = (Date) icicle.getSerializable("last_active_date");
@@ -183,22 +188,35 @@ public class DrugListActivity2 extends ActionBarActivity
 
 			updateDoseTimeInfo();
 
-			// If we're resuming, we want the date to stay untouched,
-			// unless the active doseTime and/or date have changed since the
-			// last resume.
-
-			if(mDtInfo.activeDoseTime() != mLastActiveDoseTime && !mDtInfo.activeDate().equals(mLastActiveDate))
-				setDate(mDtInfo.activeDate(), true);
-			else if(mDisplayedDate != null)
-				setDate(mDisplayedDate, false);
-			else
+			if(BuildConfig.DEBUG)
 			{
-				Date date = (Date) getArguments().getSerializable("date");
-				if(date == null)
-					date = mDtInfo.activeDate();
-
-				setDate(date, true);
+				Toast.makeText(getActivity(), "mHasExplicitDateRequest = "
+						+ mHasExplicitDateRequest, Toast.LENGTH_LONG).show();
 			}
+
+			if(!mHasExplicitDateRequest)
+			{
+				// If we're resuming, we want the date to stay untouched,
+				// unless the active doseTime and/or date have changed since the
+				// last resume.
+
+				if(mDtInfo.activeDoseTime() != mLastActiveDoseTime && !mDtInfo.activeDate().equals(mLastActiveDate))
+					setDate(mDtInfo.activeDate(), true);
+				else if(mDisplayedDate != null)
+					setDate(mDisplayedDate, false);
+				else
+				{
+					Date date = (Date) getArguments().getSerializable("date");
+					if(date == null)
+						date = mDtInfo.activeDate();
+
+					setDate(date, true);
+				}
+			}
+			else
+				setDate(mDisplayedDate, true);
+
+			mHasExplicitDateRequest = false;
 
 			NotificationReceiver.registerOnDoseTimeChangeListener(this);
 			SystemEventReceiver.registerOnSystemTimeChangeListener(this);
@@ -241,6 +259,9 @@ public class DrugListActivity2 extends ActionBarActivity
 				menu.findItem(R.id.menuitem_take_all).setEnabled(
 						mDisplayedDate.equals(mDtInfo.activeDate()));
 			}
+
+			menu.findItem(R.id.menuitem_toggle_filtering).setTitle(!mShowingAll ?
+				 R.string._title_show_all : R.string._title_filter);
 		}
 
 		@Override
@@ -282,6 +303,8 @@ public class DrugListActivity2 extends ActionBarActivity
 				}
 				case R.id.menuitem_toggle_filtering:
 				{
+					mShowingAll = !mShowingAll;
+					setDate(mDisplayedDate, true);
 					/*mShowingAll = !mShowingAll;
 					invalidateViewPager();*/
 					return true;
@@ -408,6 +431,7 @@ public class DrugListActivity2 extends ActionBarActivity
 				ImageView icon;
 				DrugSupplyMonitor supply;
 				View history;
+				View missedDoseIndicator;
 			}
 
 			public Adapter(DrugListFragment fragment) {
@@ -427,14 +451,13 @@ public class DrugListActivity2 extends ActionBarActivity
 					holder.name = (DrugNameView) view.findViewById(R.id.drug_name);
 					holder.supply = (DrugSupplyMonitor) view.findViewById(R.id.text_supply);
 					holder.history = view.findViewById(R.id.frame_history_menu);
+					holder.missedDoseIndicator = view.findViewById(R.id.img_missed_dose_warning);
 
 					holder.name.setOnClickListener((View.OnClickListener) mFragment);
 					holder.history.setOnClickListener((View.OnClickListener) mFragment);
 					holder.supply.setOnClickListener((View.OnClickListener) mFragment);
 
 					holder.supply.setOnLongClickListener((View.OnLongClickListener) mFragment);
-
-					view.findViewById(R.id.img_missed_dose_warning).setVisibility(View.GONE);
 
 					holder.setDoseViewsAndDividersFromLayout(view);
 
@@ -459,6 +482,9 @@ public class DrugListActivity2 extends ActionBarActivity
 				holder.supply.setDrugAndDate(wrapper.item, wrapper.date);
 				holder.supply.setVisibility(wrapper.isSupplyVisible ? View.VISIBLE : View.INVISIBLE);
 				holder.history.setTag(wrapper.item.getId());
+
+				holder.missedDoseIndicator.setVisibility((wrapper.isActiveDate && wrapper.hasMissingDoses)
+					? View.VISIBLE : View.GONE);
 
 				for(int i = 0; i != holder.doseViews.length; ++i)
 				{
@@ -498,9 +524,11 @@ public class DrugListActivity2 extends ActionBarActivity
 				public boolean isActiveDate;
 				public boolean isSupplyLow;
 				public boolean isSupplyVisible;
+				public boolean hasMissingDoses;
 				public boolean[] doseViewDimmed = { false, false, false, false };
 			}
 
+			private final boolean mShowAll;
 			private final int mPatientId;
 			private final Date mDate;
 			private final Settings.DoseTimeInfo mDtInfo;
@@ -511,6 +539,7 @@ public class DrugListActivity2 extends ActionBarActivity
 
 				checkArgs(args);
 
+				mShowAll = args.getBoolean(ARG_SHOW_ALL);
 				mDate = (Date) args.getSerializable(ARG_DATE);
 				mPatientId = args.getInt(ARG_PATIENT_ID);
 				mDtInfo = Settings.getDoseTimeInfo((Calendar) args.getSerializable("time"));
@@ -521,8 +550,9 @@ public class DrugListActivity2 extends ActionBarActivity
 			{
 				Database.init();
 
-				final List<Drug> drugs = (List<Drug>)
-						CollectionUtils.filter(Entries.getAllDrugs(mPatientId), mFilter);
+				final List<Drug> allDrugs = Entries.getAllDrugs(mPatientId);
+				final List<Drug> drugs = mShowAll ? allDrugs :
+						(List<Drug>) CollectionUtils.filter(allDrugs, mFilter);
 
 				Collections.sort(drugs, mComparator);
 				final ArrayList<DrugWrapper> data = new ArrayList<DrugWrapper>(drugs.size());
@@ -533,6 +563,7 @@ public class DrugListActivity2 extends ActionBarActivity
 					wrapper.date = mDate;
 					wrapper.isActiveDate = mDate.equals(mDtInfo.activeDate());
 					wrapper.isSupplyLow = Entries.hasLowSupplies(drug, mDate);
+					wrapper.hasMissingDoses = Entries.hasMissingDosesBeforeDate(drug, mDate);
 					wrapper.isSupplyVisible = (drug.getRefillSize() != 0 || !drug.getCurrentSupply().isZero()) && !mDate.before(mDtInfo.activeDate());
 
 					if(wrapper.isActiveDate)
@@ -571,6 +602,9 @@ public class DrugListActivity2 extends ActionBarActivity
 						return false;
 
 					if(Entries.countDoseEvents(drug, mDate, null) != 0)
+						return true;
+
+					if(Entries.hasMissingDosesBeforeDate(drug, mDate))
 						return true;
 
 					if(!drug.hasDoseOnDate(mDate))
@@ -629,18 +663,21 @@ public class DrugListActivity2 extends ActionBarActivity
 				}
 			};
 		}
+
 		public static String ARG_DATE = "date";
 		public static String ARG_TIME = "time";
 		public static String ARG_PATIENT_ID = "patient_id";
+		public static String ARG_SHOW_ALL = "show_all";
 
 		private Date mDate;
 
-		public static DrugListFragment newInstance(Date date, Calendar time, int patientId)
+		public static DrugListFragment newInstance(Date date, Calendar time, int patientId, boolean showAll)
 		{
 			final Bundle args = new Bundle();
 			args.putSerializable(ARG_DATE, date);
 			args.putSerializable(ARG_TIME, time);
 			args.putInt(ARG_PATIENT_ID, patientId);
+			args.putBoolean(ARG_SHOW_ALL, showAll);
 
 			final DrugListFragment instance = new DrugListFragment();
 			instance.setArguments(args);
@@ -776,16 +813,16 @@ public class DrugListActivity2 extends ActionBarActivity
 
 				pm.show();
 
-				doseView.setConstantBackgroundResource(R.drawable.generic_pressed);
-				//doseView.setSelected(true);
+				doseView.setBackgroundColor(Theme.getColorAttribute(R.attr.colorControlHighlight));
 
 				pm.setOnDismissListener(new PopupMenu.OnDismissListener()
 				{
 					@Override
 					public void onDismiss(PopupMenu popupMenu)
 					{
-						doseView.setConstantBackgroundResource(0);
-						//doseView.setSelected(false);
+						//doseView.setConstantBackgroundResource(0);
+						//doseView.setForceSelected(false);
+						doseView.setBackgroundResource(Theme.getResourceAttribute(R.attr.selectableItemBackground));
 					}
 				});
 			}
