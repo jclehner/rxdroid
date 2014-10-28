@@ -484,9 +484,14 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			reverseDependencies = "autoAddIntakes"
 		)*/
 		private Date lastAutoIntakeCreationDate;
+		private Date lastScheduleUpdateDate;
+
+		private Drug original;
 
 		public void set(Drug drug)
 		{
+			original = drug;
+
 			id = drug.getId();
 			active = drug.isActive();
 			comment = drug.getComment();
@@ -503,6 +508,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			sortRank = drug.getSortRank();
 			autoAddIntakes = drug.hasAutoDoseEvents();
 			lastAutoIntakeCreationDate = drug.getLastAutoDoseEventCreationDate();
+			lastScheduleUpdateDate = drug.getLastScheduleUpdateDate();
 			patient = drug.getPatient();
 			schedules = drug.getSchedules();
 
@@ -538,9 +544,36 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			drug.setRepeatArg(repeatArg);
 			drug.setRepeatOrigin(repeatOrigin);
 
-			if(LOGV) Log.v(TAG, "DrugWrapper.get: repeatOrigin=" + repeatOrigin);
+			drug.setLastScheduleUpdateDate(isScheduleEqual(drug, original) ?
+					lastScheduleUpdateDate : DateTime.today());
 
 			return drug;
+		}
+
+		private boolean isScheduleEqual(Drug drug1, Drug drug2)
+		{
+			if(drug1.getSchedules().size() != 0 || drug2.getSchedules().size() != 0)
+				throw new UnsupportedOperationException();
+
+			if(drug1.getRepeatMode() != drug2.getRepeatMode())
+				return false;
+
+			if(drug1.getRepeatArg() != drug2.getRepeatArg())
+				return false;
+
+			if(!Util.equalsIgnoresNull(drug1.getRepeatOrigin(), drug2.getRepeatOrigin()))
+				return false;
+
+			final Fraction schedule1[] = drug1.getSimpleSchedule();
+			final Fraction schedule2[] = drug2.getSimpleSchedule();
+
+			for(int i = 0; i != schedule1.length; ++i)
+			{
+				if(!Util.equalsIgnoresNull(schedule1[i], schedule2[i]))
+					return false;
+			}
+
+			return true;
 		}
 	}
 
