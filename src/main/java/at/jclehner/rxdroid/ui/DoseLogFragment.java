@@ -159,11 +159,11 @@ public class DoseLogFragment extends ExpandableListFragment
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-		final int iconAttr = isAllCollapsed() ? R.attr.actionIconExpandAll : R.attr.actionIconCollapseAll;
 		final int titleResId = isAllCollapsed() ? R.string._title_expand : R.string._title_collapse;
 
 		MenuItem item = menu.add(0, MENU_COLLAPSE_EXPAND, 0, titleResId)
-		.setIcon(Theme.getResourceAttribute(iconAttr))
+		.setIcon(isAllCollapsed() ? R.drawable.ic_action_expand_white
+				: R.drawable.ic_action_collapse_white)
 		.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
 			@Override

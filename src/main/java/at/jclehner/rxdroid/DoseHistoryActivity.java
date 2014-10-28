@@ -108,7 +108,7 @@ public class DoseHistoryActivity extends ActionBarActivity implements
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		MenuItem item = menu.add(0, MENU_VIEW, 0, R.string._title_view)
-				.setIcon(R.drawable.ic_action_eye_white)
+				.setIcon(R.drawable.ic_action_visibility_white)
 				.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
 					@Override

@@ -27,38 +27,38 @@
 
 		<item android:id="@+id/menuitem_add"
 		android:title="@string/_title_add"
-		android:icon="@drawable/ic_action_add"
+		android:icon="@drawable/ic_action_add_box_white"
 		app:showAsAction="never"
 	/>
 		
 	<item android:id="@+id/menuitem_patient"
 		android:title="@string/_title_patient"
-		android:icon="@drawable/ic_menu_patient"
+		android:icon="@null"
 			app:showAsAction="always"
 		android:visible="false"
 	/>
 	
 	<item android:id="@+id/menuitem_take_all"
 	    android:title="@string/_title_take_all_doses"
-	    android:icon="@drawable/ic_action_tick"
+	    android:icon="@drawable/ic_action_tick_white"
 			app:showAsAction="always"
 	/>
 		
 	<item android:id="@+id/menuitem_date"
 		android:title="@string/_title_select_date"
-		android:icon="@drawable/ic_menu_calendar_light"
+		android:icon="@drawable/ic_action_date_white"
 			app:showAsAction="always"
 	/>
 	
 	<item android:id="@+id/menuitem_preferences"
 		android:title="@string/_title_preferences"
-		android:icon="@android:drawable/ic_menu_preferences"
+		android:icon="@null"
 			app:showAsAction="never"
 	/>
 	
 	<item android:id="@+id/menuitem_toggle_filtering"
 		android:title="@string/_title_show_all"
-		android:icon="@android:drawable/ic_menu_view"
+		android:icon="@null"
 			app:showAsAction="never"
 	/>
 

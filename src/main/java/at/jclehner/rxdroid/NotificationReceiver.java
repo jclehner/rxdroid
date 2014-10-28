@@ -526,7 +526,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
             {
                 NotificationCompat.Action action = new NotificationCompat.Action.Builder(
-                       R.drawable.ic_action_tick_enabled, getString(R.string._title_take_all_doses), operation).build();
+                       R.drawable.ic_action_tick_white, getString(R.string._title_take_all_doses), operation).build();
 				builder.addAction(action);
 				builder.extend(new NotificationCompat.WearableExtender().addAction(action));
             }
