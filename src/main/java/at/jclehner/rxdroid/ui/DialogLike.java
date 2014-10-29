@@ -131,10 +131,16 @@ public class DialogLike extends Fragment
 		mNegativeBtn.setOnClickListener(mBtnListener);
 
 		final int customView = getArguments().getInt("custom_view");
-		if(customView != 0)
-		{
-			final FrameLayout customViewFrame = (FrameLayout) v.findViewById(R.id.custom);
+		final FrameLayout customViewFrame = (FrameLayout) v.findViewById(R.id.custom);
+
+		if(mCustomView != null)
+			customViewFrame.addView(mCustomView);
+		else if(customView != 0)
 			mCustomView = inflater.inflate(customView, customViewFrame, true);
+
+		if(mCustomView != null)
+		{
+			customViewFrame.setVisibility(View.VISIBLE);
 			onBindCustomView(mCustomView);
 		}
 
@@ -171,6 +177,10 @@ public class DialogLike extends Fragment
 	{
 		getArguments().putInt("custom_view", resId);
 		applyArguments();
+	}
+
+	public void setCustomView(View view) {
+		mCustomView = view;
 	}
 
 	public void setDetail(CharSequence detail)

@@ -39,7 +39,7 @@
 				<FrameLayout android:id="@+id/custom"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:paddingTop="16dip"
+						android:layout_marginTop="96dip"
 						android:visibility="gone" />
 
 				<TextView android:id="@+id/detail"
@@ -54,32 +54,7 @@
 			</LinearLayout>
     </ScrollView>
 
-    <LinearLayout android:id="@+id/button_bar"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_gravity="bottom"
-            android:orientation="horizontal"
-            android:gravity="center"
-            style="?attr/buttonBarStyle">
-
-        <Button android:id="@+id/btn_left"
-                android:layout_height="match_parent"
-                android:layout_width="0dip"
-                android:layout_weight="1"
-                android:maxWidth="200dip"
-                android:text="@android:string/cancel"
-                style="?attr/buttonBarButtonStyle"/>
-
-        <Button android:id="@+id/btn_right"
-                android:layout_height="match_parent"
-                android:layout_width="0dip"
-                android:layout_weight="1"
-                android:maxWidth="200dip"
-                android:text="@android:string/ok"
-                style="?attr/buttonBarButtonStyle"/>
-
-
-    </LinearLayout>
+    <include layout="@layout/button_bar" android:id="@+id/button_bar" />
 
     <ImageView android:id="@+id/icon"
             android:layout_width="match_parent"
