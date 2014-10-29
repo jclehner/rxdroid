@@ -99,8 +99,8 @@ public class DoseHistoryActivity extends ActionBarActivity implements
 		// setListAdapter(new DoseHistoryAdapter(this, mDrug));
 
 		final ActionBar ab = getSupportActionBar();
-		ab.setDisplayShowHomeEnabled(true);
-		ab.setDisplayHomeAsUpEnabled(true);
+		//ab.setDisplayShowHomeEnabled(true);
+		//ab.setDisplayHomeAsUpEnabled(true);
 	}
 
 	@TargetApi(11)
