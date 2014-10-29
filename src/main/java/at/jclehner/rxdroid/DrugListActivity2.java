@@ -94,7 +94,14 @@ public class DrugListActivity2 extends ActionBarActivity
 		ab.setDisplayUseLogoEnabled(true);
 		ab.setLogo(R.drawable.ic_logo_padded);
 
-		if(savedInstanceState == null)
+		if(Settings.getBoolean(Settings.Keys.IS_FIRST_LAUNCH, true))
+		{
+			final Intent intent = new Intent(this, DoseTimePreferenceActivity2.class);
+			intent.putExtra(DoseTimePreferenceActivity2.EXTRA_IS_FIRST_LAUNCH, true);
+			startActivity(intent);
+			finish();
+		}
+		else if(savedInstanceState == null)
 		{
 			final DrugListPagerFragment f = new DrugListPagerFragment();
 			final Bundle args = new Bundle();
@@ -201,14 +208,25 @@ public class DrugListActivity2 extends ActionBarActivity
 				// last resume.
 
 				if(mDtInfo.activeDoseTime() != mLastActiveDoseTime && !mDtInfo.activeDate().equals(mLastActiveDate))
+				{
+					Log.i(TAG, "Last active dose time and/or date differ");
 					setDate(mDtInfo.activeDate(), true);
+				}
 				else if(mDisplayedDate != null)
+				{
+					Log.i(TAG, "Setting date from mDisplayedDate");
 					setDate(mDisplayedDate, false);
+				}
 				else
 				{
 					Date date = (Date) getArguments().getSerializable("date");
 					if(date == null)
+					{
+						Log.i(TAG, "Setting date to active date");
 						date = mDtInfo.activeDate();
+					}
+					else
+						Log.i(TAG, "Date obtained from arguments");
 
 					setDate(date, true);
 				}

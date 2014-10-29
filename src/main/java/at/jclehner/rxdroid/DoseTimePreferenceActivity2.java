@@ -43,6 +43,8 @@ import at.jclehner.rxdroid.util.Components;
 
 public class DoseTimePreferenceActivity2 extends ActionBarActivity
 {
+	public static final String EXTRA_IS_FIRST_LAUNCH = "rxdroid:is_first_launch";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -76,7 +78,7 @@ public class DoseTimePreferenceActivity2 extends ActionBarActivity
 			final PreferenceManager pm = getPreferenceManager();
 			pm.setSharedPreferencesMode(MODE_MULTI_PROCESS);
 			pm.setSharedPreferencesName(Settings.getDefaultSharedPreferencesName(getActivity()));
-			mIsFirstLaunch = getActivity().getIntent().getBooleanExtra(DrugEditActivity2.EXTRA_IS_FIRST_LAUNCH, false);
+			mIsFirstLaunch = getActivity().getIntent().getBooleanExtra(EXTRA_IS_FIRST_LAUNCH, false);
 			addPreferencesFromResource(R.xml.dose_times);
 		}
 
@@ -87,6 +89,7 @@ public class DoseTimePreferenceActivity2 extends ActionBarActivity
 			{
 				final View v = inflater.inflate(R.layout.activity_dose_time_settings, root, false);
 				v.findViewById(R.id.btn_save).setOnClickListener(this);
+				return v;
 			}
 
 			return super.onCreateView(inflater, root, paramBundle);
@@ -99,7 +102,7 @@ public class DoseTimePreferenceActivity2 extends ActionBarActivity
 
 			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(getPreferenceScreen().getTitle());
 
-			if(!Settings.wasDisplayedOnce("license_info"))
+			if(!Settings.wasDisplayedOnce("license_info") && mIsFirstLaunch)
 			{
 				final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
 				ab.setCancelable(false);

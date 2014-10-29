@@ -31,11 +31,9 @@ import at.jclehner.rxdroid.util.Components;
 
 public class DrugEditActivity2 extends ActionBarActivity
 {
-	//public static final String EXTRA_DRUG = "drug";
 	public static final String EXTRA_DRUG_ID = "drug_id";
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
 	public static final String EXTRA_DISALLOW_DELETE = "disallow_delete";
-	public static final String EXTRA_IS_FIRST_LAUNCH = "at.jclehner.rxroid.extras.IS_FIRST_LAUNCH";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
