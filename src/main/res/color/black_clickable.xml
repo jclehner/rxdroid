@@ -23,7 +23,7 @@
 -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:state_pressed="true" android:color="@color/active_text_dark" />
-	<item android:state_focused="true" android:color="@color/active_text_light" />
+	<item android:state_pressed="true" android:color="#ffffa70b" />
+	<item android:state_focused="true" android:color="#ffffa70b" />
 	<item android:color="@android:color/black" />
 </selector>

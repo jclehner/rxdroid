@@ -22,6 +22,7 @@
 package at.jclehner.rxdroid;
 
 import android.app.DatePickerDialog;
+import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -37,17 +38,23 @@ import android.support.v7.widget.PopupMenu;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.github.espiandev.showcaseview.ShowcaseView;
+import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -71,6 +78,7 @@ import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Extras;
+import at.jclehner.rxdroid.util.ShowcaseViews;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 import at.jclehner.rxdroid.widget.DrugNameView;
@@ -164,6 +172,8 @@ public class DrugListActivity2 extends ActionBarActivity
 		private int mLastActiveDoseTime;
 		private Date mLastActiveDate;
 
+		private ShowcaseViews mShowcaseQueue = new ShowcaseViews();
+
 		@Override
 		public void onCreate(Bundle icicle)
 		{
@@ -238,6 +248,8 @@ public class DrugListActivity2 extends ActionBarActivity
 
 			NotificationReceiver.registerOnDoseTimeChangeListener(this);
 			SystemEventReceiver.registerOnSystemTimeChangeListener(this);
+
+			mShowcaseQueue.show();
 		}
 
 		@Override
@@ -389,6 +401,8 @@ public class DrugListActivity2 extends ActionBarActivity
 			updateDoseTimeInfo();
 			updateLastDisplayInfos();
 
+			showHelpOverlaysIfApplicable();
+
 			mPager.getAdapter().notifyDataSetChanged();
 			mPager.setCurrentItem(CENTER_ITEM, false);
 
@@ -421,6 +435,56 @@ public class DrugListActivity2 extends ActionBarActivity
 			Util.applyStyle(dateStr, new RelativeSizeSpan(0.75f));
 
 			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(dateStr);
+		}
+
+		private void showHelpOverlaysIfApplicable()
+		{
+			if(false && Database.countAll(Drug.class) != 0)
+			{
+				mShowingAll = true;
+
+				// 1. Swipe date
+
+				ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(getActivity());
+				svb.setText(R.string._help_title_swipe_date, R.string._help_msg_swipe_date);
+				svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+				svb.setShowcaseId(0xdeadbeef + 0);
+				//svb.setShowcaseItem(ShowcaseView.ITEM_TITLE, 0, getActivity());
+
+				final DisplayMetrics metrics = new DisplayMetrics();
+				getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+				final float w = metrics.widthPixels;
+				final float h = metrics.heightPixels;
+				final float y = h * 0.6f;
+
+				svb.setAnimatedGesture(-100, y, w, y);
+
+				mShowcaseQueue.add(tag(svb.build(), "Swipe date"));
+
+				// 2. Edit drug
+				svb = new ShowcaseViewBuilder2(getActivity());
+				svb.setText(R.string._help_title_edit_drug, R.string._help_msg_edit_drug);
+				svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+				svb.setShowcaseId(0xdeadbeef + 1);
+				svb.setShowcaseView(R.id.drug_name, getActivity());
+				mShowcaseQueue.add(tag(svb.build(false), "Edit drug"));
+
+				// 3. Take dose & long press
+				svb = new ShowcaseViewBuilder2(getActivity());
+				svb.setText(R.string._help_title_click_dose, R.string._help_msg_click_dose);
+				svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+				svb.setShowcaseId(0xdeadbeef + 4);
+				svb.setShowcaseView(R.id.noon, getActivity());
+				mShowcaseQueue.add(tag(svb.build(false), "Take dose & long press"));
+			}
+		}
+
+		private ShowcaseView tag(ShowcaseView sv, String tag)
+		{
+			if(sv != null)
+				sv.setTag(tag);
+			return sv;
 		}
 
 		private final ViewPager.OnPageChangeListener mPageListener = new ViewPager.SimpleOnPageChangeListener()
@@ -721,6 +785,8 @@ public class DrugListActivity2 extends ActionBarActivity
 		{
 			super.onResume();
 			Database.registerEventListener(this);
+
+			setEmptyText(getEmptyText());
 		}
 
 		@Override
@@ -907,12 +973,46 @@ public class DrugListActivity2 extends ActionBarActivity
 			getLoaderManager().restartLoader(0, null, this);
 		}
 
+		private String getEmptyText()
+		{
+			if(Database.countAll(Drug.class) == 0)
+			{
+				final boolean hasHardwareMenuKey;
+				if(Version.SDK_IS_PRE_HONEYCOMB)
+					hasHardwareMenuKey = true;
+				else if(Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+				{
+					// For Honeycomb, there appears to be no way to find out. As it
+					// targets tablets only, we will assume that none of these have a
+					// hardware menu key...
+					hasHardwareMenuKey = false;
+				}
+				else
+				{
+					hasHardwareMenuKey = ViewConfiguration.get(getActivity()).hasPermanentMenuKey();
+				}
+
+				final StringBuilder sb = new StringBuilder(
+						RefString.resolve(getActivity(), R.string._msg_no_drugs_compact_ab));
+				if(hasHardwareMenuKey)
+					sb.append(" " + getString(R.string._help_msg_menu_hardware));
+				else
+					sb.append(" " + getString(R.string._help_msg_menu_ab_overflow));
+
+				return sb.toString();
+			}
+			else
+				return getString(R.string._msg_no_doses_on_this_day);
+		}
+
 		private static void checkArgs(Bundle args)
 		{
 			if(!args.containsKey(ARG_DATE) || !args.containsKey(ARG_PATIENT_ID)
 					|| !args.containsKey(ARG_TIME))
 				throw new IllegalArgumentException("args=" + args.keySet());
 		}
+
+
 
 		@Override
 		public void onEntryCreated(Entry entry, int flags)

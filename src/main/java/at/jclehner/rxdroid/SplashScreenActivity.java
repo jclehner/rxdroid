@@ -253,7 +253,7 @@ public class SplashScreenActivity extends ActionBarActivity implements DialogLik
 
 				Intent intent = new Intent(getBaseContext(), intentClass);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-				intent.putExtra(DrugEditActivity2.EXTRA_IS_FIRST_LAUNCH, isFirstLaunch);
+				intent.putExtra(DoseTimePreferenceActivity2.EXTRA_IS_FIRST_LAUNCH, isFirstLaunch);
 				intent.putExtra(DrugListActivity2.EXTRA_DATE, mDate);
 				startActivity(intent);
 
