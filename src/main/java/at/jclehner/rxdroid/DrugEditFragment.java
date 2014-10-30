@@ -203,14 +203,12 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		OTPM.mapToPreferenceHierarchy(getPreferenceScreen(), mWrapper);
 		getPreferenceScreen().setOnPreferenceChangeListener(mListener);
 
-		/*Preference deletePref = findPreference("delete");
-		if(deletePref != null)
+		if(!mIsEditing)
 		{
-			if(Version.SDK_IS_HONEYCOMB_OR_NEWER || !mIsEditing)
-				getPreferenceScreen().removePreference(deletePref);
-			else
-				deletePref.setOnPreferenceClickListener(this);
-		}*/
+			final Preference p = findPreference("active");
+			if(p != null)
+				p.setEnabled(false);
+		}
 
 		if(mFocusOnCurrentSupply)
 		{

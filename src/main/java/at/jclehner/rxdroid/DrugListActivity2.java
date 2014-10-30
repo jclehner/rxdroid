@@ -248,7 +248,7 @@ public class DrugListActivity2 extends ActionBarActivity
 			NotificationReceiver.registerOnDoseTimeChangeListener(this);
 			SystemEventReceiver.registerOnSystemTimeChangeListener(this);
 
-			mShowcaseQueue.show();
+			showHelpOverlaysIfApplicable();
 		}
 
 		@Override
@@ -281,13 +281,18 @@ public class DrugListActivity2 extends ActionBarActivity
 		@Override
 		public void onPrepareOptionsMenu(Menu menu)
 		{
+			if(mDisplayedDate == null)
+				return;
+
+			final int dateCmp = mDisplayedDate.compareTo(mDtInfo.activeDate());
+
 			if(Settings.getBoolean(Settings.Keys.USE_SAFE_MODE, false))
 				menu.removeItem(R.id.menuitem_take_all);
-			else if(mDisplayedDate != null)
-			{
-				menu.findItem(R.id.menuitem_take_all).setEnabled(
-						mDisplayedDate.equals(mDtInfo.activeDate()));
-			}
+			else
+				menu.findItem(R.id.menuitem_take_all).setVisible(dateCmp <= 0);
+
+			menu.findItem(R.id.menuitem_date).setTitle(dateCmp != 0 ?
+					R.string._title_today : R.string._title_go_to_date);
 
 			menu.findItem(R.id.menuitem_toggle_filtering).setTitle(!mShowingAll ?
 				 R.string._title_show_all : R.string._title_filter);
@@ -333,8 +338,6 @@ public class DrugListActivity2 extends ActionBarActivity
 				{
 					mShowingAll = !mShowingAll;
 					setDate(mDisplayedDate, true);
-					/*mShowingAll = !mShowingAll;
-					invalidateViewPager();*/
 					return true;
 				}
 				case R.id.menuitem_take_all:
@@ -399,8 +402,6 @@ public class DrugListActivity2 extends ActionBarActivity
 			updateDoseTimeInfo();
 			updateLastDisplayInfos();
 
-			showHelpOverlaysIfApplicable();
-
 			mPager.getAdapter().notifyDataSetChanged();
 			mPager.setCurrentItem(CENTER_ITEM, false);
 
@@ -430,24 +431,38 @@ public class DrugListActivity2 extends ActionBarActivity
 			if(mDtInfo.activeDate().equals(mDisplayedDate))
 				Util.applyStyle(dateStr, new UnderlineSpan());
 
-			Util.applyStyle(dateStr, new RelativeSizeSpan(0.75f));
+			//Util.applyStyle(dateStr, new RelativeSizeSpan(0.75f));
 
 			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(dateStr);
 		}
 
 		private void showHelpOverlaysIfApplicable()
 		{
-			if(false && Database.countAll(Drug.class) != 0)
+			final List<Drug> drugs = Entries.getAllDrugs(mPatientId);
+			// "date_swipe" is used for historic reasons
+			if(drugs.size() == 1 && !Settings.wasDisplayedOnce("date_swipe"))
 			{
-				mShowingAll = true;
+				final Drug drug = drugs.get(0);
+				if(!drug.isActive())
+					return;
+
+				Date date = DateTime.today();
+
+				while(!drug.hasDoseOnDate(date))
+				{
+					date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
+					Log.i(TAG, "Trying date " + DateTime.toDateString(date) + " for " + drug);
+				}
+
+				setDate(date, false);
 
 				// 1. Swipe date
 
 				ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(getActivity());
 				svb.setText(R.string._help_title_swipe_date, R.string._help_msg_swipe_date);
-				svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+				/*svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 				svb.setShowcaseId(0xdeadbeef + 0);
-				//svb.setShowcaseItem(ShowcaseView.ITEM_TITLE, 0, getActivity());
+				svb.setShowcaseItem(ShowcaseView.ITEM_TITLE, 0, getActivity());
 
 				final DisplayMetrics metrics = new DisplayMetrics();
 				getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -456,25 +471,28 @@ public class DrugListActivity2 extends ActionBarActivity
 				final float h = metrics.heightPixels;
 				final float y = h * 0.6f;
 
-				svb.setAnimatedGesture(-100, y, w, y);
+				svb.setAnimatedGesture(-100, y, w, y);*/
 
 				mShowcaseQueue.add(tag(svb.build(), "Swipe date"));
 
 				// 2. Edit drug
 				svb = new ShowcaseViewBuilder2(getActivity());
 				svb.setText(R.string._help_title_edit_drug, R.string._help_msg_edit_drug);
-				svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
-				svb.setShowcaseId(0xdeadbeef + 1);
+				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+				//svb.setShowcaseId(0xdeadbeef + 1);
 				svb.setShowcaseView(R.id.drug_name, getActivity());
 				mShowcaseQueue.add(tag(svb.build(false), "Edit drug"));
 
 				// 3. Take dose & long press
 				svb = new ShowcaseViewBuilder2(getActivity());
 				svb.setText(R.string._help_title_click_dose, R.string._help_msg_click_dose);
-				svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
-				svb.setShowcaseId(0xdeadbeef + 4);
+				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+				//svb.setShowcaseId(0xdeadbeef + 4);
 				svb.setShowcaseView(R.id.noon, getActivity());
 				mShowcaseQueue.add(tag(svb.build(false), "Take dose & long press"));
+
+				Settings.setDisplayedOnce("date_swipe");
+				mShowcaseQueue.show();
 			}
 		}
 
