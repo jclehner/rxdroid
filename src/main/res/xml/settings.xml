@@ -115,10 +115,18 @@
 			android:title="@string/_title_licenses"
 			android:icon="@null"
 		/>
+
+		<Preference android:key="website"
+			android:title="@string/_title_website"
+			android:summary="https://github.com/jclehner/rxdroid">
+
+			<intent
+					android:action="android.intent.action.VIEW"
+					android:data="https://github.com/jclehner/rxdroid"/>
+		</Preference>
 		
 		<Preference android:key="@string/key_donate"
 		    android:title="@string/_title_donate"
-		    android:enabled="false"
 		/>
 	
 	</PreferenceCategory>

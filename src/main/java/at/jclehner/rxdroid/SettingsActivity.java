@@ -9,15 +9,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.support.v4.content.IntentCompat;
 import android.support.v4.preference.PreferenceFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.text.SpannableString;
@@ -48,6 +49,7 @@ import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.db.SchedulePart;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Components;
+import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
@@ -199,32 +201,16 @@ public class SettingsActivity extends ActionBarActivity
 			p = findPreference(Settings.Keys.DONATE);
 			if(p != null)
 			{
-				final String uriString;
-				final int titleResId;
-				final String summary;
-
-				if(/*BuildConfig.DEBUG ||*/ Util.wasInstalledViaGooglePlay())
+				if(!Util.wasInstalledViaGooglePlay() || shouldDisplayDonatePref())
 				{
-					// Google Play doesn't allow donations using PayPal,
-					// so we show a link to the project's website instead.
-					uriString = "https://github.com/jclehner/rxdroid";
-					titleResId = R.string._title_website;
-					summary = uriString;
+					final Intent intent = new Intent(Intent.ACTION_VIEW);
+					intent.setData(Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=joseph%2ec%2elehner%40gmail%2ecom" +
+							"&lc=AT&item_name=RxDroid&amount=5%2e00&currency_code=EUR&button_subtype=services" +
+							"&bn=PP%2dBuyNowBF%3abtn_buynowCC_LG%2egif%3aNonHosted"));
+					p.setIntent(intent);
 				}
 				else
-				{
-					uriString = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=joseph%2ec%2elehner%40gmail%2ecom&lc=AT&item_name=RxDroid&amount=5%2e00&currency_code=EUR&button_subtype=services&bn=PP%2dBuyNowBF%3abtn_buynowCC_LG%2egif%3aNonHosted";
-					titleResId = R.string._title_donate;
-					summary = null;
-				}
-
-				final Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setData(Uri.parse(uriString));
-
-				p.setIntent(intent);
-				p.setEnabled(true);
-				p.setTitle(titleResId);
-				p.setSummary(summary);
+					getPreferenceScreen().removePreference(p);
 			}
 
 			p = findPreference(Settings.Keys.DB_STATS);
@@ -376,6 +362,27 @@ public class SettingsActivity extends ActionBarActivity
 				}
 
 				return i >= 0;
+			}
+
+			return true;
+		}
+
+		private boolean shouldDisplayDonatePref()
+		{
+			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+			{
+				try
+				{
+					final PackageInfo info = getActivity().getPackageManager()
+							.getPackageInfo(getActivity().getPackageName(), 0);
+
+					return ((System.currentTimeMillis() - info.firstInstallTime)
+							/ Constants.MILLIS_PER_DAY) > 14;
+				}
+				catch(PackageManager.NameNotFoundException e)
+				{
+					return true;
+				}
 			}
 
 			return true;
