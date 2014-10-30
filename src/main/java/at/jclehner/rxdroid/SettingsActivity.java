@@ -329,6 +329,12 @@ public class SettingsActivity extends ActionBarActivity
 				}
 				else
 				{
+					// This hack is necessary because calling System.exit() may prevent the
+					// change from ever being committed, leaving the user stuck with the light
+					// theme forever.
+					getPreferenceManager().getDefaultSharedPreferences(
+							getActivity()).edit().putBoolean(key, (Boolean) newValue).commit();
+
 					final PendingIntent operation = PendingIntent.getActivity(getActivity(), 0, intent, 0);
 					final AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
 					am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, operation);
