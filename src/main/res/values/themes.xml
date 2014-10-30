@@ -165,6 +165,17 @@
 	
 	<style name="ShowcaseView.RxDroid" parent="@style/ShowcaseView">
 	    <item name="sv_backgroundColor">#c0000000</item>
+		<item name="sv_showcaseColor">?colorAccent</item>
+		<item name="sv_titleTextAppearance">@style/ShowcaseView.Title</item>
+	</style>
+
+	<style name="ShowcaseButton">
+		<item name="android:background">?colorPrimary</item>
+		<item name="android:textColor">#ffffff</item>
+	</style>
+
+	<style name="ShowcaseView.Title" parent="@android:style/TextAppearance.Large">
+		<item name="android:textColor">?colorPrimary</item>
 	</style>
 	
 	<!-- 
