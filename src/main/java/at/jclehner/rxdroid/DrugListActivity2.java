@@ -75,6 +75,7 @@ import at.jclehner.rxdroid.ui.DialogLike;
 import at.jclehner.rxdroid.ui.ScheduleViewHolder;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Components;
+import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Extras;
 import at.jclehner.rxdroid.util.ShowcaseViews;
@@ -171,8 +172,6 @@ public class DrugListActivity2 extends ActionBarActivity
 		private int mLastActiveDoseTime;
 		private Date mLastActiveDate;
 
-		private ShowcaseViews mShowcaseQueue = new ShowcaseViews();
-
 		@Override
 		public void onCreate(Bundle icicle)
 		{
@@ -248,7 +247,7 @@ public class DrugListActivity2 extends ActionBarActivity
 			NotificationReceiver.registerOnDoseTimeChangeListener(this);
 			SystemEventReceiver.registerOnSystemTimeChangeListener(this);
 
-			showHelpOverlaysIfApplicable();
+			showHelpOverlaysIfApplicable(false);
 		}
 
 		@Override
@@ -296,6 +295,19 @@ public class DrugListActivity2 extends ActionBarActivity
 
 			menu.findItem(R.id.menuitem_toggle_filtering).setTitle(!mShowingAll ?
 				 R.string._title_show_all : R.string._title_filter);
+
+			if(BuildConfig.DEBUG)
+			{
+				menu.add("Help").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+				{
+					@Override
+					public boolean onMenuItemClick(MenuItem item)
+					{
+						showHelpOverlaysIfApplicable(true);
+						return true;
+					}
+				});
+			}
 		}
 
 		@Override
@@ -436,11 +448,11 @@ public class DrugListActivity2 extends ActionBarActivity
 			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(dateStr);
 		}
 
-		private void showHelpOverlaysIfApplicable()
+		private void showHelpOverlaysIfApplicable(boolean force)
 		{
 			final List<Drug> drugs = Entries.getAllDrugs(mPatientId);
 			// "date_swipe" is used for historic reasons
-			if(drugs.size() == 1 && !Settings.wasDisplayedOnce("date_swipe"))
+			if(force || (drugs.size() == 1 && !Settings.wasDisplayedOnce("date_swipe")))
 			{
 				final Drug drug = drugs.get(0);
 				if(!drug.isActive())
@@ -454,7 +466,20 @@ public class DrugListActivity2 extends ActionBarActivity
 					Log.i(TAG, "Trying date " + DateTime.toDateString(date) + " for " + drug);
 				}
 
+				int doseToHighlight = R.id.noon;
+
+				for(int i = 0; i != Constants.DOSE_TIMES.length; ++i)
+				{
+					if(!drug.getDose(Schedule.TIME_MORNING + i, date).isZero())
+					{
+						doseToHighlight = Constants.DOSE_VIEW_IDS[i];
+						break;
+					}
+				}
+
 				setDate(date, false);
+
+				final ShowcaseViews svs = new ShowcaseViews();
 
 				// 1. Swipe date
 
@@ -473,26 +498,28 @@ public class DrugListActivity2 extends ActionBarActivity
 
 				svb.setAnimatedGesture(-100, y, w, y);*/
 
-				mShowcaseQueue.add(tag(svb.build(), "Swipe date"));
+				svs.add(tag(svb.build(), "Swipe date"));
 
 				// 2. Edit drug
 				svb = new ShowcaseViewBuilder2(getActivity());
 				svb.setText(R.string._help_title_edit_drug, R.string._help_msg_edit_drug);
 				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 				//svb.setShowcaseId(0xdeadbeef + 1);
-				svb.setShowcaseView(R.id.drug_name, getActivity());
-				mShowcaseQueue.add(tag(svb.build(false), "Edit drug"));
+				svb.setShowcaseView(R.id.drug_icon, getActivity());
+
+				svs.add(tag(svb.build(false), "Edit drug"));
 
 				// 3. Take dose & long press
 				svb = new ShowcaseViewBuilder2(getActivity());
 				svb.setText(R.string._help_title_click_dose, R.string._help_msg_click_dose);
 				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 				//svb.setShowcaseId(0xdeadbeef + 4);
-				svb.setShowcaseView(R.id.noon, getActivity());
-				mShowcaseQueue.add(tag(svb.build(false), "Take dose & long press"));
+				svb.setShowcaseView(doseToHighlight, getActivity());
+
+				svs.add(tag(svb.build(false), "Take dose & long press"));
 
 				Settings.setDisplayedOnce("date_swipe");
-				mShowcaseQueue.show();
+				svs.show();
 			}
 		}
 
