@@ -172,6 +172,10 @@
 	<style name="ShowcaseButton">
 		<item name="android:background">?colorPrimary</item>
 		<item name="android:textColor">#ffffff</item>
+		<item name="android:paddingLeft">8dip</item>
+		<item name="android:paddingRight">8dip</item>
+		<item name="android:paddingTop">4dip</item>
+		<item name="android:paddingBottom">4dip</item>
 	</style>
 
 	<style name="ShowcaseView.Title" parent="@android:style/TextAppearance.Large">

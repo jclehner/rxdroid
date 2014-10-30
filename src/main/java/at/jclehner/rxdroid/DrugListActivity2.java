@@ -273,8 +273,22 @@ public class DrugListActivity2 extends ActionBarActivity
 		}
 
 		@Override
-		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+		{
 			inflater.inflate(R.menu.activity_drug_list_compact, menu);
+
+			if(BuildConfig.DEBUG)
+			{
+				menu.add("Help").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+				{
+					@Override
+					public boolean onMenuItemClick(MenuItem item)
+					{
+						showHelpOverlaysIfApplicable(true);
+						return true;
+					}
+				});
+			}
 		}
 
 		@Override
@@ -295,19 +309,6 @@ public class DrugListActivity2 extends ActionBarActivity
 
 			menu.findItem(R.id.menuitem_toggle_filtering).setTitle(!mShowingAll ?
 				 R.string._title_show_all : R.string._title_filter);
-
-			if(BuildConfig.DEBUG)
-			{
-				menu.add("Help").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-				{
-					@Override
-					public boolean onMenuItemClick(MenuItem item)
-					{
-						showHelpOverlaysIfApplicable(true);
-						return true;
-					}
-				});
-			}
 		}
 
 		@Override
@@ -454,16 +455,28 @@ public class DrugListActivity2 extends ActionBarActivity
 			// "date_swipe" is used for historic reasons
 			if(force || (drugs.size() == 1 && !Settings.wasDisplayedOnce("date_swipe")))
 			{
-				final Drug drug = drugs.get(0);
-				if(!drug.isActive())
-					return;
+				Date date = mDtInfo.activeDate();
+				final Drug drug;
 
-				Date date = DateTime.today();
-
-				while(!drug.hasDoseOnDate(date))
+				if(force)
 				{
-					date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
-					Log.i(TAG, "Trying date " + DateTime.toDateString(date) + " for " + drug);
+					final DoseView dv = (DoseView) getActivity().findViewById(R.id.morning);
+					if(dv == null)
+						return;
+
+					drug = dv.getDrug();
+				}
+				else
+				{
+					drug = drugs.get(0);
+
+					while(!drug.hasDoseOnDate(date))
+					{
+						date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
+						Log.i(TAG, "Trying date " + DateTime.toDateString(date) + " for " + drug);
+					}
+
+					setDate(date, false);
 				}
 
 				int doseToHighlight = R.id.noon;
@@ -476,8 +489,6 @@ public class DrugListActivity2 extends ActionBarActivity
 						break;
 					}
 				}
-
-				setDate(date, false);
 
 				final ShowcaseViews svs = new ShowcaseViews();
 
