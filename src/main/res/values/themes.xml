@@ -217,10 +217,12 @@
 	</style>
 
 	<style name="_ApiSpecificLightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-		<item name="android:listViewStyle">@style/ListViewStyleLight</item>"
+		<item name="android:listViewStyle">@style/ListViewStyleLight</item>
+		<item name="android:editTextStyle">@android:style/Widget.EditText</item>
 	</style>
 
 	<style name="_ApiSpecificDarkTheme" parent="Theme.AppCompat">
-		<item name="android:listViewStyle">@style/ListViewStyleDark</item>"
+		<item name="android:listViewStyle">@style/ListViewStyleDark</item>
+		<item name="android:editTextStyle">@android:style/Widget.EditText</item>
 	</style>
 </resources>
