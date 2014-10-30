@@ -452,6 +452,7 @@
 	</string>
 
     <string name="_msg_comment">Optionaler Kommentar:</string>
+	<string name="_title_history">Verlauf</string>
 
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker

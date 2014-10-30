@@ -302,6 +302,7 @@
   <string name="_msg_external_storage_not_readable">Зовнішнє сховище неможливо прочитати. Неможливо створювати чи відновлювати резервні копії.
 	</string>
   <string name="_msg_comment">Необов\'язковий коментар:</string>
+  <string name="_title_history">Історія</string>
   <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">Виберіть номер</string>
 </resources>

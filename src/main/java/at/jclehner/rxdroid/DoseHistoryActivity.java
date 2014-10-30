@@ -36,6 +36,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -89,18 +91,16 @@ public class DoseHistoryActivity extends ActionBarActivity implements
 		Components.onCreateActivity(this, 0);
 		super.onCreate(savedInstanceState);
 
-		// Drug drug = (Drug) getIntent().getSerializableExtra(Extras.DRUG);
 		mDrug = Drug.get(getIntent().getIntExtra(Extras.DRUG_ID, 0));
-
-		setTitle(mDrug.getName());
 
 		updateLogFragment();
 
-		// setListAdapter(new DoseHistoryAdapter(this, mDrug));
-
 		final ActionBar ab = getSupportActionBar();
-		//ab.setDisplayShowHomeEnabled(true);
-		//ab.setDisplayHomeAsUpEnabled(true);
+		ab.setTitle(R.string._title_history);
+
+		final SpannableString ss = new SpannableString(mDrug.getName());
+		ss.setSpan(new RelativeSizeSpan(0.75f), 0, ss.length(), 0);
+		ab.setSubtitle(ss);
 	}
 
 	@TargetApi(11)

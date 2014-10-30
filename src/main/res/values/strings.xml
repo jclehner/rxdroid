@@ -475,6 +475,7 @@
 	</string>
 
     <string name="_msg_comment">Optional comment:</string>
+	<string name="_title_history">History</string>
 
     <!--
     Keep at the end of strings.xml!  
