@@ -426,6 +426,9 @@ public class SettingsActivity extends ActionBarActivity
 
 		private void removeDisabledPreferences(PreferenceGroup root)
 		{
+			if(root == null)
+				return;
+
 			final List<Preference> toRemove = new ArrayList<Preference>();
 
 			for(int i = 0; i != root.getPreferenceCount(); ++i)
