@@ -35,9 +35,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.SpannableString;
-import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -48,8 +46,6 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.espiandev.showcaseview.ShowcaseView;
@@ -379,22 +375,8 @@ public class DrugListActivity2 extends ActionBarActivity implements DialogLike.O
 		}
 
 		@Override
-		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-		{
-			inflater.inflate(R.menu.activity_drug_list_compact, menu);
-
-			if(BuildConfig.DEBUG)
-			{
-				menu.add("Help").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-				{
-					@Override
-					public boolean onMenuItemClick(MenuItem item)
-					{
-						showHelpOverlaysIfApplicable(true);
-						return true;
-					}
-				});
-			}
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			inflater.inflate(R.menu.drug_list_fragment, menu);
 		}
 
 		@Override
@@ -462,6 +444,11 @@ public class DrugListActivity2 extends ActionBarActivity implements DialogLike.O
 				case R.id.menuitem_take_all:
 				{
 					Entries.markAllNotifiedDosesAsTaken(mPatientId);
+					return true;
+				}
+				case R.id.menuitem_help:
+				{
+					showHelpOverlaysIfApplicable(true);
 					return true;
 				}
 			}
