@@ -62,6 +62,8 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class BackupActivity extends ActionBarActivity implements DialogLike.OnButtonClickListener
 {
+	public static final String EXTRA_NO_BACKUP_CREATION = "rxdroid:no_backup_creation";
+
 	public static class ImportDialog extends DialogLike
 	{
 		private boolean mCanRestore = false;

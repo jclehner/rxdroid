@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -54,6 +55,7 @@ import android.widget.Toast;
 import com.github.espiandev.showcaseview.ShowcaseView;
 import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -84,10 +86,12 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 import at.jclehner.rxdroid.widget.DrugNameView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
-public class DrugListActivity2 extends ActionBarActivity
+public class DrugListActivity2 extends ActionBarActivity implements DialogLike.OnButtonClickListener
 {
 	public static final String EXTRA_DATE = "rxdroid:date";
 	public static final String EXTRA_STARTED_FROM_NOTIFICATION = "rxdroid:started_from_notification";
+
+	private boolean mIsShowingDbErrorDialog = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -110,15 +114,117 @@ public class DrugListActivity2 extends ActionBarActivity
 			finish();
 		}
 		else if(savedInstanceState == null)
-		{
-			final DrugListPagerFragment f = new DrugListPagerFragment();
-			final Bundle args = new Bundle();
-			args.putSerializable(DrugListFragment.ARG_DATE, getIntent().getSerializableExtra(EXTRA_DATE));
-			//args.putInt(DrugListFragment.ARG_PATIENT_ID, Patient.DEFAULT_PATIENT_ID);
-			f.setArguments(args);
+			initDrugListPagerFragment();
+	}
 
-			getSupportFragmentManager().beginTransaction().replace(android.R.id.content, f, "pager").commit();
+	@Override
+	public void onButtonClick(DialogLike dialogLike, int which)
+	{
+		if(which == DialogLike.BUTTON_NEGATIVE)
+		{
+			if(deleteDatabase())
+			{
+				Toast.makeText(this, R.string._toast_db_reset_success, Toast.LENGTH_SHORT).show();
+				initDrugListPagerFragment();
+			}
+			else
+				Toast.makeText(this, R.string._toast_db_reset_failure, Toast.LENGTH_LONG).show();
 		}
+		else
+			finish();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		if(mIsShowingDbErrorDialog)
+		{
+			menu.add(R.string._title_restore).setOnMenuItemClickListener(
+					new MenuItem.OnMenuItemClickListener()
+					{
+						@Override
+						public boolean onMenuItemClick(MenuItem item)
+						{
+							final Intent intent = new Intent(DrugListActivity2.this, BackupActivity.class);
+							intent.putExtra(BackupActivity.EXTRA_NO_BACKUP_CREATION, true);
+							startActivity(intent);
+							return true;
+						}
+					}
+			);
+		}
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	protected void onLoaderException(RuntimeException e)
+	{
+		final DatabaseHelper.DatabaseError error;
+
+		if(e instanceof WrappedCheckedException && ((WrappedCheckedException) e).getCauseType() == DatabaseHelper.DatabaseError.class)
+			error = (DatabaseHelper.DatabaseError) e.getCause();
+		else if(e instanceof DatabaseHelper.DatabaseError)
+			error = (DatabaseHelper.DatabaseError) e;
+		else
+			throw e;
+
+		final StringBuilder sb = new StringBuilder();
+
+		switch(error.getType())
+		{
+			case DatabaseHelper.DatabaseError.E_GENERAL:
+				sb.append(getString(R.string._msg_db_error_general));
+				break;
+
+			case DatabaseHelper.DatabaseError.E_UPGRADE:
+				sb.append(getString(R.string._msg_db_error_upgrade));
+				break;
+
+			case DatabaseHelper.DatabaseError.E_DOWNGRADE:
+				sb.append(getString(R.string._msg_db_error_downgrade));
+				break;
+		}
+
+		sb.append(" " + RefString.resolve(this, R.string._msg_db_error_footer));
+
+		final DialogLike dialog = new DialogLike();
+		dialog.setTitle(getString(R.string._title_database));
+		dialog.setMessage(sb);
+		dialog.setNegativeButtonText(getString(R.string._btn_reset));
+		dialog.setPositiveButtonText(getString(R.string._btn_exit));
+
+		getSupportFragmentManager().beginTransaction()
+				.replace(android.R.id.content, dialog).commitAllowingStateLoss();
+
+		mIsShowingDbErrorDialog = true;
+
+	}
+
+	private void initDrugListPagerFragment()
+	{
+		mIsShowingDbErrorDialog = false;
+		supportInvalidateOptionsMenu();
+
+		final DrugListPagerFragment f = new DrugListPagerFragment();
+		final Bundle args = new Bundle();
+		args.putSerializable(DrugListFragment.ARG_DATE, getIntent().getSerializableExtra(EXTRA_DATE));
+		//args.putInt(DrugListFragment.ARG_PATIENT_ID, Patient.DEFAULT_PATIENT_ID);
+		f.setArguments(args);
+
+		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, f, "pager").commit();
+	}
+
+	private boolean deleteDatabase()
+	{
+		final String packageName = getApplicationInfo().packageName;
+
+		final File dbDir = new File(Environment.getDataDirectory(), "data/" + packageName + "/databases");
+		final File currentDb = new File(dbDir, DatabaseHelper.DB_NAME);
+
+		if(!dbDir.canWrite() || !currentDb.exists() || !currentDb.canWrite())
+			return false;
+
+		return currentDb.delete();
 	}
 
 	public static class DrugListPagerFragment extends Fragment implements DatePickerDialog.OnDateSetListener,
@@ -688,7 +794,7 @@ public class DrugListActivity2 extends ActionBarActivity
 			}
 
 			@Override
-			public List<DrugWrapper> loadInBackground()
+			public List<DrugWrapper> doLoadInBackground()
 			{
 				Database.init();
 
@@ -982,41 +1088,16 @@ public class DrugListActivity2 extends ActionBarActivity
 		}
 
 		@Override
-		protected void onLoaderException(RuntimeException e)
+		protected void onLoaderException(final RuntimeException e)
 		{
-			final DatabaseHelper.DatabaseError error;
-
-			if(e instanceof WrappedCheckedException && ((WrappedCheckedException) e).getCauseType() == DatabaseHelper.DatabaseError.class)
-				error = (DatabaseHelper.DatabaseError) e.getCause();
-			else if(e instanceof DatabaseHelper.DatabaseError)
-				error = (DatabaseHelper.DatabaseError) e;
-			else
-				throw e;
-
-			final StringBuilder sb = new StringBuilder();
-
-			switch(error.getType())
+			getActivity().runOnUiThread(new Runnable()
 			{
-				case DatabaseHelper.DatabaseError.E_GENERAL:
-					sb.append(getString(R.string._msg_db_error_general));
-					break;
-
-				case DatabaseHelper.DatabaseError.E_UPGRADE:
-					sb.append(getString(R.string._msg_db_error_upgrade));
-					break;
-
-				case DatabaseHelper.DatabaseError.E_DOWNGRADE:
-					sb.append(getString(R.string._msg_db_error_downgrade));
-					break;
-			}
-
-			sb.append(" " + RefString.resolve(getActivity(), R.string._msg_db_error_footer));
-
-			final DialogLike dialog = new DialogLike();
-			dialog.setTitle(getString(R.string._title_database));
-			dialog.setMessage(sb);
-
-			getFragmentManager().beginTransaction().replace(android.R.id.content, dialog).commit();
+				@Override
+				public void run()
+				{
+					((DrugListActivity2) getActivity()).onLoaderException(e);
+				}
+			});
 		}
 
 		@Override

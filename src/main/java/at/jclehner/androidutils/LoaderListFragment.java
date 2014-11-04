@@ -72,12 +72,12 @@ public abstract class LoaderListFragment<T> extends ListFragment implements Load
 		}
 
 		@Override
-		public final List<? extends ItemHolder<T>> onLoadInBackground()
+		public final List<? extends ItemHolder<T>> loadInBackground()
 		{
 			try
 			{
 				mException = null;
-				return loadInBackground();
+				return doLoadInBackground();
 			}
 			catch(RuntimeException e)
 			{
@@ -90,7 +90,7 @@ public abstract class LoaderListFragment<T> extends ListFragment implements Load
 			return mException;
 		}
 
-		public abstract List<? extends ItemHolder<T>> loadInBackground();
+		public abstract List<? extends ItemHolder<T>> doLoadInBackground();
 
 		@Override
 		protected void onStartLoading()

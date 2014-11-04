@@ -101,7 +101,7 @@ public class BackupFragment extends LoaderListFragment<File>
 		}
 
 		@Override
-		public List<? extends ItemHolder<File>> loadInBackground()
+		public List<? extends ItemHolder<File>> doLoadInBackground()
 		{
 			final File dir = new File(Environment.getExternalStorageDirectory(), "RxDroid");
 			if(!dir.exists())
@@ -169,51 +169,53 @@ public class BackupFragment extends LoaderListFragment<File>
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-		final MenuItem item = menu.add(getString(R.string._title_create_backup))
-				.setIcon(R.drawable.ic_action_add_box_white)
-				.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-				{
-					@Override
-					public boolean onMenuItemClick(MenuItem menuItem)
+		if(!getActivity().getIntent().getBooleanExtra(BackupActivity.EXTRA_NO_BACKUP_CREATION, false))
+		{
+			final MenuItem item = menu.add(getString(R.string._title_create_backup))
+					.setIcon(R.drawable.ic_action_add_box_white)
+					.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
 					{
-						final String storageState = Backup.getStorageState();
-						if(Backup.StorageStateListener.isWriteable(storageState))
+						@Override
+						public boolean onMenuItemClick(MenuItem menuItem)
 						{
-							try
+							final String storageState = Backup.getStorageState();
+							if(Backup.StorageStateListener.isWriteable(storageState))
 							{
-								Backup.createBackup(null, null);
-								getLoaderManager().restartLoader(0, null, BackupFragment.this);
-							}
-							catch(ZipException e)
-							{
-								showExceptionDialog(e);
-							}
-						}
-						else
-						{
-							if(mShowDialogIfNotWriteable)
-							{
-								final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-								ab.setPositiveButton(android.R.string.ok, null);
-								ab.setMessage(R.string._msg_external_storage_not_writeable);
-								ab.setTitle(R.string._title_error);
-								ab.setIcon(android.R.drawable.ic_dialog_alert);
-
-								ab.show();
-								mShowDialogIfNotWriteable = false;
+								try
+								{
+									Backup.createBackup(null, null);
+									getLoaderManager().restartLoader(0, null, BackupFragment.this);
+								} catch(ZipException e)
+								{
+									showExceptionDialog(e);
+								}
 							}
 							else
 							{
-								Toast.makeText(getActivity(), R.string._msg_external_storage_not_writeable,
-										Toast.LENGTH_LONG);
+								if(mShowDialogIfNotWriteable)
+								{
+									final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+									ab.setPositiveButton(android.R.string.ok, null);
+									ab.setMessage(R.string._msg_external_storage_not_writeable);
+									ab.setTitle(R.string._title_error);
+									ab.setIcon(android.R.drawable.ic_dialog_alert);
+
+									ab.show();
+									mShowDialogIfNotWriteable = false;
+								}
+								else
+								{
+									Toast.makeText(getActivity(), R.string._msg_external_storage_not_writeable,
+											Toast.LENGTH_LONG);
+								}
 							}
+
+							return true;
 						}
+					});
 
-						return true;
-					}
-				});
-
-		MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+			MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		}
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
