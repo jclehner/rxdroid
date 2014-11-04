@@ -1,3 +1,10 @@
+0.9.24:
+	* UI design changes using new Material theme
+	* New translations: Finnish, Japanese, Ukrainian
+	* Improved app loading time for large databases
+	* Notifications should now be compatible with Android Wear
+	* Bug fixes
+
 0.9.23:
 	* Add option to create/restore backups (requires permission
 	  to read/write external storage!)
