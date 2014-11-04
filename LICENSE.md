@@ -44,6 +44,7 @@ Third Party Works
 * [appcompat-v7](http://developer.android.com/tools/support-library) by
   Android Open Source Project
 * [ORMLite](http://ormlite.com) by Gray Watson
+* [Joda-Time](http://www.joda.org/joda-time/)
 * [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids) by
   Jake Wharton
 * [NumberPicker](https://github.com/jclehner/numberpicker) by Mike Novak

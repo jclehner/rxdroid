@@ -30,6 +30,7 @@ dependencies {
 		compile 'com.nineoldandroids:library:2.4.0'
 		compile 'net.lingala.zip4j:zip4j:1.3.2'
 		compile 'ch.acra:acra:5.0.0-SNAPSHOT'
+        compile 'joda-time:joda-time:2.5'
         compile 'com.android.support:support-v4-preferencefragment:1.0.0@aar'
 
 		compile 'at.jclehner.rxdroid.localmaven:NumberPicker:9999'

@@ -31,6 +31,9 @@ import java.util.TimeZone;
 
 import android.text.format.DateFormat;
 import android.util.Log;
+
+import org.joda.time.LocalDate;
+
 import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.PerThreadInstance;
 import at.jclehner.rxdroid.RxDroid;
@@ -298,6 +301,9 @@ public final class DateTime
 
 	public static Date add(Date date, int field, int value)
 	{
+		if(field == Calendar.DAY_OF_MONTH)
+			return new LocalDate(date).plusDays(value).toDate();
+
 		Calendar cal = calendarFromDate(date);
 		cal.add(field, value);
 		return cal.getTime();
