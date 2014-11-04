@@ -52,7 +52,6 @@ Third Party Works
   by Carl Bauer
 * [ShowcaseView](https://github.com/jclehner/ShowcaseView) by Alex Curran,
   modified by Joseph C. Lehner
-* [ACRA](https://github.com/jclehner/acra) by Kevin Gaudin
 * [android-support-v4-PreferenceFragment](https://github.com/kolavar/android-support-v4-preferencefragment)
   by Android Open Source Project
 * [zip4j](http://www.lingala.net/zip4j) by Srikanth Reddy Lingala

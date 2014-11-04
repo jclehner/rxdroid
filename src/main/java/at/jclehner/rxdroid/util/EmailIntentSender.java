@@ -36,7 +36,7 @@
  */
 package at.jclehner.rxdroid.util;
 
-import org.acra.ACRA;
+/*import org.acra.ACRA;
 import org.acra.ACRAConstants;
 import org.acra.collector.CrashReportData;
 import org.acra.ReportField;
@@ -48,7 +48,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-import at.jclehner.rxdroid.Version;
+import at.jclehner.rxdroid.Version;*/
 
 /**
  * Send reports through an email intent. The user will be asked to chose his
@@ -56,7 +56,7 @@ import at.jclehner.rxdroid.Version;
  * {@link org.acra.annotation.ReportsCrashes#customReportContent()}. Crash receiving mailbox has to be
  * defined with {@link ReportsCrashes#mailTo()}.
  */
-public class EmailIntentSender implements ReportSender
+/*public class EmailIntentSender implements ReportSender
 {
 	private final Context mContext;
 
@@ -95,4 +95,5 @@ public class EmailIntentSender implements ReportSender
 		return builder.toString();
 	}
 }
+*/
 

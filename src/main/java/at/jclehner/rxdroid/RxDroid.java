@@ -44,9 +44,9 @@ import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
-import org.acra.ACRA;
+/*import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
+import org.acra.annotation.ReportsCrashes;*/
 
 import java.io.File;
 
@@ -63,11 +63,11 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.util.Components;
-import at.jclehner.rxdroid.util.EmailIntentSender;
+//import at.jclehner.rxdroid.util.EmailIntentSender;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
-@ReportsCrashes(
+/*@ReportsCrashes(
 		formKey = "",
 		mailTo = "josephclehner+rxdbug@gmail.com",
 		mode = ReportingInteractionMode.DIALOG,
@@ -78,7 +78,7 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 		resDialogCancelButtonText = android.R.string.ok,
 		switchDialogButtonPositions = true
 		//resDialogCommentPrompt = R.string._msg_comment
-)
+)*/
 public class RxDroid extends Application
 {
 	private static final String TAG = RxDroid.class.getSimpleName();
