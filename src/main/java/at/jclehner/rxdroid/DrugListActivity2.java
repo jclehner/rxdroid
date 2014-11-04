@@ -570,8 +570,13 @@ public class DrugListActivity2 extends ActionBarActivity
 				View missedDoseIndicator;
 			}
 
-			public Adapter(DrugListFragment fragment) {
+			private final Settings.DoseTimeInfo mDtInfo;
+
+			public Adapter(DrugListFragment fragment)
+			{
 				super(fragment);
+				mDtInfo = Settings.getDoseTimeInfo((Calendar)
+						fragment.getArguments().getSerializable("time"));
 			}
 
 			@Override
@@ -615,6 +620,7 @@ public class DrugListActivity2 extends ActionBarActivity
 				holder.name.setTag(wrapper.item.getId());
 
 				holder.icon.setImageResource(Util.getDrugIconDrawable(wrapper.item.getIcon()));
+				holder.supply.setToday(mDtInfo.activeDate());
 				holder.supply.setDrugAndDate(wrapper.item, wrapper.date);
 				holder.supply.setVisibility(wrapper.isSupplyVisible ? View.VISIBLE : View.INVISIBLE);
 				holder.history.setTag(wrapper.item.getId());
@@ -792,7 +798,7 @@ public class DrugListActivity2 extends ActionBarActivity
 					if(Entries.hasLowSupplies(drug, mDate))
 						score -= 1000;
 
-					if(DateTime.isToday(mDate))
+					if(mDtInfo.activeDate().equals(mDate))
 					{
 						if(Entries.hasMissingDosesBeforeDate(drug, mDate))
 							score -= 1000;

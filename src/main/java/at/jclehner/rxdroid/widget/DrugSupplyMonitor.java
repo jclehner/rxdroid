@@ -49,8 +49,9 @@ public class DrugSupplyMonitor extends TextView implements
 	//private int mDrugId = -1;
 	private Drug mDrug;
 	private Date mDate;
+	private Date mToday;
 
-	private boolean mHasLowSupplies;
+	private boolean mHasLowSupply;
 
 	public DrugSupplyMonitor(Context context) {
 		super(context);
@@ -91,8 +92,18 @@ public class DrugSupplyMonitor extends TextView implements
 		return mDrug;
 	}
 
-	public boolean hasLowSupplies() {
-		return mHasLowSupplies;
+	public boolean getHasLowSupply() {
+		return mHasLowSupply;
+	}
+
+	public void setHasLowSupply(boolean hasLowSupply)
+	{
+		mHasLowSupply = hasLowSupply;
+		updateText(mDrug, mDate);
+	}
+
+	public void setToday(Date date) {
+		mToday = date;
 	}
 
 	@Override
@@ -152,7 +163,7 @@ public class DrugSupplyMonitor extends TextView implements
 	{
 		int typeface = Typeface.NORMAL;
 		float textScaleX = 1.0f;
-		mHasLowSupplies = false;
+		mHasLowSupply = false;
 
 		if(drug != null)
 		{
@@ -160,7 +171,7 @@ public class DrugSupplyMonitor extends TextView implements
 
 			if(drug.isActive() && date != null)
 			{
-				final Date today = DateTime.today();
+				final Date today = mToday != null ? mToday : DateTime.today();
 				if(date.after(today))
 				{
 					//Fraction doseInTimePeriod_smart = Entries.getTotalDoseInTimePeriod_smart(drug, today, date);
@@ -171,7 +182,7 @@ public class DrugSupplyMonitor extends TextView implements
 				{
 					typeface = Typeface.BOLD_ITALIC;
 					textScaleX = 1.25f;
-					mHasLowSupplies = true;
+					mHasLowSupply = true;
 				}
 			}
 
