@@ -1060,6 +1060,15 @@ public class DrugListActivity2 extends ActionBarActivity implements DialogLike.O
 							doseView.performClick();
 						else if(menuItem.getItemId() == R.id.menuitem_skip)
 							Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
+						else if(menuItem.getItemId() == R.id.menuitem_edit)
+						{
+							final Intent intent = new Intent(getActivity(), DrugEditActivity2.class);
+							intent.setAction(Intent.ACTION_EDIT);
+							intent.putExtra(DrugEditActivity2.EXTRA_DRUG_ID, drug.getId());
+
+							startActivity(intent);
+						}
+
 						else
 							return false;
 
