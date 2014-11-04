@@ -43,8 +43,6 @@ Third Party Works
   Android Open Source Project
 * [appcompat-v7](http://developer.android.com/tools/support-library) by
   Android Open Source Project
-* [cardview-v7](http://developer.android.com/tools/support-library) by
-  Android Open Source Project
 * [ORMLite](http://ormlite.com) by Gray Watson
 * [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids) by
   Jake Wharton
