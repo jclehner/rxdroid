@@ -9,7 +9,7 @@
  * RxDroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option) any later version. Additional terms apply (see LICENSE).
  *
  * RxDroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -129,7 +129,7 @@
     </string>
   <string name="_title_weekdays">平日</string>
   <string name="_title_on_demand">必要に応じて</string>
-  <string name="_title_delete_drug">%1$s を本当に削除しますか?</string>
+  <string name="_title_delete_item">%1$s を削除してもよろしいですか?</string>
   <string name="_msg_delete_drug">この操作は元に戻せません!</string>
   <string name="_toast_db_reset_success">データベースは正常にリセットされました。</string>
   <string name="_toast_db_reset_failure">データベースのリセットに失敗しました。再インストールしてください。</string>
@@ -292,6 +292,8 @@
   <string name="_msg_external_storage_not_readable">
 外部ストレージの読み取りができません。バックアップを作成または復元できません。</string>
   <string name="_msg_comment">オプションのコメント:</string>
+  <string name="_title_history">履歴</string>
+  <string name="_btn_skip">スキップ</string>
   <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">番号を選択してください</string>
 </resources>
