@@ -62,9 +62,11 @@
 			app:showAsAction="never"
 	/>
 
+	<!--
 	<item android:id="@+id/menuitem_help"
 		android:title="@string/_title_help"
 		android:icon="@null"
 		    app:showAsAction="never"
 	/>
+	-->
 </menu>

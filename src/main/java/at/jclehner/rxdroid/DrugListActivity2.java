@@ -46,6 +46,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.Toast;
 
 import com.github.espiandev.showcaseview.ShowcaseView;
@@ -68,6 +69,7 @@ import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
+import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.ui.DialogLike;
 import at.jclehner.rxdroid.ui.ScheduleViewHolder;
@@ -82,7 +84,8 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 import at.jclehner.rxdroid.widget.DrugNameView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
-public class DrugListActivity2 extends ActionBarActivity implements DialogLike.OnButtonClickListener
+public class DrugListActivity2 extends ActionBarActivity implements
+		DialogLike.OnButtonClickListener
 {
 	public static final String EXTRA_DATE = "rxdroid:date";
 	public static final String EXTRA_STARTED_FROM_NOTIFICATION = "rxdroid:started_from_notification";
@@ -348,8 +351,6 @@ public class DrugListActivity2 extends ActionBarActivity implements DialogLike.O
 
 			NotificationReceiver.registerOnDoseTimeChangeListener(this);
 			SystemEventReceiver.registerOnSystemTimeChangeListener(this);
-
-			showHelpOverlaysIfApplicable(false);
 		}
 
 		@Override
@@ -390,13 +391,13 @@ public class DrugListActivity2 extends ActionBarActivity implements DialogLike.O
 			if(Settings.getBoolean(Settings.Keys.USE_SAFE_MODE, false))
 				menu.removeItem(R.id.menuitem_take_all);
 			else
-				menu.findItem(R.id.menuitem_take_all).setVisible(dateCmp <= 0);
+				menu.findItem(R.id.menuitem_take_all).setVisible(dateCmp == 0);
 
 			menu.findItem(R.id.menuitem_date).setTitle(dateCmp != 0 ?
 					R.string._title_today : R.string._title_go_to_date);
 
 			menu.findItem(R.id.menuitem_toggle_filtering).setTitle(!mShowingAll ?
-				 R.string._title_show_all : R.string._title_filter);
+					R.string._title_show_all : R.string._title_filter);
 		}
 
 		@Override
@@ -444,11 +445,6 @@ public class DrugListActivity2 extends ActionBarActivity implements DialogLike.O
 				case R.id.menuitem_take_all:
 				{
 					Entries.markAllNotifiedDosesAsTaken(mPatientId);
-					return true;
-				}
-				case R.id.menuitem_help:
-				{
-					showHelpOverlaysIfApplicable(true);
 					return true;
 				}
 			}
@@ -540,98 +536,6 @@ public class DrugListActivity2 extends ActionBarActivity implements DialogLike.O
 			//Util.applyStyle(dateStr, new RelativeSizeSpan(0.75f));
 
 			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(dateStr);
-		}
-
-		private void showHelpOverlaysIfApplicable(boolean force)
-		{
-			final List<Drug> drugs = Entries.getAllDrugs(mPatientId);
-			// "date_swipe" is used for historic reasons
-			if(force || (drugs.size() == 1 && !Settings.wasDisplayedOnce("date_swipe")))
-			{
-				Date date = mDtInfo.activeDate();
-				final Drug drug;
-
-				if(force)
-				{
-					final DoseView dv = (DoseView) getActivity().findViewById(R.id.morning);
-					if(dv == null)
-						return;
-
-					drug = dv.getDrug();
-				}
-				else
-				{
-					drug = drugs.get(0);
-
-					while(!drug.hasDoseOnDate(date))
-					{
-						date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
-						Log.i(TAG, "Trying date " + DateTime.toDateString(date) + " for " + drug);
-					}
-
-					setDate(date, false);
-				}
-
-				int doseToHighlight = R.id.noon;
-
-				for(int i = 0; i != Constants.DOSE_TIMES.length; ++i)
-				{
-					if(!drug.getDose(Schedule.TIME_MORNING + i, date).isZero())
-					{
-						doseToHighlight = Constants.DOSE_VIEW_IDS[i];
-						break;
-					}
-				}
-
-				final ShowcaseViews svs = new ShowcaseViews();
-
-				// 1. Swipe date
-
-				ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(getActivity());
-				svb.setText(R.string._help_title_swipe_date, R.string._help_msg_swipe_date);
-				/*svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
-				svb.setShowcaseId(0xdeadbeef + 0);
-				svb.setShowcaseItem(ShowcaseView.ITEM_TITLE, 0, getActivity());
-
-				final DisplayMetrics metrics = new DisplayMetrics();
-				getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-				final float w = metrics.widthPixels;
-				final float h = metrics.heightPixels;
-				final float y = h * 0.6f;
-
-				svb.setAnimatedGesture(-100, y, w, y);*/
-
-				svs.add(tag(svb.build(), "Swipe date"));
-
-				// 2. Edit drug
-				svb = new ShowcaseViewBuilder2(getActivity());
-				svb.setText(R.string._help_title_edit_drug, R.string._help_msg_edit_drug);
-				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
-				//svb.setShowcaseId(0xdeadbeef + 1);
-				svb.setShowcaseView(R.id.drug_icon, getActivity());
-
-				svs.add(tag(svb.build(false), "Edit drug"));
-
-				// 3. Take dose & long press
-				svb = new ShowcaseViewBuilder2(getActivity());
-				svb.setText(R.string._help_title_click_dose, R.string._help_msg_click_dose);
-				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
-				//svb.setShowcaseId(0xdeadbeef + 4);
-				svb.setShowcaseView(doseToHighlight, getActivity());
-
-				svs.add(tag(svb.build(false), "Take dose & long press"));
-
-				Settings.setDisplayedOnce("date_swipe");
-				svs.show();
-			}
-		}
-
-		private ShowcaseView tag(ShowcaseView sv, String tag)
-		{
-			if(sv != null)
-				sv.setTag(tag);
-			return sv;
 		}
 
 		private final ViewPager.OnPageChangeListener mPageListener = new ViewPager.SimpleOnPageChangeListener()
@@ -930,6 +834,7 @@ public class DrugListActivity2 extends ActionBarActivity implements DialogLike.O
 		public void onCreate(Bundle icicle)
 		{
 			super.onCreate(icicle);
+			setHasOptionsMenu(true);
 			mDate = (Date) getArguments().getSerializable(ARG_DATE);
 		}
 
@@ -938,8 +843,6 @@ public class DrugListActivity2 extends ActionBarActivity implements DialogLike.O
 		{
 			super.onResume();
 			Database.registerEventListener(this);
-
-			setEmptyText(getEmptyText());
 		}
 
 		@Override
@@ -1084,6 +987,21 @@ public class DrugListActivity2 extends ActionBarActivity implements DialogLike.O
 		}
 
 		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+		{
+			menu.add(R.string._title_help)
+					.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+
+					@Override
+					public boolean onMenuItemClick(MenuItem item)
+					{
+						showHelpOverlaysIfApplicable(true);
+						return true;
+					}
+			});
+		}
+
+		@Override
 		protected void onLoaderException(final RuntimeException e)
 		{
 			getActivity().runOnUiThread(new Runnable()
@@ -1108,6 +1026,116 @@ public class DrugListActivity2 extends ActionBarActivity implements DialogLike.O
 
 		private void reloadLoader() {
 			getLoaderManager().restartLoader(0, null, this);
+		}
+
+		@Override
+		public void setListAdapter(ListAdapter adapter)
+		{
+			super.setListAdapter(adapter);
+
+			if(adapter.isEmpty())
+				setEmptyText(getEmptyText());
+
+			showHelpOverlaysIfApplicable(false);
+		}
+
+		private void showHelpOverlaysIfApplicable(boolean force)
+		{
+			final List<Drug> drugs = Entries.getAllDrugs(getArguments().getInt(ARG_PATIENT_ID,
+					Patient.DEFAULT_PATIENT_ID));
+			final Settings.DoseTimeInfo dtInfo = Settings.getDoseTimeInfo((Calendar)
+					getArguments().getSerializable(ARG_TIME));
+
+			// "date_swipe" is used for historic reasons
+			if(force || (drugs.size() == 1 && !Settings.wasDisplayedOnce("date_swipe")))
+			{
+				Date date = dtInfo.activeDate();
+				final Drug drug;
+
+				if(force)
+				{
+					final DoseView dv = (DoseView) getActivity().findViewById(R.id.morning);
+					if(dv == null)
+						return;
+
+					drug = dv.getDrug();
+				}
+				else
+				{
+					drug = drugs.get(0);
+
+					while(!drug.hasDoseOnDate(date))
+					{
+						date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
+						//Log.i(TAG, "Trying date " + DateTime.toDateString(date) + " for " + drug);
+						//Log.i(TAG, "Trying date " + DateTime.toDateString(date) + " for " + drug);
+					}
+
+					final Fragment f = getFragmentManager().findFragmentById(android.R.id.content);
+					if(f instanceof DrugListPagerFragment)
+						((DrugListPagerFragment) f).setDate(date, false);
+				}
+
+				int doseToHighlight = R.id.noon;
+
+				for(int i = 0; i != Constants.DOSE_TIMES.length; ++i)
+				{
+					if(!drug.getDose(Schedule.TIME_MORNING + i, date).isZero())
+					{
+						doseToHighlight = Constants.DOSE_VIEW_IDS[i];
+						break;
+					}
+				}
+
+				final ShowcaseViews svs = new ShowcaseViews();
+
+				// 1. Swipe date
+
+				ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(getActivity());
+				svb.setText(R.string._help_title_swipe_date, R.string._help_msg_swipe_date);
+				/*svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+				svb.setShowcaseId(0xdeadbeef + 0);
+				svb.setShowcaseItem(ShowcaseView.ITEM_TITLE, 0, getActivity());
+
+				final DisplayMetrics metrics = new DisplayMetrics();
+				getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+				final float w = metrics.widthPixels;
+				final float h = metrics.heightPixels;
+				final float y = h * 0.6f;
+
+				svb.setAnimatedGesture(-100, y, w, y);*/
+
+				svs.add(tag(svb.build(), "Swipe date"));
+
+				// 2. Edit drug
+				svb = new ShowcaseViewBuilder2(getActivity());
+				svb.setText(R.string._help_title_edit_drug, R.string._help_msg_edit_drug);
+				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+				//svb.setShowcaseId(0xdeadbeef + 1);
+				svb.setShowcaseView(R.id.drug_icon, getActivity());
+
+				svs.add(tag(svb.build(false), "Edit drug"));
+
+				// 3. Take dose & long press
+				svb = new ShowcaseViewBuilder2(getActivity());
+				svb.setText(R.string._help_title_click_dose, R.string._help_msg_click_dose);
+				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+				//svb.setShowcaseId(0xdeadbeef + 4);
+				svb.setShowcaseView(doseToHighlight, getActivity());
+
+				svs.add(tag(svb.build(false), "Take dose & long press"));
+
+				Settings.setDisplayedOnce("date_swipe");
+				svs.show();
+			}
+		}
+
+		private ShowcaseView tag(ShowcaseView sv, String tag)
+		{
+			if(sv != null)
+				sv.setTag(tag);
+			return sv;
 		}
 
 		private String getEmptyText()
