@@ -1,4 +1,4 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 buildscript {
 	repositories {
@@ -6,7 +6,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:0.12.2'
+		classpath 'com.android.tools.build:gradle:0.14.1'
 	}
 }
 
@@ -40,7 +40,7 @@ dependencies {
 
 
 android {
-	buildToolsVersion '19.1.0'
+	buildToolsVersion '21.1.1'
 	compileSdkVersion 21
 
 	lintOptions {
@@ -61,7 +61,7 @@ android {
 
 	buildTypes {
 		release {
-			runProguard false
+			minifyEnabled false
 			signingConfig signingConfigs.release
 		}
 	}
