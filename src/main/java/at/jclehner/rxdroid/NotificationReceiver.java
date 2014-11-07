@@ -59,6 +59,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	private static final String TAG = NotificationReceiver.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
 
+	private static final boolean USE_WEARABLE_HACK = true;
+
 	private static final int LED_CYCLE_MS = 5000;
 	private static final int LED_ON_MS = 500;
 	private static final int LED_OFF_MS = LED_CYCLE_MS - LED_ON_MS;
@@ -78,6 +80,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final String EXTRA_IS_ALARM_REPETITION = "at.jclehner.rxdroid.extra.IS_ALARM_REPETITION";
 	static final String EXTRA_FORCE_UPDATE = "at.jclehner.rxdroid.extra.FORCE_UPDATE";
 	static final String EXTRA_REFILL_SNOOZE_DRUGS = "drug_id_list";
+	//static final String EXTRA_NO_WEARABLE_NOTIFICATION = "no_wearable_notification";
 
 	private static final String ACTION_MARK_ALL_AS_TAKEN = "at.jclehner.rxdroid.ACTION_MARK_ALL_AS_TAKEN";
 
@@ -112,6 +115,9 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private boolean mDoPostSilent = false;
 	private boolean mForceUpdate = false;
+	//private boolean mNoWearableNotification = false;
+
+	private Bundle mExtras;
 
 	private static final EventDispatcher<OnDoseTimeChangeListener> sEventMgr =
 			new EventDispatcher<OnDoseTimeChangeListener>();
@@ -137,6 +143,9 @@ public class NotificationReceiver extends BroadcastReceiver
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
 		mAllDrugs = Database.getAll(Drug.class);
+		//mNoWearableNotification = intent.getBooleanExtra(EXTRA_NO_WEARABLE_NOTIFICATION, false);
+
+		mExtras = intent.getExtras();
 
 		final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
 
@@ -422,12 +431,6 @@ public class NotificationReceiver extends BroadcastReceiver
 		else
 			isShowingLowSupplyNotificationOnly = false;
 
-		final int priority;
-		if(isShowingLowSupplyNotificationOnly)
-			priority = NotificationCompat.PRIORITY_DEFAULT;
-		else
-			priority = NotificationCompat.PRIORITY_HIGH;
-
 		final String message = sb.toString();
 		if(message.length() == 0 || isShowingLowSupplyNotificationOnly)
 		{
@@ -500,11 +503,20 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setTicker(getString(R.string._msg_new_notification));
 		builder.setSmallIcon(icon);
 		builder.setWhen(0);
-		builder.setPriority(priority);
 		builder.setCategory(NotificationCompat.CATEGORY_ALARM);
-		builder.setGroup("rxdroid");
-		builder.setGroupSummary(true);
-		builder.setColor(0xff5722);
+		builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
+		builder.setAutoCancel(false);
+		if(false)
+		{
+			builder.setPriority(isShowingLowSupplyNotificationOnly ?
+					NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_HIGH);
+		}
+
+		if(USE_WEARABLE_HACK /*&& !mNoWearableNotification*/)
+		{
+			builder.setGroup("rxdroid");
+			builder.setGroupSummary(true);
+		}
 
 		boolean noClear = true;
 
@@ -646,13 +658,18 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		final Notification notification = builder.build();
 
+		Log.d(TAG, "noClear=" + noClear);
+
 		if(noClear)
 		{
-			notification.flags |= Notification.FLAG_NO_CLEAR;
+			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
 
-			builder.setOngoing(false);
-			builder.setGroupSummary(false);
-			getNotificationManager().notify(ID_WEARABLE, builder.build());
+			if(USE_WEARABLE_HACK /*&& !mNoWearableNotification*/)
+			{
+				builder.setOngoing(false);
+				builder.setGroupSummary(false);
+				getNotificationManager().notify(ID_WEARABLE, builder.build());
+			}
 		}
 
 		getNotificationManager().notify(ID_NORMAL, notification);
