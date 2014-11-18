@@ -355,7 +355,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	public void updateNotification(Date date, int doseTime, boolean isActiveDoseTime, int mode)
 	{
 		final List<Drug> drugsWithLowSupplies = new ArrayList<Drug>();
-		int lowSupplyDrugCount = getDrugsWithLowSupplies(date, doseTime, drugsWithLowSupplies);
+		final int lowSupplyDrugCount = getDrugsWithLowSupplies(date, doseTime, drugsWithLowSupplies);
 		final int missedDoseCount = getDrugsWithMissedDoses(date, doseTime, isActiveDoseTime);
 		final int dueDoseCount = isActiveDoseTime ? getDrugsWithDueDoses(date, doseTime) : 0;
 
@@ -382,97 +382,42 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 
 		final boolean isShowingLowSupplyNotificationOnly;
-		// this value is only valid if isShowingLowSupplyNotificationOnly == true
-		boolean areAllDrugsSnoozed = true;
 
 		if(lowSupplyDrugCount != 0)
 		{
 			isShowingLowSupplyNotificationOnly = sb.length() == 0;
 
-			final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
-			for(int i = 0; i < drugsWithLowSupplies.size(); ++i)
+			final String msg;
+			final String first = Entries.getDrugName(drugsWithLowSupplies.get(0));
+
+			icon = R.drawable.ic_stat_exclamation;
+
+			//titleResId = R.string._title_notification_low_supplies;
+
+			if(lowSupplyDrugCount == 1)
+				msg = getString(R.string._qmsg_low_supply_single, first);
+			else
 			{
-				if(snoozedDrugIds.contains(drugsWithLowSupplies.get(i).getId()))
-				{
-					drugsWithLowSupplies.remove(i);
-					--i;
-				}
+				final String second = Entries.getDrugName(drugsWithLowSupplies.get(1));
+				msg = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount - 1, first, second);
 			}
 
-			lowSupplyDrugCount = drugsWithLowSupplies.size();
-			areAllDrugsSnoozed = lowSupplyDrugCount == 0;
-
-			if(lowSupplyDrugCount > 0)
+			if(isShowingLowSupplyNotificationOnly)
 			{
-				final String msg;
-				final String first = Entries.getDrugName(drugsWithLowSupplies.get(0));
-
-				icon = R.drawable.ic_stat_exclamation;
-
-				//titleResId = R.string._title_notification_low_supplies;
-
-				if(lowSupplyDrugCount == 1)
-					msg = getString(R.string._qmsg_low_supply_single, first);
-				else
-				{
-					final String second = Entries.getDrugName(drugsWithLowSupplies.get(1));
-					msg = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount - 1, first, second);
-				}
-
-				if(isShowingLowSupplyNotificationOnly)
-				{
-					sb.append(msg);
-					titleResId = R.string._title_notification_low_supplies;
-				}
-
-				lines[0] = "<b>" + getString(R.string._title_notification_low_supplies) + "</b> " + Util.escapeHtml(msg);
+				sb.append(msg);
+				titleResId = R.string._title_notification_low_supplies;
 			}
+
+			lines[0] = "<b>" + getString(R.string._title_notification_low_supplies) + "</b> " + Util.escapeHtml(msg);
 		}
 		else
 			isShowingLowSupplyNotificationOnly = false;
 
 		final String message = sb.toString();
-		if(message.length() == 0 || isShowingLowSupplyNotificationOnly)
+		if(message.length() == 0)
 		{
-			final boolean cancelNotification;
-			if(isShowingLowSupplyNotificationOnly)
-			{
-				final Date today = DateTime.today();
-				final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
-
-				Log.d(TAG, "Showing refill reminder only; nextRefillReminderDate=" + nextRefillReminderDate);
-
-				if(nextRefillReminderDate != null && today.before(nextRefillReminderDate))
-				{
-					Log.d(TAG, "  date is in the future, now checking drugs");
-
-					// The date indicates that we should skip the notification, but we must check
-					// whether all drugs in drugsWithLowSupply were indeed snoozed.
-
-
-					cancelNotification = areAllDrugsSnoozed;
-				}
-				else
-				{
-					if(nextRefillReminderDate != null)
-					{
-						// We have a reminder date, but it's already in the past. Clear it.
-						Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
-						Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, null);
-						Log.d(TAG, "  date is in the past; setting to null");
-					}
-
-					cancelNotification = false;
-				}
-			}
-			else
-				cancelNotification = true;
-
-			if(cancelNotification)
-			{
-				cancelNotifications();
-				return;
-			}
+			cancelNotifications();
+			return;
 		}
 
 		final StringBuilder source = new StringBuilder();
@@ -506,13 +451,14 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setCategory(NotificationCompat.CATEGORY_ALARM);
 		builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
 		builder.setAutoCancel(false);
+
 		if(false)
 		{
 			builder.setPriority(isShowingLowSupplyNotificationOnly ?
 					NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_HIGH);
 		}
 
-		if(USE_WEARABLE_HACK /*&& !mNoWearableNotification*/)
+		if(USE_WEARABLE_HACK)
 		{
 			builder.setGroup("rxdroid");
 			builder.setGroupSummary(true);
@@ -664,7 +610,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		{
 			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
 
-			if(USE_WEARABLE_HACK /*&& !mNoWearableNotification*/)
+			if(USE_WEARABLE_HACK)
 			{
 				builder.setOngoing(false);
 				builder.setGroupSummary(false);
@@ -685,16 +631,37 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private int getDrugsWithLowSupplies(Date date, int doseTime, List<Drug> outDrugs)
 	{
+		final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
+		final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
+
+		if(nextRefillReminderDate == null || date.after(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
+		{
+			snoozedDrugIds.clear();
+			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, null);
+			Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
+			Log.d(TAG, "Clearing refill reminder snooze info");
+		}
+
 		int count = 0;
 
 		for(Drug drug : mAllDrugs)
 		{
+			final boolean isSnoozed = snoozedDrugIds.contains(drug.getId());
+
 			if(Entries.hasLowSupplies(drug, date))
 			{
-				++count;
-
-				if(outDrugs != null)
-					outDrugs.add(drug);
+				if(!isSnoozed)
+				{
+					++count;
+					if(outDrugs != null)
+						outDrugs.add(drug);
+				}
+			}
+			else if(isSnoozed)
+			{
+				Log.d(TAG, "Removing " + drug + " from snoozed drugs");
+				snoozedDrugIds.remove(drug.getId());
+				Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, fromIntSet(snoozedDrugIds));
 			}
 		}
 
@@ -749,5 +716,15 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 
 		return intSet;
+	}
+
+	private static String fromIntSet(Set<Integer> set)
+	{
+		final StringBuilder sb = new StringBuilder();
+
+		for(Integer i : set)
+			sb.append(i);
+
+		return sb.toString();
 	}
 }
