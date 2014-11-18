@@ -36,7 +36,7 @@ public class ReadonlyPreferenceController extends PreferenceController<Preferenc
 	}
 
 	@Override
-	public void onDependencyChange(Preference preference, String depKey) {
-		updateSummary(preference, getFieldValue());
+	public void onDependencyChange(Preference preference, String depKey, Object newPrefValue) {
+		updateSummary(preference, newPrefValue);
 	}
 }

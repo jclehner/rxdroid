@@ -292,7 +292,8 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 		if(requireSufficientSupply && hasInsufficientSupplies())
 			return false;
 
-		final Fraction newSupply = mDrug.getCurrentSupply().minus(mDose);
+		final Fraction newSupply = mDrug.getRefillSize() != 0 ?
+				mDrug.getCurrentSupply().minus(mDose) : Fraction.ZERO;
 
 		mDrug.setCurrentSupply(newSupply.isNegative() ? Fraction.ZERO : newSupply);
 		Database.update(mDrug, Database.FLAG_DONT_NOTIFY_LISTENERS);

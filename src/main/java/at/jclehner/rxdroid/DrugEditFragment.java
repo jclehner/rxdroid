@@ -200,12 +200,22 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		else
 			throw new IllegalArgumentException("Unhandled action " + action);
 
+		if(mWrapper.refillSize == 0)
+			mWrapper.currentSupply = Fraction.ZERO;
+
 		OTPM.mapToPreferenceHierarchy(getPreferenceScreen(), mWrapper);
 		getPreferenceScreen().setOnPreferenceChangeListener(mListener);
 
 		if(!mIsEditing)
 		{
 			final Preference p = findPreference("active");
+			if(p != null)
+				p.setEnabled(false);
+		}
+
+		if(mWrapper.refillSize == 0)
+		{
+			final Preference p = findPreference("currentSupply");
 			if(p != null)
 				p.setEnabled(false);
 		}
@@ -760,8 +770,10 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
+					final long repeatArg = bitset.longValue();
+
 					setFieldValue(Drug.REPEAT_WEEKDAYS);
-					setFieldValue("repeatArg", bitset.longValue());
+					setFieldValue("repeatArg", repeatArg);
 
 					updateSummary();
 					notifyForwardDependencies();
@@ -903,11 +915,19 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		}
 
 		@Override
-		public void onDependencyChange(AdvancedDialogPreference preference, String depKey)
+		public void onDependencyChange(AdvancedDialogPreference preference, String depKey, Object newPrefValue)
 		{
 			preference.setSummary(getSummary(mValue));
 			if("refillSize".equals(depKey))
-				((CurrentSupplyPreference) preference).setRefillSize((Integer) getFieldValue("refillSize"));
+			{
+				final int refillSize = (Integer) newPrefValue;
+				final CurrentSupplyPreference p = (CurrentSupplyPreference) preference;
+
+				Log.d(TAG, "onDependencyChange: newPrefValue=" + newPrefValue);
+
+				p.setRefillSize(refillSize);
+				p.setEnabled(refillSize > 0);
+			}
 		}
 
 		private String getSummary(Object value)

@@ -148,7 +148,7 @@ public abstract class PreferenceController<P extends Preference, T>
 		return false;
 	}
 
-	public void onDependencyChange(P preference, String depKey) {
+	public void onDependencyChange(P preference, String depKey, Object newPrefValue) {
 		// do nothing
 	}
 
@@ -222,15 +222,13 @@ public abstract class PreferenceController<P extends Preference, T>
 		return (P) root.findPreference(mPrefKey);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected final void notifyForwardDependencies(/*Preference preference, Object newPrefValue*/)
-	{
-		/*if(Version.SDK_IS_PRE_HONEYCOMB)
-		{
-			Log.w(TAG, "notifyForwardDependencies: stub");
-			return;
-		}*/
+	protected final void notifyForwardDependencies() {
+		notifyForwardDependencies(getFieldValue());
+	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected final void notifyForwardDependencies(T newPrefValue)
+	{
 		if(mForwardDependencies == null)
 			return;
 
@@ -263,7 +261,7 @@ public abstract class PreferenceController<P extends Preference, T>
 
 				//ph.updateSummary(p, ph.getFieldValue());
 				//ph.onDependencyChange(p, preference.getKey(), newPrefValue);
-				ph.onDependencyChange(p, mPrefKey);
+				ph.onDependencyChange(p, mPrefKey, newPrefValue);
 			}
 		}
 		else
@@ -288,7 +286,7 @@ public abstract class PreferenceController<P extends Preference, T>
 					Log.v(TAG, "Not updating summary of " + preference.getKey());
 
 				if(doChange)
-					notifyForwardDependencies();
+					notifyForwardDependencies(newValue);
 
 				return doChange;
 			}

@@ -176,14 +176,16 @@ public enum DoseEventJanitor implements
 		if(dose.isZero())
 			return;
 
-		final Fraction newSupply = drug.getCurrentSupply().minus(dose);
+		final Fraction newSupply = drug.getRefillSize() != 0 ?
+				drug.getCurrentSupply().minus(dose) : Fraction.ZERO;
+
 		if(newSupply.isNegative())
 			return;
 
 		if(Entries.countDoseEvents(drug, date, doseTime) != 0)
 			return;
 
-		if(LOGV) Log.v(TAG, "createDoseEvent: drug=" + drug + ", date=" + date + ", doseTime=" + doseTime);
+		if(BuildConfig.DEBUG) Log.v(TAG, "createDoseEvent: drug=" + drug + ", date=" + date + ", doseTime=" + doseTime);
 
 		final DoseEvent intake = new DoseEvent(drug, date, doseTime, dose);
 		intake.setWasAutoCreated(true);

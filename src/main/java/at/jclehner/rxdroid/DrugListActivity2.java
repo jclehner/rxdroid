@@ -663,7 +663,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 					wrapper.isActiveDate = mDate.equals(mDtInfo.activeDate());
 					wrapper.isSupplyLow = Entries.hasLowSupplies(drug, mDate);
 					wrapper.hasMissingDoses = Entries.hasMissingDosesBeforeDate(drug, mDate);
-					wrapper.isSupplyVisible = (drug.getRefillSize() != 0 || !drug.getCurrentSupply().isZero()) && !mDate.before(mDtInfo.activeDate());
+					wrapper.isSupplyVisible = (drug.getRefillSize() != 0 /*|| !drug.getCurrentSupply().isZero()*/) && !mDate.before(mDtInfo.activeDate());
 
 					if(wrapper.isActiveDate)
 					{
@@ -694,10 +694,13 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 			private final CollectionUtils.Filter<Drug> mFilter = new CollectionUtils.Filter<Drug>()
 			{
+				private final boolean skipAutoDoseEventDrugs = !Settings.getBoolean(
+						Settings.Keys.SHOW_SUPPLY_MONITORS, false);
+
 				@Override
 				public boolean matches(Drug drug)
 				{
-					if(!drug.isActive() || drug.hasAutoDoseEvents())
+					if(!drug.isActive() || (drug.hasAutoDoseEvents() && skipAutoDoseEventDrugs))
 						return false;
 
 					if(Entries.countDoseEvents(drug, mDate, null) != 0)
@@ -734,9 +737,9 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				private int getSmartSortScore(Drug drug)
 				{
 					if(!drug.isActive())
-						return 10000 - drug.getId();
+						return 100000 - drug.getId();
 
-					int score = 0;
+					int score = drug.hasAutoDoseEvents() ? 50000 : 0;
 
 					if(!Entries.hasAllDoseEvents(drug, mDate, mDtInfo.activeOrNextDoseTime(), false))
 						score -= 5000;
