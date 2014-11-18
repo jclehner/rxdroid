@@ -46,11 +46,12 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.Toast;
 
 import com.github.espiandev.showcaseview.ShowcaseView;
 import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
+
+import org.joda.time.LocalDate;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -269,13 +270,12 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		private Date mDisplayedDate;
 		private Date mReferenceDate;
 
+		private int mLastDoseTimePeriodIndex = -1;
+
 		private boolean mShowingAll = false;
 
 		private Settings.DoseTimeInfo mDtInfo;
-		private boolean mHasExplicitDateRequest = false;
-
-		private int mLastActiveDoseTime;
-		private Date mLastActiveDate;
+		private boolean mUseDateArg = false;
 
 		@Override
 		public void onCreate(Bundle icicle)
@@ -287,18 +287,14 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 			final Bundle args = icicle != null ? icicle : getArguments();
 			mPatientId = args.getInt(ARG_PATIENT_ID);
-			mDisplayedDate = (Date) getArguments().getSerializable(ARG_DATE);
-			mHasExplicitDateRequest = mDisplayedDate != null;
+			mLastDoseTimePeriodIndex = -1;
 
-			if(icicle != null && mDisplayedDate == null)
-			{
-				mLastActiveDoseTime = icicle.getInt("last_active_dose_time", -1);
-				mLastActiveDate = (Date) icicle.getSerializable("last_active_date");
-				mDisplayedDate = (Date) icicle.getSerializable("last_displayed_date");
-				mReferenceDate = (Date) icicle.getSerializable("reference_date");
+			if(icicle != null)
+				mUseDateArg = icicle.getBoolean("use_date_arg");
+			else
+				mUseDateArg = getArguments().getSerializable(ARG_DATE) != null;
 
-				updateDoseTimeInfo();
-			}
+			updateDoseTimeInfo();
 		}
 
 		@Override
@@ -308,46 +304,23 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 			updateDoseTimeInfo();
 
-			if(BuildConfig.DEBUG)
+			Date date = null;
+			boolean forceSetDate = true;
+
+			if(mUseDateArg)
+				date = (Date) getArguments().getSerializable(ARG_DATE);
+
+			if(date == null)
 			{
-				Toast.makeText(getActivity(), "mHasExplicitDateRequest = "
-						+ mHasExplicitDateRequest, Toast.LENGTH_LONG).show();
+				date = mDtInfo.activeDate();
+				forceSetDate = mLastDoseTimePeriodIndex != mDtInfo.doseTimePeriodIndex();
 			}
 
-			if(!mHasExplicitDateRequest)
-			{
-				// If we're resuming, we want the date to stay untouched,
-				// unless the active doseTime and/or date have changed since the
-				// last resume.
+			mLastDoseTimePeriodIndex = mDtInfo.doseTimePeriodIndex();
+			Log.d(TAG, "doseTimePeriodIndex=" + mLastDoseTimePeriodIndex);
 
-				if(mDtInfo.activeDoseTime() != mLastActiveDoseTime && !mDtInfo.activeDate().equals(mLastActiveDate))
-				{
-					Log.i(TAG, "Last active dose time and/or date differ");
-					setDate(mDtInfo.activeDate(), true);
-				}
-				else if(mDisplayedDate != null)
-				{
-					Log.i(TAG, "Setting date from mDisplayedDate");
-					setDate(mDisplayedDate, false);
-				}
-				else
-				{
-					Date date = (Date) getArguments().getSerializable("date");
-					if(date == null)
-					{
-						Log.i(TAG, "Setting date to active date");
-						date = mDtInfo.activeDate();
-					}
-					else
-						Log.i(TAG, "Date obtained from arguments");
-
-					setDate(date, true);
-				}
-			}
-			else
-				setDate(mDisplayedDate, true);
-
-			mHasExplicitDateRequest = false;
+			setDate(date, forceSetDate);
+			mUseDateArg = false;
 
 			NotificationReceiver.registerOnDoseTimeChangeListener(this);
 			SystemEventReceiver.registerOnSystemTimeChangeListener(this);
@@ -360,19 +333,13 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 			NotificationReceiver.unregisterOnDoseTimeChangeListener(this);
 			SystemEventReceiver.registerOnSystemTimeChangeListener(this);
-
-			updateLastDisplayInfos();
 		}
 
 		@Override
 		public void onSaveInstanceState(Bundle outState)
 		{
 			super.onSaveInstanceState(outState);
-
-			outState.putInt("last_active_dose_time", mDtInfo.activeDoseTime());
-			outState.putSerializable("last_active_date", mDtInfo.activeDate());
-			outState.putSerializable("last_displayed_date", mDisplayedDate);
-			outState.putSerializable("reference_date", mReferenceDate);
+			outState.putBoolean("use_date_arg", mUseDateArg);
 		}
 
 		@Override
@@ -502,18 +469,11 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			mReferenceDate = mDisplayedDate = date;
 
 			updateDoseTimeInfo();
-			updateLastDisplayInfos();
 
 			mPager.getAdapter().notifyDataSetChanged();
 			mPager.setCurrentItem(CENTER_ITEM, false);
 
 			updateActionBar();
-		}
-
-		private void updateLastDisplayInfos()
-		{
-			mLastActiveDoseTime = mDtInfo.activeDoseTime();
-			mLastActiveDate = mDtInfo.activeDate();
 		}
 
 		private void updateDoseTimeInfo() {
@@ -863,6 +823,27 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			}
 			else if(view instanceof DoseView)
 			{
+				if(BuildConfig.DEBUG)
+				{
+					try
+					{
+						final LocalDate fragmentDate = new LocalDate(mDate);
+						final LocalDate activityDate = LocalDate.parse((
+								(ActionBarActivity) getActivity()).getSupportActionBar().getTitle().toString().replace('/', '-'));
+
+						if(!fragmentDate.equals(activityDate))
+						{
+							Toast.makeText(getActivity(), "fragmentDate=" + fragmentDate + "\nactivityDate=" + activityDate,
+									Toast.LENGTH_LONG).show();
+							Log.d("DLA2.DLF", "Date mismatch:\n  fragmentDate=" + fragmentDate + "\n  activityDate=" + activityDate);
+						}
+					}
+					catch(RuntimeException e)
+					{
+						Log.w("DLA2.DLF", e);
+					}
+				}
+
 				final Bundle args = new Bundle();
 				args.putInt(DoseDialog.ARG_DRUG_ID, ((DoseView) view).getDrug().getId());
 				args.putInt(DoseDialog.ARG_DOSE_TIME, ((DoseView) view).getDoseTime());
@@ -990,15 +971,16 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 		{
 			menu.add(R.string._title_help)
-					.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-					@Override
-					public boolean onMenuItemClick(MenuItem item)
+					.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
 					{
-						showHelpOverlaysIfApplicable(true);
-						return true;
-					}
-			});
+
+						@Override
+						public boolean onMenuItemClick(MenuItem item)
+						{
+							showHelpOverlaysIfApplicable(true);
+							return true;
+						}
+					});
 		}
 
 		@Override
@@ -1029,13 +1011,10 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		}
 
 		@Override
-		public void setListAdapter(ListAdapter adapter)
+		public void onLoadFinished(List<LLFLoader.ItemHolder<Drug>> data)
 		{
-			super.setListAdapter(adapter);
-
-			if(adapter.isEmpty())
-				setEmptyText(getEmptyText());
-
+			super.onLoadFinished(data);
+			setEmptyText(getEmptyText());
 			showHelpOverlaysIfApplicable(false);
 		}
 
@@ -1071,7 +1050,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 						//Log.i(TAG, "Trying date " + DateTime.toDateString(date) + " for " + drug);
 					}
 
-					final Fragment f = getFragmentManager().findFragmentById(android.R.id.content);
+					final Fragment f = getFragmentManager().findFragmentByTag("pager");
 					if(f instanceof DrugListPagerFragment)
 						((DrugListPagerFragment) f).setDate(date, false);
 				}
