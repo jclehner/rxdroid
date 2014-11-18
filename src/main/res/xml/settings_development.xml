@@ -62,6 +62,14 @@
 			android:title="Add 5 drugs"
 			/>
 
+	<Preference android:key="refill_reminder_snooze_drugs"
+			android:title="Snoozed drugs"
+			android:enabled="true" />
+
+	<Preference android:key="next_refill_reminder_date"
+		android:title="Next refill reminder date"
+		android:enabled="true" />
+
 	<Preference android:key="key_debug_crash_app"
 			android:title="Crash app"
 			/>

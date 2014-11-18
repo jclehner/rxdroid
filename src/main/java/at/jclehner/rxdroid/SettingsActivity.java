@@ -269,8 +269,12 @@ public class SettingsActivity extends ActionBarActivity
 
 				NotificationReceiver.cancelNotifications();
 			}
-			else if(Settings.Keys.LAST_MSG_HASH.equals(key))
+			else if(Settings.Keys.LAST_MSG_HASH.equals(key)
+					|| Settings.Keys.NEXT_REFILL_REMINDER_DATE.equals(key)
+					|| "refill_reminder_snooze_drugs".equals(key))
+			{
 				return;
+			}
 
 			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true);
 		}
@@ -803,6 +807,20 @@ public class SettingsActivity extends ActionBarActivity
 						return true;
 					}
 				});
+			}
+
+			final String[] keys = {
+					Settings.Keys.NEXT_REFILL_REMINDER_DATE,
+					"refill_reminder_snooze_drugs"
+			};
+
+			for(String key : keys)
+			{
+				p = findPreference(key);
+				if(p == null)
+					continue;
+
+				p.setSummary(p.getSharedPreferences().getString(key, "(null)"));
 			}
 		}
 	}
