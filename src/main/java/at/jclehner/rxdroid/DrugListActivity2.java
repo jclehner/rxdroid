@@ -724,15 +724,10 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				@Override
 				public int compare(Drug lhs, Drug rhs)
 				{
-					if(Settings.getBoolean(Settings.Keys.USE_SMART_SORT, false))
-					{
-						if(getSmartSortScore(lhs) < getSmartSortScore(rhs))
-							return -1;
-						else
-							return 1;
-					}
-
-					return lhs.compareTo(rhs);
+					if(getSmartSortScore(lhs) < getSmartSortScore(rhs))
+						return -1;
+					else
+						return 1;
 				}
 
 				// lower score is better (higher up)

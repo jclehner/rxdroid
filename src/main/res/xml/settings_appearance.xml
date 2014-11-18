@@ -39,6 +39,7 @@
 				android:title="@string/_title_smart_sort"
 				android:summary="@string/_summary_smart_sort"
 				android:defaultValue="true"
+				android:enabled="false"
 				/>
 
 		<at.jclehner.rxdroid.preferences.RefSummaryCheckBoxPreference android:key="@string/key_skip_dose_dialog"

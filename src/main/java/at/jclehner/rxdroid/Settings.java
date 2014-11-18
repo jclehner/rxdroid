@@ -80,7 +80,6 @@ public final class Settings
 		public static final String COMPACT_ACTION_BAR = key(R.string.key_compact_action_bar);
 		public static final String NOTIFICATION_LIGHT_COLOR = key(R.string.key_notification_light_color);
 		public static final String QUIET_HOURS = key(R.string.key_quiet_hours);
-		public static final String USE_SMART_SORT = key(R.string.key_use_smart_sort);
 		public static final String LANGUAGE = key(R.string.key_language);
 		public static final String USE_BACKUP_FRAMEWORK = key(R.string.key_use_backup_framework);
 		public static final String USE_PRETTY_FRACTIONS = key(R.string.key_use_pretty_fractions);
@@ -823,10 +822,6 @@ public final class Settings
 				putString(Keys.NOTIFICATION_LIGHT_COLOR, "");
 
 			remove(Keys.USE_LED);
-		}
-
-		if(isFirstLaunchOfVersionOrLater(Version.versionCodeBeta(21, 0))) {
-			putBoolean(Keys.USE_SMART_SORT, true);
 		}
 
 		if(isFirstLaunchOfVersionOrLater(Version.versionCodeBeta(22, 1))) {
