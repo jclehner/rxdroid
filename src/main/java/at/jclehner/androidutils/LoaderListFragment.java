@@ -199,6 +199,12 @@ public abstract class LoaderListFragment<T> extends ListFragment implements Load
 			setListShown(true);
 		else
 			setListShownNoAnimation(true);
+
+		onLoadFinished(data);
+	}
+
+	public void onLoadFinished(List<LLFLoader.ItemHolder<T>> data) {
+
 	}
 
 	@Override
