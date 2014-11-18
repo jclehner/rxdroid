@@ -475,7 +475,14 @@ public final class Database
 			final Method m = dao.getClass().getMethod(methodName, Object.class);
 			final Timer t = LOGV ? new Timer() : null;
 
-			synchronized(LOCK_DATA) {
+			synchronized(LOCK_DATA)
+			{
+				if(!sHelper.isOpen())
+				{
+					Log.w(TAG, "Database was not open; reopening!");
+					reload(RxDroid.getContext());
+				}
+
 				m.invoke(dao, entry);
 			}
 
