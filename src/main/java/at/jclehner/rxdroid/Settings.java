@@ -484,6 +484,35 @@ public final class Settings
 			return mNextDoseTime;
 		}
 
+		/**
+		 * An index that increments over the course of the day.
+		 *
+		 * index		dose-time
+		 * 0
+		 * 1            TIME_MORNING
+		 * 2
+		 * 3            TIME_NOON
+		 * 4
+		 * 5            TIME_EVENING
+		 * 6
+		 * 7            TIME_NIGHT
+		 * 8
+		 *
+		 * An index of 8 is only returned if TIME_NIGHT does not wrap around midnight.
+		 */
+		public int doseTimePeriodIndex()
+		{
+			if(mActiveDoseTime == Schedule.TIME_INVALID)
+			{
+				if(mNextDoseTime == Schedule.TIME_MORNING && !hasWrappingDoseTimeNight())
+					return 8;
+
+				return mNextDoseTime * 2;
+			}
+
+			return 1 + mActiveDoseTime * 2;
+		}
+
 		public int activeOrNextDoseTime()
 		{
 			if(mActiveDoseTime == Schedule.TIME_INVALID)
