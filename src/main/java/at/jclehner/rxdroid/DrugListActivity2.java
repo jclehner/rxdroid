@@ -295,6 +295,8 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				mUseDateArg = getArguments().getSerializable(ARG_DATE) != null;
 
 			updateDoseTimeInfo();
+
+			Log.d(TAG, "onCreate: icicle=" + icicle);
 		}
 
 		@Override
@@ -310,14 +312,15 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			if(mUseDateArg)
 				date = (Date) getArguments().getSerializable(ARG_DATE);
 
+			Log.d(TAG, "onResume: ARG_DATE => " + date);
+
 			if(date == null)
 			{
 				date = mDtInfo.activeDate();
-				forceSetDate = mLastDoseTimePeriodIndex != mDtInfo.doseTimePeriodIndex();
+				//forceSetDate = mLastDoseTimePeriodIndex != mDtInfo.doseTimePeriodIndex();
 			}
 
 			mLastDoseTimePeriodIndex = mDtInfo.doseTimePeriodIndex();
-			Log.d(TAG, "doseTimePeriodIndex=" + mLastDoseTimePeriodIndex);
 
 			setDate(date, forceSetDate);
 			mUseDateArg = false;
@@ -460,6 +463,8 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 		private void setDate(Date date, boolean force)
 		{
+			Log.d(TAG, "setDate: date=" + date + ", force=" + force);
+
 			if(date == null)
 				throw new NullPointerException();
 
