@@ -1,3 +1,7 @@
+0.9.24:
+	* Improve compatibility with Android Wear
+	* Add translations for: Finnish, Japanese, Ukranian
+
 0.9.23:
 	* Add option to create/restore backups (requires permission
 	  to read/write external storage!)
