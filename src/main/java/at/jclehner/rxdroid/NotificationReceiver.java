@@ -452,7 +452,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
 		builder.setAutoCancel(false);
 
-		if(BuildConfig.DEBUG)
+		if(BuildConfig.DEBUG && false)
 		{
 			builder.setPriority(isShowingLowSupplyNotificationOnly ?
 					NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_HIGH);
@@ -483,10 +483,8 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
             {
-                NotificationCompat.Action action = new NotificationCompat.Action.Builder(
-                       R.drawable.ic_action_tick_white, getString(R.string._title_take_all_doses), operation).build();
-				builder.addAction(action);
-				builder.extend(new NotificationCompat.WearableExtender().addAction(action));
+				addAction(builder, new int[] { R.drawable.ic_action_tick_white, R.drawable.ic_wearableaction_tick },
+						R.string._title_take_all_doses, operation);
             }
             else if(Settings.getBoolean(Settings.Keys.SWIPE_TO_TAKE_ALL, false))
 			{
@@ -513,10 +511,8 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
 			{
-				NotificationCompat.Action action = new NotificationCompat.Action.Builder(
-						R.drawable.ic_action_snooze, getString(R.string._title_remind_tomorrow), operation).build();
-				builder.addAction(action);
-				builder.extend(new NotificationCompat.WearableExtender().addAction(action));
+				addAction(builder, new int[] { R.drawable.ic_action_snooze_white, R.drawable.ic_wearableaction_snooze },
+						R.string._title_remind_tomorrow, operation);
 			}
 			else
 			{
@@ -627,6 +623,17 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private int getDrugsWithMissedDoses(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime) {
 		return Entries.getDrugsWithMissedDoses(mAllDrugs, date, activeOrNextDoseTime, isActiveDoseTime, null);
+	}
+
+	private void addAction(NotificationCompat.Builder builder, int[] icons, int titleResId, PendingIntent operation)
+	{
+		builder.addAction(buildAction(icons[0], titleResId, operation));
+		builder.extend(new NotificationCompat.WearableExtender().addAction(
+				buildAction(icons[1], titleResId, operation)));
+	}
+
+	private NotificationCompat.Action buildAction(int icon, int titleResId, PendingIntent operation) {
+		return new NotificationCompat.Action.Builder(icon, getString(titleResId), operation).build();
 	}
 
 	private int getDrugsWithLowSupplies(Date date, int doseTime, List<Drug> outDrugs)
