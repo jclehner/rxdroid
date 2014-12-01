@@ -1,3 +1,7 @@
+0.9.24.2:
+	* Fix spurious database crashes on some devices
+	* Fix notification loop issue
+
 0.9.24.1:
 	* Fix dual notification issue on some devices
 
