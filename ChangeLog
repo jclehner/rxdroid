@@ -1,3 +1,6 @@
+0.9.24.1:
+	* Fix dual notification issue on some devices
+
 0.9.24:
 	* Improve compatibility with Android Wear
 	* Add translations for: Finnish, Japanese, Ukranian
