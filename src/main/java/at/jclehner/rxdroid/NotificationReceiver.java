@@ -452,7 +452,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
 		builder.setAutoCancel(false);
 
-		if(false)
+		if(BuildConfig.DEBUG)
 		{
 			builder.setPriority(isShowingLowSupplyNotificationOnly ?
 					NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_HIGH);
