@@ -927,8 +927,11 @@ public class DrugListActivity2 extends ActionBarActivity implements
 								Database.delete(intake);
 							}
 
-							drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
-							Database.update(drug);
+							if(drug.getRefillSize() != 0)
+							{
+								drug.setCurrentSupply(drug.getCurrentSupply().plus(dose));
+								Database.update(drug);
+							}
 						}
 						else if(menuItem.getItemId() == R.id.menuitem_take)
 							doseView.performClick();
