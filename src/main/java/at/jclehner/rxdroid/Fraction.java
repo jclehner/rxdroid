@@ -280,7 +280,9 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 
 		return hasher.getHashCode();*/
 
-		return mDenominator << 16 | mNumerator;
+		// Must return a consistent hash for all zero fractions, regardless
+		// of internal representation (0/1, 0/2000, etc.).
+		return (mNumerator != 0 ? mDenominator : 1) << 16 | mNumerator;
 	}
 
 	@Override
