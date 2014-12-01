@@ -391,7 +391,7 @@ public class TimePeriodPreference extends BaseAdvancedDialogPreference<TimePerio
 			mMessageView.setVisibility(View.GONE);
 
 		final boolean isValidTime = isCurrentlyVisibleTimePickerValueValid();
-		mNextButton.setEnabled(isCurrentlyVisibleTimePickerValueValid());
+		mNextButton.setEnabled(isValidTime);
 		if(mCurrentPage == 1)
 			mBackButton.setEnabled(isValidTime);
 	}
