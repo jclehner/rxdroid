@@ -59,7 +59,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	private static final String TAG = NotificationReceiver.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
 
-	private static final boolean USE_WEARABLE_HACK = true;
+	private static final boolean USE_WEARABLE_HACK = true && Version.SDK_IS_JELLYBEAN_OR_NEWER;
 
 	private static final int LED_CYCLE_MS = 5000;
 	private static final int LED_ON_MS = 500;
