@@ -288,8 +288,12 @@ public class PreferencesActivity extends PreferenceActivityBase implements
 
 			NotificationReceiver.cancelNotifications();
 		}
-		else if(Settings.Keys.LAST_MSG_HASH.equals(key))
+		else if(Settings.Keys.LAST_MSG_HASH.equals(key)
+				|| Keys.NEXT_REFILL_REMINDER_DATE.equals(key)
+				|| "refill_reminder_snooze_drugs".equals(key))
+		{
 			return;
+		}
 
 		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true);
 	}
