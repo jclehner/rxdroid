@@ -493,7 +493,29 @@ public class SettingsActivity extends ActionBarActivity
 
 		private void setupDebugPreferences()
 		{
-			Preference p = findPreference("db_create_drug_with_schedule");
+			Preference p = new Preference(getActivity());
+			p.setTitle("Notify in 7s");
+			p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+			{
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					new Thread() {
+						@Override
+						public void run()
+						{
+							Util.sleepAtMost(7000);
+							NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false, true);
+						}
+					}.start();
+
+					return true;
+				}
+			});
+
+			getPreferenceScreen().addPreference(p);
+
+			p = findPreference("db_create_drug_with_schedule");
 			if(p != null)
 			{
 				p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
