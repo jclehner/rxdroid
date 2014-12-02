@@ -470,7 +470,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setColor(0xff5722);
 		builder.setAutoCancel(false);
 
-		if(BuildConfig.DEBUG && false)
+		if(Build.VERSION.SDK_INT < 21)
 		{
 			builder.setPriority(isShowingLowSupplyNotificationOnly ?
 					NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_HIGH);
@@ -501,7 +501,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
             {
-				addAction(builder, new int[] { R.drawable.ic_action_tick_white, R.drawable.ic_wearableaction_tick },
+				addAction(builder, new int[] { R.drawable.ic_action_tick_enabled, R.drawable.ic_wearableaction_tick },
 						R.string._title_take_all_doses, operation);
             }
             else if(Settings.getBoolean(Settings.Keys.SWIPE_TO_TAKE_ALL, false))
