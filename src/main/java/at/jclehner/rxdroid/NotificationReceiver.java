@@ -27,6 +27,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -115,6 +116,9 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private boolean mDoPostSilent = false;
 	private boolean mForceUpdate = false;
+
+	private boolean mUseWearableHack = USE_WEARABLE_HACK;
+
 	//private boolean mNoWearableNotification = false;
 
 	private Bundle mExtras;
@@ -187,6 +191,20 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			mForceUpdate = isAlarmRepetition ? true : intent.getBooleanExtra(EXTRA_FORCE_UPDATE, false);
 			rescheduleAlarms();
+		}
+
+		if(mUseWearableHack)
+		{
+			try
+			{
+				context.getPackageManager().getApplicationInfo("com.google.android.wearable.app", 0);
+				Log.i(TAG, "Found Android Wear app; using wearable hack");
+			}
+			catch(PackageManager.NameNotFoundException e)
+			{
+				Log.i(TAG, "Would use wearable hack, but Android Wear app not found!");
+				mUseWearableHack = false;
+			}
 		}
 
 		updateCurrentNotifications();
@@ -458,7 +476,7 @@ public class NotificationReceiver extends BroadcastReceiver
 					NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_HIGH);
 		}
 
-		if(USE_WEARABLE_HACK)
+		if(mUseWearableHack)
 		{
 			builder.setGroup("rxdroid");
 			builder.setGroupSummary(true);
@@ -606,7 +624,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		{
 			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
 
-			if(USE_WEARABLE_HACK)
+			if(mUseWearableHack)
 			{
 				builder.setOngoing(false);
 				builder.setGroupSummary(false);
