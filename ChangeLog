@@ -1,3 +1,9 @@
+0.9.24.4:
+	* Another attempt at fixing the notification issues
+
+0.9.24.3:
+	* Potential fix for missing notification actions
+
 0.9.24.2:
 	* Fix spurious database crashes on some devices
 	* Fix notification loop issue
