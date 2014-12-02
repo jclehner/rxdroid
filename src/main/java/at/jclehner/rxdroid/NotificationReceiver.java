@@ -627,7 +627,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void addAction(NotificationCompat.Builder builder, int[] icons, int titleResId, PendingIntent operation)
 	{
-		builder.addAction(buildAction(icons[0], titleResId, operation));
+		builder.addAction(icons[0], getString(titleResId), operation);
 		builder.extend(new NotificationCompat.WearableExtender().addAction(
 				buildAction(icons[1], titleResId, operation)));
 	}
