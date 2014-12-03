@@ -125,7 +125,7 @@ public final class Entries
 				offset = (int) -days;
 
 			final Date lastIntakeDate = DateTime.add(date, Calendar.DAY_OF_MONTH, offset);
-			if(lastIntakeDate.compareTo(drug.getLastScheduleUpdateDate()) == -1)
+			if(lastScheduleUpdateDate != null && lastIntakeDate.compareTo(drug.getLastScheduleUpdateDate()) == -1)
 				return false;
 
 			//if(!isDateAfterLastScheduleUpdateOfDrug(lastIntakeDate, drug))
