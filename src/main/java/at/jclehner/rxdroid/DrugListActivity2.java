@@ -88,6 +88,8 @@ import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 public class DrugListActivity2 extends ActionBarActivity implements
 		DialogLike.OnButtonClickListener
 {
+	private static final String TAG = DrugListActivity2.class.getSimpleName();
+
 	public static final String EXTRA_DATE = "rxdroid:date";
 	public static final String EXTRA_STARTED_FROM_NOTIFICATION = "rxdroid:started_from_notification";
 
@@ -115,6 +117,29 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		}
 		else if(savedInstanceState == null)
 			initDrugListPagerFragment();
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent)
+	{
+		super.onNewIntent(intent);
+		setIntent(intent);
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+
+		if(Version.SDK_IS_LOLLIPOP_OR_NEWER)
+		{
+			if(getIntent().getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION, false))
+			{
+				Log.i(TAG, "Rescheduling alarms; better safe than sorry!");
+				NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true, false);
+				getIntent().putExtra(EXTRA_STARTED_FROM_NOTIFICATION, false);
+			}
+		}
 	}
 
 	@Override
@@ -253,8 +278,6 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				return POSITION_NONE;
 			}
 		};
-
-		private static final String TAG = DrugListPagerFragment.class.getSimpleName();
 
 		public static final String ARG_PATIENT_ID = DrugListFragment.ARG_PATIENT_ID;
 		public static final String ARG_DATE = DrugListFragment.ARG_DATE;
@@ -838,12 +861,12 @@ public class DrugListActivity2 extends ActionBarActivity implements
 						{
 							Toast.makeText(getActivity(), "fragmentDate=" + fragmentDate + "\nactivityDate=" + activityDate,
 									Toast.LENGTH_LONG).show();
-							Log.d("DLA2.DLF", "Date mismatch:\n  fragmentDate=" + fragmentDate + "\n  activityDate=" + activityDate);
+							Log.d(TAG, "Date mismatch:\n  fragmentDate=" + fragmentDate + "\n  activityDate=" + activityDate);
 						}
 					}
 					catch(RuntimeException e)
 					{
-						Log.w("DLA2.DLF", e);
+						Log.w(TAG, e);
 					}
 				}
 
