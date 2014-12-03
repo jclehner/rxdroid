@@ -339,10 +339,7 @@ public class SettingsActivity extends ActionBarActivity
 					getPreferenceManager().getDefaultSharedPreferences(
 							getActivity()).edit().putBoolean(key, (Boolean) newValue).commit();
 
-					final PendingIntent operation = PendingIntent.getActivity(getActivity(), 0, intent, 0);
-					final AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-					am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, operation);
-					System.exit(0);
+					RxDroid.forceRestart();
 				}
 			}
 			else if(Settings.Keys.NOTIFICATION_LIGHT_COLOR.equals(key))

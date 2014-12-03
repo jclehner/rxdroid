@@ -132,6 +132,7 @@ public class Backup
 		private String[] mInfo;
 		private Date mTimestamp;
 		private int mVersion;
+		private int mDbVersion;
 		private boolean mIsEncrypted;
 
 		public BackupFile(String path)
@@ -159,6 +160,11 @@ public class Backup
 
 			mVersion = Integer.parseInt(mInfo[0].substring("rxdbak".length()));
 			mTimestamp = new Date(Long.parseLong(mInfo[1]));
+
+			if(mInfo.length >= 3)
+				mDbVersion = Integer.parseInt(mInfo[2].substring("DBv".length()));
+			else
+				mDbVersion = -1;
 		}
 
 		public boolean isValid() {
@@ -171,6 +177,10 @@ public class Backup
 
 		public int version() {
 			return mVersion;
+		}
+
+		public int dbVersion() {
+			return mDbVersion;
 		}
 
 		public String getPath() {

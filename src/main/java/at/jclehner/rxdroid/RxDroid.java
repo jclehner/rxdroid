@@ -22,9 +22,11 @@
 package at.jclehner.rxdroid;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -211,6 +213,18 @@ public class RxDroid extends Application
 //		}
 
 		return false;
+	}
+
+	public static void forceRestart()
+	{
+		toastLong(R.string._toast_theme_changed);
+
+		final Context c = getContext();
+		final Intent intent = c.getPackageManager().getLaunchIntentForPackage(
+				c.getPackageName());
+		final AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, PendingIntent.getActivity(c, 0, intent, 0));
+		System.exit(0);
 	}
 
 	public static void notifyBackupDataChanged()

@@ -39,6 +39,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +55,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.ui.DialogLike;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.DateTime;
@@ -213,10 +215,20 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 
 		private boolean restoreBackup(String password)
 		{
+			Log.i("BackupActivity", "Restoring backup with DBv" + mFile.dbVersion());
+
 			if(mFile.restore(password))
 			{
-				startActivity(RxDroid.getLaunchIntent());
-				getActivity().finish();
+				if(mFile.dbVersion() == DatabaseHelper.DB_VERSION)
+				{
+					startActivity(RxDroid.getLaunchIntent());
+					getActivity().finish();
+				}
+				else
+				{
+					RxDroid.forceRestart();
+				}
+
 				return true;
 			}
 
