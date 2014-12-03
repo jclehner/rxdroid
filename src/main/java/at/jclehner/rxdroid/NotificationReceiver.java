@@ -469,7 +469,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setCategory(NotificationCompat.CATEGORY_ALARM);
 		builder.setColor(0xff5722);
 
-		if(Build.VERSION.SDK_INT < 21 || BuildConfig.DEBUG)
+		if(true)
 		{
 			builder.setPriority(isShowingLowSupplyNotificationOnly ?
 					NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_HIGH);

@@ -192,6 +192,18 @@ public class DrugListActivity extends SherlockFragmentActivity implements OnLong
 			}
 		}
 
+		// Lollipop-style heads-up notifications behave like autoCancel. Make sure
+		// we repost the notification
+		if(Build.VERSION.SDK_INT >= 21)
+		{
+			if(getIntent().getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION, false))
+			{
+				Log.i(TAG, "Updating notifications; better safe than sorry!");
+				NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true, false);
+				getIntent().putExtra(EXTRA_STARTED_FROM_NOTIFICATION, false);
+			}
+		}
+
 		mShowcaseQueue.show();
 	}
 
