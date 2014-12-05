@@ -34,6 +34,7 @@ import android.widget.TextView;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
@@ -180,8 +181,8 @@ public class DrugSupplyMonitor extends TextView implements
 				}
 				else if(date.equals(today) && Entries.hasLowSupplies(drug, date))
 				{
-					typeface = Typeface.BOLD_ITALIC;
-					textScaleX = 1.25f;
+					//typeface = Typeface.BOLD_ITALIC;
+					//textScaleX = 1.25f;
 					mHasLowSupply = true;
 				}
 			}
@@ -191,6 +192,9 @@ public class DrugSupplyMonitor extends TextView implements
 			else
 				setText("0");
 		}
+
+		setBackgroundResource(mHasLowSupply ? R.drawable.highlight
+						: Theme.getResourceAttribute(R.attr.selectableItemBackground));
 
 		setTypeface(null, typeface);
 		setTextScaleX(textScaleX);

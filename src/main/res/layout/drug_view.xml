@@ -190,22 +190,27 @@
 	  		
 	  		android:orientation="vertical"
 	  >
-		  	<at.jclehner.rxdroid.widget.DrugSupplyMonitor android:id="@+id/text_supply"
-			    android:layout_width="match_parent"
-			    android:layout_height="48dip"
-			   			    
-			    android:gravity="center"
-			    android:textAppearance="?android:attr/textAppearanceSmall"
-			    
-			    android:background="?attr/selectableItemBackground"
-			    android:clickable="true"
-			    android:onClick="onSupplyMonitorClick"
-			    custom:onLongClick="onSupplyMonitorLongClick"
-			    
-			    android:paddingBottom="6dip"
-			    
-			    android:text="36"
-			/>
+          <FrameLayout
+              android:layout_width="match_parent"
+              android:layout_height="48dip">
+
+                <at.jclehner.rxdroid.widget.DrugSupplyMonitor android:id="@+id/text_supply"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+
+                    android:paddingLeft="4dip"
+                    android:paddingRight="4dip"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+
+                    android:background="?selectableItemBackground"
+                    android:clickable="true"
+                    android:onClick="onSupplyMonitorClick"
+                    custom:onLongClick="onSupplyMonitorLongClick"
+
+                    android:text="36"
+                />
+          </FrameLayout>
 		  	
 		  	<FrameLayout android:id="@+id/frame_history_menu"
 		  	    android:layout_width="wrap_content"

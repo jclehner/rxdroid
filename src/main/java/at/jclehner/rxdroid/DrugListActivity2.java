@@ -609,7 +609,6 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				holder.supply.setDrugAndDate(wrapper.item, wrapper.date);
 				holder.supply.setVisibility(wrapper.isSupplyVisible ? View.VISIBLE : View.INVISIBLE);
 				holder.history.setTag(wrapper.item.getId());
-
 				holder.missedDoseIndicator.setVisibility((wrapper.isActiveDate && wrapper.hasMissingDoses)
 					? View.VISIBLE : View.GONE);
 
