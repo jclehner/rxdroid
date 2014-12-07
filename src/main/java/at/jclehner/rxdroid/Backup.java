@@ -25,34 +25,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.ZipInputStream;
-import net.lingala.zip4j.model.FileHeader;
-import net.lingala.zip4j.model.UnzipParameters;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
-import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class Backup
@@ -67,7 +55,7 @@ public class Backup
 		private static final IntentFilter INTENT_FILTER = new IntentFilter();
 
 		private boolean mReadable;
-		private boolean mWriteable;
+		private boolean mWritable;
 
 		@Override
 		public final void onReceive(Context context, Intent intent)
@@ -91,8 +79,8 @@ public class Backup
 			return mReadable;
 		}
 
-		public boolean isWriteable() {
-			return mWriteable;
+		public boolean isWritable() {
+			return mWritable;
 		}
 
 		public static boolean isReadable(String storageState)
@@ -101,14 +89,14 @@ public class Backup
 					|| Environment.MEDIA_MOUNTED.equals(storageState);
 		}
 
-		public static boolean isWriteable(String storageState) {
+		public static boolean isWritable(String storageState) {
 			return Environment.MEDIA_MOUNTED.equals(storageState);
 		}
 
 		private void update(String storageState)
 		{
 			mReadable = isReadable(storageState);
-			mWriteable = isWriteable(storageState);
+			mWritable = isWritable(storageState);
 		}
 
 		public StorageStateListener() {
@@ -217,9 +205,8 @@ public class Backup
 				}
 				catch(ZipException e)
 				{
-					final String msg = e.getMessage().toLowerCase(Locale.US);
-
-					if(password != null && msg.contains("password"))
+					final String msg = e.getMessage();
+					if(password != null && msg.toLowerCase(Locale.US).contains("password"))
 						return false;
 
 					throw new WrappedCheckedException(e);

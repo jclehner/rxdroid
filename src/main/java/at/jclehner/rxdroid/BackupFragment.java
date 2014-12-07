@@ -179,7 +179,7 @@ public class BackupFragment extends LoaderListFragment<File>
 						public boolean onMenuItemClick(MenuItem menuItem)
 						{
 							final String storageState = Backup.getStorageState();
-							if(Backup.StorageStateListener.isWriteable(storageState))
+							if(Backup.StorageStateListener.isWritable(storageState))
 							{
 								try
 								{
