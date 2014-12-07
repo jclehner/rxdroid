@@ -24,6 +24,7 @@ package at.jclehner.rxdroid;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -41,6 +42,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -578,6 +580,19 @@ public class DrugListActivity2 extends ActionBarActivity implements
 					holder.supply = (DrugSupplyMonitor) view.findViewById(R.id.text_supply);
 					holder.history = view.findViewById(R.id.frame_history_menu);
 					holder.missedDoseIndicator = view.findViewById(R.id.img_missed_dose_warning);
+
+					final View frameSupply = (View) holder.supply.getParent();
+					frameSupply.post(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							final Rect rect = new Rect(0, 0, frameSupply.getWidth(),
+										frameSupply.getHeight());
+							frameSupply.setTouchDelegate(new TouchDelegate(
+									rect, holder.supply));
+						}
+					});
 
 					holder.name.setOnClickListener((View.OnClickListener) mFragment);
 					holder.history.setOnClickListener((View.OnClickListener) mFragment);
