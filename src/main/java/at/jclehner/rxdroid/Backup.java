@@ -203,6 +203,9 @@ public class Backup
 
 		public boolean restore(String password)
 		{
+			if(!isValid())
+				throw new IllegalStateException("Invalid backup file");
+
 			synchronized(Database.LOCK_DATA)
 			{
 				try
