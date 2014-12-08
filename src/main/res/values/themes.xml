@@ -68,9 +68,9 @@
 
 		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 
-		<item name="colorPrimary">#ff5722</item>
-		<item name="colorPrimaryDark">#dd2c00</item>
-		<item name="colorAccent">#ffffa70b</item>
+		<item name="colorPrimary">@color/color_primary</item>
+		<item name="colorPrimaryDark">@color/color_primary_dark</item>
+		<item name="colorAccent">@color/color_accent</item>
 
 		<!--
         <item name="buttonBarStyle">@style/Theme.RxDroid.ButtonBar</item>
@@ -135,9 +135,9 @@
         <item name="android:windowAnimationStyle">@null</item>
         <item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 
-		<item name="colorPrimary">#ff5722</item>
-		<item name="colorPrimaryDark">#dd2c00</item>
-		<item name="colorAccent">#ffffa70b</item>
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/color_accent</item>
 
 		<!--
         <item name="buttonBarStyle">@style/Theme.RxDroid.ButtonBar.Dark</item>

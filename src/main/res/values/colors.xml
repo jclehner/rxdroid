@@ -28,4 +28,8 @@
 	
 	<color name="list_divider_dark">#1b1b1b</color>
 	<color name="list_divider_light">#d2d2d2</color>
+
+    <color name="color_primary">#ff5722</color>
+    <color name="color_primary_dark">#dd2c00</color>
+    <color name="color_accent">#ffffa70b</color>
 </resources>
