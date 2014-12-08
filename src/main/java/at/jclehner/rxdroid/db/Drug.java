@@ -805,30 +805,15 @@ public class Drug extends Entry implements Comparable<Drug>
 	};
 
 	@Keep
-	/* package */ static final Callback<Drug> CALLBACK_DELETED = new Callback<Drug>() {
-
-		@Override
-		public void call(Drug drug)
+	static final void onDelete(Drug drug)
+	{
+		for(DoseEvent intake : Database.getAll(DoseEvent.class))
 		{
-			for(DoseEvent intake : Database.getAll(DoseEvent.class))
-			{
-				if(intake.getDrug() == null || intake.getDrugId() == drug.id)
-					Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
-			}
-
-			for(Schedule schedule : drug.mSchedules.get())
-				Database.delete(schedule, Database.FLAG_DONT_NOTIFY_LISTENERS);
-
+			if(intake.getDrug() == null || intake.getDrugId() == drug.id)
+				Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
 		}
-	};
 
-	@Keep
-	/* package */ static final Callback<Drug> CALLBACK_ALL_CACHED = new Callback<Drug>() {
-
-		@Override
-		public void call(Drug entry)
-		{
-
-		}
-	};
+		for(Schedule schedule : drug.mSchedules.get())
+			Database.delete(schedule, Database.FLAG_DONT_NOTIFY_LISTENERS);
+	}
 }

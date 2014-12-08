@@ -44,6 +44,7 @@ import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.SplashScreenActivity;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.jclehner.rxdroid.util.Timer;
+import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.dao.Dao;
@@ -414,23 +415,15 @@ public final class Database
 		final Dao<E, Integer> dao = getDaoChecked(clazz);
 		runDaoMethodInThread(dao, methodName, entry);
 
-		final String callbackName = "CALLBACK_" + methodName.toUpperCase(Locale.US) + "D";
-		final Field callbackField = Reflect.getDeclaredField(clazz, callbackName);
-		if(callbackField != null)
+		final String callbackName = "on" + Util.capitalize(methodName);
+		final Method m = Reflect.getMethod(clazz, callbackName, clazz);
+		if(m != null)
 		{
-			@SuppressWarnings("rawtypes")
-			final Entry.Callback callback = (Entry.Callback) Reflect.getFieldValue(callbackField, null, null);
-			if(callback != null)
-			{
-				// don't run this in a thread as we want a clean state when events are
-				// dispatched to listeners
-				callback.call(entry);
-				if(LOGV) Log.v(TAG, "Ran callback " + callbackField.getName());
-			}
+			Reflect.invokeMethod(m, null, entry);
+			if(LOGV) Log.v(TAG, "Ran callback " + callbackName);
 		}
 		else if(LOGV)
 			Log.v(TAG, "No callback " + callbackName + " for " + clazz.getSimpleName());
-
 
 		if((flags & FLAG_DONT_NOTIFY_LISTENERS) == 0)
 		{
