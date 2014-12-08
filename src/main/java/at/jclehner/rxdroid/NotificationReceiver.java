@@ -658,7 +658,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
 		final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
 
-		if(nextRefillReminderDate == null || date.after(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
+		if(nextRefillReminderDate == null || !date.before(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
 		{
 			snoozedDrugIds.clear();
 			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, null);
