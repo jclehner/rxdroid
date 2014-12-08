@@ -884,15 +884,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 					}
 				}
 
-				final Bundle args = new Bundle();
-				args.putInt(DoseDialog.ARG_DRUG_ID, ((DoseView) view).getDrug().getId());
-				args.putInt(DoseDialog.ARG_DOSE_TIME, ((DoseView) view).getDoseTime());
-				args.putSerializable(DoseDialog.ARG_DATE, mDate);
-				args.putBoolean(DoseDialog.ARG_FORCE_SHOW, false);
-
-				final DoseDialog dialog = new DoseDialog(getActivity());
-				dialog.setArgs(args);
-				dialog.show();
+				showDoseDialog((DoseView) view, false);
 			}
 			else if(view.getId() == R.id.drug_name)
 			{
@@ -971,7 +963,12 @@ public class DrugListActivity2 extends ActionBarActivity implements
 							}
 						}
 						else if(menuItem.getItemId() == R.id.menuitem_take)
-							doseView.performClick();
+						{
+							// When using the popup menu, force	the dialog to display
+							// even when disabled in settings.
+							showDoseDialog(doseView, Settings.getBoolean(
+									Settings.Keys.SKIP_DOSE_DIALOG, true));
+						}
 						else if(menuItem.getItemId() == R.id.menuitem_skip)
 							Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
 						else if(menuItem.getItemId() == R.id.menuitem_edit)
@@ -1059,6 +1056,19 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			super.onLoadFinished(data);
 			setEmptyText(getEmptyText());
 			showHelpOverlaysIfApplicable(false);
+		}
+
+		private void showDoseDialog(DoseView doseView, boolean force)
+		{
+			final Bundle args = new Bundle();
+			args.putInt(DoseDialog.ARG_DRUG_ID, doseView.getDrug().getId());
+			args.putInt(DoseDialog.ARG_DOSE_TIME, doseView.getDoseTime());
+			args.putSerializable(DoseDialog.ARG_DATE, doseView.getDate());
+			args.putBoolean(DoseDialog.ARG_FORCE_SHOW, force);
+
+			final DoseDialog dialog = new DoseDialog(getActivity());
+			dialog.setArgs(args);
+			dialog.show();
 		}
 
 		private void showHelpOverlaysIfApplicable(boolean force)
