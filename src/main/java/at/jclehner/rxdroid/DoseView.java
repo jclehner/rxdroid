@@ -102,9 +102,6 @@ public class DoseView extends FrameLayout implements OnChangeListener
 
 		LayoutInflater.from(context).inflate(R.layout.dose_view, this, true);
 
-		if(!isInEditMode())
-			setBackgroundResource(Theme.getResourceAttribute(R.attr.selectableItemBackground));
-
 		mIntakeStatus = (ImageView) findViewById(R.id.icon_intake_status);
 		mDoseText = (TextView) findViewById(R.id.text_dose);
 		mDoseTimeIcon = (ImageView) findViewById(R.id.icon_dose_time);
