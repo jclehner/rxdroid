@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid;
 
+import java.io.File;
 import java.io.IOException;
 
 import android.app.backup.BackupAgentHelper;
@@ -32,6 +33,9 @@ import android.app.backup.SharedPreferencesBackupHelper;
 import android.content.Context;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
+
+import net.lingala.zip4j.exception.ZipException;
+
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
@@ -40,9 +44,9 @@ public class BackupAgent extends BackupAgentHelper
 {
 	private static final String TAG = BackupAgent.class.getSimpleName();
 
-	private static final String KEY_DATABASE = "database";
-	private static final String KEY_PREFS = "preferences";
-	private static final String KEY_SHOWCASE_VIEW = "showcase_view";
+	private static final String KEY_BACKUP = "backup";
+
+	private File mBackupFile;
 
 	@Override
 	public void onCreate()
@@ -52,11 +56,10 @@ public class BackupAgent extends BackupAgentHelper
 		if(!isBackupEnabled())
 			return;
 
-		addHelper(KEY_DATABASE, new FileBackupHelper(this, "../databases/" + DatabaseHelper.DB_NAME));
-		addHelper(KEY_PREFS, new DefaultSharedPreferencesBackupHelper(this));
-		addHelper(KEY_SHOWCASE_VIEW, new SharedPreferencesBackupHelper(this, "showcase_internal"));
+		mBackupFile = new File(getFilesDir(), "cloud.rxdbak");
+		addHelper(KEY_BACKUP, new FileBackupHelper(this, mBackupFile.getAbsolutePath()));
 
-		Log.i(TAG, "Created BackupAgent");
+		Log.i(TAG, "onCreate");
 	}
 
 	@Override
@@ -69,11 +72,18 @@ public class BackupAgent extends BackupAgentHelper
 			return;
 		}
 
-		synchronized(Database.LOCK_DATA)
+		try
 		{
-			Log.i(TAG, "Backing up...");
-			super.onBackup(oldState, data, newState);
+			Backup.createBackup(mBackupFile, null);
 		}
+		catch(ZipException e)
+		{
+			Log.w(TAG, e);
+			return;
+		}
+
+		Log.i(TAG, "Created backup at " + mBackupFile);
+		super.onBackup(oldState, data, newState);
 	}
 
 	@Override
@@ -82,9 +92,10 @@ public class BackupAgent extends BackupAgentHelper
 	{
 		Log.i(TAG, "Restoring...");
 
-		synchronized(Database.LOCK_DATA) {
-			super.onRestore(data, appVersionCode, newState);
-		}
+		super.onRestore(data, appVersionCode, newState);
+		final Backup.BackupFile bf = new Backup.BackupFile(mBackupFile.getAbsolutePath());
+		if(bf.isValid() && !bf.isEncrypted())
+			bf.restore(null);
 	}
 
 	private static boolean isBackupEnabled()
@@ -97,17 +108,6 @@ public class BackupAgent extends BackupAgentHelper
 		{
 			Log.w(TAG, e);
 			return true;
-		}
-	}
-
-	private static class DefaultSharedPreferencesBackupHelper extends SharedPreferencesBackupHelper
-	{
-		public DefaultSharedPreferencesBackupHelper(Context context) {
-			super(context, getDefaultPreferencesName(context));
-		}
-
-		private static String getDefaultPreferencesName(Context context) {
-			return context.getPackageName() + "_preferences";
 		}
 	}
 }

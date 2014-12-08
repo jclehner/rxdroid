@@ -182,11 +182,16 @@ public class Backup
 		public String getLocation()
 		{
 			final String file = new File(mPath).getAbsolutePath();
+
 			final String extDir = Environment.getExternalStorageDirectory().getAbsolutePath();
 			if(file.startsWith(extDir))
 				return file.substring(extDir.length() + 1);
-			else
-				return file;
+
+			final String filesDir = RxDroid.getContext().getFilesDir().getAbsolutePath();
+			if(file.startsWith(filesDir))
+				return file.replace(filesDir, "[files]");
+
+			return file;
 		}
 
 		public boolean restore(String password)

@@ -103,19 +103,24 @@ public class BackupFragment extends LoaderListFragment<File>
 		@Override
 		public List<? extends ItemHolder<File>> doLoadInBackground()
 		{
-			final File dir = new File(Environment.getExternalStorageDirectory(), "RxDroid");
-			if(!dir.exists())
-			{
-				dir.mkdir();
-				return Collections.emptyList();
-			}
-			else if(!dir.isDirectory())
-				throw new IllegalStateException(dir + ": not a directory");
+			final File[] dirs = {
+					new File(Environment.getExternalStorageDirectory(), "RxDroid"),
+					mContext.getFilesDir()
+			};
 
 			final List<BackupFileHolder> data = new ArrayList<BackupFileHolder>();
 
-			for(File file : dir.listFiles(this))
-				data.add(new BackupFileHolder(file));
+			for(File dir : dirs)
+			{
+				if(!dir.exists() || !dir.isDirectory())
+					continue;
+
+				for(File file : dir.listFiles(this))
+				{
+					if(file.isFile())
+						data.add(new BackupFileHolder(file));
+				}
+			}
 
 			Collections.sort(data);
 
