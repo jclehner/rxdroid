@@ -67,14 +67,10 @@ public enum DoseEventJanitor implements
 		if(Database.countAll(Patient.class) == 0)
 			Database.create(new Patient(), Database.FLAG_DONT_NOTIFY_LISTENERS);
 
-		SplashScreenActivity.setStatusMessage(R.string._title_db_status_creating_intakes);
-
 		for(Drug drug : Database.getAll(Drug.class))
 			createAutoDoseEvents(drug);
 
 		////////////////////////////////////
-
-		SplashScreenActivity.setStatusMessage(R.string._title_db_status_discarding_intakes);
 
 		final Date today = DateTime.today();
 

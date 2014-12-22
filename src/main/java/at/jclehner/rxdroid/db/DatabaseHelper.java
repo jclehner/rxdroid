@@ -34,7 +34,6 @@ import android.util.Log;
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.RxDroid;
-import at.jclehner.rxdroid.SplashScreenActivity;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
@@ -129,7 +128,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	{
 		try
 		{
-			SplashScreenActivity.setStatusMessage(R.string._title_db_status_initializing);
 			for(Class<?> clazz : Database.CLASSES)
 				TableUtils.createTableIfNotExists(cs, clazz);
 		}
@@ -156,8 +154,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		{
 			Log.e(TAG, "Failed to create " + dbCopy, e);
 		}
-
-		SplashScreenActivity.setStatusMessage(R.string._title_db_status_upgrading);
 
 		db.beginTransaction();
 

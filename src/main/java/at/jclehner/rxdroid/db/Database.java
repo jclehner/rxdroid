@@ -41,7 +41,6 @@ import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.RxDroid;
-import at.jclehner.rxdroid.SplashScreenActivity;
 import at.jclehner.rxdroid.db.DatabaseHelper.DatabaseError;
 import at.jclehner.rxdroid.util.Timer;
 import at.jclehner.rxdroid.util.Util;
@@ -147,8 +146,6 @@ public final class Database
 
 		synchronized(LOCK_INIT)
 		{
-			SplashScreenActivity.setStatusMessage(R.string._title_db_status_loading);
-
 			sIsLoaded = false;
 			sCache.clear();
 
