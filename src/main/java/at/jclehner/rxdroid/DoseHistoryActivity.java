@@ -90,6 +90,7 @@ public class DoseHistoryActivity extends ActionBarActivity implements
 	{
 		Components.onCreateActivity(this, 0);
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.simple_activity);
 
 		mDrug = Drug.get(getIntent().getIntExtra(Extras.DRUG_ID, 0));
 
@@ -157,7 +158,7 @@ public class DoseHistoryActivity extends ActionBarActivity implements
 		final FragmentTransaction ft = fm.beginTransaction();
 		final DoseLogFragment f = DoseLogFragment.newInstance(mDrug, flags);
 
-		ft.add(android.R.id.content, f, "log");
+		ft.replace(android.R.id.content, f);
 		ft.commit();
 
 		if(!Settings.getBoolean(Keys.LOG_IS_ALL_COLLAPSED, true))
