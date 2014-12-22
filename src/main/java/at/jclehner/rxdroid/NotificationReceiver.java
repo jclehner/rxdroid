@@ -363,7 +363,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		final Intent intent = new Intent(mContext, DrugListActivity2.class);
 		intent.putExtra(DrugListActivity2.EXTRA_STARTED_FROM_NOTIFICATION, true);
-		intent.putExtra(DrugListActivity2.EXTRA_DATE, date);
+		//intent.putExtra(DrugListActivity2.EXTRA_DATE, date);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
