@@ -236,15 +236,6 @@
 			  	    android:src="@drawable/ic_error_small"
 			  	/>
 		  	    
-		  	    
-		  	    
-		  	    
-		  	    
-		  	    
-		  	    
-		  	    
-		  	    
-		  	    
 		  	</FrameLayout>
 		  	<!-- android:layout_alignBottom="@id/drug_name" -->
 		  	
