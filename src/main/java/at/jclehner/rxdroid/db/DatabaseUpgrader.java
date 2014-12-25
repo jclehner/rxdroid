@@ -59,10 +59,19 @@ public class DatabaseUpgrader implements Closeable
 
 		if(oldVersion < 59)
 		{
+			execute("DROP TABLE schedules");
+			execute("DROP TABLE schedulepart");
 
+			execute("ALTER TABLE [intakes] RENAME TO [dose_events]");
+
+			execute("ALTER TABLE [drugs] ADD COLUMN [autoAddDoseEvents] SMALLINT");
+			execute("UPDATE [drugs] SET [autoAddDoseEvents]=[autoAddIntakes]");
+
+			execute("ALTER TABLE [drugs] ADD COLUMN [lastAutoDoseEventCreationDate] VARCHAR");
+			execute("UPDATE [drugs] SET [lastAutoDoseEventCreationDate]=[lastAutoIntakeCreationDate]");
+
+			execute("ALTER TABLE [drugs] ADD COLUMN [expirationDate] VARCHAR");
 		}
-
-
 	}
 
 	private int execute(String statement) throws SQLException {
