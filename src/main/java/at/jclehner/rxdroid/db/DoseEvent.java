@@ -54,7 +54,7 @@ import com.j256.ormlite.table.DatabaseTable;
  * @author Joseph Lehner
  */
 
-@DatabaseTable(tableName = "intake")
+@DatabaseTable(tableName = "dose_events")
 public class DoseEvent extends Entry
 {
 	@DatabaseField(foreign = true)
@@ -122,10 +122,6 @@ public class DoseEvent extends Entry
 
 	public int getDoseTime() {
 		return doseTime;
-	}
-
-	public boolean isEmptyIntake() {
-		return dose == null || dose.isZero();
 	}
 
 	public boolean wasAutoCreated() {

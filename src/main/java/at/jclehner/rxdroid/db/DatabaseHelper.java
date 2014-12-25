@@ -55,7 +55,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	private static final String TAG = DatabaseHelper.class.getSimpleName();
 	private static final boolean LOGV = false;
 
-	public static final int DB_VERSION = 58;
+	public static final int DB_VERSION = 59;
 	public static final String DB_NAME = "db.sqlite";
 
 	public static class DatabaseError extends RuntimeException
@@ -142,35 +142,17 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	{
 		if(oldVersion == newVersion)
 			return;
-
-		final File dbOrig = RxDroid.getContext().getDatabasePath(DB_NAME);
-		final File dbCopy = RxDroid.getContext().getDatabasePath("backup_" + oldVersion + ".sqlite");
+		else if(oldVersion > newVersion)
+			throw new DatabaseError(DatabaseError.E_DOWNGRADE);
 
 		try
 		{
-			Util.copyFile(dbOrig, dbCopy);
+			new DatabaseUpgrader(db, cs).onUpgrade(oldVersion, newVersion);
 		}
-		catch(IOException e)
+		catch(SQLException e)
 		{
-			Log.e(TAG, "Failed to create " + dbCopy, e);
+			throw new DatabaseError(DatabaseError.E_UPGRADE, e);
 		}
-
-		db.beginTransaction();
-
-		if(upgrade(cs, oldVersion, newVersion))
-		{
-			db.setTransactionSuccessful();
-			db.endTransaction();
-
-			dbCopy.delete();
-
-			return; // everything ok
-		}
-
-		db.endTransaction();
-
-		db.setVersion(oldVersion);
-		throw new DatabaseError(oldVersion < newVersion ? DatabaseError.E_UPGRADE : DatabaseError.E_DOWNGRADE);
 	}
 
 	// !!! Do NOT @Override (crashes on API < 11) !!!

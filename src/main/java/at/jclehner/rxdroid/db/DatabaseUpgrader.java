@@ -1,10 +1,7 @@
 package at.jclehner.rxdroid.db;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
 import com.j256.ormlite.table.TableUtils;
@@ -18,7 +15,7 @@ public class DatabaseUpgrader implements Closeable
 	private final ConnectionSource mCs;
 	private final DatabaseConnection mDc;
 
-	public DatabaseUpgrader(SQLiteDatabase db, ConnectionSource cs, DatabaseConnection dc) throws SQLException
+	public DatabaseUpgrader(SQLiteDatabase db, ConnectionSource cs) throws SQLException
 	{
 		mDb = db;
 		mCs = cs;
@@ -33,19 +30,13 @@ public class DatabaseUpgrader implements Closeable
 					"Unsupported database version");
 		}
 
-
-
 		if(oldVersion < 55)
 			execute("UPDATE [drugs] SET [sortRank]=" + Integer.MAX_VALUE);
 
 		if(oldVersion < 56)
 		{
 			TableUtils.createTableIfNotExists(mCs, Patient.class);
-
-			Dao<Patient, Integer> dao = DaoManager.createDao(mCs, Patient.class);
-			dao.create(new Patient());
-
-			execute("ALTER TABLE [drugs] ADD COLUMN [patient] INTEGER DEFAULT " + Patient.DEFAULT_PATIENT_ID);
+			execute("INSERT INTO [patients] ( [name], [id] ) VALUES ( NULL, " + Patient.DEFAULT_PATIENT_ID);
 		}
 
 		if(oldVersion < 57)
@@ -59,10 +50,10 @@ public class DatabaseUpgrader implements Closeable
 
 		if(oldVersion < 59)
 		{
-			execute("DROP TABLE schedules");
-			execute("DROP TABLE schedulepart");
+			execute("DROP TABLE [schedules]");
+			execute("DROP TABLE [schedulepart]");
 
-			execute("ALTER TABLE [intakes] RENAME TO [dose_events]");
+			execute("ALTER TABLE [intake] RENAME TO [dose_events]");
 
 			execute("ALTER TABLE [drugs] ADD COLUMN [autoAddDoseEvents] SMALLINT");
 			execute("UPDATE [drugs] SET [autoAddDoseEvents]=[autoAddIntakes]");
@@ -72,6 +63,11 @@ public class DatabaseUpgrader implements Closeable
 
 			execute("ALTER TABLE [drugs] ADD COLUMN [expirationDate] VARCHAR");
 		}
+	}
+
+	@Override
+	public void close() {
+		mDc.closeQuietly();
 	}
 
 	private int execute(String statement) throws SQLException {

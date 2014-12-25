@@ -197,23 +197,22 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField
 	private Date repeatOrigin;
 
-	@DatabaseField(columnName = "autoAddIntakes")
+	@DatabaseField
 	private boolean hasAutoDoseEvents = false;
 
-	@DatabaseField(columnName = "lastAutoIntakeCreationDate")
+	@DatabaseField
 	private Date lastAutoDoseEventCreationDate;
 
 	@DatabaseField
 	private Date lastScheduleUpdateDate;
 
-//	@DatabaseField
-//	private Date lastDosesClearedDate;
-
 	@DatabaseField
 	private int sortRank = Integer.MAX_VALUE;
 
-	@ForeignCollectionField(eager = true, maxEagerLevel = 2)
 	private ForeignCollection<Schedule> foreignSchedules;
+
+	@DatabaseField
+	private Date expirationDate;
 
 	@DatabaseField
 	private String comment;

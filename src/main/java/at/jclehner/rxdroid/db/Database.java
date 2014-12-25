@@ -75,11 +75,7 @@ public final class Database
 	static final Class<?>[] CLASSES = {
 		Drug.class,
 		DoseEvent.class,
-		Patient.class,
-		Schedule.class,
-		// XXX
-		SchedulePart.class
-		// XXX
+		Patient.class
 	};
 
 	static final int ID_VIRTUAL_ENTRY = 0x7fffffff;
