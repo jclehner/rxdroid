@@ -93,6 +93,10 @@ public class DatabaseUpgrader implements Closeable
 				execute("UPDATE [drugs] SET [asNeeded]=1, [repeatMode]=0 WHERE [repeatMode]=3");
 				execute("UPDATE [drugs] SET [repeatMode]=[repeatMode]-1 WHERE [repeatMode]>=4");
 
+				// Set currentSupply to zero where refillSize is zero (i.e. not set) as this
+				// how things are handled since 8eaf8c2.
+				execute("UPDATE [drugs] SET [currentSupply]='0' WHERE [refillSize]=0");
+
 				break;
 
 			default:
