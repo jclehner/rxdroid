@@ -85,6 +85,14 @@ public class DatabaseUpgrader implements Closeable
 
 				execute("ALTER TABLE [drugs] ADD COLUMN [expirationDate] VARCHAR");
 
+				// Separate asNeeded from repeatMode. All drugs with REPEAT_AS_NEEDED (3) will be
+				// switched to REPEAT_DAILY (0). Also, decrement all repeatModes >= REPEAT_21_7 (4)
+				// to prevent a gap in the REPEAT_* indexes.
+
+				execute("ALTER TABLE [drugs] ADD COLUMN [asNeeded] SMALLINT DEFAULT 0");
+				execute("UPDATE [drugs] SET [asNeeded]=1, [repeatMode]=0 WHERE [repeatMode]=3");
+				execute("UPDATE [drugs] SET [repeatMode]=[repeatMode]-1 WHERE [repeatMode]>=4");
+
 				break;
 
 			default:

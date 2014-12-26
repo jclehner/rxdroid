@@ -123,10 +123,9 @@ public class Drug extends Entry implements Comparable<Drug>
 	public static final int REPEAT_DAILY = 0;
 	public static final int REPEAT_EVERY_N_DAYS = 1;
 	public static final int REPEAT_WEEKDAYS = 2;
-	public static final int REPEAT_AS_NEEDED = 3;
-	public static final int REPEAT_21_7 = 4; // for oral contraceptives, 21 days on, 7 off
-	public static final int REPEAT_CUSTOM = 5;
-	public static final int REPEAT_INVALID = 6;
+	public static final int REPEAT_21_7 = 3; // for oral contraceptives, 21 days on, 7 off
+	public static final int REPEAT_CUSTOM = 4;
+	public static final int REPEAT_INVALID = 5;
 
 	// TODO valid arguments: 6, 8, 12, with automapping to doseTimes
 	public static final int REPEAT_EVERY_N_HOURS = REPEAT_INVALID;
@@ -215,6 +214,9 @@ public class Drug extends Entry implements Comparable<Drug>
 	private Date expirationDate;
 
 	@DatabaseField
+	private boolean asNeeded;
+
+	@DatabaseField
 	private String comment;
 
 	private transient Fraction[] mSimpleSchedule;
@@ -257,7 +259,6 @@ public class Drug extends Entry implements Comparable<Drug>
 		switch(repeatMode)
 		{
 			case REPEAT_DAILY:
-			case REPEAT_AS_NEEDED:
 				return true;
 
 			case REPEAT_EVERY_N_DAYS:
@@ -312,6 +313,14 @@ public class Drug extends Entry implements Comparable<Drug>
 			// FIXME
 		}
 	}*/
+
+	public boolean isAsNeeded() {
+		return asNeeded;
+	}
+
+	public void setAsNeeded(boolean asNeeded) {
+		this.asNeeded = asNeeded;
+	}
 
 	public int getRepeatMode() {
 		return repeatMode;

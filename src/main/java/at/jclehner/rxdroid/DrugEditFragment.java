@@ -426,9 +426,19 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 
 		@CreatePreference
 		(
+			titleResId = R.string._title_on_demand,
+			summary = "",
+			order = 8,
+			type = CheckBoxPreference.class,
+			controller = CheckboxPreferenceController.class
+		)
+		private boolean asNeeded;
+
+		@CreatePreference
+		(
 			titleResId = R.string._title_icon,
 			categoryResId = R.string._title_misc,
-			order = 8,
+			order = 9,
 			type = ListPreference.class,
 			controller = FormPreferenceController.class
 		)
@@ -449,7 +459,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			order = 11,
 			type = CurrentSupplyPreference.class,
 			controller = CurrentSupplyPreferenceController.class,
-			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat"},
+			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat", "asNeeded"},
 			fieldDependencies = { "repeatArg", "repeatOrigin" }
 		)
 		private Fraction currentSupply;
@@ -517,7 +527,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			lastAutoIntakeCreationDate = drug.getLastAutoDoseEventCreationDate();
 			lastScheduleUpdateDate = drug.getLastScheduleUpdateDate();
 			patient = drug.getPatient();
-			schedules = drug.getSchedules();
+			asNeeded = drug.isAsNeeded();
 
 			name = drug.getName();
 			form = drug.getIcon();
@@ -541,7 +551,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			drug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);
 			drug.setAutoAddIntakesEnabled(autoAddIntakes);
 			drug.setPatient(patient);
-			drug.setSchedules(schedules);
+			drug.setAsNeeded(asNeeded);
 
 			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };
 
@@ -649,7 +659,6 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 					return false;
 
 				case Drug.REPEAT_DAILY:
-				case Drug.REPEAT_AS_NEEDED:
 					return super.updatePreference(preference, newValue);
 
 				default:
@@ -665,10 +674,6 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			{
 				case Drug.REPEAT_DAILY:
 					preference.setSummary(R.string._title_daily);
-					break;
-
-				case Drug.REPEAT_AS_NEEDED:
-					preference.setSummary(R.string._title_on_demand);
 					break;
 
 				case Drug.REPEAT_EVERY_N_DAYS:
@@ -943,7 +948,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 				return "0";
 			}
 
-			if(drug.getRepeatMode() == Drug.REPEAT_AS_NEEDED || drug.hasNoDoses())
+			if(drug.isAsNeeded() || drug.hasNoDoses())
 			{
 				// TODO change?
 				return currentSupply.toString();

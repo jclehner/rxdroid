@@ -315,8 +315,9 @@ public final class Entries
 		final MutableFraction baseDose = new MutableFraction();
 		int doseMultiplier = 0;
 
-		if(repeatMode == Drug.REPEAT_AS_NEEDED)
+		if(drug.isAsNeeded())
 			return Fraction.ZERO;
+
 		if(repeatMode == Drug.REPEAT_DAILY)
 		{
 			getTotalDose(drug, null, baseDose);
@@ -546,7 +547,7 @@ public final class Entries
 		{
 			final Fraction dose = drug.getDose(doseTime, date);
 
-			if(!drug.isActive() || dose.isZero() || drug.hasAutoDoseEvents() || drug.getRepeatMode() == Drug.REPEAT_AS_NEEDED)
+			if(!drug.isActive() || dose.isZero() || drug.hasAutoDoseEvents() || drug.isAsNeeded())
 				continue;
 
 			if(Entries.countDoseEvents(drug, date, doseTime) == 0)
@@ -584,11 +585,7 @@ public final class Entries
 
 	private static void getTotalDose(Drug drug, Date date, MutableFraction outTotalDose)
 	{
-		if(date != null && !drug.hasDoseOnDate(date))
-			return;
-
-		final int repeatMode = drug.getRepeatMode();
-		if(repeatMode == Drug.REPEAT_AS_NEEDED)
+		if((date != null && !drug.hasDoseOnDate(date)) || drug.isAsNeeded())
 			return;
 
 		for(int doseTime : Constants.DOSE_TIMES)
