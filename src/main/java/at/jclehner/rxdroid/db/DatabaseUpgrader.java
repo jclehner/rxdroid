@@ -58,7 +58,7 @@ public class DatabaseUpgrader implements Closeable
 
 			case 56:
 				// TODO this must be changed if the [patient] table is ever changed
-				TableUtils.createTableIfNotExists(mCs, Patient.class);
+				TableUtils.createTableIfNotExists(mCs, getEntryClass(Patient.class, 56));
 				execute("INSERT INTO [patients] ( [name], [id] ) VALUES ( NULL, " + Patient.DEFAULT_PATIENT_ID);
 				break;
 
@@ -95,5 +95,18 @@ public class DatabaseUpgrader implements Closeable
 
 	private int execute(String statement) throws SQLException {
 		return mDc.executeStatement(statement, DatabaseConnection.DEFAULT_RESULT_FLAGS);
+	}
+
+	private static Class<?> getEntryClass(Class<? extends Entry> clazz, int dbVersion)
+	{
+		try
+		{
+			final String pkgName = Database.class.getPackage().getName() + ".v" + dbVersion;
+			return Class.forName(pkgName + ".Old" + clazz.getSimpleName());
+		}
+		catch(ClassNotFoundException e)
+		{
+			return clazz;
+		}
 	}
 }
