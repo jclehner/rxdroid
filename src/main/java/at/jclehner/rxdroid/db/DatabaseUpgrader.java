@@ -72,8 +72,8 @@ public class DatabaseUpgrader implements Closeable
 				break;
 
 			case 59:
-				execute("DROP TABLE [schedules]");
-				execute("DROP TABLE [schedulepart]");
+				execute("DROP TABLE IF EXISTS [schedules]");
+				execute("DROP TABLE IF EXISTS [schedulepart]");
 
 				execute("ALTER TABLE [intake] RENAME TO [dose_events]");
 				// Rename autoAddIntakes -> hasAutoDoseEvents
