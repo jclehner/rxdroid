@@ -488,7 +488,6 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		private long repeatArg;
 		private Date repeatOrigin;
 		private int sortRank;
-		private List<Schedule> schedules;
 		private Patient patient;
 		private String comment;
 
@@ -521,7 +520,6 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			repeat = drug.getRepeatMode();
 			repeatArg = drug.getRepeatArg();
 			repeatOrigin = drug.getRepeatOrigin();
-			//schedule = drug.getSchedule();
 			sortRank = drug.getSortRank();
 			autoAddIntakes = drug.hasAutoDoseEvents();
 			lastAutoIntakeCreationDate = drug.getLastAutoDoseEventCreationDate();
@@ -547,7 +545,6 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			drug.setRefillSize(refillSize);
 			drug.setRepeatMode(repeat);
 			drug.setSortRank(sortRank);
-			//drug.setSchedule(schedule);
 			drug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);
 			drug.setAutoAddIntakesEnabled(autoAddIntakes);
 			drug.setPatient(patient);
@@ -571,6 +568,9 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		{
 			if(drug1.getSchedules().size() != 0 || drug2.getSchedules().size() != 0)
 				throw new UnsupportedOperationException();
+
+			if(drug1.isAsNeeded() != drug2.isAsNeeded())
+				return false;
 
 			if(drug1.getRepeatMode() != drug2.getRepeatMode())
 				return false;

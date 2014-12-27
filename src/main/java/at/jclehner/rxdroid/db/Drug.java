@@ -779,6 +779,8 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.repeatMode,
 			this.repeatArg,
 			this.repeatOrigin,
+			this.asNeeded,
+			this.expirationDate,
 			this.comment
 		};
 
