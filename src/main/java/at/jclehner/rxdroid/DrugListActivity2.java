@@ -196,26 +196,11 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			throw e;
 
 		final StringBuilder sb = new StringBuilder();
-
-		switch(error.getType())
-		{
-			case DatabaseHelper.DatabaseError.E_GENERAL:
-				sb.append(getString(R.string._msg_db_error_general));
-				break;
-
-			case DatabaseHelper.DatabaseError.E_UPGRADE:
-				sb.append(getString(R.string._msg_db_error_upgrade));
-				break;
-
-			case DatabaseHelper.DatabaseError.E_DOWNGRADE:
-				sb.append(getString(R.string._msg_db_error_downgrade));
-				break;
-		}
-
+		sb.append(Util.getDbErrorMessage(this, error));
 		sb.append(" " + RefString.resolve(this, R.string._msg_db_error_footer));
 
 		final DialogLike dialog = new DialogLike();
-		dialog.setTitle(getString(R.string._title_database));
+		dialog.setTitle(getString(R.string._title_error));
 		dialog.setMessage(sb);
 		dialog.setNegativeButtonText(getString(R.string._btn_reset));
 		dialog.setPositiveButtonText(getString(R.string._btn_exit));

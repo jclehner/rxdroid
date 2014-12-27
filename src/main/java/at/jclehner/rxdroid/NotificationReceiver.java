@@ -47,6 +47,7 @@ import java.util.Set;
 import at.jclehner.androidutils.EventDispatcher;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.db.Database;
+import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Schedule;
@@ -119,10 +120,6 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private boolean mUseWearableHack = USE_WEARABLE_HACK;
 
-	//private boolean mNoWearableNotification = false;
-
-	private Bundle mExtras;
-
 	private static final EventDispatcher<OnDoseTimeChangeListener> sEventMgr =
 			new EventDispatcher<OnDoseTimeChangeListener>();
 
@@ -140,16 +137,23 @@ public class NotificationReceiver extends BroadcastReceiver
 		if(intent == null)
 			return;
 
-		Settings.init();
-		Database.init();
-
 		mContext = context;
+
+		Settings.init();
+
+		try
+		{
+			Database.init();
+		}
+		catch(DatabaseHelper.DatabaseError e)
+		{
+			handleDatabaseError(e);
+			return;
+		}
+
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
 		mAllDrugs = Database.getAll(Drug.class);
-		//mNoWearableNotification = intent.getBooleanExtra(EXTRA_NO_WEARABLE_NOTIFICATION, false);
-
-		mExtras = intent.getExtras();
 
 		final Date date = (Date) intent.getSerializableExtra(EXTRA_DATE);
 
@@ -208,6 +212,19 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 
 		updateCurrentNotifications();
+	}
+
+	private void handleDatabaseError(DatabaseHelper.DatabaseError e)
+	{
+		final NotificationCompat.Builder nb = new NotificationCompat.Builder(mContext);
+		nb.setSmallIcon(R.drawable.ic_stat_exclamation);
+		nb.setContentTitle(getString(R.string._title_database));
+		nb.setContentText(Util.getDbErrorMessage(mContext, e));
+		nb.setContentIntent(createDrugListIntent(null));
+		nb.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
+		nb.setOngoing(true);
+
+		getNotificationManager().notify(ID_NORMAL, nb.build());
 	}
 
 	private void rescheduleAlarms()

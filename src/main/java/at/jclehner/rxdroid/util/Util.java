@@ -71,6 +71,7 @@ import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.Theme;
+import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
 
@@ -347,6 +348,21 @@ public final class Util
 		}
 
 		return sb.toString();
+	}
+
+	public static String getDbErrorMessage(Context context, DatabaseHelper.DatabaseError e)
+	{
+		switch(e.getType())
+		{
+			case DatabaseHelper.DatabaseError.E_DOWNGRADE:
+				return context.getString(R.string._msg_db_error_downgrade);
+
+			case DatabaseHelper.DatabaseError.E_UPGRADE:
+				return context.getString(R.string._msg_db_error_upgrade);
+
+			default:
+				return context.getString(R.string._msg_db_error_general);
+		}
 	}
 
 	public static boolean isAsciiLetter(int c)

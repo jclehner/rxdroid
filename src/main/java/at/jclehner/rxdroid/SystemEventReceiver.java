@@ -30,6 +30,7 @@ import java.util.TimeZone;
 
 import at.jclehner.androidutils.EventDispatcher;
 import at.jclehner.rxdroid.db.Database;
+import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.Settings.Keys;
 
@@ -68,7 +69,15 @@ public class SystemEventReceiver extends BroadcastReceiver
 				|| Intent.ACTION_DATE_CHANGED.equals(intent.getAction()))
 		{
 			DateTime.clearDateCache();
-			Database.reload(context);
+			try
+			{
+				Database.reload(context);
+			}
+			catch(DatabaseHelper.DatabaseError e)
+			{
+				// Sucks, but we handle this condition in NotificationReceiver
+				Log.w(TAG, e);
+			}
 
 			Settings.init();
 
@@ -92,7 +101,7 @@ public class SystemEventReceiver extends BroadcastReceiver
 				return;
 
 			// FIXME gracefully handle db errors (notification)
-			Database.reload(context);
+			//Database.reload(context);
 			postSilent = true;
 		}
 
