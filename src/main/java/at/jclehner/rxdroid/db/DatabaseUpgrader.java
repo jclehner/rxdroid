@@ -41,6 +41,11 @@ public class DatabaseUpgrader implements Closeable
 				throw new DatabaseHelper.DatabaseError(DatabaseHelper.DatabaseError.E_UPGRADE, e);
 			}
 		}
+
+		// TODO cleanup stale database columns
+		// Since SQLite does not support removing columns, the upgrade process leaves stale
+		// stale columns whenever a 'rename' or 'delete' happens in an entry's schema.
+		// A possible workaround would be http://www.sqlite.org/faq.html#q11
 	}
 
 	@Override

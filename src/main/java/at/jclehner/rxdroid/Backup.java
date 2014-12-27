@@ -218,7 +218,6 @@ public class Backup
 				}
 
 				Settings.init(true);
-				Database.reload(RxDroid.getContext());
 			}
 
 			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);

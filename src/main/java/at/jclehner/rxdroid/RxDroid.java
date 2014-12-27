@@ -40,6 +40,7 @@ import android.os.*;
 import android.os.Process;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.IntentCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
@@ -222,8 +223,13 @@ public class RxDroid extends Application
 		final Context c = getContext();
 		final Intent intent = c.getPackageManager().getLaunchIntentForPackage(
 				c.getPackageName());
+
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addFlags(Version.SDK_IS_HONEYCOMB_OR_NEWER ? IntentCompat.FLAG_ACTIVITY_CLEAR_TASK
+				: Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		final AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
-		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, PendingIntent.getActivity(c, 0, intent, 0));
+		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000,
+				PendingIntent.getActivity(c, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT));
 		System.exit(0);
 	}
 

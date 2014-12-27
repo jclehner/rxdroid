@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.ui.DialogLike;
 import at.jclehner.rxdroid.util.Components;
@@ -221,6 +222,7 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 			{
 				if(mFile.dbVersion() == DatabaseHelper.DB_VERSION)
 				{
+					Database.reload(RxDroid.getContext());
 					startActivity(RxDroid.getLaunchIntent());
 					getActivity().finish();
 				}

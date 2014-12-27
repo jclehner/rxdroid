@@ -95,7 +95,10 @@ public class BackupAgent extends BackupAgentHelper
 		super.onRestore(data, appVersionCode, newState);
 		final Backup.BackupFile bf = new Backup.BackupFile(mBackupFile.getAbsolutePath());
 		if(bf.isValid() && !bf.isEncrypted())
+		{
 			bf.restore(null);
+			Database.reload(getApplicationContext());
+		}
 	}
 
 	private static boolean isBackupEnabled()

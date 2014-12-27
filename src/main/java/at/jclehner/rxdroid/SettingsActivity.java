@@ -60,7 +60,7 @@ public class SettingsActivity extends ActionBarActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		Components.onCreateActivity(this, 0);
+		Components.onCreateActivity(this, Components.NO_DATABASE_INIT);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.simple_activity);
 
