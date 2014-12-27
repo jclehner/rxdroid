@@ -191,7 +191,10 @@ public abstract class LoaderListFragment<T> extends ListFragment implements Load
 	public final void onLoadFinished(Loader<List<LLFLoader.ItemHolder<T>>> loader, List<LLFLoader.ItemHolder<T>> data)
 	{
 		if(data == LLFLoader.EXCEPTION_IN_LOADER)
+		{
 			onLoaderException(((LLFLoader) loader).getException());
+			return;
+		}
 
 		mAdapter.setData(data);
 
