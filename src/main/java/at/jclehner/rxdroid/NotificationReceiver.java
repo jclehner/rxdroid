@@ -109,6 +109,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private static final int ID_NORMAL = R.id.notification;
 	private static final int ID_WEARABLE = 1;
+	private static final int ID_ERROR = 2;
 
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
@@ -150,6 +151,8 @@ public class NotificationReceiver extends BroadcastReceiver
 			handleDatabaseError(e);
 			return;
 		}
+
+		getNotificationManager().cancel(ID_ERROR);
 
 		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
@@ -224,7 +227,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		nb.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
 		nb.setOngoing(true);
 
-		getNotificationManager().notify(ID_NORMAL, nb.build());
+		getNotificationManager().notify(ID_ERROR, nb.build());
 	}
 
 	private void rescheduleAlarms()
