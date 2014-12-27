@@ -66,6 +66,11 @@ public class NumberPickerWrapper extends LinearLayout
 		void onValueChange(NumberPickerWrapper picker, int oldVal, int newVal);
 	}
 
+	public interface Formatter
+	{
+		String format(int value);
+	}
+
 	public NumberPickerWrapper(Context context) {
 		this(context, null, 0);
 	}
@@ -222,6 +227,44 @@ public class NumberPickerWrapper extends LinearLayout
 			mNumberPickerOld.setSpeed(intervalMillis);
 		else
 			mNumberPickerNew.setOnLongPressUpdateInterval(intervalMillis);
+	}
+
+	public void setFormatter(final Formatter formatter)
+	{
+		if(Version.SDK_IS_PRE_HONEYCOMB)
+		{
+			if(formatter == null)
+			{
+				mNumberPickerOld.setFormatter(null);
+				return;
+			}
+
+			mNumberPickerOld.setFormatter(new com.michaelnovakjr.numberpicker.NumberPicker.Formatter()
+			{
+				@Override
+				public String toString(int value)
+				{
+					return formatter.format(value);
+				}
+			});
+		}
+		else
+		{
+			if(formatter == null)
+			{
+				mNumberPickerNew.setFormatter(null);
+				return;
+			}
+
+			mNumberPickerNew.setFormatter(new android.widget.NumberPicker.Formatter()
+			{
+				@Override
+				public String format(int value)
+				{
+					return formatter.format(value);
+				}
+			});
+		}
 	}
 
 	@Override
