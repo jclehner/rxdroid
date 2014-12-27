@@ -50,6 +50,17 @@ public class DatabaseUpgrader implements Closeable
 
 	private void upgradeTo(int version) throws SQLException
 	{
+		// Note to possibly bored future self: to upgrade from v53 (RxDroid 0.9.1, first release
+		// on Google Play), the Serializable representation of all Fraction values must be
+		// converted first. Format: (115 bytes, both denominator and numerator are 4 bytes)
+		// ACED00057372001B61742E636173706173
+		// 652E727864726F69642E4672616374696F
+		// 6E1C74F7F02E65C9FC02000249000C6D44
+		// 656E6F6D696E61746F7249000A6D4E756D
+		// 657261746F72787200106A6176612E6C61
+		// 6E672E4E756D62657286AC951D0B94E08B
+		// 0200007870<DENOMINATOR><NUMERATOR>
+
 		switch(version)
 		{
 			case 55:
@@ -59,7 +70,10 @@ public class DatabaseUpgrader implements Closeable
 			case 56:
 				// TODO this must be changed if the [patient] table is ever changed
 				TableUtils.createTableIfNotExists(mCs, getEntryClass(Patient.class, 56));
-				execute("INSERT INTO [patients] ( [name], [id] ) VALUES ( NULL, " + Patient.DEFAULT_PATIENT_ID);
+				execute("INSERT INTO [patients] ( [name], [id] ) VALUES ( NULL, " + Patient.DEFAULT_PATIENT_ID + " )");
+				execute("ALTER TABLE [drugs] ADD COLUMN [patient_id] INTEGER");
+				execute("UPDATE [drugs] SET [patient_id]=" + Patient.DEFAULT_PATIENT_ID);
+
 				break;
 
 			case 57:
