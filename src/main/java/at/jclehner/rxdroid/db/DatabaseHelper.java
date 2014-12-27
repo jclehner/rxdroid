@@ -145,13 +145,20 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		else if(oldVersion > newVersion)
 			throw new DatabaseError(DatabaseError.E_DOWNGRADE);
 
+		DatabaseUpgrader upgrader = null;
+
 		try
 		{
-			new DatabaseUpgrader(db, cs).onUpgrade(oldVersion, newVersion);
+			upgrader = new DatabaseUpgrader(db, cs);
+			upgrader.onUpgrade(oldVersion, newVersion);
 		}
 		catch(SQLException e)
 		{
 			throw new DatabaseError(DatabaseError.E_UPGRADE, e);
+		}
+		finally
+		{
+			Util.closeQuietly(upgrader);
 		}
 	}
 
