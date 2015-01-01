@@ -48,6 +48,11 @@
 
 	</Preference>
 
+    <at.jclehner.rxdroid.preferences.DatePreference android:key="test_date"
+            android:title="Date"
+            android:defaultValue="2020-10-10"
+    />
+
 	<CheckBoxPreference android:key="@string/key_use_pretty_fractions"
 			android:title="@string/_title_use_pretty_fractions"
 			android:summary="@string/_summary_use_pretty_fractions"
