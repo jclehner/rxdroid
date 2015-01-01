@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -63,7 +64,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import at.jclehner.androidutils.DatePickerDialog;
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.androidutils.RefString;
 import at.jclehner.rxdroid.db.Database;
@@ -389,7 +389,9 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				{
 					if(mDtInfo.activeDate().equals(mDisplayedDate))
 					{
-						DatePickerDialog.withDate(getActivity(), 0, this, mDisplayedDate).show();
+						// TODO set minDate depending on history size
+						Util.createDatePickerDialog(getActivity(), new LocalDate(mDisplayedDate),
+								this).show();
 					}
 					else
 					{

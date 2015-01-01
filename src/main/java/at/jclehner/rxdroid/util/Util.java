@@ -22,7 +22,10 @@
 package at.jclehner.rxdroid.util;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -40,8 +43,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import org.joda.time.LocalDate;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -61,6 +67,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Scanner;
 
 import at.jclehner.androidutils.Reflect;
@@ -683,6 +690,28 @@ public final class Util
 			return findViewById((ViewGroup) root, id, 0);
 
 		return null;
+	}
+
+	public static AlertDialog createDatePickerDialog(Context context,
+			LocalDate date, final DatePickerDialog.OnDateSetListener listener)
+	{
+		final DatePicker picker = new DatePicker(context);
+		picker.init(date.getYear(), date.getMonthOfYear() - 1, date.getDayOfMonth(), null);
+
+		final AlertDialog.Builder ab = new AlertDialog.Builder(context);
+		ab.setView(picker);
+		ab.setNegativeButton(android.R.string.cancel, null);
+		ab.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				listener.onDateSet(picker, picker.getYear(), picker.getMonth(),
+						picker.getDayOfMonth());
+			}
+		});
+
+		return ab.create();
 	}
 
 	// https://gist.github.com/mrenouf/889747

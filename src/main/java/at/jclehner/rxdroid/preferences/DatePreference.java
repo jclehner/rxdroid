@@ -2,20 +2,14 @@ package at.jclehner.rxdroid.preferences;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.DatePicker;
 
 import org.joda.time.LocalDate;
 
-import java.util.Date;
-
-import at.jclehner.androidutils.AdvancedDialogPreference;
-import at.jclehner.androidutils.DatePickerDialog;
 import at.jclehner.rxdroid.Version;
 
 public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
@@ -29,6 +23,8 @@ public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
 	{
 		super(context, attrs);
 		setDefaultValue(new LocalDate());
+		setPositiveButtonText(android.R.string.ok);
+		setNegativeButtonText(android.R.string.cancel);
 	}
 
 	@Override
@@ -41,6 +37,11 @@ public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
 			mDate = date;
 
 		((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(mIsValidDate);
+	}
+
+	@Override
+	public CharSequence getDialogTitle() {
+		return Version.SDK_IS_LOLLIPOP_OR_NEWER ? null : super.getDialogTitle();
 	}
 
 	@Override
@@ -63,8 +64,6 @@ public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
 		return value.toString();
 	}
 
-	on
-
 	@TargetApi(11)
 	@Override
 	protected View onCreateDialogView()
@@ -73,11 +72,7 @@ public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
 		final DatePicker picker = new DatePicker(getThemedContext());
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-		{
 			picker.setMinDate(mToday.toDate().getTime());
-			picker.setSpinnersShown(true);
-			picker.setCalendarViewShown(false);
-		}
 
 		picker.init(value.getYear(), value.getMonthOfYear() - 1, value.getDayOfMonth(), this);
 
