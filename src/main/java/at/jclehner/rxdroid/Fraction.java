@@ -273,16 +273,9 @@ public class Fraction extends Number implements Comparable<Number>, Parcelable
 	@Override
 	public int hashCode()
 	{
-		/*final Hasher hasher = new Hasher();
-
-		hasher.hash(mNumerator);
-		hasher.hash(mDenominator);
-
-		return hasher.getHashCode();*/
-
 		// Must return a consistent hash for all zero fractions, regardless
 		// of internal representation (0/1, 0/2000, etc.).
-		return (mNumerator != 0 ? mDenominator : 1) << 16 | mNumerator;
+		return ((mNumerator != 0 ? mDenominator : 1) * 0x1f1f1f1f) ^ mNumerator;
 	}
 
 	@Override
