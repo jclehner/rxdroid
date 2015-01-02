@@ -48,8 +48,6 @@ Third Party Works
 * [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids) by
   Jake Wharton
 * [NumberPicker](https://github.com/jclehner/numberpicker) by Mike Novak
-* [DragSortListView](https://github.com/jclehner/drag-sort-listview)
-  by Carl Bauer
 * [ShowcaseView](https://github.com/jclehner/ShowcaseView) by Alex Curran,
   modified by Joseph C. Lehner
 * [android-support-v4-PreferenceFragment](https://github.com/kolavar/android-support-v4-preferencefragment)
