@@ -178,21 +178,6 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField
 	private long repeatArg = 0;
 
-	/**
-	 * Defines the repeat origin.
-	 *
-	 *
-	 *
-	 * For every repeat other than {@link #REPEAT_DAILY}, this field holds a specific value,
-	 * allowing {@link #hasDoseOnDate(Date)} to determine whether a dose is scheduled on a specific date.
-	 *
-	 * <ul>
-	 *     <li><code>FREQ_EVERY_OTHER_DAY</code>: field is set to a date (in milliseconds) where this drug's
-	 *         intake should be set, i.e. if the date corresponds to 2011-09-07, there's an intake on that day,
-	 *         another one on 2011-09-09, and so forth.</li>
-	 *     <li><code>FREQ_WEEKLY</code>: field is set to a week day value from {@link java.util.Calendar}.</li>
-	 * </ul>
-	 */
 	@DatabaseField
 	private Date repeatOrigin;
 
