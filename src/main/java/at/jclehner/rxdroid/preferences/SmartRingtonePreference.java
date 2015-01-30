@@ -70,28 +70,23 @@ public class SmartRingtonePreference extends RingtonePreference
 		else
 			value = (String) defaultValueObj;
 
-		setSummaryFromValue(value);
+		setSummaryFromValue(value != null ? Uri.parse(value) : null);
 	}
 
 	@Override
-	protected boolean callChangeListener(Object newValue)
+	protected void onSaveRingtone(Uri ringtoneUri)
 	{
-		if(super.callChangeListener(newValue))
-		{
-			setSummaryFromValue((String) newValue);
-			return true;
-		}
-
-		return false;
+		super.onSaveRingtone(ringtoneUri);
+		setSummaryFromValue(ringtoneUri);
 	}
 
-	private void setSummaryFromValue(String value)
+	private void setSummaryFromValue(Uri ringtoneUri)
 	{
-		if(value == null)
+		if(ringtoneUri == null)
 			return;
 
 		final Context c = getContext();
-		final Ringtone r = RingtoneManager.getRingtone(c, Uri.parse(value));
+		final Ringtone r = RingtoneManager.getRingtone(c, ringtoneUri);
 		setSummary(r == null ? null : r.getTitle(c));
 	}
 }

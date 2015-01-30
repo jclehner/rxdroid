@@ -19,6 +19,7 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.v4.app.Fragment;
 import android.support.v4.preference.PreferenceFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.text.SpannableString;
@@ -89,6 +90,14 @@ public class SettingsActivity extends ActionBarActivity
 	{
 		Components.onResumeActivity(this, 0);
 		super.onResume();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		super.onActivityResult(requestCode, resultCode, data);
+		final Fragment fragment = getSupportFragmentManager().findFragmentById(android.R.id.content);
+		fragment.onActivityResult(requestCode, resultCode, data);
 	}
 
 	public static class SettingsFragment extends PreferenceFragment implements
