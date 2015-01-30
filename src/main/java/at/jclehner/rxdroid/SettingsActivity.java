@@ -210,7 +210,7 @@ public class SettingsActivity extends ActionBarActivity
 			p = findPreference(Settings.Keys.DONATE);
 			if(p != null)
 			{
-				if(!Util.wasInstalledViaGooglePlay() || shouldDisplayDonatePref())
+				if(!Util.wasInstalledViaGooglePlay())
 				{
 					final Intent intent = new Intent(Intent.ACTION_VIEW);
 					intent.setData(Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=joseph%2ec%2elehner%40gmail%2ecom" +
