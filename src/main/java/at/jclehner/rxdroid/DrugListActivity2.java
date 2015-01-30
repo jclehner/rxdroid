@@ -222,6 +222,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		args.putSerializable(DrugListFragment.ARG_DATE, getIntent().getSerializableExtra(EXTRA_DATE));
 		//args.putInt(DrugListFragment.ARG_PATIENT_ID, Patient.DEFAULT_PATIENT_ID);
 		f.setArguments(args);
+		f.setRetainInstance(false);
 
 		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, f, "pager").commit();
 	}
@@ -813,6 +814,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 			final DrugListFragment instance = new DrugListFragment();
 			instance.setArguments(args);
+			instance.setRetainInstance(false);
 
 			return instance;
 		}
