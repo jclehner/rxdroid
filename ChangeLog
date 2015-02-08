@@ -1,4 +1,10 @@
-0.9.25:
+0.9.25.3:
+	* Create backup before database upgrade
+
+0.9.25.2:
+	* Fix crash on certain (Samsung) devices
+
+0.9.25.1:
 	* UI design changes using new Material theme
 	* Improved app loading time for large databases
 	* Bug fixes
