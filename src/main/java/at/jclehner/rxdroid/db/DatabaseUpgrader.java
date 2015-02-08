@@ -28,8 +28,15 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
 import com.j256.ormlite.table.TableUtils;
 
+import net.lingala.zip4j.exception.ZipException;
+
 import java.io.Closeable;
+import java.io.File;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import at.jclehner.rxdroid.Backup;
 
 public class DatabaseUpgrader implements Closeable
 {
@@ -48,6 +55,17 @@ public class DatabaseUpgrader implements Closeable
 
 	public void onUpgrade(int oldVersion, int newVersion) throws SQLException
 	{
+		try
+		{
+			final File f = Backup.makeBackupFilename("pre_v" + oldVersion + "to" + newVersion);
+			Backup.createBackup(f, null);
+			Log.i(TAG, "Created backup: " + f);
+		}
+		catch(ZipException e)
+		{
+			Log.w(TAG, e);
+		}
+
 		for(int version = oldVersion + 1; version <= newVersion; ++version)
 		{
 			try

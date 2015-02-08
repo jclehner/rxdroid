@@ -245,13 +245,18 @@ public class Backup
 		return state;
 	}
 
-	public static void createBackup(File outFile, String password) throws ZipException
+	public static File makeBackupFilename(String template)
+	{
+		return new File(Environment.getExternalStorageDirectory(),
+				"RxDroid/" + template + ".rxdbak");
+	}
+
+	public static File createBackup(File outFile, String password) throws ZipException
 	{
 		if(outFile == null)
 		{
 			final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-			outFile = new File(Environment.getExternalStorageDirectory(),
-					"RxDroid/" + sdf.format(new Date()) + ".rxdbak");
+			outFile = makeBackupFilename(sdf.format(new Date()));
 		}
 
 		synchronized(Database.LOCK_DATA)
@@ -284,6 +289,8 @@ public class Backup
 
 			zip.setComment("rxdbak1:" + System.currentTimeMillis() + ":DBv" + DatabaseHelper.DB_VERSION);
 		}
+
+		return outFile;
 	}
 
 	private static final String[] FILES = {
