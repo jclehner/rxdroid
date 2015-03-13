@@ -26,6 +26,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 
 import at.jclehner.androidutils.EventDispatcher;
@@ -81,11 +83,21 @@ public class SystemEventReceiver extends BroadcastReceiver
 
 			Settings.init();
 
-			if(Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction())) {
+			if(Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()))
+			{
 				Settings.putLong(Keys.TIMEZONE_OFFSET, TimeZone.getDefault().getRawOffset());
 			}
 
-			Settings.putDate(Keys.NEXT_REFILL_REMINDER_DATE, null);
+			final Date nextRefillReminder = Settings.getDate(Keys.NEXT_REFILL_REMINDER_DATE);
+			if(nextRefillReminder != null)
+			{
+				final Date today = DateTime.today();
+				if(Math.abs(DateTime.diffDays(nextRefillReminder, today)) > 1)
+				{
+					Settings.putDate(Keys.NEXT_REFILL_REMINDER_DATE,
+							DateTime.add(today, Calendar.DAY_OF_MONTH, 1));
+				}
+			}
 
 			sListeners.post("onTimeChanged", new Class<?>[] { int.class }, actionToListenerType(intent.getAction()));
 		}
