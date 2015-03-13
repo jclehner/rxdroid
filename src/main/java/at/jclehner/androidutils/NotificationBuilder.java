@@ -20,6 +20,8 @@ public class NotificationBuilder extends NotificationCompat.Builder
 
 	private int mHeadsUpMode = HEADS_UP_NATIVE;
 	private long mMaxFlashDuration = 0;
+	private int mAddFlags = 0;
+
 	private int mDefaults = 0;
 	private Uri mSound = null;
 	private long[] mPattern = null;
@@ -33,14 +35,21 @@ public class NotificationBuilder extends NotificationCompat.Builder
 		mHandler = new Handler();
 	}
 
-	public void setHeadsUpMode(int mode, long maxFlashDuration)
+	public NotificationBuilder setHeadsUpMode(int mode, long maxFlashDuration)
 	{
 		mHeadsUpMode = mode;
 		mMaxFlashDuration = maxFlashDuration;
+		return this;
 	}
 
-	public void setHeadsUpMode(int mode) {
-		setHeadsUpMode(mode, mMaxFlashDuration);
+	public NotificationBuilder setHeadsUpMode(int mode)  {
+		return setHeadsUpMode(mode, mMaxFlashDuration);
+	}
+
+	public NotificationBuilder addFlags(int flags)
+	{
+		mAddFlags |= flags;
+		return this;
 	}
 
 	@Override
@@ -82,6 +91,14 @@ public class NotificationBuilder extends NotificationCompat.Builder
 		super.setPriority(priority);
 		mPriority = priority;
 		return this;
+	}
+
+	@Override
+	public Notification build()
+	{
+		final Notification n = super.build();
+		n.flags |= mAddFlags;
+		return n;
 	}
 
 	public void notify(int id) {
