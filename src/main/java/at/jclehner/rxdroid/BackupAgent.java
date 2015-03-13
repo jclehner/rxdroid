@@ -105,12 +105,12 @@ public class BackupAgent extends BackupAgentHelper
 	{
 		try
 		{
-			return Settings.getBoolean(Keys.USE_BACKUP_FRAMEWORK, true);
+			return Settings.getBoolean(Keys.USE_BACKUP_FRAMEWORK, false);
 		}
 		catch(Exception e)
 		{
 			Log.w(TAG, e);
-			return true;
+			return false;
 		}
 	}
 }
