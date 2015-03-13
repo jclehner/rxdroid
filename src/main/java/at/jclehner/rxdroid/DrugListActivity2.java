@@ -999,6 +999,9 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		@Override
 		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 		{
+			if(menu == null)
+				return;
+
 			menu.add(R.string._title_help)
 					.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
 					{
