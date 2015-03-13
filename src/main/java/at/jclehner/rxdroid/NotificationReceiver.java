@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Set;
 
 import at.jclehner.androidutils.EventDispatcher;
+import at.jclehner.androidutils.NotificationBuilder;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
@@ -479,7 +480,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			}
 		}
 
-		final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+		final NotificationBuilder builder = new NotificationBuilder(mContext);
 		builder.setContentTitle(getString(titleResId));
 		builder.setContentIntent(createDrugListIntent(date));
 		builder.setContentText(message);
@@ -488,6 +489,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setWhen(0);
 		builder.setCategory(NotificationCompat.CATEGORY_ALARM);
 		builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
+		builder.setHeadsUpMode(NotificationBuilder.HEADS_UP_FLASH);
 
 		if(true)
 		{
@@ -651,7 +653,8 @@ public class NotificationReceiver extends BroadcastReceiver
 			}
 		}
 
-		getNotificationManager().notify(ID_NORMAL, notification);
+		builder.notify(ID_NORMAL);
+		//getNotificationManager().notify(ID_NORMAL, notification);
 	}
 
 	private  int getDrugsWithDueDoses(Date date, int doseTime) {
