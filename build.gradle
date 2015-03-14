@@ -26,8 +26,8 @@ repositories {
 dependencies {
 		compile 'com.j256.ormlite:ormlite-core:4.47'
 		compile 'com.j256.ormlite:ormlite-android:4.47'
-		compile 'com.android.support:support-v4:21.0.0'
-		compile 'com.android.support:appcompat-v7:21.0.0'
+		compile 'com.android.support:support-v4:21.0.3'
+		compile 'com.android.support:appcompat-v7:21.0.3'
 		//compile 'com.android.support:cardview-v7:21.0.0'
 		compile 'com.nineoldandroids:library:2.4.0'
 		compile 'net.lingala.zip4j:zip4j:1.3.2'
@@ -41,8 +41,16 @@ dependencies {
 
 
 android {
-	buildToolsVersion '21.1.1'
+	buildToolsVersion '21.1.2'
 	compileSdkVersion 21
+
+	defaultConfig {
+		minSdkVersion 8
+		targetSdkVersion 21
+
+		versionCode 9253
+		versionName '0.9.25.3'
+	}
 
 	lintOptions {
 		warning 'MissingTranslation'

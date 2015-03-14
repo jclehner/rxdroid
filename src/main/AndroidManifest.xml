@@ -2,15 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	package="at.jclehner.rxdroid"
-	android:versionCode="9253"
-	android:versionName="@string/version"
 	android:installLocation="internalOnly"
 >
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="21" tools:overrideLibrary="hugo.weaving" />
 	<uses-configuration android:reqTouchScreen="stylus" />
 	<uses-configuration android:reqTouchScreen="finger" />
 
