@@ -137,7 +137,7 @@ public class NotificationBuilder extends NotificationCompat.Builder
 			// sort rank.
 
 			if(mHeadsUpMode != HEADS_UP_FLASH)
-				setPriority(NotificationCompat.PRIORITY_DEFAULT);
+				super.setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
 			nm.notify(tag, id, build());
 
@@ -145,10 +145,11 @@ public class NotificationBuilder extends NotificationCompat.Builder
 
 				@Override
 				public void run() {
-					setPriority(mPriority);
-					setSound(null);
-					setVibrate(null);
-					setDefaults((mDefaults ^ Notification.DEFAULT_SOUND)
+					NotificationBuilder.super.setPriority(mPriority);
+					NotificationBuilder.super.setSound(null);
+					NotificationBuilder.super.setVibrate(null);
+					NotificationBuilder.super.setDefaults(
+							(mDefaults ^ Notification.DEFAULT_SOUND)
 							^ Notification.DEFAULT_VIBRATE);
 
 					nm.cancel(tag, id);
@@ -159,13 +160,13 @@ public class NotificationBuilder extends NotificationCompat.Builder
 					if(mSound != null)
 					{
 						if(mStreamType != Notification.STREAM_DEFAULT)
-							setSound(mSound, mStreamType);
+							NotificationBuilder.super.setSound(mSound, mStreamType);
 						else
-							setSound(mSound);
+							NotificationBuilder.super.setSound(mSound);
 					}
 
-					setVibrate(mPattern);
-					setDefaults(mDefaults);
+					NotificationBuilder.super.setVibrate(mPattern);
+					NotificationBuilder.super.setDefaults(mDefaults);
 				}
 			}, getDelay());
 		}
