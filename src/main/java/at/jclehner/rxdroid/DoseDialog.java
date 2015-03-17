@@ -263,7 +263,7 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 			public void onClick(View v)
 			{
 				final Context context = DoseDialog.this.getContext();
-				final Intent intent = new Intent(context, DrugEditFragment.class);
+				final Intent intent = new Intent(context, DrugEditActivity2.class);
 				intent.setAction(Intent.ACTION_EDIT);
 				intent.putExtra(DrugEditActivity2.EXTRA_DRUG_ID, mDrug.getId());
 				intent.putExtra(DrugEditActivity2.EXTRA_FOCUS_ON_CURRENT_SUPPLY, true);
