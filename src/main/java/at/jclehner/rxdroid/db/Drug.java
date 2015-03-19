@@ -469,7 +469,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			return;
 
 		if(repeatMode != REPEAT_EVERY_N_HOURS && DateTime.getOffsetFromMidnight(repeatOrigin) != 0)
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(repeatOrigin.toString());
 
 		this.repeatOrigin = repeatOrigin;
 		onScheduleUpdated();

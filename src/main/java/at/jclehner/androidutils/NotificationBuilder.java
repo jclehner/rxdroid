@@ -6,8 +6,12 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompatExtras;
+import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 
 public class NotificationBuilder extends NotificationCompat.Builder
 {
@@ -145,14 +149,17 @@ public class NotificationBuilder extends NotificationCompat.Builder
 
 				@Override
 				public void run() {
+
+					nm.cancel(tag, id);
+
 					NotificationBuilder.super.setPriority(mPriority);
 					NotificationBuilder.super.setSound(null);
 					NotificationBuilder.super.setVibrate(null);
-					NotificationBuilder.super.setDefaults(
-							(mDefaults ^ Notification.DEFAULT_SOUND)
-							^ Notification.DEFAULT_VIBRATE);
 
-					nm.cancel(tag, id);
+					NotificationBuilder.super.setDefaults(
+							(mDefaults & ~Notification.DEFAULT_SOUND)
+							& ~Notification.DEFAULT_VIBRATE);
+
 					nm.notify(tag, id, build());
 
 					// Restore the builder's state
