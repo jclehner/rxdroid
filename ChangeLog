@@ -1,3 +1,7 @@
+0.9.26:
+	* Fix "Remind tomorrow" bug
+	* Bug fixes
+
 0.9.25.3:
 	* Create backup before database upgrade
 
