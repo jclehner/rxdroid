@@ -489,7 +489,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setWhen(0);
 		builder.setCategory(NotificationCompat.CATEGORY_ALARM);
 		builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
-		builder.setHeadsUpMode(NotificationBuilder.HEADS_UP_FLASH);
+		//builder.setHeadsUpMode(NotificationBuilder.HEADS_UP_FLASH);
 
 		if(true)
 		{
@@ -653,8 +653,8 @@ public class NotificationReceiver extends BroadcastReceiver
 			}
 		}
 
-		builder.notify(ID_NORMAL);
-		//getNotificationManager().notify(ID_NORMAL, notification);
+		//builder.notify(ID_NORMAL);
+		getNotificationManager().notify(ID_NORMAL, notification);
 	}
 
 	private  int getDrugsWithDueDoses(Date date, int doseTime) {
