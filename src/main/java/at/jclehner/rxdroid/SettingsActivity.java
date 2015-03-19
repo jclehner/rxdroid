@@ -210,16 +210,18 @@ public class SettingsActivity extends ActionBarActivity
 			p = findPreference(Settings.Keys.DONATE);
 			if(p != null)
 			{
+				final Intent intent = new Intent(Intent.ACTION_VIEW);
 				if(!Util.wasInstalledViaGooglePlay())
 				{
-					final Intent intent = new Intent(Intent.ACTION_VIEW);
+
 					intent.setData(Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=joseph%2ec%2elehner%40gmail%2ecom" +
 							"&lc=AT&item_name=RxDroid&amount=5%2e00&currency_code=EUR&button_subtype=services" +
 							"&bn=PP%2dBuyNowBF%3abtn_buynowCC_LG%2egif%3aNonHosted"));
-					p.setIntent(intent);
 				}
 				else
-					getPreferenceScreen().removePreference(p);
+					intent.setData(Uri.parse("https://github.com/jclehner/rxdroid/README.md"));
+
+				p.setIntent(intent);
 			}
 
 			p = findPreference(Settings.Keys.DB_STATS);
