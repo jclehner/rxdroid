@@ -201,7 +201,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			rescheduleAlarms();
 		}
 
-		if(false /*mUseWearableHack*/)
+		if(mUseWearableHack)
 		{
 			try
 			{
@@ -490,8 +490,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		builder.setCategory(NotificationCompat.CATEGORY_ALARM);
 		builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
 		builder.setHeadsUpMode(NotificationBuilder.HEADS_UP_FLASH);
-		builder.setPriority(isShowingLowSupplyNotificationOnly ?
-				NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_HIGH);
+
+		if(true)
+		{
+			builder.setPriority(isShowingLowSupplyNotificationOnly ?
+					NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_HIGH);
+		}
 
 		if(mUseWearableHack)
 		{
@@ -633,13 +637,24 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		builder.setDefaults(defaults);
 
+		final Notification notification = builder.build();
+
+		Log.d(TAG, "noClear=" + noClear);
+
 		if(noClear)
 		{
-			builder.setOngoing(true);
-			builder.addFlags(Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT);
+			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
+
+			if(mUseWearableHack)
+			{
+				builder.setOngoing(false);
+				builder.setGroupSummary(false);
+				getNotificationManager().notify(ID_WEARABLE, builder.build());
+			}
 		}
 
 		builder.notify(ID_NORMAL);
+		//getNotificationManager().notify(ID_NORMAL, notification);
 	}
 
 	private  int getDrugsWithDueDoses(Date date, int doseTime) {
