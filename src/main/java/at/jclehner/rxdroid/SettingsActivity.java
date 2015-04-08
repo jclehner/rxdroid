@@ -219,7 +219,7 @@ public class SettingsActivity extends ActionBarActivity
 							"&bn=PP%2dBuyNowBF%3abtn_buynowCC_LG%2egif%3aNonHosted"));
 				}
 				else
-					intent.setData(Uri.parse("https://github.com/jclehner/rxdroid/README.md"));
+					intent.setData(Uri.parse("https://github.com/jclehner/rxdroid/blob/master/README.md"));
 
 				p.setIntent(intent);
 			}
