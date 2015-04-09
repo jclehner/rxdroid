@@ -119,6 +119,8 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		}
 		else if(savedInstanceState == null)
 			initDrugListPagerFragment();
+
+		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true);
 	}
 
 	@Override
