@@ -44,4 +44,6 @@
 	<item name="is_drug_list_activity_date_menu_item_visible" type="bool">false</item>
 	
 	<item name="menu_default_drug_list_activity" type="menu">@menu/drug_list_fragment</item>
+
+    <item name="is_tablet" type="bool">false</item>
 </resources>

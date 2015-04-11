@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid.util;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -78,6 +79,7 @@ import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.Theme;
+import at.jclehner.rxdroid.Version;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
@@ -692,11 +694,14 @@ public final class Util
 		return null;
 	}
 
+	@TargetApi(11)
 	public static AlertDialog createDatePickerDialog(Context context,
 			LocalDate date, final DatePickerDialog.OnDateSetListener listener)
 	{
 		final DatePicker picker = new DatePicker(context);
 		picker.init(date.getYear(), date.getMonthOfYear() - 1, date.getDayOfMonth(), null);
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER && !context.getResources().getBoolean(R.bool.is_tablet))
+			picker.setCalendarViewShown(false);
 
 		final AlertDialog.Builder ab = new AlertDialog.Builder(context);
 		ab.setView(picker);
