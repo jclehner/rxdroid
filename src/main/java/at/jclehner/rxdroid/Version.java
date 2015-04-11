@@ -62,7 +62,7 @@ public final class Version
 	public static final int FORMAT_FULL = 2;
 
 	private static String sVersion;
-	private static String sRevision;
+	//private static String sRevision;
 	private static String sAppName;
 
 	/**
@@ -81,20 +81,17 @@ public final class Version
 
 		switch(format)
 		{
+			case FORMAT_FULL:
 			case FORMAT_SHORT:
 				return sAppName + " " + sVersion;
 
-			case FORMAT_FULL:
-				return get(FORMAT_SHORT) + "-r" + sRevision;
+			//case FORMAT_FULL:
+			//	return get(FORMAT_SHORT) + "-r" + sRevision;
 
 
 			default:
 				throw new IllegalArgumentException();
 		}
-	}
-
-	public static String getRevision() {
-		return sRevision;
 	}
 
 	public static int versionCodeBeta(int minor, int patch)
@@ -119,17 +116,8 @@ public final class Version
 	{
 		if(sVersion == null)
 		{
-			final Context c = RxDroid.getContext();
-			sVersion = c.getString(R.string.version);
-			sRevision = c.getString(R.string.git_hash);
-			sAppName = c.getString(R.string.app_name);
-
-			final StringTokenizer st = new StringTokenizer(sRevision);
-			if(st.countTokens() != 3)
-				return;
-
-			st.nextToken(); // discard
-			sRevision = st.nextToken().substring(0, 8);
+			sVersion = RxDroid.getPackageInfo().versionName;
+			sAppName = RxDroid.getContext().getString(R.string.app_name);
 		}
 	}
 
