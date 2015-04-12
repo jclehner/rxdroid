@@ -143,10 +143,11 @@ public class Backup
 				return;
 			}
 
-			if(mInfo.length < 2 || !mInfo[0].startsWith("rxdbak"))
+			if(mInfo.length < 2 || !mInfo[0].startsWith("rxdbak") || mInfo[0].equals("rxdbak"))
 				return;
 
 			mVersion = Integer.parseInt(mInfo[0].substring("rxdbak".length()));
+
 			mTimestamp = new Date(Long.parseLong(mInfo[1]));
 
 			if(mInfo.length >= 3)

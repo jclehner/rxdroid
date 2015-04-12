@@ -358,6 +358,7 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 			else
 			{
 				final DialogLike dialog = new DialogLike();
+				dialog.setTitle(getString(R.string._title_error));
 				dialog.setMessage(getString(R.string._msg_external_storage_not_readable));
 				dialog.setPositiveButtonText(getString(android.R.string.ok));
 
