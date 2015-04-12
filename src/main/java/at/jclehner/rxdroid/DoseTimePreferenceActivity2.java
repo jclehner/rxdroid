@@ -108,7 +108,7 @@ public class DoseTimePreferenceActivity2 extends ActionBarActivity
 				ab.setCancelable(false);
 				ab.setMessage(Html.fromHtml(
 						"<center><h1>RxDroid</h1></center>\n" +
-								"<small><p>&copy; 2011&ndash;2014&nbsp;&nbsp;Joseph C. Lehner</p>\n" +
+								"<small><p>&copy; 2011&ndash;2015&nbsp;&nbsp;Joseph C. Lehner</p>\n" +
 								"<p><tt>This program comes with ABSOLUTELY NO WARRANTY.\n" +
 								"This is free software, and you are welcome to redistribute it\n" +
 								"under the terms of the <a href=\"http://www.gnu.org/licenses/gpl-3.0.html\">" +
@@ -119,6 +119,14 @@ public class DoseTimePreferenceActivity2 extends ActionBarActivity
 					public void onClick(DialogInterface dialog, int which)
 					{
 						Settings.setDisplayedOnce("license_info");
+					}
+				});
+				ab.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						getActivity().finish();
 					}
 				});
 
