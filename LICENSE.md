@@ -2,7 +2,7 @@ RxDroid
 =======
 
 <small>
-Copyright (C) 2011-2014 Joseph C. Lehner
+Copyright (C) 2011-2015 Joseph C. Lehner
 
 RxDroid is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
