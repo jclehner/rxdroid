@@ -22,7 +22,7 @@
 package at.jclehner.rxdroid;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import at.jclehner.androidutils.ActionBarActivity;
 
 public class AdvancedScheduleActivity extends ActionBarActivity
 {
