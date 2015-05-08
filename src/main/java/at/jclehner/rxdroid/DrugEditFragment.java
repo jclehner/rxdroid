@@ -1066,7 +1066,15 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		@Override
 		public void updateSummary(ListPreference preference, Boolean newValue)
 		{
-			preference.setSummary(mEntries[newValue ? NOTIFY_SUPPLIES_ONLY : NOTIFY_ALL]);
+			if(newValue)
+			{
+				final Context c = getPreference().getContext();
+
+				preference.setSummary(mEntries[NOTIFY_SUPPLIES_ONLY] +
+						"  \u2014 " + c.getString(R.string._title_auto_dose_events));
+			}
+			else
+				preference.setSummary(mEntries[NOTIFY_ALL]);
 		}
 
 		@Override

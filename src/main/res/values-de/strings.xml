@@ -463,5 +463,6 @@
     <string name="dialog_set_number">@string/_btn_set</string>
     <string name="dialog_cancel">@android:string/cancel</string>
     <string name="dialog_picker_title">Zahl wählen</string>
-	
+    <string name="_title_auto_dose_events">Automatische Einnahmen</string>
+
 </resources>
