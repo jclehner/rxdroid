@@ -79,6 +79,10 @@ android {
 
 
 task askForKeystorePassword << {
+	if (!android.signingConfigs.release.storeFile) {
+		return
+	}
+
 	def prompt = 
 			"\n==========================================================" +
 			"\nKeystore : ${android.signingConfigs.release.storeFile}"     +
