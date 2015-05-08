@@ -24,7 +24,6 @@ package at.jclehner.rxdroid;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -47,7 +46,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceScreen;
 import android.support.v4.preference.PreferenceFragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
+
 import at.jclehner.androidutils.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -69,7 +68,6 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Patient;
-import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.preferences.DosePreference;
 import at.jclehner.rxdroid.preferences.DrugNamePreference2;
 import at.jclehner.rxdroid.preferences.FractionPreference;
@@ -546,7 +544,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			drug.setRepeatMode(repeat);
 			drug.setSortRank(sortRank);
 			drug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);
-			drug.setAutoAddIntakesEnabled(autoAddIntakes);
+			drug.setHasAutoDoseEvents(autoAddIntakes);
 			drug.setPatient(patient);
 			drug.setAsNeeded(asNeeded);
 
