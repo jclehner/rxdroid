@@ -266,6 +266,16 @@
   <string name="_help_msg_click_dose">用量を服用するには、それをクリックします。追加のオプションは、それを長押しします。</string>
   <string name="_title_use_pretty_fractions">小さい分数</string>
   <string name="_summary_use_pretty_fractions">分数を \"1/2\" の代わりに \"½\" として表示します (いくつかの分数に対してのみ有効です)</string>
+  <string name="_msg_not_started_on_boot">
+    <![CDATA[
+        <p>RxDroid was not started at boot. A few possible reasons are listed below:</p>
+        <p>&bull; The app was moved to external storage</p>
+        <p>&bull; Auto-start for RxDroid was disabled in Android settings (certain flavours of Android only)</p>
+        <p>&bull; Auto-start for RxDroid was disabled by an app</p>
+        <br/>
+        <p>If none of the above applies to you, please click the \"[@string/_btn_report]\" button.</p>
+    ]]>
+    </string>
   <string name="_btn_report">報告</string>
   <string name="_btn_continue">続行</string>
   <string name="_title_use_safe_mode">セーフモード</string>
@@ -294,6 +304,8 @@
   <string name="_msg_comment">オプションのコメント:</string>
   <string name="_title_history">履歴</string>
   <string name="_btn_skip">スキップ</string>
+  <string name="dialog_set_number">@string/_btn_set</string>
   <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">番号を選択してください</string>
+  <string name="_title_auto_dose_events">用量を自動服用</string>
 </resources>
