@@ -447,12 +447,27 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		{
 			final View view = inflater.inflate(R.layout.fragment_drug_list_pager, container, false);
 			mPager = ((ViewPager) view.findViewById(R.id.pager));
+
+			return view;
+		}
+
+		@Override
+		public void onStart()
+		{
+			super.onStart();
+
 			mPager.setOffscreenPageLimit(OFFSCREEN_PAGES);
 			mPager.setOnPageChangeListener(mPageListener);
 			mPager.setAdapter(new MyPagerAdapter(getChildFragmentManager()));
 			mPager.setPageMargin(Util.pixelsFromDips(getActivity(), 48));
+		}
 
-			return view;
+		@Override
+		public void onStop()
+		{
+			super.onStop();
+
+			mPager.removeAllViews();
 		}
 
 		@Override
