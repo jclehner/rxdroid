@@ -319,14 +319,14 @@ public class Drug extends Entry implements Comparable<Drug>
 		return repeatOrigin;
 	}
 
-	public void setAutoAddIntakesEnabled(boolean autoAddIntakes)
+	public void setHasAutoDoseEvents(boolean autoDoseEvents)
 	{
-		if(this.hasAutoDoseEvents == autoAddIntakes)
+		if(this.hasAutoDoseEvents == autoDoseEvents)
 			return;
 
-		this.hasAutoDoseEvents = autoAddIntakes;
+		this.hasAutoDoseEvents = autoDoseEvents;
 
-		if(autoAddIntakes)
+		if(autoDoseEvents)
 		{
 			if(lastAutoDoseEventCreationDate == null)
 				lastAutoDoseEventCreationDate = DateTime.yesterday();

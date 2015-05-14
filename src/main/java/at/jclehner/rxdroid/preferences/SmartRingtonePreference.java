@@ -28,7 +28,10 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.preference.RingtonePreference;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.AttributeSet;
+
+import at.jclehner.rxdroid.R;
 
 
 /**
@@ -70,7 +73,7 @@ public class SmartRingtonePreference extends RingtonePreference
 		else
 			value = (String) defaultValueObj;
 
-		setSummaryFromValue(value != null ? Uri.parse(value) : null);
+		setSummaryFromValue(!TextUtils.isEmpty(value) ? Uri.parse(value) : null);
 	}
 
 	@Override
@@ -83,7 +86,10 @@ public class SmartRingtonePreference extends RingtonePreference
 	private void setSummaryFromValue(Uri ringtoneUri)
 	{
 		if(ringtoneUri == null)
+		{
+			setSummary(R.string._title_silent);
 			return;
+		}
 
 		final Context c = getContext();
 		final Ringtone r = RingtoneManager.getRingtone(c, ringtoneUri);

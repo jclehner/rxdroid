@@ -6,3 +6,6 @@ build
 *.swp
 *.config
 *.sqlite
+*.rxdbak
+*.txt
+releases/*.apk

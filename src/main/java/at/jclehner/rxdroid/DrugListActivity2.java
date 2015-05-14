@@ -34,7 +34,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import at.jclehner.androidutils.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -759,10 +759,14 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				@Override
 				public int compare(Drug lhs, Drug rhs)
 				{
-					if(getSmartSortScore(lhs) < getSmartSortScore(rhs))
-						return -1;
-					else
-						return 1;
+					int l = getSmartSortScore(lhs);
+					int r = getSmartSortScore(rhs);
+
+					if (l != r) {
+						return l < r ? -1 : 1;
+					}
+
+					return 0;
 				}
 
 				// lower score is better (higher up)

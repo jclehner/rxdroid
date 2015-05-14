@@ -48,8 +48,8 @@ android {
 		minSdkVersion 8
 		targetSdkVersion 21
 
-		versionCode 9261
-		versionName '0.9.26.1'
+		versionCode 9270
+		versionName '0.9.27'
 	}
 
 	lintOptions {
@@ -79,6 +79,10 @@ android {
 
 
 task askForKeystorePassword << {
+	if (!android.signingConfigs.release.storeFile) {
+		return
+	}
+
 	def prompt = 
 			"\n==========================================================" +
 			"\nKeystore : ${android.signingConfigs.release.storeFile}"     +

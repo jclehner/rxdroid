@@ -21,7 +21,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.app.Fragment;
 import android.support.v4.preference.PreferenceFragment;
-import android.support.v7.app.ActionBarActivity;
+import at.jclehner.androidutils.ActionBarActivity;
 import android.text.SpannableString;
 import android.text.style.TypefaceSpan;
 import android.util.Log;

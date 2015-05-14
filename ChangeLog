@@ -1,3 +1,6 @@
+0.9.27:
+	* Fix crash when pressing the menu key on certain (LG) devices
+
 0.9.26.1:
 	* Minor bug fixes
 
