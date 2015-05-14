@@ -1,3 +1,7 @@
+0.9.28:
+	* Added French and Polish translation
+	* Some bugs fixed
+
 0.9.27:
 	* Fix crash when pressing the menu key on certain (LG) devices
 
