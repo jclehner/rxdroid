@@ -58,7 +58,7 @@
   <string name="_msg_err_non_unique_drug_name">Ce nom est déjà utilisé</string>
   <string name="_title_warning">Attention</string>
   <string name="_title_preferences">Préférences</string>
-  <string name="_title_prefscreen_times">Nombre de fois</string>
+  <string name="_title_prefscreen_times">Horaires des médications</string>
   <string name="_summary_prefscreen_times">Définition de matin, midi, etc.</string>
   <string name="_title_prefscreen_notifications">Notifications</string>
   <string name="_summary_prefscreen_notifications">Méthodes de notification, délai de rappel, etc.</string>
