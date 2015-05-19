@@ -21,8 +21,10 @@
 
 package at.jclehner.rxdroid;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Rect;
@@ -109,6 +111,8 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		ab.setDisplayShowHomeEnabled(true);
 		ab.setDisplayUseLogoEnabled(true);
 		ab.setLogo(R.drawable.ic_logo_padded);
+
+		showBackupAgentRemovalDialogIfNeccessary();
 
 		if(Settings.getBoolean(Settings.Keys.IS_FIRST_LAUNCH, true))
 		{
@@ -228,6 +232,28 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, f, "pager").commit();
 	}
+
+	private void showBackupAgentRemovalDialogIfNeccessary()
+	{
+		Settings.putBoolean(Settings.Keys.USE_BACKUP_FRAMEWORK, true);
+
+		if(!Settings.getBoolean(Settings.Keys.USE_BACKUP_FRAMEWORK, false))
+			return;
+
+		final AlertDialog.Builder ab = new AlertDialog.Builder(this);
+		ab.setMessage(RefString.resolve(this, R.string._msg_backup_agent_removal));
+		ab.setCancelable(false);
+		ab.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				Settings.remove(Settings.Keys.USE_BACKUP_FRAMEWORK);
+			}
+		});
+
+		ab.show();
+	}
+
 
 	private boolean deleteDatabase()
 	{

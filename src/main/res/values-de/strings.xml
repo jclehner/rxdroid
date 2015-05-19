@@ -454,6 +454,13 @@
     <string name="_msg_comment">Optionaler Kommentar:</string>
 	<string name="_title_history">Verlauf</string>
 
+	<string name="_msg_backup_agent_removal">
+		Die Option \"[@string/_title_use_backup_framework]\" wurde
+		deaktiviert, da sie zu unzuverlässig funktionierte. Stattdessen sollte die manuelle
+		Backup-Option verwendet werden, zu finden unter \"[@string/_title_preferences]\" &#x2192;
+		\"[@string/_title_database]\" &#x2192; \"[@string/_title_backup_restore]\".
+	</string>
+
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.

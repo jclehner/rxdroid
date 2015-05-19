@@ -12,12 +12,6 @@
 			android:defaultValue="1"
 			/>
 
-	<CheckBoxPreference android:key="@string/key_use_backup_framework"
-			android:title="@string/_title_use_backup_framework"
-			android:summary="@string/_summary_use_backup_framework"
-			android:defaultValue="false"
-			/>
-
 	<Preference android:key="backup_restore"
 			android:title="@string/_title_backup_restore">
 		<intent

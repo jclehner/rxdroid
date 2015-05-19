@@ -81,6 +81,7 @@ public final class Settings
 		public static final String NOTIFICATION_LIGHT_COLOR = key(R.string.key_notification_light_color);
 		public static final String QUIET_HOURS = key(R.string.key_quiet_hours);
 		public static final String LANGUAGE = key(R.string.key_language);
+		@Deprecated
 		public static final String USE_BACKUP_FRAMEWORK = key(R.string.key_use_backup_framework);
 		public static final String USE_PRETTY_FRACTIONS = key(R.string.key_use_pretty_fractions);
 		public static final String DIM_DOSE_VIEWS = key(R.string.key_dim_dose_views);
@@ -764,7 +765,7 @@ public final class Settings
 		return "__" + key + "_is_checked__";
 	}
 
-	private static void remove(String key)
+	public static void remove(String key)
 	{
 		removeInternal(key);
 		removeInternal(getKeyForCheckedStatus(key));
@@ -778,6 +779,7 @@ public final class Settings
 		return sSharedPrefs.contains(key);
 	}
 
+	@SuppressWarnings("Deprecated")
 	private static void migrateSettings()
 	{
 		if(contains("displayed_info_ids"))
@@ -822,10 +824,6 @@ public final class Settings
 				putString(Keys.NOTIFICATION_LIGHT_COLOR, "");
 
 			remove(Keys.USE_LED);
-		}
-
-		if(isFirstLaunchOfVersionOrLater(Version.versionCodeBeta(22, 1))) {
-			putBoolean(Keys.USE_BACKUP_FRAMEWORK, false);
 		}
 
 		if(!contains(Keys.TIMEZONE_OFFSET)) {

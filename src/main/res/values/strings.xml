@@ -332,7 +332,7 @@
 	<string name="_title_supply_edit">Supply: %1$s</string>
 	<string name="_title_x_to_y" tools:ignore="MissingTranslation">%1$s – %2$s</string>
 	
-	<string name="_title_disabled">Disabled</string>	
+	<string name="_title_disabled">Disabled</string>
 	
     <string name="_msg_no_drugs_compact_ab">Select \"[@string/_title_add]\" from the menu to add a drug.</string>
     <string name="_msg_no_drugs_extended_ab">Press the \"+\" button in the action bar to add a drug.</string>
@@ -420,23 +420,14 @@
 	<string name="_title_use_pretty_fractions">Pretty fractions</string>
 	<string name="_summary_use_pretty_fractions">Display fractions as \"½\" instead of \"1/2\" (only works for some fractions)</string>
 
-    <string name="_msg_not_started_on_boot">
-    <![CDATA[
-        <p>RxDroid was not started at boot. A few possible reasons are listed below:</p>
-        <p>&bull; The app was moved to external storage</p>
-        <p>&bull; Auto-start for RxDroid was disabled in Android settings (certain flavours of Android only)</p>
-        <p>&bull; Auto-start for RxDroid was disabled by an app</p>
-        <br/>
-        <p>If none of the above applies to you, please click the \"[@string/_btn_report]\" button.</p>
-    ]]>
-    </string>
-
     <string name="_btn_report">Report</string>
     <string name="_btn_continue">Continue</string>
 
     <string name="_title_use_safe_mode">Safe mode</string>
-    <string name="_summary_use_safe_mode">Disable unsafe features such as \"[@string/_title_take_all_doses]\" or
-            \"[@string/_title_skip_dose_dialog]\"</string>
+    <string name="_summary_use_safe_mode">
+		Disable unsafe features such as \"[@string/_title_take_all_doses]\" or
+        \"[@string/_title_skip_dose_dialog]\"
+	</string>
 
     <string name="_title_remind_tomorrow">Remind tomorrow</string>
     <string name="_toast_remind_tomorrow">Hiding notification until tomorrow.</string>
@@ -485,5 +476,11 @@
     <string name="dialog_cancel">@android:string/cancel</string>
     <string name="dialog_picker_title">Choose a number</string>
     <string name="_title_auto_dose_events">Auto-take doses</string>
+	<string name="_msg_backup_agent_removal">
+		The \"[@string/_title_use_backup_framework]\" option has
+		been disabled, as it has proven to be unreliable. Use the manual backup option instead,
+		located at \"[@string/_title_preferences]\" &#x2192; \"[@string/_title_database]\" &#x2192;
+		\"[@string/_title_backup_restore]\"!
+	</string>
 
 </resources>
