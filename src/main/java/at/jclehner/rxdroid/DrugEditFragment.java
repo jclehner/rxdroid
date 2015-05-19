@@ -1036,6 +1036,8 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		@Override
 		public void initPreference(ListPreference preference, Boolean fieldValue)
 		{
+			super.initPreference(preference, fieldValue);
+
 			if(mEntries == null)
 			{
 				final Resources r = preference.getContext().getResources();
@@ -1068,7 +1070,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		{
 			if(newValue)
 			{
-				final Context c = getPreference().getContext();
+				final Context c = preference.getContext();
 
 				preference.setSummary(mEntries[NOTIFY_SUPPLIES_ONLY] +
 						"  \u2014 " + c.getString(R.string._title_auto_dose_events));
