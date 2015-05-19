@@ -48,8 +48,8 @@ android {
 		minSdkVersion 8
 		targetSdkVersion 21
 
-		versionCode 9281
-		versionName '0.9.28.1'
+		versionCode 9282
+		versionName '0.9.28.2'
 	}
 
 	lintOptions {
