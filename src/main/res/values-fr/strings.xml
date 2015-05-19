@@ -92,10 +92,10 @@
   <string name="_title_tablet">Tablette</string>
   <string name="_title_capsule">Capsule</string>
   <string name="_title_inhaler">Inhalateur</string>
-  <string name="_title_injection">Seringue</string>
+  <string name="_title_injection">Piqure</string>
   <string name="_title_spray">Nébuliseur</string>
   <string name="_title_drop">Verre</string>
-  <string name="_title_gel">Tube</string>
+  <string name="_title_gel">Crème/gel</string>
   <string name="_title_ring">Comprimé</string>
   <string name="_title_other">Autre</string>
   <string name="_title_ampoule">Ampoule</string>
@@ -155,7 +155,6 @@
   <string name="_summary_supply_monitor">Les doses sont automatiquement marquées comme prises. Les notifications ne seront affichées que si le stock est faible.</string>
   <string name="_title_go_to_date">Aller à la date du</string>
   <string name="_title_today">Aujourd\'hui</string>
-  <string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
   <string name="_msg_restore_default_settings">Ceci va réinitialiser tous les paramètres à leurs valeurs par défaut</string>
   <string name="_title_show_supply_monitors">Afficher tout</string>
   <string name="_summary_show_supply_monitors">Afficher les médicaments avec les doses désactivées</string>
@@ -266,16 +265,6 @@ Pour entrer une valeur telle que ¾, afficher «3» dans le champ gauche et «4�
   <string name="_help_msg_click_dose">Pour prendre une dose, cliquez dessus. Pour plus d\'options, clic-long sur la dose.</string>
   <string name="_title_use_pretty_fractions">Fractions utiles</string>
   <string name="_summary_use_pretty_fractions">Afficher la fraction comme «½» au lieu de «1/2» (ne fonctionne que pour certaines fractions)</string>
-  <string name="_msg_not_started_on_boot">
-    <![CDATA[
-        <p>RxDroid was not started at boot. A few possible reasons are listed below:</p>
-        <p>&bull; The app was moved to external storage</p>
-        <p>&bull; Auto-start for RxDroid was disabled in Android settings (certain flavours of Android only)</p>
-        <p>&bull; Auto-start for RxDroid was disabled by an app</p>
-        <br/>
-        <p>If none of the above applies to you, please click the \"[@string/_btn_report]\" button.</p>
-    ]]>
-    </string>
   <string name="_btn_report">Rapport</string>
   <string name="_btn_continue">Continuer</string>
   <string name="_title_use_safe_mode">Mode sans échec</string>
@@ -301,7 +290,6 @@ Pour entrer une valeur telle que ¾, afficher «3» dans le champ gauche et «4�
   <string name="_msg_comment">Commentaire facultatif :</string>
   <string name="_title_history">Historique</string>
   <string name="_btn_skip">Passer</string>
-  <string name="dialog_set_number">@string/_btn_set</string>
   <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">Choisir une valeur</string>
   <string name="_title_auto_dose_events">Auto-notation doses</string>

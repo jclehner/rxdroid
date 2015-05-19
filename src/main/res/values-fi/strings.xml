@@ -9,7 +9,7 @@
  * RxDroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option) any later version. Additional terms apply (see LICENSE).
  *
  * RxDroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -146,7 +146,6 @@
   <string name="_title_select_date">Valitse päivämäärä</string>
   <string name="_title_repetition_origin">Aloituspäivä</string>
   <string name="_title_history_age">Lokin koko</string>
-  <string name="_title_history">Loki</string>
   <string name="_summary_history_age">Valittua aikaa vanhemmat tiedot poistetaan</string>
   <string name="_title_history_1_month">Yksi kuukausi</string>
   <string name="_title_history_2_months">Kaksi kuukautta</string>
@@ -295,6 +294,9 @@ Valitettavasti RxDroid kaatui. Ilmoita asiasta, jotta ongelma voidaan korjata.</
   <string name="_msg_external_storage_not_writeable">Ulkoinen muisti on vain luku -tilassa. Varmuuskopion luominen ei onnistu.</string>
   <string name="_msg_external_storage_not_readable">Ulkoinen muisti ei ole luettavissa. Ei voi luoda tai palauttaa varmuuskopioita.</string>
   <string name="_msg_comment">Valinnainen kommentti:</string>
+  <string name="_title_history">Historia</string>
+  <string name="_btn_skip">Ohita</string>
   <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">Valitse määrä</string>
+  <string name="_title_auto_dose_events">Ota automaattisesti</string>
 </resources>
