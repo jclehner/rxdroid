@@ -770,7 +770,10 @@ public class NotificationReceiver extends BroadcastReceiver
 		final StringBuilder sb = new StringBuilder();
 
 		for(Integer i : set)
+		{
 			sb.append(i);
+			sb.append(" ");
+		}
 
 		return sb.toString();
 	}
