@@ -235,8 +235,6 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 	private void showBackupAgentRemovalDialogIfNeccessary()
 	{
-		Settings.putBoolean(Settings.Keys.USE_BACKUP_FRAMEWORK, true);
-
 		if(!Settings.getBoolean(Settings.Keys.USE_BACKUP_FRAMEWORK, false))
 			return;
 
