@@ -162,6 +162,7 @@
   <string name="_summary_supply_monitor">Dawki są automatycznie oznaczane jako wzięte. Powiadomienia będą wyświetlane tylko przy niskim stanie zapasów.</string>
   <string name="_title_go_to_date">Przejdź do daty</string>
   <string name="_title_today">Dziś</string>
+  <string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
   <string name="_msg_restore_default_settings">Przywraca ustawienia domyślne</string>
   <string name="_title_show_supply_monitors">Pokaż wszystko</string>
   <string name="_summary_show_supply_monitors">Pokaż leki z wyłączonym przypomnieniem o dawce</string>
@@ -299,6 +300,10 @@ Nie można odczytać pamięci zewnętrznej. Utworzenie/przywrócenie kopii zapas
   <string name="_msg_comment">Opcjonalny komentarz:</string>
   <string name="_title_history">Historia</string>
   <string name="_btn_skip">Pomiń</string>
+  <string name="dialog_set_number">@string/_btn_set</string>
+  <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">Wybierz liczbę</string>
   <string name="_title_auto_dose_events">Zaznacz jako wzięte</string>
+  <string name="_msg_backup_agent_removal">
+Opcja \"[@string/_title_use_backup_framework]\" została wyłączona z powodu zawodności. Użyj opcji ręcznego tworzenia kopii zapasowej dostępnej w \"[@string/_title_preferences]\" → \"[@string/_title_database]\" → \"[@string/_title_backup_restore]\"!</string>
 </resources>

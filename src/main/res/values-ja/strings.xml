@@ -294,7 +294,14 @@
   <string name="_msg_comment">オプションのコメント:</string>
   <string name="_title_history">履歴</string>
   <string name="_btn_skip">スキップ</string>
+  <string name="dialog_set_number">@string/_btn_set</string>
   <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">番号を選択してください</string>
   <string name="_title_auto_dose_events">用量を自動服用</string>
+  <string name="_msg_backup_agent_removal">
+		\"[@string/_title_use_backup_framework]\" オプションは
+		信頼できないため無効になりました。 代わりに、手動バックアップオプションを使用してください。
+		場所は \"[@string/_title_preferences]\" → \"[@string/_title_database]\" →
+		\"[@string/_title_backup_restore]\"!
+	</string>
 </resources>

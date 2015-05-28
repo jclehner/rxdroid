@@ -155,6 +155,7 @@
   <string name="_summary_supply_monitor">Les doses sont automatiquement marquées comme prises. Les notifications ne seront affichées que si le stock est faible.</string>
   <string name="_title_go_to_date">Aller à la date du</string>
   <string name="_title_today">Aujourd\'hui</string>
+  <string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
   <string name="_msg_restore_default_settings">Ceci va réinitialiser tous les paramètres à leurs valeurs par défaut</string>
   <string name="_title_show_supply_monitors">Afficher tout</string>
   <string name="_summary_show_supply_monitors">Afficher les médicaments avec les doses désactivées</string>
@@ -290,7 +291,10 @@ Pour entrer une valeur telle que ¾, afficher «3» dans le champ gauche et «4�
   <string name="_msg_comment">Commentaire facultatif :</string>
   <string name="_title_history">Historique</string>
   <string name="_btn_skip">Passer</string>
+  <string name="dialog_set_number">@string/_btn_set</string>
   <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">Choisir une valeur</string>
   <string name="_title_auto_dose_events">Auto-notation doses</string>
+  <string name="_msg_backup_agent_removal">L\'option «[@string/_title_use_backup_framework]» ,a été désactivée, car n\'étant pas fiable. Utiliser à la place  l\'option de sauvegarde manuelle, située à «[@string/_title_preferences]» → «[@string/_title_database]» → «[@string/_title_backup_restore]»!
+	</string>
 </resources>
