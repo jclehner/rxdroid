@@ -1,4 +1,5 @@
-0.9.28.3:
+0.9.29:
+	* Disabled "Cloud backup" option
 	* Fixed crash related to snoozing refill reminders
 
 0.9.28.2:
