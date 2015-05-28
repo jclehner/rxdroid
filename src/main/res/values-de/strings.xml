@@ -393,18 +393,6 @@
 	<string name="_help_msg_swipe_date">Das derzeit angezeigte Datum ist in der Titelleiste ersichtlich. Durch Wischen
         nach links oder rechts kann das angezeigte Datum geändert werden.</string>
 
-
-    <string name="_msg_not_started_on_boot">
-    <![CDATA[
-        <p>RxDroid wurde beim Hochfahren nicht gestartet. Mögliche Ursachen: </p>
-        <p>&bull; Die App wurde auf einen externen Speicher verschoben</p>
-        <p>&bull; Autostart für RxDroid wurde deaktiviert in den Android Einstellungen deaktiviert (nur bestimmte Android-Versionen)</p>
-        <p>&bull; Autostart für RxDroid wurde durch eine App deaktiviert<p>
-        <br/>
-        <p>Wenn keine der genannten Ursachen zutrifft, den »[@string/_btn_report]«-Button drücken.</p>
-        ]]>
-    </string>
-
     <string name="_btn_report">Melden</string>
     <string name="_btn_continue">Weiter</string>
 
