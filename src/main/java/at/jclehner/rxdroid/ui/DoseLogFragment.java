@@ -713,7 +713,10 @@ class EventInfo
 
 	private EventInfo(DoseEvent intake)
 	{
-		timestamp = new Date(intake.getTimestamp().getTime());
+		final Date timestamp = intake.getTimestamp();
+		if(timestamp != null)
+			this.timestamp = new Date(timestamp.getTime());
+
 		date = intake.getDate();
 		doseTime = intake.getDoseTime();
 
