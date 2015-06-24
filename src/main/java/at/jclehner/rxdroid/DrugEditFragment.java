@@ -470,6 +470,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			order = 12,
 			type = ListPreference.class,
 			controller = NotificationsPreferenceController.class
+			//, reverseDependencies = "refillSize"
 		)
 		private boolean autoAddIntakes;
 
@@ -1081,6 +1082,24 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		{
 			final int i = Integer.parseInt((String) prefValue);
 			return i == NOTIFY_SUPPLIES_ONLY;
+		}
+
+		@Override
+		public void onDependencyChange(ListPreference preference, String depKey, Object newPrefValue)
+		{
+			if("refillSize".equals(depKey))
+			{
+				final int refillSize = (int) newPrefValue;
+
+				if(refillSize == 0)
+				{
+					setFieldValue(false);
+					updateSummary(preference, false);
+					preference.setValueIndex(0);
+				}
+
+				preference.setEnabled(refillSize > 0);
+			}
 		}
 	}
 
