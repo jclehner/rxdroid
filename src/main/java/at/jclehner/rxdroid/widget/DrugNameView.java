@@ -96,6 +96,8 @@ public class DrugNameView extends TextView
 		{
 			if(mIsCurrentlyScrambled)
 			{
+				// TODO show toast for the first few times to let the user know
+
 				setScrambled(false);
 
 				if(mUnscrambledDuration > 0)
