@@ -27,7 +27,6 @@ import java.util.LinkedList;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
 import android.content.Context;
@@ -57,7 +56,11 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Toast;
+
+import org.joda.time.LocalDate;
+
 import at.jclehner.androidutils.AdvancedDialogPreference;
+import at.jclehner.androidutils.DatePickerDialog;
 import at.jclehner.androidutils.otpm.AdvancedDialogPreferenceController;
 import at.jclehner.androidutils.otpm.CheckboxPreferenceController;
 import at.jclehner.androidutils.otpm.DialogPreferenceController;
@@ -812,16 +815,11 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 				}
 			};
 
+			final AlertDialog datePickerDialog = Util.createDatePickerDialog(mContext,
+					LocalDate.fromDateFields(repeatOrigin), onDateSetListener);
 
-
-			final Calendar cal = DateTime.calendarFromDate(repeatOrigin);
-			final int year = cal.get(Calendar.YEAR);
-			final int month = cal.get(Calendar.MONTH);
-			final int day = cal.get(Calendar.DAY_OF_MONTH);
-
-			final DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, onDateSetListener, year, month, day);
-			datePickerDialog.setCancelable(false);
 			datePickerDialog.setTitle(R.string._title_repetition_origin);
+			datePickerDialog.setCancelable(false);
 			datePickerDialog.show();
 		}
 
