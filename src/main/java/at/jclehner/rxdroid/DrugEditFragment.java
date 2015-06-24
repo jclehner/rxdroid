@@ -60,7 +60,6 @@ import android.widget.Toast;
 import org.joda.time.LocalDate;
 
 import at.jclehner.androidutils.AdvancedDialogPreference;
-import at.jclehner.androidutils.DatePickerDialog;
 import at.jclehner.androidutils.otpm.AdvancedDialogPreferenceController;
 import at.jclehner.androidutils.otpm.CheckboxPreferenceController;
 import at.jclehner.androidutils.otpm.DialogPreferenceController;

@@ -41,6 +41,7 @@ import android.text.Spannable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -694,14 +695,39 @@ public final class Util
 		return null;
 	}
 
+	private static final boolean NEED_SAMSUNG_DATE_PICKER_HACK =
+			Version.SDK_IS_LOLLIPOP_OR_NEWER
+			&& Build.MANUFACTURER.equalsIgnoreCase("Samsung")
+			&& Build.FINGERPRINT.contains("5.0/");
+
 	@TargetApi(11)
 	public static AlertDialog createDatePickerDialog(Context context,
 			LocalDate date, final DatePickerDialog.OnDateSetListener listener)
 	{
-		final DatePicker picker = new DatePicker(context);
+		final DatePicker picker;
+
+		if(!NEED_SAMSUNG_DATE_PICKER_HACK)
+		{
+			picker = new DatePicker(context);
+			if(Version.SDK_IS_HONEYCOMB_OR_NEWER && !context.getResources().getBoolean(R.bool.is_tablet))
+				picker.setCalendarViewShown(false);
+		}
+		else
+		{
+			// In some locales, Samsung Lollipop ROMs crash with an obscure
+			// java.util.IllegalFormatConversionException: %d can't format java.lang.String arguments
+			// related to DatePickers on these ROMs[1,2]. Attempting to reproduce the crash in
+			// Samsung's "Remote Testing Lab" failed. In the spirit of "better safe than sorry",
+			// we fall back to the pre-Lollipop DatePicker without the Calendar.
+			//
+			// [1] https://stackoverflow.com/questions/28345413/datepicker-crash-in-samsung-with-android-5-0
+			// [2] https://stackoverflow.com/questions/28618405/datepicker-crashes-on-my-device-when-clicked-with-personal-app
+
+			picker = (DatePicker) LayoutInflater.from(context)
+					.inflate(R.layout.date_picker_spinner_mode, null);
+		}
+
 		picker.init(date.getYear(), date.getMonthOfYear() - 1, date.getDayOfMonth(), null);
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER && !context.getResources().getBoolean(R.bool.is_tablet))
-			picker.setCalendarViewShown(false);
 
 		final AlertDialog.Builder ab = new AlertDialog.Builder(context);
 		ab.setView(picker);
