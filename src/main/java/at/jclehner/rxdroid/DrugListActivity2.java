@@ -121,8 +121,15 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			startActivity(intent);
 			finish();
 		}
-		else if(savedInstanceState == null)
+
+		if(savedInstanceState == null)
 			initDrugListPagerFragment();
+		else
+		{
+			final Fragment f = getSupportFragmentManager().findFragmentByTag("pager");
+			if(f instanceof DrugListPagerFragment)
+				((DrugListPagerFragment) f).setDate(Settings.getActiveDate(), true);
+		}
 
 		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true);
 	}
@@ -231,6 +238,11 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		f.setRetainInstance(false);
 
 		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, f, "pager").commit();
+	}
+
+	private void setDrugListPagerFragmentDate(Date date)
+	{
+
 	}
 
 	private void showBackupAgentRemovalDialogIfNeccessary()
