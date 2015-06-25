@@ -1,3 +1,6 @@
+### 0.9.30:
+* Bug fixes
+
 ### 0.9.29:
 * Disabled "Cloud backup" option
 * Fixed crash related to snoozing refill reminders
