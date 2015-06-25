@@ -347,7 +347,7 @@ public class FractionInput extends LinearLayout
 				if(!isShown())
 					return;
 
-				if(mFractionInputMode == MODE_INTEGER)
+				if(mFractionInputMode == MODE_INTEGER && !isFractionInputModeDisabled())
 				{
 					mShowcaseQueue.add(makeShowcaseView(mModeSwitcher, 0xdeadc0de,
 							R.string._help_title_to_fraction_mode, R.string._help_msg_to_fraction_mode));
