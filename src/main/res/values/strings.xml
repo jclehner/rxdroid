@@ -483,4 +483,9 @@
 		\"[@string/_title_backup_restore]\"!
 	</string>
 
+	<string name="_msg_power_save_warning">
+		The use of power-saving features or task-killer apps may prevent RxDroid from working
+		as intended (notifications not being displayed, etc.). In that case, make sure to
+		either add an exception for RxDroid, or disable such features or apps!
+	</string>
 </resources>

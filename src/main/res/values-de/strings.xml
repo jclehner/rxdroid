@@ -449,6 +449,14 @@
 		\"[@string/_title_database]\" &#x2192; \"[@string/_title_backup_restore]\".
 	</string>
 
+	<string name="_msg_power_save_warning">
+		Die Verwendung von Energiesparfunktionen oder Taskkiller-Apps kann verhindern, dass
+		RxDroid ordentlich funktioniert (Benachrichtigungen werden nicht angezeigt, etc.).
+		In diesem Fall muss für RxDroid eine Ausnahme eingerichtet werden, oder solche
+		Funktionen oder Apps deaktiviert werden!
+	</string>
+
+
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
     and thus use a different naming scheme.

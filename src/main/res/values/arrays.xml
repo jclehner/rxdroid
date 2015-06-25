@@ -98,4 +98,13 @@
         <item>ffffff</item>        
     </string-array>
 
+    <string-array name="missed_alarm_reasons">
+        <item>@string/_msg_missed_alarm_reason1</item>
+        <item>@string/_msg_missed_alarm_reason2</item>
+        <item>@string/_msg_missed_alarm_reason3</item>
+        <item>@string/_msg_missed_alarm_reason4</item>
+        <item>@string/_msg_missed_alarm_reason5</item>
+        <item>@string/_msg_missed_alarm_reason6</item>
+    </string-array>
+
 </resources>

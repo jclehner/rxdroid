@@ -23,6 +23,7 @@ package at.jclehner.rxdroid;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,6 +32,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -38,6 +40,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import at.jclehner.androidutils.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
@@ -49,6 +52,7 @@ import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -113,6 +117,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		ab.setLogo(R.drawable.ic_logo_padded);
 
 		showBackupAgentRemovalDialogIfNeccessary();
+		showLateAlarmDialogIfNeccessary();
 
 		if(Settings.getBoolean(Settings.Keys.IS_FIRST_LAUNCH, true))
 		{
@@ -240,11 +245,6 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, f, "pager").commit();
 	}
 
-	private void setDrugListPagerFragmentDate(Date date)
-	{
-
-	}
-
 	private void showBackupAgentRemovalDialogIfNeccessary()
 	{
 		if(!Settings.getBoolean(Settings.Keys.USE_BACKUP_FRAMEWORK, false))
@@ -253,7 +253,8 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		final AlertDialog.Builder ab = new AlertDialog.Builder(this);
 		ab.setMessage(RefString.resolve(this, R.string._msg_backup_agent_removal));
 		ab.setCancelable(false);
-		ab.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+		ab.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener()
+		{
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
@@ -262,6 +263,81 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		});
 
 		ab.show();
+	}
+
+	private void showLateAlarmDialogIfNeccessary()
+	{
+		if(Settings.wasDisplayedOnce("power_save_warning"))
+			return;
+
+		/*final StringBuilder sb = new StringBuilder();
+		sb.append("<p>");
+		sb.append(getString(R.string._msg_missed_alarm, "RxDroid"));
+		sb.append("</p><p><small>");
+
+		final String[] reasons = getResources().getStringArray(R.array.missed_alarm_reasons);
+		for(String reason : reasons)
+		{
+			sb.append("&bull; ");
+			sb.append(Util.escapeHtml(reason));
+			sb.append("<br/>");
+		}
+
+		sb.append("</small></p><p><small>");
+		sb.append(getString(R.string._msg_power_save_warning));
+		sb.append("</small></p>");*/
+
+		final String btnStrOrig = getString(android.R.string.ok);
+
+		final AlertDialog.Builder ab = new AlertDialog.Builder(this);
+		ab.setMessage(R.string._msg_power_save_warning);
+		ab.setCancelable(false);
+		ab.setNeutralButton(btnStrOrig, new DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				Settings.setDisplayedOnce("power_save_warning");
+			}
+		});
+
+		final AlertDialog dialog = ab.create();
+		dialog.show();
+
+		final Button btn = dialog.getButton(Dialog.BUTTON_NEUTRAL);
+		btn.setEnabled(false);
+
+		new Thread() {
+			@Override
+			public void run()
+			{
+				for(int i = 0; i != 10; ++i)
+				{
+					final String btnStr = btnStrOrig + " (" + (10 - i) + ")";
+
+					btn.post(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							btn.setText(btnStr);
+						}
+					});
+
+					Util.sleepAtMost(1100);
+				}
+
+				btn.post(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						btn.setEnabled(true);
+						btn.setText(btnStrOrig);
+					}
+				});
+			}
+		}.start();
 	}
 
 
@@ -540,6 +616,9 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			mReferenceDate = mDisplayedDate = date;
 
 			updateDoseTimeInfo();
+
+			if(mPager == null || mPager.getAdapter() == null)
+				return;
 
 			mPager.getAdapter().notifyDataSetChanged();
 			mPager.setCurrentItem(CENTER_ITEM, false);
