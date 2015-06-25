@@ -450,10 +450,14 @@
 	</string>
 
 	<string name="_msg_power_save_warning">
-		Die Verwendung von Energiesparfunktionen oder Taskkiller-Apps kann verhindern, dass
+		Die Verwendung von <b>Energiesparfunktionen</b> oder <b>Taskkiller-Apps</b> kann verhindern, dass
 		RxDroid ordentlich funktioniert (Benachrichtigungen werden nicht angezeigt, etc.).
 		In diesem Fall muss für RxDroid eine Ausnahme eingerichtet werden, oder solche
 		Funktionen oder Apps deaktiviert werden!
+	</string>
+
+	<string name="_msg_backups_detected">
+		RxDroid hat Backups auf diesem Gerät gefunden. Jetzt wiederherstellen?
 	</string>
 
 
