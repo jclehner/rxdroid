@@ -157,6 +157,10 @@ public class DatabaseUpgrader implements Closeable
 
 				break;
 
+			case 60:
+				execute("ALTER TABLE [drugs] ADD COLUMN [scheduleEndDate] VARCHAR");
+				break;
+
 			default:
 				throw new DatabaseHelper.DatabaseError(DatabaseHelper.DatabaseError.E_UPGRADE,
 						"Unsupported database version " + version);

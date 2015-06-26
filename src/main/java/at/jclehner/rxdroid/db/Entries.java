@@ -47,6 +47,9 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
 
+import org.joda.time.Days;
+import org.joda.time.LocalDate;
+
 public final class Entries
 {
 	@SuppressWarnings("unused")
@@ -428,6 +431,15 @@ public final class Entries
 		final int minSupplyDays = Settings.getStringAsInt(Settings.Keys.LOW_SUPPLY_THRESHOLD, 10);
 		if(minSupplyDays == 0)
 			return false;
+
+		final int supplyDaysLeft = getSupplyDaysLeftForDrug(drug, date);
+
+		final LocalDate scheduleEnd = drug.getScheduleEndDate();
+		if(scheduleEnd != null)
+		{
+			if(supplyDaysLeft >= Days.daysBetween(scheduleEnd, LocalDate.fromDateFields(date)).getDays())
+				return false;
+		}
 
 		return getSupplyDaysLeftForDrug(drug, date) < minSupplyDays;
 	}

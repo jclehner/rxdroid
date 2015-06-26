@@ -44,6 +44,8 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import org.joda.time.LocalDate;
+
 /**
  * Class for handling the drug database.
  * <p>
@@ -198,6 +200,10 @@ public class Drug extends Entry implements Comparable<Drug>
 	@DatabaseField
 	private Date expirationDate;
 
+	// this is the last date on which a dose is scheduled
+	//@DatabaseField
+	private Date scheduleEndDate;
+
 	@DatabaseField
 	private boolean asNeeded;
 
@@ -213,6 +219,9 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public boolean hasDoseOnDate(Date date)
 	{
+		if(scheduleEndDate != null && date.after(scheduleEndDate))
+			return false;
+
 		if(repeatOrigin != null)
 		{
 			switch(repeatMode)
@@ -602,6 +611,14 @@ public class Drug extends Entry implements Comparable<Drug>
 		lastScheduleUpdateDate = date;
 	}
 
+	public LocalDate getScheduleEndDate() {
+		return scheduleEndDate != null ? LocalDate.fromDateFields(scheduleEndDate) : null;
+	}
+
+	public void setScheduleEndDate(LocalDate date) {
+		scheduleEndDate = date.toDate();
+	}
+
 //	public Date getLastDosesClearedDate() {
 //		return lastDosesClearedDate;
 //	}
@@ -766,6 +783,7 @@ public class Drug extends Entry implements Comparable<Drug>
 			this.repeatOrigin,
 			this.asNeeded,
 			this.expirationDate,
+			this.scheduleEndDate,
 			this.comment
 		};
 
