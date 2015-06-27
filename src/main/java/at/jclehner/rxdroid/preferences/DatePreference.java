@@ -23,41 +23,37 @@ package at.jclehner.rxdroid.preferences;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.Toast;
 
 import org.joda.time.LocalDate;
 
+import java.util.IllegalFormatException;
+
+import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Version;
+import at.jclehner.rxdroid.ui.DatePickerDialog;
+import at.jclehner.rxdroid.util.Util;
 
 public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
-		implements DatePicker.OnDateChangedListener
+		implements DatePickerDialog.OnDateSetListener
 {
-	private final LocalDate mToday = new LocalDate();
-	private boolean mIsValidDate = true;
-	private LocalDate mDate;
+	private LocalDate mMinDate;
+	private LocalDate mMaxDate;
+
+	private DatePickerDialog mDialog;
 
 	public DatePreference(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		setDefaultValue(new LocalDate());
-		setPositiveButtonText(android.R.string.ok);
-		setNegativeButtonText(android.R.string.cancel);
-	}
-
-	@Override
-	public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-	{
-		final LocalDate date = new LocalDate(year, monthOfYear + 1, dayOfMonth);
-		mIsValidDate = !date.isBefore(mToday);
-
-		if(mIsValidDate)
-			mDate = date;
-
-		((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(mIsValidDate);
+		handleAttributes(context, attrs);
 	}
 
 	@Override
@@ -65,19 +61,27 @@ public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
 		return Version.SDK_IS_LOLLIPOP_OR_NEWER ? null : super.getDialogTitle();
 	}
 
+	public void setMinDate(LocalDate minDate) {
+		mMinDate = minDate;
+	}
+
+	public void setMaxDate(LocalDate maxDate) {
+		mMaxDate = maxDate;
+	}
+
 	@Override
-	protected void onDialogClosed(boolean positiveResult) {
-		super.onDialogClosed(mIsValidDate ? positiveResult : false);
+	public void onDateSet(DatePickerDialog dialog, LocalDate date) {
+		changeValue(date);
 	}
 
 	@Override
 	protected LocalDate getDialogValue() {
-		return mDate;
+		return mDialog != null ? mDialog.getDate() : null;
 	}
 
 	@Override
 	protected LocalDate fromPersistedString(String string) {
-		return LocalDate.parse(string);
+		return xmlValueToDate(string);
 	}
 
 	@Override
@@ -85,18 +89,55 @@ public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
 		return value.toString();
 	}
 
-	@TargetApi(11)
 	@Override
-	protected View onCreateDialogView()
+	protected Dialog onGetCustomDialog()
 	{
-		final LocalDate value = getValue();
-		final DatePicker picker = new DatePicker(getThemedContext());
+		LocalDate value = getValue();
+		if(value == null)
+			value = new LocalDate();
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			picker.setMinDate(mToday.toDate().getTime());
+		if(mDialog == null)
+			mDialog = new DatePickerDialog(getThemedContext(), value, this);
 
-		picker.init(value.getYear(), value.getMonthOfYear() - 1, value.getDayOfMonth(), this);
+		mDialog.setMinDate(mMinDate);
+		mDialog.setMaxDate(mMaxDate);
 
-		return picker;
+		return mDialog;
+	}
+
+	private void handleAttributes(Context context, AttributeSet attrs)
+	{
+		if(attrs == null)
+			return;
+
+		final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DatePreference);
+		mMinDate = xmlValueToDate(a.getString(R.styleable.DatePreference_minDate));
+		mMaxDate = xmlValueToDate(a.getString(R.styleable.DatePreference_maxDate));
+	}
+
+	private LocalDate xmlValueToDate(String value)
+	{
+		if(value == null)
+			return null;
+
+		try
+		{
+			return LocalDate.parse(value);
+		}
+		catch(RuntimeException e)
+		{
+			// ignore
+		}
+
+		final LocalDate today = LocalDate.now();
+
+		if("today".equals(value))
+			return today;
+		else if("tomorrow".equals(value))
+			return today.plusDays(1);
+		else if("yesterday".equals(value))
+			return today.minusDays(1);
+
+		throw new IllegalArgumentException("Failed to interpret value as date: " + value);
 	}
 }

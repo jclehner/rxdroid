@@ -42,6 +42,11 @@
         <attr name="autoSummary" format="boolean" />
         <attr name="neutralButtonText" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="DatePreference">
+        <attr name="minDate" format="string" />
+        <attr name="maxDate" format="string" />
+    </declare-styleable>
         
     <declare-styleable name="DrugSupplyMontior">
         <attr name="onLongClick" format="string" /> 
