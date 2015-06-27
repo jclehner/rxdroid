@@ -229,7 +229,7 @@ public final class Util
 				break;
 
 			default:
-				throw new IllegalArgumentException();
+				return "(invalid " + doseTime + ")";
 		}
 
 		return RxDroid.getContext().getString(resId);
