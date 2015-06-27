@@ -42,14 +42,14 @@ dependencies {
 
 android {
 	buildToolsVersion '21.1.2'
-	compileSdkVersion 21
+	compileSdkVersion 22
 
 	defaultConfig {
 		minSdkVersion 8
-		targetSdkVersion 21
+		targetSdkVersion 22
 
-		versionCode 9290
-		versionName '0.9.29'
+		versionCode 9300
+		versionName '0.9.30'
 	}
 
 	lintOptions {
