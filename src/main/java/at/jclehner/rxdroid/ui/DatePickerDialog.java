@@ -25,6 +25,9 @@ import at.jclehner.rxdroid.util.DateTime;
 public class DatePickerDialog extends AlertDialog implements
 		DatePicker.OnDateChangedListener, DialogInterface.OnClickListener
 {
+	private static final String TAG = DatePickerDialog.class.getSimpleName();
+	private static final boolean LOGV = BuildConfig.DEBUG;
+
 	// In some locales, Samsung Lollipop ROMs crash with an obscure
 	// java.util.IllegalFormatConversionException: %d can't format java.lang.String arguments
 	// related to DatePickers on these ROMs[1,2]. Attempting to reproduce the crash in
@@ -45,7 +48,7 @@ public class DatePickerDialog extends AlertDialog implements
 	// This means that we have to check the DatePicker's date when clicking the
 	// 'OK' button, and not close the dialog if it's not within range
 	// (see mBtnListener).
-	private static final boolean NEED_5_0_DATE_PICKER_HACK = BuildConfig.DEBUG ||
+	private static final boolean NEED_5_0_DATE_PICKER_HACK =
 			!NEED_SAMSUNG_DATE_PICKER_HACK &&
 			Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP;
 
@@ -110,7 +113,7 @@ public class DatePickerDialog extends AlertDialog implements
 			throw new IllegalArgumentException("Requested min date " + date + " is before max date " + mMaxDate);
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			mPicker.setMinDate(mMinDate.toDate().getTime());
+			mPicker.setMinDate(mMinDate != null ? mMinDate.toDate().getTime() : null);
 
 		updateMessage();
 	}
@@ -124,7 +127,7 @@ public class DatePickerDialog extends AlertDialog implements
 			throw new IllegalArgumentException("Requested max date " + date + " is after min date " + mMinDate);
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			mPicker.setMaxDate(mMaxDate.toDate().getTime());
+			mPicker.setMaxDate(mMaxDate != null ? mMaxDate.toDate().getTime() : null);
 
 		updateMessage();
 	}
@@ -164,7 +167,7 @@ public class DatePickerDialog extends AlertDialog implements
 		}
 
 		updateMessage();
-		
+
 		final View v = findViewById(android.R.id.message);
 		if(v != null && v instanceof TextView)
 			((TextView) v).setGravity(Gravity.CENTER);
