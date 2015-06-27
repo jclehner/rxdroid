@@ -31,7 +31,6 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -39,7 +38,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import at.jclehner.androidutils.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
-import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
@@ -52,7 +50,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -133,7 +130,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		{
 			final Fragment f = getSupportFragmentManager().findFragmentByTag("pager");
 			if(f instanceof DrugListPagerFragment)
-				((DrugListPagerFragment) f).setDate(Settings.getActiveDate(), true);
+				((DrugListPagerFragment) f).setDate(Settings.getDoseTimeInfo().relevantDate(), true);
 		}
 
 		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true);
@@ -441,7 +438,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 			if(date == null)
 			{
-				date = mDtInfo.activeDate();
+				date = mDtInfo.relevantDate();
 				//forceSetDate = mLastDoseTimePeriodIndex != mDtInfo.doseTimePeriodIndex();
 			}
 
@@ -481,7 +478,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			if(mDisplayedDate == null)
 				return;
 
-			final int dateCmp = mDisplayedDate.compareTo(mDtInfo.activeDate());
+			final int dateCmp = mDisplayedDate.compareTo(mDtInfo.relevantDate());
 
 			if(Settings.getBoolean(Settings.Keys.USE_SAFE_MODE, false))
 				menu.removeItem(R.id.menuitem_take_all);
@@ -502,7 +499,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			{
 				case R.id.menuitem_date:
 				{
-					if(mDtInfo.activeDate().equals(mDisplayedDate))
+					if(mDtInfo.relevantDate().equals(mDisplayedDate))
 					{
 						final DatePickerDialog dialog = new DatePickerDialog(getActivity(),
 								LocalDate.fromDateFields(mDisplayedDate), this);
@@ -513,7 +510,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 					}
 					else
 					{
-						setDate(mDtInfo.activeDate(), true);
+						setDate(mDtInfo.relevantDate(), true);
 					}
 
 					return true;
@@ -587,23 +584,23 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 		@Override
 		public void onDoseTimeBegin(Date date, int doseTime) {
-			updateDoseTimeInfoAndSetToActiveDate();
+			updateDoseTimeInfoAndSetToRelevantDate();
 		}
 
 		@Override
 		public void onDoseTimeEnd(Date date, int doseTime) {
-			updateDoseTimeInfoAndSetToActiveDate();
+			updateDoseTimeInfoAndSetToRelevantDate();
 		}
 
 		@Override
 		public void onTimeChanged(int type) {
-			updateDoseTimeInfoAndSetToActiveDate();
+			updateDoseTimeInfoAndSetToRelevantDate();
 		}
 
-		private void updateDoseTimeInfoAndSetToActiveDate()
+		private void updateDoseTimeInfoAndSetToRelevantDate()
 		{
 			updateDoseTimeInfo();
-			setDate(mDtInfo.activeDate(), true);
+			setDate(mDtInfo.relevantDate(), true);
 		}
 
 		private void setDate(Date date, boolean force)
@@ -643,7 +640,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 			final SpannableString dateStr = new SpannableString(DateTime.toNativeDate(mDisplayedDate));
 
-			if(mDtInfo.activeDate().equals(mDisplayedDate))
+			if(mDtInfo.relevantDate().equals(mDisplayedDate))
 				Util.applyStyle(dateStr, new UnderlineSpan());
 
 			//Util.applyStyle(dateStr, new RelativeSizeSpan(0.75f));
@@ -743,11 +740,11 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				holder.name.setTag(wrapper.item.getId());
 
 				holder.icon.setImageResource(Util.getDrugIconDrawable(wrapper.item.getIcon()));
-				holder.supply.setToday(mDtInfo.activeDate());
+				holder.supply.setToday(mDtInfo.relevantDate());
 				holder.supply.setDrugAndDate(wrapper.item, wrapper.date);
 				holder.supply.setVisibility(wrapper.isSupplyVisible ? View.VISIBLE : View.INVISIBLE);
 				holder.history.setTag(wrapper.item.getId());
-				holder.missedDoseIndicator.setVisibility((wrapper.isActiveDate && wrapper.hasMissingDoses)
+				holder.missedDoseIndicator.setVisibility((wrapper.isRelevantDate && wrapper.hasMissingDoses)
 					? View.VISIBLE : View.GONE);
 
 				for(int i = 0; i != holder.doseViews.length; ++i)
@@ -785,7 +782,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				}
 
 				public Date date;
-				public boolean isActiveDate;
+				public boolean isRelevantDate;
 				public boolean isSupplyLow;
 				public boolean isSupplyVisible;
 				public boolean hasMissingDoses;
@@ -823,39 +820,35 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				Collections.sort(drugs, mComparator);
 				final ArrayList<DrugWrapper> data = new ArrayList<DrugWrapper>(drugs.size());
 
+				final int nextDoseTime = mDtInfo.nextDoseTime();
+				final int activeDoseTime = mDtInfo.activeDoseTime();
+
 				for(Drug drug : drugs)
 				{
 					final DrugWrapper wrapper = new DrugWrapper(drug);
 					wrapper.date = mDate;
-					wrapper.isActiveDate = mDate.equals(mDtInfo.activeDate());
+					wrapper.isRelevantDate = mDate.equals(mDtInfo.relevantDate());
 					wrapper.isSupplyLow = Entries.hasLowSupplies(drug, mDate);
 					wrapper.hasMissingDoses = Entries.hasMissingDosesBeforeDate(drug, mDate);
-					wrapper.isSupplyVisible = (drug.getRefillSize() != 0 /*|| !drug.getCurrentSupply().isZero()*/) && !mDate.before(mDtInfo.activeDate());
+					wrapper.isSupplyVisible = drug.getRefillSize() != 0 && !mDate.before(mDtInfo.relevantDate());
 
-					if(wrapper.isActiveDate)
+					if(wrapper.isRelevantDate && drug.isActive())
 					{
-						if(drug.isActive())
+						for(int i = 0; i != wrapper.doseViewDimmed.length; ++i)
 						{
-							// This will "underflow" if nextDoseTime is TIME_MORNING, but
-							// this doesn't matter since it just dims all doses
-							final int maxDoseTimeForNoDim = mDtInfo.nextDoseTime() - 1;
-
-							if(maxDoseTimeForNoDim >= Schedule.TIME_MORNING && mDtInfo.activeDoseTime() != Schedule.TIME_INVALID)
+							final int doseTime = Schedule.TIME_MORNING + i;
+							if(doseTime < nextDoseTime || nextDoseTime == Schedule.TIME_MORNING)
 							{
-								for(int i = 0; i != wrapper.doseViewDimmed.length; ++i)
-								{
-									final int doseTime = Schedule.TIME_MORNING + i;
-									if(doseTime <= maxDoseTimeForNoDim && !drug.getDose(doseTime, mDate).isZero())
-										wrapper.doseViewDimmed[i] = Entries.countDoseEvents(drug, mDate, doseTime) != 0;
-									else
-										wrapper.doseViewDimmed[i] = true;
-								}
+								if(!drug.getDose(doseTime, mDate).isZero())
+									wrapper.doseViewDimmed[i] = Entries.countDoseEvents(drug, mDate, doseTime) != 0;
+								else
+									wrapper.doseViewDimmed[i] = true;
 							}
+							else
+								wrapper.doseViewDimmed[i] = true;
 						}
-						else
-							wrapper.doseViewDimmed = ALL_DIMMED;
 					}
-					else if(wrapper.date.after(mDtInfo.activeDate()))
+					else
 						wrapper.doseViewDimmed = ALL_DIMMED;
 
 					data.add(wrapper);
@@ -878,7 +871,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 					if(Entries.countDoseEvents(drug, mDate, null) != 0)
 						return true;
 
-					if(mDtInfo.activeDate().equals(mDate))
+					if(mDtInfo.relevantDate().equals(mDate))
 					{
 						if(Entries.hasMissingDosesBeforeDate(drug, mDate))
 							return true;
@@ -929,7 +922,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 					if(Entries.hasLowSupplies(drug, mDate))
 						score -= 1000;
 
-					if(mDtInfo.activeDate().equals(mDate))
+					if(mDtInfo.relevantDate().equals(mDate))
 					{
 						if(Entries.hasMissingDosesBeforeDate(drug, mDate))
 							score -= 1000;
@@ -1219,7 +1212,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			// "date_swipe" is used for historic reasons
 			if(force || (drugs.size() == 1 && !Settings.wasDisplayedOnce("date_swipe")))
 			{
-				Date date = dtInfo.activeDate();
+				Date date = dtInfo.relevantDate();
 				final Drug drug;
 
 				if(force)
