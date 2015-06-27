@@ -99,16 +99,15 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	//private static final String KEY_IS_DIALOG_SHOWING = TAG + ".is_showing";
 	//private static final String KEY_DIALOG_VALUE = TAG + ".dialog_value";
 
-	public AdvancedDialogPreference(Context context, AttributeSet attrs, int defStyle) {
+	public AdvancedDialogPreference(Context context, AttributeSet attrs, int defStyle)
+	{
 		super(context, attrs, defStyle);
+		handleAttributes(attrs);
+		if(LOGV) Log.d(TAG, "ctor: key=" + getKey());
 	}
 
-	public AdvancedDialogPreference(Context context, AttributeSet attrs)
-	{
+	public AdvancedDialogPreference(Context context, AttributeSet attrs) {
 		this(context, attrs, android.R.attr.preferenceStyle);
-		handleAttributes(attrs);
-
-		if(LOGV) Log.d(TAG, "ctor: key=" + getKey());
 	}
 
 	public void setNeutralButtonText(CharSequence text) {
@@ -197,9 +196,9 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 		return mValue;
 	}
 
-	public void setCheckable(boolean checkable)
-	{
+	public void setCheckable(boolean checkable) {
 		setWidgetLayoutResource(checkable ? R.layout.toggler : 0);
+		if(LOGV) Log.v(TAG, getKey() + ": setCheckable: checkable=" + checkable);
 	}
 
 	@Override
