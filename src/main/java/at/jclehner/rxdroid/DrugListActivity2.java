@@ -792,6 +792,8 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				public boolean[] doseViewDimmed = { false, false, false, false };
 			}
 
+			private static final boolean[] ALL_DIMMED = { true, true, true, true };
+
 			private final boolean mShowAll;
 			private final int mPatientId;
 			private final Date mDate;
@@ -832,24 +834,29 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 					if(wrapper.isActiveDate)
 					{
-						// This will "underflow" if nextDoseTime is TIME_MORNING, but
-						// this doesn't matter since it just dims all doses
-						final int maxDoseTimeForNoDim = mDtInfo.nextDoseTime() - 1;
-
-						if(maxDoseTimeForNoDim >= Schedule.TIME_MORNING && mDtInfo.activeDoseTime() != Schedule.TIME_INVALID)
+						if(drug.isActive())
 						{
-							for(int i = 0; i != wrapper.doseViewDimmed.length; ++i)
+							// This will "underflow" if nextDoseTime is TIME_MORNING, but
+							// this doesn't matter since it just dims all doses
+							final int maxDoseTimeForNoDim = mDtInfo.nextDoseTime() - 1;
+
+							if(maxDoseTimeForNoDim >= Schedule.TIME_MORNING && mDtInfo.activeDoseTime() != Schedule.TIME_INVALID)
 							{
-								final int doseTime = Schedule.TIME_MORNING + i;
-								if(doseTime <= maxDoseTimeForNoDim && !drug.getDose(doseTime, mDate).isZero())
-									wrapper.doseViewDimmed[i] = Entries.countDoseEvents(drug, mDate, doseTime) != 0;
-								else
-									wrapper.doseViewDimmed[i] = true;
+								for(int i = 0; i != wrapper.doseViewDimmed.length; ++i)
+								{
+									final int doseTime = Schedule.TIME_MORNING + i;
+									if(doseTime <= maxDoseTimeForNoDim && !drug.getDose(doseTime, mDate).isZero())
+										wrapper.doseViewDimmed[i] = Entries.countDoseEvents(drug, mDate, doseTime) != 0;
+									else
+										wrapper.doseViewDimmed[i] = true;
+								}
 							}
 						}
+						else
+							wrapper.doseViewDimmed = ALL_DIMMED;
 					}
 					else if(wrapper.date.after(mDtInfo.activeDate()))
-						wrapper.doseViewDimmed = new boolean[] { true, true, true, true };
+						wrapper.doseViewDimmed = ALL_DIMMED;
 
 					data.add(wrapper);
 				}
