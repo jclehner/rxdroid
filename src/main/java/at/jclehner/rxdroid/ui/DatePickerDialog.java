@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -112,8 +113,8 @@ public class DatePickerDialog extends AlertDialog implements
 		if(mMaxDate != null && mMaxDate.isBefore(date))
 			throw new IllegalArgumentException("Requested min date " + date + " is before max date " + mMaxDate);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			mPicker.setMinDate(mMinDate != null ? mMinDate.toDate().getTime() : null);
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER && mMinDate != null)
+			mPicker.setMinDate(mMinDate.toDate().getTime());
 
 		updateMessage();
 	}
@@ -126,8 +127,8 @@ public class DatePickerDialog extends AlertDialog implements
 		if(mMinDate != null && mMinDate.isAfter(date))
 			throw new IllegalArgumentException("Requested max date " + date + " is after min date " + mMinDate);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			mPicker.setMaxDate(mMaxDate != null ? mMaxDate.toDate().getTime() : null);
+		if(Version.SDK_IS_HONEYCOMB_OR_NEWER && mMaxDate != null)
+			mPicker.setMaxDate(mMaxDate.toDate().getTime());
 
 		updateMessage();
 	}
@@ -248,7 +249,7 @@ public class DatePickerDialog extends AlertDialog implements
 
 			if(mMinDate != null && mDate.isBefore(mMinDate))
 				setPickerDate(mMinDate);
-			else if(mMaxDate != null && mDate.isBefore(mMaxDate))
+			else if(mMaxDate != null && mDate.isAfter(mMaxDate))
 				setPickerDate(mMaxDate);
 			else
 			{

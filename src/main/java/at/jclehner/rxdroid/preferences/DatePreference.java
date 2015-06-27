@@ -86,7 +86,7 @@ public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
 
 	@Override
 	protected String toPersistedString(LocalDate value) {
-		return value.toString();
+		return value != null ? value.toString() : null;
 	}
 
 	@Override
