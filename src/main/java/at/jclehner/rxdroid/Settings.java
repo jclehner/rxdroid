@@ -42,6 +42,9 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import org.joda.time.LocalDate;
+
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
@@ -472,6 +475,10 @@ public final class Settings
 			return mActiveDate;
 		}
 
+		public Date relevantDate() {
+			return mRelevantDate;
+		}
+
 		public Date nextDoseTimeDate() {
 			return mNextDoseTimeDate;
 		}
@@ -524,6 +531,7 @@ public final class Settings
 		private Calendar mCurrentTime;
 		private Date mCurrentDate;
 		private Date mActiveDate;
+		private Date mRelevantDate;
 		private Date mNextDoseTimeDate;
 		private int mActiveDoseTime;
 		private int mNextDoseTime;
@@ -580,7 +588,11 @@ public final class Settings
 
 			if(useNextDay)
 				dtInfo.mNextDoseTimeDate = DateTime.add(dtInfo.mNextDoseTimeDate, Calendar.DAY_OF_MONTH, 1);
+
+			dtInfo.mRelevantDate = DateTime.add(dtInfo.mNextDoseTimeDate, Calendar.DAY_OF_MONTH, -1);
 		}
+		else
+			dtInfo.mRelevantDate = dtInfo.mActiveDate;
 
 		return dtInfo;
 	}
