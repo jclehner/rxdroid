@@ -40,6 +40,7 @@ import java.util.IllegalFormatException;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Version;
 import at.jclehner.rxdroid.ui.DatePickerDialog;
+import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
 public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
@@ -90,14 +91,15 @@ public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
 	}
 
 	@Override
+	protected String toSummaryString(LocalDate value) {
+		return DateTime.toNativeDate(value.toDate());
+	}
+
+	@Override
 	protected Dialog onGetCustomDialog()
 	{
-		LocalDate value = getValue();
-		if(value == null)
-			value = new LocalDate();
-
 		if(mDialog == null)
-			mDialog = new DatePickerDialog(getThemedContext(), value, this);
+			mDialog = new DatePickerDialog(getThemedContext(), getValue(), this);
 
 		mDialog.setMinDate(mMinDate);
 		mDialog.setMaxDate(mMaxDate);

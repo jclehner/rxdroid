@@ -197,6 +197,11 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 		return mValue;
 	}
 
+	public void setCheckable(boolean checkable)
+	{
+		setWidgetLayoutResource(checkable ? R.layout.toggler : 0);
+	}
+
 	@Override
 	public void setSummary(CharSequence summary)
 	{
@@ -378,7 +383,11 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 	{
 		if(isChecked)
+		{
+			// Reset the checked status as this will be set by changeValue (if not null)
+			mToggler.setChecked(false);
 			showDialog(null);
+		}
 		else
 			changeValue(null);
 	}
@@ -537,8 +546,7 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 		setAutoSummaryEnabled(a.getBoolean(R.styleable.AdvancedDialogPreference_autoSummary, true));
 		setNeutralButtonText(a.getString(R.styleable.AdvancedDialogPreference_neutralButtonText));
 
-		if(a.getBoolean(R.styleable.AdvancedDialogPreference_checkable, false))
-			setWidgetLayoutResource(R.layout.toggler);
+		setCheckable(a.getBoolean(R.styleable.AdvancedDialogPreference_checkable, false));
 
 		a.recycle();
 

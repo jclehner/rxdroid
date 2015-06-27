@@ -430,10 +430,9 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		@CreatePreference
 		(
 			titleResId = R.string._title_end,
-			summary = "",
 			order = 8,
 			type = DatePreference.class,
-			controller = AdvancedDialogPreferenceController.class
+			controller = ScheduleEndPreferenceController.class
 		)
 		private LocalDate scheduleEnd;
 
@@ -472,7 +471,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			order = 12,
 			type = CurrentSupplyPreference.class,
 			controller = CurrentSupplyPreferenceController.class,
-			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat", "asNeeded"},
+			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat", "asNeeded", "scheduleEnd" },
 			fieldDependencies = { "repeatArg", "repeatOrigin" }
 		)
 		private Fraction currentSupply;
@@ -539,6 +538,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			lastAutoIntakeCreationDate = drug.getLastAutoDoseEventCreationDate();
 			lastScheduleUpdateDate = drug.getLastScheduleUpdateDate();
 			patient = drug.getPatient();
+			scheduleEnd = drug.getScheduleEndDate();
 			asNeeded = drug.isAsNeeded();
 
 			name = drug.getName();
@@ -562,6 +562,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			drug.setLastAutoDoseEventCreationDate(lastAutoIntakeCreationDate);
 			drug.setHasAutoDoseEvents(autoAddIntakes);
 			drug.setPatient(patient);
+			drug.setScheduleEndDate(scheduleEnd);
 			drug.setAsNeeded(asNeeded);
 
 			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };
@@ -955,15 +956,17 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 				return "0";
 			}
 
-			if(drug.isAsNeeded() || drug.hasNoDoses())
+			if(!drug.isAsNeeded() && !drug.hasNoDoses())
 			{
-				// TODO change?
-				return currentSupply.toString();
+				final int currentSupplyDays = Math.max(Entries.getSupplyDaysLeftForDrug(drug, null), 0);
+				final LocalDate supplyEnd = LocalDate.now().plusDays(currentSupplyDays);
+				final LocalDate scheduleEnd = drug.getScheduleEndDate();
+
+				if(scheduleEnd == null || supplyEnd.isBefore(scheduleEnd))
+					return mContext.getString(R.string._msg_supply, currentSupply, DateTime.toNativeDate(supplyEnd));
 			}
 
-			final int currentSupplyDays = Math.max(Entries.getSupplyDaysLeftForDrug(drug, null), 0);
-			final Date end = DateTime.add(DateTime.today(), Calendar.DAY_OF_MONTH, currentSupplyDays);
-			return mContext.getString(R.string._msg_supply, currentSupply, DateTime.toNativeDate(end));
+			return currentSupply.toString();
 		}
 	}
 
@@ -1003,6 +1006,30 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 	{
 		public FormPreferenceController() {
 			super(R.array.drug_forms);
+		}
+	}
+
+	public static class ScheduleEndPreferenceController extends AdvancedDialogPreferenceController
+	{
+		@Override
+		public void initPreference(AdvancedDialogPreference preference, Object fieldValue)
+		{
+			super.initPreference(preference, fieldValue);
+			preference.setCheckable(true);
+
+			final LocalDate minDate = LocalDate.fromDateFields(
+					Settings.getDoseTimeInfo().activeDate()).plusDays(1);
+
+			((DatePreference) preference).setMinDate(minDate);
+		}
+
+		@Override
+		public void updateSummary(AdvancedDialogPreference preference, Object newValue)
+		{
+			if(newValue != null)
+				preference.setSummary(DateTime.toNativeDate(((LocalDate) newValue).toDate()));
+			else
+				preference.setSummary(R.string._summary_not_available);
 		}
 	}
 

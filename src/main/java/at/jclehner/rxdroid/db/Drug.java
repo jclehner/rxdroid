@@ -616,7 +616,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	}
 
 	public void setScheduleEndDate(LocalDate date) {
-		scheduleEndDate = date.toDate();
+		scheduleEndDate = date != null ? date.toDate() : null;
 	}
 
 //	public Date getLastDosesClearedDate() {

@@ -227,6 +227,10 @@ public final class DateTime
 		return sdf.format(date);
 	}
 
+	public static String toNativeDate(LocalDate date) {
+		return toNativeDate(date.toDate());
+	}
+
 	public static String toNativeDate(Date date) {
 		return DateFormat.getDateFormat(RxDroid.getContext()).format(date);
 	}

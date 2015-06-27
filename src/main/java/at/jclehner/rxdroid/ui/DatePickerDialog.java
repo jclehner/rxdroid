@@ -87,7 +87,8 @@ public class DatePickerDialog extends AlertDialog implements
 					.inflate(R.layout.date_picker_spinner_mode, null);
 		}
 
-		setPickerDate(date);
+		if(date != null)
+			setPickerDate(date);
 
 		setView(mPicker);
 		setButton(BUTTON_NEGATIVE, getContext().getString(android.R.string.cancel), this);
@@ -110,7 +111,7 @@ public class DatePickerDialog extends AlertDialog implements
 	{
 		mMinDate = date;
 
-		if(mMaxDate != null && mMaxDate.isBefore(date))
+		if(date != null && mMaxDate != null && mMaxDate.isBefore(date))
 			throw new IllegalArgumentException("Requested min date " + date + " is before max date " + mMaxDate);
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER && mMinDate != null)
@@ -124,7 +125,7 @@ public class DatePickerDialog extends AlertDialog implements
 	{
 		mMaxDate = date;
 
-		if(mMinDate != null && mMinDate.isAfter(date))
+		if(date != null && mMinDate != null && mMinDate.isAfter(date))
 			throw new IllegalArgumentException("Requested max date " + date + " is after min date " + mMinDate);
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER && mMaxDate != null)
@@ -186,7 +187,7 @@ public class DatePickerDialog extends AlertDialog implements
 				mDate = LocalDate.parse(dateStr);
 		}
 		else if(mDate == null)
-			mDate = new LocalDate();
+			mDate = mMinDate == null ? LocalDate.now() : mMinDate;
 
 		setPickerDate(mDate);
 	}
