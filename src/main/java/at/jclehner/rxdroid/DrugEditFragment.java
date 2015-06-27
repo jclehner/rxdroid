@@ -27,7 +27,6 @@ import java.util.LinkedList;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -66,13 +65,16 @@ import at.jclehner.androidutils.otpm.DialogPreferenceController;
 import at.jclehner.androidutils.otpm.ListPreferenceWithIntController;
 import at.jclehner.androidutils.otpm.OTPM;
 import at.jclehner.androidutils.otpm.OTPM.CreatePreference;
+import at.jclehner.androidutils.otpm.PreferenceController;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Patient;
+import at.jclehner.rxdroid.preferences.DatePreference;
 import at.jclehner.rxdroid.preferences.DosePreference;
 import at.jclehner.rxdroid.preferences.DrugNamePreference2;
 import at.jclehner.rxdroid.preferences.FractionPreference;
+import at.jclehner.rxdroid.ui.DatePickerDialog;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
@@ -424,11 +426,22 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		)
 		private int repeat;
 
+
+		@CreatePreference
+		(
+			titleResId = R.string._title_end,
+			summary = "",
+			order = 8,
+			type = DatePreference.class,
+			controller = AdvancedDialogPreferenceController.class
+		)
+		private LocalDate scheduleEnd;
+
 		@CreatePreference
 		(
 			titleResId = R.string._title_on_demand,
 			summary = "",
-			order = 8,
+			order = 9,
 			type = CheckBoxPreference.class,
 			controller = CheckboxPreferenceController.class
 		)
@@ -438,7 +451,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		(
 			titleResId = R.string._title_icon,
 			categoryResId = R.string._title_misc,
-			order = 9,
+			order = 10,
 			type = ListPreference.class,
 			controller = FormPreferenceController.class
 		)
@@ -447,7 +460,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		@CreatePreference
 		(
 			titleResId = R.string._title_refill_size,
-			order = 10,
+			order = 11,
 			type = FractionPreference.class,
 			controller = RefillSizePreferenceController.class
 		)
@@ -456,7 +469,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		@CreatePreference
 		(
 			titleResId = R.string._title_current_supply,
-			order = 11,
+			order = 12,
 			type = CurrentSupplyPreference.class,
 			controller = CurrentSupplyPreferenceController.class,
 			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat", "asNeeded"},
@@ -467,7 +480,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		@CreatePreference
 		(
 			titleResId = R.string._title_per_drug_reminders,
-			order = 12,
+			order = 13,
 			type = ListPreference.class,
 			controller = NotificationsPreferenceController.class
 			//, reverseDependencies = "refillSize"
@@ -478,7 +491,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		(
 			titleResId = R.string._title_active,
 			summary = "",
-			order = 13,
+			order = 14,
 			type = CheckBoxPreference.class,
 			controller = CheckboxPreferenceController.class
 		)
@@ -799,15 +812,13 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 
 		private void showRepeatOriginDateDialog(final int repeatMode, Date repeatOrigin, final long repeatArg)
 		{
-			final OnDateSetListener onDateSetListener = new OnDateSetListener() {
+			final DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
 
 				@Override
-				public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+				public void onDateSet(DatePickerDialog dialog, LocalDate date)
 				{
-					final Date newRepeatOrigin = DateTime.date(year, monthOfYear, dayOfMonth);
-
 					setFieldValue(repeatMode);
-					setFieldValue("repeatOrigin", newRepeatOrigin);
+					setFieldValue("repeatOrigin", date.toDate());
 					setFieldValue("repeatArg", repeatArg);
 
 					updateSummary();
@@ -815,7 +826,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 				}
 			};
 
-			final AlertDialog datePickerDialog = Util.createDatePickerDialog(mContext,
+			final AlertDialog datePickerDialog = new DatePickerDialog(mContext,
 					LocalDate.fromDateFields(repeatOrigin), onDateSetListener);
 
 			datePickerDialog.setTitle(R.string._title_repetition_origin);

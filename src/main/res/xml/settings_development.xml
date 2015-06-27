@@ -54,6 +54,7 @@
             android:defaultValue="today"
 			app:maxDate="tomorrow"
 			app:minDate="yesterday"
+			app:checkable="true"
     />
 
 	<CheckBoxPreference android:key="@string/key_use_pretty_fractions"

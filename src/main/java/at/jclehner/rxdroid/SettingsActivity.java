@@ -523,6 +523,10 @@ public class SettingsActivity extends ActionBarActivity
 
 			getPreferenceScreen().addPreference(p);
 
+			p = findPreference("test_date");
+			if(p != null)
+				Settings.remove("test_date");
+
 			p = findPreference("db_create_drug_with_schedule");
 			if(p != null)
 			{
