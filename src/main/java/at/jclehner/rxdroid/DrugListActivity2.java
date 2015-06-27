@@ -508,6 +508,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 								LocalDate.fromDateFields(mDisplayedDate), this);
 						dialog.setMinDate(LocalDate.fromDateFields(
 								Settings.getOldestPossibleHistoryDate(DateTime.today())));
+
 						dialog.show();
 					}
 					else

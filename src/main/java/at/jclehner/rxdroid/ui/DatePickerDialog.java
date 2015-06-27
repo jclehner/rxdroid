@@ -10,12 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.Toast;
 
 import org.joda.time.LocalDate;
 
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Version;
+import at.jclehner.rxdroid.util.DateTime;
 
 public class DatePickerDialog extends AlertDialog implements
 		DatePicker.OnDateChangedListener, DialogInterface.OnClickListener
@@ -28,7 +30,7 @@ public class DatePickerDialog extends AlertDialog implements
 	//
 	// [1] https://stackoverflow.com/questions/28345413/datepicker-crash-in-samsung-with-android-5-0
 	// [2] https://stackoverflow.com/questions/28618405/datepicker-crashes-on-my-device-when-clicked-with-personal-app
-	private static final boolean NEED_SAMSUNG_DATE_PICKER_HACK = BuildConfig.DEBUG ||
+	private static final boolean NEED_SAMSUNG_DATE_PICKER_HACK =
 			Version.SDK_IS_LOLLIPOP_OR_NEWER
 			&& Build.MANUFACTURER.equalsIgnoreCase("Samsung")
 			&& Build.FINGERPRINT.contains("5.0/");
@@ -40,7 +42,7 @@ public class DatePickerDialog extends AlertDialog implements
 	// This means that we have to check the DatePicker's date when clicking the
 	// 'OK' button, and not close the dialog if it's not within range
 	// (see mBtnListener).
-	private static final boolean NEED_5_0_DATE_PICKER_HACK =
+	private static final boolean NEED_5_0_DATE_PICKER_HACK = BuildConfig.DEBUG ||
 			!NEED_SAMSUNG_DATE_PICKER_HACK &&
 			Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP;
 
@@ -50,6 +52,8 @@ public class DatePickerDialog extends AlertDialog implements
 
 	private LocalDate mMinDate;
 	private LocalDate mMaxDate;
+
+	private boolean mShowConstraintMessage = Version.SDK_IS_PRE_HONEYCOMB;
 
 	public interface OnDateSetListener
 	{
@@ -88,6 +92,12 @@ public class DatePickerDialog extends AlertDialog implements
 		return mDate;
 	}
 
+	public void setShowConstraintMessage(boolean showMessage)
+	{
+		mShowConstraintMessage = showMessage;
+		updateMessage();
+	}
+
 	@TargetApi(11)
 	public void setMinDate(LocalDate date)
 	{
@@ -98,6 +108,8 @@ public class DatePickerDialog extends AlertDialog implements
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 			mPicker.setMinDate(mMinDate.toDate().getTime());
+
+		updateMessage();
 	}
 
 	@TargetApi(11)
@@ -110,6 +122,8 @@ public class DatePickerDialog extends AlertDialog implements
 
 		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
 			mPicker.setMaxDate(mMaxDate.toDate().getTime());
+
+		updateMessage();
 	}
 
 	@Override
@@ -136,13 +150,17 @@ public class DatePickerDialog extends AlertDialog implements
 	@Override
 	public void show()
 	{
-		if(mDate == null)
-			mDate = LocalDate.now();
-
 		super.show();
 
-		if(NEED_5_0_DATE_PICKER_HACK)
-			getButton(BUTTON_POSITIVE).setOnClickListener(mBtnListener);
+		final Button btn = getButton(BUTTON_POSITIVE);
+		if(btn != null)
+		{
+			btn.setEnabled(isDateWithinValidRange());
+			if(NEED_5_0_DATE_PICKER_HACK)
+				btn.setOnClickListener(mBtnListener);
+		}
+
+		updateMessage();
 	}
 
 	@Override
@@ -152,10 +170,14 @@ public class DatePickerDialog extends AlertDialog implements
 
 		if(savedInstanceState != null)
 		{
-			final String date = savedInstanceState.getString("date");
-			if(date != null)
-				setPickerDate(LocalDate.parse(date));
+			final String dateStr = savedInstanceState.getString("date");
+			if(dateStr != null)
+				mDate = LocalDate.parse(dateStr);
 		}
+		else if(mDate == null)
+			mDate = new LocalDate();
+
+		setPickerDate(mDate);
 	}
 
 	@Override
@@ -174,6 +196,37 @@ public class DatePickerDialog extends AlertDialog implements
 		mPicker.init(date.getYear(), date.getMonthOfYear() - 1, date.getDayOfMonth(), this);
 	}
 
+	private void updateMessage()
+	{
+		if(mShowConstraintMessage)
+			setMessage(getConstraintMessage());
+	}
+
+	private CharSequence getConstraintMessage()
+	{
+		final String begin = mMinDate != null ? DateTime.toNativeDate(mMinDate.toDate()) : null;
+		String end = mMaxDate != null ? DateTime.toNativeDate(mMaxDate.toDate()) : null;
+
+		final int resId;
+
+		if(mMinDate != null && mMaxDate != null)
+			resId = R.string._msg_constraints_date_between;
+		else if(mMinDate != null)
+			resId = R.string._msg_constraints_date_from;
+		else if(mMaxDate != null)
+		{
+			// To avoid the use of the ambiguous 'until', we
+			// use 'before' instead. Yes, I've been to
+			// english.stackexchange.com to research this.
+			resId = R.string._msg_constraints_date_before;
+			end = DateTime.toNativeDate(mMaxDate.plusDays(1).toDate());
+		}
+		else
+			resId = 0;
+
+		return resId != 0 ? getContext().getString(resId, begin, end) : null;
+	}
+
 	private final View.OnClickListener mBtnListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v)
@@ -181,7 +234,7 @@ public class DatePickerDialog extends AlertDialog implements
 			mDate = getPickerDate();
 
 			// If the date is outside the valid range, set it to the closest
-			// valid date and DON't close the dialog.
+			// valid date and DON't close the dialog. Also, display a toast.
 
 			if(mMinDate != null && mDate.isBefore(mMinDate))
 				setPickerDate(mMinDate);
@@ -191,26 +244,20 @@ public class DatePickerDialog extends AlertDialog implements
 			{
 				DatePickerDialog.this.onClick(DatePickerDialog.this, BUTTON_POSITIVE);
 				dismiss();
+				return;
 			}
+
+			Toast.makeText(getContext(), getConstraintMessage(), Toast.LENGTH_SHORT).show();
 		}
 	};
 
-
-
-
-
-	public boolean isDateWithinValidRange()
+	private boolean isDateWithinValidRange()
 	{
 		if(mMinDate != null && mDate.isBefore(mMinDate))
 			return false;
-
 		if(mMaxDate != null && mDate.isAfter(mMaxDate))
 			return false;
 
 		return true;
 	}
-
-
-
-
 }
