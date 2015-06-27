@@ -95,6 +95,7 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	private Context mThemedContext;
 
 	private CompoundButton mToggler;
+	private boolean mCheckable = false;
 
 	//private static final String KEY_IS_DIALOG_SHOWING = TAG + ".is_showing";
 	//private static final String KEY_DIALOG_VALUE = TAG + ".dialog_value";
@@ -196,7 +197,9 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 		return mValue;
 	}
 
-	public void setCheckable(boolean checkable) {
+	public void setCheckable(boolean checkable)
+	{
+		mCheckable = checkable;
 		setWidgetLayoutResource(checkable ? R.layout.toggler : 0);
 		if(LOGV) Log.v(TAG, getKey() + ": setCheckable: checkable=" + checkable);
 	}
@@ -509,12 +512,15 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	{
 		super.onBindView(view);
 
-		mToggler = (CompoundButton) view.findViewById(android.R.id.checkbox);
-
-		if(mToggler != null)
+		if(mCheckable)
 		{
-			mToggler.setChecked(mValue != null);
-			mToggler.setOnCheckedChangeListener(this);
+			mToggler = (CompoundButton) view.findViewById(android.R.id.checkbox);
+
+			if(mToggler != null)
+			{
+				mToggler.setChecked(mValue != null);
+				mToggler.setOnCheckedChangeListener(this);
+			}
 		}
 	}
 
