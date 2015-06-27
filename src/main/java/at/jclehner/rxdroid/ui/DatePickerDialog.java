@@ -6,10 +6,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.LocalDate;
@@ -161,6 +164,10 @@ public class DatePickerDialog extends AlertDialog implements
 		}
 
 		updateMessage();
+		
+		final View v = findViewById(android.R.id.message);
+		if(v != null && v instanceof TextView)
+			((TextView) v).setGravity(Gravity.CENTER);
 	}
 
 	@Override
@@ -199,10 +206,10 @@ public class DatePickerDialog extends AlertDialog implements
 	private void updateMessage()
 	{
 		if(mShowConstraintMessage)
-			setMessage(getConstraintMessage());
+			setMessage(Html.fromHtml("<small>" + getConstraintMessage() + "</small>"));
 	}
 
-	private CharSequence getConstraintMessage()
+	private String getConstraintMessage()
 	{
 		final String begin = mMinDate != null ? DateTime.toNativeDate(mMinDate.toDate()) : null;
 		String end = mMaxDate != null ? DateTime.toNativeDate(mMaxDate.toDate()) : null;
