@@ -41,6 +41,7 @@
     <declare-styleable name="AdvancedDialogPreference">
         <attr name="autoSummary" format="boolean" />
         <attr name="neutralButtonText" format="string" />
+        <attr name="checkable" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="DatePreference">

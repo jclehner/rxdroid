@@ -39,10 +39,11 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
+import android.widget.CompoundButton;
+
 import at.jclehner.androidutils.InstanceState.SaveState;
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.R;
-import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.util.Util;
 
 
@@ -57,6 +58,7 @@ import at.jclehner.rxdroid.util.Util;
  *
  */
 public abstract class AdvancedDialogPreference<T extends Serializable> extends DialogPreference
+		implements CompoundButton.OnCheckedChangeListener
 {
 	private static final String TAG = AdvancedDialogPreference.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
@@ -91,6 +93,8 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 
 	private LayoutInflater mThemedInflater;
 	private Context mThemedContext;
+
+	private CompoundButton mToggler;
 
 	//private static final String KEY_IS_DIALOG_SHOWING = TAG + ".is_showing";
 	//private static final String KEY_DIALOG_VALUE = TAG + ".dialog_value";
@@ -146,6 +150,9 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 			setSummaryInternal(value != null ? toSummaryString(value) : null);
 
 		onValueSet(value);
+
+		if(mToggler != null)
+			mToggler.setChecked(value != null);
 
 		if(shouldPersist())
 			persistString(toPersistedString(value));
@@ -368,6 +375,15 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	}
 
 	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+	{
+		if(isChecked)
+			showDialog(null);
+		else
+			changeValue(null);
+	}
+
+	@Override
 	protected final void showDialog(Bundle state)
 	{
 		mDialog = onGetCustomDialog();
@@ -419,6 +435,12 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 
 		mDialog.setOnDismissListener(mDismissListener);
 		mDialog.show();
+
+		onShow(mDialog);
+	}
+
+	protected void onShow(Dialog dialog) {
+		// do nothing
 	}
 
 	@Override
@@ -474,6 +496,20 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 			changeValue(getDialogValue());
 	}
 
+	@Override
+	protected void onBindView(View view)
+	{
+		super.onBindView(view);
+
+		mToggler = (CompoundButton) view.findViewById(android.R.id.checkbox);
+
+		if(mToggler != null)
+		{
+			mToggler.setChecked(mValue != null);
+			mToggler.setOnCheckedChangeListener(this);
+		}
+	}
+
 	protected void setSummaryInternal(CharSequence summary)
 	{
 		if(LOGV) Log.v(TAG, getKey() + ": setSummaryInternal: summary=" + summary);
@@ -500,6 +536,9 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 
 		setAutoSummaryEnabled(a.getBoolean(R.styleable.AdvancedDialogPreference_autoSummary, true));
 		setNeutralButtonText(a.getString(R.styleable.AdvancedDialogPreference_neutralButtonText));
+
+		if(a.getBoolean(R.styleable.AdvancedDialogPreference_checkable, false))
+			setWidgetLayoutResource(R.layout.toggler);
 
 		a.recycle();
 
