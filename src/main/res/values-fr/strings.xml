@@ -269,7 +269,7 @@ Pour entrer une valeur telle que ¾, afficher «3» dans le champ gauche et «4�
   <string name="_btn_report">Rapport</string>
   <string name="_btn_continue">Continuer</string>
   <string name="_title_use_safe_mode">Mode sans échec</string>
-  <string name="_summary_use_safe_mode">Désactiver des fonctionnalités non sécurisées telles que [@string/_title_take_all_doses] » ou 
+  <string name="_summary_use_safe_mode">Désactiver des fonctionnalités non sécurisées telles que «[@string/_title_take_all_doses]» ou 
 «[@string/_title_skip_dose_dialog]»</string>
   <string name="_title_remind_tomorrow">Rappeler demain</string>
   <string name="_toast_remind_tomorrow">Cacher la notification jusqu\'au lendemain.</string>
@@ -297,4 +297,9 @@ Pour entrer une valeur telle que ¾, afficher «3» dans le champ gauche et «4�
   <string name="_title_auto_dose_events">Auto-notation doses</string>
   <string name="_msg_backup_agent_removal">L\'option «[@string/_title_use_backup_framework]» ,a été désactivée, car n\'étant pas fiable. Utiliser à la place  l\'option de sauvegarde manuelle, située à «[@string/_title_preferences]» → «[@string/_title_database]» → «[@string/_title_backup_restore]»!
 	</string>
+  <string name="_msg_power_save_warning">
+L\'utilisation de la fonction <b>économie d\'énergie</b> ou <b>tuer les tâches</b> peut empêcher RxDroid de fonctionner comme il se doit
+		(notifications qui ne sont pas affichées, etc.). Dans ce cas, assurez-vous de
+		soit ajouter une exception pour RxDroid, soit de déactiver ces fonctionnalités ou applications!</string>
+  <string name="_msg_backups_detected">RxDroid a détecté des sauvegardes sur cet appareil. Voulez-vous en restaurer une maintenant ?</string>
 </resources>

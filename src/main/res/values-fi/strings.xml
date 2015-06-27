@@ -296,7 +296,6 @@ Valitettavasti RxDroid kaatui. Ilmoita asiasta, jotta ongelma voidaan korjata.</
   <string name="_msg_comment">Valinnainen kommentti:</string>
   <string name="_title_history">Historia</string>
   <string name="_btn_skip">Ohita</string>
-  <string name="dialog_set_number">@string/_btn_set</string>
   <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">Valitse määrä</string>
   <string name="_title_auto_dose_events">Ota automaattisesti</string>

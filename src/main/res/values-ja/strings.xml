@@ -294,7 +294,6 @@
   <string name="_msg_comment">オプションのコメント:</string>
   <string name="_title_history">履歴</string>
   <string name="_btn_skip">スキップ</string>
-  <string name="dialog_set_number">@string/_btn_set</string>
   <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">番号を選択してください</string>
   <string name="_title_auto_dose_events">用量を自動服用</string>
@@ -304,4 +303,8 @@
 		場所は \"[@string/_title_preferences]\" → \"[@string/_title_database]\" →
 		\"[@string/_title_backup_restore]\"!
 	</string>
+  <string name="_msg_power_save_warning">
+<b>省電力</b> 機能や <b>タスクキラー</b> アプリを使用すると、RxDroid が意図したとおりに機能しないことがあります (通知が表示されないなど)。その場合には、そのような機能やアプリで RxDroid に対して例外を追加するか、無効にするようにしてください!</string>
+  <string name="_msg_backups_detected">
+RxDroid が、このデバイス上でバックアップを検出しました。今すぐ復元しますか?</string>
 </resources>
