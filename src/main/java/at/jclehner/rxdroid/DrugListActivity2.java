@@ -22,7 +22,6 @@
 package at.jclehner.rxdroid;
 
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -80,6 +79,7 @@ import at.jclehner.rxdroid.db.Entries;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
+import at.jclehner.rxdroid.ui.DatePickerDialog;
 import at.jclehner.rxdroid.ui.DialogLike;
 import at.jclehner.rxdroid.ui.ScheduleViewHolder;
 import at.jclehner.rxdroid.util.CollectionUtils;
@@ -504,9 +504,11 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				{
 					if(mDtInfo.activeDate().equals(mDisplayedDate))
 					{
-						// TODO set minDate depending on history size
-						Util.createDatePickerDialog(getActivity(), new LocalDate(mDisplayedDate),
-								this).show();
+						final DatePickerDialog dialog = new DatePickerDialog(getActivity(),
+								LocalDate.fromDateFields(mDisplayedDate), this);
+						dialog.setMinDate(LocalDate.fromDateFields(
+								Settings.getOldestPossibleHistoryDate(DateTime.today())));
+						dialog.show();
 					}
 					else
 					{
@@ -550,8 +552,8 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		}
 
 		@Override
-		public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-			setDate(DateTime.date(year, month, day), false);
+		public void onDateSet(DatePickerDialog datePicker, LocalDate date) {
+			setDate(date.toDate(), false);
 		}
 
 		@Override
