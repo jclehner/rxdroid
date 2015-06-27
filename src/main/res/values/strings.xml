@@ -69,9 +69,9 @@
         <item quantity="other">%2$s and %1$d others</item>       
     </plurals>
     
-	<string name="_msg_constraints_ab">Pick a time between %1$s and %2$s</string>
-	<string name="_msg_constraints_a">Pick a time after %1$s</string>
-	<string name="_msg_constraints_b">Pick a time before %2$s</string>
+	<string name="_msg_constraints_ab">Select time between %1$s and %2$s</string>
+	<string name="_msg_constraints_a">Select time after %1$s</string>
+	<string name="_msg_constraints_b">Select time before %2$s</string>
 	
 	<string name="_btn_set">Set</string>    
     <string name="_title_drug_name">Drug name</string>

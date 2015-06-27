@@ -52,9 +52,9 @@
         <item quantity="other">%1$d fällig</item>
     </plurals>
     
-	<string name="_msg_constraints_ab">Wähle eine Zeit zwischen %1$s und %2$s.</string>
-	<string name="_msg_constraints_a">Wähle eine Zeit nach %1$s.</string>
-	<string name="_msg_constraints_b">Wähle eine Zeit vor %2$s.</string>
+	<string name="_msg_constraints_ab">Zeit zwischen %1$s und %2$s wählen.</string>
+	<string name="_msg_constraints_a">Zeit nach %1$s wählen.</string>
+	<string name="_msg_constraints_b">Zeit vor %2$s wählen.</string>
 	
 	<string name="_btn_set">Auswählen</string>
     
