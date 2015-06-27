@@ -494,10 +494,10 @@
 	</string>
 
 	<!-- %1$s and %2$s are INCLUSIVE, so "date between 1970-01-01 and 1970-01-03" would include 1970-01-01 and 1970-01-03 -->
-	<string name="_msg_constraints_date_between">Select date between %1$s and %2$s</string>
+	<string name="_msg_constraints_date_between">Select date between %1$s and %2$s.</string>
 	<!-- %1$s is INCLUSIVE, so in "date from 1970-01-01", the first valid date would be 1970-01-02 -->
-	<string name="_msg_constraints_date_from">Select date from %1$s</string>
+	<string name="_msg_constraints_date_from">Select date from %1$s.</string>
 	<!-- %2$s is EXCLUSIVE, so in "date before 1970-01-03", the last valid date would be 1970-01-02 -->
-	<string name="_msg_constraints_date_before">Select date before %2$s</string>
+	<string name="_msg_constraints_date_before">Select date before %2$s.</string>
 
 </resources>

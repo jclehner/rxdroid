@@ -460,6 +460,9 @@
 		RxDroid hat Backups auf diesem Gerät gefunden. Jetzt wiederherstellen?
 	</string>
 
+	<string name="_msg_constraints_date_before">Datum vor %2$2 wählen.</string>
+	<string name="_msg_constraints_date_between">Datum zwischen %1$s and %2$s wählen.</string>
+	<string name="_msg_constraints_date_from">Datum ab %1$s wählen.</string>
 
 	<!-- 
     An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
@@ -471,5 +474,4 @@
     <string name="dialog_cancel">@android:string/cancel</string>
     <string name="dialog_picker_title">Zahl wählen</string>
     <string name="_title_auto_dose_events">Automatische Einnahmen</string>
-
 </resources>
