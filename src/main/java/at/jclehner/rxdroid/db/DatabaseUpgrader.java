@@ -159,6 +159,13 @@ public class DatabaseUpgrader implements Closeable
 
 			case 60:
 				execute("ALTER TABLE [drugs] ADD COLUMN [scheduleEndDate] VARCHAR");
+				execute(
+						"CREATE TRIGGER [drug_cleanup] AFTER DELETE ON [drugs] " +
+						"FOR EACH ROW " +
+						"BEGIN " +
+						"  DELETE FROM [dose_events] WHERE drug_id = OLD.id; " +
+						"END"
+				);
 				break;
 
 			default:

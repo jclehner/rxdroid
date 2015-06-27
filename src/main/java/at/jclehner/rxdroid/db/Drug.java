@@ -201,7 +201,7 @@ public class Drug extends Entry implements Comparable<Drug>
 	private Date expirationDate;
 
 	// this is the last date on which a dose is scheduled
-	//@DatabaseField
+	@DatabaseField
 	private Date scheduleEndDate;
 
 	@DatabaseField
@@ -816,17 +816,4 @@ public class Drug extends Entry implements Comparable<Drug>
 		}
 
 	};
-
-	@Keep
-	static final void onDelete(Drug drug)
-	{
-		for(DoseEvent intake : Database.getAll(DoseEvent.class))
-		{
-			if(intake.getDrug() == null || intake.getDrugId() == drug.id)
-				Database.delete(intake, Database.FLAG_DONT_NOTIFY_LISTENERS);
-		}
-
-		for(Schedule schedule : drug.mSchedules.get())
-			Database.delete(schedule, Database.FLAG_DONT_NOTIFY_LISTENERS);
-	}
 }
