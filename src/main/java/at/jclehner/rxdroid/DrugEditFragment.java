@@ -432,7 +432,10 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			titleResId = R.string._title_end,
 			order = 8,
 			type = DatePreference.class,
-			controller = ScheduleEndPreferenceController.class
+			controller = ScheduleEndPreferenceController.class,
+			reverseDependencies = { "repeat" },
+			fieldDependencies = { "repeatOrigin" }
+
 		)
 		private LocalDate scheduleEnd;
 
@@ -827,11 +830,14 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 				}
 			};
 
-			final AlertDialog datePickerDialog = new DatePickerDialog(mContext,
+
+
+			final DatePickerDialog datePickerDialog = new DatePickerDialog(mContext,
 					LocalDate.fromDateFields(repeatOrigin), onDateSetListener);
 
 			datePickerDialog.setTitle(R.string._title_repetition_origin);
 			datePickerDialog.setCancelable(false);
+			datePickerDialog.setMaxDate((LocalDate) getFieldValue("scheduleEnd"));
 			datePickerDialog.show();
 		}
 
@@ -1021,6 +1027,13 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 					Settings.getDoseTimeInfo().activeDate()).plusDays(1);
 
 			((DatePreference) preference).setMinDate(minDate);
+		}
+
+		@Override
+		public void onDependencyChange(AdvancedDialogPreference preference, String depKey, Object newPrefValue)
+		{
+			super.onDependencyChange(preference, depKey, newPrefValue);
+			((DatePreference) preference).setMinDate(LocalDate.fromDateFields((Date) getFieldValue("repeatOrigin")));
 		}
 
 		@Override
