@@ -113,9 +113,6 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		ab.setDisplayUseLogoEnabled(true);
 		ab.setLogo(R.drawable.ic_logo_padded);
 
-		showBackupAgentRemovalDialogIfNeccessary();
-		showLateAlarmDialogIfNeccessary();
-
 		if(Settings.getBoolean(Settings.Keys.IS_FIRST_LAUNCH, true))
 		{
 			final Intent intent = new Intent(this, DoseTimePreferenceActivity2.class);
@@ -123,14 +120,20 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			startActivity(intent);
 			finish();
 		}
-
-		if(savedInstanceState == null)
-			initDrugListPagerFragment();
 		else
 		{
-			final Fragment f = getSupportFragmentManager().findFragmentByTag("pager");
-			if(f instanceof DrugListPagerFragment)
-				((DrugListPagerFragment) f).setDate(Settings.getDoseTimeInfo().relevantDate(), true);
+			if(savedInstanceState == null)
+				initDrugListPagerFragment();
+			else
+			{
+				final Fragment f = getSupportFragmentManager().findFragmentByTag("pager");
+				if(f instanceof DrugListPagerFragment)
+					((DrugListPagerFragment) f).setDate(Settings.getDoseTimeInfo().relevantDate(), true);
+			}
+
+			// Don't show two dialogs at once
+			if(!showBackupAgentRemovalDialogIfNeccessary())
+				showPowerSaveWarningDialogIfNeccessary();
 		}
 
 		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true);
@@ -242,10 +245,10 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, f, "pager").commit();
 	}
 
-	private void showBackupAgentRemovalDialogIfNeccessary()
+	private boolean showBackupAgentRemovalDialogIfNeccessary()
 	{
 		if(!Settings.getBoolean(Settings.Keys.USE_BACKUP_FRAMEWORK, false))
-			return;
+			return false;
 
 		final AlertDialog.Builder ab = new AlertDialog.Builder(this);
 		ab.setMessage(RefString.resolve(this, R.string._msg_backup_agent_removal));
@@ -260,12 +263,13 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		});
 
 		ab.show();
+		return true;
 	}
 
-	private void showLateAlarmDialogIfNeccessary()
+	private boolean showPowerSaveWarningDialogIfNeccessary()
 	{
 		if(Settings.wasDisplayedOnce("power_save_warning"))
-			return;
+			return false;
 
 		/*final StringBuilder sb = new StringBuilder();
 		sb.append("<p>");
@@ -335,6 +339,8 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				});
 			}
 		}.start();
+
+		return true;
 	}
 
 
