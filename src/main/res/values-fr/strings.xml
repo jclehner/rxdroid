@@ -302,4 +302,7 @@ L\'utilisation de la fonction <b>économie d\'énergie</b> ou <b>tuer les tâche
 		(notifications qui ne sont pas affichées, etc.). Dans ce cas, assurez-vous de
 		soit ajouter une exception pour RxDroid, soit de déactiver ces fonctionnalités ou applications!</string>
   <string name="_msg_backups_detected">RxDroid a détecté des sauvegardes sur cet appareil. Voulez-vous en restaurer une maintenant ?</string>
+  <string name="_msg_constraints_date_between">Choisir une date entre le  %1$s et le %2$s.</string>
+  <string name="_msg_constraints_date_from">Choisir une date à partir du  %1$s.</string>
+  <string name="_msg_constraints_date_before">Choisir une date avant le %2$s.</string>
 </resources>

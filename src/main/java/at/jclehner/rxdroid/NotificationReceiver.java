@@ -87,7 +87,6 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final String EXTRA_IS_ALARM_REPETITION = "at.jclehner.rxdroid.extra.IS_ALARM_REPETITION";
 	static final String EXTRA_FORCE_UPDATE = "at.jclehner.rxdroid.extra.FORCE_UPDATE";
 	static final String EXTRA_REFILL_SNOOZE_DRUGS = "drug_id_list";
-	//static final String EXTRA_NO_WEARABLE_NOTIFICATION = "no_wearable_notification";
 
 	private static final String ACTION_MARK_ALL_AS_TAKEN = "at.jclehner.rxdroid.ACTION_MARK_ALL_AS_TAKEN";
 
@@ -118,6 +117,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
+	private DoseTimeInfo mDtInfo;
 
 	private List<Drug> mAllDrugs;
 
@@ -146,6 +146,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		mContext = context;
 
 		Settings.init();
+		mDtInfo = Settings.getDoseTimeInfo();
 
 		try
 		{
@@ -172,8 +173,9 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 		else if(ACTION_SNOOZE_REFILL_REMINDER.equals(intent.getAction()))
 		{
-			final Date tomorrow = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
-			Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, tomorrow);
+			final Date nextReminderDate = DateTime.add(
+					mDtInfo.relevantDate(), Calendar.DAY_OF_MONTH, 1);
+			Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, nextReminderDate);
 
 			final String drugIds = Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, "");
 			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, drugIds + " " +
@@ -565,7 +567,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				intent.setAction(ACTION_MARK_ALL_AS_TAKEN);
 
 				PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-				
+
 				if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
 				{
 					addAction(builder, new int[] { R.drawable.ic_action_tick_white, R.drawable.ic_wearableaction_tick },
@@ -763,7 +765,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
 		final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
 
-		if(nextRefillReminderDate == null || !date.before(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
+		if(nextRefillReminderDate == null || !mDtInfo.relevantDate().before(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
 		{
 			snoozedDrugIds.clear();
 			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, null);
