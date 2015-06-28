@@ -341,7 +341,7 @@ public final class Settings
 
 	public static Date getOldestPossibleHistoryDate(Date reference)
 	{
-		final int index = getStringAsInt(Keys.HISTORY_SIZE, 2);
+		final int index = getStringAsInt(Keys.HISTORY_SIZE, 1);
 
 		final int field;
 		final int value;
