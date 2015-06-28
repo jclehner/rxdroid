@@ -1,5 +1,7 @@
 ### 0.9.30:
-* Bug fixes
+* Added option to specify an end date for drug schedules
+* New translation: Turkish (Kudret Emre)
+* Fixed bugs and crashes
 
 ### 0.9.29:
 * Disabled "Cloud backup" option
