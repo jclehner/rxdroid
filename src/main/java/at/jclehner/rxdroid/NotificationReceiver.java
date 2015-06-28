@@ -34,7 +34,6 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
 import android.support.v4.app.NotificationManagerCompat;
-import android.text.Html;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -45,7 +44,6 @@ import java.util.List;
 import java.util.Set;
 
 import at.jclehner.androidutils.EventDispatcher;
-import at.jclehner.androidutils.NotificationBuilder;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
@@ -61,6 +59,12 @@ public class NotificationReceiver extends BroadcastReceiver
 {
 	private static final String TAG = NotificationReceiver.class.getSimpleName();
 	private static final boolean LOGV = BuildConfig.DEBUG;
+
+	private static final int[] IDS = {
+			R.id.notification,
+			R.id.notification + 1,
+			R.id.notification + 2
+	};
 
 	private static final boolean USE_WEARABLE_HACK = true && Version.SDK_IS_JELLYBEAN_OR_NEWER;
 
@@ -110,7 +114,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private static final int ID_NORMAL = R.id.notification;
 	private static final int ID_WEARABLE = 1;
-	private static final int ID_ERROR = 2;
+	private static final int ID_ERROR = 5;
 
 	private Context mContext;
 	private AlarmManager mAlarmMgr;
@@ -390,22 +394,78 @@ public class NotificationReceiver extends BroadcastReceiver
 		return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	}
 
-	// FIXME cleanup this mess of a function
 	public void updateNotification(Date date, int doseTime, boolean isActiveDoseTime, int mode)
 	{
-		final List<Drug> drugsWithLowSupplies = new ArrayList<Drug>();
-		final int lowSupplyDrugCount = getDrugsWithLowSupplies(date, doseTime, drugsWithLowSupplies);
-		final int missedDoseCount = getDrugsWithMissedDoses(date, doseTime, isActiveDoseTime);
-		final int dueDoseCount = isActiveDoseTime ? getDrugsWithDueDoses(date, doseTime) : 0;
+		new MyNotificationBuilder(date, doseTime,
+				isActiveDoseTime, mode).update();
+	}
 
-		int titleResId = R.string._title_notification_doses;
-		int icon = R.drawable.ic_stat_normal;
+	class MyNotificationBuilder
+	{
+		private final Date mDate;
+		private final int mMode;
 
-		final StringBuilder sb = new StringBuilder();
-		final String[] lines = new String[2];
+		private final List<Drug> mLowSupplyDrugs = new ArrayList<Drug>();
+		private final int missedDoseCount;
+		private final int dueDoseCount;
 
-		if(missedDoseCount != 0 || dueDoseCount != 0)
+		private boolean mUseGroups = true;
+		private String mGroup = mUseGroups ? "rxdroid" : null;
+
+		private Notification mNtfSummary;
+		private Notification mNtfDoses;
+		private Notification mNtfRefill;
+
+		private CharSequence mTextDoses;
+		private CharSequence mTextRefill;
+
+		private boolean mNoClear = true;
+
+		public MyNotificationBuilder(Date date, int doseTime, boolean isActiveDoseTime, int mode)
 		{
+			mDate = date;
+			mMode = mode;
+
+			getDrugsWithLowSupplies(date, doseTime, mLowSupplyDrugs);
+			missedDoseCount = getDrugsWithMissedDoses(date, doseTime, isActiveDoseTime);
+			dueDoseCount = isActiveDoseTime ? getDrugsWithDueDoses(date, doseTime) : 0;
+		}
+
+		public void update()
+		{
+			buildDosesNotification();
+			buildRefillReminderNotification();
+			buildSummaryNotification();
+
+			final NotificationManagerCompat nm = NotificationManagerCompat.from(mContext);
+			int i = 0;
+
+			if(mTextRefill == null && mTextDoses == null)
+			{
+				cancelNotifications();
+				return;
+			}
+
+			nm.notify(IDS[i], mNtfSummary);
+
+			if(mUseGroups)
+			{
+				for(Notification n : getPages())
+					nm.notify(IDS[++i], n);
+			}
+		}
+
+		private void buildDosesNotification()
+		{
+			if(missedDoseCount == 0 && dueDoseCount == 0)
+			{
+				mNtfDoses = null;
+				mTextDoses = null;
+				return;
+			}
+
+			final StringBuilder sb = new StringBuilder();
+
 			if(dueDoseCount != 0)
 				sb.append(RxDroid.getQuantityString(R.plurals._qmsg_due, dueDoseCount));
 
@@ -417,244 +477,277 @@ public class NotificationReceiver extends BroadcastReceiver
 				sb.append(RxDroid.getQuantityString(R.plurals._qmsg_missed, missedDoseCount));
 			}
 
-			lines[1] = "<b>" + getString(R.string._title_notification_doses) + "</b> " + Util.escapeHtml(sb.toString());
+			mTextDoses = sb.toString();
+
+			final NotificationCompat.Builder nb = createPageBuilder(R.string._title_notification_doses, mTextDoses);
+			addDoseActions(nb);
+			mNtfDoses = nb.build();
 		}
 
-		final boolean isShowingLowSupplyNotificationOnly;
-
-		if(lowSupplyDrugCount != 0)
+		private void buildRefillReminderNotification()
 		{
-			isShowingLowSupplyNotificationOnly = sb.length() == 0;
+			if(mLowSupplyDrugs.size() == 0)
+			{
+				mNtfRefill = null;
+				mTextRefill = null;
+				return;
+			}
 
-			final String msg;
-			final String first = Entries.getDrugName(drugsWithLowSupplies.get(0));
+			final String first = Entries.getDrugName(mLowSupplyDrugs.get(0));
 
-			icon = R.drawable.ic_stat_exclamation;
-
-			//titleResId = R.string._title_notification_low_supplies;
-
-			if(lowSupplyDrugCount == 1)
-				msg = getString(R.string._qmsg_low_supply_single, first);
+			if(mLowSupplyDrugs.size() == 1)
+				mTextRefill = getString(R.string._qmsg_low_supply_single, first);
 			else
 			{
-				final String second = Entries.getDrugName(drugsWithLowSupplies.get(1));
-				msg = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, lowSupplyDrugCount - 1, first, second);
+				final String second = Entries.getDrugName(mLowSupplyDrugs.get(1));
+				mTextRefill = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, mLowSupplyDrugs.size() - 1, first, second);
 			}
 
-			if(isShowingLowSupplyNotificationOnly)
+			final NotificationCompat.Builder nb = createPageBuilder(R.string._title_notification_low_supplies, mTextRefill);
+			addRefillReminderActions(nb, true);
+			mNtfRefill = nb.build();
+		}
+
+		private void buildSummaryNotification()
+		{
+			if(mTextDoses == null && mTextRefill == null)
 			{
-				sb.append(msg);
-				titleResId = R.string._title_notification_low_supplies;
+				mNtfSummary = null;
+				return;
 			}
 
-			lines[0] = "<b>" + getString(R.string._title_notification_low_supplies) + "</b> " + Util.escapeHtml(msg);
-		}
-		else
-			isShowingLowSupplyNotificationOnly = false;
+			final int titleResId = mTextDoses != null ? R.string._title_notification_doses : R.string._title_notification_low_supplies;
+			final int iconResId = mTextRefill != null ? R.drawable.ic_stat_exclamation : R.drawable.ic_stat_normal;
+			final CharSequence contentText = mTextDoses != null ? mTextDoses : mTextRefill;
+			final int priority = mTextDoses != null ? NotificationCompat.PRIORITY_HIGH : NotificationCompat.PRIORITY_DEFAULT;
 
-		final String message = sb.toString();
-		if(message.length() == 0)
-		{
-			cancelNotifications();
-			return;
-		}
+			final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+			builder.setContentIntent(createDrugListIntent(mDate));
+			builder.setTicker(getString(R.string._msg_new_notification));
+			builder.setCategory(NotificationCompat.CATEGORY_ALARM);
+			builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
+			builder.setWhen(0);
 
-		final StringBuilder source = new StringBuilder();
+			builder.setContentTitle(getString(titleResId));
+			builder.setSmallIcon(iconResId);
+			builder.setContentText(contentText);
+			builder.setPriority(priority);
 
-//		final InboxStyle inboxStyle = new InboxStyle();
-//		inboxStyle.setBigContentTitle(getString(R.string.app_name) +
-//				" (" + (dueDoseCount + missedDoseCount + lowSupplyDrugCount) + ")");
+			builder.setStyle(createSummaryStyle());
 
-		int lineCount = 0;
-
-		for(String line : lines)
-		{
-			if(line != null)
+			if(!mUseGroups)
 			{
-				if(lineCount != 0)
-					source.append("\n<br/>\n");
-
-				source.append(line);
-//				inboxStyle.addLine(Html.fromHtml(line));
-				++lineCount;
-			}
-		}
-
-		final NotificationBuilder builder = new NotificationBuilder(mContext);
-		builder.setContentTitle(getString(titleResId));
-		builder.setContentIntent(createDrugListIntent(date));
-		builder.setContentText(message);
-		builder.setTicker(getString(R.string._msg_new_notification));
-		builder.setSmallIcon(icon);
-		builder.setWhen(0);
-		builder.setCategory(NotificationCompat.CATEGORY_ALARM);
-		builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
-		//builder.setHeadsUpMode(NotificationBuilder.HEADS_UP_FLASH);
-
-		if(true)
-		{
-			builder.setPriority(isShowingLowSupplyNotificationOnly ?
-					NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_HIGH);
-		}
-
-		if(mUseWearableHack)
-		{
-			builder.setGroup("rxdroid");
-			builder.setGroupSummary(true);
-		}
-
-		boolean noClear = true;
-
-		if(lineCount > 1)
-		{
-			final BigTextStyle style = new BigTextStyle();
-			style.setBigContentTitle(getString(R.string.app_name));
-			style.bigText(Html.fromHtml(source.toString()));
-			builder.setStyle(style);
-		}
-
-		if(!isShowingLowSupplyNotificationOnly && !Settings.getBoolean(Settings.Keys.USE_SAFE_MODE, false))
-		{
-			Intent intent = new Intent(mContext, NotificationReceiver.class);
-			intent.setAction(ACTION_MARK_ALL_AS_TAKEN);
-
-			PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
-            {
-				addAction(builder, new int[] { R.drawable.ic_action_tick_white, R.drawable.ic_wearableaction_tick },
-						R.string._title_take_all_doses, operation);
-            }
-            else if(Settings.getBoolean(Settings.Keys.SWIPE_TO_TAKE_ALL, false))
-			{
-				builder.setDeleteIntent(operation);
-				noClear = false;
-			}
-		}
-		else if(isShowingLowSupplyNotificationOnly)
-		{
-			// Use simple string like "1 33 56 10231"
-			final StringBuilder drugIds = new StringBuilder();
-			for(Drug drug : drugsWithLowSupplies)
-			{
-				drugIds.append(drug.getId());
-				drugIds.append(' ');
-			}
-
-			final Intent intent = new Intent(mContext, NotificationReceiver.class);
-			intent.setAction(ACTION_SNOOZE_REFILL_REMINDER);
-			intent.putExtra(EXTRA_REFILL_SNOOZE_DRUGS, drugIds.toString());
-			intent.putExtra(EXTRA_DATE, date);
-
-			PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-			if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
-			{
-				addAction(builder, new int[] { R.drawable.ic_action_snooze_white, R.drawable.ic_wearableaction_snooze },
-						R.string._title_remind_tomorrow, operation);
+				builder.extend(new NotificationCompat.WearableExtender()
+						.addPages(getPages()));
 			}
 			else
 			{
-				builder.setDeleteIntent(operation);
-				noClear = false;
+				builder.setGroup(mGroup);
+				builder.setGroupSummary(true);
 			}
+
+			if(!addDoseActions(builder))
+				addRefillReminderActions(builder, false);
+
+			applyNotificationModalities(builder);
+
+			mNtfSummary = builder.build();
+
+			if(mNoClear && mUseGroups)
+				mNtfSummary.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
 		}
 
-		final int currentHash = message.hashCode();
-		final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
-
-		if(mode == NOTIFICATION_FORCE_UPDATE || currentHash != lastHash)
+		private boolean addDoseActions(NotificationCompat.Builder builder)
 		{
-			builder.setOnlyAlertOnce(false);
-			Settings.putInt(Settings.Keys.LAST_MSG_HASH, currentHash);
-		}
-		else
-			builder.setOnlyAlertOnce(true);
-
-		// Prevents low supplies from constantly annoying the user with
-		// notification's sound and/or vibration if alarms are repeated.
-		if(isShowingLowSupplyNotificationOnly)
-			mode = NOTIFICATION_FORCE_SILENT;
-
-		int defaults = 0;
-
-		final String lightColor = Settings.getString(Settings.Keys.NOTIFICATION_LIGHT_COLOR, "");
-		if(lightColor.length() == 0)
-			defaults |= Notification.DEFAULT_LIGHTS;
-		else
-		{
-			try
+			if(mTextDoses != null && !Settings.getBoolean(Settings.Keys.USE_SAFE_MODE, false))
 			{
-				int ledARGB = Integer.parseInt(lightColor, 16);
-				if(ledARGB != 0)
+				final Intent intent = new Intent(mContext, NotificationReceiver.class);
+				intent.setAction(ACTION_MARK_ALL_AS_TAKEN);
+
+				PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				
+				if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
 				{
-					ledARGB |= 0xff000000; // set alpha to ff
-					builder.setLights(ledARGB, LED_ON_MS, LED_OFF_MS);
+					addAction(builder, new int[] { R.drawable.ic_action_tick_white, R.drawable.ic_wearableaction_tick },
+							R.string._title_take_all_doses, operation);
+				}
+				else if(Settings.getBoolean(Settings.Keys.SWIPE_TO_TAKE_ALL, false))
+				{
+					builder.setDeleteIntent(operation);
+					mNoClear = false;
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
+		private void addRefillReminderActions(NotificationCompat.Builder builder, boolean force)
+		{
+			if(force || (mTextDoses == null && mTextRefill != null))
+			{
+				// Use simple string like "1 33 56 10231"
+				final StringBuilder drugIds = new StringBuilder();
+				for(Drug drug : mLowSupplyDrugs)
+				{
+					drugIds.append(drug.getId());
+					drugIds.append(' ');
+				}
+
+				final Intent intent = new Intent(mContext, NotificationReceiver.class);
+				intent.setAction(ACTION_SNOOZE_REFILL_REMINDER);
+				intent.putExtra(EXTRA_REFILL_SNOOZE_DRUGS, drugIds.toString());
+				intent.putExtra(EXTRA_DATE, mDate);
+
+				PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+				if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
+				{
+					addAction(builder, new int[] { R.drawable.ic_action_snooze_white, R.drawable.ic_wearableaction_snooze },
+							R.string._title_remind_tomorrow, operation);
+				}
+				else
+				{
+					builder.setDeleteIntent(operation);
+					mNoClear = false;
 				}
 			}
-			catch(NumberFormatException e)
-			{
-				Log.e(TAG, "Failed to parse light color; using default", e);
-				defaults |= Notification.DEFAULT_LIGHTS;
-			}
 		}
 
-		if(mode != NOTIFICATION_FORCE_SILENT)
+		private void applyNotificationModalities(NotificationCompat.Builder builder)
 		{
-			boolean isNowWithinQuietHours = false;
+			final int currentHash = ("" + mTextDoses + mTextRefill).hashCode();
+			final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
 
-			do
+			int mode = mMode;
+
+			if(mode == NOTIFICATION_FORCE_UPDATE || currentHash != lastHash)
 			{
-				if(!Settings.isChecked(Settings.Keys.QUIET_HOURS, false))
-					break;
-
-				final String quietHoursStr = Settings.getString(Settings.Keys.QUIET_HOURS);
-				if(quietHoursStr == null)
-					break;
-
-				final TimePeriod quietHours = TimePeriod.fromString(quietHoursStr);
-				if(quietHours.contains(DumbTime.now()))
-					isNowWithinQuietHours = true;
-
-			} while(false);
-
-			if(!isNowWithinQuietHours)
-			{
-				final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
-				if(ringtone != null)
-					builder.setSound(Uri.parse(ringtone));
-				else
-					defaults |= Notification.DEFAULT_SOUND;
-
-				if(LOGV) Log.i(TAG, "Sound: " + (ringtone != null ? ringtone.toString() : "(default)"));
+				builder.setOnlyAlertOnce(false);
+				Settings.putInt(Settings.Keys.LAST_MSG_HASH, currentHash);
 			}
 			else
-				Log.i(TAG, "Currently within quiet hours; muting sound...");
-		}
+				builder.setOnlyAlertOnce(true);
 
-		if(mode != NOTIFICATION_FORCE_SILENT && Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true))
-			defaults |= Notification.DEFAULT_VIBRATE;
+			// Prevents low supplies from constantly annoying the user with
+			// notification's sound and/or vibration if alarms are repeated.
+			if(mTextRefill != null && mTextDoses == null)
+				mode = NOTIFICATION_FORCE_SILENT;
 
-		builder.setDefaults(defaults);
+			int defaults = 0;
 
-		final Notification notification = builder.build();
-
-		Log.d(TAG, "noClear=" + noClear);
-
-		if(noClear)
-		{
-			notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
-
-			if(mUseWearableHack)
+			final String lightColor = Settings.getString(Settings.Keys.NOTIFICATION_LIGHT_COLOR, "");
+			if(lightColor.length() == 0)
+				defaults |= Notification.DEFAULT_LIGHTS;
+			else
 			{
-				builder.setOngoing(false);
-				builder.setGroupSummary(false);
-				getNotificationManager().notify(ID_WEARABLE, builder.build());
+				try
+				{
+					int ledARGB = Integer.parseInt(lightColor, 16);
+					if(ledARGB != 0)
+					{
+						ledARGB |= 0xff000000; // set alpha to ff
+						builder.setLights(ledARGB, LED_ON_MS, LED_OFF_MS);
+					}
+				}
+				catch(NumberFormatException e)
+				{
+					Log.e(TAG, "Failed to parse light color; using default", e);
+					defaults |= Notification.DEFAULT_LIGHTS;
+				}
 			}
+
+			if(mode != NOTIFICATION_FORCE_SILENT)
+			{
+				boolean isNowWithinQuietHours = false;
+
+				do
+				{
+					if(!Settings.isChecked(Settings.Keys.QUIET_HOURS, false))
+						break;
+
+					final String quietHoursStr = Settings.getString(Settings.Keys.QUIET_HOURS);
+					if(quietHoursStr == null)
+						break;
+
+					final TimePeriod quietHours = TimePeriod.fromString(quietHoursStr);
+					if(quietHours.contains(DumbTime.now()))
+						isNowWithinQuietHours = true;
+
+				} while(false);
+
+				if(!isNowWithinQuietHours)
+				{
+					final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
+					if(ringtone != null)
+						builder.setSound(Uri.parse(ringtone));
+					else
+						defaults |= Notification.DEFAULT_SOUND;
+
+					if(LOGV) Log.i(TAG, "Sound: " + (ringtone != null ? ringtone.toString() : "(default)"));
+				}
+				else
+					Log.i(TAG, "Currently within quiet hours; muting sound...");
+			}
+
+			if(mode != NOTIFICATION_FORCE_SILENT && Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true))
+				defaults |= Notification.DEFAULT_VIBRATE;
+
+			builder.setDefaults(defaults);
 		}
 
-		//builder.notify(ID_NORMAL);
-		getNotificationManager().notify(ID_NORMAL, notification);
+		private List<Notification> getPages()
+		{
+			final List<Notification> notifications = new ArrayList<Notification>();
+			if(mNtfRefill != null)
+				notifications.add(mNtfRefill);
+			if(mNtfDoses != null)
+				notifications.add(mNtfDoses);
+
+			Log.d(TAG, "getPages: " + notifications.size() + " pages; groupKey=" + mGroup);
+
+			return notifications;
+		}
+
+		private NotificationCompat.Style createSummaryStyle()
+		{
+			if(mTextDoses == null || mTextRefill == null)
+				return null;
+
+			final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
+			style.setBigContentTitle(getString(R.string.app_name));
+			style.addLine(getString(R.string._title_notification_low_supplies) + "   " + mTextRefill);
+			style.addLine(getString(R.string._title_notification_doses) + "   " + mTextDoses);
+
+			return style;
+		}
+
+		private NotificationCompat.Builder createPageBuilder(int titleResId, CharSequence text)
+		{
+			final BigTextStyle style = new NotificationCompat.BigTextStyle();
+			style.setBigContentTitle(getString(titleResId));
+			style.setSummaryText(text);
+
+			return new NotificationCompat.Builder(mContext)
+					.setStyle(style)
+					.setContentTitle(getString(titleResId))
+					.setContentText(text)
+					.setGroup(mGroup)
+					.setGroupSummary(false)
+					.setSmallIcon(R.drawable.ic_stat_normal);
+		}
+
+		private void addAction(NotificationCompat.Builder builder, int[] icons, int titleResId, PendingIntent operation)
+		{
+			builder.addAction(icons[0], getString(titleResId), operation);
+			builder.extend(new NotificationCompat.WearableExtender().addAction(
+					buildAction(icons[1], titleResId, operation)));
+		}
+
+		private NotificationCompat.Action buildAction(int icon, int titleResId, PendingIntent operation) {
+			return new NotificationCompat.Action.Builder(icon, getString(titleResId), operation).build();
+		}
 	}
 
 	private  int getDrugsWithDueDoses(Date date, int doseTime) {
@@ -663,17 +756,6 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private int getDrugsWithMissedDoses(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime) {
 		return Entries.getDrugsWithMissedDoses(mAllDrugs, date, activeOrNextDoseTime, isActiveDoseTime, null);
-	}
-
-	private void addAction(NotificationCompat.Builder builder, int[] icons, int titleResId, PendingIntent operation)
-	{
-		builder.addAction(icons[0], getString(titleResId), operation);
-		builder.extend(new NotificationCompat.WearableExtender().addAction(
-				buildAction(icons[1], titleResId, operation)));
-	}
-
-	private NotificationCompat.Action buildAction(int icon, int titleResId, PendingIntent operation) {
-		return new NotificationCompat.Action.Builder(icon, getString(titleResId), operation).build();
 	}
 
 	private int getDrugsWithLowSupplies(Date date, int doseTime, List<Drug> outDrugs)
@@ -726,8 +808,11 @@ public class NotificationReceiver extends BroadcastReceiver
 	/* package */ static void cancelNotifications()
 	{
 		final NotificationManagerCompat nm = NotificationManagerCompat.from(RxDroid.getContext());
-		nm.cancel(ID_NORMAL);
-		nm.cancel(ID_WEARABLE);
+
+		for(int id : IDS)
+			nm.cancel(id);
+
+		nm.cancel(R.id.notification);
 	}
 
 	/* package */ static void rescheduleAlarmsAndUpdateNotification(boolean silent) {
