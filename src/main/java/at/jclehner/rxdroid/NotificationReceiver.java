@@ -174,7 +174,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		else if(ACTION_SNOOZE_REFILL_REMINDER.equals(intent.getAction()))
 		{
 			final Date nextReminderDate = DateTime.add(
-					mDtInfo.relevantDate(), Calendar.DAY_OF_MONTH, 1);
+					mDtInfo.displayDate(), Calendar.DAY_OF_MONTH, 1);
 			Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, nextReminderDate);
 
 			final String drugIds = Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, "");
@@ -765,7 +765,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
 		final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
 
-		if(nextRefillReminderDate == null || !mDtInfo.relevantDate().before(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
+		if(nextRefillReminderDate == null || !mDtInfo.displayDate().before(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
 		{
 			snoozedDrugIds.clear();
 			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, null);

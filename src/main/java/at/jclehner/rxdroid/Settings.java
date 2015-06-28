@@ -43,16 +43,11 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.joda.time.LocalDate;
-
-import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
-import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
-import at.jclehner.rxdroid.util.Millis;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public final class Settings
@@ -475,8 +470,8 @@ public final class Settings
 			return mActiveDate;
 		}
 
-		public Date relevantDate() {
-			return mRelevantDate;
+		public Date displayDate() {
+			return mDisplayDate;
 		}
 
 		public Date nextDoseTimeDate() {
@@ -531,7 +526,7 @@ public final class Settings
 		private Calendar mCurrentTime;
 		private Date mCurrentDate;
 		private Date mActiveDate;
-		private Date mRelevantDate;
+		private Date mDisplayDate;
 		private Date mNextDoseTimeDate;
 		private int mActiveDoseTime;
 		private int mNextDoseTime;
@@ -589,10 +584,10 @@ public final class Settings
 			if(useNextDay)
 				dtInfo.mNextDoseTimeDate = DateTime.add(dtInfo.mNextDoseTimeDate, Calendar.DAY_OF_MONTH, 1);
 
-			dtInfo.mRelevantDate = DateTime.add(dtInfo.mNextDoseTimeDate, Calendar.DAY_OF_MONTH, -1);
+			dtInfo.mDisplayDate = DateTime.add(dtInfo.mNextDoseTimeDate, Calendar.DAY_OF_MONTH, -1);
 		}
 		else
-			dtInfo.mRelevantDate = dtInfo.mActiveDate;
+			dtInfo.mDisplayDate = dtInfo.mActiveDate;
 
 		return dtInfo;
 	}
