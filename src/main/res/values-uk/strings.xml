@@ -306,4 +306,18 @@
   <string name="_btn_skip">Пропустити</string>
   <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">Виберіть номер</string>
+  <string name="_title_auto_dose_events">Автоматичні дози</string>
+  <string name="_msg_backup_agent_removal">
+		Функцію \"[@string/_title_use_backup_framework]\" вимкнуто, оскільки вона виявилась ненадійною. Натомість використовуйте ручне резервне копіювання,
+		розташоване тут: \"[@string/_title_preferences]\" → \"[@string/_title_database]\" →
+		\"[@string/_title_backup_restore]\"!
+	</string>
+  <string name="_msg_power_save_warning">
+Використання функції <b>економії енергії</b> або <b>таск-кіллерів</b> може завадити RxDroid в роботі
+як передбачалось (не відображаються сповіщення і т.д.). У цьому випадку, не забудьте додати RxDroid як виняток, або вимкнути такі функції чи програми!	</string>
+  <string name="_msg_backups_detected">
+RxDroid виявив резервні копії на цьому пристрої. Відновити одну зараз?	</string>
+  <string name="_msg_constraints_date_between">Виберіть дату між %1$s і %2$s.</string>
+  <string name="_msg_constraints_date_from">Виберіть дату від %1$s.</string>
+  <string name="_msg_constraints_date_before">Виберіть дату перед %2$s.</string>
 </resources>

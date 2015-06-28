@@ -321,4 +321,7 @@
   <string name="_msg_backups_detected">
 		RxDroid bu cihazdaki yedekler buldu. Bir tanesi geri yüklensin mi?
 	</string>
+  <string name="_msg_constraints_date_between">%1$s ve %2$s arasında bir tarih seçin.</string>
+  <string name="_msg_constraints_date_from">%1$s tarihinden sonraki bir tarih seçin.</string>
+  <string name="_msg_constraints_date_before">%2$s tarihinden önceki bir tarih seçin.</string>
 </resources>

@@ -307,4 +307,7 @@
 <b>省電力</b> 機能や <b>タスクキラー</b> アプリを使用すると、RxDroid が意図したとおりに機能しないことがあります (通知が表示されないなど)。その場合には、そのような機能やアプリで RxDroid に対して例外を追加するか、無効にするようにしてください!</string>
   <string name="_msg_backups_detected">
 RxDroid が、このデバイス上でバックアップを検出しました。今すぐ復元しますか?</string>
+  <string name="_msg_constraints_date_between">%1$s から %2$s の間で日付を選択してください。</string>
+  <string name="_msg_constraints_date_from">%1$s 以降の日付を選択してください。</string>
+  <string name="_msg_constraints_date_before">%2$s 以前の日付を選択してください。</string>
 </resources>
