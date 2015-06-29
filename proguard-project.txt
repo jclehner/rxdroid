@@ -1,5 +1,6 @@
 -keepattributes **
 -keep class !android.support.v7.internal.view.menu.**,** {*;}
+-dontwarn android.support.**
 -dontwarn org.joda.convert.**
 -dontpreverify
 -dontoptimize
