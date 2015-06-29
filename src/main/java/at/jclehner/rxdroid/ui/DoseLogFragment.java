@@ -43,6 +43,9 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.joda.time.LocalDate;
+
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity2;
@@ -266,7 +269,10 @@ public class DoseLogFragment extends ExpandableListFragment
 
 		if((flags & SHOW_MISSED) != 0)
 		{
-			while(!date.after(mToday))
+			final LocalDate scheduleEnd = drug.getScheduleEndDate();
+			final Date lastDate = scheduleEnd != null ? scheduleEnd.toDate() : mToday;
+
+			while(!date.after(lastDate))
 			{
 				if(lastScheduleUpdateDate == null || !date.before(lastScheduleUpdateDate))
 				{
