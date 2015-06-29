@@ -574,7 +574,6 @@ public final class Settings
 			}
 			else if(dtInfo.mActiveDoseTime == Schedule.TIME_NIGHT)
 				useNextDay = true;
-
 			else
 			{
 				Log.w(TAG, "W00t? This was unexpected...");
@@ -583,9 +582,18 @@ public final class Settings
 
 			if(useNextDay)
 				dtInfo.mNextDoseTimeDate = DateTime.add(dtInfo.mNextDoseTimeDate, Calendar.DAY_OF_MONTH, 1);
-
-			dtInfo.mDisplayDate = DateTime.add(dtInfo.mNextDoseTimeDate, Calendar.DAY_OF_MONTH, -1);
 		}
+
+		long morningBegOffset = getDoseTimeBeginOffset(Schedule.TIME_MORNING);
+		long nightEndOffset = getDoseTimeEndOffset(Schedule.TIME_NIGHT);
+
+		if(nightEndOffset > morningBegOffset)
+			morningBegOffset += Constants.MILLIS_PER_DAY;
+
+		// Check if we're more than half way between the end of TIME_NIGHT and the begin of TIME_MORNING
+
+		if(DateTime.getOffsetFromMidnight(currentTime) < ((morningBegOffset - nightEndOffset) / 2))
+			dtInfo.mDisplayDate = DateTime.add(dtInfo.mNextDoseTimeDate, Calendar.DAY_OF_MONTH, -1);
 		else
 			dtInfo.mDisplayDate = dtInfo.mActiveDate;
 
