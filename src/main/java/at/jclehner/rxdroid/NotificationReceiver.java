@@ -34,6 +34,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
 import android.support.v4.app.NotificationManagerCompat;
+import android.text.Html;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -440,13 +441,14 @@ public class NotificationReceiver extends BroadcastReceiver
 			buildSummaryNotification();
 
 			final NotificationManagerCompat nm = NotificationManagerCompat.from(mContext);
-			int i = 0;
 
-			if(mTextRefill == null && mTextDoses == null)
+			if(mNtfSummary == null)
 			{
 				cancelNotifications();
 				return;
 			}
+
+			int i = 0;
 
 			nm.notify(IDS[i], mNtfSummary);
 
@@ -482,6 +484,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			mTextDoses = sb.toString();
 
 			final NotificationCompat.Builder nb = createPageBuilder(R.string._title_notification_doses, mTextDoses);
+			nb.setPriority(NotificationCompat.PRIORITY_HIGH);
 			addDoseActions(nb);
 			mNtfDoses = nb.build();
 		}
@@ -639,6 +642,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			int defaults = 0;
 
+			boolean usesLed = true;
 			final String lightColor = Settings.getString(Settings.Keys.NOTIFICATION_LIGHT_COLOR, "");
 			if(lightColor.length() == 0)
 				defaults |= Notification.DEFAULT_LIGHTS;
@@ -652,12 +656,20 @@ public class NotificationReceiver extends BroadcastReceiver
 						ledARGB |= 0xff000000; // set alpha to ff
 						builder.setLights(ledARGB, LED_ON_MS, LED_OFF_MS);
 					}
+					else
+						usesLed = false;
 				}
 				catch(NumberFormatException e)
 				{
 					Log.e(TAG, "Failed to parse light color; using default", e);
 					defaults |= Notification.DEFAULT_LIGHTS;
 				}
+			}
+
+			if(usesLed)
+			{
+				addDefaults(mNtfDoses, Notification.DEFAULT_LIGHTS);
+				addDefaults(mNtfRefill, Notification.DEFAULT_LIGHTS);
 			}
 
 			if(mode != NOTIFICATION_FORCE_SILENT)
@@ -687,6 +699,9 @@ public class NotificationReceiver extends BroadcastReceiver
 					else
 						defaults |= Notification.DEFAULT_SOUND;
 
+					addDefaults(mNtfDoses, Notification.DEFAULT_SOUND);
+					addDefaults(mNtfRefill, Notification.DEFAULT_SOUND);
+
 					if(LOGV) Log.i(TAG, "Sound: " + (ringtone != null ? ringtone.toString() : "(default)"));
 				}
 				else
@@ -694,9 +709,19 @@ public class NotificationReceiver extends BroadcastReceiver
 			}
 
 			if(mode != NOTIFICATION_FORCE_SILENT && Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true))
+			{
 				defaults |= Notification.DEFAULT_VIBRATE;
+				addDefaults(mNtfSummary, Notification.DEFAULT_VIBRATE);
+				addDefaults(mNtfRefill, Notification.DEFAULT_VIBRATE);
+			}
 
 			builder.setDefaults(defaults);
+		}
+
+		private void addDefaults(Notification notification, int defaults)
+		{
+			if(notification != null)
+				notification.defaults |= defaults;
 		}
 
 		private List<Notification> getPages()
@@ -719,8 +744,8 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
 			style.setBigContentTitle(getString(R.string.app_name));
-			style.addLine(getString(R.string._title_notification_low_supplies) + "   " + mTextRefill);
-			style.addLine(getString(R.string._title_notification_doses) + "   " + mTextDoses);
+			style.addLine(createLine(R.string._title_notification_low_supplies, mTextRefill));
+			style.addLine(createLine(R.string._title_notification_doses, mTextDoses));
 
 			return style;
 		}
@@ -749,6 +774,10 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		private NotificationCompat.Action buildAction(int icon, int titleResId, PendingIntent operation) {
 			return new NotificationCompat.Action.Builder(icon, getString(titleResId), operation).build();
+		}
+
+		private CharSequence createLine(int titleResId, CharSequence text) {
+			return Html.fromHtml("<b>" + mContext.getString(titleResId) + "</b> " + text);
 		}
 	}
 
@@ -813,8 +842,6 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		for(int id : IDS)
 			nm.cancel(id);
-
-		nm.cancel(R.id.notification);
 	}
 
 	/* package */ static void rescheduleAlarmsAndUpdateNotification(boolean silent) {
