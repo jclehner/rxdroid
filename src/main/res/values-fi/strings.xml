@@ -296,8 +296,20 @@ Valitettavasti RxDroid kaatui. Ilmoita asiasta, jotta ongelma voidaan korjata.</
   <string name="_msg_comment">Valinnainen kommentti:</string>
   <string name="_title_history">Historia</string>
   <string name="_btn_skip">Ohita</string>
+  <string name="dialog_set_number">@string/_btn_set</string>
   <string name="dialog_cancel">@android:string/cancel</string>
   <string name="dialog_picker_title">Valitse määrä</string>
   <string name="_title_auto_dose_events">Ota automaattisesti</string>
   <string name="_msg_backup_agent_removal"> \"[@string/_title_use_backup_framework]\"-vaihtoehto on poistettu käytöstä, koska se on osoittautunut epäluotettaviksi. Käytä manuaalista varmuuskopiointivaihtoehtoa sen sijaan. Se sijaitsee \"[@string/_title_preferences]\" → \"[@string/_title_database]\" → \"[@string/_title_backup_restore]\"!  </string>
+  <string name="_msg_power_save_warning">
+		<b>Virranhallintasovellukset</b> tai <b>tehtävänhallintaohjelmat</b> voivat aiheuttaa
+                RxDroidin virheelistä toimintaa  (muistutukset eivät toimi tms.)
+                Mikäli huomaat häiriöitä, laita RxDroid ohjelman poikkeuslistalle tai älä käytä ao. ohjelmia! 
+	</string>
+  <string name="_msg_backups_detected">
+		RxDroid havaitsi varmuuskopioita tällä laitteella. Palautetaanko nyt?
+	</string>
+  <string name="_msg_constraints_date_between">Valitse päiväys väliltä %1$s ja %2$s.</string>
+  <string name="_msg_constraints_date_from">Valitse päiväys %1$s jälkeen.</string>
+  <string name="_msg_constraints_date_before">Valitse päiväys ennen %2$s.</string>
 </resources>
