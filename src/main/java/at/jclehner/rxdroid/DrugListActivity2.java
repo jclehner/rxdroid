@@ -31,7 +31,9 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -1192,6 +1194,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		{
 			super.onLoadFinished(data);
 			setEmptyText(getEmptyText());
+
 			showHelpOverlaysIfApplicable(false);
 		}
 
@@ -1221,6 +1224,11 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				Date date = dtInfo.displayDate();
 				final Drug drug;
 
+				// Save the activity, because if we call setDate() below, our current fragment
+				// will be detached, and getActivity() might return null, thus crashing
+				// ShowcaseView below!
+				final FragmentActivity activity = getActivity();
+
 				if(force)
 				{
 					final DoseView dv = (DoseView) getActivity().findViewById(R.id.morning);
@@ -1231,18 +1239,28 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				}
 				else
 				{
+					// FIXME this is bad!
+
 					drug = drugs.get(0);
 
-					while(!drug.hasDoseOnDate(date))
+					int i = 0;
+
+					while(!drug.hasDoseOnDate(date) && ++i < 60)
 					{
 						date = DateTime.add(date, Calendar.DAY_OF_MONTH, 1);
-						//Log.i(TAG, "Trying date " + DateTime.toDateString(date) + " for " + drug);
-						//Log.i(TAG, "Trying date " + DateTime.toDateString(date) + " for " + drug);
 					}
 
-					final Fragment f = getFragmentManager().findFragmentByTag("pager");
+					if(i == 60)
+					{
+						Log.w(TAG, "Next date with dose not found");
+						return;
+					}
+
+					final Fragment f = activity.getSupportFragmentManager().findFragmentByTag("pager");
 					if(f instanceof DrugListPagerFragment)
 						((DrugListPagerFragment) f).setDate(date, false);
+					else
+						Log.w(TAG, "Found fragment is not of expected type: " + f);
 				}
 
 				int doseToHighlight = R.id.noon;
@@ -1260,7 +1278,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 				// 1. Swipe date
 
-				ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(getActivity());
+				ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(activity);
 				svb.setText(R.string._help_title_swipe_date, R.string._help_msg_swipe_date);
 				/*svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 				svb.setShowcaseId(0xdeadbeef + 0);
@@ -1278,20 +1296,20 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				svs.add(tag(svb.build(), "Swipe date"));
 
 				// 2. Edit drug
-				svb = new ShowcaseViewBuilder2(getActivity());
+				svb = new ShowcaseViewBuilder2(activity);
 				svb.setText(R.string._help_title_edit_drug, R.string._help_msg_edit_drug);
 				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 				//svb.setShowcaseId(0xdeadbeef + 1);
-				svb.setShowcaseView(R.id.drug_icon, getActivity());
+				svb.setShowcaseView(R.id.drug_icon, activity);
 
 				svs.add(tag(svb.build(false), "Edit drug"));
 
 				// 3. Take dose & long press
-				svb = new ShowcaseViewBuilder2(getActivity());
+				svb = new ShowcaseViewBuilder2(activity);
 				svb.setText(R.string._help_title_click_dose, R.string._help_msg_click_dose);
 				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
 				//svb.setShowcaseId(0xdeadbeef + 4);
-				svb.setShowcaseView(doseToHighlight, getActivity());
+				svb.setShowcaseView(doseToHighlight, activity);
 
 				svs.add(tag(svb.build(false), "Take dose & long press"));
 
