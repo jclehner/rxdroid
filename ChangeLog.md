@@ -1,5 +1,6 @@
 ### 0.9.30:
 * Added option to specify an end date for drug schedules
+* Better Wear notifications
 * New translation: Turkish (Kudret Emre)
 * Fixed bugs and crashes
 
