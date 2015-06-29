@@ -444,9 +444,11 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			if(mNtfSummary == null)
 			{
-				cancelNotifications();
+				cancelAllNotifications();
 				return;
 			}
+			else
+				cancelWearNotifications();
 
 			int i = 0;
 
@@ -457,6 +459,14 @@ public class NotificationReceiver extends BroadcastReceiver
 				for(Notification n : getPages())
 					nm.notify(IDS[++i], n);
 			}
+		}
+
+		private void cancelWearNotifications()
+		{
+			final NotificationManagerCompat nm = NotificationManagerCompat.from(mContext);
+
+			for(int i = 1; i != IDS.length; ++i)
+				nm.cancel(IDS[i]);
 		}
 
 		private void buildDosesNotification()
@@ -836,7 +846,7 @@ public class NotificationReceiver extends BroadcastReceiver
         return NotificationManagerCompat.from(mContext);
 	}
 
-	/* package */ static void cancelNotifications()
+	/* package */ static void cancelAllNotifications()
 	{
 		final NotificationManagerCompat nm = NotificationManagerCompat.from(RxDroid.getContext());
 

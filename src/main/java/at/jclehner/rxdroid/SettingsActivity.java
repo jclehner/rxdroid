@@ -1,9 +1,7 @@
 package at.jclehner.rxdroid;
 
 import android.annotation.TargetApi;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,6 +27,8 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import net.lingala.zip4j.exception.ZipException;
+
+import org.joda.time.LocalDate;
 
 import java.io.File;
 import java.io.IOException;
@@ -278,7 +278,7 @@ public class SettingsActivity extends ActionBarActivity
 				if(useSafeMode)
 					sharedPreferences.edit().putBoolean(Settings.Keys.SKIP_DOSE_DIALOG, false).commit();
 
-				NotificationReceiver.cancelNotifications();
+				NotificationReceiver.cancelAllNotifications();
 			}
 			else if(Settings.Keys.LAST_MSG_HASH.equals(key)
 					|| Settings.Keys.NEXT_REFILL_REMINDER_DATE.equals(key)
@@ -593,6 +593,28 @@ public class SettingsActivity extends ActionBarActivity
 						drug.setRepeatArg(3);
 						drug.setRepeatOrigin(DateTime.add(DateTime.today(), Calendar.DAY_OF_MONTH, -2));
 						drug.setLastScheduleUpdateDate(drug.getRepeatOrigin());
+
+						Database.create(drug);
+
+						return true;
+					}
+				});
+			}
+
+			p = findPreference("key_add_drug_past_schedule_end_date");
+			if(p != null)
+			{
+				p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+					@Override
+					public boolean onPreferenceClick(Preference preference)
+					{
+						final Drug drug = new Drug();
+						final LocalDate end = LocalDate.now().minusDays(2);
+
+						drug.setName("PastEndDate #" + Database.countAll(Drug.class));
+						drug.setScheduleEndDate(end);
+						drug.setDose(Schedule.TIME_MORNING, new Fraction(1, 2));
+						drug.setLastScheduleUpdateDate(end.minusDays(9).toDate());
 
 						Database.create(drug);
 
