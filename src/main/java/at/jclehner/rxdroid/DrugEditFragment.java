@@ -209,7 +209,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		if(mWrapper.refillSize == 0)
 			mWrapper.currentSupply = Fraction.ZERO;
 
-		if(mIsEditing && DateTime.getOffsetFromMidnight(mWrapper.repeatOrigin) != 0)
+		if(mIsEditing && mWrapper.repeatOrigin != null && DateTime.getOffsetFromMidnight(mWrapper.repeatOrigin) != 0)
 		{
 			if(BuildConfig.DEBUG)
 			{
