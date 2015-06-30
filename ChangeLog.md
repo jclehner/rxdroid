@@ -1,3 +1,6 @@
+### 0.9.30.2:
+* Fix crash on ancient Android versions
+
 ### 0.9.30.1:
 * Fix crash
 
