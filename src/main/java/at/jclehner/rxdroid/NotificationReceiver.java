@@ -394,7 +394,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		//intent.putExtra(DrugListActivity2.EXTRA_DATE, date);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	public void updateNotification(Date date, int doseTime, boolean isActiveDoseTime, int mode)
@@ -772,6 +772,7 @@ public class NotificationReceiver extends BroadcastReceiver
 					.setContentText(text)
 					.setGroup(mGroup)
 					.setGroupSummary(false)
+					.setContentIntent(createDrugListIntent(mDate))
 					.setSmallIcon(R.drawable.ic_stat_normal);
 		}
 
