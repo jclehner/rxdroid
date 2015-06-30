@@ -619,6 +619,32 @@ public class Drug extends Entry implements Comparable<Drug>
 		scheduleEndDate = date != null ? date.toDate() : null;
 	}
 
+	public LocalDate getNextScheduledDate(LocalDate reference)
+	{
+		if(repeatMode == REPEAT_DAILY)
+			return reference;
+
+		final int maxLoopDays;
+
+		if(repeatMode == REPEAT_21_7)
+			maxLoopDays = 28;
+		else if(repeatMode == REPEAT_EVERY_N_DAYS)
+			maxLoopDays = (int) repeatArg;
+		else if(repeatMode == REPEAT_WEEKDAYS)
+			maxLoopDays = 7;
+		else
+			throw new UnsupportedOperationException("repeatMode=" + repeatMode);
+
+		for(int i = 0; i != maxLoopDays; ++i)
+		{
+			final LocalDate date = reference.plusDays(i);
+			if(hasDoseOnDate(date.toDate()))
+				return date;
+		}
+
+		return null;
+	}
+
 //	public Date getLastDosesClearedDate() {
 //		return lastDosesClearedDate;
 //	}

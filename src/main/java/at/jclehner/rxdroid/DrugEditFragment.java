@@ -46,6 +46,8 @@ import android.support.v4.preference.PreferenceFragment;
 import android.support.v4.view.MenuItemCompat;
 
 import at.jclehner.androidutils.ActionBarActivity;
+
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -59,6 +61,7 @@ import android.widget.Toast;
 import org.joda.time.LocalDate;
 
 import at.jclehner.androidutils.AdvancedDialogPreference;
+import at.jclehner.androidutils.Reflect;
 import at.jclehner.androidutils.otpm.AdvancedDialogPreferenceController;
 import at.jclehner.androidutils.otpm.CheckboxPreferenceController;
 import at.jclehner.androidutils.otpm.DialogPreferenceController;
@@ -80,6 +83,7 @@ import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.SimpleBitSet;
 import at.jclehner.rxdroid.util.Util;
+import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 /**
  * Edit a drug's database entry.
@@ -205,30 +209,24 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		if(mWrapper.refillSize == 0)
 			mWrapper.currentSupply = Fraction.ZERO;
 
-		OTPM.mapToPreferenceHierarchy(getPreferenceScreen(), mWrapper);
-		getPreferenceScreen().setOnPreferenceChangeListener(mListener);
-
-		if(!mIsEditing)
+		if(mIsEditing && DateTime.getOffsetFromMidnight(mWrapper.repeatOrigin) != 0)
 		{
-			final Preference p = findPreference("active");
-			if(p != null)
-				p.setEnabled(false);
+			if(BuildConfig.DEBUG)
+			{
+				Toast.makeText(getActivity(), "repeatOrigin=" + mWrapper.repeatOrigin,
+						Toast.LENGTH_LONG).show();
+			}
+
+			Log.i(TAG, "Drug has invalid repeatOrigin: " + mWrapper.repeatOrigin);
+
+			if(!fixInvalidRepeatOrigin(drug))
+				return;
+
+			mWrapper.repeatOrigin = drug.getRepeatOrigin();
+			mDrugHash = drug.hashCode();
 		}
 
-		if(mWrapper.refillSize == 0)
-		{
-			final Preference p = findPreference("currentSupply");
-			if(p != null)
-				p.setEnabled(false);
-		}
-
-		if(mFocusOnCurrentSupply)
-		{
-			Log.i(TAG, "Will focus on current supply preference");
-			performPreferenceClick("currentSupply");
-		}
-
-		getActivity().supportInvalidateOptionsMenu();
+		updatePreferenceHierarchy();
 	}
 
 	@Override
@@ -281,6 +279,99 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 
 	private void setActivityTitle(int resId) {
 		((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(resId);
+	}
+
+	private boolean fixInvalidRepeatOrigin(final Drug drug)
+	{
+		final LocalDate dateOnly = LocalDate.fromDateFields(drug.getRepeatOrigin());
+
+		if(fixInvalidRepeatOrigin(drug, dateOnly))
+			return true;
+		else if(fixInvalidRepeatOrigin(drug, drug.getNextScheduledDate(LocalDate.now())))
+			return true;
+		else
+		{
+			final DatePickerDialog dialog = new DatePickerDialog(
+					getActivity(), dateOnly, new DatePickerDialog.OnDateSetListener() {
+				@Override
+				public void onDateSet(DatePickerDialog dialog, LocalDate date)
+				{
+					updateRepeatOrigin(drug, date);
+					updatePreferenceHierarchy();
+				}
+			});
+			dialog.setTitle(R.string._title_repetition_origin);
+			dialog.setCancelable(false);
+			dialog.show();
+			return false;
+		}
+	}
+
+	private boolean fixInvalidRepeatOrigin(Drug drug, LocalDate reference)
+	{
+		if(reference == null)
+			return false;
+
+		final Date invalidRepeatOrigin = drug.getRepeatOrigin();
+
+		for(int i = 0; i != 2; ++i)
+		{
+			final LocalDate date = reference.plusDays(i);
+			if(drug.hasDoseOnDate(date.toDate()))
+			{
+				updateRepeatOrigin(drug, date);
+				Log.i(TAG, "Updated invalid repeatOrigin: " + drug.getRepeatOrigin());
+				return true;
+			}
+		}
+
+		try
+		{
+			Reflect.setFieldValue(Drug.class.getDeclaredField("repeatOrigin"), drug, invalidRepeatOrigin);
+		}
+		catch(NoSuchFieldException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
+
+		return false;
+	}
+
+	private void updateRepeatOrigin(Drug drug, LocalDate repeatOrigin)
+	{
+		final Date scheduleBegin = drug.getLastScheduleUpdateDate();
+		drug.setRepeatOrigin(repeatOrigin.toDate());
+		drug.setLastScheduleUpdateDate(scheduleBegin);
+
+		Database.update(drug);
+	}
+
+	private void updatePreferenceHierarchy()
+	{
+		OTPM.mapToPreferenceHierarchy(getPreferenceScreen(), mWrapper);
+		getPreferenceScreen().setOnPreferenceChangeListener(mListener);
+
+		if(!mIsEditing)
+		{
+			final Preference p = findPreference("active");
+			if(p != null)
+				p.setEnabled(false);
+		}
+
+		if(mWrapper.refillSize == 0)
+		{
+			final Preference p = findPreference("currentSupply");
+			if(p != null)
+				p.setEnabled(false);
+		}
+
+		if(mFocusOnCurrentSupply)
+		{
+			Log.i(TAG, "Will focus on current supply preference");
+			performPreferenceClick("currentSupply");
+		}
+
+		getActivity().supportInvalidateOptionsMenu();
 	}
 
 	private void showDrugDeleteDialog()
@@ -546,8 +637,6 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 
 			name = drug.getName();
 			form = drug.getIcon();
-
-			if(LOGV) Log.v(TAG, "DrugWrapper.set: repeatOrigin=" + repeatOrigin);
 		}
 
 		public Drug get()
