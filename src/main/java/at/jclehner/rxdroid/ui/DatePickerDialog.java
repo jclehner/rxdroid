@@ -211,7 +211,10 @@ public class DatePickerDialog extends AlertDialog implements
 	private void updateMessage()
 	{
 		if(mShowConstraintMessage)
-			setMessage(Html.fromHtml("<small>" + getConstraintMessage() + "</small>"));
+		{
+			final String msg = getConstraintMessage();
+			setMessage(msg != null ? Html.fromHtml("<small>" + msg + "</small>") : null);
+		}
 	}
 
 	private String getConstraintMessage()
