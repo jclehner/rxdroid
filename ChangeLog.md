@@ -1,3 +1,6 @@
+### 0.9.30.1:
+* Fix crash
+
 ### 0.9.30:
 * Added option to specify an end date for drug schedules
 * Better Wear notifications
