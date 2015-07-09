@@ -652,7 +652,6 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			int defaults = 0;
 
-			boolean usesLed = true;
 			final String lightColor = Settings.getString(Settings.Keys.NOTIFICATION_LIGHT_COLOR, "");
 			if(lightColor.length() == 0)
 				defaults |= Notification.DEFAULT_LIGHTS;
@@ -666,20 +665,12 @@ public class NotificationReceiver extends BroadcastReceiver
 						ledARGB |= 0xff000000; // set alpha to ff
 						builder.setLights(ledARGB, LED_ON_MS, LED_OFF_MS);
 					}
-					else
-						usesLed = false;
 				}
 				catch(NumberFormatException e)
 				{
 					Log.e(TAG, "Failed to parse light color; using default", e);
 					defaults |= Notification.DEFAULT_LIGHTS;
 				}
-			}
-
-			if(usesLed)
-			{
-				addDefaults(mNtfDoses, Notification.DEFAULT_LIGHTS);
-				addDefaults(mNtfRefill, Notification.DEFAULT_LIGHTS);
 			}
 
 			if(mode != NOTIFICATION_FORCE_SILENT)
@@ -709,9 +700,6 @@ public class NotificationReceiver extends BroadcastReceiver
 					else
 						defaults |= Notification.DEFAULT_SOUND;
 
-					addDefaults(mNtfDoses, Notification.DEFAULT_SOUND);
-					addDefaults(mNtfRefill, Notification.DEFAULT_SOUND);
-
 					if(LOGV) Log.i(TAG, "Sound: " + (ringtone != null ? ringtone.toString() : "(default)"));
 				}
 				else
@@ -719,19 +707,9 @@ public class NotificationReceiver extends BroadcastReceiver
 			}
 
 			if(mode != NOTIFICATION_FORCE_SILENT && Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true))
-			{
 				defaults |= Notification.DEFAULT_VIBRATE;
-				addDefaults(mNtfSummary, Notification.DEFAULT_VIBRATE);
-				addDefaults(mNtfRefill, Notification.DEFAULT_VIBRATE);
-			}
 
 			builder.setDefaults(defaults);
-		}
-
-		private void addDefaults(Notification notification, int defaults)
-		{
-			if(notification != null)
-				notification.defaults |= defaults;
 		}
 
 		private List<Notification> getPages()
