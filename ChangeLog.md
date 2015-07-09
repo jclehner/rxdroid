@@ -1,3 +1,6 @@
+### 0.9.30.3:
+* Fix notification issues
+
 ### 0.9.30.2:
 * Fix crash on ancient Android versions
 
