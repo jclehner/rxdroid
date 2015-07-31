@@ -1122,7 +1122,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		public void onDependencyChange(AdvancedDialogPreference preference, String depKey, Object newPrefValue)
 		{
 			super.onDependencyChange(preference, depKey, newPrefValue);
-			((DatePreference) preference).setMinDate(LocalDate.fromDateFields((Date) getFieldValue("repeatOrigin")));
+			((DatePreference) preference).setMinDate(DateTime.fromDateFields(repeatOrigin));
 		}
 
 		@Override

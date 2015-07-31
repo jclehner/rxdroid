@@ -511,7 +511,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 					{
 						final DatePickerDialog dialog = new DatePickerDialog(getActivity(),
 								LocalDate.fromDateFields(mDisplayedDate), this);
-						dialog.setMinDate(LocalDate.fromDateFields(
+						dialog.setMinDate(DateTime.fromDateFields(
 								Settings.getOldestPossibleHistoryDate(DateTime.today())));
 
 						dialog.show();

@@ -227,6 +227,10 @@ public final class DateTime
 		return sdf.format(date);
 	}
 
+	public static LocalDate fromDateFields(Date date) {
+		return date != null ? LocalDate.fromDateFields(date) : null;
+	}
+
 	public static String toNativeDate(LocalDate date) {
 		return toNativeDate(date.toDate());
 	}
