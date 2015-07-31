@@ -1,3 +1,7 @@
+### 0.9.30.4:
+* Fix crashes
+* Fix missing menu on certain LG devices
+
 ### 0.9.30.3:
 * Fix notification issues
 
