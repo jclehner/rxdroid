@@ -31,10 +31,11 @@ import android.view.KeyEvent;
  */
 public class ActionBarActivity extends android.support.v7.app.ActionBarActivity
 {
-	private static final boolean USE_WORKAROUND =
-			Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT &&
-			Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1 &&
-			("LGE".equalsIgnoreCase(Build.MANUFACTURER) || "E6710".equalsIgnoreCase(Build.DEVICE));
+	private static final boolean USE_WORKAROUND = false;
+//	private static final boolean USE_WORKAROUND =
+//			Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT &&
+//			Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1 &&
+//			("LGE".equalsIgnoreCase(Build.MANUFACTURER) || "E6710".equalsIgnoreCase(Build.DEVICE));
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)
