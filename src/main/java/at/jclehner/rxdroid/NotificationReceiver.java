@@ -715,12 +715,13 @@ public class NotificationReceiver extends BroadcastReceiver
 		private List<Notification> getPages()
 		{
 			final List<Notification> notifications = new ArrayList<Notification>();
-			if(mNtfRefill != null)
-				notifications.add(mNtfRefill);
-			if(mNtfDoses != null)
-				notifications.add(mNtfDoses);
-
-			Log.d(TAG, "getPages: " + notifications.size() + " pages; groupKey=" + mGroup);
+			if(mUseWearableHack)
+			{
+				if(mNtfRefill != null)
+					notifications.add(mNtfRefill);
+				if(mNtfDoses != null)
+					notifications.add(mNtfDoses);
+			}
 
 			return notifications;
 		}
