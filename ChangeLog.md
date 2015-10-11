@@ -1,3 +1,6 @@
+### 0.9.30.5:
+* Make app compatible with Marshmallow
+
 ### 0.9.30.4:
 * Fix crashes
 * Fix missing menu on certain LG devices
