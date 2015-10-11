@@ -32,7 +32,6 @@ dependencies {
 		//compile 'ch.acra:acra:5.0.0-SNAPSHOT'
         compile 'joda-time:joda-time:2.5'
 
-		compile 'at.jclehner.rxdroid.localmaven:NumberPicker:9999'
 		compile 'at.jclehner.rxdroid.localmaven:ShowcaseView:9999'
 }
 
