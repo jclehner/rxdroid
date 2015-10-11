@@ -63,7 +63,6 @@
 
         <activity android:name=".BackupActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:noHistory="true"
             android:launchMode="singleTop"
         >
             <!-- IntentFilter WITH mimeType -->
