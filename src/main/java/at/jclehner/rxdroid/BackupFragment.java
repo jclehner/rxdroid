@@ -216,7 +216,7 @@ public class BackupFragment extends LoaderListFragment<File>
 								else
 								{
 									Toast.makeText(getActivity(), R.string._msg_external_storage_not_writeable,
-											Toast.LENGTH_LONG);
+											Toast.LENGTH_LONG).show();
 								}
 							}
 
