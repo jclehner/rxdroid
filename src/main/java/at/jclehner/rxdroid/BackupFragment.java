@@ -35,6 +35,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.Html;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -115,10 +116,14 @@ public class BackupFragment extends LoaderListFragment<File>
 				if(!dir.exists() || !dir.isDirectory())
 					continue;
 
-				for(File file : dir.listFiles(this))
+				final File[] files = dir.listFiles(this);
+				if(files != null)
 				{
-					if(file.isFile())
-						data.add(new BackupFileHolder(file));
+					for(File file : dir.listFiles(this))
+					{
+						if(file.isFile())
+							data.add(new BackupFileHolder(file));
+					}
 				}
 			}
 
@@ -260,8 +265,10 @@ public class BackupFragment extends LoaderListFragment<File>
 	}
 
 	@Override
-	protected void onLoaderException(RuntimeException e) {
+	protected void onLoaderException(RuntimeException e)
+	{
 		showExceptionDialog(e);
+		Log.w("BackupFragment", e);
 	}
 
 	private void showExceptionDialog(Exception e)
