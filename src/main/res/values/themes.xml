@@ -24,7 +24,6 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 	<style name="Theme.RxDroid" parent="_ApiSpecificLightTheme">
-		<item name="android:windowActionBar">true</item>
 		<item name="drugIconTablet">@drawable/ic_drug_tablet_black</item>
 		<item name="drugIconTube">@drawable/ic_drug_tube_black</item>
 		<item name="drugIconGlass">@drawable/ic_drug_glass_black</item>
@@ -65,7 +64,6 @@
 		<item name="dividerColor">@color/list_divider_light</item>
 		
 		<item name="android:windowAnimationStyle">@null</item>
-		<item name="android:alertDialogStyle">@style/Theme.RxDroid.Dialog</item>
 
 		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 

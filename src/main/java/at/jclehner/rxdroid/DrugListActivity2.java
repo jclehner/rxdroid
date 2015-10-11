@@ -110,13 +110,10 @@ public class DrugListActivity2 extends AppCompatActivity implements
 		super.onCreate(savedInstanceState);
 		//setContentView(R.layout.simple_activity);
 
-		if(false)
-		{
-			final ActionBar ab = getSupportActionBar();
-			ab.setDisplayShowHomeEnabled(true);
-			ab.setDisplayUseLogoEnabled(true);
-			ab.setLogo(R.drawable.ic_logo_padded);
-		}
+		final ActionBar ab = getSupportActionBar();
+		ab.setDisplayShowHomeEnabled(true);
+		ab.setDisplayUseLogoEnabled(true);
+		ab.setLogo(R.drawable.ic_logo_padded);
 
 		if(Settings.getBoolean(Settings.Keys.IS_FIRST_LAUNCH, true))
 		{
