@@ -57,7 +57,9 @@ public final class Reflect
 
 		try
 		{
-			return clazz.getDeclaredField(fieldName);
+			final Field f = clazz.getDeclaredField(fieldName);
+			f.setAccessible(true);
+			return f;
 		}
 		catch(SecurityException e)
 		{
@@ -136,7 +138,9 @@ public final class Reflect
 	{
 		try
 		{
-			return clazz.getMethod(name, parameterTypes);
+			final Method m = clazz.getMethod(name, parameterTypes);
+			m.setAccessible(true);
+			return m;
 		}
 		catch(NoSuchMethodException e)
 		{
@@ -150,6 +154,7 @@ public final class Reflect
 
 		try
 		{
+			m.setAccessible(true);
 			return m.invoke(receiver, args);
 		}
 		catch(IllegalArgumentException e)
@@ -233,6 +238,7 @@ public final class Reflect
 		try
 		{
 			Constructor<T> ctor = clazz.getConstructor(argTypes);
+			ctor.setAccessible(true);
 			return ctor.newInstance(args);
 		}
 		catch (NoSuchMethodException e)
@@ -271,18 +277,6 @@ public final class Reflect
 		}
 	}
 
-	public static List<Field> getDeclaredAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotationType)
-	{
-		final ArrayList<Field> fields = new ArrayList<Field>();
-		for(Field f : clazz.getDeclaredFields())
-		{
-			if(f.getAnnotation(annotationType) != null)
-				fields.add(f);
-		}
-
-		return fields;
-	}
-
 	/**
 	 * Obtains the value of an <code>Annotation</code>'s parameter.
 	 *
@@ -314,8 +308,12 @@ public final class Reflect
 		return types;
 	}
 
-	private static void getDeclaredFields(Class<?> clazz, List<Field> outFields) {
+	private static void getDeclaredFields(Class<?> clazz, List<Field> outFields)
+	{
 		outFields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+
+		for(Field f : outFields)
+			f.setAccessible(true);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -329,6 +327,7 @@ public final class Reflect
 		try
 		{
 			final Method m = annotation.getClass().getMethod(parameterName);
+			m.setAccessible(true);
 			return (T) m.invoke(annotation);
 		}
 		catch(NoSuchMethodException e)

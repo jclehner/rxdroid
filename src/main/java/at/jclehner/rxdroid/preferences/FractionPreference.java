@@ -21,7 +21,7 @@
 
 package at.jclehner.rxdroid.preferences;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -124,11 +124,6 @@ public class FractionPreference extends BaseAdvancedDialogPreference<Fraction> i
 			dialog.disableFractionInputMode(true);
 
 		return dialog;
-	}
-
-	@Override
-	protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
-		// do nothing
 	}
 
 	@Override

@@ -23,7 +23,7 @@ package at.jclehner.rxdroid;
 
 import java.util.Date;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;

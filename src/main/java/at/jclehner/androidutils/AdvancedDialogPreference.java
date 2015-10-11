@@ -23,7 +23,7 @@ package at.jclehner.androidutils;
 
 import java.io.Serializable;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -303,14 +303,14 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	 * Note that if overriding this function, you must do all
 	 * initialization before returning. If this function returns
 	 * something other than <code>null</code>,
-	 * {@link #onPrepareDialogBuilder(android.app.AlertDialog.Builder)}
+	 * {@link #onPrepareDialogBuilder(android.support.v7.app.AlertDialog.Builder)}
 	 * will never be called. Also note that an OnDismissListener
 	 * set on the returned dialog will be overridden in {@link #showDialog(Bundle)}!
 	 * <p>
 	 * Using this function requires care, as the following functions will <em>never</em>
 	 * be called:
 	 * <ul>
-	 * <li>{@link #onPrepareDialogBuilder(android.app.AlertDialog.Builder)}</li>
+	 * <li>{@link #onPrepareDialogBuilder(android.support.v7.app.AlertDialog.Builder)}</li>
 	 * <li>{@link #onCreateDialogView()}</li>
 	 * <li>{@link #onDialogClosed(boolean)}<sup>*</sup></li>
 	 * </ul>
@@ -417,7 +417,6 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 			else
 				builder.setMessage(getDialogMessage());
 
-			onPrepareDialogBuilder(builder);
 			mDialog = builder.create();
 		}
 
@@ -451,11 +450,6 @@ public abstract class AdvancedDialogPreference<T extends Serializable> extends D
 	}
 
 	protected void onShow(Dialog dialog) {
-		// do nothing
-	}
-
-	@Override
-	protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
 		// do nothing
 	}
 

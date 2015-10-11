@@ -12,21 +12,20 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:0.5.+'
+		classpath 'com.android.tools.build:gradle:1.1.1'
 	}
 }
 
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
 
 archiveBaseName = "$2"
 
 repositories {
-	mavenLocal()
 	mavenCentral()
 }
 
 dependencies {
-	compile 'com.android.support:support-v4:18.0.+'
+	compile 'com.android.support:support-v4:23.0.1'
 }
 
 tasks.withType(Compile) {
@@ -34,8 +33,8 @@ tasks.withType(Compile) {
 }
 
 android {
-	compileSdkVersion 18
-	buildToolsVersion "18.0.1"
+	compileSdkVersion 23
+	buildToolsVersion "23.0.1"
 
 	sourceSets {
 		main {
@@ -51,10 +50,10 @@ EOF
 
 
 GIT_REPOS=( 
-#	"NumberPicker git://github.com/jclehner/numberpicker.git lib"
+	"NumberPicker git://github.com/jclehner/numberpicker.git lib"
 #	"DragSortListView git://github.com/jclehner/drag-sort-listview.git library"
 #	"ShowcaseView git://github.com/jclehner/ShowcaseView.git library"
-	"SherlockNavigationDrawer git://github.com/nicolasjafelle/SherlockNavigationDrawer.git AndroidStudio/SherlockNavigationDrawerProject/SherlockNavigationDrawer"
+#	"SherlockNavigationDrawer git://github.com/nicolasjafelle/SherlockNavigationDrawer.git AndroidStudio/SherlockNavigationDrawerProject/SherlockNavigationDrawer"
 )
 
 ORIGPWD="$(pwd)"

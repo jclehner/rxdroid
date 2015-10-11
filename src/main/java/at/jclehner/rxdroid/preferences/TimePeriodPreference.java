@@ -24,7 +24,7 @@ package at.jclehner.rxdroid.preferences;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
