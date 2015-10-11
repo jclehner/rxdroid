@@ -41,7 +41,7 @@ android {
 	compileSdkVersion 23
 
 	defaultConfig {
-		minSdkVersion 23
+		minSdkVersion 14
 		targetSdkVersion 23
 
 		versionCode 9305
