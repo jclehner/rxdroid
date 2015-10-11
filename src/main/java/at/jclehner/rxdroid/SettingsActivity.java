@@ -17,9 +17,9 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.support.v4.app.Fragment;
-import android.support.v4.preference.PreferenceFragment;
-import at.jclehner.androidutils.ActionBarActivity;
+import android.app.Fragment;
+import android.preference.PreferenceFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.style.TypefaceSpan;
 import android.util.Log;
@@ -54,7 +54,7 @@ import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
-public class SettingsActivity extends ActionBarActivity
+public class SettingsActivity extends AppCompatActivity
 {
 	private static final String EXTRA_PREFERENCE_SCREEN = "rxdroid:preference_screen";
 
@@ -81,7 +81,7 @@ public class SettingsActivity extends ActionBarActivity
 				resId = R.xml.settings;
 
 			final SettingsFragment f = SettingsFragment.newInstance(resId);
-			getSupportFragmentManager().beginTransaction().replace(android.R.id.content, f).commit();
+			getFragmentManager().beginTransaction().replace(android.R.id.content, f).commit();
 		}
 	}
 
@@ -96,7 +96,7 @@ public class SettingsActivity extends ActionBarActivity
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 		super.onActivityResult(requestCode, resultCode, data);
-		final Fragment fragment = getSupportFragmentManager().findFragmentById(android.R.id.content);
+		final Fragment fragment = getFragmentManager().findFragmentById(android.R.id.content);
 		fragment.onActivityResult(requestCode, resultCode, data);
 	}
 
@@ -258,7 +258,7 @@ public class SettingsActivity extends ActionBarActivity
 			super.onResume();
 			updateLowSupplyThresholdPreferenceSummary();
 
-			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(getPreferenceScreen().getTitle());
+			((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getPreferenceScreen().getTitle());
 		}
 
 		@Override

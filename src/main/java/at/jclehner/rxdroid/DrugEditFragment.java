@@ -42,10 +42,10 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceScreen;
-import android.support.v4.preference.PreferenceFragment;
+import android.preference.PreferenceFragment;
 import android.support.v4.view.MenuItemCompat;
 
-import at.jclehner.androidutils.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import android.text.Html;
 import android.util.Log;
@@ -169,7 +169,6 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 	public void onResume()
 	{
 		super.onResume();
-
 		Intent intent = getActivity().getIntent();
 		String action = intent.getAction();
 
@@ -274,11 +273,11 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 	}
 
 	private void setActivityTitle(String title) {
-		((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(title);
+		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(title);
 	}
 
 	private void setActivityTitle(int resId) {
-		((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(resId);
+		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(resId);
 	}
 
 	private boolean fixInvalidRepeatOrigin(final Drug drug)
@@ -365,13 +364,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 				p.setEnabled(false);
 		}
 
-		if(mFocusOnCurrentSupply)
-		{
-			Log.i(TAG, "Will focus on current supply preference");
-			performPreferenceClick("currentSupply");
-		}
-
-		getActivity().supportInvalidateOptionsMenu();
+		getActivity().invalidateOptionsMenu();
 	}
 
 	private void showDrugDeleteDialog()
@@ -439,19 +432,6 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		ab.setPositiveButton(R.string._btn_save, l);
 
 		ab.show();
-	}
-
-	private void performPreferenceClick(String key)
-	{
-		final PreferenceScreen ps = getPreferenceScreen();
-		for(int i = 0; i != ps.getPreferenceCount(); ++i)
-		{
-			if(key.equals(ps.getPreference(i).getKey()))
-			{
-				ps.onItemClick(getListView(), null, i, 0);
-				break;
-			}
-		}
 	}
 
 	private static class DrugWrapper
@@ -710,7 +690,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		{
 			try
 			{
-				((ActionBarActivity) preference.getContext()).getSupportActionBar().setTitle((String) newValue);
+				((AppCompatActivity) preference.getContext()).getSupportActionBar().setTitle((String) newValue);
 			}
 			catch(ClassCastException e)
 			{

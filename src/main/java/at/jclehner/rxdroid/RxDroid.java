@@ -21,7 +21,7 @@
 
 package at.jclehner.rxdroid;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.app.AlarmManager;
 import android.support.v7.app.AlertDialog;
 import android.app.Application;
@@ -86,8 +86,8 @@ public class RxDroid extends Application
 {
 	private static final String TAG = RxDroid.class.getSimpleName();
 
-	private static WeakHashMap<Activity, Boolean> sActivityVisibility =
-			new WeakHashMap<Activity, Boolean>();
+	private static WeakHashMap<AppCompatActivity, Boolean> sActivityVisibility =
+			new WeakHashMap<AppCompatActivity, Boolean>();
 
 	private static long sUnlockedTime = 0;
 	private static volatile WeakReference<Context> sContextRef;
@@ -199,7 +199,7 @@ public class RxDroid extends Application
 		sUnlockedTime = System.currentTimeMillis();
 	}
 
-	public static void setIsVisible(Activity activity, boolean isVisible)
+	public static void setIsVisible(AppCompatActivity activity, boolean isVisible)
 	{
 		if(sActivityVisibility.containsKey(activity))
 			sActivityVisibility.put(activity, isVisible);

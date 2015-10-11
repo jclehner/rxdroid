@@ -22,14 +22,14 @@
 package at.jclehner.rxdroid;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import at.jclehner.androidutils.ActionBarActivity;
+import android.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 
 import at.jclehner.rxdroid.util.Components;
 
-public class DrugEditActivity2 extends ActionBarActivity
+public class DrugEditActivity2 extends AppCompatActivity
 {
 	public static final String EXTRA_DRUG_ID = "drug_id";
 	public static final String EXTRA_FOCUS_ON_CURRENT_SUPPLY = "focus_on_current_supply";
@@ -44,7 +44,7 @@ public class DrugEditActivity2 extends ActionBarActivity
 
 		if(savedInstanceState == null)
 		{
-			getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
+			getFragmentManager().beginTransaction().replace(android.R.id.content,
 					new DrugEditFragment(), "content").commit();
 		}
 	}
@@ -61,7 +61,7 @@ public class DrugEditActivity2 extends ActionBarActivity
 	{
 		if(keyCode == KeyEvent.KEYCODE_BACK)
 		{
-			final DrugEditFragment f = (DrugEditFragment) getSupportFragmentManager().findFragmentByTag("content");
+			final DrugEditFragment f = (DrugEditFragment) getFragmentManager().findFragmentByTag("content");
 			f.onBackPressed();
 			return true;
 		}

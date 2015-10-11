@@ -145,7 +145,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		if(!isAllCollapsed())
 		{
 			if(++mCollapsedCount == mGroupedEvents.size())
-				getActivity().supportInvalidateOptionsMenu();
+				getActivity().invalidateOptionsMenu();
 		}
 	}
 
@@ -155,7 +155,7 @@ public class DoseLogFragment extends ExpandableListFragment
 		if(mCollapsedCount != 0)
 		{
 			if(--mCollapsedCount == 0)
-				getActivity().supportInvalidateOptionsMenu();
+				getActivity().invalidateOptionsMenu();
 		}
 	}
 

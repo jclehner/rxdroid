@@ -22,9 +22,9 @@
 package at.jclehner.rxdroid;
 
 import android.os.Bundle;
-import at.jclehner.androidutils.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
-public class AdvancedScheduleActivity extends ActionBarActivity
+public class AdvancedScheduleActivity extends AppCompatActivity
 {
 	@Override
 	protected void onCreate(Bundle savedInstanceState)

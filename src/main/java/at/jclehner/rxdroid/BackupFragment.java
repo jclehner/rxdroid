@@ -29,10 +29,10 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import at.jclehner.androidutils.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.Html;
 import android.util.TypedValue;
@@ -237,7 +237,7 @@ public class BackupFragment extends LoaderListFragment<File>
 		super.onResume();
 		mShowDialogIfNotWriteable = true;
 
-		((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_backup_restore);
+		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_backup_restore);
 	}
 
 	@Override

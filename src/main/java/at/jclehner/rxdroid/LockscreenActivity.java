@@ -21,7 +21,7 @@
 
 package at.jclehner.rxdroid;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,7 +34,7 @@ import android.widget.Toast;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Components;
 
-public class LockscreenActivity extends Activity implements OnClickListener
+public class LockscreenActivity extends AppCompatActivity implements OnClickListener
 {
 	private static final String TAG = LockscreenActivity.class.getSimpleName();
 
@@ -175,11 +175,11 @@ public class LockscreenActivity extends Activity implements OnClickListener
 		}
 	}
 
-	public static void startMaybe(Activity caller) {
+	public static void startMaybe(AppCompatActivity caller) {
 		startMaybe(caller, null);
 	}
 
-	public static void startMaybe(Activity caller, Intent unlockIntent)
+	public static void startMaybe(AppCompatActivity caller, Intent unlockIntent)
 	{
 		if(!BuildConfig.DEBUG || !Settings.getBoolean("use_lockscreen", false))
 			return;

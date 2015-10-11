@@ -32,10 +32,10 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
-import at.jclehner.androidutils.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -63,7 +63,7 @@ import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
-public class BackupActivity extends ActionBarActivity implements DialogLike.OnButtonClickListener
+public class BackupActivity extends AppCompatActivity implements DialogLike.OnButtonClickListener
 {
 	public static final String EXTRA_NO_BACKUP_CREATION = "rxdroid:no_backup_creation";
 
@@ -87,7 +87,7 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 			mFile = new Backup.BackupFile(getBackupFilePath());
 			mCanRestore = mFile.isValid();
 
-			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_restore);
+			((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_restore);
 
 			if(mCanRestore)
 			{
@@ -333,8 +333,8 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 
 		if(!Intent.ACTION_VIEW.equals(getIntent().getAction()))
 		{
-			//getSupportActionBar().setDisplayShowHomeEnabled(true);
-			//getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			//getActionBar().setDisplayShowHomeEnabled(true);
+			//getActionBar().setDisplayHomeAsUpEnabled(true);
 
 			if(Backup.StorageStateListener.isReadable(storageState))
 			{
@@ -370,8 +370,8 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 
 		//setContentView(R.layout.simple_activity);
 
-		final Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("content");
-		final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		final Fragment currentFragment = getFragmentManager().findFragmentByTag("content");
+		final FragmentTransaction ft = getFragmentManager().beginTransaction();
 
 		if(currentFragment != null)
 		{
@@ -385,7 +385,7 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 			ft.addToBackStack(null);
 
 		ft.commit();
-		supportInvalidateOptionsMenu();
+		invalidateOptionsMenu();
 	}
 
 	private final Backup.StorageStateListener mStorageListener = new Backup.StorageStateListener()

@@ -22,7 +22,7 @@
 package at.jclehner.rxdroid.util;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -118,7 +118,7 @@ public final class Util
 		}
 	}
 
-	public static void lockActivityOrientation(Activity activity,
+	public static void lockActivityOrientation(AppCompatActivity activity,
 			int orientation)
 	{
 		activity.setRequestedOrientation(orientation);

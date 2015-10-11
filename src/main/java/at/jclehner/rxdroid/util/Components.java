@@ -23,11 +23,13 @@ package at.jclehner.rxdroid.util;
 
 import java.util.Locale;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.util.Log;
+import android.view.Window;
+
 import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.LockscreenActivity;
 import at.jclehner.rxdroid.RxDroid;
@@ -68,7 +70,7 @@ public final class Components
 	/**
 	 * Initializes activity-specific stuff.
 	 */
-	public static void onCreateActivity(Activity activity, int flags)
+	public static void onCreateActivity(AppCompatActivity activity, int flags)
 	{
 		onCreate(activity.getApplicationContext(), flags);
 
@@ -77,6 +79,8 @@ public final class Components
 
 		if((flags & NO_THEME) == 0)
 			activity.setTheme(Theme.get());
+
+		activity.requestWindowFeature(Window.FEATURE_ACTION_BAR);
 
 		if(BuildConfig.DEBUG)
 		{
@@ -100,7 +104,7 @@ public final class Components
 		SystemEventReceiver.registerOnSystemTimeChangeListener(activity);
 	}
 
-	public static void onResumeActivity(Activity activity, int flags)
+	public static void onResumeActivity(AppCompatActivity activity, int flags)
 	{
 		if((flags & NO_LOCKSCREEN) == 0)
 			LockscreenActivity.startMaybe(activity);
@@ -111,7 +115,7 @@ public final class Components
 		Settings.maybeLockInPortraitMode(activity);
 	}
 
-	public static void onPauseActivity(Activity activity, int flags) {
+	public static void onPauseActivity(AppCompatActivity activity, int flags) {
 		RxDroid.setIsVisible(activity, false);
 	}
 

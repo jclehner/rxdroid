@@ -23,10 +23,10 @@ package at.jclehner.androidutils;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
+import android.app.ListFragment;
+import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
+import android.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -211,7 +211,7 @@ public abstract class LoaderListFragment<T> extends ListFragment implements Load
 	}
 
 	@Override
-	public final void onLoaderReset(android.support.v4.content.Loader loader) {
+	public final void onLoaderReset(Loader loader) {
 		mAdapter.setData(null);
 	}
 
