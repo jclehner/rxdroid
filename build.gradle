@@ -44,8 +44,8 @@ android {
 		minSdkVersion 14
 		targetSdkVersion 23
 
-		versionCode 9305
-		versionName '0.9.30.5'
+		versionCode 9307
+		versionName '0.9.30.7'
 	}
 
 	lintOptions {

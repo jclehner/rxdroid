@@ -578,7 +578,11 @@ public class DrugListActivity2 extends AppCompatActivity implements
 
 			mPager.setOffscreenPageLimit(OFFSCREEN_PAGES);
 			mPager.setOnPageChangeListener(mPageListener);
-			mPager.setAdapter(new MyPagerAdapter(getChildFragmentManager()));
+
+			final FragmentManager fm = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1 ?
+				getFragmentManager() : getChildFragmentManager();
+
+			mPager.setAdapter(new MyPagerAdapter(fm));
 			mPager.setPageMargin(Util.pixelsFromDips(getActivity(), 48));
 		}
 

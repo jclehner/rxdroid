@@ -1,3 +1,6 @@
+### 0.9.30.7:
+* Fix crashes on Android < 4.2
+
 ### 0.9.30.5:
 * Make app compatible with Marshmallow
 
