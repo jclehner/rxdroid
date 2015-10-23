@@ -71,6 +71,9 @@ android {
 			proguardFile 'proguard-project.txt'
 			signingConfig signingConfigs.release
 		}
+		debug {
+			applicationIdSuffix '.debug'
+		}
 	}
 }
 

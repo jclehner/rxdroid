@@ -434,7 +434,7 @@ public final class Settings
 		{
 			final Context context = RxDroid.getContext();
 			int resId = context.getResources().
-					getIdentifier("at.jclehner.rxdroid:string/pref_default_" + key, null, null);
+					getIdentifier(context.getPackageName() + ":string/pref_default_" + key, null, null);
 
 			if(resId == 0 || (value = context.getString(resId)) == null)
 				throw new IllegalStateException("No default value for time preference " + key + " in strings.xml");

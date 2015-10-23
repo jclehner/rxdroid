@@ -24,7 +24,7 @@
 
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:rxdroid="http://schemas.android.com/apk/res/at.jclehner.rxdroid"
+  xmlns:rxdroid="http://schemas.android.com/apk/res-auto"
   android:title="@string/_title_preferences"
   android:orderingFromXml="true"  
 >
