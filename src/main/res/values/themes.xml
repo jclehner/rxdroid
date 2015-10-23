@@ -64,7 +64,6 @@
 		<item name="dividerColor">@color/list_divider_light</item>
 		
 		<item name="android:windowAnimationStyle">@null</item>
-		<item name="android:alertDialogStyle">@style/Theme.RxDroid.Dialog</item>
 
 		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 
@@ -93,6 +92,7 @@
 	</style>
 	
 	<style name="Theme.RxDroid.Dark" parent="_ApiSpecificDarkTheme">
+		<item name="android:windowActionBar">true</item>
 		<item name="drugIconTablet">@drawable/ic_drug_tablet_white</item>
 		<item name="drugIconTube">@drawable/ic_drug_tube_white</item>
         <item name="drugIconGlass">@drawable/ic_drug_glass_white</item>

@@ -21,14 +21,14 @@
 
 package at.jclehner.rxdroid;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.preference.PreferenceFragment;
+import android.preference.PreferenceFragment;
 import android.support.v4.view.MenuItemCompat;
-import at.jclehner.androidutils.ActionBarActivity;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -41,7 +41,7 @@ import android.widget.TextView;
 
 import at.jclehner.rxdroid.util.Components;
 
-public class DoseTimePreferenceActivity2 extends ActionBarActivity
+public class DoseTimePreferenceActivity2 extends AppCompatActivity
 {
 	public static final String EXTRA_IS_FIRST_LAUNCH = "rxdroid:is_first_launch";
 
@@ -54,7 +54,7 @@ public class DoseTimePreferenceActivity2 extends ActionBarActivity
 
 		if(savedInstanceState == null)
 		{
-			getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
+			getFragmentManager().beginTransaction().replace(android.R.id.content,
 					new DoseTimePreferenceFragment()).commit();
 		}
 	}
@@ -100,7 +100,7 @@ public class DoseTimePreferenceActivity2 extends ActionBarActivity
 		{
 			super.onResume();
 
-			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(getPreferenceScreen().getTitle());
+			((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getPreferenceScreen().getTitle());
 
 			if(!Settings.wasDisplayedOnce("license_info") && mIsFirstLaunch)
 			{

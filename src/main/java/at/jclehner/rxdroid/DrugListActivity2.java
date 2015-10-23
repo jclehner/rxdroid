@@ -21,7 +21,8 @@
 
 package at.jclehner.rxdroid;
 
-import android.app.AlertDialog;
+import android.app.Activity;
+import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,13 +33,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import at.jclehner.androidutils.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -92,7 +92,7 @@ import at.jclehner.rxdroid.util.WrappedCheckedException;
 import at.jclehner.rxdroid.widget.DrugNameView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
 
-public class DrugListActivity2 extends ActionBarActivity implements
+public class DrugListActivity2 extends AppCompatActivity implements
 		DialogLike.OnButtonClickListener
 {
 	private static final String TAG = DrugListActivity2.class.getSimpleName();
@@ -108,7 +108,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		Components.onCreateActivity(this, Components.NO_DATABASE_INIT);
 
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.simple_activity);
+		//setContentView(R.layout.simple_activity);
 
 		final ActionBar ab = getSupportActionBar();
 		ab.setDisplayShowHomeEnabled(true);
@@ -128,7 +128,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				initDrugListPagerFragment();
 			else
 			{
-				final Fragment f = getSupportFragmentManager().findFragmentByTag("pager");
+				final Fragment f = getFragmentManager().findFragmentByTag("pager");
 				if(f instanceof DrugListPagerFragment)
 					((DrugListPagerFragment) f).setDate(Settings.getDoseTimeInfo().displayDate(), true);
 			}
@@ -225,7 +225,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		dialog.setNegativeButtonText(getString(R.string._btn_reset));
 		dialog.setPositiveButtonText(getString(R.string._btn_exit));
 
-		getSupportFragmentManager().beginTransaction()
+		getFragmentManager().beginTransaction()
 				.replace(android.R.id.content, dialog).commitAllowingStateLoss();
 
 		mIsShowingDbErrorDialog = true;
@@ -235,7 +235,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 	private void initDrugListPagerFragment()
 	{
 		mIsShowingDbErrorDialog = false;
-		supportInvalidateOptionsMenu();
+		invalidateOptionsMenu();
 
 		final DrugListPagerFragment f = new DrugListPagerFragment();
 		final Bundle args = new Bundle();
@@ -244,7 +244,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 		f.setArguments(args);
 		f.setRetainInstance(false);
 
-		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, f, "pager").commit();
+		getFragmentManager().beginTransaction().replace(android.R.id.content, f, "pager").commit();
 	}
 
 	private boolean showBackupAgentRemovalDialogIfNeccessary()
@@ -644,7 +644,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 		private void updateActionBar()
 		{
-			getActivity().supportInvalidateOptionsMenu();
+			getActivity().invalidateOptionsMenu();
 
 			final SpannableString dateStr = new SpannableString(DateTime.toNativeDate(mDisplayedDate));
 
@@ -653,7 +653,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 
 			//Util.applyStyle(dateStr, new RelativeSizeSpan(0.75f));
 
-			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(dateStr);
+			((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(dateStr);
 		}
 
 		private final ViewPager.OnPageChangeListener mPageListener = new ViewPager.SimpleOnPageChangeListener()
@@ -1005,7 +1005,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 					{
 						final LocalDate fragmentDate = new LocalDate(mDate);
 						final LocalDate activityDate = LocalDate.parse((
-								(ActionBarActivity) getActivity()).getSupportActionBar().getTitle().toString().replace('/', '-'));
+								(AppCompatActivity) getActivity()).getSupportActionBar().getTitle().toString().replace('/', '-'));
 
 						if(!fragmentDate.equals(activityDate))
 						{
@@ -1227,7 +1227,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 				// Save the activity, because if we call setDate() below, our current fragment
 				// will be detached, and getActivity() might return null, thus crashing
 				// ShowcaseView below!
-				final FragmentActivity activity = getActivity();
+				final Activity activity = getActivity();
 
 				if(force)
 				{
@@ -1256,7 +1256,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 						return;
 					}
 
-					final Fragment f = activity.getSupportFragmentManager().findFragmentByTag("pager");
+					final Fragment f = activity.getFragmentManager().findFragmentByTag("pager");
 					if(f instanceof DrugListPagerFragment)
 						((DrugListPagerFragment) f).setDate(date, false);
 					else
@@ -1372,7 +1372,7 @@ public class DrugListActivity2 extends ActionBarActivity implements
 			if(entry instanceof Drug)
 				reloadLoader();
 			else if(entry instanceof DoseEvent)
-				getActivity().supportInvalidateOptionsMenu();
+				getActivity().invalidateOptionsMenu();
 		}
 
 		@Override

@@ -22,8 +22,8 @@
 package at.jclehner.rxdroid.util;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -118,7 +118,7 @@ public final class Util
 		}
 	}
 
-	public static void lockActivityOrientation(Activity activity,
+	public static void lockActivityOrientation(AppCompatActivity activity,
 			int orientation)
 	{
 		activity.setRequestedOrientation(orientation);
@@ -640,18 +640,18 @@ public final class Util
 		// while Jellybean converts
 		// them to their simple counterparts (i.e. 1/5 instead of ⅕)
 
-		if(frac.isInteger() || (frac.denominator() > 4 && frac.denominator() != 8))
-			return frac.toString();
+		if(!frac.isInteger() && (frac.denominator() <= (Version.SDK_IS_LOLLIPOP_OR_NEWER ? 6 : 4) || frac.denominator() == 8))
+		{
+			final int[] data = frac.getFractionData(true);
+			// numerator minus integer component!
+			final int wholeNum = data[0];
+			final int numerator = data[1];
+			final int denominator = data[2];
 
-		final int[] data = frac.getFractionData(true);
-		// numerator minus integer component!
-		final int wholeNum = data[0];
-		final int numerator = data[1];
-		final int denominator = data[2];
-
-		final String pretty = PRETTY_FRACTIONS[denominator - 2][numerator - 1];
-		if(pretty != null)
-			return wholeNum != 0 ? (wholeNum + pretty) : pretty;
+			final String pretty = PRETTY_FRACTIONS[denominator - 2][numerator - 1];
+			if(pretty != null)
+				return wholeNum != 0 ? (wholeNum + pretty) : pretty;
+		}
 
 		return frac.toString();
 	}

@@ -21,7 +21,11 @@
 
 package at.jclehner.rxdroid;
 
-import android.app.AlertDialog;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -32,10 +36,10 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
-import at.jclehner.androidutils.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -63,7 +67,8 @@ import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
-public class BackupActivity extends ActionBarActivity implements DialogLike.OnButtonClickListener
+public class BackupActivity extends AppCompatActivity implements DialogLike.OnButtonClickListener,
+		ActivityCompat.OnRequestPermissionsResultCallback
 {
 	public static final String EXTRA_NO_BACKUP_CREATION = "rxdroid:no_backup_creation";
 
@@ -87,7 +92,7 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 			mFile = new Backup.BackupFile(getBackupFilePath());
 			mCanRestore = mFile.isValid();
 
-			((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_restore);
+			((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_restore);
 
 			if(mCanRestore)
 			{
@@ -283,11 +288,18 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 		Components.onCreateActivity(this, Components.NO_DATABASE_INIT);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.simple_activity);
-
 		setTitle(R.string._title_backup_restore);
 
+		mStorageListener = new Backup.StorageStateListener(this) {
+			@Override
+			public void onStateChanged(String storageState, Intent intent)
+			{
+				setContentFragment(false);
+			}
+		};
+
 		if(savedInstanceState == null)
-			setContentFragment(Environment.getExternalStorageState(), true);
+			setContentFragment(true);
 		else
 			mStorageListener.onStateChanged(Environment.getExternalStorageState(), null);
 	}
@@ -327,16 +339,39 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 		finish();
 	}
 
-	private void setContentFragment(String storageState, boolean calledFromOnCreate)
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
 	{
+		if(grantResults.length >= 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+		{
+			mStorageListener.update(this);
+			setContentFragment(false);
+		}
+	}
+
+	private boolean shouldShowPermissionDialog()
+	{
+		return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+				!= PackageManager.PERMISSION_GRANTED;
+	}
+
+	private void setContentFragment(boolean calledFromOnCreate)
+	{
+		if(shouldShowPermissionDialog())
+		{
+			ActivityCompat.requestPermissions(this,
+					new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
+
+		}
+
 		final Fragment content;
 
 		if(!Intent.ACTION_VIEW.equals(getIntent().getAction()))
 		{
-			//getSupportActionBar().setDisplayShowHomeEnabled(true);
-			//getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			//getActionBar().setDisplayShowHomeEnabled(true);
+			//getActionBar().setDisplayHomeAsUpEnabled(true);
 
-			if(Backup.StorageStateListener.isReadable(storageState))
+			if(mStorageListener.isReadable())
 			{
 				content = new BackupFragment();
 
@@ -370,8 +405,8 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 
 		//setContentView(R.layout.simple_activity);
 
-		final Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("content");
-		final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		final Fragment currentFragment = getFragmentManager().findFragmentByTag("content");
+		final FragmentTransaction ft = getFragmentManager().beginTransaction();
 
 		if(currentFragment != null)
 		{
@@ -385,15 +420,8 @@ public class BackupActivity extends ActionBarActivity implements DialogLike.OnBu
 			ft.addToBackStack(null);
 
 		ft.commit();
-		supportInvalidateOptionsMenu();
+		invalidateOptionsMenu();
 	}
 
-	private final Backup.StorageStateListener mStorageListener = new Backup.StorageStateListener()
-	{
-		@Override
-		public void onStateChanged(String storageState, Intent intent)
-		{
-			setContentFragment(storageState, false);
-		}
-	};
+	private Backup.StorageStateListener mStorageListener;
 }

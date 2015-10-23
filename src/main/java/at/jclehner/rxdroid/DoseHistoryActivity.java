@@ -22,20 +22,18 @@
 package at.jclehner.rxdroid;
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog.Builder;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
-import at.jclehner.androidutils.ActionBarActivity;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
@@ -77,7 +75,7 @@ import at.jclehner.rxdroid.util.Extras;
  *
  */
 
-public class DoseHistoryActivity extends ActionBarActivity implements
+public class DoseHistoryActivity extends AppCompatActivity implements
 		SystemEventReceiver.OnSystemTimeChangeListener
 {
 	private Drug mDrug;
@@ -116,7 +114,7 @@ public class DoseHistoryActivity extends ActionBarActivity implements
 					public boolean onMenuItemClick(MenuItem item)
 					{
 						ViewOptionsDialogFragment f = new ViewOptionsDialogFragment();
-						f.show(getSupportFragmentManager(), "view_options");
+						f.show(getFragmentManager(), "view_options");
 						return true;
 					}
 				});
@@ -154,7 +152,7 @@ public class DoseHistoryActivity extends ActionBarActivity implements
 		if(Settings.getBoolean(Keys.LOG_SHOW_TAKEN, true))
 			flags |= DoseLogFragment.SHOW_TAKEN;
 
-		final FragmentManager fm = getSupportFragmentManager();
+		final FragmentManager fm = getFragmentManager();
 		final FragmentTransaction ft = fm.beginTransaction();
 		final DoseLogFragment f = DoseLogFragment.newInstance(mDrug, flags);
 
@@ -173,7 +171,7 @@ public class DoseHistoryActivity extends ActionBarActivity implements
 				@Override
 				public void run()
 				{
-					supportInvalidateOptionsMenu();
+					invalidateOptionsMenu();
 				}
 			});
 		}

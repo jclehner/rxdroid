@@ -21,12 +21,15 @@
 
 package at.jclehner.rxdroid;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -57,11 +60,15 @@ public class Backup
 		private boolean mReadable;
 		private boolean mWritable;
 
+		public StorageStateListener(Context context) {
+			update(context, getStorageState());
+		}
+
 		@Override
 		public final void onReceive(Context context, Intent intent)
 		{
 			final String storageState = getStorageState();
-			update(storageState);
+			update(context, storageState);
 			onStateChanged(storageState, intent);
 		}
 
@@ -93,14 +100,22 @@ public class Backup
 			return Environment.MEDIA_MOUNTED.equals(storageState);
 		}
 
-		private void update(String storageState)
-		{
-			mReadable = isReadable(storageState);
-			mWritable = isWritable(storageState);
+		public void update(Context context) {
+			update(context, Environment.getExternalStorageState());
 		}
 
-		public StorageStateListener() {
-			update(getStorageState());
+		private void update(Context context, String storageState)
+		{
+			if(ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+				!= PackageManager.PERMISSION_GRANTED)
+			{
+				mReadable = mWritable = false;
+			}
+			else
+			{
+				mReadable = isReadable(storageState);
+				mWritable = isWritable(storageState);
+			}
 		}
 
 		static

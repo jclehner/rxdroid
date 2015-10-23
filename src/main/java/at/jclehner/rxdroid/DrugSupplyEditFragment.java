@@ -23,7 +23,7 @@ package at.jclehner.rxdroid;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.app.DialogFragment;
 import android.view.ViewStub;
 import android.view.View;
 import android.widget.Button;

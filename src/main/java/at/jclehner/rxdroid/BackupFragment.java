@@ -21,7 +21,7 @@
 
 package at.jclehner.rxdroid;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,12 +29,13 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import at.jclehner.androidutils.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.Html;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -115,10 +116,14 @@ public class BackupFragment extends LoaderListFragment<File>
 				if(!dir.exists() || !dir.isDirectory())
 					continue;
 
-				for(File file : dir.listFiles(this))
+				final File[] files = dir.listFiles(this);
+				if(files != null)
 				{
-					if(file.isFile())
-						data.add(new BackupFileHolder(file));
+					for(File file : dir.listFiles(this))
+					{
+						if(file.isFile())
+							data.add(new BackupFileHolder(file));
+					}
 				}
 			}
 
@@ -211,7 +216,7 @@ public class BackupFragment extends LoaderListFragment<File>
 								else
 								{
 									Toast.makeText(getActivity(), R.string._msg_external_storage_not_writeable,
-											Toast.LENGTH_LONG);
+											Toast.LENGTH_LONG).show();
 								}
 							}
 
@@ -237,7 +242,7 @@ public class BackupFragment extends LoaderListFragment<File>
 		super.onResume();
 		mShowDialogIfNotWriteable = true;
 
-		((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_backup_restore);
+		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_backup_restore);
 	}
 
 	@Override
@@ -260,8 +265,10 @@ public class BackupFragment extends LoaderListFragment<File>
 	}
 
 	@Override
-	protected void onLoaderException(RuntimeException e) {
+	protected void onLoaderException(RuntimeException e)
+	{
 		showExceptionDialog(e);
+		Log.w("BackupFragment", e);
 	}
 
 	private void showExceptionDialog(Exception e)

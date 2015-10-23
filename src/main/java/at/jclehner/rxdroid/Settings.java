@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -716,7 +716,7 @@ public final class Settings
 		return sIsFirstLaunchOfThisVersion;
 	}
 
-	public static void maybeLockInPortraitMode(Activity activity)
+	public static void maybeLockInPortraitMode(AppCompatActivity activity)
 	{
 		if(!Settings.getBoolean(Keys.ENABLE_LANDSCAPE, Defaults.ENABLE_LANDSCAPE))
 		{
