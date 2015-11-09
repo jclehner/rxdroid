@@ -44,14 +44,14 @@
 		
 		style="@style/FractionInputBottomPadding"
 	>	
-		<at.jclehner.rxdroid.NumberPickerWrapper android:id="@+id/integer" 
+		<NumberPicker android:id="@+id/integer"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginRight="@dimen/fraction_wholenum_margin"
 			android:visibility="gone"
 		/>
 	    
-		<at.jclehner.rxdroid.NumberPickerWrapper android:id="@+id/numerator" 
+		<NumberPicker android:id="@+id/numerator"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 		/>
@@ -66,7 +66,7 @@
 			android:text="/"
 		/>
 		
-		<at.jclehner.rxdroid.NumberPickerWrapper android:id="@+id/denominator" 
+		<NumberPicker android:id="@+id/denominator"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 		/>   

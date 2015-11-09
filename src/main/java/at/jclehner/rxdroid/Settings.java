@@ -143,15 +143,6 @@ public final class Settings
 	private static boolean sIsFirstLaunchOfThisVersion = false;
 	private static int sPreviousLaunchVersion = 0;
 
-	public static SharedPreferences getDefaultSharedPreferences(Context context)
-	{
-		if(Version.SDK_IS_PRE_HONEYCOMB)
-			return PreferenceManager.getDefaultSharedPreferences(context);
-
-		return context.getSharedPreferences(getDefaultSharedPreferencesName(context),
-				Context.MODE_MULTI_PROCESS);
-	}
-
 	public static String getDefaultSharedPreferencesName(Context context)
 	{
 		try
@@ -186,7 +177,9 @@ public final class Settings
 	{
 		if(sSharedPrefs == null || force)
 		{
-			sSharedPrefs = getDefaultSharedPreferences(RxDroid.getContext());
+			final Context context = RxDroid.getContext();
+			sSharedPrefs = context.getSharedPreferences(getDefaultSharedPreferencesName(context),
+					Context.MODE_MULTI_PROCESS);
 
 			if(LOGV)
 			{

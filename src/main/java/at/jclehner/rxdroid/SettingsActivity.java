@@ -187,16 +187,7 @@ public class SettingsActivity extends AppCompatActivity
 				{
 					final Locale l = Locale.getDefault();
 
-					if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-						sb.append("\n\n");
-					else
-					{
-						// Preference appears to be limited in height on pre-HC
-						// devices... Prefix with an en-dash to make it look a
-						// little less ugly!
-						sb.append("\n\u2013 ");
-					}
-
+					sb.append("\n\n");
 					sb.append(Util.capitalize(l.getDisplayLanguage(l))  + ": " + translator);
 				}
 
@@ -337,21 +328,8 @@ public class SettingsActivity extends AppCompatActivity
 				final PackageManager pm = context.getPackageManager();
 				final Intent intent = pm.getLaunchIntentForPackage(context.getPackageName());
 
-				if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-				{
-					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-					getActivity().startActivity(intent);
-				}
-				else
-				{
-					// This hack is necessary because calling System.exit() may prevent the
-					// change from ever being committed, leaving the user stuck with the light
-					// theme forever.
-					getPreferenceManager().getDefaultSharedPreferences(
-							getActivity()).edit().putBoolean(key, (Boolean) newValue).commit();
-
-					RxDroid.forceRestart();
-				}
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+				getActivity().startActivity(intent);
 			}
 			else if(Settings.Keys.NOTIFICATION_LIGHT_COLOR.equals(key))
 			{

@@ -222,9 +222,7 @@ public class RxDroid extends Application
 		final Intent intent = c.getPackageManager().getLaunchIntentForPackage(
 				c.getPackageName());
 
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.addFlags(Version.SDK_IS_HONEYCOMB_OR_NEWER ? IntentCompat.FLAG_ACTIVITY_CLEAR_TASK
-				: Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		final AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
 		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000,
 				PendingIntent.getActivity(c, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT));
@@ -297,11 +295,7 @@ public class RxDroid extends Application
 		final Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(
 				getPackageInfo().packageName);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-		else
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		return intent;
 	}
 

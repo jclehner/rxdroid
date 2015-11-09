@@ -60,7 +60,7 @@ public class DatePickerDialog extends AlertDialog implements
 	private LocalDate mMinDate;
 	private LocalDate mMaxDate;
 
-	private boolean mShowConstraintMessage = Version.SDK_IS_PRE_HONEYCOMB;
+	private boolean mShowConstraintMessage = false;
 
 	public interface OnDateSetListener
 	{
@@ -78,7 +78,7 @@ public class DatePickerDialog extends AlertDialog implements
 		if(!NEED_SAMSUNG_DATE_PICKER_HACK)
 		{
 			mPicker = new DatePicker(context);
-			if(Version.SDK_IS_HONEYCOMB_OR_NEWER && !context.getResources().getBoolean(R.bool.is_tablet))
+			if(!context.getResources().getBoolean(R.bool.is_tablet))
 				mPicker.setCalendarViewShown(false);
 		}
 		else
@@ -114,7 +114,7 @@ public class DatePickerDialog extends AlertDialog implements
 		if(date != null && mMaxDate != null && mMaxDate.isBefore(date))
 			throw new IllegalArgumentException("Requested min date " + date + " is before max date " + mMaxDate);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER && mMinDate != null)
+		if(mMinDate != null)
 			mPicker.setMinDate(mMinDate.toDate().getTime());
 
 		updateMessage();
@@ -128,7 +128,7 @@ public class DatePickerDialog extends AlertDialog implements
 		if(date != null && mMinDate != null && mMinDate.isAfter(date))
 			throw new IllegalArgumentException("Requested max date " + date + " is after min date " + mMinDate);
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER && mMaxDate != null)
+		if(mMaxDate != null)
 			mPicker.setMaxDate(mMaxDate.toDate().getTime());
 
 		updateMessage();

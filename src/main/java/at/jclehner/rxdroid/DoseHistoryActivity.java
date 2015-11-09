@@ -164,9 +164,7 @@ public class DoseHistoryActivity extends AppCompatActivity implements
 		else
 			f.collapseAll();
 
-		if(Version.SDK_IS_HONEYCOMB_OR_NEWER)
-		{
-			RxDroid.runInMainThread(new Runnable() {
+		RxDroid.runInMainThread(new Runnable() {
 
 				@Override
 				public void run()
@@ -174,7 +172,6 @@ public class DoseHistoryActivity extends AppCompatActivity implements
 					invalidateOptionsMenu();
 				}
 			});
-		}
 	}
 
 	public static class ViewOptionsDialogFragment extends DialogFragment

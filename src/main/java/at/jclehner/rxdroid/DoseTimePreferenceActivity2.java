@@ -155,6 +155,8 @@ public class DoseTimePreferenceActivity2 extends AppCompatActivity
 		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 		{
 			MenuItem item = menu.add(R.string._title_pref_restore_defaults);
+			item.setIcon(R.drawable.ic_action_undo);
+			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 			item.setIcon(android.R.drawable.ic_menu_revert);
 			item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
 			{
@@ -188,14 +190,6 @@ public class DoseTimePreferenceActivity2 extends AppCompatActivity
 					return true;
 				}
 			});
-
-			if(Version.SDK_IS_PRE_HONEYCOMB)
-			{
-				item.setIcon(R.drawable.ic_action_undo);
-				MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-			}
-			else
-				MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_NEVER);
 		}
 
 		@Override

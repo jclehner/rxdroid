@@ -21,7 +21,9 @@
 
 package at.jclehner.rxdroid;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.database.DataSetObserver;
 import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -384,6 +386,20 @@ public class DrugListActivity2 extends AppCompatActivity implements
 			public int getItemPosition(Object object) {
 				return POSITION_NONE;
 			}
+
+			@Override
+			public void unregisterDataSetObserver(DataSetObserver observer)
+			{
+				try
+				{
+					super.unregisterDataSetObserver(observer);
+				}
+				catch(IllegalStateException e)
+				{
+					Log.w(TAG, e);
+				}
+
+			}
 		};
 
 		public static final String ARG_PATIENT_ID = DrugListFragment.ARG_PATIENT_ID;
@@ -571,6 +587,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 			return view;
 		}
 
+		@TargetApi(17)
 		@Override
 		public void onStart()
 		{
@@ -1332,24 +1349,9 @@ public class DrugListActivity2 extends AppCompatActivity implements
 		{
 			if(Database.countAll(Drug.class) == 0)
 			{
-				final boolean hasHardwareMenuKey;
-				if(Version.SDK_IS_PRE_HONEYCOMB)
-					hasHardwareMenuKey = true;
-				else if(Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-				{
-					// For Honeycomb, there appears to be no way to find out. As it
-					// targets tablets only, we will assume that none of these have a
-					// hardware menu key...
-					hasHardwareMenuKey = false;
-				}
-				else
-				{
-					hasHardwareMenuKey = ViewConfiguration.get(getActivity()).hasPermanentMenuKey();
-				}
-
 				final StringBuilder sb = new StringBuilder(
 						RefString.resolve(getActivity(), R.string._msg_no_drugs_compact_ab));
-				if(hasHardwareMenuKey)
+				if(ViewConfiguration.get(getActivity()).hasPermanentMenuKey())
 					sb.append(" " + getString(R.string._help_msg_menu_hardware));
 				else
 					sb.append(" " + getString(R.string._help_msg_menu_ab_overflow));

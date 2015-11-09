@@ -30,10 +30,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import at.jclehner.androidutils.InstanceState;
 import at.jclehner.androidutils.InstanceState.SaveState;
-import at.jclehner.rxdroid.NumberPickerWrapper.OnValueChangeListener;
+import android.widget.NumberPicker.OnValueChangeListener;
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.ShowcaseViews;
 import at.jclehner.rxdroid.util.Util;
@@ -63,9 +64,9 @@ public class FractionInput extends LinearLayout
 	public static final int MODE_FRACTION = 2;
 	public static final int MODE_INVALID = 3;
 
-	private NumberPickerWrapper mIntegerPicker;
-	private NumberPickerWrapper mNumeratorPicker;
-	private NumberPickerWrapper mDenominatorPicker;
+	private NumberPicker mIntegerPicker;
+	private NumberPicker mNumeratorPicker;
+	private NumberPicker mDenominatorPicker;
 	private TextView mFractionBar;
 	private Button mModeSwitcher;
 
@@ -94,11 +95,13 @@ public class FractionInput extends LinearLayout
 		LayoutInflater lf = LayoutInflater.from(context);
 		lf.inflate(R.layout.fraction_input2, this, true);
 
-		mIntegerPicker = (NumberPickerWrapper) findViewById(R.id.integer);
-		mNumeratorPicker = (NumberPickerWrapper) findViewById(R.id.numerator);
-		mDenominatorPicker = (NumberPickerWrapper) findViewById(R.id.denominator);
+		mIntegerPicker = (NumberPicker) findViewById(R.id.integer);
+		mNumeratorPicker = (NumberPicker) findViewById(R.id.numerator);
+		mDenominatorPicker = (NumberPicker) findViewById(R.id.denominator);
 		mFractionBar = (TextView) findViewById(R.id.fraction_bar);
 		mModeSwitcher = (Button) findViewById(R.id.mode_switcher);
+
+		setPickerLimits(0, 9999);
 
 		mIntegerPicker.setOnValueChangedListener(mPickerListener);
 		mIntegerPicker.setWrapSelectorWheel(false);
@@ -288,6 +291,19 @@ public class FractionInput extends LinearLayout
 		mAttached = false;
 	}
 
+	private void setPickerLimits(int min, int max)
+	{
+		final NumberPicker[] pickers = {
+				mIntegerPicker, mNumeratorPicker, mDenominatorPicker
+		};
+
+		for(NumberPicker picker : pickers)
+		{
+			picker.setMinValue(min);
+			picker.setMaxValue(max);
+		}
+	}
+
 	private void updateView()
 	{
 		// hide in fraction mode
@@ -407,7 +423,7 @@ public class FractionInput extends LinearLayout
 	private OnValueChangeListener mPickerListener = new OnValueChangeListener() {
 
 		@Override
-		public void onValueChange(NumberPickerWrapper picker, int oldVal, int newVal)
+		public void onValueChange(NumberPicker picker, int oldVal, int newVal)
 		{
 			Fraction oldValue = getValue();
 

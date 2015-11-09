@@ -56,6 +56,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import org.joda.time.LocalDate;
@@ -792,8 +793,9 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 				repeatArg = (Long) getFieldValue("repeatArg");
 			}
 
-			final NumberPickerWrapper picker = new NumberPickerWrapper(mContext);
+			final NumberPicker picker = new NumberPicker(mContext);
 			picker.setMinValue(2);
+			picker.setMaxValue(365);
 			picker.setWrapSelectorWheel(false);
 			picker.setValue((int) repeatArg);
 			picker.setGravity(Gravity.CENTER_HORIZONTAL);

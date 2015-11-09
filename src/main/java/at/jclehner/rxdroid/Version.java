@@ -34,8 +34,6 @@ import android.os.Build;
  */
 public final class Version
 {
-	public static final boolean SDK_IS_PRE_HONEYCOMB = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
-	public static final boolean SDK_IS_HONEYCOMB_OR_NEWER = !SDK_IS_PRE_HONEYCOMB;
 	public static final boolean SDK_IS_JELLYBEAN_OR_NEWER = Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1;
 	public static final boolean SDK_IS_LOLLIPOP_OR_NEWER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
 
