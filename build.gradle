@@ -25,7 +25,6 @@ dependencies {
 		compile 'com.android.support:support-v4:23.0.1'
 		compile 'com.android.support:support-v13:23.0.1'
 		compile 'com.android.support:appcompat-v7:23.0.1'
-		compile 'com.android.support:preference-v7:23.0.1'
 		//compile 'com.android.support:cardview-v7:21.0.0'
 		compile 'com.nineoldandroids:library:2.4.0'
 		compile 'net.lingala.zip4j:zip4j:1.3.2'
@@ -44,8 +43,8 @@ android {
 		minSdkVersion 14
 		targetSdkVersion 23
 
-		versionCode 9307
-		versionName '0.9.30.7'
+		versionCode 9308
+		versionName '0.9.30.8'
 	}
 
 	lintOptions {
