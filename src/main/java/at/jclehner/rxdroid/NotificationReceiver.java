@@ -369,6 +369,9 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		final int mode;
 		if (true) {
+			// Samsung - the king of fragmentation:
+			// https://stackoverflow.com/questions/18815707/alarmmanager-inconsistency
+
 			mode = AlarmManager.ELAPSED_REALTIME_WAKEUP;
 			triggerAtMillis = SystemClock.elapsedRealtime() + (triggerAtMillis - System.currentTimeMillis());
 
