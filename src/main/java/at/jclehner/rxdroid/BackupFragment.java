@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid;
 
+import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -54,7 +55,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import at.jclehner.androidutils.StorageHelper;
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
@@ -106,9 +106,7 @@ public class BackupFragment extends LoaderListFragment<File>
 		{
 			final List<File> dirs = new ArrayList<>();
 			dirs.add(mContext.getFilesDir());
-
-			for(StorageHelper.PathInfo si: StorageHelper.getDirectories(mContext))
-				dirs.add(new File(si.path, "RxDroid"));
+			dirs.add(new File(Environment.getExternalStorageDirectory(), "RxDroid"));
 
 			final List<BackupFileHolder> data = new ArrayList<BackupFileHolder>();
 
