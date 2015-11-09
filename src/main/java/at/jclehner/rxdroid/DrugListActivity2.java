@@ -21,7 +21,9 @@
 
 package at.jclehner.rxdroid;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.database.DataSetObserver;
 import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -384,6 +386,20 @@ public class DrugListActivity2 extends AppCompatActivity implements
 			public int getItemPosition(Object object) {
 				return POSITION_NONE;
 			}
+
+			@Override
+			public void unregisterDataSetObserver(DataSetObserver observer)
+			{
+				try
+				{
+					super.unregisterDataSetObserver(observer);
+				}
+				catch(IllegalStateException e)
+				{
+					Log.w(TAG, e);
+				}
+
+			}
 		};
 
 		public static final String ARG_PATIENT_ID = DrugListFragment.ARG_PATIENT_ID;
@@ -571,6 +587,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 			return view;
 		}
 
+		@TargetApi(17)
 		@Override
 		public void onStart()
 		{
