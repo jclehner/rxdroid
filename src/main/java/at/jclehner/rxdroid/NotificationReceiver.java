@@ -31,6 +31,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
 import android.support.v4.app.NotificationManagerCompat;
@@ -366,10 +367,28 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void setAlarm(long triggerAtMillis, PendingIntent operation)
 	{
+		final int mode;
+		if (true) {
+			mode = AlarmManager.ELAPSED_REALTIME_WAKEUP;
+			triggerAtMillis = SystemClock.elapsedRealtime() + (triggerAtMillis - System.currentTimeMillis());
+
+			/*final long nowElapsed = SystemClock.elapsedRealtime();
+			final long nowRtc = System.currentTimeMillis();
+
+			triggerAtMillis = nowElapsed + (triggerAtMillis - nowRtc);
+
+			Log.d(TAG, "nowElapsed=" + nowElapsed
+					+ "\nnowRtc=" + nowRtc
+					+ "\ntriggerAtMillis=" + triggerAtMillis
+					+ "\ndiff=" + (triggerAtMillis - nowElapsed));*/
+		} else {
+			mode = AlarmManager.RTC_WAKEUP;
+		}
+
 		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
-			mAlarmMgr.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, operation);
+			mAlarmMgr.set(mode, triggerAtMillis, operation);
 		else
-			mAlarmMgr.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, operation);
+			mAlarmMgr.setExact(mode, triggerAtMillis, operation);
 	}
 
 	private void cancelAllAlarms() {
@@ -540,7 +559,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.setContentIntent(createDrugListIntent(mDate));
 			builder.setTicker(getString(R.string._msg_new_notification));
 			builder.setCategory(NotificationCompat.CATEGORY_ALARM);
-			builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
+			builder.setColor(!BuildConfig.DEBUG ? Theme.getColorAttribute(R.attr.colorPrimary) : 0x00ff00);
 			builder.setWhen(0);
 
 			builder.setContentTitle(getString(titleResId));
