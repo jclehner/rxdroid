@@ -45,6 +45,8 @@ android {
 		minSdkVersion 14
 		targetSdkVersion 23
 
+        applicationId 'at.jclehner.rxdroid';
+
 		versionCode 9305
 		versionName '0.9.30.5'
 	}
@@ -72,7 +74,7 @@ android {
 			signingConfig signingConfigs.release
 		}
 		debug {
-			//applicationIdSuffix '.debug'
+			applicationIdSuffix '.debug'
 		}
 	}
 }

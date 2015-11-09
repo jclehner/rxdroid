@@ -28,7 +28,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
@@ -55,6 +54,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import at.jclehner.androidutils.StorageHelper;
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
@@ -104,10 +104,11 @@ public class BackupFragment extends LoaderListFragment<File>
 		@Override
 		public List<? extends ItemHolder<File>> doLoadInBackground()
 		{
-			final File[] dirs = {
-					new File(Environment.getExternalStorageDirectory(), "RxDroid"),
-					mContext.getFilesDir()
-			};
+			final List<File> dirs = new ArrayList<>();
+			dirs.add(mContext.getFilesDir());
+
+			for(StorageHelper.PathInfo si: StorageHelper.getDirectories(mContext))
+				dirs.add(new File(si.path, "RxDroid"));
 
 			final List<BackupFileHolder> data = new ArrayList<BackupFileHolder>();
 
@@ -175,6 +176,7 @@ public class BackupFragment extends LoaderListFragment<File>
 	}
 
 	private boolean mShowDialogIfNotWriteable = true;
+	private File[] mDirectories;
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)

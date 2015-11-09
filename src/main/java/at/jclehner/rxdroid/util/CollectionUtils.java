@@ -64,6 +64,17 @@ public final class CollectionUtils
 		return filtered;
 	}
 
+	public static <E> List<E> filter(final List<E> list, Filter<E> filter)
+	{
+		final List<E> filtered = new ArrayList<>();
+		for(E e : list)
+		{
+			if(filter.matches(e))
+				filtered.add(e);
+		}
+		return filtered;
+	}
+
 	public static <E> Collection<E> copy(final Collection<E> collection)
 	{
 		final Collection<E> cloned = create(collection);

@@ -23,28 +23,18 @@ package at.jclehner.rxdroid;
 
 import android.support.v7.app.AppCompatActivity;
 import android.app.AlarmManager;
-import android.support.v7.app.AlertDialog;
 import android.app.Application;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.backup.BackupManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.net.Uri;
 import android.os.*;
-import android.os.Process;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v4.content.IntentCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.Html;
 import android.util.Log;
-import android.view.Window;
 import android.widget.Toast;
 
 /*import org.acra.ACRA;
@@ -53,21 +43,17 @@ import org.acra.annotation.ReportsCrashes;*/
 
 import java.io.File;
 
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.WeakHashMap;
 
-import at.jclehner.androidutils.RefString;
+import at.jclehner.androidutils.StorageHelper;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Entry;
 import at.jclehner.rxdroid.util.Components;
 //import at.jclehner.rxdroid.util.EmailIntentSender;
-import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 /*@ReportsCrashes(
@@ -93,6 +79,8 @@ public class RxDroid extends Application
 	private static volatile WeakReference<Context> sContextRef;
 	private static volatile Handler sHandler;
 
+	private static FileObserver sObserver = new StorageHelper.MountWatcher("/sdcard/RxDroid");
+
 	@Override
 	public void onCreate()
 	{
@@ -107,6 +95,16 @@ public class RxDroid extends Application
 		Components.onCreate(getContext(), Components.NO_DATABASE_INIT | Components.NO_SETTINGS_INIT);
 
 		super.onCreate();
+
+		final List<StorageHelper.PathInfo> dirs = StorageHelper.getDirectories(this);
+		for (StorageHelper.PathInfo pi : dirs)
+		{
+			Log.d(TAG, "path=" + pi.path + ", rem=" + pi.removable + ", emu=" + pi.emulated);
+			Log.d(TAG, "  name=" + StorageHelper.getPrettyName(pi, dirs, new StorageHelper.SimpleFormatter()));
+		}
+
+		sObserver.startWatching();
+
 		//ACRA.init(this);
 		//ACRA.getErrorReporter().setReportSender(new EmailIntentSender(this));
 	}
