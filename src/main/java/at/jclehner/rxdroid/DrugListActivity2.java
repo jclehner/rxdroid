@@ -400,6 +400,32 @@ public class DrugListActivity2 extends AppCompatActivity implements
 				}
 
 			}
+
+			@Override
+			public void destroyItem(ViewGroup container, int position, Object object)
+			{
+				try
+				{
+					super.destroyItem(container, position, object);
+				}
+				catch(IllegalStateException e)
+				{
+					Log.w(TAG, e);
+				}
+			}
+
+			@Override
+			public void finishUpdate(ViewGroup container)
+			{
+				try
+				{
+					super.finishUpdate(container);
+				}
+				catch(IllegalStateException e)
+				{
+					Log.w(TAG, e);
+				}
+			}
 		};
 
 		public static final String ARG_PATIENT_ID = DrugListFragment.ARG_PATIENT_ID;
