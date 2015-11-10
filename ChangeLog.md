@@ -1,3 +1,6 @@
+### 0.9.31:
+* Fix crashes on Android < 4.2 (this time for real)
+
 ### 0.9.30.9:
 * Fix late notifications on some (Samsung) devices
 
