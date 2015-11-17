@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -365,6 +366,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		setAlarm(triggerAtMillis, createOperation(alarmExtras));
 	}
 
+	@TargetApi(23)
 	private void setAlarm(long triggerAtMillis, PendingIntent operation)
 	{
 		final int mode;
@@ -390,8 +392,10 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
 			mAlarmMgr.set(mode, triggerAtMillis, operation);
-		else
+		else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
 			mAlarmMgr.setExact(mode, triggerAtMillis, operation);
+		else
+			mAlarmMgr.setExactAndAllowWhileIdle(mode, triggerAtMillis, operation);
 	}
 
 	private void cancelAllAlarms() {
