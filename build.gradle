@@ -46,10 +46,10 @@ android {
 
 	defaultConfig {
 		minSdkVersion 8
-		targetSdkVersion 22
+		maxSdkVersion 13
 
-		versionCode 9304
-		versionName '0.9.30.4'
+		versionCode 9311
+		versionName '0.9.31-legacy'
 	}
 
 	lintOptions {
