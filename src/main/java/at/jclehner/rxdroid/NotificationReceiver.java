@@ -22,7 +22,6 @@
 package at.jclehner.rxdroid;
 
 import android.annotation.TargetApi;
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -46,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import at.jclehner.androidutils.AlarmManager;
 import at.jclehner.androidutils.EventDispatcher;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.db.Database;
@@ -114,6 +114,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	private static final int NOTIFICATION_FORCE_UPDATE = 1;
 	private static final int NOTIFICATION_FORCE_SILENT = 2;
 
+	private static final int ID_ALARM = 0;
+
 	private static final int ID_NORMAL = R.id.notification;
 	private static final int ID_WEARABLE = 1;
 	private static final int ID_ERROR = 5;
@@ -146,6 +148,9 @@ public class NotificationReceiver extends BroadcastReceiver
 		if(intent == null)
 			return;
 
+		long delay = AlarmManager.onAlarmTriggered(ID_ALARM);
+		Log.i(TAG, "Alarm delay was " + Millis.toString(delay));
+
 		mContext = context;
 
 		Settings.init();
@@ -163,7 +168,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		getNotificationManager().cancel(ID_ERROR);
 
-		mAlarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		mAlarmMgr = AlarmManager.from(mContext);
 		mDoPostSilent = intent.getBooleanExtra(EXTRA_SILENT, false);
 		mAllDrugs = Database.getAll(Drug.class);
 
@@ -366,40 +371,22 @@ public class NotificationReceiver extends BroadcastReceiver
 		setAlarm(triggerAtMillis, createOperation(alarmExtras));
 	}
 
-	@TargetApi(23)
 	private void setAlarm(long triggerAtMillis, PendingIntent operation)
 	{
-		final int mode;
-		if (true) {
-			// Samsung - the king of fragmentation:
-			// https://stackoverflow.com/questions/18815707/alarmmanager-inconsistency
+		// Translate rtc to elapsed time
+		triggerAtMillis = SystemClock.elapsedRealtime()
+				+ (triggerAtMillis - System.currentTimeMillis());
 
-			mode = AlarmManager.ELAPSED_REALTIME_WAKEUP;
-			triggerAtMillis = SystemClock.elapsedRealtime() + (triggerAtMillis - System.currentTimeMillis());
+		final AlarmManager.Args args = AlarmManager.Args.elapsed()
+				.exact()
+				.allowWhileIdle()
+				.time(triggerAtMillis);
 
-			/*final long nowElapsed = SystemClock.elapsedRealtime();
-			final long nowRtc = System.currentTimeMillis();
-
-			triggerAtMillis = nowElapsed + (triggerAtMillis - nowRtc);
-
-			Log.d(TAG, "nowElapsed=" + nowElapsed
-					+ "\nnowRtc=" + nowRtc
-					+ "\ntriggerAtMillis=" + triggerAtMillis
-					+ "\ndiff=" + (triggerAtMillis - nowElapsed));*/
-		} else {
-			mode = AlarmManager.RTC_WAKEUP;
-		}
-
-		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
-			mAlarmMgr.set(mode, triggerAtMillis, operation);
-		else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-			mAlarmMgr.setExact(mode, triggerAtMillis, operation);
-		else
-			mAlarmMgr.setExactAndAllowWhileIdle(mode, triggerAtMillis, operation);
+		mAlarmMgr.set(ID_ALARM, args, operation);
 	}
 
 	private void cancelAllAlarms() {
-		mAlarmMgr.cancel(createOperation(null));
+		mAlarmMgr.cancel(0, createOperation(null));
 	}
 
 	private PendingIntent createOperation(Bundle extras)
