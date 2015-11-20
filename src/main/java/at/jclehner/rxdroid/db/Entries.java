@@ -581,6 +581,7 @@ public final class Entries
 
 		if(!isActiveDoseTime && activeOrNextDoseTime == Drug.TIME_MORNING)
 		{
+			// FIXME fails if we're between end of TIME_NIGHT and midnight!
 			date = DateTime.add(date, Calendar.DAY_OF_MONTH, -1);
 			begin = Drug.TIME_NIGHT;
 		}
