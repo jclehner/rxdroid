@@ -396,7 +396,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 				}
 				catch(IllegalStateException e)
 				{
-					Log.w(TAG, e);
+					Log.w(TAG, "unregisterDataSetObserver: " + e.getMessage());
 				}
 
 			}
@@ -410,7 +410,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 				}
 				catch(IllegalStateException e)
 				{
-					Log.w(TAG, e);
+					Log.w(TAG, "destroyItem: " + e.getMessage());
 				}
 			}
 
@@ -423,7 +423,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 				}
 				catch(IllegalStateException e)
 				{
-					Log.w(TAG, e);
+					Log.w(TAG, "finishUpdate:" + e.getMessage());
 				}
 			}
 		};
