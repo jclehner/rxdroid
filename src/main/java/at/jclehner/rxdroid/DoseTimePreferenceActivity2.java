@@ -157,7 +157,6 @@ public class DoseTimePreferenceActivity2 extends AppCompatActivity
 			MenuItem item = menu.add(R.string._title_pref_restore_defaults);
 			item.setIcon(R.drawable.ic_action_undo);
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-			item.setIcon(android.R.drawable.ic_menu_revert);
 			item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
 			{
 
