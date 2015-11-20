@@ -23,6 +23,8 @@
 -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
+	<item name="app_package" type="string">at.jclehner.rxdroid</item>
+
     <item name="pref_default_time_morning" type="string">06:00-10:00</item>
     <item name="pref_default_time_noon" type="string">12:00-14:00</item>
     <item name="pref_default_time_evening" type="string">19:00-21:00</item>
