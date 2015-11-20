@@ -191,15 +191,14 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 		else
 		{
-			long delay = AlarmManager.onAlarmTriggered(ID_ALARM);
-			Log.i(TAG, "Alarm delay was " + Millis.toString(delay));
-
-
 			final boolean isAlarmRepetition = intent.getBooleanExtra(EXTRA_IS_ALARM_REPETITION, false);
 
 			final int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Schedule.TIME_INVALID);
 			if(doseTime != Schedule.TIME_INVALID)
 			{
+				long delay = AlarmManager.onAlarmTriggered(ID_ALARM);
+				Log.i(TAG, "Alarm delay was " + Millis.toString(delay));
+
 				if(!isAlarmRepetition)
 				{
 

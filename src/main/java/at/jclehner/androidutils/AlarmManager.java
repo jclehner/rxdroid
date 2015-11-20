@@ -298,6 +298,8 @@ public class AlarmManager
 			return 0;
 		}
 
+		Log.d(TAG, "triggered: #" + id + ": " + alarm);
+
 		sAlarms.remove(id);
 
 		final long now = alarm.elapsed ? SystemClock.elapsedRealtime() : System.currentTimeMillis();
