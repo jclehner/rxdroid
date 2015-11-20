@@ -48,7 +48,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import at.jclehner.androidutils.StorageHelper;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Entry;
@@ -79,8 +78,6 @@ public class RxDroid extends Application
 	private static volatile WeakReference<Context> sContextRef;
 	private static volatile Handler sHandler;
 
-	private static FileObserver sObserver = new StorageHelper.MountWatcher("/sdcard/RxDroid");
-
 	@Override
 	public void onCreate()
 	{
@@ -95,15 +92,6 @@ public class RxDroid extends Application
 		Components.onCreate(getContext(), Components.NO_DATABASE_INIT | Components.NO_SETTINGS_INIT);
 
 		super.onCreate();
-
-		final List<StorageHelper.PathInfo> dirs = StorageHelper.getDirectories(this);
-		for (StorageHelper.PathInfo pi : dirs)
-		{
-			Log.d(TAG, "path=" + pi.path + ", rem=" + pi.removable + ", emu=" + pi.emulated);
-			Log.d(TAG, "  name=" + StorageHelper.getPrettyName(pi, dirs, new StorageHelper.SimpleFormatter()));
-		}
-
-		sObserver.startWatching();
 
 		//ACRA.init(this);
 		//ACRA.getErrorReporter().setReportSender(new EmailIntentSender(this));
