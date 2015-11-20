@@ -24,7 +24,7 @@ public class AlarmManager
 	public static final long INTERVAL_HALF_DAY = android.app.AlarmManager.INTERVAL_HALF_DAY;
 	public static final long INTERVAL_DAY = android.app.AlarmManager.INTERVAL_DAY;
 
-	public static class Args
+	public static class Alarm
 	{
 		private boolean elapsed = true;
 		private boolean wakeup = false;
@@ -39,82 +39,84 @@ public class AlarmManager
 		long windowStartMillis = -1;
 		long windowLengthMillis = -1;
 
-		static Args type(int type)
+		static Alarm type(int type)
 		{
-			final Args args = new Args();
-			args.type = type;
-			args.elapsed = (type == ELAPSED_REALTIME || type == ELAPSED_REALTIME_WAKEUP);
-			args.wakeup = (type == ELAPSED_REALTIME_WAKEUP || type == RTC_WAKEUP);
-			return args;
+			final Alarm alarm = new Alarm();
+			alarm.type = type;
+			alarm.elapsed = (type == ELAPSED_REALTIME || type == ELAPSED_REALTIME_WAKEUP);
+			alarm.wakeup = (type == ELAPSED_REALTIME_WAKEUP || type == RTC_WAKEUP);
+			return alarm;
 		}
 
-		public Args elapsed(boolean elapsed)
+		public Alarm elapsed(boolean elapsed)
 		{
 			this.elapsed = elapsed;
 			return this;
 		}
 
-		public static Args elapsed()
+		public static Alarm elapsed()
 		{
-			return new Args().elapsed(true);
+			return new Alarm().elapsed(true);
 		}
 
-		public Args rtc(boolean rtc)
+		public Alarm rtc(boolean rtc)
 		{
 			return elapsed(!rtc);
 		}
 
-		public static Args rtc()
+		public static Alarm rtc()
 		{
-			return new Args().rtc(true);
+			return new Alarm().rtc(true);
 		}
 
-		public Args wakeup()
+		public Alarm wakeup()
 		{
 			return wakeup(true);
 		}
 
-		public Args wakeup(boolean wakeup)
+		public Alarm wakeup(boolean wakeup)
 		{
 			this.wakeup = wakeup;
 			return this;
 		}
 
-		public Args allowWhileIdle()
+		public Alarm allowWhileIdle()
 		{
 			return allowWhileIdle(true);
 		}
 
-		public Args allowWhileIdle(boolean allowWhileIdle)
+		public Alarm allowWhileIdle(boolean allowWhileIdle)
 		{
 			this.allowWhileIdle = allowWhileIdle;
 			return this;
 		}
 
-		public Args exact()
+		public Alarm exact()
 		{
 			return exact(true);
 		}
 
-		public Args exact(boolean exact)
+		public Alarm exact(boolean exact)
 		{
 			this.exact = exact;
 			return this;
 		}
 
-		public Args time(long triggerAtMillis)
+		public Alarm time(long triggerAtMillis)
 		{
 			this.triggerAtMillis = triggerAtMillis;
+			this.intervalMillis = this.windowStartMillis = this.windowLengthMillis = -1;
 			return this;
 		}
 
-		public Args repeating(long triggerAtMillis, long intervalMillis)
+		public Alarm repeating(long triggerAtMillis, long intervalMillis)
 		{
 			this.intervalMillis = intervalMillis;
+			this.windowStartMillis = this.windowLengthMillis = -1;
 			return time(triggerAtMillis);
 		}
 
-		public Args window(long windowStartMillis, long windowLengthMillis)
+		public Alarm window(long windowStartMillis, long windowLengthMillis)
 		{
 			if(windowStartMillis == -1 ^ windowLengthMillis == -1)
 			{
@@ -123,6 +125,7 @@ public class AlarmManager
 
 			this.windowStartMillis = windowStartMillis;
 			this.windowLengthMillis = windowLengthMillis;
+			this.triggerAtMillis = this.intervalMillis = -1;
 
 			return this;
 		}
@@ -130,7 +133,7 @@ public class AlarmManager
 		@Override
 		public String toString()
 		{
-			return "Args {"
+			return "Alarm {"
 					+ " type=" + (elapsed ? "elapsed" : "rtc")
 					+ " wakeup=" + wakeup
 					+ " exact=" + exact
@@ -144,10 +147,12 @@ public class AlarmManager
 		void verifyAndAdjust()
 		{
 			// No need to check windowLengthMillis, as this is done by window().
-			if (this.triggerAtMillis == -1 && this.windowStartMillis == -1)
-			{
+			if(this.triggerAtMillis == -1 && this.windowStartMillis == -1)
 				throw new IllegalArgumentException("No alarm time specified");
-			}
+
+			if(this.windowStartMillis != -1 && this.intervalMillis != -1)
+				throw new IllegalArgumentException("Both window and repeating specified");
+
 
 			if(type == -1)
 			{
@@ -163,7 +168,7 @@ public class AlarmManager
 		}
 	}
 
-	private static final SparseArray<Args> sAlarms = new SparseArray<>();
+	private static final SparseArray<Alarm> sAlarms = new SparseArray<>();
 	private final android.app.AlarmManager mAm;
 
 	public static AlarmManager from(Context context)
@@ -172,87 +177,89 @@ public class AlarmManager
 	}
 
 	@TargetApi(Build.VERSION_CODES.M)
-	public void set(int id, Args args, PendingIntent operation)
+	public void set(int id, Alarm alarm, PendingIntent operation)
 	{
-		args.verifyAndAdjust();
+		alarm.verifyAndAdjust();
 
-		if(args.triggerAtMillis != -1)
+		Log.d(TAG, "set: #" + id + ", " + alarm);
+
+		if(alarm.triggerAtMillis != -1)
 		{
-			if(args.intervalMillis == -1)
+			if(alarm.intervalMillis == -1)
 			{
-				if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT || !args.exact)
-					mAm.set(args.type, args.triggerAtMillis, operation);
-				else if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || !args.allowWhileIdle)
-					mAm.setExact(args.type, args.triggerAtMillis, operation);
+				if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT || !alarm.exact)
+					mAm.set(alarm.type, alarm.triggerAtMillis, operation);
+				else if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || !alarm.allowWhileIdle)
+					mAm.setExact(alarm.type, alarm.triggerAtMillis, operation);
 				else
-					mAm.setExactAndAllowWhileIdle(args.type, args.triggerAtMillis, operation);
+					mAm.setExactAndAllowWhileIdle(alarm.type, alarm.triggerAtMillis, operation);
 			}
 			else
 			{
-				if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT && !args.exact)
+				if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT && !alarm.exact)
 				{
-					mAm.setInexactRepeating(args.type, args.triggerAtMillis, args.intervalMillis,
+					mAm.setInexactRepeating(alarm.type, alarm.triggerAtMillis, alarm.intervalMillis,
 							operation);
 				}
 				else
 				{
-					mAm.setRepeating(args.type, args.triggerAtMillis, args.intervalMillis,
+					mAm.setRepeating(alarm.type, alarm.triggerAtMillis, alarm.intervalMillis,
 							operation);
 				}
 			}
 		}
-		else if(args.windowStartMillis != -1)
+		else if(alarm.windowStartMillis != -1)
 		{
 			if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
-				mAm.set(args.type, args.windowStartMillis, operation);
+				mAm.set(alarm.type, alarm.windowStartMillis, operation);
 			else
 			{
-				mAm.setWindow(args.type, args.windowStartMillis, args.windowLengthMillis,
+				mAm.setWindow(alarm.type, alarm.windowStartMillis, alarm.windowLengthMillis,
 						operation);
 			}
 		}
 
-		sAlarms.put(id, args);
+		sAlarms.put(id, alarm);
 	}
 
 	public void set(int id, int type, long triggerAtMillis, PendingIntent operation)
 	{
-		set(id, Args.type(type).time(triggerAtMillis), operation);
+		set(id, Alarm.type(type).time(triggerAtMillis), operation);
 	}
 
 	public void setAndAllowWhileIdle(int id, int type, long triggerAtMillis,
 			PendingIntent operation)
 	{
-		set(id, Args.type(type).time(triggerAtMillis).allowWhileIdle(), operation);
+		set(id, Alarm.type(type).time(triggerAtMillis).allowWhileIdle(), operation);
 	}
 
 	public void setExact(int id, int type, long triggerAtMillis, PendingIntent operation)
 	{
-		set(id, Args.type(type).time(triggerAtMillis).exact(), operation);
+		set(id, Alarm.type(type).time(triggerAtMillis).exact(), operation);
 	}
 
 	public void setExactAndAllowWhileIdle(int id, int type, long triggerAtMillis,
 										  PendingIntent operation)
 	{
-		set(id, Args.type(type).time(triggerAtMillis).exact().allowWhileIdle(), operation);
+		set(id, Alarm.type(type).time(triggerAtMillis).exact().allowWhileIdle(), operation);
 	}
 
 	public void setInexactRepeating(int id, int type, long triggerAtMillis, long intervalMillis,
 									PendingIntent operation)
 	{
-		set(id, Args.type(type).repeating(triggerAtMillis, intervalMillis), operation);
+		set(id, Alarm.type(type).repeating(triggerAtMillis, intervalMillis), operation);
 	}
 
 	public void setRepeating(int id, int type, long triggerAtMillis, long intervalMillis,
 							 PendingIntent operation)
 	{
-		set(id, Args.type(type).repeating(triggerAtMillis, intervalMillis).exact(), operation);
+		set(id, Alarm.type(type).repeating(triggerAtMillis, intervalMillis).exact(), operation);
 	}
 
 	public void setWindow(int id, int type, long windowStartMillis, long windowLengthMillis,
 						  PendingIntent operation)
 	{
-		set(id, Args.type(type).window(windowStartMillis, windowLengthMillis), operation);
+		set(id, Alarm.type(type).window(windowStartMillis, windowLengthMillis), operation);
 	}
 
 	public void setAlarmClock(int id, Object info, PendingIntent operation)
@@ -262,7 +269,7 @@ public class AlarmManager
 			final AlarmClockInfo alarmInfo = (AlarmClockInfo) info;
 			cancelIfExists(id, operation);
 			mAm.setAlarmClock(alarmInfo, operation);
-			sAlarms.put(id, Args.rtc().wakeup().exact().time(alarmInfo.getTriggerTime()));
+			sAlarms.put(id, Alarm.rtc().wakeup().exact().time(alarmInfo.getTriggerTime()));
 		}
 
 		throw new UnsupportedOperationException();
@@ -284,8 +291,8 @@ public class AlarmManager
 
 	public static long onAlarmTriggered(int id)
 	{
-		final Args args = sAlarms.get(id);
-		if(args == null)
+		final Alarm alarm = sAlarms.get(id);
+		if(alarm == null)
 		{
 			Log.w(TAG, "Unknown alarm #" + id);
 			return 0;
@@ -293,21 +300,21 @@ public class AlarmManager
 
 		sAlarms.remove(id);
 
-		final long now = args.elapsed ? SystemClock.elapsedRealtime() : System.currentTimeMillis();
+		final long now = alarm.elapsed ? SystemClock.elapsedRealtime() : System.currentTimeMillis();
 
-		if(args.triggerAtMillis != -1)
+		if(alarm.triggerAtMillis != -1)
 		{
-			final long diff = now - args.intervalMillis;
+			final long diff = now - alarm.intervalMillis;
 
-			if(args.intervalMillis == -1)
+			if(alarm.intervalMillis == -1)
 				return diff;
 			else
-				return diff % args.intervalMillis;
+				return diff % alarm.intervalMillis;
 		}
-		else if(args.windowStartMillis != -1)
+		else if(alarm.windowStartMillis != -1)
 		{
-			final long end = args.windowStartMillis + args.windowLengthMillis;
-			if(now >= args.windowStartMillis && now <= end)
+			final long end = alarm.windowStartMillis + alarm.windowLengthMillis;
+			if(now >= alarm.windowStartMillis && now <= end)
 				return 0;
 
 			return now - end;

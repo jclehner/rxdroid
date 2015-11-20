@@ -21,7 +21,6 @@
 
 package at.jclehner.rxdroid;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -29,7 +28,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
@@ -148,9 +146,6 @@ public class NotificationReceiver extends BroadcastReceiver
 		if(intent == null)
 			return;
 
-		long delay = AlarmManager.onAlarmTriggered(ID_ALARM);
-		Log.i(TAG, "Alarm delay was " + Millis.toString(delay));
-
 		mContext = context;
 
 		Settings.init();
@@ -196,6 +191,10 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 		else
 		{
+			long delay = AlarmManager.onAlarmTriggered(ID_ALARM);
+			Log.i(TAG, "Alarm delay was " + Millis.toString(delay));
+
+
 			final boolean isAlarmRepetition = intent.getBooleanExtra(EXTRA_IS_ALARM_REPETITION, false);
 
 			final int doseTime = intent.getIntExtra(EXTRA_DOSE_TIME, Schedule.TIME_INVALID);
@@ -377,12 +376,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		triggerAtMillis = SystemClock.elapsedRealtime()
 				+ (triggerAtMillis - System.currentTimeMillis());
 
-		final AlarmManager.Args args = AlarmManager.Args.elapsed()
+		final AlarmManager.Alarm alarm = AlarmManager.Alarm.elapsed()
 				.exact()
 				.allowWhileIdle()
 				.time(triggerAtMillis);
 
-		mAlarmMgr.set(ID_ALARM, args, operation);
+		mAlarmMgr.set(ID_ALARM, alarm, operation);
 	}
 
 	private void cancelAllAlarms() {
