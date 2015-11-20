@@ -41,8 +41,6 @@
 	    
 		android:orientation="horizontal"
 		android:gravity="center"
-		
-		style="@style/FractionInputBottomPadding"
 	>	
 		<NumberPicker android:id="@+id/integer"
 			android:layout_width="wrap_content"

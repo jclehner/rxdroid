@@ -197,8 +197,10 @@
 -	</style>
 
     <style name="Theme.RxDroid.ButtonBar.Dark" parent="Theme.RxDroid.ButtonBar" />
-    <style name="Theme.RxDroid.ButtonBarButton" />
-    <style name="Theme.RxDroid.ButtonBarButton.Dark"/>
+	<style name="Theme.RxDroid.ButtonBarButton" parent="@android:style/Widget.Holo.Button.Borderless">
+		<item name="android:textColor">?android:attr/textColorPrimary</item>
+	</style>
+	<style name="Theme.RxDroid.ButtonBarButton.Dark" parent="@android:style/Widget.Holo.Button.Borderless" />
 
     <style name="Theme.RxDroid.Transparent" parent="Theme.RxDroid">
         <item name="android:windowIsTranslucent">true</item>
