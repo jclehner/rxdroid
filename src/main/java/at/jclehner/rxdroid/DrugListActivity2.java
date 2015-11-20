@@ -1192,10 +1192,10 @@ public class DrugListActivity2 extends AppCompatActivity implements
 		@Override
 		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 		{
-			if(menu == null)
+			if(menu == null || menu.findItem(R.id.help) != null)
 				return;
 
-			menu.add(R.string._title_help)
+			menu.add(0, R.id.help, 0, R.string._title_help)
 					.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
 					{
 
