@@ -311,7 +311,7 @@ public class AlarmManager
 
 		if(alarm.triggerAtMillis != -1)
 		{
-			final long diff = now - alarm.intervalMillis;
+			final long diff = now - alarm.triggerAtMillis;
 
 			if(alarm.intervalMillis == -1)
 				return diff;
