@@ -289,6 +289,11 @@ public class AlarmManager
 		sAlarms.remove(id);
 	}
 
+	public static void clearAlarms()
+	{
+		sAlarms.clear();
+	}
+
 	public static long onAlarmTriggered(int id)
 	{
 		final Alarm alarm = sAlarms.get(id);
@@ -298,7 +303,7 @@ public class AlarmManager
 			return 0;
 		}
 
-		Log.d(TAG, "triggered: #" + id + ": " + alarm);
+		Log.d(TAG, "onAlarmTriggered: #" + id + ": " + alarm);
 
 		sAlarms.remove(id);
 
