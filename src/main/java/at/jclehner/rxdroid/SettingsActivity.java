@@ -260,7 +260,11 @@ public class SettingsActivity extends AppCompatActivity
 			else if(Settings.Keys.HISTORY_SIZE.equals(key))
 			{
 				if(Settings.getStringAsInt(Settings.Keys.HISTORY_SIZE, -1) >= Settings.Enums.HISTORY_SIZE_6M)
-					Toast.makeText(getActivity(), R.string._toast_large_history_size, Toast.LENGTH_LONG).show();
+				{
+					final Context ctx = getActivity();
+					if(ctx != null)
+						Toast.makeText(ctx, R.string._toast_large_history_size, Toast.LENGTH_LONG).show();
+				}
 			}
 			else if(Settings.Keys.USE_SAFE_MODE.equals(key))
 			{
