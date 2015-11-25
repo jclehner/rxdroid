@@ -479,4 +479,5 @@
 	<string name="_btn_skip">Überspringen</string>
 	<string name="_title_expiry_date">Verfallsdatum</string>
 	<string name="_title_supplies">Vorräte</string>
+	<string name="_toast_expiry">Verfällt am %1$s.</string>
 </resources>

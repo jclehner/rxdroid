@@ -1081,12 +1081,25 @@ public class DrugListActivity2 extends AppCompatActivity implements
 				final Drug drug = ((DrugSupplyMonitor) view).getDrug();
 				if(drug != null)
 				{
-					//final Date today = DateTime.today();
+					final LocalDate expiry = drug.getExpiryDate();
+					final LocalDate supplyEnd = Entries.getSupplyEndDate(drug, mDate);
 
-					final int daysLeft = Entries.getSupplyDaysLeftForDrug(drug, mDate);
-					final String dateString = DateTime.toNativeDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, daysLeft));
+					final int toastTextId;
+					final LocalDate toastDate;
 
-					Toast.makeText(getActivity(), getString(R.string._toast_low_supplies, dateString), Toast.LENGTH_LONG).show();
+					if(expiry != null && expiry.isBefore(supplyEnd))
+					{
+						toastTextId = R.string._toast_expiry;
+						toastDate = expiry;
+					}
+					else
+					{
+						toastTextId = R.string._toast_low_supplies;
+						toastDate = supplyEnd;
+					}
+
+					Toast.makeText(getActivity(), getString(toastTextId,
+							DateTime.toNativeDate(toastDate)), Toast.LENGTH_LONG).show();
 				}
 			}
 		}

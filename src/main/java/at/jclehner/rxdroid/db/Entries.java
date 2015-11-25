@@ -442,6 +442,10 @@ public final class Entries
 		return getSupplyDaysLeftForDrug(drug, date) < minSupplyDays;
 	}
 
+	public static LocalDate getSupplyEndDate(Drug drug, Date date) {
+		return LocalDate.fromDateFields(date).plusDays(getSupplyDaysLeftForDrug(drug, date));
+	}
+
 	public static boolean willExpireSoon(Drug drug, Date date)
 	{
 		if(!drug.isActive() || drug.getRefillSize() == 0)

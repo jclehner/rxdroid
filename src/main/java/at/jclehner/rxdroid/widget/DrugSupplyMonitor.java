@@ -52,8 +52,6 @@ public class DrugSupplyMonitor extends TextView implements
 	private Date mDate;
 	private Date mToday;
 
-	private boolean mHasLowSupply;
-
 	public DrugSupplyMonitor(Context context) {
 		super(context);
 	}
@@ -91,16 +89,6 @@ public class DrugSupplyMonitor extends TextView implements
 
 	public Drug getDrug() {
 		return mDrug;
-	}
-
-	public boolean getHasLowSupply() {
-		return mHasLowSupply;
-	}
-
-	public void setHasLowSupply(boolean hasLowSupply)
-	{
-		mHasLowSupply = hasLowSupply;
-		updateText(mDrug, mDate);
 	}
 
 	public void setToday(Date date) {
@@ -164,7 +152,7 @@ public class DrugSupplyMonitor extends TextView implements
 	{
 		int typeface = Typeface.NORMAL;
 		float textScaleX = 1.0f;
-		mHasLowSupply = false;
+		boolean highlight = false;
 
 		if(drug != null)
 		{
@@ -179,11 +167,11 @@ public class DrugSupplyMonitor extends TextView implements
 					Fraction doseInTimePeriod_dumb = Entries.getTotalDoseInTimePeriod_dumb(drug, today, date, true);
 					currentSupply.subtract(doseInTimePeriod_dumb);
 				}
-				else if(date.equals(today) && Entries.hasLowSupplies(drug, date))
+				else if(date.equals(today) && (Entries.hasLowSupplies(drug, date) || Entries.willExpireSoon(drug, date)))
 				{
 					//typeface = Typeface.BOLD_ITALIC;
 					//textScaleX = 1.25f;
-					mHasLowSupply = true;
+					highlight = true;
 				}
 			}
 
@@ -193,7 +181,7 @@ public class DrugSupplyMonitor extends TextView implements
 				setText("0");
 		}
 
-		setBackgroundResource(mHasLowSupply ? R.drawable.highlight
+		setBackgroundResource(highlight ? R.drawable.highlight
 						: Theme.getResourceAttribute(R.attr.selectableItemBackground));
 
 		setTypeface(null, typeface);

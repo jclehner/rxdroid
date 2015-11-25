@@ -503,4 +503,7 @@
 
 	<string name="_title_expiry_date">Expiry date</string>
 
+	<!-- %1$s is a date -->
+	<string name="_toast_expiry">Expires on %1$s.</string>
+
 </resources>
