@@ -16,7 +16,7 @@
 			android:title="@string/_title_backup_restore">
 		<intent
 				android:action="android.intent.action.MAIN"
-				android:targetPackage="at.jclehner.rxdroid"
+				android:targetPackage="@string/app_package"
 				android:targetClass="at.jclehner.rxdroid.BackupActivity"
 				/>
 	</Preference>
