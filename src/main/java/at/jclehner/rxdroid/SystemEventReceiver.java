@@ -88,13 +88,13 @@ public class SystemEventReceiver extends BroadcastReceiver
 				Settings.putLong(Keys.TIMEZONE_OFFSET, TimeZone.getDefault().getRawOffset());
 			}
 
-			final Date nextRefillReminder = Settings.getDate(Keys.NEXT_REFILL_REMINDER_DATE);
+			final Date nextRefillReminder = Settings.getDate(Keys.UNSNOOZE_DATE);
 			if(nextRefillReminder != null)
 			{
 				final Date today = DateTime.today();
 				if(Math.abs(DateTime.diffDays(nextRefillReminder, today)) > 1)
 				{
-					Settings.putDate(Keys.NEXT_REFILL_REMINDER_DATE,
+					Settings.putDate(Keys.UNSNOOZE_DATE,
 							DateTime.add(today, Calendar.DAY_OF_MONTH, 1));
 				}
 			}

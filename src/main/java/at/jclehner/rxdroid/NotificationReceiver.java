@@ -178,9 +178,9 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 		else if(ACTION_SNOOZE_SUPPLY.equals(intent.getAction()))
 		{
-			final Date nextReminderDate = DateTime.add(
+			final Date unsnoozeDate = DateTime.add(
 					mDtInfo.displayDate(), Calendar.DAY_OF_MONTH, 1);
-			Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, nextReminderDate);
+			Settings.putDate(Settings.Keys.UNSNOOZE_DATE, unsnoozeDate);
 
 			final DrugIdSet drugIds = DrugIdSet.fromString(
 					Settings.getString(SUPPLY_SNOOZE_DRUGS, ""));
@@ -807,15 +807,15 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		private void collectDrugsWithSupplyNotifications()
 		{
-			final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
+			final Date unsnoozeDate = Settings.getDate(Settings.Keys.UNSNOOZE_DATE);
 			final DrugIdSet snoozedDrugIds = DrugIdSet.fromString(
 					Settings.getString(SUPPLY_SNOOZE_DRUGS, ""));
 
-			if(nextRefillReminderDate == null || !mDtInfo.displayDate().before(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
+			if(unsnoozeDate == null || !mDtInfo.displayDate().before(unsnoozeDate) || snoozedDrugIds.isEmpty())
 			{
 				snoozedDrugIds.clear();
 				Settings.putString(SUPPLY_SNOOZE_DRUGS, null);
-				Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
+				Settings.putDate(Settings.Keys.UNSNOOZE_DATE, null);
 				Log.d(TAG, "Clearing refill reminder snooze info");
 			}
 

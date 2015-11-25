@@ -93,10 +93,8 @@ public final class Settings
 		public static final String OLDEST_POSSIBLE_DOSE_EVENT_TIME = "oldest_possible_dose_event_time";
 
 		public static final String TIMEZONE_OFFSET = "timezone_offset";
-		/**
-		 * @see at.jclehner.rxdroid.NotificationReceiver.ACTION_SNOOZE_REFILL_REMINDER
-		 */
-		public static final String NEXT_REFILL_REMINDER_DATE = "next_refill_reminder_date";
+
+		public static final String UNSNOOZE_DATE = "next_refill_reminder_date";
 
 		public static final String LOG_SHOW_TAKEN = "log_show_taken";
 		public static final String LOG_SHOW_SKIPPED = "log_show_skipped";

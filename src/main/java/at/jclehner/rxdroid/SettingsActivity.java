@@ -276,7 +276,7 @@ public class SettingsActivity extends AppCompatActivity
 				NotificationReceiver.cancelAllNotifications();
 			}
 			else if(Settings.Keys.LAST_MSG_HASH.equals(key)
-					|| Settings.Keys.NEXT_REFILL_REMINDER_DATE.equals(key)
+					|| Settings.Keys.UNSNOOZE_DATE.equals(key)
 					|| "refill_reminder_snooze_drugs".equals(key))
 			{
 				return;
@@ -773,7 +773,7 @@ public class SettingsActivity extends AppCompatActivity
 					@Override
 					public boolean onPreferenceClick(Preference preference)
 					{
-						Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
+						Settings.putDate(Settings.Keys.UNSNOOZE_DATE, null);
 						return true;
 					}
 				});
@@ -848,7 +848,7 @@ public class SettingsActivity extends AppCompatActivity
 			}
 
 			final String[] keys = {
-					Settings.Keys.NEXT_REFILL_REMINDER_DATE,
+					Settings.Keys.UNSNOOZE_DATE,
 					"refill_reminder_snooze_drugs"
 			};
 
