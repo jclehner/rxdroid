@@ -520,18 +520,35 @@ public class NotificationReceiver extends BroadcastReceiver
 				return;
 			}
 
-			final String first = Entries.getDrugName(mLowSupplyDrugs.get(0));
+			final StringBuilder sb = new StringBuilder();
 
-			if(mLowSupplyDrugs.size() == 1)
-				mTextSupply = getString(R.string._qmsg_low_supply_single, first);
-			else
+			final Object[][] data = {
+					{ mLowSupplyDrugs, R.string._title_supplies_low },
+					{ mExpiringDrugs, R.string._title_supplies_expiring }
+			};
+
+			for(Object[] datum : data)
 			{
-				final String second = Entries.getDrugName(mLowSupplyDrugs.get(1));
-				mTextSupply = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, mLowSupplyDrugs.size() - 1, first, second);
+				final List<Drug> drugs = (List<Drug>) datum[0];
+				if(drugs.isEmpty())
+					continue;
+
+				final String first = Entries.getDrugName(drugs.get(0));
+
+				sb.append(getString((int) datum[1]) + ": ");
+
+				if(drugs.size() == 1)
+					sb.append(getString(R.string._qmsg_low_supply_single, first));
+				else
+				{
+					final String second = Entries.getDrugName(drugs.get(1));
+					sb.append(RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple,
+							drugs.size() - 1, first, second));
+				}
 			}
 
-			final NotificationCompat.Builder nb = createPageBuilder(R.string._title_notification_low_supplies, mTextSupply);
-			addRefillReminderActions(nb, true);
+			final NotificationCompat.Builder nb = createPageBuilder(R.string._title_notification_supplies, mTextSupply);
+			addSupplyActions(nb, true);
 			mNtfSupply = nb.build();
 		}
 
@@ -574,7 +591,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			}
 
 			if(!addDoseActions(builder))
-				addRefillReminderActions(builder, false);
+				addSupplyActions(builder, false);
 
 			applyNotificationModalities(builder);
 
@@ -610,7 +627,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			return false;
 		}
 
-		private void addRefillReminderActions(NotificationCompat.Builder builder, boolean force)
+		private void addSupplyActions(NotificationCompat.Builder builder, boolean force)
 		{
 			if(force || (mTextDoses == null && mTextSupply != null))
 			{

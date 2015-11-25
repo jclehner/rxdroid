@@ -469,12 +469,6 @@
 	<string name="_title_history">History</string>
 	<string name="_btn_skip">Skip</string>
 
-    <!--
-    Keep at the end of strings.xml!  
-     -->
-    <string name="dialog_set_number">@string/_btn_set</string>
-    <string name="dialog_cancel">@android:string/cancel</string>
-    <string name="dialog_picker_title">Choose a number</string>
     <string name="_title_auto_dose_events">Auto-take doses</string>
 	<string name="_msg_backup_agent_removal">
 		The \"[@string/_title_use_backup_framework]\" option has
@@ -499,5 +493,14 @@
 	<string name="_msg_constraints_date_from">Select date from %1$s.</string>
 	<!-- %2$s is EXCLUSIVE, so in "date before 1970-01-03", the last valid date would be 1970-01-02 -->
 	<string name="_msg_constraints_date_before">Select date before %2$s.</string>
+
+	<!-- Example: "Low: Drug1 and 2 others" -->
+	<string name="_title_supplies_low">Low</string>
+	<!-- Example: "Expires: Drug1 and 2 others" -->
+	<string name="_title_supplies_expiring">Expiring</string>
+	<!-- Example: "Supplies: Low: Drug1 and 2 others" -->
+	<string name="_title_supplies">Supplies</string>
+
+	<string name="_title_expiry_date">Expiry date</string>
 
 </resources>

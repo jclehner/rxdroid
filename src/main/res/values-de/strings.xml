@@ -474,4 +474,9 @@
     <string name="dialog_cancel">@android:string/cancel</string>
     <string name="dialog_picker_title">Zahl wählen</string>
     <string name="_title_auto_dose_events">Automatische Einnahmen</string>
+	<string name="_title_supplies_expiring">Verfällt</string>
+	<string name="_title_supplies_low">Niedrig</string>
+	<string name="_btn_skip">Überspringen</string>
+	<string name="_title_expiry_date">Verfallsdatum</string>
+	<string name="_title_supplies">Vorräte</string>
 </resources>
