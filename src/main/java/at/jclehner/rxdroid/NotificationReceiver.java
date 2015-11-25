@@ -420,6 +420,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		private final int mMode;
 
 		private final List<Drug> mLowSupplyDrugs = new ArrayList<Drug>();
+		private final List<Drug> mExpiringDrugs = new ArrayList<>();
 		private final int missedDoseCount;
 		private final int dueDoseCount;
 
@@ -440,7 +441,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			mDate = date;
 			mMode = mode;
 
-			getDrugsWithLowSupplies(date, doseTime, mLowSupplyDrugs);
+			collectDrugsWithSupplyNotifications();
 			missedDoseCount = getDrugsWithMissedDoses(date, doseTime, isActiveDoseTime);
 			dueDoseCount = isActiveDoseTime ? getDrugsWithDueDoses(date, doseTime) : 0;
 		}
@@ -780,6 +781,45 @@ public class NotificationReceiver extends BroadcastReceiver
 		private CharSequence createLine(int titleResId, CharSequence text) {
 			return Html.fromHtml("<b>" + mContext.getString(titleResId) + "</b> " + text);
 		}
+
+		private int collectDrugsWithSupplyNotifications()
+		{
+			final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
+			final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
+
+			if(nextRefillReminderDate == null || !mDtInfo.displayDate().before(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
+			{
+				snoozedDrugIds.clear();
+				Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, null);
+				Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
+				Log.d(TAG, "Clearing refill reminder snooze info");
+			}
+
+			int count = 0;
+
+			for(Drug drug : mAllDrugs)
+			{
+				final boolean isSnoozed = snoozedDrugIds.contains(drug.getId());
+				final boolean isLow = Entries.hasLowSupplies(drug, mDate);
+				final boolean willExpire = Entries.willExpireSoon(drug, mDate);
+
+				if(!isSnoozed && (isLow || willExpire))
+				{
+					if(isLow)
+						mLowSupplyDrugs.add(drug);
+					if(willExpire)
+						mExpiringDrugs.add(drug);
+				}
+				else if(isSnoozed)
+				{
+					snoozedDrugIds.remove(drug.getId());
+					Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, fromIntSet(snoozedDrugIds));
+				}
+			}
+
+			return count;
+		}
+
 	}
 
 	private  int getDrugsWithDueDoses(Date date, int doseTime) {
@@ -788,45 +828,6 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private int getDrugsWithMissedDoses(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime) {
 		return Entries.getDrugsWithMissedDoses(mAllDrugs, date, activeOrNextDoseTime, isActiveDoseTime, null);
-	}
-
-	private int getDrugsWithLowSupplies(Date date, int doseTime, List<Drug> outDrugs)
-	{
-		final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
-		final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
-
-		if(nextRefillReminderDate == null || !mDtInfo.displayDate().before(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
-		{
-			snoozedDrugIds.clear();
-			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, null);
-			Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
-			Log.d(TAG, "Clearing refill reminder snooze info");
-		}
-
-		int count = 0;
-
-		for(Drug drug : mAllDrugs)
-		{
-			final boolean isSnoozed = snoozedDrugIds.contains(drug.getId());
-
-			if(Entries.hasLowSupplies(drug, date))
-			{
-				if(!isSnoozed)
-				{
-					++count;
-					if(outDrugs != null)
-						outDrugs.add(drug);
-				}
-			}
-			else if(isSnoozed)
-			{
-				Log.d(TAG, "Removing " + drug + " from snoozed drugs");
-				snoozedDrugIds.remove(drug.getId());
-				Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, fromIntSet(snoozedDrugIds));
-			}
-		}
-
-		return count;
 	}
 
 	private String getString(int resId, Object... formatArgs) {

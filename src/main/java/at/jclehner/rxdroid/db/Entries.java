@@ -444,6 +444,26 @@ public final class Entries
 		return getSupplyDaysLeftForDrug(drug, date) < minSupplyDays;
 	}
 
+	public static boolean willExpireSoon(Drug drug, Date date)
+	{
+		if(!drug.isActive() || drug.getRefillSize() == 0)
+			return false;
+
+		final LocalDate expirationDate = drug.getExpirationDate();
+		if(expirationDate == null)
+			return false;
+
+		final LocalDate scheduleEnd = drug.getScheduleEndDate();
+		if(scheduleEnd != null && expirationDate.isAfter(scheduleEnd))
+			return false;
+
+		final int minSupplyDays = Settings.getStringAsInt(Settings.Keys.LOW_SUPPLY_THRESHOLD, 10);
+		if(minSupplyDays == 0)
+			return false;
+
+		return LocalDate.fromDateFields(date).plusDays(minSupplyDays).isAfter(expirationDate);
+	}
+
 	public static String getDrugName(Drug drug)
 	{
 		final String name = drug.getName();
