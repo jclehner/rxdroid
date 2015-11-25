@@ -35,13 +35,12 @@ import android.support.v4.app.NotificationCompat.BigTextStyle;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
 import android.util.Log;
+import android.util.SparseIntArray;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import at.jclehner.androidutils.AlarmManager;
 import at.jclehner.androidutils.EventDispatcher;
@@ -180,9 +179,10 @@ public class NotificationReceiver extends BroadcastReceiver
 					mDtInfo.displayDate(), Calendar.DAY_OF_MONTH, 1);
 			Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, nextReminderDate);
 
-			final String drugIds = Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, "");
-			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, drugIds + " " +
-					intent.getStringExtra(EXTRA_REFILL_SNOOZE_DRUGS));
+			final DrugIdSet drugIds = DrugIdSet.fromString(
+					Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
+			drugIds.addAll(intent.getStringExtra(EXTRA_REFILL_SNOOZE_DRUGS));
+			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, drugIds.toString());
 
 			// Pre-Jellybean has no actions, so we let the user know what he just did
 			// by showing a Toast.
@@ -614,13 +614,9 @@ public class NotificationReceiver extends BroadcastReceiver
 		{
 			if(force || (mTextDoses == null && mTextRefill != null))
 			{
-				// Use simple string like "1 33 56 10231"
-				final StringBuilder drugIds = new StringBuilder();
-				for(Drug drug : mLowSupplyDrugs)
-				{
-					drugIds.append(drug.getId());
-					drugIds.append(' ');
-				}
+				final DrugIdSet drugIds = new DrugIdSet();
+				drugIds.addAll(mLowSupplyDrugs);
+				drugIds.addAll(mExpiringDrugs);
 
 				final Intent intent = new Intent(mContext, NotificationReceiver.class);
 				intent.setAction(ACTION_SNOOZE_REFILL_REMINDER);
@@ -785,7 +781,8 @@ public class NotificationReceiver extends BroadcastReceiver
 		private int collectDrugsWithSupplyNotifications()
 		{
 			final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
-			final Set<Integer> snoozedDrugIds = toIntSet(Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
+			final DrugIdSet snoozedDrugIds = DrugIdSet.fromString(
+					Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
 
 			if(nextRefillReminderDate == null || !mDtInfo.displayDate().before(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
 			{
@@ -813,7 +810,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				else if(isSnoozed)
 				{
 					snoozedDrugIds.remove(drug.getId());
-					Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, fromIntSet(snoozedDrugIds));
+					Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, snoozedDrugIds.toString());
 				}
 			}
 
@@ -869,28 +866,76 @@ public class NotificationReceiver extends BroadcastReceiver
 		context.sendBroadcast(intent);
 	}
 
-	private static Set<Integer> toIntSet(String str)
+	static class DrugIdSet
 	{
-		final Set<Integer> intSet = new HashSet<Integer>();
-		for(String element : str.split(" "))
+		private SparseIntArray mIds = new SparseIntArray();
+
+		void addAll(String str)
 		{
-			if(element.length() != 0)
-				intSet.add(Integer.valueOf(element, 10));
+			if(str != null)
+			{
+				for(String e : str.split(" "))
+				{
+					if(e.length() != 0)
+						add(Integer.valueOf(e, 10));
+				}
+			}
 		}
 
-		return intSet;
-	}
-
-	private static String fromIntSet(Set<Integer> set)
-	{
-		final StringBuilder sb = new StringBuilder();
-
-		for(Integer i : set)
+		void addAll(List<Drug> drugs)
 		{
-			sb.append(i);
-			sb.append(" ");
+			if(drugs != null)
+			{
+				for(Drug drug : drugs)
+					add(drug.getId());
+			}
 		}
 
-		return sb.toString();
+		void add(int id) {
+			mIds.put(id, 1);
+		}
+
+		boolean contains(Drug drug) {
+			return contains(drug.getId());
+		}
+
+		boolean contains(int id) {
+			return mIds.indexOfKey(id) >= 0;
+		}
+
+		boolean isEmpty() {
+			return mIds.size() == 0;
+		}
+
+		void remove(int id)
+		{
+			final int i = mIds.indexOfKey(id);
+			if(i >= 0)
+				mIds.removeAt(i);
+		}
+
+		void clear() {
+			mIds.clear();
+		}
+
+		static DrugIdSet fromString(String str)
+		{
+			final DrugIdSet set = new DrugIdSet();
+			set.addAll(str);
+			return set;
+		}
+
+		@Override
+		public String toString()
+		{
+			final StringBuilder sb = new StringBuilder();
+			for(int i = 0; i != mIds.size(); ++i)
+			{
+				sb.append(mIds.keyAt(i));
+				sb.append(' ');
+			}
+
+			return sb.toString();
+		}
 	}
 }
