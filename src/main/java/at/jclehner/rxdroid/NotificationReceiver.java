@@ -547,7 +547,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				}
 			}
 
-			final NotificationCompat.Builder nb = createPageBuilder(R.string._title_notification_supplies, mTextSupply);
+			final NotificationCompat.Builder nb = createPageBuilder(R.string._title_supplies, mTextSupply);
 			addSupplyActions(nb, true);
 			mNtfSupply = nb.build();
 		}

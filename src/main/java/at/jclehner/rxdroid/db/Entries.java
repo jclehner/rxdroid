@@ -22,7 +22,6 @@
 package at.jclehner.rxdroid.db;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -43,7 +42,6 @@ import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
 
@@ -449,7 +447,7 @@ public final class Entries
 		if(!drug.isActive() || drug.getRefillSize() == 0)
 			return false;
 
-		final LocalDate expirationDate = drug.getExpirationDate();
+		final LocalDate expirationDate = drug.getExpiryDate();
 		if(expirationDate == null)
 			return false;
 

@@ -328,8 +328,12 @@ public class Drug extends Entry implements Comparable<Drug>
 		return repeatOrigin;
 	}
 
-	public LocalDate getExpirationDate() {
-		return LocalDate.fromDateFields(expirationDate);
+	public LocalDate getExpiryDate() {
+		return DateTime.fromDateFields(expirationDate);
+	}
+
+	public void setExpiryDate(LocalDate date) {
+		expirationDate = date != null ? date.toDate() : null;
 	}
 
 	public void setHasAutoDoseEvents(boolean autoDoseEvents)
