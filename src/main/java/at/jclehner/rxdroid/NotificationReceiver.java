@@ -34,6 +34,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
+import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.util.SparseIntArray;
 
@@ -513,14 +514,14 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		private void buildSupplyNotification()
 		{
-			if(mLowSupplyDrugs.size() == 0)
+			if(mLowSupplyDrugs.size() == 0 && mExpiringDrugs.size() == 0)
 			{
 				mNtfSupply = null;
 				mTextSupply = null;
 				return;
 			}
 
-			final StringBuilder sb = new StringBuilder();
+			final SpannableStringBuilder ssb = new SpannableStringBuilder();
 
 			final Object[][] data = {
 					{ mLowSupplyDrugs, R.string._title_supplies_low },
@@ -533,23 +534,30 @@ public class NotificationReceiver extends BroadcastReceiver
 				if(drugs.isEmpty())
 					continue;
 
+				ssb.append(getString((int) datum[1]) + ": ");
+
 				final String first = Entries.getDrugName(drugs.get(0));
-
-				sb.append(getString((int) datum[1]) + ": ");
-
 				if(drugs.size() == 1)
-					sb.append(getString(R.string._qmsg_low_supply_single, first));
+					ssb.append(getString(R.string._qmsg_low_supply_single, first));
 				else
 				{
 					final String second = Entries.getDrugName(drugs.get(1));
-					sb.append(RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple,
+					ssb.append(RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple,
 							drugs.size() - 1, first, second));
 				}
+
+				if(ssb.length() != 0)
+					ssb.append(Html.fromHtml("<br>"));
 			}
 
-			final NotificationCompat.Builder nb = createPageBuilder(R.string._title_supplies, mTextSupply);
-			addSupplyActions(nb, true);
-			mNtfSupply = nb.build();
+			if(ssb.length() != 0)
+			{
+				mTextSupply = ssb;
+
+				final NotificationCompat.Builder nb = createPageBuilder(R.string._title_supplies, mTextSupply);
+				addSupplyActions(nb, true);
+				mNtfSupply = nb.build();
+			}
 		}
 
 		private void buildSummaryNotification()
@@ -560,7 +568,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				return;
 			}
 
-			final int titleResId = mTextDoses != null ? R.string._title_notification_doses : R.string._title_notification_low_supplies;
+			final int titleResId = mTextDoses != null ? R.string._title_notification_doses : R.string._title_supplies;
 			final int iconResId = mTextSupply != null ? R.drawable.ic_stat_exclamation : R.drawable.ic_stat_normal;
 			final CharSequence contentText = mTextDoses != null ? mTextDoses : mTextSupply;
 			final int priority = mTextDoses != null ? NotificationCompat.PRIORITY_HIGH : NotificationCompat.PRIORITY_DEFAULT;
@@ -758,7 +766,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
 			style.setBigContentTitle(getString(R.string.app_name));
-			style.addLine(createLine(R.string._title_notification_low_supplies, mTextSupply));
+			style.addLine(createLine(R.string._title_supplies, mTextSupply));
 			style.addLine(createLine(R.string._title_notification_doses, mTextDoses));
 
 			return style;
@@ -795,7 +803,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			return Html.fromHtml("<b>" + mContext.getString(titleResId) + "</b> " + text);
 		}
 
-		private int collectDrugsWithSupplyNotifications()
+		private void collectDrugsWithSupplyNotifications()
 		{
 			final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
 			final DrugIdSet snoozedDrugIds = DrugIdSet.fromString(
@@ -809,13 +817,13 @@ public class NotificationReceiver extends BroadcastReceiver
 				Log.d(TAG, "Clearing refill reminder snooze info");
 			}
 
-			int count = 0;
-
 			for(Drug drug : mAllDrugs)
 			{
 				final boolean isSnoozed = snoozedDrugIds.contains(drug.getId());
 				final boolean isLow = Entries.hasLowSupplies(drug, mDate);
 				final boolean willExpire = Entries.willExpireSoon(drug, mDate);
+
+				Log.d(TAG, drug + ": s/l/e = " + isSnoozed + "/" + isLow + "/" + willExpire);
 
 				if(!isSnoozed && (isLow || willExpire))
 				{
@@ -830,8 +838,6 @@ public class NotificationReceiver extends BroadcastReceiver
 					Settings.putString(SUPPLY_SNOOZE_DRUGS, snoozedDrugIds.toString());
 				}
 			}
-
-			return count;
 		}
 
 	}
@@ -910,10 +916,6 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		void add(int id) {
 			mIds.put(id, 1);
-		}
-
-		boolean contains(Drug drug) {
-			return contains(drug.getId());
 		}
 
 		boolean contains(int id) {
