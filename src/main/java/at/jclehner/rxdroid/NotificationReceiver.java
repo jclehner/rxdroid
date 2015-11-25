@@ -103,9 +103,9 @@ public class NotificationReceiver extends BroadcastReceiver
 	 *   date/time/timezone).
 	 *
 	 */
-	private static final String ACTION_SNOOZE_REFILL_REMINDER = "snooze";
-	// Drugs affected by the refill reminder's snoozing
-	private static final String REFILL_REMINDER_SNOOZE_DRUGS = "refill_reminder_snooze_drugs";
+	private static final String ACTION_SNOOZE_SUPPLY = "snooze";
+	// XXX: this is a settings key; do not change!
+	private static final String SUPPLY_SNOOZE_DRUGS = "refill_reminder_snooze_drugs";
 
 	private static final int NOTIFICATION_NORMAL = 0;
 	private static final int NOTIFICATION_FORCE_UPDATE = 1;
@@ -173,16 +173,16 @@ public class NotificationReceiver extends BroadcastReceiver
 			Entries.markAllNotifiedDosesAsTaken(0);
 			//
 		}
-		else if(ACTION_SNOOZE_REFILL_REMINDER.equals(intent.getAction()))
+		else if(ACTION_SNOOZE_SUPPLY.equals(intent.getAction()))
 		{
 			final Date nextReminderDate = DateTime.add(
 					mDtInfo.displayDate(), Calendar.DAY_OF_MONTH, 1);
 			Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, nextReminderDate);
 
 			final DrugIdSet drugIds = DrugIdSet.fromString(
-					Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
+					Settings.getString(SUPPLY_SNOOZE_DRUGS, ""));
 			drugIds.addAll(intent.getStringExtra(EXTRA_REFILL_SNOOZE_DRUGS));
-			Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, drugIds.toString());
+			Settings.putString(SUPPLY_SNOOZE_DRUGS, drugIds.toString());
 
 			// Pre-Jellybean has no actions, so we let the user know what he just did
 			// by showing a Toast.
@@ -429,10 +429,10 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		private Notification mNtfSummary;
 		private Notification mNtfDoses;
-		private Notification mNtfRefill;
+		private Notification mNtfSupply;
 
 		private CharSequence mTextDoses;
-		private CharSequence mTextRefill;
+		private CharSequence mTextSupply;
 
 		private boolean mNoClear = true;
 
@@ -449,7 +449,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		public void update()
 		{
 			buildDosesNotification();
-			buildRefillReminderNotification();
+			buildSupplyNotification();
 			buildSummaryNotification();
 
 			final NotificationManagerCompat nm = NotificationManagerCompat.from(mContext);
@@ -511,41 +511,41 @@ public class NotificationReceiver extends BroadcastReceiver
 			mNtfDoses = nb.build();
 		}
 
-		private void buildRefillReminderNotification()
+		private void buildSupplyNotification()
 		{
 			if(mLowSupplyDrugs.size() == 0)
 			{
-				mNtfRefill = null;
-				mTextRefill = null;
+				mNtfSupply = null;
+				mTextSupply = null;
 				return;
 			}
 
 			final String first = Entries.getDrugName(mLowSupplyDrugs.get(0));
 
 			if(mLowSupplyDrugs.size() == 1)
-				mTextRefill = getString(R.string._qmsg_low_supply_single, first);
+				mTextSupply = getString(R.string._qmsg_low_supply_single, first);
 			else
 			{
 				final String second = Entries.getDrugName(mLowSupplyDrugs.get(1));
-				mTextRefill = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, mLowSupplyDrugs.size() - 1, first, second);
+				mTextSupply = RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple, mLowSupplyDrugs.size() - 1, first, second);
 			}
 
-			final NotificationCompat.Builder nb = createPageBuilder(R.string._title_notification_low_supplies, mTextRefill);
+			final NotificationCompat.Builder nb = createPageBuilder(R.string._title_notification_low_supplies, mTextSupply);
 			addRefillReminderActions(nb, true);
-			mNtfRefill = nb.build();
+			mNtfSupply = nb.build();
 		}
 
 		private void buildSummaryNotification()
 		{
-			if(mTextDoses == null && mTextRefill == null)
+			if(mTextDoses == null && mTextSupply == null)
 			{
 				mNtfSummary = null;
 				return;
 			}
 
 			final int titleResId = mTextDoses != null ? R.string._title_notification_doses : R.string._title_notification_low_supplies;
-			final int iconResId = mTextRefill != null ? R.drawable.ic_stat_exclamation : R.drawable.ic_stat_normal;
-			final CharSequence contentText = mTextDoses != null ? mTextDoses : mTextRefill;
+			final int iconResId = mTextSupply != null ? R.drawable.ic_stat_exclamation : R.drawable.ic_stat_normal;
+			final CharSequence contentText = mTextDoses != null ? mTextDoses : mTextSupply;
 			final int priority = mTextDoses != null ? NotificationCompat.PRIORITY_HIGH : NotificationCompat.PRIORITY_DEFAULT;
 
 			final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
@@ -612,14 +612,14 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		private void addRefillReminderActions(NotificationCompat.Builder builder, boolean force)
 		{
-			if(force || (mTextDoses == null && mTextRefill != null))
+			if(force || (mTextDoses == null && mTextSupply != null))
 			{
 				final DrugIdSet drugIds = new DrugIdSet();
 				drugIds.addAll(mLowSupplyDrugs);
 				drugIds.addAll(mExpiringDrugs);
 
 				final Intent intent = new Intent(mContext, NotificationReceiver.class);
-				intent.setAction(ACTION_SNOOZE_REFILL_REMINDER);
+				intent.setAction(ACTION_SNOOZE_SUPPLY);
 				intent.putExtra(EXTRA_REFILL_SNOOZE_DRUGS, drugIds.toString());
 				intent.putExtra(EXTRA_DATE, mDate);
 
@@ -640,7 +640,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		private void applyNotificationModalities(NotificationCompat.Builder builder)
 		{
-			final int currentHash = ("" + mTextDoses + mTextRefill).hashCode();
+			final int currentHash = ("" + mTextDoses + mTextSupply).hashCode();
 			final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
 
 			int mode = mMode;
@@ -655,7 +655,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			// Prevents low supplies from constantly annoying the user with
 			// notification's sound and/or vibration if alarms are repeated.
-			if(mTextRefill != null && mTextDoses == null)
+			if(mTextSupply != null && mTextDoses == null)
 				mode = NOTIFICATION_FORCE_SILENT;
 
 			int defaults = 0;
@@ -725,8 +725,8 @@ public class NotificationReceiver extends BroadcastReceiver
 			final List<Notification> notifications = new ArrayList<Notification>();
 			if(mUseWearableHack)
 			{
-				if(mNtfRefill != null)
-					notifications.add(mNtfRefill);
+				if(mNtfSupply != null)
+					notifications.add(mNtfSupply);
 				if(mNtfDoses != null)
 					notifications.add(mNtfDoses);
 			}
@@ -736,12 +736,12 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		private NotificationCompat.Style createSummaryStyle()
 		{
-			if(mTextDoses == null || mTextRefill == null)
+			if(mTextDoses == null || mTextSupply == null)
 				return null;
 
 			final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
 			style.setBigContentTitle(getString(R.string.app_name));
-			style.addLine(createLine(R.string._title_notification_low_supplies, mTextRefill));
+			style.addLine(createLine(R.string._title_notification_low_supplies, mTextSupply));
 			style.addLine(createLine(R.string._title_notification_doses, mTextDoses));
 
 			return style;
@@ -782,12 +782,12 @@ public class NotificationReceiver extends BroadcastReceiver
 		{
 			final Date nextRefillReminderDate = Settings.getDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE);
 			final DrugIdSet snoozedDrugIds = DrugIdSet.fromString(
-					Settings.getString(REFILL_REMINDER_SNOOZE_DRUGS, ""));
+					Settings.getString(SUPPLY_SNOOZE_DRUGS, ""));
 
 			if(nextRefillReminderDate == null || !mDtInfo.displayDate().before(nextRefillReminderDate) || snoozedDrugIds.isEmpty())
 			{
 				snoozedDrugIds.clear();
-				Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, null);
+				Settings.putString(SUPPLY_SNOOZE_DRUGS, null);
 				Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
 				Log.d(TAG, "Clearing refill reminder snooze info");
 			}
@@ -810,7 +810,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				else if(isSnoozed)
 				{
 					snoozedDrugIds.remove(drug.getId());
-					Settings.putString(REFILL_REMINDER_SNOOZE_DRUGS, snoozedDrugIds.toString());
+					Settings.putString(SUPPLY_SNOOZE_DRUGS, snoozedDrugIds.toString());
 				}
 			}
 
