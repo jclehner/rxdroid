@@ -41,13 +41,11 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceScreen;
 import android.preference.PreferenceFragment;
 import android.support.v4.view.MenuItemCompat;
 
 import android.support.v7.app.AppCompatActivity;
 
-import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -55,7 +53,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
@@ -69,7 +66,6 @@ import at.jclehner.androidutils.otpm.DialogPreferenceController;
 import at.jclehner.androidutils.otpm.ListPreferenceWithIntController;
 import at.jclehner.androidutils.otpm.OTPM;
 import at.jclehner.androidutils.otpm.OTPM.CreatePreference;
-import at.jclehner.androidutils.otpm.PreferenceController;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
@@ -521,20 +517,12 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		)
 		private boolean asNeeded;
 
-		@CreatePreference
-		(
-			titleResId = R.string._title_icon,
-			categoryResId = R.string._title_misc,
-			order = 10,
-			type = ListPreference.class,
-			controller = FormPreferenceController.class
-		)
-		private int form;
 
 		@CreatePreference
 		(
 			titleResId = R.string._title_refill_size,
-			order = 11,
+			categoryResId = R.string._title_supplies,
+			order = 10,
 			type = FractionPreference.class,
 			controller = RefillSizePreferenceController.class
 		)
@@ -543,7 +531,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		@CreatePreference
 		(
 			titleResId = R.string._title_current_supply,
-			order = 12,
+			order = 11,
 			type = CurrentSupplyPreference.class,
 			controller = CurrentSupplyPreferenceController.class,
 			reverseDependencies = { "morning", "noon", "evening", "night", "refillSize", "repeat", "asNeeded", "scheduleEnd" },
@@ -553,8 +541,28 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 
 		@CreatePreference
 		(
-			titleResId = R.string._title_per_drug_reminders,
+			titleResId = R.string._title_expiry_date,
+			order = 12,
+			type = DatePreference.class,
+			controller = CheckableDatePreferenceController.class
+
+		)
+		private LocalDate expiryDate;
+
+		@CreatePreference
+		(
+			titleResId = R.string._title_icon,
+			categoryResId = R.string._title_misc,
 			order = 13,
+			type = ListPreference.class,
+			controller = FormPreferenceController.class
+		)
+		private int form;
+
+		@CreatePreference
+		(
+			titleResId = R.string._title_per_drug_reminders,
+			order = 14,
 			type = ListPreference.class,
 			controller = NotificationsPreferenceController.class
 			//, reverseDependencies = "refillSize"
@@ -565,7 +573,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		(
 			titleResId = R.string._title_active,
 			summary = "",
-			order = 14,
+			order = 15,
 			type = CheckBoxPreference.class,
 			controller = CheckboxPreferenceController.class
 		)
@@ -615,6 +623,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			patient = drug.getPatient();
 			scheduleEnd = drug.getScheduleEndDate();
 			asNeeded = drug.isAsNeeded();
+			expiryDate = drug.getExpiryDate();
 
 			name = drug.getName();
 			form = drug.getIcon();
@@ -637,6 +646,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			drug.setPatient(patient);
 			drug.setScheduleEndDate(scheduleEnd);
 			drug.setAsNeeded(asNeeded);
+			drug.setExpiryDate(expiryDate);
 
 			final Fraction doses[] = { doseMorning, doseNoon, doseEvening, doseNight };
 
@@ -1086,7 +1096,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		}
 	}
 
-	public static class ScheduleEndPreferenceController extends AdvancedDialogPreferenceController
+	public static class CheckableDatePreferenceController extends AdvancedDialogPreferenceController
 	{
 		@Override
 		public void initPreference(AdvancedDialogPreference preference, Object fieldValue)
@@ -1101,19 +1111,22 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		}
 
 		@Override
-		public void onDependencyChange(AdvancedDialogPreference preference, String depKey, Object newPrefValue)
-		{
-			super.onDependencyChange(preference, depKey, newPrefValue);
-			((DatePreference) preference).setMinDate(DateTime.fromDateFields((Date) getFieldValue("repeatOrigin")));
-		}
-
-		@Override
 		public void updateSummary(AdvancedDialogPreference preference, Object newValue)
 		{
 			if(newValue != null)
 				preference.setSummary(DateTime.toNativeDate(((LocalDate) newValue).toDate()));
 			else
 				preference.setSummary(R.string._summary_not_available);
+		}
+	}
+
+	public static class ScheduleEndPreferenceController extends CheckableDatePreferenceController
+	{
+		@Override
+		public void onDependencyChange(AdvancedDialogPreference preference, String depKey, Object newPrefValue)
+		{
+			super.onDependencyChange(preference, depKey, newPrefValue);
+			((DatePreference) preference).setMinDate(DateTime.fromDateFields((Date) getFieldValue("repeatOrigin")));
 		}
 	}
 
