@@ -38,6 +38,8 @@ import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.util.SparseIntArray;
 
+import org.joda.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -820,13 +822,22 @@ public class NotificationReceiver extends BroadcastReceiver
 			for(Drug drug : mAllDrugs)
 			{
 				final boolean isSnoozed = snoozedDrugIds.contains(drug.getId());
-				final boolean isLow = Entries.hasLowSupplies(drug, mDate);
-				final boolean willExpire = Entries.willExpireSoon(drug, mDate);
-
-				Log.d(TAG, drug + ": s/l/e = " + isSnoozed + "/" + isLow + "/" + willExpire);
+				boolean isLow = Entries.hasLowSupplies(drug, mDate);
+				boolean willExpire = Entries.willExpireSoon(drug, mDate);
 
 				if(!isSnoozed && (isLow || willExpire))
 				{
+					if(isLow && willExpire)
+					{
+						final LocalDate supplyEnd = Entries.getSupplyEndDate(drug, mDate);
+						final LocalDate expiryDate = drug.getExpiryDate();
+
+						if(supplyEnd.isBefore(expiryDate))
+							willExpire = false;
+						else
+							isLow = false;
+					}
+
 					if(isLow)
 						mLowSupplyDrugs.add(drug);
 					if(willExpire)

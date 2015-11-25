@@ -497,7 +497,7 @@
 	<!-- Example: "Low: Drug1 and 2 others" -->
 	<string name="_title_supplies_low">Low</string>
 	<!-- Example: "Expires: Drug1 and 2 others" -->
-	<string name="_title_supplies_expiring">Expiring</string>
+	<string name="_title_supplies_expiring">Expires</string>
 	<!-- Example: "Supplies: Low: Drug1 and 2 others" -->
 	<string name="_title_supplies">Supplies</string>
 
