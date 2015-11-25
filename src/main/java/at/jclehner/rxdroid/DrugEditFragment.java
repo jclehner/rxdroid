@@ -356,7 +356,11 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 
 		if(mWrapper.refillSize == 0)
 		{
-			final Preference p = findPreference("currentSupply");
+			Preference p = findPreference("currentSupply");
+			if(p != null)
+				p.setEnabled(false);
+
+			p = findPreference("expiryDate");
 			if(p != null)
 				p.setEnabled(false);
 		}
@@ -544,8 +548,8 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			titleResId = R.string._title_expiry_date,
 			order = 12,
 			type = DatePreference.class,
-			controller = CheckableDatePreferenceController.class
-
+			controller = ExpiryDatePreferenceController.class,
+			reverseDependencies = "refillSize"
 		)
 		private LocalDate expiryDate;
 
@@ -1117,6 +1121,24 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 				preference.setSummary(DateTime.toNativeDate(((LocalDate) newValue).toDate()));
 			else
 				preference.setSummary(R.string._summary_not_available);
+		}
+	}
+
+	public static class ExpiryDatePreferenceController extends CheckableDatePreferenceController
+	{
+		@Override
+		public void onDependencyChange(AdvancedDialogPreference preference, String depKey, Object newPrefValue)
+		{
+			super.onDependencyChange(preference, depKey, newPrefValue);
+			if("refillSize".equals(depKey))
+			{
+				preference.setEnabled(0 != (int) newPrefValue);
+				if(!preference.isEnabled())
+				{
+					setFieldValue(null);
+					preference.setValue(null);
+				}
+			}
 		}
 	}
 
