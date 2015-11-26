@@ -422,8 +422,10 @@ public class NotificationReceiver extends BroadcastReceiver
 		private final Date mDate;
 		private final int mMode;
 
-		private final List<Drug> mLowSupplyDrugs = new ArrayList<Drug>();
+		private final List<Drug> mLowSupplyDrugs = new ArrayList<>();
 		private final List<Drug> mExpiringDrugs = new ArrayList<>();
+		private final List<Drug> mDueDrugs = new ArrayList<>();
+		private final List<Drug> mMissedDrugs = new ArrayList<>();
 		private final int missedDoseCount;
 		private final int dueDoseCount;
 
@@ -508,7 +510,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			mTextDoses = sb.toString();
 
-			final NotificationCompat.Builder nb = createPageBuilder(R.string._title_notification_doses, mTextDoses);
+			final NotificationCompat.Builder nb = createBuilder(R.string._title_notification_doses, mTextDoses);
 			nb.setPriority(NotificationCompat.PRIORITY_HIGH);
 			addDoseActions(nb);
 			mNtfDoses = nb.build();
@@ -556,7 +558,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			{
 				mTextSupply = ssb;
 
-				final NotificationCompat.Builder nb = createPageBuilder(R.string._title_supplies, mTextSupply);
+				final NotificationCompat.Builder nb = createBuilder(R.string._title_supplies, mTextSupply);
 				addSupplyActions(nb, true);
 				mNtfSupply = nb.build();
 			}
@@ -610,6 +612,10 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(mNoClear && mUseGroups)
 				mNtfSummary.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
 		}
+
+		// arg must be:
+		// { List<Dr
+		private NotificationCompat buildNotifications(Object[][] arg)
 
 		private boolean addDoseActions(NotificationCompat.Builder builder)
 		{
@@ -774,7 +780,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			return style;
 		}
 
-		private NotificationCompat.Builder createPageBuilder(int titleResId, CharSequence text)
+		private NotificationCompat.Builder createBuilder(int titleResId, CharSequence text)
 		{
 			final BigTextStyle style = new NotificationCompat.BigTextStyle();
 			style.setBigContentTitle(getString(titleResId));
@@ -784,6 +790,104 @@ public class NotificationReceiver extends BroadcastReceiver
 					.setStyle(style)
 					.setContentTitle(getString(titleResId))
 					.setContentText(text)
+					.setGroup(mGroup)
+					.setGroupSummary(false)
+					.setContentIntent(createDrugListIntent(mDate))
+					.setSmallIcon(R.drawable.ic_stat_normal);
+		}
+
+		/**
+		 * This class describes notifications such as:
+		 *
+		 * 1. Compact view
+		 *
+		 * Doses
+		 *   1 due, 3 missed
+		 *
+		 * 2. Expanded view
+		 *
+		 * Doses
+		 *   Due: Drug1
+		 *   Missed: Drug3 and 2 others
+		 *
+		 * Members would thus be:
+		 *
+		 * titleResId => "Doses"
+		 *
+		 * simpleTextResId1 => "%d due"
+		 * multiTextResId1 => "%s and %d others"
+		 *
+		 * simpleTextResId2 => "%d missed"
+		 * multiTextResId2 => "%s and %d others"
+		 *
+		 */
+		private class NotificationData
+		{
+			int titleResId;
+
+			int simpleTextResId1;
+			int multiTextResId1;
+			List<Drug> drugs1;
+
+			int simpleTextResId2;
+			int multiTextResId2;
+			List<Drug> drugs2;
+		}
+
+		private NotificationCompat.Builder createBuilder(NotificationData data, String[] outSummary)
+		{
+			final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
+			style.setBigContentTitle(getString(data.titleResId));
+
+			final Object[][] dataArr = {
+					{ data.simpleTextResId1, data.multiTextResId1, data.drugs1 },
+					{ data.simpleTextResId2, data.multiTextResId2, data.drugs2 }
+			};
+
+			final StringBuilder summary = new StringBuilder();
+
+			for(Object[] datum : dataArr)
+			{
+				final int multiPluralResId = (int) datum[0];
+				final int simplePluralResId = (int) datum[1];
+				final List<Drug> drugs = (List<Drug>) datum[2];
+
+				if(drugs != null && !drugs.isEmpty())
+				{
+					final String text;
+
+					final String first = Entries.getDrugName(drugs.get(0));
+					if(drugs.size() == 1)
+						text = first;
+					else
+					{
+						final String second = Entries.getDrugName(drugs.get(1));
+						if(drugs.size() == 2)
+							text = first + ", " + second;
+						else
+						{
+							text = RxDroid.getQuantityString(multiPluralResId,
+									drugs.size() - 1, first, second);
+						}
+					}
+
+					final String bold = RxDroid.getQuantityString(simplePluralResId, drugs.size());
+					style.addLine(Html.fromHtml("<b>" + bold + "</b> " + text));
+
+					if(summary.length() != 0)
+						summary.append(", ");
+
+					summary.append(bold);
+				}
+			}
+
+			outSummary[0] = summary.toString();
+			style.setSummaryText(summary);
+
+			return new NotificationCompat.Builder(mContext)
+					.setStyle(style)
+					.setContentTitle(getString(data.titleResId))
+					.setContentText(summary)
 					.setGroup(mGroup)
 					.setGroupSummary(false)
 					.setContentIntent(createDrugListIntent(mDate))
