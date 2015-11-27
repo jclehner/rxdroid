@@ -74,14 +74,11 @@
     <attr name="doseStatusTaken" format="reference" />
     <attr name="doseStatusMissed" format="reference" />
     <attr name="doseStatusIgnored" format="reference" />
-    
-    <attr name="iconLowSupplies" format="reference" />
+
     <attr name="iconMissedDose" format="reference" />
-    
-    <attr name="iconLock" />
+
 	<attr name="iconTime" />
 	<attr name="iconPicture" />
-	<attr name="iconInfo" />
 	<attr name="iconWarning" />
 	<attr name="iconStorage" />
 	<attr name="iconOverflow" />
