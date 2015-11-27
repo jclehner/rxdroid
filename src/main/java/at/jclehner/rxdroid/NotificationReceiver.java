@@ -525,6 +525,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			{
 				mNtfSupply = null;
 				mTextSupply = null;
+				mStyleSupply = null;
 				return;
 			}
 
@@ -793,15 +794,20 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		private NotificationCompat.Style createSummaryStyle()
 		{
-			if(mTextDoses == null || mTextSupply == null)
-				return null;
+			if(mTextDoses != null && mTextSupply != null)
+			{
+				final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
+				style.setBigContentTitle(getString(R.string.app_name));
+				style.addLine(createLine(R.string._title_supplies, mTextSupply));
+				style.addLine(createLine(R.string._title_notification_doses, mTextDoses));
+				return style;
+			}
+			else if(mTextDoses == null && mStyleSupply != null)
+				return mStyleSupply;
+			else if(mTextSupply == null && mStyleDoses != null)
+				return mStyleDoses;
 
-			final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
-			style.setBigContentTitle(getString(R.string.app_name));
-			style.addLine(createLine(R.string._title_supplies, mTextSupply));
-			style.addLine(createLine(R.string._title_notification_doses, mTextDoses));
-
-			return style;
+			return null;
 		}
 
 		private NotificationCompat.Builder createBuilder(int titleResId, CharSequence text)
@@ -906,7 +912,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				}
 			}
 
-			style.setSummaryText(summary);
+			//style.setSummaryText(summary);
 
 			outSummary[0] = summary.toString();
 			outStyle[0] = style;
