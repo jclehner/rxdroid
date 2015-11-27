@@ -439,6 +439,9 @@ public class NotificationReceiver extends BroadcastReceiver
 		private CharSequence mTextDoses;
 		private CharSequence mTextSupply;
 
+		private NotificationCompat.Style mStyleDoses;
+		private NotificationCompat.Style mStyleSupply;
+
 		private boolean mNoClear = true;
 
 		public MyNotificationBuilder(Date date, int doseTime, boolean isActiveDoseTime, int mode)
@@ -525,7 +528,31 @@ public class NotificationReceiver extends BroadcastReceiver
 				return;
 			}
 
-			final SpannableStringBuilder ssb = new SpannableStringBuilder();
+			final NotificationData data = new NotificationData();
+			data.titleResId = R.string._title_supplies;
+
+			data.simpleTextResId1 = R.plurals._qmsg_low;
+			data.multiTextResId1 = R.plurals._qmsg_supply_multiple;
+			data.drugs1 = mLowSupplyDrugs;
+
+			data.simpleTextResId2 = R.plurals._qmsg_expiring;
+			data.multiTextResId2 = R.plurals._qmsg_supply_multiple;
+			data.drugs2 = mExpiringDrugs;
+
+			final String[] summary = { null };
+			final NotificationCompat.Style[] style = { null };
+
+			final NotificationCompat.Builder nb = createBuilder(data, summary, style);
+			if (summary[0] != null && !summary[0].isEmpty())
+			{
+				addSupplyActions(nb, true);
+				mNtfSupply = nb.build();
+				mTextSupply = summary[0];
+				mStyleSupply = style[0];
+			}
+
+
+			/*final SpannableStringBuilder ssb = new SpannableStringBuilder();
 
 			final Object[][] data = {
 					{ mLowSupplyDrugs, R.string._title_supplies_low },
@@ -546,7 +573,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				else
 				{
 					final String second = Entries.getDrugName(drugs.get(1));
-					ssb.append(RxDroid.getQuantityString(R.plurals._qmsg_low_supply_multiple,
+					ssb.append(RxDroid.getQuantityString(R.plurals._qmsg_supply_multiple,
 							drugs.size() - 1, first, second));
 				}
 
@@ -561,7 +588,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				final NotificationCompat.Builder nb = createBuilder(R.string._title_supplies, mTextSupply);
 				addSupplyActions(nb, true);
 				mNtfSupply = nb.build();
-			}
+			}*/
 		}
 
 		private void buildSummaryNotification()
@@ -571,6 +598,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				mNtfSummary = null;
 				return;
 			}
+
 
 			final int titleResId = mTextDoses != null ? R.string._title_notification_doses : R.string._title_supplies;
 			final int iconResId = mTextSupply != null ? R.drawable.ic_stat_exclamation : R.drawable.ic_stat_normal;
@@ -612,10 +640,6 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(mNoClear && mUseGroups)
 				mNtfSummary.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
 		}
-
-		// arg must be:
-		// { List<Dr
-		private NotificationCompat buildNotifications(Object[][] arg)
 
 		private boolean addDoseActions(NotificationCompat.Builder builder)
 		{
@@ -834,7 +858,8 @@ public class NotificationReceiver extends BroadcastReceiver
 			List<Drug> drugs2;
 		}
 
-		private NotificationCompat.Builder createBuilder(NotificationData data, String[] outSummary)
+		private NotificationCompat.Builder createBuilder(NotificationData data, String[] outSummary,
+				NotificationCompat.Style[] outStyle)
 		{
 			final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
 			style.setBigContentTitle(getString(data.titleResId));
@@ -848,8 +873,8 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			for(Object[] datum : dataArr)
 			{
-				final int multiPluralResId = (int) datum[0];
-				final int simplePluralResId = (int) datum[1];
+				final int simplePluralResId = (int) datum[0];
+				final int multiPluralResId = (int) datum[1];
 				final List<Drug> drugs = (List<Drug>) datum[2];
 
 				if(drugs != null && !drugs.isEmpty())
@@ -881,8 +906,10 @@ public class NotificationReceiver extends BroadcastReceiver
 				}
 			}
 
-			outSummary[0] = summary.toString();
 			style.setSummaryText(summary);
+
+			outSummary[0] = summary.toString();
+			outStyle[0] = style;
 
 			return new NotificationCompat.Builder(mContext)
 					.setStyle(style)

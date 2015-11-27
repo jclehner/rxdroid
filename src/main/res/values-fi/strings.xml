@@ -40,7 +40,7 @@
     <item quantity="other">%1$d otettava nyt</item>
   </plurals>
   <string name="_qmsg_low_supply_single">%1$s</string>
-  <plurals name="_qmsg_low_supply_multiple">
+  <plurals name="_qmsg_supply_multiple">
     <item quantity="one">%2$s ja %3$s</item>
     <item quantity="other">%2$s ja %1$d muuta</item>
   </plurals>

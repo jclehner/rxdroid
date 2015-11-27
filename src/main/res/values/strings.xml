@@ -53,21 +53,31 @@
     <string name="_title_end">End</string>
         
     <string name="_msg_new_notification">New notification</string>
-    
+
+	<!-- Refers to doses; %1$d is a number -->
     <plurals name="_qmsg_missed">
         <item quantity="other">%1$d missed</item>
     </plurals>
-    
+
+	<!-- Refers to doses; %1$d is a number -->
     <plurals name="_qmsg_due">
         <item quantity="other">%1$d due</item>
-    </plurals>    
-    
-    <string name="_qmsg_low_supply_single">%1$s</string>        
-	
-	<plurals name="_qmsg_low_supply_multiple">
+    </plurals>
+
+	<plurals name="_qmsg_supply_multiple">
         <item quantity="one">%2$s and %3$s</item>
         <item quantity="other">%2$s and %1$d others</item>       
     </plurals>
+
+	<!-- Refers to supplies that are low; %1$d is a number -->
+	<plurals name="_qmsg_low">
+		<item quantity="other">%1$d low</item>
+	</plurals>
+
+	<!-- Refers to supplies that are about to expire; %1$d is a number -->
+	<plurals name="_qmsg_expiring">
+		<item quantity="other">%1$d expiring</item>
+	</plurals>
     
 	<string name="_msg_constraints_ab">Select time between %1$s and %2$s</string>
 	<string name="_msg_constraints_a">Select time after %1$s</string>

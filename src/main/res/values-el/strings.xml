@@ -64,7 +64,7 @@
     
     <string name="_qmsg_low_supply_single">%1$s</string>        
         
-        <plurals name="_qmsg_low_supply_multiple">
+        <plurals name="_qmsg_supply_multiple">
         <item quantity="one">%2$s και %3$s</item>
         <item quantity="other">%2$s και %1$d άλλα</item>       
     </plurals>

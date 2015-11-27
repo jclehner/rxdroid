@@ -39,7 +39,7 @@
     <string name="_msg_new_notification">Neue Benachrichtigung</string>
            
  	<string name="_qmsg_low_supply_single">%1$s</string>        
-    <plurals name="_qmsg_low_supply_multiple">
+    <plurals name="_qmsg_supply_multiple">
         <item quantity="one">%2$s und %3$s</item>
         <item quantity="other">%2$s und %1$d andere</item>       
     </plurals>

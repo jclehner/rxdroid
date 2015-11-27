@@ -42,7 +42,7 @@
     <item quantity="other">pozostało %1$d</item>
   </plurals>
   <string name="_qmsg_low_supply_single">%1$s</string>
-  <plurals name="_qmsg_low_supply_multiple">
+  <plurals name="_qmsg_supply_multiple">
     <item quantity="one">%2$s i %3$s</item>
     <item quantity="few">%2$s i %1$d inne</item>
     <item quantity="other">%2$s i %1$d innych</item>
