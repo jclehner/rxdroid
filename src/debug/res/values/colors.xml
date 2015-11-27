@@ -23,7 +23,7 @@
 -->
 
 <resources>
-	<color name="color_primary">#0277bd</color>
-	<color name="color_primary_dark">#01579b</color>
-	<color name="color_accent">#81d4fa</color>
+	<color name="color_primary">#616161</color>
+	<color name="color_primary_dark">#424242</color>
+	<color name="color_accent">#9e9e9e</color>
 </resources>
