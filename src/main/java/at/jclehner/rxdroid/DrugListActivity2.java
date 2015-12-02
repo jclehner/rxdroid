@@ -138,6 +138,28 @@ public class DrugListActivity2 extends AppCompatActivity implements
 			// Don't show two dialogs at once
 			if(!showBackupAgentRemovalDialogIfNeccessary())
 				showPowerSaveWarningDialogIfNeccessary();
+
+			final int backupPwNags = Settings.getInt("backup_pw_nags");
+
+			if(backupPwNags < 3)
+			{
+				if(!Backup.getBackupFiles(this).isEmpty())
+				{
+					final Dialog d = new Backup.PasswordDialog(this, Backup.PasswordDialog.MODE_INITIAL_PW);
+					d.setCancelable(false);
+					d.setOnDismissListener(new DialogInterface.OnDismissListener() {
+						@Override
+						public void onDismiss(DialogInterface dialog)
+						{
+							Settings.putInt("backup_pw_nags",
+									Settings.contains(Settings.Keys.BACKUP_KEY) ? 3 : backupPwNags + 1);
+						}
+					});
+					d.show();
+				}
+				else
+					Settings.putInt("backup_pw_nags", 3);
+			}
 		}
 
 		NotificationReceiver.rescheduleAlarmsAndUpdateNotification(true);

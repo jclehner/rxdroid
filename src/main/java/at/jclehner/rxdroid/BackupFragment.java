@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
@@ -159,21 +160,26 @@ public class BackupFragment extends LoaderListFragment<File>
 	{
 		if(!getActivity().getIntent().getBooleanExtra(BackupActivity.EXTRA_NO_BACKUP_CREATION, false))
 		{
-			MenuItem item;
+			final DialogInterface.OnDismissListener l = new DialogInterface.OnDismissListener() {
+				@Override
+				public void onDismiss(DialogInterface dialog)
+				{
+					restartLoader();
+				}
+			};
 
-			if(BuildConfig.DEBUG)
-			{
-				item = menu.add("Encrypt all").setIcon(R.drawable.ic_action_lock_closed);
-				MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-				item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-					@Override
-					public boolean onMenuItemClick(MenuItem item)
-					{
-						new Backup.PasswordDialog(getActivity(), Backup.PasswordDialog.MODE_CHANGE_PW).show();
-						return true;
-					}
-				});
-			}
+			MenuItem item = menu.add(R.string._title_backup_pw).setIcon(R.drawable.ic_action_lock_closed);
+			MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+			item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item)
+				{
+					final Dialog d = new Backup.PasswordDialog(getActivity(), Backup.PasswordDialog.MODE_CHANGE_PW);
+					d.setOnDismissListener(l);
+					d.show();
+					return true;
+				}
+			});
 
 			item = menu.add(getString(R.string._title_create_backup))
 					.setIcon(R.drawable.ic_action_add_box_white)
@@ -187,7 +193,7 @@ public class BackupFragment extends LoaderListFragment<File>
 							{
 								try
 								{
-									Backup.createBackup(null, null);
+									Backup.createBackup(null, Settings.getString(Settings.Keys.BACKUP_KEY, null));
 									getLoaderManager().restartLoader(0, null, BackupFragment.this);
 								} catch(ZipException e)
 								{

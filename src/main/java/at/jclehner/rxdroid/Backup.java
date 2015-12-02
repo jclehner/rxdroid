@@ -43,6 +43,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -450,6 +451,9 @@ public class Backup
 
 	private static String passwordToKey(String password)
 	{
+		if(password.length() == 0)
+			return null;
+
 		try
 		{
 			final MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -473,6 +477,7 @@ public class Backup
 		private final int mMode;
 
 		private Button mPosBtn;
+		private TextView mMessage;
 		private EditText mPw;
 		private EditText mPwRepeat;
 		private CheckBox mUseForAll;
@@ -500,6 +505,11 @@ public class Backup
 			if(pw.equals(mPwRepeat.getText().toString()))
 			{
 				final String key = passwordToKey(pw);
+				if(key != null && mUseForAll.isChecked())
+					Settings.putString(Settings.Keys.BACKUP_KEY, key);
+				else
+					Settings.remove(Settings.Keys.BACKUP_KEY);
+
 				dismiss();
 
 				if(mMode == MODE_CREATE_BACKUP)
@@ -515,23 +525,14 @@ public class Backup
 					}
 				}
 
-				if(mUseForAll.isChecked() || mMode == MODE_INITIAL_PW)
-				{
-					if(!mOldKey.equals(key))
-					{
-						encryptAll(mContext, key);
-						if(mMode == MODE_CHANGE_PW)
-							RxDroid.toastLong(R.string._toast_backup_pw_change);
-					}
-				}
-
-				if(mUseForAll.isChecked())
-					Settings.putString(Settings.Keys.BACKUP_KEY, key);
-				else
-					Settings.remove(Settings.Keys.BACKUP_KEY);
+				if(mMode == MODE_INITIAL_PW && key != null)
+					encryptAll(mContext, key);
 			}
 			else
+			{
+				mPwRepeat.setText("");
 				mPwRepeat.setError(mContext.getText(R.string._msg_pw_error));
+			}
 		}
 
 		@Override
@@ -544,24 +545,45 @@ public class Backup
 
 			mPosBtn = getButton(BUTTON_POSITIVE);
 			mPosBtn.setOnClickListener(this);
+			mPosBtn.setEnabled(mMode != MODE_INITIAL_PW && mOldKey.length() == 0);
 
 			mPw = (EditText) findViewById(R.id.pw_new);
+			// It doesn't really matter what we put here. The idea is that if a password is
+			// already set, we allow the user to remove the password protection by setting
+			// a zero-length password
+			mPw.setText(mOldKey.substring(0, Math.min(mOldKey.length(), 12)));
 			mPw.addTextChangedListener(this);
 
 			mPwRepeat = (EditText) findViewById(R.id.pw_repeat);
 			mPwRepeat.addTextChangedListener(this);
 
 			mUseForAll = (CheckBox) findViewById(R.id.checkbox);
+			mMessage = (TextView) findViewById(R.id.message);
 
-			if(mMode != MODE_INITIAL_PW)
-				mUseForAll.setChecked(mOldKey.length() != 0);
+			switch(mMode)
+			{
+				case MODE_CHANGE_PW:
+					mMessage.setText(R.string._msg_change_backup_pw);
+					// fall through
 
+				case MODE_INITIAL_PW:
+					mUseForAll.setChecked(true);
+					mUseForAll.setEnabled(false);
+					break;
+
+				case MODE_CREATE_BACKUP:
+					mUseForAll.setChecked(mOldKey.length() != 0);
+					break;
+			}
 		}
 
 		@Override
 		public void afterTextChanged(Editable s)
 		{
 			mPwRepeat.setError(null);
+			final int len = mPw.length();
+			mPosBtn.setEnabled((mMode == MODE_INITIAL_PW ? len != 0 : true)
+					&& len == mPwRepeat.length());
 		}
 
 		@Override

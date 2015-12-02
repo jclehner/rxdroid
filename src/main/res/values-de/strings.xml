@@ -476,11 +476,15 @@
 		Bitte geben Sie ein Backup-Passwort an, um Ihre Privatsphäre zu schützen.
 	</string>
 
-	<string name="_toast_backup_pw_change">Bestehende Backups benutzen weiterhin das alte Passwort.</string>
+	<string name="_msg_change_backup_pw">
+		Backup-Passwort ändern. Bestehende Backups benutzen weiterhin das alte Passwort.
+	</string>
+
+	<string name="_toast_backup_pw_change"></string>
 
 	<string name="_msg_encrypting">Verschlüsseln…</string>
 
-	<string name="_msg_use_pw_for_all_backups">Für alle Backups verwenden</string>
+	<string name="_msg_use_pw_for_all_backups">Für alle zukünftigen Backups verwenden</string>
 
 	<string name="_title_backup_pw">Backup-Passwort</string>
 	<string name="_title_new_pw">Passwort</string>

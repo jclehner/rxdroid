@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="@string/_msg_set_backup_pw"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@android:id/message"/>
+        android:id="@+id/message"/>
 
     <EditText
         android:layout_width="match_parent"
