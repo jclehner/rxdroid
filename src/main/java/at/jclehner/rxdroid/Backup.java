@@ -22,15 +22,28 @@
 package at.jclehner.rxdroid;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Message;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -40,6 +53,9 @@ import net.lingala.zip4j.util.Zip4jConstants;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -347,7 +363,7 @@ public class Backup
 		return files;
 	}
 
-	public static void encrypt(Context context, File backup, String password) throws ZipException, IOException
+	private static void encrypt(Context context, File backup, String password) throws ZipException, IOException
 	{
 		final ZipFile zip = new ZipFile(backup);
 		if(zip.isEncrypted())
@@ -366,6 +382,195 @@ public class Backup
 		Util.copyFile(tmpFile, backup);
 	}
 
+	private static AsyncTask<Void, String, Exception> encryptAll(final Context context, final String key)
+	{
+		return new AsyncTask<Void, String, Exception>() {
+			private ProgressDialog mDialog;
+			private List<File> mFiles;
+
+			@Override
+			protected void onPreExecute()
+			{
+				mFiles = Backup.getBackupFiles(context);
+
+				mDialog = new ProgressDialog(context);
+				mDialog.setTitle(R.string._msg_encrypting);
+				mDialog.setCancelable(false);
+				mDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				mDialog.setIndeterminate(false);
+				mDialog.setMax(mFiles.size());
+				mDialog.setProgress(0);
+				mDialog.show();
+			}
+
+			@Override
+			protected Exception doInBackground(Void... params)
+			{
+				int progress = 0;
+
+				for(File file : mFiles)
+				{
+					try
+					{
+						Backup.encrypt(context, file, key);
+					}
+					catch(IOException | ZipException e)
+					{
+						Log.w(TAG, e);
+						return e;
+					}
+
+					mDialog.setProgress(progress++);
+				}
+
+				return null;
+			}
+
+			@Override
+			protected void onCancelled()
+			{
+				super.onCancelled();
+			}
+
+			@Override
+			protected void onPostExecute(Exception e)
+			{
+				if(mDialog != null)
+				{
+					mDialog.dismiss();
+					mDialog = null;
+				}
+
+				if(e != null)
+					Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+
+			}
+		}.execute();
+	}
+
+	private static String passwordToKey(String password)
+	{
+		try
+		{
+			final MessageDigest md = MessageDigest.getInstance("SHA-256");
+			final byte[] hash = md.digest(password.getBytes("UTF-8"));
+			return Base64.encodeToString(hash, Base64.NO_WRAP);
+		}
+		catch(NoSuchAlgorithmException|UnsupportedEncodingException e)
+		{
+			throw new WrappedCheckedException(e);
+		}
+	}
+
+	public static class PasswordDialog extends AlertDialog implements
+			DialogInterface.OnShowListener, TextWatcher, View.OnClickListener
+	{
+		public static final int MODE_INITIAL_PW = 0;
+		public static final int MODE_CHANGE_PW = 1;
+		public static final int MODE_CREATE_BACKUP = 2;
+
+		private final Context mContext;
+		private final int mMode;
+
+		private Button mPosBtn;
+		private EditText mPw;
+		private EditText mPwRepeat;
+		private CheckBox mUseForAll;
+		private String mOldKey;
+
+		public PasswordDialog(Context context, int mode)
+		{
+			super(context);
+			mContext = context;
+			mMode = mode;
+
+			setView(getLayoutInflater().inflate(R.layout.dialog_pw, null));
+			setButton(BUTTON_NEGATIVE, mContext.getString(android.R.string.cancel), (Message) null);
+			setButton(BUTTON_POSITIVE, mContext.getString(android.R.string.ok), (Message) null);
+			setOnShowListener(this);
+		}
+
+		@Override
+		public void onClick(View v)
+		{
+			if(v != mPosBtn)
+				return;
+
+			final String pw = mPw.getText().toString();
+			if(pw.equals(mPwRepeat.getText().toString()))
+			{
+				final String key = passwordToKey(pw);
+				dismiss();
+
+				if(mMode == MODE_CREATE_BACKUP)
+				{
+					try
+					{
+						Backup.createBackup(null, key);
+					}
+					catch(ZipException e)
+					{
+						Util.showExceptionDialog(mContext, e);
+						return;
+					}
+				}
+
+				if(mUseForAll.isChecked() || mMode == MODE_INITIAL_PW)
+				{
+					if(!mOldKey.equals(key))
+					{
+						encryptAll(mContext, key);
+						if(mMode == MODE_CHANGE_PW)
+							RxDroid.toastLong(R.string._toast_backup_pw_change);
+					}
+				}
+
+				if(mUseForAll.isChecked())
+					Settings.putString(Settings.Keys.BACKUP_KEY, key);
+				else
+					Settings.remove(Settings.Keys.BACKUP_KEY);
+			}
+			else
+				mPwRepeat.setError(mContext.getText(R.string._msg_pw_error));
+		}
+
+		@Override
+		public void onShow(DialogInterface dialog)
+		{
+			if(dialog != this)
+				return;
+
+			mOldKey = Settings.getString(Settings.Keys.BACKUP_KEY, "");
+
+			mPosBtn = getButton(BUTTON_POSITIVE);
+			mPosBtn.setOnClickListener(this);
+
+			mPw = (EditText) findViewById(R.id.pw_new);
+			mPw.addTextChangedListener(this);
+
+			mPwRepeat = (EditText) findViewById(R.id.pw_repeat);
+			mPwRepeat.addTextChangedListener(this);
+
+			mUseForAll = (CheckBox) findViewById(R.id.checkbox);
+
+			if(mMode != MODE_INITIAL_PW)
+				mUseForAll.setChecked(mOldKey.length() != 0);
+
+		}
+
+		@Override
+		public void afterTextChanged(Editable s)
+		{
+			mPwRepeat.setError(null);
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+	}
+
 	private static final FilenameFilter FILTER = new FilenameFilter() {
 		@Override
 		public boolean accept(File dir, String filename)
@@ -376,7 +581,7 @@ public class Backup
 
 	private static final String[] FILES = {
 			"databases/" + DatabaseHelper.DB_NAME,
-			"shared_prefs/at.jclehner.rxdroid_preferences.xml",
+			"shared_prefs/at.jclehner.rxdroid" + (BuildConfig.DEBUG ? ".debug" : "") + "_preferences.xml",
 			"shared_prefs/showcase_internal.xml"
 	};
 }

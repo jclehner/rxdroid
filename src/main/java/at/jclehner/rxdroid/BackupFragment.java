@@ -169,71 +169,7 @@ public class BackupFragment extends LoaderListFragment<File>
 					@Override
 					public boolean onMenuItemClick(MenuItem item)
 					{
-						new AsyncTask<Void, String, Exception>()
-						{
-							private ProgressDialog mDialog;
-							private List<File> mFiles;
-
-							@Override
-							protected void onPreExecute()
-							{
-								mFiles = Backup.getBackupFiles(getActivity());
-
-								mDialog = new ProgressDialog(getActivity());
-								mDialog.setTitle("Encrypting...");
-								mDialog.setCancelable(false);
-								mDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-								mDialog.setIndeterminate(false);
-								mDialog.setMax(mFiles.size());
-								mDialog.setProgress(0);
-								mDialog.show();
-							}
-
-							@Override
-							protected Exception doInBackground(Void... params)
-							{
-								int progress = 0;
-
-								for(File file : mFiles)
-								{
-									try
-									{
-										Backup.encrypt(getActivity(), file, "foobar");
-									}
-									catch(IOException | ZipException e)
-									{
-										Log.w("BackupFragment", e);
-										return e;
-									}
-
-									mDialog.setProgress(progress++);
-								}
-
-								return null;
-							}
-
-							@Override
-							protected void onCancelled()
-							{
-								super.onCancelled();
-							}
-
-							@Override
-							protected void onPostExecute(Exception e)
-							{
-								if(mDialog != null)
-								{
-									mDialog.dismiss();
-									mDialog = null;
-								}
-
-								if(e != null)
-									Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
-
-								restartLoader();
-
-							}
-						}.execute();
+						new Backup.PasswordDialog(getActivity(), Backup.PasswordDialog.MODE_CHANGE_PW).show();
 						return true;
 					}
 				});

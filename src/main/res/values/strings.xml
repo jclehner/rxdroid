@@ -520,15 +520,16 @@
 		Please specify a backup password to protect your privacy.
 	</string>
 
-	<string name="_msg_backup_pw_change">Existing backups will use the old password.</string>
+	<string name="_toast_backup_pw_change">Existing backups will use the old password.</string>
 
 	<string name="_msg_encrypting">Encrypting…</string>
 
-	<string name="_title_remember_pw">Remember password</string>
+	<string name="_msg_use_pw_for_all_backups">Use for all backups</string>
 
 	<string name="_title_backup_pw">Backup password</string>
 	<string name="_title_new_pw">Password</string>
 	<string name="_title_repeat_pw">Repeat password</string>
+	<string name="_msg_pw_error">Passwords do not match</string>
 
 
 </resources>

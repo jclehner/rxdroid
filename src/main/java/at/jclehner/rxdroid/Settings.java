@@ -103,6 +103,7 @@ public final class Settings
 		public static final String HAS_FRACTIONS_IN_ANY_SCHEDULE = "has_fractions_in_any_schedule";
 		public static final String BOOT_COMPLETED_TIMESTAMP = "boot_completed_timestamp";
 		public static final String LAST_NOT_STARTED_WARNING_TIMESTAMP = "last_not_started_timestamp";
+		public static final String BACKUP_KEY = "backup_key";
 
 		public static final String DEBUG_FORCE_SPLASH_WARNING = "debug_force_splash_warning";
 	}

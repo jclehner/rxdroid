@@ -607,6 +607,19 @@ public final class Util
 		return b;
 	}
 
+	public static void showExceptionDialog(Context context, Exception e)
+	{
+		final AlertDialog.Builder ab = new AlertDialog.Builder(context);
+		ab.setTitle(R.string._title_error);
+		ab.setIcon(android.R.drawable.ic_dialog_alert);
+		ab.setPositiveButton(android.R.string.ok, null);
+		ab.setCancelable(true);
+
+		ab.setMessage(Html.fromHtml("<tt>" + e.getClass().getSimpleName() + "</tt><br/>"
+				+ Util.escapeHtml(e.getMessage())));
+		ab.show();
+	}
+
 	/*
 	 * VULGAR FRACTION 1/4 ¼ &frac14; &#188; &#xBC; VULGAR FRACTION 1/2 ½
 	 * &frac12; &#189; &#xBD; VULGAR FRACTION 3/4 ¾ &frac34; &#190; &#xBE;
