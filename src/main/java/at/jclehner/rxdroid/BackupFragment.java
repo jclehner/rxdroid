@@ -48,13 +48,11 @@ import android.widget.Toast;
 import net.lingala.zip4j.exception.ZipException;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import at.jclehner.androidutils.StorageHelper;
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
@@ -94,7 +92,7 @@ public class BackupFragment extends LoaderListFragment<File>
 		final boolean isValid;
 	}
 
-	static class Loader extends LLFLoader<File> implements FilenameFilter
+	static class Loader extends LLFLoader<File>
 	{
 		Loader(Context context)
 		{
@@ -104,39 +102,14 @@ public class BackupFragment extends LoaderListFragment<File>
 		@Override
 		public List<? extends ItemHolder<File>> doLoadInBackground()
 		{
-			final List<File> dirs = new ArrayList<>();
-			dirs.add(mContext.getFilesDir());
-
-			for(StorageHelper.PathInfo si: StorageHelper.getDirectories(mContext))
-				dirs.add(new File(si.path, "RxDroid"));
-
 			final List<BackupFileHolder> data = new ArrayList<BackupFileHolder>();
 
-			for(File dir : dirs)
-			{
-				if(!dir.exists() || !dir.isDirectory())
-					continue;
-
-				final File[] files = dir.listFiles(this);
-				if(files != null)
-				{
-					for(File file : dir.listFiles(this))
-					{
-						if(file.isFile())
-							data.add(new BackupFileHolder(file));
-					}
-				}
-			}
+			for(File file : Backup.getBackupFiles(mContext))
+				data.add(new BackupFileHolder(file));
 
 			Collections.sort(data);
 
 			return data;
-		}
-
-		@Override
-		public boolean accept(File dir, String filename)
-		{
-			return filename.endsWith(".rxdbak");
 		}
 	}
 

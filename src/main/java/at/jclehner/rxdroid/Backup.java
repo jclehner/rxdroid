@@ -38,10 +38,14 @@ import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import at.jclehner.androidutils.StorageHelper;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
@@ -308,6 +312,42 @@ public class Backup
 
 		return outFile;
 	}
+
+	public static List<File> getBackupFiles(Context context)
+	{
+		final List<File> files = new ArrayList<>();
+		final List<File> dirs = new ArrayList<>();
+		dirs.add(context.getFilesDir());
+
+		for(StorageHelper.PathInfo si: StorageHelper.getDirectories(context))
+			dirs.add(new File(si.path, "RxDroid"));
+
+		for(File dir : dirs)
+		{
+			if(!dir.exists() || !dir.isDirectory())
+				continue;
+
+			final File[] dirFiles = dir.listFiles(FILTER);
+			if(dirFiles != null)
+			{
+				for(File file : dirFiles)
+				{
+					if(file.isFile())
+						files.add(file);
+				}
+			}
+		}
+
+		return files;
+	}
+
+	private static final FilenameFilter FILTER = new FilenameFilter() {
+		@Override
+		public boolean accept(File dir, String filename)
+		{
+			return filename.endsWith(".rxdbak");
+		}
+	};
 
 	private static final String[] FILES = {
 			"databases/" + DatabaseHelper.DB_NAME,
