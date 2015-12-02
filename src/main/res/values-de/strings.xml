@@ -464,15 +464,6 @@
 	<string name="_msg_constraints_date_between">Datum zwischen %1$s and %2$s wählen.</string>
 	<string name="_msg_constraints_date_from">Datum ab %1$s wählen.</string>
 
-	<!-- 
-    An exception to the rules laid out above. These strings are used by com.quietlycoding.android.picker
-    and thus use a different naming scheme.
-    
-    Keep at the end of strings.xml!  
-     -->
-    <string name="dialog_set_number">@string/_btn_set</string>
-    <string name="dialog_cancel">@android:string/cancel</string>
-    <string name="dialog_picker_title">Zahl wählen</string>
     <string name="_title_auto_dose_events">Automatische Einnahmen</string>
 	<string name="_title_supplies_expiring">Verfällt</string>
 	<string name="_title_supplies_low">Niedrig</string>
@@ -480,4 +471,18 @@
 	<string name="_title_expiry_date">Verfallsdatum</string>
 	<string name="_title_supplies">Vorräte</string>
 	<string name="_toast_expiry">Verfällt am %1$s.</string>
+
+	<string name="_msg_set_backup_pw">
+		Bitte geben Sie ein Backup-Passwort an, um Ihre Privatsphäre zu schützen.
+	</string>
+
+	<string name="_msg_backup_pw_change">Bestehende Backups benutzen weiterhin das alte Passwort.</string>
+
+	<string name="_msg_encrypting">Verschlüsseln…</string>
+
+	<string name="_title_remember_pw">Passwort merken</string>
+
+	<string name="_title_backup_pw">Backup-Passwort</string>
+	<string name="_title_new_pw">Passwort</string>
+	<string name="_title_repeat_pw">Passwort wiederholen</string>
 </resources>

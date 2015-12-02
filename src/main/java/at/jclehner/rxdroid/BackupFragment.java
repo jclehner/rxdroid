@@ -21,6 +21,8 @@
 
 package at.jclehner.rxdroid;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,6 +50,7 @@ import android.widget.Toast;
 import net.lingala.zip4j.exception.ZipException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -156,7 +159,87 @@ public class BackupFragment extends LoaderListFragment<File>
 	{
 		if(!getActivity().getIntent().getBooleanExtra(BackupActivity.EXTRA_NO_BACKUP_CREATION, false))
 		{
-			final MenuItem item = menu.add(getString(R.string._title_create_backup))
+			MenuItem item;
+
+			if(BuildConfig.DEBUG)
+			{
+				item = menu.add("Encrypt all").setIcon(R.drawable.ic_action_lock_closed);
+				MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+				item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+					@Override
+					public boolean onMenuItemClick(MenuItem item)
+					{
+						new AsyncTask<Void, String, Exception>()
+						{
+							private ProgressDialog mDialog;
+							private List<File> mFiles;
+
+							@Override
+							protected void onPreExecute()
+							{
+								mFiles = Backup.getBackupFiles(getActivity());
+
+								mDialog = new ProgressDialog(getActivity());
+								mDialog.setTitle("Encrypting...");
+								mDialog.setCancelable(false);
+								mDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+								mDialog.setIndeterminate(false);
+								mDialog.setMax(mFiles.size());
+								mDialog.setProgress(0);
+								mDialog.show();
+							}
+
+							@Override
+							protected Exception doInBackground(Void... params)
+							{
+								int progress = 0;
+
+								for(File file : mFiles)
+								{
+									try
+									{
+										Backup.encrypt(getActivity(), file, "foobar");
+									}
+									catch(IOException | ZipException e)
+									{
+										Log.w("BackupFragment", e);
+										return e;
+									}
+
+									mDialog.setProgress(progress++);
+								}
+
+								return null;
+							}
+
+							@Override
+							protected void onCancelled()
+							{
+								super.onCancelled();
+							}
+
+							@Override
+							protected void onPostExecute(Exception e)
+							{
+								if(mDialog != null)
+								{
+									mDialog.dismiss();
+									mDialog = null;
+								}
+
+								if(e != null)
+									Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+
+								restartLoader();
+
+							}
+						}.execute();
+						return true;
+					}
+				});
+			}
+
+			item = menu.add(getString(R.string._title_create_backup))
 					.setIcon(R.drawable.ic_action_add_box_white)
 					.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
 					{
@@ -199,7 +282,7 @@ public class BackupFragment extends LoaderListFragment<File>
 						}
 					});
 
-			MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+			item.setShowAsAction(MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 		}
 		super.onCreateOptionsMenu(menu, inflater);
 	}

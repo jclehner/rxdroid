@@ -39,6 +39,7 @@ import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,14 +49,16 @@ import java.util.Locale;
 import at.jclehner.androidutils.StorageHelper;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
+import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class Backup
 {
 	private static final String TAG = Backup.class.getSimpleName();
+	private static final String DIRECTORY_NAME = "RxDroid" + (BuildConfig.DEBUG ? "Dbg" : "");
 
 	public static final File DIRECTORY =
-			new File(Environment.getExternalStorageDirectory(), "RxDroid");
+			new File(Environment.getExternalStorageDirectory(), DIRECTORY_NAME);
 
 	public static abstract class StorageStateListener extends BroadcastReceiver
 	{
@@ -267,11 +270,15 @@ public class Backup
 
 	public static File makeBackupFilename(String template)
 	{
-		return new File(Environment.getExternalStorageDirectory(),
-				"RxDroid/" + template + ".rxdbak");
+		return new File(DIRECTORY + "/" + template + ".rxdbak");
 	}
 
 	public static File createBackup(File outFile, String password) throws ZipException
+	{
+		return createBackup(outFile, password, RxDroid.getPackageInfo().applicationInfo.dataDir);
+	}
+
+	public static File createBackup(File outFile, String password, String dataDir) throws ZipException
 	{
 		if(outFile == null)
 		{
@@ -282,7 +289,6 @@ public class Backup
 		synchronized(Database.LOCK_DATA)
 		{
 			final ZipFile zip = new ZipFile(outFile);
-			final File dataDir = new File(RxDroid.getPackageInfo().applicationInfo.dataDir);
 
 			for(int i = 0; i != FILES.length; ++i)
 			{
@@ -320,7 +326,7 @@ public class Backup
 		dirs.add(context.getFilesDir());
 
 		for(StorageHelper.PathInfo si: StorageHelper.getDirectories(context))
-			dirs.add(new File(si.path, "RxDroid"));
+			dirs.add(new File(si.path, DIRECTORY_NAME));
 
 		for(File dir : dirs)
 		{
@@ -339,6 +345,25 @@ public class Backup
 		}
 
 		return files;
+	}
+
+	public static void encrypt(Context context, File backup, String password) throws ZipException, IOException
+	{
+		final ZipFile zip = new ZipFile(backup);
+		if(zip.isEncrypted())
+			return;
+
+		Log.i(TAG, "Encrypting " + backup);
+
+		final File tmpDir = new File(context.getCacheDir(), "tmp");
+		tmpDir.mkdirs();
+
+		final File tmpFile = new File(tmpDir, "tmp.zip");
+
+		zip.extractAll(tmpDir.getAbsolutePath());
+		tmpFile.delete();
+		createBackup(tmpFile, password, tmpDir.getAbsolutePath());
+		Util.copyFile(tmpFile, backup);
 	}
 
 	private static final FilenameFilter FILTER = new FilenameFilter() {
