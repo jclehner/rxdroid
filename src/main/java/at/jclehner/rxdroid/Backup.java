@@ -233,6 +233,10 @@ public class Backup
 			return file;
 		}
 
+		public ZipFile getZip() {
+			return mZip;
+		}
+
 		public boolean restore(String password)
 		{
 			if(!isValid())
@@ -291,10 +295,10 @@ public class Backup
 
 	public static File createBackup(File outFile, String password) throws ZipException
 	{
-		return createBackup(outFile, password, RxDroid.getPackageInfo().applicationInfo.dataDir);
+		return createBackup(outFile, password, RxDroid.getPackageInfo().applicationInfo.dataDir, -1);
 	}
 
-	public static File createBackup(File outFile, String password, String dataDir) throws ZipException
+	public static File createBackup(File outFile, String password, String dataDir, long time) throws ZipException
 	{
 		if(outFile == null)
 		{
@@ -329,7 +333,10 @@ public class Backup
 				zip.addFile(file, zp);
 			}
 
-			zip.setComment("rxdbak1:" + System.currentTimeMillis() + ":DBv" + DatabaseHelper.DB_VERSION);
+			if(time == -1)
+				time = System.currentTimeMillis();
+
+			zip.setComment("rxdbak1:" + time + ":DBv" + DatabaseHelper.DB_VERSION);
 		}
 
 		return outFile;
@@ -370,8 +377,8 @@ public class Backup
 
 	private static void encrypt(Context context, File backup, String password) throws ZipException, IOException
 	{
-		final ZipFile zip = new ZipFile(backup);
-		if(zip.isEncrypted())
+		final BackupFile bf = new BackupFile(backup.getAbsolutePath());
+		if(!bf.isValid() || bf.isEncrypted())
 			return;
 
 		Log.i(TAG, "Encrypting " + backup);
@@ -379,11 +386,11 @@ public class Backup
 		final File tmpDir = new File(context.getCacheDir(), "tmp");
 		tmpDir.mkdirs();
 
-		final File tmpFile = new File(tmpDir, "tmp.zip");
+		final File tmpFile = new File(tmpDir, "tmp.rxdbak");
 
-		zip.extractAll(tmpDir.getAbsolutePath());
+		bf.getZip().extractAll(tmpDir.getAbsolutePath());
 		tmpFile.delete();
-		createBackup(tmpFile, password, tmpDir.getAbsolutePath());
+		createBackup(tmpFile, password, tmpDir.getAbsolutePath(), bf.getTimestamp().getTime());
 		Util.copyFile(tmpFile, backup);
 	}
 
