@@ -117,7 +117,11 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 			if(which == BUTTON_POSITIVE && mCanRestore)
 			{
 				if(mFile.isEncrypted())
-					showPasswordDialog();
+				{
+					final String key = Settings.getString(Settings.Keys.BACKUP_KEY, "");
+					if(key.length() == 0 || !restoreBackup(key))
+						showPasswordDialog();
+				}
 				else
 					restoreBackup(null);
 			}

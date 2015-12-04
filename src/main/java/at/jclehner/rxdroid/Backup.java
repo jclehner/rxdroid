@@ -44,7 +44,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -336,16 +335,21 @@ public class Backup
 		return outFile;
 	}
 
-	public static List<File> getBackupFiles(Context context)
+	public static List<File> getBackupDirectories(Context context)
 	{
-		final List<File> files = new ArrayList<>();
 		final List<File> dirs = new ArrayList<>();
 		dirs.add(context.getFilesDir());
-
 		for(StorageHelper.PathInfo si: StorageHelper.getDirectories(context))
 			dirs.add(new File(si.path, DIRECTORY_NAME));
 
-		for(File dir : dirs)
+		return dirs;
+	}
+
+	public static List<File> getBackupFiles(Context context)
+	{
+		final List<File> files = new ArrayList<>();
+
+		for(File dir : getBackupDirectories(context))
 		{
 			if(!dir.exists() || !dir.isDirectory())
 				continue;
@@ -383,9 +387,9 @@ public class Backup
 		Util.copyFile(tmpFile, backup);
 	}
 
-	private static AsyncTask<Void, String, Exception> encryptAll(final Context context, final String key)
+	private static void encryptAll(final Context context, final String key, final Runnable callback)
 	{
-		return new AsyncTask<Void, String, Exception>() {
+		new AsyncTask<Void, String, Exception>() {
 			private ProgressDialog mDialog;
 			private List<File> mFiles;
 
@@ -443,7 +447,9 @@ public class Backup
 				}
 
 				if(e != null)
-					Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+					Util.showExceptionDialog(mDialog.getContext(), e);
+				else if(callback != null)
+					callback.run();
 
 			}
 		}.execute();
@@ -479,6 +485,8 @@ public class Backup
 		private CheckBox mUseForAll;
 		private String mOldKey;
 
+		private Runnable mBackupCallback;
+
 		public PasswordDialog(Context context) {
 			this(context, false);
 		}
@@ -493,6 +501,10 @@ public class Backup
 			setButton(BUTTON_NEGATIVE, mContext.getString(android.R.string.cancel), (Message) null);
 			setButton(BUTTON_POSITIVE, mContext.getString(android.R.string.ok), (Message) null);
 			setOnShowListener(this);
+		}
+
+		public void setBackupSuccessCallback(Runnable callback) {
+			mBackupCallback = callback;
 		}
 
 		@Override
@@ -510,13 +522,13 @@ public class Backup
 				else
 					Settings.remove(Settings.Keys.BACKUP_KEY);
 
-				dismiss();
-
 				if(mCreateBackup)
 				{
 					try
 					{
 						Backup.createBackup(null, key);
+						if(mBackupCallback != null)
+							mBackupCallback.run();
 					}
 					catch(ZipException e)
 					{
@@ -524,7 +536,11 @@ public class Backup
 					}
 				}
 				else if(key != null)
-					encryptAll(mContext, key);
+				{
+					encryptAll(mContext, key, mBackupCallback);
+				}
+
+				dismiss();
 			}
 			else
 			{

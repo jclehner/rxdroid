@@ -24,6 +24,7 @@ package at.jclehner.rxdroid;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+import android.os.FileObserver;
 import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -74,6 +75,7 @@ public class BackupFragment extends LoaderListFragment<File>
 			uri = Uri.fromFile(file);
 			location = bf.getLocation();
 			isValid = bf.isValid();
+			isEncrypted = bf.isEncrypted();
 
 			if(isValid)
 				mTimestamp = bf.getTimestamp();
@@ -94,6 +96,7 @@ public class BackupFragment extends LoaderListFragment<File>
 		final String location;
 		final String dateTime;
 		final boolean isValid;
+		final boolean isEncrypted;
 	}
 
 	static class Loader extends LLFLoader<File>
@@ -138,7 +141,10 @@ public class BackupFragment extends LoaderListFragment<File>
 			final TextView text1 = (TextView) view.findViewById(android.R.id.text1);
 			final TextView text2 = (TextView) view.findViewById(android.R.id.text2);
 
-			text1.setText(data.dateTime);
+			if(!BuildConfig.DEBUG)
+				text1.setText(data.dateTime);
+			else
+				text1.setText((data.isEncrypted ? "[E] " : "[U] ") + data.dateTime);
 
 			text2.setTextAppearance(getActivity(), android.R.attr.textAppearanceSmall);
 			text2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
@@ -152,7 +158,23 @@ public class BackupFragment extends LoaderListFragment<File>
 		}
 	}
 
+	class MyFileObserver extends FileObserver
+	{
+		MyFileObserver(File path) {
+			super(path.getAbsolutePath(), CREATE | DELETE | DELETE_SELF | MOVED_TO | MOVED_FROM |
+					MOVE_SELF);
+		}
+
+		@Override
+		public void onEvent(int event, String path)
+		{
+			restartLoader();
+			Log.d("BackupFragment", "path=" + path + ", event=0x" + Integer.toHexString(event));
+		}
+	}
+
 	private static final int MENU_CREATE_BACKUP = 1;
+	private List<MyFileObserver> mObservers = new ArrayList<>();
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
@@ -168,10 +190,11 @@ public class BackupFragment extends LoaderListFragment<File>
 
 					if(!createBackup || key.length() == 0)
 					{
-						final Dialog d = new Backup.PasswordDialog(getActivity(), createBackup);
-						d.setOnDismissListener(new DialogInterface.OnDismissListener() {
+						final Backup.PasswordDialog d = new Backup.PasswordDialog(getActivity(), createBackup);
+						d.setBackupSuccessCallback(new Runnable()
+						{
 							@Override
-							public void onDismiss(DialogInterface dialog)
+							public void run()
 							{
 								restartLoader();
 							}
@@ -220,9 +243,26 @@ public class BackupFragment extends LoaderListFragment<File>
 	public void onResume()
 	{
 		super.onResume();
-		mShowDialogIfNotWriteable = true;
+		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(
+				R.string._title_backup_restore);
 
-		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_backup_restore);
+		mObservers.clear();
+
+		for(File dir : Backup.getBackupDirectories(getActivity()))
+		{
+			final MyFileObserver o = new MyFileObserver(dir);
+			o.startWatching();
+			mObservers.add(o);
+		}
+	}
+
+	@Override
+	public void onPause()
+	{
+		super.onPause();
+
+		for(MyFileObserver o : mObservers)
+			o.stopWatching();
 	}
 
 	@Override
@@ -266,8 +306,7 @@ public class BackupFragment extends LoaderListFragment<File>
 		ab.show();
 	}
 
-
-	private View.OnClickListener mMenuListener = new View.OnClickListener()
+	private final View.OnClickListener mMenuListener = new View.OnClickListener()
 	{
 		@Override
 		public void onClick(final View v)
