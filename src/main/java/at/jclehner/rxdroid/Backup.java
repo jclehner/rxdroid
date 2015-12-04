@@ -244,6 +244,8 @@ public class Backup
 
 			synchronized(Database.LOCK_DATA)
 			{
+				final String key = Settings.getString(Settings.Keys.BACKUP_KEY, "");
+
 				try
 				{
 					if(password != null)
@@ -261,6 +263,7 @@ public class Backup
 				}
 
 				Settings.init(true);
+				Settings.putString(Settings.Keys.BACKUP_KEY, key);
 			}
 
 			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
@@ -523,7 +526,7 @@ public class Backup
 			final String pw = mPw.getText().toString();
 			if(pw.equals(mPwRepeat.getText().toString()))
 			{
-				final String key = passwordToKey(pw);
+				final String key = !pw.equals(mOldKey) ? passwordToKey(pw) : mOldKey;
 				if(key != null && mUseForAll.isChecked())
 					Settings.putString(Settings.Keys.BACKUP_KEY, key);
 				else
@@ -567,29 +570,30 @@ public class Backup
 
 			mPosBtn = getButton(BUTTON_POSITIVE);
 			mPosBtn.setOnClickListener(this);
-			mPosBtn.setEnabled(mOldKey.length() == 0 && !isInitialSetting);
+			mPosBtn.setEnabled(!isInitialSetting || mCreateBackup);
 
 			mPw = (EditText) findViewById(R.id.pw_new);
 			// It doesn't really matter what we put here. The idea is that if a password is
 			// already set, we allow the user to remove the password protection by setting
 			// a zero-length password
-			mPw.setText(mOldKey.substring(0, Math.min(mOldKey.length(), 12)));
+			mPw.setText(mOldKey);
 			mPw.addTextChangedListener(this);
 
 			mPwRepeat = (EditText) findViewById(R.id.pw_repeat);
+			mPwRepeat.setText(mOldKey);
 			mPwRepeat.addTextChangedListener(this);
 
 			mUseForAll = (CheckBox) findViewById(R.id.checkbox);
 			mMessage = (TextView) findViewById(R.id.message);
 
-			if(!mCreateBackup && mOldKey.length() != 0)
+			if(!mCreateBackup)
 			{
 				mMessage.setText(R.string._msg_change_backup_pw);
 				mUseForAll.setChecked(true);
 				mUseForAll.setEnabled(false);
 			}
-			else if(mCreateBackup)
-				mUseForAll.setChecked(mOldKey.length() != 0);
+			else
+				mUseForAll.setChecked(true);
 		}
 
 		@Override
