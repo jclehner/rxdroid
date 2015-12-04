@@ -477,7 +477,7 @@
 	</string>
 
 	<string name="_msg_change_backup_pw">
-		Backup-Passwort ändern. Bestehende Backups benutzen weiterhin das alte Passwort.
+		Backup-Passwort ändern. Bestehende passwortgeschützte Backups benutzen weiterhin das alte Passwort.
 	</string>
 
 	<string name="_toast_backup_pw_change"></string>

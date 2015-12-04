@@ -469,12 +469,8 @@ public class Backup
 	public static class PasswordDialog extends AlertDialog implements
 			DialogInterface.OnShowListener, TextWatcher, View.OnClickListener
 	{
-		public static final int MODE_INITIAL_PW = 0;
-		public static final int MODE_CHANGE_PW = 1;
-		public static final int MODE_CREATE_BACKUP = 2;
-
 		private final Context mContext;
-		private final int mMode;
+		private final boolean mCreateBackup;
 
 		private Button mPosBtn;
 		private TextView mMessage;
@@ -483,11 +479,15 @@ public class Backup
 		private CheckBox mUseForAll;
 		private String mOldKey;
 
-		public PasswordDialog(Context context, int mode)
+		public PasswordDialog(Context context) {
+			this(context, false);
+		}
+
+		public PasswordDialog(Context context, boolean createBackup)
 		{
 			super(context);
 			mContext = context;
-			mMode = mode;
+			mCreateBackup = createBackup;
 
 			setView(getLayoutInflater().inflate(R.layout.dialog_pw, null));
 			setButton(BUTTON_NEGATIVE, mContext.getString(android.R.string.cancel), (Message) null);
@@ -512,7 +512,7 @@ public class Backup
 
 				dismiss();
 
-				if(mMode == MODE_CREATE_BACKUP)
+				if(mCreateBackup)
 				{
 					try
 					{
@@ -521,11 +521,9 @@ public class Backup
 					catch(ZipException e)
 					{
 						Util.showExceptionDialog(mContext, e);
-						return;
 					}
 				}
-
-				if(mMode == MODE_INITIAL_PW && key != null)
+				else if(key != null)
 					encryptAll(mContext, key);
 			}
 			else
@@ -541,11 +539,12 @@ public class Backup
 			if(dialog != this)
 				return;
 
+			final boolean isInitialSetting = !Settings.contains(Settings.Keys.BACKUP_KEY);
 			mOldKey = Settings.getString(Settings.Keys.BACKUP_KEY, "");
 
 			mPosBtn = getButton(BUTTON_POSITIVE);
 			mPosBtn.setOnClickListener(this);
-			mPosBtn.setEnabled(mMode != MODE_INITIAL_PW && mOldKey.length() == 0);
+			mPosBtn.setEnabled(mOldKey.length() == 0 && !isInitialSetting);
 
 			mPw = (EditText) findViewById(R.id.pw_new);
 			// It doesn't really matter what we put here. The idea is that if a password is
@@ -560,30 +559,21 @@ public class Backup
 			mUseForAll = (CheckBox) findViewById(R.id.checkbox);
 			mMessage = (TextView) findViewById(R.id.message);
 
-			switch(mMode)
+			if(!mCreateBackup && mOldKey.length() != 0)
 			{
-				case MODE_CHANGE_PW:
-					mMessage.setText(R.string._msg_change_backup_pw);
-					// fall through
-
-				case MODE_INITIAL_PW:
-					mUseForAll.setChecked(true);
-					mUseForAll.setEnabled(false);
-					break;
-
-				case MODE_CREATE_BACKUP:
-					mUseForAll.setChecked(mOldKey.length() != 0);
-					break;
+				mMessage.setText(R.string._msg_change_backup_pw);
+				mUseForAll.setChecked(true);
+				mUseForAll.setEnabled(false);
 			}
+			else if(mCreateBackup)
+				mUseForAll.setChecked(mOldKey.length() != 0);
 		}
 
 		@Override
 		public void afterTextChanged(Editable s)
 		{
 			mPwRepeat.setError(null);
-			final int len = mPw.length();
-			mPosBtn.setEnabled((mMode == MODE_INITIAL_PW ? len != 0 : true)
-					&& len == mPwRepeat.length());
+			mPosBtn.setEnabled(mPw.length() == mPwRepeat.length());
 		}
 
 		@Override

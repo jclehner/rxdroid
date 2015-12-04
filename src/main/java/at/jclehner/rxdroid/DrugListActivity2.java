@@ -145,7 +145,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 			{
 				if(!Backup.getBackupFiles(this).isEmpty())
 				{
-					final Dialog d = new Backup.PasswordDialog(this, Backup.PasswordDialog.MODE_INITIAL_PW);
+					final Dialog d = new Backup.PasswordDialog(this);
 					d.setCancelable(false);
 					d.setOnDismissListener(new DialogInterface.OnDismissListener() {
 						@Override

@@ -521,12 +521,12 @@
 	</string>
 
 	<string name="_msg_change_backup_pw">
-		Change backup password. Existing backups will still use the old password.
+		Change backup password. Existing password-protected backups will still use the old password.
 	</string>
 
 	<string name="_msg_encrypting">Encrypting…</string>
 
-	<string name="_msg_use_pw_for_all_backups">Use for all future backups</string>
+	<string name="_msg_use_pw_for_all_backups">Use for all backups</string>
 
 	<string name="_title_backup_pw">Backup password</string>
 	<string name="_title_new_pw">Password</string>

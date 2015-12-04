@@ -152,80 +152,60 @@ public class BackupFragment extends LoaderListFragment<File>
 		}
 	}
 
-	private boolean mShowDialogIfNotWriteable = true;
-	private File[] mDirectories;
+	private static final int MENU_CREATE_BACKUP = 1;
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
 		if(!getActivity().getIntent().getBooleanExtra(BackupActivity.EXTRA_NO_BACKUP_CREATION, false))
 		{
-			final DialogInterface.OnDismissListener l = new DialogInterface.OnDismissListener() {
-				@Override
-				public void onDismiss(DialogInterface dialog)
-				{
-					restartLoader();
-				}
-			};
-
-			MenuItem item = menu.add(R.string._title_backup_pw).setIcon(R.drawable.ic_action_lock_closed);
-			MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-			item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			final MenuItem.OnMenuItemClickListener l = new MenuItem.OnMenuItemClickListener() {
 				@Override
 				public boolean onMenuItemClick(MenuItem item)
 				{
-					final Dialog d = new Backup.PasswordDialog(getActivity(), Backup.PasswordDialog.MODE_CHANGE_PW);
-					d.setOnDismissListener(l);
-					d.show();
+					final boolean createBackup = item.getItemId() == MENU_CREATE_BACKUP;
+					final String key = Settings.getString(Settings.Keys.BACKUP_KEY, "");
+
+					if(!createBackup || key.length() == 0)
+					{
+						final Dialog d = new Backup.PasswordDialog(getActivity(), createBackup);
+						d.setOnDismissListener(new DialogInterface.OnDismissListener() {
+							@Override
+							public void onDismiss(DialogInterface dialog)
+							{
+								restartLoader();
+							}
+						});
+						d.show();
+					}
+					else
+					{
+						try
+						{
+							Backup.createBackup(null, key);
+							restartLoader();
+						}
+						catch(ZipException e)
+						{
+							showExceptionDialog(e);
+						}
+
+					}
 					return true;
 				}
-			});
+			};
 
-			item = menu.add(getString(R.string._title_create_backup))
+			MenuItem item = menu.add(R.string._title_backup_pw).setIcon(
+					R.drawable.ic_action_lock_closed)
+					.setOnMenuItemClickListener(l);
+			MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
+			item = menu.add(0, MENU_CREATE_BACKUP, 0, R.string._title_create_backup)
 					.setIcon(R.drawable.ic_action_add_box_white)
-					.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-					{
-						@Override
-						public boolean onMenuItemClick(MenuItem menuItem)
-						{
-							final String storageState = Backup.getStorageState();
-							if(Backup.StorageStateListener.isWritable(storageState))
-							{
-								try
-								{
-									Backup.createBackup(null, Settings.getString(Settings.Keys.BACKUP_KEY, null));
-									getLoaderManager().restartLoader(0, null, BackupFragment.this);
-								} catch(ZipException e)
-								{
-									showExceptionDialog(e);
-								}
-							}
-							else
-							{
-								if(mShowDialogIfNotWriteable)
-								{
-									final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-									ab.setPositiveButton(android.R.string.ok, null);
-									ab.setMessage(R.string._msg_external_storage_not_writeable);
-									ab.setTitle(R.string._title_error);
-									ab.setIcon(android.R.drawable.ic_dialog_alert);
-
-									ab.show();
-									mShowDialogIfNotWriteable = false;
-								}
-								else
-								{
-									Toast.makeText(getActivity(), R.string._msg_external_storage_not_writeable,
-											Toast.LENGTH_LONG).show();
-								}
-							}
-
-							return true;
-						}
-					});
-
+					.setOnMenuItemClickListener(l);
 			item.setShowAsAction(MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 		}
+
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
