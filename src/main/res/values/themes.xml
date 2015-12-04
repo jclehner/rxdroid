@@ -57,6 +57,9 @@
 		<item name="iconStorage">@drawable/ic_menu_storage_black</item>
 		<item name="iconOverflow">@drawable/ic_overflow_black</item>
 		<item name="iconList">@drawable/ic_list_black</item>
+
+		<item name="iconLockOpen">@drawable/ic_lock_open_black_18dp</item>
+		<item name="iconLockClosed">@drawable/ic_lock_outline_black_18dp</item>
 				
 		<item name="dividerColor">@color/list_divider_light</item>
 		
@@ -123,6 +126,9 @@
         <item name="iconStorage">@drawable/ic_menu_storage_white</item>
         <item name="iconOverflow">@drawable/ic_overflow_white</item>
         <item name="iconList">@drawable/ic_list_white</item>
+
+		<item name="iconLockOpen">@drawable/ic_lock_open_white_18dp</item>
+		<item name="iconLockClosed">@drawable/ic_lock_outline_white_18dp</item>
 
         <item name="dividerColor">@color/list_divider_dark</item>
         

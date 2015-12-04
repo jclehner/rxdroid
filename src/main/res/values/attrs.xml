@@ -77,6 +77,9 @@
 
     <attr name="iconMissedDose" format="reference" />
 
+    <attr name="iconLockOpen" format="reference" />
+    <attr name="iconLockClosed" format="reference" />
+
 	<attr name="iconTime" />
 	<attr name="iconPicture" />
 	<attr name="iconWarning" />
