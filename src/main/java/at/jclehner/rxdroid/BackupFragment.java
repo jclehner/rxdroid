@@ -46,6 +46,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -138,13 +139,14 @@ public class BackupFragment extends LoaderListFragment<File>
 
 			final BackupFileHolder data = getItemHolder(position);
 
+			final ImageView icon = (ImageView) view.findViewById(android.R.id.icon);
 			final TextView text1 = (TextView) view.findViewById(android.R.id.text1);
 			final TextView text2 = (TextView) view.findViewById(android.R.id.text2);
 
-			if(!BuildConfig.DEBUG)
-				text1.setText(data.dateTime);
-			else
-				text1.setText((data.isEncrypted ? "[E] " : "[U] ") + data.dateTime);
+			icon.setImageResource(Theme.getResourceAttribute(data.isEncrypted
+					? R.attr.iconLockClosed : R.attr.iconLockOpen));
+
+			text1.setText(data.dateTime);
 
 			text2.setTextAppearance(getActivity(), android.R.attr.textAppearanceSmall);
 			text2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);

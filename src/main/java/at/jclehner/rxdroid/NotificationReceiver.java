@@ -200,7 +200,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(doseTime != Schedule.TIME_INVALID)
 			{
 				long delay = AlarmManager.onAlarmTriggered(ID_ALARM);
-				Log.i(TAG, "Alarm delay was " + Millis.toString(delay));
+				Log.i(TAG, "Alarm delay was " + delay + "ms");
 
 				if(!isAlarmRepetition)
 				{
