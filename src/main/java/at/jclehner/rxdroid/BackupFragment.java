@@ -143,8 +143,8 @@ public class BackupFragment extends LoaderListFragment<File>
 			final TextView text1 = (TextView) view.findViewById(android.R.id.text1);
 			final TextView text2 = (TextView) view.findViewById(android.R.id.text2);
 
-			icon.setImageResource(Theme.getResourceAttribute(data.isEncrypted
-					? R.attr.iconLockClosed : R.attr.iconLockOpen));
+			icon.setVisibility(data.isEncrypted ? View.GONE : View.VISIBLE);
+			icon.setImageResource(Theme.getResourceAttribute(R.attr.iconLockOpen));
 
 			text1.setText(data.dateTime);
 
