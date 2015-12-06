@@ -36,6 +36,7 @@ import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
@@ -222,15 +223,11 @@ public class Backup
 		{
 			final String file = new File(mPath).getAbsolutePath();
 
-			final String extDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-			if(file.startsWith(extDir))
-				return file.substring(extDir.length() + 1);
-
 			final String filesDir = RxDroid.getContext().getFilesDir().getAbsolutePath();
 			if(file.startsWith(filesDir))
 				return file.replace(filesDir, "[files]");
 
-			return file;
+			return StorageHelper.getPrettyName(file, RxDroid.getContext(), null);
 		}
 
 		public ZipFile getZip() {
@@ -324,7 +321,7 @@ public class Backup
 				zp.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
 				zp.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
 
-				if(password != null)
+				if(!TextUtils.isEmpty(password))
 				{
 					zp.setPassword(password);
 					zp.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
@@ -473,8 +470,8 @@ public class Backup
 		try
 		{
 			final MessageDigest md = MessageDigest.getInstance("SHA-256");
-			final byte[] hash = md.digest(password.getBytes("UTF-8"));
-			return Base64.encodeToString(hash, Base64.NO_WRAP);
+			md.update("RxDroid".getBytes());
+			return Base64.encodeToString(md.digest(password.getBytes("UTF-8")), Base64.NO_WRAP);
 		}
 		catch(NoSuchAlgorithmException|UnsupportedEncodingException e)
 		{

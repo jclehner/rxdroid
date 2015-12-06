@@ -2,6 +2,7 @@ package at.jclehner.androidutils;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Path;
 import android.os.Build;
 import android.os.Environment;
 import android.os.FileObserver;
@@ -72,10 +73,25 @@ public class StorageHelper
 		public final boolean removable;
 	}
 
-	public static String getPrettyName(PathInfo dir, List<PathInfo> dirs, Formatter formatter)
+	public static String getPrettyName(String path, Context context, Formatter formatter)
 	{
-		//int count = dirs.size();
+		if(formatter == null)
+			formatter = new SimpleFormatter();
 
+		final List<PathInfo> dirs = getDirectories(context);
+		for(PathInfo dir : dirs)
+		{
+			final String absDirPath = dir.path.getAbsolutePath();
+
+			if(path.startsWith(absDirPath))
+				return path.replace(absDirPath, getPrettyName(dir, dirs, formatter));
+		}
+
+		return path;
+	}
+
+	private static String getPrettyName(PathInfo dir, List<PathInfo> dirs, Formatter formatter)
+	{
 		List<PathInfo> filtered = getRemovablePaths(dirs);
 		//count -= filtered.size();
 		int index = filtered.indexOf(dir);
