@@ -214,7 +214,7 @@ public class StorageHelper
 				storage + "/sdcard1",
 				"/mnt/ext_card",
 				"/external_sd",
-				storage + "/sdcard2 "
+				storage + "/sdcard2"
 		};
 
 		for (int i = 0; i != paths.length; ++i)
