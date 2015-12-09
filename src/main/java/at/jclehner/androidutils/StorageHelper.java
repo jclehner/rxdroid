@@ -210,17 +210,31 @@ public class StorageHelper
 	private static void getDirsFromHardcodedPaths(List<File> outDirs)
 	{
 		final String storage = getPathEnv(null, "ANDROID_STORAGE", "/storage").getPath();
+		// Inspired by https://stackoverflow.com/questions/13976982
 		final String[] paths = {
 				storage + "/sdcard1",
-				"/mnt/ext_card",
-				"/external_sd",
 				storage + "/sdcard2"
+				storage + "/extSdCard",
+				storage + "/ext_sd",
+				storage + "/external_SD",
+				storage + "/removable/sdcard1",
+				"/mnt/external_sd",
+				"/mnt/extSdCard",
+				"/mnt/external1",
+				"/mnt/media_rw/sdcard1",
+				"/mnt/sdcard/external_sd",
+				"/mnt/ext_card",
+				"/mnt/Removable/MicroSD"
+				"/external_sd",
+				"/sdcard2",
+				"/Removable/MicroSD",
+				"/data/sdext"
 		};
 
 		for (int i = 0; i != paths.length; ++i)
 		{
 			final File path = new File(paths[i]);
-			if (path.exists())
+			if (path.exists() && path.isDirectory())
 				outDirs.add(path);
 		}
 	}
