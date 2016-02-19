@@ -36,7 +36,7 @@ import at.jclehner.rxdroid.util.Util;
 public class StorageHelper
 {
 	private static final String TAG = "StorageHelper";
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	public interface Formatter
 	{
@@ -66,6 +66,17 @@ public class StorageHelper
 			this.path = path;
 			this.emulated = emulated;
 			this.removable = removable;
+		}
+
+		@Override
+		public String toString()
+		{
+			return "PathInfo { '" + path + "' "  + (emulated ? "E" : "") + (removable ? "R" : "") + " }";
+		}
+
+		public boolean isConsideredRemovable()
+		{
+			return !emulated && removable;
 		}
 
 		public final File path;
@@ -113,7 +124,7 @@ public class StorageHelper
 			@Override
 			public boolean matches(PathInfo pathInfo)
 			{
-				return pathInfo.removable;
+				return pathInfo.isConsideredRemovable();
 			}
 		});
 	}
@@ -124,7 +135,7 @@ public class StorageHelper
 			@Override
 			public boolean matches(PathInfo pathInfo)
 			{
-				return !pathInfo.removable || pathInfo.emulated;
+				return !pathInfo.isConsideredRemovable();
 			}
 		});
 	}
@@ -213,7 +224,7 @@ public class StorageHelper
 		// Inspired by https://stackoverflow.com/questions/13976982
 		final String[] paths = {
 				storage + "/sdcard1",
-				storage + "/sdcard2"
+				storage + "/sdcard2",
 				storage + "/extSdCard",
 				storage + "/ext_sd",
 				storage + "/external_SD",
@@ -224,7 +235,7 @@ public class StorageHelper
 				"/mnt/media_rw/sdcard1",
 				"/mnt/sdcard/external_sd",
 				"/mnt/ext_card",
-				"/mnt/Removable/MicroSD"
+				"/mnt/Removable/MicroSD",
 				"/external_sd",
 				"/sdcard2",
 				"/Removable/MicroSD",
