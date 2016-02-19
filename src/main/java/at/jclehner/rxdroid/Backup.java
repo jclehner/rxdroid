@@ -272,7 +272,9 @@ public class Backup
 	{
 		final String state;
 
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+			state = Environment.getExternalStorageState(DIRECTORY);
+		else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
 			state = Environment.getStorageState(DIRECTORY);
 		else
 			state = Environment.getExternalStorageState();
