@@ -37,11 +37,11 @@ dependencies {
 
 android {
 	buildToolsVersion '23.0.1'
-	compileSdkVersion 23
+	compileSdkVersion 'android-N'
 
 	defaultConfig {
 		minSdkVersion 14
-		targetSdkVersion 23
+		targetSdkVersion 'android-N'
 
         applicationId 'at.jclehner.rxdroid';
 
