@@ -36,6 +36,7 @@ public final class Version
 {
 	public static final boolean SDK_IS_JELLYBEAN_OR_NEWER = Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1;
 	public static final boolean SDK_IS_LOLLIPOP_OR_NEWER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+	public static final boolean SDK_IS_N_OR_NEWER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N || Build.VERSION.PREVIEW_SDK_INT != 0;
 
 	private static final boolean BETA_BUILD = false;
 

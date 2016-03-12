@@ -34,7 +34,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
-import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.util.SparseIntArray;
 
@@ -600,8 +599,6 @@ public class NotificationReceiver extends BroadcastReceiver
 				return;
 			}
 
-
-			final int titleResId = mTextDoses != null ? R.string._title_notification_doses : R.string._title_supplies;
 			final int iconResId = mTextSupply != null ? R.drawable.ic_stat_exclamation : R.drawable.ic_stat_normal;
 			final CharSequence contentText = mTextDoses != null ? mTextDoses : mTextSupply;
 			final int priority = mTextDoses != null ? NotificationCompat.PRIORITY_HIGH : NotificationCompat.PRIORITY_DEFAULT;
@@ -613,7 +610,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
 			builder.setWhen(0);
 
-			builder.setContentTitle(getString(titleResId));
+			builder.setContentTitle(getContentTitle());
 			builder.setSmallIcon(iconResId);
 			builder.setContentText(contentText);
 			builder.setPriority(priority);
@@ -781,7 +778,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		private List<Notification> getPages()
 		{
 			final List<Notification> notifications = new ArrayList<Notification>();
-			if(mUseWearableHack)
+			if(mUseWearableHack || Version.SDK_IS_N_OR_NEWER)
 			{
 				if(mNtfSupply != null)
 					notifications.add(mNtfSupply);
@@ -797,7 +794,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			if(mTextDoses != null && mTextSupply != null)
 			{
 				final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
-				style.setBigContentTitle(getString(R.string.app_name));
+				style.setBigContentTitle(getContentTitle());
 				style.addLine(createLine(R.string._title_supplies, mTextSupply));
 				style.addLine(createLine(R.string._title_notification_doses, mTextDoses));
 				return style;
@@ -817,7 +814,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			style.setSummaryText(text);
 
 			return new NotificationCompat.Builder(mContext)
-					.setStyle(style)
+					.setStyle(Version.SDK_IS_N_OR_NEWER ? null : style)
 					.setContentTitle(getString(titleResId))
 					.setContentText(text)
 					.setGroup(mGroup)
@@ -942,6 +939,10 @@ public class NotificationReceiver extends BroadcastReceiver
 			return Html.fromHtml("<b>" + mContext.getString(titleResId) + "</b> " + text);
 		}
 
+		private String getContentTitle() {
+			return getString(mTextDoses != null ? R.string._title_notification_doses : R.string._title_supplies);
+		}
+
 		private void collectDrugsWithSupplyNotifications()
 		{
 			final Date unsnoozeDate = Settings.getDate(Settings.Keys.UNSNOOZE_DATE);
@@ -995,7 +996,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	}
 
 	private int getDrugsWithMissedDoses(Date date, int activeOrNextDoseTime, boolean isActiveDoseTime) {
-		return Entries.getDrugsWithMissedDoses(mAllDrugs, date, activeOrNextDoseTime, isActiveDoseTime, null);
+		return Entries.getDrugsWithMissedDoses(mAllDrugs, date, activeOrNextDoseTime,
+				isActiveDoseTime, null);
 	}
 
 	private String getString(int resId, Object... formatArgs) {
