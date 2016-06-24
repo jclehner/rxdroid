@@ -28,45 +28,45 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:paddingRight="5dip"
-	
+
 	android:orientation="horizontal"
 	android:descendantFocusability="beforeDescendants"
 	android:focusable="true"
-	
-	android:nextFocusDown="@+id/drug_name"	
+
+	android:nextFocusDown="@+id/drug_name"
 >
 	<!-- first line: icon + name -->
-		
+
 	<ImageView android:id="@+id/drug_icon"
 		android:layout_width="@dimen/drug_icon_width"
 		android:layout_height="?android:attr/listPreferredItemHeight"
 
-									
+
 		android:scaleType="fitCenter"
 		android:padding="1dip"
-		
-		
+
+
 		android:src="?attr/drugIconTablet"
 	/>
-  
+
   	<at.jclehner.rxdroid.widget.DrugNameView android:id="@+id/drug_name"
   		android:layout_width="0dip"
   		android:layout_height="match_parent"
         android:layout_weight="1"
-  		
+
   		android:layout_alignParentTop="true"
-  		  		
+
   		android:layout_marginLeft="5dp"
-  		  		  		  		
+
   		android:gravity="center_vertical"
-  		android:text="Cocaine 100mg"
+  		android:text="Tylenol 100mg"
   		android:ellipsize="marquee"
   		android:singleLine="true"
-  		
+
   		android:focusable="true"
   		android:clickable="true"
   		android:onClick="onDrugNameClick"
-  		  		  		
+
   		style="@style/TextAppearance.Large.Clickable"
 	/>
 
