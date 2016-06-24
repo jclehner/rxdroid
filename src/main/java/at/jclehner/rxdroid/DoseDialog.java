@@ -232,7 +232,6 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 		if(mMessageText != null)
 		{
 			mMessageText.setGravity(Gravity.CENTER);
-			mMessageText.setTextAppearance(getContext(), android.R.attr.textAppearanceSmall);
 		}
 	}
 

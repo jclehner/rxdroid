@@ -161,7 +161,6 @@ public class BackupFragment extends LoaderListFragment<File>
 
 			text1.setText(data.dateTime);
 
-			text2.setTextAppearance(getActivity(), android.R.attr.textAppearanceSmall);
 			text2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
 			text2.setTypeface(Typeface.MONOSPACE);
 			text2.setText(data.location);
