@@ -246,7 +246,7 @@ public class Backup
 				try
 				{
 					if(password != null)
-						mZip.setPassword(password);
+						mZip.setPassword(passwordToKey(password));
 
 					mZip.extractAll(RxDroid.getPackageInfo().applicationInfo.dataDir);
 				}
