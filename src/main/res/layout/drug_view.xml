@@ -81,7 +81,7 @@
   		android:layout_marginLeft="5dp"
   		  		  		  		
   		android:gravity="center_vertical"
-  		android:text="Cocaine 100mg"
+  		android:text="Tylenol 100mg"
   		android:ellipsize="marquee"
   		android:singleLine="true"
   		
