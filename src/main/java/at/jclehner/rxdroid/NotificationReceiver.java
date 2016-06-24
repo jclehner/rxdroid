@@ -380,6 +380,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		final AlarmManager.Alarm alarm = AlarmManager.Alarm.elapsed()
 				.exact()
+				.wakeup()
 				.allowWhileIdle()
 				.time(triggerAtMillis);
 
