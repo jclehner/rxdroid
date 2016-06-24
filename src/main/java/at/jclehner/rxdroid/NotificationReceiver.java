@@ -390,8 +390,10 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
 			mAlarmMgr.set(mode, triggerAtMillis, operation);
-		else
+		else if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
 			mAlarmMgr.setExact(mode, triggerAtMillis, operation);
+		else
+			mAlarmMgr.setExactAndAllowWhileIdle(mode, triggerAtMillis, operation);
 	}
 
 	private void cancelAllAlarms() {
