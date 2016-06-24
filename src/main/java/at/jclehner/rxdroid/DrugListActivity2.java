@@ -99,6 +99,8 @@ public class DrugListActivity2 extends AppCompatActivity implements
 {
 	private static final String TAG = DrugListActivity2.class.getSimpleName();
 
+	private static final int ITEM_HELP = 1;
+
 	public static final String EXTRA_DATE = "rxdroid:date";
 	public static final String EXTRA_STARTED_FROM_NOTIFICATION = "rxdroid:started_from_notification";
 
@@ -1192,10 +1194,10 @@ public class DrugListActivity2 extends AppCompatActivity implements
 		@Override
 		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 		{
-			if(menu == null)
+			if(menu == null || menu.findItem(ITEM_HELP) != null)
 				return;
 
-			menu.add(R.string._title_help)
+			menu.add(0, ITEM_HELP, 0, R.string._title_help)
 					.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
 					{
 
