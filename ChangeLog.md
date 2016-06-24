@@ -1,3 +1,6 @@
+### 0.9.31.1:
+* Fix alarm issues on Marshmallow
+
 ### 0.9.31:
 * Fix crashes on Android < 4.2 (this time for real)
 
