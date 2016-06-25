@@ -40,7 +40,7 @@ public class DatePickerDialog extends AlertDialog implements
 	private static final boolean NEED_SAMSUNG_DATE_PICKER_HACK =
 			Version.SDK_IS_LOLLIPOP_OR_NEWER
 			&& Build.MANUFACTURER.equalsIgnoreCase("Samsung")
-			&& Build.FINGERPRINT.contains("5.0/");
+			&& Build.FINGERPRINT.contains("5.0");
 
 	// DatePicker is broken on Lollipop 5.0, as the OnDateChangeListener is never
 	// called. The second problem is that while you can set min/max dates, this
