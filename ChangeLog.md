@@ -1,5 +1,5 @@
 ### 0.9.31.2:
-* Fix crashes on Samsung Android 5.0 ROMs
+* Fix crashes on Samsung ROMs
 
 ### 0.9.31.1:
 * Fix alarm issues on Marshmallow
