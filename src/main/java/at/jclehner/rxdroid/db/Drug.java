@@ -507,6 +507,8 @@ public class Drug extends Entry implements Comparable<Drug>
 
 	public void setDose(int doseTime, Fraction value)
 	{
+		value = Fraction.nullAsZero(value);
+
 		switch(doseTime)
 		{
 			case TIME_MORNING:
