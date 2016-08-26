@@ -46,6 +46,7 @@ import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
 import at.jclehner.rxdroid.db.DoseEvent;
 import at.jclehner.rxdroid.db.Drug;
+import at.jclehner.rxdroid.db.Patient;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.db.SchedulePart;
 import at.jclehner.rxdroid.util.CollectionUtils;
@@ -113,7 +114,8 @@ public class SettingsActivity extends AppCompatActivity
 
 		private static final String[] REGISTER_CLICK_LISTENER = {
 			Settings.Keys.LICENSES,
-			Settings.Keys.VERSION
+			Settings.Keys.VERSION,
+			"db_export"
 		};
 
 		private static final String[] REGISTER_CHANGE_LISTENER = {
@@ -311,6 +313,9 @@ public class SettingsActivity extends AppCompatActivity
 				}
 
 				return true;
+			}
+			else if("db_export".equals(key)) {
+				CsvExport.export(getActivity(), Patient.DEFAULT_PATIENT_ID);
 			}
 
 			return false;

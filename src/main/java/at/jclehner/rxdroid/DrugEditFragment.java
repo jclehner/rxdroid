@@ -716,7 +716,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 		}
 	}
 
-	private static class RepeatModePreferenceController extends ListPreferenceWithIntController
+	public static class RepeatModePreferenceController extends ListPreferenceWithIntController
 	{
 		private ListPreference mPref;
 		private Context mContext;
@@ -926,41 +926,40 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			datePickerDialog.show();
 		}
 
-		private void updateSummary()
+		public static String getSummary(Context context, int repeatMode, long repeatArg, Date repeatOrigin)
 		{
-			//final int repeatMode = (Integer) getFieldValue("repeat");
-			final int repeatMode = getFieldValue();
-			final long repeatArg = (Long) getFieldValue("repeatArg");
-			final Date repeatOrigin = (Date) getFieldValue("repeatOrigin");
-
-			final String summary;
-
 			if(repeatMode == Drug.REPEAT_EVERY_N_DAYS)
 			{
 				// FIXME change to next occurence
-				summary = mContext.getString(
+				return context.getString(
 						R.string._msg_freq_every_n_days,
 						repeatArg,
 						DateTime.toNativeDate(repeatOrigin)
 				);
 			}
 			else if(repeatMode == Drug.REPEAT_WEEKDAYS)
-				summary = getWeekdayRepeatSummary(repeatArg);
+				return getWeekdayRepeatSummary(context, repeatArg);
 			else if(repeatMode == Drug.REPEAT_21_7)
 			{
-				summary = mContext.getString(
+				return context.getString(
 						R.string._msg_freq_21days_on_7days_off,
 						DateTime.toNativeDate(repeatOrigin)
 				);
 			}
 			else
-				summary = null;
-
-			if(summary != null)
-				mPref.setSummary(summary);
+				return null;
 		}
 
-		private String getWeekdayRepeatSummary(long repeatArg)
+		private void updateSummary()
+		{
+			final String summary = getSummary(mContext, getFieldValue(),
+					(long) getFieldValue("repeatArg"), (Date) getFieldValue("repeatOrigin"));
+			if (summary != null) {
+				mPref.setSummary(summary);
+			}
+		}
+
+		private static String getWeekdayRepeatSummary(Context context, long repeatArg)
 		{
 			final LinkedList<String> weekdays = new LinkedList<String>();
 
@@ -971,7 +970,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			}
 
 			if(weekdays.isEmpty())
-				return mContext.getString(R.string._summary_intake_never);
+				return context.getString(R.string._summary_intake_never);
 
 			StringBuilder sb = new StringBuilder(weekdays.get(0));
 

@@ -21,6 +21,9 @@
 				/>
 	</Preference>
 
+	<Preference android:key="db_export"
+				android:title="CSV"/>
+
 
 	<Preference android:key="@string/key_db_stats"
 			android:title="@string/_title_db_stats"
