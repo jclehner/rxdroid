@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'hugo'
 
+def pwd = new File('.').absolutePath
+
 buildscript {
 	repositories {
 		mavenCentral()
@@ -15,7 +17,7 @@ buildscript {
 repositories {
 	mavenCentral()
 	maven {
-		url './.m2repo'
+		url "file://$pwd/.m2repo"
 	}
 }
 
