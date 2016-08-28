@@ -249,7 +249,12 @@ public class SettingsActivity extends AppCompatActivity
 			super.onResume();
 			updateLowSupplyThresholdPreferenceSummary();
 
-			((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getPreferenceScreen().getTitle());
+			try
+			{
+				((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(
+						getPreferenceScreen().getTitle());
+			}
+			catch(NullPointerException e) {} // yuck!
 		}
 
 		@Override
@@ -259,7 +264,7 @@ public class SettingsActivity extends AppCompatActivity
 				updateLowSupplyThresholdPreferenceSummary();
 			else if(Settings.Keys.HISTORY_SIZE.equals(key))
 			{
-				if(Settings.getStringAsInt(Settings.Keys.HISTORY_SIZE, -1) >= Settings.Enums.HISTORY_SIZE_6M)
+				if(Settings.getStringAsInt(Settings.Keys.HISTORY_SIZE, -1) >= Settings.Enums.HISTORY_SIZE_6M && getActivity() != null)
 					Toast.makeText(getActivity(), R.string._toast_large_history_size, Toast.LENGTH_LONG).show();
 			}
 			else if(Settings.Keys.USE_SAFE_MODE.equals(key))
