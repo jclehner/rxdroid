@@ -27,6 +27,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -614,12 +615,12 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
 			builder.setWhen(0);
 
+			builder.setStyle(createSummaryStyle(builder));
+
 			builder.setContentTitle(getString(titleResId));
 			builder.setSmallIcon(iconResId);
 			builder.setContentText(contentText);
 			builder.setPriority(priority);
-
-			builder.setStyle(createSummaryStyle());
 
 			if(!mUseGroups)
 			{
@@ -793,12 +794,13 @@ public class NotificationReceiver extends BroadcastReceiver
 			return notifications;
 		}
 
-		private NotificationCompat.Style createSummaryStyle()
+		private NotificationCompat.Style createSummaryStyle(NotificationCompat.Builder builder)
 		{
 			if(mTextDoses != null && mTextSupply != null)
 			{
-				final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
-				style.setBigContentTitle(getString(R.string.app_name));
+				final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle(builder);
+				style.setBigContentTitle(Build.VERSION.SDK_INT <= Build.VERSION_CODES.M ?
+						getString(R.string.app_name) : "");
 				style.addLine(createLine(R.string._title_supplies, mTextSupply));
 				style.addLine(createLine(R.string._title_notification_doses, mTextDoses));
 				return style;
