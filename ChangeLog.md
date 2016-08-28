@@ -1,3 +1,6 @@
+### 0.9.31.3:
+* Improve Notification design on Nougat
+
 ### 0.9.31.2:
 * Fix crashes on Samsung ROMs
 
