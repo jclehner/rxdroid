@@ -7,7 +7,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:2.1.0'
+		classpath 'com.android.tools.build:gradle:2.1.3'
 		//classpath 'com.jakewharton.hugo:hugo-plugin:1.1.0'
 	}
 }
@@ -37,11 +37,11 @@ dependencies {
 
 android {
 	buildToolsVersion '23.0.2'
-	compileSdkVersion 23
+	compileSdkVersion 24
 
 	defaultConfig {
 		minSdkVersion 14
-		targetSdkVersion 23
+		targetSdkVersion 24
 
         applicationId 'at.jclehner.rxdroid';
 
