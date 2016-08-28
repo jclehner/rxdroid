@@ -46,7 +46,7 @@ android {
         applicationId 'at.jclehner.rxdroid';
 
 		versionCode 9313
-		versionName '0.9.31.2'
+		versionName '0.9.31.3'
 	}
 
 	lintOptions {
