@@ -28,6 +28,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -564,15 +565,15 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.setContentIntent(createDrugListIntent(mDate));
 			builder.setTicker(getString(R.string._msg_new_notification));
 			builder.setCategory(NotificationCompat.CATEGORY_ALARM);
-			builder.setColor(!BuildConfig.DEBUG ? Theme.getColorAttribute(R.attr.colorPrimary) : 0x00ff00);
+			builder.setColor(!BuildConfig.DEBUG ? Theme.getColorAttribute(R.attr.colorPrimary) : Color.GREEN);
 			builder.setWhen(0);
+
+			builder.setStyle(createSummaryStyle(builder));
 
 			builder.setContentTitle(getString(titleResId));
 			builder.setSmallIcon(iconResId);
 			builder.setContentText(contentText);
 			builder.setPriority(priority);
-
-			builder.setStyle(createSummaryStyle());
 
 			if(!mUseGroups)
 			{
@@ -750,13 +751,14 @@ public class NotificationReceiver extends BroadcastReceiver
 			return notifications;
 		}
 
-		private NotificationCompat.Style createSummaryStyle()
+		private NotificationCompat.Style createSummaryStyle(NotificationCompat.Builder builder)
 		{
 			if(mTextDoses == null || mTextRefill == null)
 				return null;
 
-			final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
-			style.setBigContentTitle(getString(R.string.app_name));
+			final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle(builder);
+			style.setBigContentTitle(Build.VERSION.SDK_INT <= Build.VERSION_CODES.M ?
+					getString(R.string.app_name) : "");
 			style.addLine(createLine(R.string._title_notification_low_supplies, mTextRefill));
 			style.addLine(createLine(R.string._title_notification_doses, mTextDoses));
 
