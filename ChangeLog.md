@@ -1,3 +1,6 @@
+### 0.9.31.4:
+* Minor design fix for >= Nougat notifications
+
 ### 0.9.31.3:
 * Improve Notification design on Nougat
 
