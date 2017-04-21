@@ -179,7 +179,7 @@ public class SettingsActivity extends AppCompatActivity
 				}
 
 				sb.append("\n" +
-						"Copyright (C) 2011-2015 Joseph Lehner\n" +
+						"Copyright (C) 2011-2017 Joseph C. Lehner\n" +
 						"<joseph.c.lehner@gmail.com>");
 
 				final String translator = getString(R.string.translator);
