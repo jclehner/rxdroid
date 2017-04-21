@@ -757,10 +757,18 @@ public class NotificationReceiver extends BroadcastReceiver
 				return null;
 
 			final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle(builder);
-			style.setBigContentTitle(Build.VERSION.SDK_INT <= Build.VERSION_CODES.M ?
-					getString(R.string.app_name) : "");
-			style.addLine(createLine(R.string._title_notification_low_supplies, mTextRefill));
-			style.addLine(createLine(R.string._title_notification_doses, mTextDoses));
+
+			if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.M)
+			{
+				style.setBigContentTitle(getString(R.string.app_name));
+				style.addLine(createLine(R.string._title_notification_low_supplies, mTextRefill));
+				style.addLine(createLine(R.string._title_notification_doses, mTextDoses));
+			}
+			else
+			{
+				style.setBigContentTitle(createLine(R.string._title_notification_doses, mTextDoses));
+				style.addLine(createLine(R.string._title_notification_low_supplies, mTextRefill));
+			}
 
 			return style;
 		}
