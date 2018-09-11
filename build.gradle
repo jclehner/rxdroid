@@ -10,10 +10,12 @@ buildscript {
 			url 'https://maven.google.com/'
 			name 'Google'
 		}
+		google()
+		jcenter()
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:3.1.3'
+		classpath 'com.android.tools.build:gradle:3.1.4'
 		//classpath 'com.jakewharton.hugo:hugo-plugin:1.1.0'
 	}
 }
@@ -27,14 +29,15 @@ repositories {
 		url 'https://maven.google.com/'
 		name 'Google'
 	}
+	jcenter()
 }
 
 dependencies {
 		compile 'com.j256.ormlite:ormlite-core:4.48'
 		compile 'com.j256.ormlite:ormlite-android:4.48'
-		compile 'com.android.support:support-v4:24.0.0'
-		compile 'com.android.support:support-v13:24.0.0'
-		compile 'com.android.support:appcompat-v7:24.0.0'
+		compile 'com.android.support:support-v4:26.0.0'
+		compile 'com.android.support:support-v13:26.0.0'
+		compile 'com.android.support:appcompat-v7:26.0.0'
 		//compile 'com.android.support:cardview-v7:21.0.0'
 		compile 'com.nineoldandroids:library:2.4.0'
 		compile 'net.lingala.zip4j:zip4j:1.3.2'
@@ -46,17 +49,17 @@ dependencies {
 
 
 android {
-	//buildToolsVersion '23.0.1'
-	compileSdkVersion 26
+	buildToolsVersion '28.0.2'
+	compileSdkVersion 28
 
 	defaultConfig {
 		minSdkVersion 14
-		targetSdkVersion 24
+		targetSdkVersion 28
 
         applicationId 'at.jclehner.rxdroid';
 
-		versionCode 9314
-		versionName '0.9.31.4'
+		versionCode 9315
+		versionName '0.9.31.5'
 	}
 
 	lintOptions {
@@ -101,8 +104,8 @@ task askForKeystorePassword << {
 			"\nPassword: "
 
 	def console = System.console()
-	
-	if (console) {
+
+	if (true /*console*/) {
 		def pw = new String(console.readPassword(prompt))
 
 		android.signingConfigs.release.storePassword = pw
