@@ -1108,7 +1108,8 @@ public class DrugListActivity2 extends AppCompatActivity implements
 			}
 			else if(view instanceof DoseView)
 			{
-				final PopupMenu pm = new PopupMenu(getActivity(), view);
+				final Activity act = getActivity();
+				final PopupMenu pm = new PopupMenu(act, view);
 				pm.inflate(R.menu.dose_view_context_menu);
 
 				final Menu menu = pm.getMenu();
@@ -1158,7 +1159,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 							Database.create(new DoseEvent(drug, doseView.getDate(), doseTime));
 						else if(menuItem.getItemId() == R.id.menuitem_edit)
 						{
-							final Intent intent = new Intent(getActivity(), DrugEditActivity2.class);
+							final Intent intent = new Intent(act, DrugEditActivity2.class);
 							intent.setAction(Intent.ACTION_EDIT);
 							intent.putExtra(DrugEditActivity2.EXTRA_DRUG_ID, drug.getId());
 
