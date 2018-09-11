@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -315,6 +316,11 @@ public final class Database
 
 	static synchronized <T extends Entry> List<T> getCached(Class<T> clazz)
 	{
+		return getCached(clazz, false);
+	}
+
+	static synchronized <T extends Entry> List<T> getCached(Class<T> clazz, boolean copy)
+	{
 		if(!USE_CUSTOM_CACHE)
 		{
 			//Log.w(TAG, "getCached called", new )
@@ -346,7 +352,8 @@ public final class Database
 
 		@SuppressWarnings("unchecked")
 		List<T> cached = (List<T>) sCache.get(clazz);
-		return cached;
+
+		return !copy ? cached : new ArrayList<>(cached);
 	}
 
 	@SuppressWarnings({ "unchecked", "unused" })

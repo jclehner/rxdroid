@@ -217,10 +217,10 @@ public final class Entries
 		{
 			final List<DoseEvent> events = new LinkedList<DoseEvent>();
 
-			for(DoseEvent intake : Database.getCached(DoseEvent.class))
+			for(DoseEvent event : Database.getCached(DoseEvent.class, true))
 			{
-				if(DoseEvent.has(intake, drug, date, doseTime))
-					events.add(intake);
+				if(DoseEvent.has(event, drug, date, doseTime))
+					events.add(event);
 			}
 
 			return events;
