@@ -1,3 +1,6 @@
+### 0.9.31.5:
+* Fix some crashes on >= Nougat
+
 ### 0.9.31.4:
 * Minor design fix for >= Nougat notifications
 
