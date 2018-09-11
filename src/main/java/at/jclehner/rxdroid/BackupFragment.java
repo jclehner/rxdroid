@@ -339,11 +339,12 @@ public class BackupFragment extends LoaderListFragment<File>
 					else if(item.getItemId() == R.id.menuitem_share)
 					{
 						final Intent target = new Intent(Intent.ACTION_SEND);
-						target.putExtra(Intent.EXTRA_STREAM, file.uri);
+						target.putExtra(Intent.EXTRA_STREAM, Util.getExternalFileUri(file.item));
 						target.setType("application/octet-stream");
 
 						final Intent intent = Intent.createChooser(target, getString(R.string._title_share));
-						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 						startActivity(intent);
 					}

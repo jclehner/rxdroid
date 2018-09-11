@@ -22,6 +22,8 @@
 package at.jclehner.rxdroid.util;
 
 import android.annotation.TargetApi;
+import android.net.Uri;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -775,6 +777,12 @@ public final class Util
 		{
 			return false;
 		}
+	}
+
+	public static Uri getExternalFileUri(File file)
+	{
+		final Context c = RxDroid.getContext();
+		return FileProvider.getUriForFile(c, c.getPackageName() + ".provider", file);
 	}
 
 	private static View findViewById(ViewGroup group, int id, int level)

@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid;
 
+/*
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import android.test.suitebuilder.TestSuiteBuilder;
@@ -31,3 +32,4 @@ public class AllTests extends TestSuite {
 		return new TestSuiteBuilder(AllTests.class).includeAllPackagesUnderHere().build();
 	}
 }
+*/
