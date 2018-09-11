@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -48,6 +49,7 @@ import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.preferences.TimePeriodPreference.TimePeriod;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
+import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public final class Settings
@@ -851,6 +853,17 @@ public final class Settings
 				Log.i(TAG, "Small screen detected - disabling landscape mode");
 				Settings.putBoolean(Settings.Keys.ENABLE_LANDSCAPE, false);
 			}
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			try {
+				Uri uri = Uri.parse(Settings.getString(Keys.NOTIFICATION_SOUND));
+				Settings.putString(Keys.NOTIFICATION_SOUND, Util.sanitizeNotificationSoundUri(uri).toString());
+
+			} catch (RuntimeException e) {
+
+			}
+
 		}
 
 
