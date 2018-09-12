@@ -91,6 +91,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final String EXTRA_FORCE_UPDATE = "at.jclehner.rxdroid.extra.FORCE_UPDATE";
 	static final String EXTRA_REFILL_SNOOZE_DRUGS = "drug_id_list";
 
+	static final String CHANNEL_ID = "rxdroid_channel_1";
+
 	private static final String ACTION_MARK_ALL_AS_TAKEN = "at.jclehner.rxdroid.ACTION_MARK_ALL_AS_TAKEN";
 
 	/**
@@ -236,6 +238,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		nb.setContentIntent(createDrugListIntent(null));
 		nb.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
 		nb.setOngoing(true);
+		nb.setChannelId(CHANNEL_ID);
 
 		getNotificationManager().notify(ID_ERROR, nb.build());
 	}
@@ -574,6 +577,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.setSmallIcon(iconResId);
 			builder.setContentText(contentText);
 			builder.setPriority(priority);
+			builder.setChannelId(CHANNEL_ID);
 
 			if(!mUseGroups)
 			{
@@ -786,7 +790,8 @@ public class NotificationReceiver extends BroadcastReceiver
 					.setGroup(mGroup)
 					.setGroupSummary(false)
 					.setContentIntent(createDrugListIntent(mDate))
-					.setSmallIcon(R.drawable.ic_stat_normal);
+					.setSmallIcon(R.drawable.ic_stat_normal)
+					.setChannelId(CHANNEL_ID);
 		}
 
 		private void addAction(NotificationCompat.Builder builder, int[] icons, int titleResId, PendingIntent operation)
