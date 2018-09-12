@@ -30,6 +30,9 @@ repositories {
 		name 'Google'
 	}
 	jcenter()
+	maven {
+		url "https://jitpack.io"
+	}
 }
 
 dependencies {
@@ -45,6 +48,7 @@ dependencies {
         compile 'joda-time:joda-time:2.5'
 
 		compile 'at.jclehner.rxdroid.localmaven:ShowcaseView:9999'
+		//compile 'com.github.deano2390:MaterialShowcaseView:1.2.0'
 }
 
 
@@ -58,8 +62,8 @@ android {
 
         applicationId 'at.jclehner.rxdroid';
 
-		versionCode 9316
-		versionName '0.9.31.6'
+		versionCode 9317
+		versionName '0.9.31.7'
 	}
 
 	lintOptions {

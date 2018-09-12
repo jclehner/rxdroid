@@ -1,4 +1,7 @@
-### 0.9.31.5:
+### 0.9.31.7:
+* Fix notifications on >= Oreo
+
+### 0.9.31.6:
 * Fix some crashes on >= Nougat
 
 ### 0.9.31.4:
