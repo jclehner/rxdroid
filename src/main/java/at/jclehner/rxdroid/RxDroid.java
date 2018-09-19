@@ -23,6 +23,9 @@ package at.jclehner.rxdroid;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.media.AudioAttributes;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.app.AlarmManager;
 import android.app.Application;
@@ -92,8 +95,6 @@ public class RxDroid extends Application
 		// shared preferences if this class is instantiated by the Android
 		// backup framework.
 		Components.onCreate(getContext(), Components.NO_DATABASE_INIT | Components.NO_SETTINGS_INIT);
-
-		createNotificationChannel();
 
 		super.onCreate();
 
@@ -301,24 +302,6 @@ public class RxDroid extends Application
 			}
 		});
 	}
-
-	private static void createNotificationChannel()
-	{
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-			return;
-		}
-
-		final NotificationChannel ch = new NotificationChannel(
-				NotificationReceiver.CHANNEL_ID,
-				getContext().getString(R.string._title_prefscreen_notifications),
-				NotificationManager.IMPORTANCE_HIGH);
-
-		final NotificationManager nm = ((NotificationManager) getContext().getSystemService(
-				Context.NOTIFICATION_SERVICE));
-
-		nm.createNotificationChannel(ch);
-	}
-
 
 	private static final Database.OnChangeListener sNotificationUpdater = new Database.OnChangeListener() {
 

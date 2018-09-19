@@ -32,6 +32,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.FileUriExposedException;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
@@ -39,6 +40,8 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
 import android.util.Log;
 
+import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -231,14 +234,13 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void handleDatabaseError(DatabaseHelper.DatabaseError e)
 	{
-		final NotificationCompat.Builder nb = new NotificationCompat.Builder(mContext);
+		final NotificationCompat.Builder nb = new NotificationCompat.Builder(mContext, CHANNEL_ID);
 		nb.setSmallIcon(R.drawable.ic_stat_exclamation);
 		nb.setContentTitle(getString(R.string._title_database));
 		nb.setContentText(Util.getDbErrorMessage(mContext, e));
 		nb.setContentIntent(createDrugListIntent(null));
 		nb.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
 		nb.setOngoing(true);
-		nb.setChannelId(CHANNEL_ID);
 
 		getNotificationManager().notify(ID_ERROR, nb.build());
 	}
@@ -564,7 +566,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			final CharSequence contentText = mTextDoses != null ? mTextDoses : mTextRefill;
 			final int priority = mTextDoses != null ? NotificationCompat.PRIORITY_HIGH : NotificationCompat.PRIORITY_DEFAULT;
 
-			final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+			final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, CHANNEL_ID);
 			builder.setContentIntent(createDrugListIntent(mDate));
 			builder.setTicker(getString(R.string._msg_new_notification));
 			builder.setCategory(NotificationCompat.CATEGORY_ALARM);
@@ -577,7 +579,6 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.setSmallIcon(iconResId);
 			builder.setContentText(contentText);
 			builder.setPriority(priority);
-			builder.setChannelId(CHANNEL_ID);
 
 			if(!mUseGroups)
 			{
@@ -725,7 +726,18 @@ public class NotificationReceiver extends BroadcastReceiver
 				{
 					final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
 					if(ringtone != null)
-						builder.setSound(Uri.parse(ringtone));
+					{
+						Uri uri = Uri.parse(ringtone);
+						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+						{
+							if("file".equals(uri.getScheme()))
+							{
+								uri = Util.getExternalFileUri(new File(uri.getPath()));
+							}
+						}
+
+						builder.setSound(uri);
+					}
 					else
 						defaults |= Notification.DEFAULT_SOUND;
 
@@ -783,15 +795,14 @@ public class NotificationReceiver extends BroadcastReceiver
 			style.setBigContentTitle(getString(titleResId));
 			style.setSummaryText(text);
 
-			return new NotificationCompat.Builder(mContext)
+			return new NotificationCompat.Builder(mContext, CHANNEL_ID)
 					.setStyle(style)
 					.setContentTitle(getString(titleResId))
 					.setContentText(text)
 					.setGroup(mGroup)
 					.setGroupSummary(false)
 					.setContentIntent(createDrugListIntent(mDate))
-					.setSmallIcon(R.drawable.ic_stat_normal)
-					.setChannelId(CHANNEL_ID);
+					.setSmallIcon(R.drawable.ic_stat_normal);
 		}
 
 		private void addAction(NotificationCompat.Builder builder, int[] icons, int titleResId, PendingIntent operation)
@@ -919,5 +930,25 @@ public class NotificationReceiver extends BroadcastReceiver
 		}
 
 		return sb.toString();
+	}
+
+	private static void notify(NotificationManagerCompat nm, int id, Notification n)
+	{
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+		{
+			try
+			{
+				nm.notify(id, n);
+				return;
+			}
+			catch(FileUriExposedException e)
+			{
+				Log.w(TAG, e);
+				n.sound = null;
+				n.defaults |= Notification.DEFAULT_SOUND;
+			}
+		}
+
+		nm.notify(id, n);
 	}
 }

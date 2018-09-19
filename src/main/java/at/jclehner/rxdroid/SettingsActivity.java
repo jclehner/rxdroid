@@ -223,6 +223,28 @@ public class SettingsActivity extends AppCompatActivity
 				p.setSummary(getString(R.string._msg_db_stats, str));
 			}
 
+			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+			{
+				p = findPreference("notification_methods");
+				if (p != null) {
+					getPreferenceScreen().removePreference(p);
+				}
+
+				p = findPreference(Settings.Keys.NOTIFICATION_CHANNELS);
+				if(p != null)
+				{
+					final Intent intent = new Intent(
+							android.provider.Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
+					intent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE,
+							BuildConfig.APPLICATION_ID);
+					intent.putExtra(android.provider.Settings.EXTRA_CHANNEL_ID,
+							NotificationReceiver.CHANNEL_ID);
+					p.setIntent(intent);
+					p.setEnabled(true);
+				}
+
+			}
+
 			removeDisabledPreferences(getPreferenceScreen());
 			setPreferenceListeners();
 

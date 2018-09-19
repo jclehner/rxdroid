@@ -33,6 +33,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.media.AudioAttributes;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -91,6 +95,7 @@ public final class Settings
 		public static final String DISPLAYED_ONCE = "displayed_once";
 		public static final String IS_FIRST_LAUNCH = "is_first_launch";
 		public static final String OLDEST_POSSIBLE_DOSE_EVENT_TIME = "oldest_possible_dose_event_time";
+		public static final String NOTIFICATION_CHANNELS = "notification_channels";
 
 		public static final String TIMEZONE_OFFSET = "timezone_offset";
 		/**
@@ -214,6 +219,7 @@ public final class Settings
 
 			fixSettings();
 			migrateSettings();
+			createNotificationChannel(context);
 		}
 	}
 
@@ -862,6 +868,43 @@ public final class Settings
 				Settings.putBoolean(Keys.THEME_IS_DARK, true);
 			}
 		}*/
+	}
+
+	private static void createNotificationChannel(Context context)
+	{
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			return;
+		}
+
+		final NotificationChannel ch = new NotificationChannel(
+				NotificationReceiver.CHANNEL_ID,
+				context.getString(R.string._title_prefscreen_notifications),
+				NotificationManager.IMPORTANCE_HIGH);
+
+		final String led = Settings.getString(Settings.Keys.NOTIFICATION_LIGHT_COLOR, "");
+		if(!"0".equals(led))
+		{
+			ch.enableLights(true);
+			if(!led.isEmpty())
+			{
+				ch.setLightColor(Integer.parseInt(led, 16));
+			}
+		}
+
+		ch.enableVibration(Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true));
+
+		final String sound = Settings.getString(Settings.Keys.NOTIFICATION_SOUND, null);
+		if (sound != null) {
+			final AudioAttributes.Builder ab = new AudioAttributes.Builder()
+					.setUsage(AudioAttributes.USAGE_NOTIFICATION)
+					.setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN);
+			ch.setSound(Uri.parse(sound), ab.build());
+		}
+
+		final NotificationManager nm = ((NotificationManager) context.getSystemService(
+				Context.NOTIFICATION_SERVICE));
+
+		nm.createNotificationChannel(ch);
 	}
 
 	// converts the string set [ "foo", "bar", "foobar", "barz" ] to the following string:

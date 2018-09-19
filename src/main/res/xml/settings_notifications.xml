@@ -35,9 +35,13 @@
 			android:defaultValue="@string/pref_default_quiet_hours"
 			/>
 
-	<PreferenceCategory
+	<Preference android:key="notification_channels"
 			android:title="@string/_title_pref_notification_methods"
-			>
+			android:enabled="false" />
+
+	<PreferenceCategory android:key="notification_methods"
+			android:title="@string/_title_pref_notification_methods"
+	>
 
 		<at.jclehner.rxdroid.preferences.SmartRingtonePreference android:key="@string/key_notification_sound"
 				android:title="@string/_title_notification_sound"
