@@ -26,15 +26,12 @@ import android.content.res.TypedArray;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.preference.RingtonePreference;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
 import at.jclehner.rxdroid.R;
-import at.jclehner.rxdroid.RxDroid;
-import at.jclehner.rxdroid.util.Util;
 
 
 /**
@@ -82,8 +79,6 @@ public class SmartRingtonePreference extends RingtonePreference
 	@Override
 	protected void onSaveRingtone(Uri ringtoneUri)
 	{
-		ringtoneUri = Util.sanitizeNotificationSoundUri(ringtoneUri);
-		RxDroid.toastShort(R.string._title_error);
 		super.onSaveRingtone(ringtoneUri);
 		setSummaryFromValue(ringtoneUri);
 	}
