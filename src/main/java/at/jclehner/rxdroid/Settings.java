@@ -885,7 +885,7 @@ public final class Settings
 		if(!"0".equals(led))
 		{
 			ch.enableLights(true);
-			if(!led.isEmpty())
+			if(led.length() > 0)
 			{
 				ch.setLightColor(Integer.parseInt(led, 16));
 			}
