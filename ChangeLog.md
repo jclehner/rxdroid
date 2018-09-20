@@ -1,3 +1,6 @@
+### 0.9.31.8:
+* Customizable notifications on >= Oreo
+
 ### 0.9.31.7:
 * Fix notifications on >= Oreo
 
