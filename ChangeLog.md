@@ -1,3 +1,6 @@
+### 0.9.32
+* Fix crash on startup
+
 ### 0.9.31.9:
 * Fix crash on older Android versions
 
