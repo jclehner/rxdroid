@@ -1,3 +1,6 @@
+### 0.9.31.9:
+* Fix crash on older Android versions
+
 ### 0.9.31.8:
 * Customizable notifications on >= Oreo
 
