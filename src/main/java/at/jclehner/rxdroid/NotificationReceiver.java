@@ -931,24 +931,4 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		return sb.toString();
 	}
-
-	private static void notify(NotificationManagerCompat nm, int id, Notification n)
-	{
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-		{
-			try
-			{
-				nm.notify(id, n);
-				return;
-			}
-			catch(FileUriExposedException e)
-			{
-				Log.w(TAG, e);
-				n.sound = null;
-				n.defaults |= Notification.DEFAULT_SOUND;
-			}
-		}
-
-		nm.notify(id, n);
-	}
 }
