@@ -675,6 +675,10 @@ public class NotificationReceiver extends BroadcastReceiver
 			else
 				builder.setOnlyAlertOnce(true);
 
+			// The rest is handled by notification channels on >= Oreo
+			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+				return;
+
 			// Prevents low supplies from constantly annoying the user with
 			// notification's sound and/or vibration if alarms are repeated.
 			if(mTextRefill != null && mTextDoses == null)
