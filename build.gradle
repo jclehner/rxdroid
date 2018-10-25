@@ -15,7 +15,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:3.1.4'
+		classpath 'com.android.tools.build:gradle:3.2.1'
 		//classpath 'com.jakewharton.hugo:hugo-plugin:1.1.0'
 	}
 }
@@ -53,7 +53,7 @@ dependencies {
 
 
 android {
-	buildToolsVersion '28.0.2'
+	buildToolsVersion '28.0.3'
 	compileSdkVersion 28
 
 	defaultConfig {
@@ -62,8 +62,8 @@ android {
 
         applicationId 'at.jclehner.rxdroid';
 
-		versionCode 9320
-		versionName '0.9.32'
+		versionCode 9321
+		versionName '0.9.32.1'
 	}
 
 	lintOptions {

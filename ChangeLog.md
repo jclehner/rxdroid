@@ -1,3 +1,6 @@
+### 0.9.32.1
+* Fix notification issues on some devices
+
 ### 0.9.32
 * Fix crash on startup
 
