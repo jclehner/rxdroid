@@ -884,24 +884,21 @@ public final class Settings
 		final NotificationChannel quiet = new NotificationChannel(
 				NotificationReceiver.CHANNEL_QUIET,
 				context.getString(R.string._title_quiet_hours),
-				NotificationManager.IMPORTANCE_HIGH);
+				NotificationManager.IMPORTANCE_LOW);
 
 		final String led = Settings.getString(Settings.Keys.NOTIFICATION_LIGHT_COLOR, "");
 		if(!"0".equals(led))
 		{
 			ch.enableLights(true);
-			quiet.enableLights(true);
 			if(led.length() > 0)
 			{
 				final int color = Integer.parseInt(led, 16);
 				ch.setLightColor(color);
-				quiet.setLightColor(color);
 			}
 		}
 
 		final boolean vibrate = Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true);
 		ch.enableVibration(vibrate);
-		quiet.enableVibration(vibrate);
 
 		final String sound = Settings.getString(Settings.Keys.NOTIFICATION_SOUND, null);
 		if (sound != null) {
