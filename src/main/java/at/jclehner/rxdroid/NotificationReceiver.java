@@ -32,8 +32,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.FileUriExposedException;
-import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
 import android.support.v4.app.NotificationManagerCompat;
@@ -41,7 +39,6 @@ import android.text.Html;
 import android.util.Log;
 
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -94,7 +91,8 @@ public class NotificationReceiver extends BroadcastReceiver
 	static final String EXTRA_FORCE_UPDATE = "at.jclehner.rxdroid.extra.FORCE_UPDATE";
 	static final String EXTRA_REFILL_SNOOZE_DRUGS = "drug_id_list";
 
-	static final String CHANNEL_ID = "rxdroid_channel_1";
+	static final String CHANNEL_DEFAULT = "rxdroid_channel_1";
+	static final String CHANNEL_QUIET = "rxdroid_channel_quiet";
 
 	private static final String ACTION_MARK_ALL_AS_TAKEN = "at.jclehner.rxdroid.ACTION_MARK_ALL_AS_TAKEN";
 
@@ -234,7 +232,8 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void handleDatabaseError(DatabaseHelper.DatabaseError e)
 	{
-		final NotificationCompat.Builder nb = new NotificationCompat.Builder(mContext, CHANNEL_ID);
+		final NotificationCompat.Builder nb = new NotificationCompat.Builder(mContext,
+				CHANNEL_DEFAULT);
 		nb.setSmallIcon(R.drawable.ic_stat_exclamation);
 		nb.setContentTitle(getString(R.string._title_database));
 		nb.setContentText(Util.getDbErrorMessage(mContext, e));
@@ -414,6 +413,19 @@ public class NotificationReceiver extends BroadcastReceiver
 				isActiveDoseTime, mode).update();
 	}
 
+	private static boolean isNowWithinQuietHours()
+	{
+		if(!Settings.isChecked(Settings.Keys.QUIET_HOURS, false))
+			return false;
+
+		final String quietHoursStr = Settings.getString(Settings.Keys.QUIET_HOURS);
+		if(quietHoursStr == null)
+			return false;
+
+		final TimePeriod quietHours = TimePeriod.fromString(quietHoursStr);
+		return quietHours.contains(DumbTime.now());
+	}
+
 	class MyNotificationBuilder
 	{
 		private final Date mDate;
@@ -547,7 +559,8 @@ public class NotificationReceiver extends BroadcastReceiver
 			final CharSequence contentText = mTextDoses != null ? mTextDoses : mTextRefill;
 			final int priority = mTextDoses != null ? NotificationCompat.PRIORITY_HIGH : NotificationCompat.PRIORITY_DEFAULT;
 
-			final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, CHANNEL_ID);
+			final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext,
+					CHANNEL_DEFAULT);
 			builder.setContentIntent(createDrugListIntent(mDate));
 			builder.setTicker(getString(R.string._msg_new_notification));
 			builder.setCategory(NotificationCompat.CATEGORY_ALARM);
@@ -645,6 +658,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		{
 			final int currentHash = ("" + mTextDoses + mTextRefill).hashCode();
 			final int lastHash = Settings.getInt(Settings.Keys.LAST_MSG_HASH);
+			final boolean inQuietHours = isNowWithinQuietHours();
 
 			int mode = mMode;
 
@@ -658,7 +672,11 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			// The rest is handled by notification channels on >= Oreo
 			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+			{
+				if(inQuietHours)
+					builder.setChannelId(CHANNEL_QUIET);
 				return;
+			}
 
 			// Prevents low supplies from constantly annoying the user with
 			// notification's sound and/or vibration if alarms are repeated.
@@ -690,24 +708,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			if(mode != NOTIFICATION_FORCE_SILENT)
 			{
-				boolean isNowWithinQuietHours = false;
-
-				do
-				{
-					if(!Settings.isChecked(Settings.Keys.QUIET_HOURS, false))
-						break;
-
-					final String quietHoursStr = Settings.getString(Settings.Keys.QUIET_HOURS);
-					if(quietHoursStr == null)
-						break;
-
-					final TimePeriod quietHours = TimePeriod.fromString(quietHoursStr);
-					if(quietHours.contains(DumbTime.now()))
-						isNowWithinQuietHours = true;
-
-				} while(false);
-
-				if(!isNowWithinQuietHours)
+				if(!inQuietHours)
 				{
 					final String ringtone = Settings.getString(Settings.Keys.NOTIFICATION_SOUND);
 					if(ringtone != null)
@@ -780,7 +781,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			style.setBigContentTitle(getString(titleResId));
 			style.setSummaryText(text);
 
-			return new NotificationCompat.Builder(mContext, CHANNEL_ID)
+			return new NotificationCompat.Builder(mContext, CHANNEL_DEFAULT)
 					.setStyle(style)
 					.setContentTitle(getString(titleResId))
 					.setContentText(text)

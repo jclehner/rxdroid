@@ -238,7 +238,7 @@ public class SettingsActivity extends AppCompatActivity
 					intent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE,
 							BuildConfig.APPLICATION_ID);
 					intent.putExtra(android.provider.Settings.EXTRA_CHANNEL_ID,
-							NotificationReceiver.CHANNEL_ID);
+							NotificationReceiver.CHANNEL_DEFAULT);
 					p.setIntent(intent);
 					p.setEnabled(true);
 				}

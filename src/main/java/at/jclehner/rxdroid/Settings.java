@@ -877,21 +877,31 @@ public final class Settings
 		}
 
 		final NotificationChannel ch = new NotificationChannel(
-				NotificationReceiver.CHANNEL_ID,
+				NotificationReceiver.CHANNEL_DEFAULT,
 				context.getString(R.string._title_prefscreen_notifications),
+				NotificationManager.IMPORTANCE_HIGH);
+
+		final NotificationChannel quiet = new NotificationChannel(
+				NotificationReceiver.CHANNEL_QUIET,
+				context.getString(R.string._title_quiet_hours),
 				NotificationManager.IMPORTANCE_HIGH);
 
 		final String led = Settings.getString(Settings.Keys.NOTIFICATION_LIGHT_COLOR, "");
 		if(!"0".equals(led))
 		{
 			ch.enableLights(true);
+			quiet.enableLights(true);
 			if(led.length() > 0)
 			{
-				ch.setLightColor(Integer.parseInt(led, 16));
+				final int color = Integer.parseInt(led, 16);
+				ch.setLightColor(color);
+				quiet.setLightColor(color);
 			}
 		}
 
-		ch.enableVibration(Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true));
+		final boolean vibrate = Settings.getBoolean(Settings.Keys.USE_VIBRATOR, true);
+		ch.enableVibration(vibrate);
+		quiet.enableVibration(vibrate);
 
 		final String sound = Settings.getString(Settings.Keys.NOTIFICATION_SOUND, null);
 		if (sound != null) {
@@ -905,6 +915,7 @@ public final class Settings
 				Context.NOTIFICATION_SERVICE));
 
 		nm.createNotificationChannel(ch);
+		nm.createNotificationChannel(quiet);
 	}
 
 	// converts the string set [ "foo", "bar", "foobar", "barz" ] to the following string:
