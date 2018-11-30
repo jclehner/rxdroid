@@ -373,26 +373,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private void setAlarm(long triggerAtMillis, PendingIntent operation)
 	{
-		final int mode;
-		if (true) {
-			// Samsung - the king of fragmentation:
-			// https://stackoverflow.com/questions/18815707/alarmmanager-inconsistency
-
-			mode = AlarmManager.ELAPSED_REALTIME_WAKEUP;
-			triggerAtMillis = SystemClock.elapsedRealtime() + (triggerAtMillis - System.currentTimeMillis());
-
-			/*final long nowElapsed = SystemClock.elapsedRealtime();
-			final long nowRtc = System.currentTimeMillis();
-
-			triggerAtMillis = nowElapsed + (triggerAtMillis - nowRtc);
-
-			Log.d(TAG, "nowElapsed=" + nowElapsed
-					+ "\nnowRtc=" + nowRtc
-					+ "\ntriggerAtMillis=" + triggerAtMillis
-					+ "\ndiff=" + (triggerAtMillis - nowElapsed));*/
-		} else {
-			mode = AlarmManager.RTC_WAKEUP;
-		}
+		final int mode = AlarmManager.RTC_WAKEUP;
 
 		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
 			mAlarmMgr.set(mode, triggerAtMillis, operation);
