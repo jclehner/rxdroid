@@ -902,14 +902,21 @@ public final class Settings
 
 		final String sound = Settings.getString(Settings.Keys.NOTIFICATION_SOUND, null);
 		if (sound != null) {
-			final AudioAttributes.Builder ab = new AudioAttributes.Builder()
-					.setUsage(AudioAttributes.USAGE_NOTIFICATION)
-					.setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN);
-			ch.setSound(Uri.parse(sound), ab.build());
+			// we ignore the actual sound here, but this hopefully takes care of some
+			// SecurityExceptions on NotificationManager.notify(), according to one
+			// answer in https://stackoverflow.com/questions/54120745
+			ch.setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI,
+					new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build());
 		}
 
 		final NotificationManager nm = ((NotificationManager) context.getSystemService(
 				Context.NOTIFICATION_SERVICE));
+
+		if(!Settings.getBoolean("notification_channels_fixed", false))
+		{
+			nm.deleteNotificationChannel(NotificationReceiver.CHANNEL_DEFAULT);
+			Settings.putBoolean("notification_channels_fixed", true);
+		}
 
 		nm.createNotificationChannel(ch);
 		nm.createNotificationChannel(quiet);
