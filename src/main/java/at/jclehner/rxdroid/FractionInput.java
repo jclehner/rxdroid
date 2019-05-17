@@ -387,7 +387,8 @@ public class FractionInput extends LinearLayout
 							R.string._help_title_input_mixed, R.string._help_msg_input_mixed));
 				}
 
-				seq.start();
+				// FIXME
+				//seq.start();
 			}
 		}, 100);
 	}
