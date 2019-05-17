@@ -1,3 +1,7 @@
+### 0.9.33
+* Fix notification issues
+* Update icon
+
 ### 0.9.32.2
 * Fix notification issues
 
