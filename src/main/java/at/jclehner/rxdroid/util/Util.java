@@ -22,6 +22,8 @@
 package at.jclehner.rxdroid.util;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.ContextWrapper;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -783,6 +785,22 @@ public final class Util
 	{
 		final Context c = RxDroid.getContext();
 		return FileProvider.getUriForFile(c, c.getPackageName() + ".provider", file);
+	}
+
+	public static Activity getActivity(View view)
+	{
+		Context c = view.getContext();
+		while(c instanceof ContextWrapper)
+		{
+			if(c instanceof Activity)
+				return (Activity) c;
+			c = ((ContextWrapper) c).getBaseContext();
+		}
+
+		if(view.getId() != android.R.id.content)
+			return getActivity(view.findViewById(android.R.id.content));
+
+		return null;
 	}
 
 	private static View findViewById(ViewGroup group, int id, int level)

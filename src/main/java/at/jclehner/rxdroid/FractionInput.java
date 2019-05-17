@@ -21,6 +21,7 @@
 
 package at.jclehner.rxdroid;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -36,11 +37,10 @@ import at.jclehner.androidutils.InstanceState;
 import at.jclehner.androidutils.InstanceState.SaveState;
 import android.widget.NumberPicker.OnValueChangeListener;
 import at.jclehner.rxdroid.util.CollectionUtils;
-import at.jclehner.rxdroid.util.ShowcaseViews;
 import at.jclehner.rxdroid.util.Util;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
-import com.github.espiandev.showcaseview.ShowcaseView;
-import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
 
 /**
  * A widget for fraction input.
@@ -69,8 +69,6 @@ public class FractionInput extends LinearLayout
 	private NumberPicker mDenominatorPicker;
 	private TextView mFractionBar;
 	private Button mModeSwitcher;
-
-	private final ShowcaseViews mShowcaseQueue = new ShowcaseViews();
 
 	@SaveState
 	private int mInteger = 0;
@@ -287,7 +285,6 @@ public class FractionInput extends LinearLayout
 	protected void onDetachedFromWindow()
 	{
 		super.onDetachedFromWindow();
-		mShowcaseQueue.hide();
 		mAttached = false;
 	}
 
@@ -355,7 +352,12 @@ public class FractionInput extends LinearLayout
 				return;
 		}
 
-		post(new Runnable() {
+		final Activity act = Util.getActivity(this);
+		if (act == null) {
+			return;
+		}
+
+		postDelayed(new Runnable() {
 
 			@Override
 			public void run()
@@ -363,41 +365,52 @@ public class FractionInput extends LinearLayout
 				if(!isShown())
 					return;
 
+				final MaterialShowcaseSequence seq = new MaterialShowcaseSequence(act);
+
 				if(mFractionInputMode == MODE_INTEGER && !isFractionInputModeDisabled())
 				{
-					mShowcaseQueue.add(makeShowcaseView(mModeSwitcher, 0xdeadc0de,
+					seq.addSequenceItem(makeShowcaseView(mModeSwitcher, 0xdeadc0de,
 							R.string._help_title_to_fraction_mode, R.string._help_msg_to_fraction_mode));
+
 				}
 				else if(mFractionInputMode == MODE_FRACTION)
 				{
-					mShowcaseQueue.add(makeShowcaseView(null, 0xdeadc0de+1,
+					seq.addSequenceItem(makeShowcaseView(null, 0xdeadc0de+1,
 							R.string._help_title_input_fraction, R.string._help_msg_input_fraction));
 
-					mShowcaseQueue.add(makeShowcaseView(mModeSwitcher, 0xdeadc0de+2,
+					seq.addSequenceItem(makeShowcaseView(mModeSwitcher, 0xdeadc0de+2,
 							R.string._help_title_to_mixed_mode, R.string._help_msg_to_mixed_mode));
 				}
 				else if(mFractionInputMode == MODE_MIXED)
 				{
-					mShowcaseQueue.add(makeShowcaseView(null, 0xdeadc0de+3,
+					seq.addSequenceItem(makeShowcaseView(null, 0xdeadc0de+3,
 							R.string._help_title_input_mixed, R.string._help_msg_input_mixed));
 				}
 
-				mShowcaseQueue.show();
+				seq.start();
 			}
-		});
+		}, 100);
 	}
 
-	private ShowcaseView makeShowcaseView(View view, int showcaseId, int titleResId, int msgResId)
+	private MaterialShowcaseView makeShowcaseView(View view, int showcaseId, int titleResId, int msgResId)
 	{
-		ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(getContext());
-		svb.setHideOnClickOutside(false);
-		svb.setBlock(false);
-		svb.setShowcaseId(showcaseId);
-		svb.setText(titleResId, msgResId);
-		svb.setShowcaseView(view);
-		svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
+		final MaterialShowcaseView.Builder b = new MaterialShowcaseView.Builder(Util.getActivity(this));
+		//b.singleUse(Integer.toString(showcaseId));
+		b.setContentText(msgResId);
+		b.setTitleText(titleResId);
+		b.setDismissText(android.R.string.ok);
+		b.renderOverNavigationBar();
 
-		return svb.build();
+		if(view == null)
+		{
+			b.withoutShape();
+			// abuse as dummy view
+			b.setTarget(mFractionBar);
+		}
+		else
+			b.setTarget(view);
+
+		return b.build();
 	}
 
 	private void updateModeSwitcher()

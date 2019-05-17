@@ -57,9 +57,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.github.espiandev.showcaseview.ShowcaseView;
-import com.github.espiandev.showcaseview.ShowcaseViewBuilder2;
-
 import org.joda.time.LocalDate;
 
 import java.io.File;
@@ -88,11 +85,12 @@ import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Extras;
-import at.jclehner.rxdroid.util.ShowcaseViews;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 import at.jclehner.rxdroid.widget.DrugNameView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 public class DrugListActivity2 extends AppCompatActivity implements
 		DialogLike.OnButtonClickListener
@@ -1278,6 +1276,8 @@ public class DrugListActivity2 extends AppCompatActivity implements
 				// will be detached, and getActivity() might return null, thus crashing
 				// ShowcaseView below!
 				final Activity activity = getActivity();
+				if(activity == null)
+					return;
 
 				if(force)
 				{
@@ -1324,55 +1324,47 @@ public class DrugListActivity2 extends AppCompatActivity implements
 					}
 				}
 
-				final ShowcaseViews svs = new ShowcaseViews();
+				final MaterialShowcaseSequence seq = new MaterialShowcaseSequence(activity);
 
 				// 1. Swipe date
-
-				ShowcaseViewBuilder2 svb = new ShowcaseViewBuilder2(activity);
-				svb.setText(R.string._help_title_swipe_date, R.string._help_msg_swipe_date);
-				/*svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
-				svb.setShowcaseId(0xdeadbeef + 0);
-				svb.setShowcaseItem(ShowcaseView.ITEM_TITLE, 0, getActivity());
-
-				final DisplayMetrics metrics = new DisplayMetrics();
-				getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-				final float w = metrics.widthPixels;
-				final float h = metrics.heightPixels;
-				final float y = h * 0.6f;
-
-				svb.setAnimatedGesture(-100, y, w, y);*/
-
-				svs.add(tag(svb.build(), "Swipe date"));
+				MaterialShowcaseView.Builder b = new MaterialShowcaseView.Builder(activity);
+				b.setContentText(R.string._help_msg_swipe_date);
+				b.setTitleText(R.string._help_title_swipe_date);
+				b.setDismissText(android.R.string.ok);
+				setShowcaseTarget(b, 0);
+				seq.addSequenceItem(b.build());
 
 				// 2. Edit drug
-				svb = new ShowcaseViewBuilder2(activity);
-				svb.setText(R.string._help_title_edit_drug, R.string._help_msg_edit_drug);
-				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
-				//svb.setShowcaseId(0xdeadbeef + 1);
-				svb.setShowcaseView(R.id.drug_icon, activity);
-
-				svs.add(tag(svb.build(false), "Edit drug"));
+				b = new MaterialShowcaseView.Builder(activity);
+				b.setTitleText(R.string._help_title_edit_drug);
+				b.setContentText(R.string._help_msg_edit_drug);
+				b.setDismissText(android.R.string.ok);
+				setShowcaseTarget(b, R.id.drug_icon);
+				seq.addSequenceItem(b.build());
 
 				// 3. Take dose & long press
-				svb = new ShowcaseViewBuilder2(activity);
-				svb.setText(R.string._help_title_click_dose, R.string._help_msg_click_dose);
-				//svb.setShotType(ShowcaseView.TYPE_ONE_SHOT);
-				//svb.setShowcaseId(0xdeadbeef + 4);
-				svb.setShowcaseView(doseToHighlight, activity);
-
-				svs.add(tag(svb.build(false), "Take dose & long press"));
+				b = new MaterialShowcaseView.Builder(activity);
+				b.setTitleText(R.string._help_title_click_dose);
+				b.setContentText(R.string._help_msg_click_dose);
+				b.setDismissText(android.R.string.ok);
+				setShowcaseTarget(b, doseToHighlight);
+				seq.addSequenceItem(b.build());
 
 				Settings.setDisplayedOnce("date_swipe");
-				svs.show();
+				seq.start();
 			}
 		}
 
-		private ShowcaseView tag(ShowcaseView sv, String tag)
+		private void setShowcaseTarget(MaterialShowcaseView.Builder builder, int viewId)
 		{
-			if(sv != null)
-				sv.setTag(tag);
-			return sv;
+			View v = getActivity().findViewById(viewId);
+			if(v == null)
+			{
+				builder.withoutShape();
+				builder.setTarget(getActivity().findViewById(android.R.id.content));
+			}
+			else
+				builder.setTarget(v);
 		}
 
 		private String getEmptyText()

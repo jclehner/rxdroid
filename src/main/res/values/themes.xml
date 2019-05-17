@@ -65,8 +65,6 @@
 		
 		<item name="android:windowAnimationStyle">@null</item>
 
-		<item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
-
 		<item name="colorPrimary">@color/color_primary</item>
 		<item name="colorPrimaryDark">@color/color_primary_dark</item>
 		<item name="colorAccent">@color/color_accent</item>
@@ -133,7 +131,6 @@
         <item name="dividerColor">@color/list_divider_dark</item>
         
         <item name="android:windowAnimationStyle">@null</item>
-        <item name="showcaseViewStyle">@style/ShowcaseView.RxDroid</item>
 
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
@@ -161,12 +158,6 @@
 	
 	<style name="Theme.RxDroid.NoAnimation" parent="@style/Theme.RxDroid">
 		<item name="android:windowAnimationStyle">@null</item>		
-	</style>
-	
-	<style name="ShowcaseView.RxDroid" parent="@style/ShowcaseView">
-	    <item name="sv_backgroundColor">#c0000000</item>
-		<item name="sv_showcaseColor">?colorAccent</item>
-		<item name="sv_titleTextAppearance">@style/ShowcaseView.Title</item>
 	</style>
 
 	<style name="ShowcaseButton">
