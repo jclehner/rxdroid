@@ -1,5 +1,6 @@
 ### 0.9.33
 * Fix notification issues
+* Update translations
 * Update icon
 
 ### 0.9.32.2
