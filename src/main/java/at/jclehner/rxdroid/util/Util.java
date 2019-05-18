@@ -644,6 +644,9 @@ public final class Util
 		// while Jellybean converts
 		// them to their simple counterparts (i.e. 1/5 instead of ⅕)
 
+		// a left-to-right-mark (U+200E) is appended to correctly display fractional values
+		// on RTL locales
+
 		if(!frac.isInteger() && (frac.denominator() <= (Version.SDK_IS_LOLLIPOP_OR_NEWER ? 6 : 4) || frac.denominator() == 8))
 		{
 			final int[] data = frac.getFractionData(true);
@@ -654,10 +657,10 @@ public final class Util
 
 			final String pretty = PRETTY_FRACTIONS[denominator - 2][numerator - 1];
 			if(pretty != null)
-				return wholeNum != 0 ? (wholeNum + pretty) : pretty;
+				return (wholeNum != 0 ? (wholeNum + pretty) : pretty) + "\u200E";
 		}
 
-		return frac.toString();
+		return frac.toString() + "\u200E";
 	}
 
 	public static String visibilityToString(int visibility)
