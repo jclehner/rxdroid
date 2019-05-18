@@ -337,8 +337,8 @@
 		\"[@string/_title_backup_restore]\" konumundan elle yedekleme yapın!
 	"</string>
     <string name="_msg_power_save_warning">"
-		<b>Güç tasarrufu</b> özellikleri ya da <b>task-killer</b> uygulamalarının kullanılması RxDroid'in çalışmasını engelleyebilir
-		 (bildirimlerin gösterilememesi, vb.). Bu durumlarda RxDroid'i hariç tutun
+		<b>Güç tasarrufu</b> özellikleri ya da <b>task-killer</b> uygulamalarının kullanılması RxDroid\'in çalışmasını engelleyebilir
+		 (bildirimlerin gösterilememesi, vb.). Bu durumlarda RxDroid\'i hariç tutun
 		ya da bu uygulamaları kaldırın!
 	"</string>
     <string name="_msg_backups_detected">"
