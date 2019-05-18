@@ -4,6 +4,7 @@
     android:layout_height="@dimen/log_group_height"
     android:background="?attr/bgColorLogGroup"
     android:layout_gravity="center"
+    android:layoutDirection="locale"
 >
     
     <TextView android:id="@+id/text_date"

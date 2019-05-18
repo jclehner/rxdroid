@@ -4,6 +4,7 @@
 		android:id="@+id/dose_container"
 		android:layout_height="@dimen/dose_view_height"
 		android:layout_width="wrap_content"
+		android:layoutDirection="locale"
   	>  	
   	
 	  	<at.jclehner.rxdroid.DoseView android:id="@+id/morning"

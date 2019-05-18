@@ -41,12 +41,14 @@
 	    
 		android:orientation="horizontal"
 		android:gravity="center"
+		android:layoutDirection="ltr"
 		
 		style="@style/FractionInputBottomPadding"
 	>	
 		<NumberPicker android:id="@+id/integer"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_marginEnd="@dimen/fraction_wholenum_margin"
 			android:layout_marginRight="@dimen/fraction_wholenum_margin"
 			android:visibility="gone"
 		/>
@@ -76,7 +78,7 @@
 	<LinearLayout 
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_gravity="right|bottom"
+		android:layout_gravity="end|bottom"
 		android:orientation="vertical"
 	>
 		<!--

@@ -28,6 +28,7 @@
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:paddingRight="5dip"
+	android:paddingEnd="5dip"
 	
 	android:orientation="vertical"
 	android:descendantFocusability="beforeDescendants"
@@ -42,6 +43,7 @@
 		android:layout_height="36dip"
 		
 		android:layout_alignParentLeft="true"
+		android:layout_alignParentStart="true"
 		android:layout_alignParentTop="true"
 		android:layout_alignBottom="@+id/dose_container"
 									
@@ -74,13 +76,15 @@
   		android:layout_height="@dimen/drug_name_height"
   		  		
   		android:layout_toRightOf="@id/drug_icon"
+		android:layout_toEndOf="@id/drug_icon"
         android:layout_toLeftOf="@+id/indicators"
+		android:layout_toStartOf="@+id/indicators"
   		
   		android:layout_alignParentTop="true"
   		  		
   		android:layout_marginLeft="5dp"
-  		  		  		  		
-  		android:gravity="center_vertical"
+		android:layout_marginStart="5dp"
+
   		android:text="Cocaine 100mg"
   		android:ellipsize="marquee"
   		android:singleLine="true"
@@ -89,7 +93,7 @@
   		android:clickable="true"
   		android:onClick="onDrugNameClick"
   		  		  		
-  		style="@style/TextAppearance.Large.Clickable"
+  		style="@style/DrugNameStyle"
   		  		
   		android:nextFocusDown="@id/dose_container"
 	/>
@@ -106,7 +110,9 @@
   		android:nextFocusDown="@+id/morning"
   		
   		android:layout_toRightOf="@id/drug_icon"
-        android:layout_toLeftOf="@id/indicators"
+        android:layout_toEndOf="@id/drug_icon"
+		android:layout_toLeftOf="@id/indicators"
+		android:layout_toStartOf="@id/indicators"
   		android:layout_below="@id/drug_name"
   	/>  	
   	
@@ -187,7 +193,7 @@
 	  		android:layout_alignParentTop="true"
 	  		android:layout_alignBottom="@id/dose_container"
 	  		android:layout_alignParentRight="true"
-	  		
+	  		android:layout_alignParentEnd="true"
 	  		android:orientation="vertical"
 	  >
           <FrameLayout
@@ -231,7 +237,7 @@
 			  	<ImageView android:id="@+id/img_missed_dose_warning"
 			  	    android:layout_width="wrap_content"
 			  	    android:layout_height="wrap_content"
-			  	    android:layout_gravity="bottom|left"
+			  	    android:layout_gravity="bottom|start"
 			  	    
 			  	    android:src="@drawable/ic_error_small"
 			  	/>

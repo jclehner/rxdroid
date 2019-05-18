@@ -25,6 +25,7 @@
 	    android:label="@string/app_name"
 	    android:name=".RxDroid"
 		android:theme="@style/Theme.RxDroid"
+		android:supportsRtl="true"
 		android:killAfterRestore="true" android:restoreAnyVersion="false">
 
 		<activity android:name=".DrugListActivity2"

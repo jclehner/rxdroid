@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="DrugNameStyle" parent="@android:style/TextAppearance.Large">
+        <item name="android:gravity">center_horizontal|right</item>
+    </style>
+</resources>

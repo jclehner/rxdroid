@@ -6,6 +6,8 @@
     android:orientation="horizontal"
     android:background="?attr/bgColorLogChild"
     android:paddingLeft="4dip"
+    android:paddingStart="4dip"
+    android:layoutDirection="locale"
     android:descendantFocusability="blocksDescendants"
 >    
     <TextView android:id="@+id/text_time"
@@ -13,6 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="4dip"
+        android:layout_marginEnd="4dip"
         
         android:focusable="false"
         android:gravity="center_vertical"

@@ -37,7 +37,7 @@
   <ImageView android:id="@+id/icon_dose_time"
   	android:layout_width="30dp"
   	android:layout_height="30dp"
-  	android:layout_gravity="left"
+  	android:layout_gravity="start"
   	android:scaleType="fitCenter"
   	
   />  
