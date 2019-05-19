@@ -43,4 +43,5 @@
 	<dimen name="logo_padding">12dip</dimen>
 	<dimen name="logo_padding_left">0dip</dimen>
 	<dimen name="logo_padding_right">@dimen/logo_padding</dimen>
+	<dimen name="mockup_width_firstcolumn">200dip</dimen>
 </resources>
