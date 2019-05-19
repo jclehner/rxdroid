@@ -101,6 +101,7 @@
 			android:minEms="3"
 			android:textSize="20sp"
 			android:text="¾"
+			android:textDirection="ltr"
 		/>
 		
 	</LinearLayout>

@@ -50,6 +50,7 @@
   	android:layout_gravity="center"
   	android:gravity="center"
   	android:text="X"
+	android:textDirection="ltr"
   	
   	style="@android:style/TextAppearance.Large"
   />
