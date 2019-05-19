@@ -372,7 +372,7 @@ public class DoseLogFragment extends ExpandableListFragment
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			return mGroupedEvents.get(groupPosition).size() + 1;
+			return mGroupedEvents.get(groupPosition).size();
 		}
 
 		@Override
@@ -454,7 +454,7 @@ public class DoseLogFragment extends ExpandableListFragment
 			else
 				holder = (ChildViewHolder) view.getTag();
 
-			if(!isLastChild)
+			if(true)
 			{
 				holder.dose.setVisibility(View.VISIBLE);
 				holder.time.setVisibility(View.VISIBLE);
