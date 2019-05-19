@@ -22,7 +22,9 @@
 package at.jclehner.rxdroid;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -36,10 +38,13 @@ import android.widget.TextView;
 import at.jclehner.androidutils.InstanceState;
 import at.jclehner.androidutils.InstanceState.SaveState;
 import android.widget.NumberPicker.OnValueChangeListener;
+
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
+import com.getkeepsafe.taptargetview.TapTargetView;
+
 import at.jclehner.rxdroid.util.CollectionUtils;
 import at.jclehner.rxdroid.util.Util;
-import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
-import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 
 /**
@@ -86,6 +91,8 @@ public class FractionInput extends LinearLayout
 
 	private OnChangedListener mListener;
 
+	private Dialog mDialog;
+
 	public FractionInput(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
@@ -118,6 +125,11 @@ public class FractionInput extends LinearLayout
 		setFractionInputMode(MODE_FRACTION);
 
 		updateView();
+	}
+
+	public void setHostingDialog(Dialog dialog)
+	{
+		mDialog = dialog;
 	}
 
 	public void setValue(Fraction value)
@@ -346,14 +358,7 @@ public class FractionInput extends LinearLayout
 		if(!mAttached || getVisibility() != View.VISIBLE)
 			return;
 
-		if(!BuildConfig.DEBUG)
-		{
-			if(Settings.getBoolean(Settings.Keys.HAS_FRACTIONS_IN_ANY_SCHEDULE, false))
-				return;
-		}
-
-		final Activity act = Util.getActivity(this);
-		if (act == null) {
+		if (mDialog == null) {
 			return;
 		}
 
@@ -365,36 +370,45 @@ public class FractionInput extends LinearLayout
 				if(!isShown())
 					return;
 
-				final MaterialShowcaseSequence seq = new MaterialShowcaseSequence(act);
+				//final MaterialShowcaseSequence seq = new MaterialShowcaseSequence(act);
+				final TapTargetSequence seq = new TapTargetSequence(mDialog);
 
 				if(mFractionInputMode == MODE_INTEGER && !isFractionInputModeDisabled())
 				{
-					seq.addSequenceItem(makeShowcaseView(mModeSwitcher, 0xdeadc0de,
+					seq.target(makeShowcaseView(mModeSwitcher, 0xdeadc0de,
 							R.string._help_title_to_fraction_mode, R.string._help_msg_to_fraction_mode));
 
 				}
 				else if(mFractionInputMode == MODE_FRACTION)
 				{
-					seq.addSequenceItem(makeShowcaseView(null, 0xdeadc0de+1,
+					seq.target(makeShowcaseView(null, 0xdeadc0de+1,
 							R.string._help_title_input_fraction, R.string._help_msg_input_fraction));
 
-					seq.addSequenceItem(makeShowcaseView(mModeSwitcher, 0xdeadc0de+2,
+					seq.target(makeShowcaseView(mModeSwitcher, 0xdeadc0de+2,
 							R.string._help_title_to_mixed_mode, R.string._help_msg_to_mixed_mode));
 				}
 				else if(mFractionInputMode == MODE_MIXED)
 				{
-					seq.addSequenceItem(makeShowcaseView(null, 0xdeadc0de+3,
+					seq.target(makeShowcaseView(null, 0xdeadc0de+3,
 							R.string._help_title_input_mixed, R.string._help_msg_input_mixed));
 				}
 
 				// FIXME
-				//seq.start();
+				seq.start();
 			}
 		}, 100);
 	}
 
-	private MaterialShowcaseView makeShowcaseView(View view, int showcaseId, int titleResId, int msgResId)
+	private TapTarget makeShowcaseView(View view, int showcaseId, int titleResId, int msgResId)
 	{
+		final boolean noTarget = (view == null);
+
+		if(noTarget)
+			view = mFractionBar;
+
+		return Util.tapTargetFor(view, titleResId, msgResId).transparentTarget(true);
+
+		/*
 		final MaterialShowcaseView.Builder b = new MaterialShowcaseView.Builder(Util.getActivity(this));
 		//b.singleUse(Integer.toString(showcaseId));
 		b.setContentText(msgResId);
@@ -412,6 +426,7 @@ public class FractionInput extends LinearLayout
 			b.setTarget(view);
 
 		return b.build();
+		*/
 	}
 
 	private void updateModeSwitcher()

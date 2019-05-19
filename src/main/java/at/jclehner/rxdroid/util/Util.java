@@ -53,6 +53,8 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+
 import org.joda.time.LocalDate;
 
 import java.io.BufferedReader;
@@ -804,6 +806,20 @@ public final class Util
 			return getActivity(view.findViewById(android.R.id.content));
 
 		return null;
+	}
+
+	public static TapTarget tapTargetFor(View view, int titleResId, int msgResId)
+	{
+		final Context ctx = view.getContext();
+		return tapTargetConfig(TapTarget.forView(
+				view,
+				ctx.getString(titleResId),
+				ctx.getString(msgResId)));
+	}
+
+	public static TapTarget tapTargetConfig(TapTarget tt)
+	{
+		return tt.outerCircleAlpha(0.95f).cancelable(true);
 	}
 
 	private static View findViewById(ViewGroup group, int id, int level)

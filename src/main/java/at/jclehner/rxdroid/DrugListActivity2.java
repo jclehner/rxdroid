@@ -44,6 +44,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -56,6 +57,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 
 import org.joda.time.LocalDate;
 
@@ -89,8 +93,6 @@ import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 import at.jclehner.rxdroid.widget.DrugNameView;
 import at.jclehner.rxdroid.widget.DrugSupplyMonitor;
-import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
-import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 public class DrugListActivity2 extends AppCompatActivity implements
 		DialogLike.OnButtonClickListener
@@ -1324,47 +1326,31 @@ public class DrugListActivity2 extends AppCompatActivity implements
 					}
 				}
 
-				final MaterialShowcaseSequence seq = new MaterialShowcaseSequence(activity);
+				DisplayMetrics metrics = new DisplayMetrics();
+				activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-				// 1. Swipe date
-				MaterialShowcaseView.Builder b = new MaterialShowcaseView.Builder(activity);
-				b.setContentText(R.string._help_msg_swipe_date);
-				b.setTitleText(R.string._help_title_swipe_date);
-				b.setDismissText(android.R.string.ok);
-				setShowcaseTarget(b, 0);
-				seq.addSequenceItem(b.build());
+				final int px = 12 * (metrics.densityDpi / 160);
+				final int left = metrics.widthPixels - px;
+				final int top = (metrics.heightPixels / 2) - px;
 
-				// 2. Edit drug
-				b = new MaterialShowcaseView.Builder(activity);
-				b.setTitleText(R.string._help_title_edit_drug);
-				b.setContentText(R.string._help_msg_edit_drug);
-				b.setDismissText(android.R.string.ok);
-				setShowcaseTarget(b, R.id.drug_icon);
-				seq.addSequenceItem(b.build());
-
-				// 3. Take dose & long press
-				b = new MaterialShowcaseView.Builder(activity);
-				b.setTitleText(R.string._help_title_click_dose);
-				b.setContentText(R.string._help_msg_click_dose);
-				b.setDismissText(android.R.string.ok);
-				setShowcaseTarget(b, doseToHighlight);
-				seq.addSequenceItem(b.build());
+				final TapTargetSequence seq = new TapTargetSequence(activity);
+				seq.targets(
+						Util.tapTargetConfig(TapTarget.forBounds(
+								new Rect(left, top, left  + 2 * px, top + 2 * px),
+								getString(R.string._help_title_swipe_date),
+								getString(R.string._help_msg_swipe_date))),
+						Util.tapTargetFor(
+								activity.findViewById(R.id.drug_icon),
+								R.string._help_title_edit_drug,
+								R.string._help_msg_edit_drug),
+						Util.tapTargetFor(
+								activity.findViewById(doseToHighlight),
+								R.string._help_title_click_dose,
+								R.string._help_msg_click_dose));
 
 				Settings.setDisplayedOnce("date_swipe");
 				seq.start();
 			}
-		}
-
-		private void setShowcaseTarget(MaterialShowcaseView.Builder builder, int viewId)
-		{
-			View v = getActivity().findViewById(viewId);
-			if(v == null)
-			{
-				builder.withoutShape();
-				builder.setTarget(getActivity().findViewById(android.R.id.content));
-			}
-			else
-				builder.setTarget(v);
 		}
 
 		private String getEmptyText()

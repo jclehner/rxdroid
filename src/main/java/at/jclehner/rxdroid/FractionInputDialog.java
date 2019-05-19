@@ -52,6 +52,7 @@ public class FractionInputDialog extends AlertDialog implements OnClickListener,
 		mInput = (FractionInput) view.findViewById(R.id.input);
 		mFooterStub = (ViewStub) view.findViewById(R.id.footer_stub);
 		mInput.setOnChangeListener(this);
+		mInput.setHostingDialog(this);
 		mListener = listener;
 
 		if(value != null)
