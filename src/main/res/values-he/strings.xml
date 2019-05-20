@@ -24,7 +24,7 @@
 -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Your name here, for credit! -->
-    <string name="translator">מובנה</string>
+    <string name="translator">מובנית</string>
     <!-- 
     Translatable strings start here. The naming scheme is as follows:
     
@@ -102,7 +102,7 @@
     <string name="_toast_saved">נשמר.</string>
     <string name="_title_add">הוספה</string>
     <string name="_msg_intake_normal">לקחת מינון כזה של &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="_msg_intake_unscheduled">ציון מינון של f &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="_msg_intake_unscheduled">ציון מינון של &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="_title_change_dose">שינוי מינון</string>
     <string name="_title_edit_drug">עריכת תרופה</string>
     <string name="_title_mark_not_taken">הסרת מינון שניטל</string>
@@ -259,7 +259,7 @@
     <string name="_title_view">תצוגה</string>
     <string name="_title_missed">הוחמצו</string>
     <string name="_title_skipped">דולגו</string>
-    <string name="_title_taken">ניטלו</string>
+    <string name="_title_taken">ניטל</string>
     <string name="_title_morning_dose">מינון בוקר</string>
     <string name="_title_noon_dose">מינון צהריים</string>
     <string name="_title_evening_dose">מינון ערב</string>
@@ -288,7 +288,7 @@
     <string name="_help_title_to_mixed_mode">יותר מאחד?</string>
     <string name="_help_msg_to_mixed_mode">אם המינונים הניטלים הם ‎1¾‎ למשל, יש ללחוץ על הכפתור הזה.</string>
     <string name="_help_title_input_mixed">מצב שבר מעורב.</string>
-    <string name="_help_msg_input_mixed">"כדי לציין ערכים כגון 1¾, יש להקליד „1” בשדה השמאלי,
+    <string name="_help_msg_input_mixed">"כדי לציין ערכים כגון 1‎¾‎, יש להקליד „1” בשדה השמאלי,
 	    „3” בשדה האמצעי ו־„4” בשדה הימני."</string>
     <string name="_help_title_swipe_date">החלקה לשינוי תאריך.</string>
     <string name="_help_msg_swipe_date">"התאריך שמוצג כרגע מצוין בשורת הכותרת. כדי לחזור אחורה או להתקדם קדימה בזמן, 
