@@ -381,7 +381,7 @@
 	<string name="_toast_no_doses_to_take">No doses at the moment.</string>
 	
 	<string name="_help_title_to_fraction_mode">Taking only half a tablet?</string>
-	<string name="_help_msg_to_fraction_mode">By pressing this button you can also enter values such as ½ or 1¾ as doses!</string>
+	<string name="_help_msg_to_fraction_mode">By pressing this button you can also enter doses such as ½ or 1¾!</string>
 	
 	<string name="_help_title_input_fraction">Fraction mode.</string>
 	<string name="_help_msg_input_fraction">
