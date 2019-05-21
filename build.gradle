@@ -1,7 +1,21 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'hugo'
 
-def pwd = new File('.').absolutePath
+def askForKeystorePassword() {
+	def prompt =
+			"\n==========================================================" +
+			"\nKeystore : ${android.signingConfigs.release.storeFile}"     +
+			"\nKey alias: ${android.signingConfigs.release.keyAlias}"      +
+			"\n==========================================================" +
+			"\nPassword: "
+
+	def console = System.console()
+
+	if (console) {
+		return new String(console.readPassword(prompt))
+	} else {
+		return ""
+	}
+}
 
 buildscript {
 	repositories {
@@ -15,8 +29,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:3.4.0'
-		//classpath 'com.jakewharton.hugo:hugo-plugin:1.1.0'
+		classpath 'com.android.tools.build:gradle:3.4.1'
 	}
 }
 
@@ -65,11 +78,12 @@ android {
 	signingConfigs {
 		release {
 			def keystore = System.getenv("RXDROID_KEYSTORE")
-			if (keystore) {
+			def console = System.console()
+			if (keystore && console) {
 				storeFile file(keystore)
 				keyAlias System.getenv("RXDROID_KEY_ALIAS")
-				storePassword "****"
-				keyPassword "****"
+				storePassword askForKeystorePassword()
+				keyPassword storePassword
 			}
 		}
 	}
@@ -83,36 +97,5 @@ android {
 		debug {
 			applicationIdSuffix '.debug'
 		}
-	}
-}
-
-
-task askForKeystorePassword {
-	doLast {
-		if (!android.signingConfigs.release.storeFile) {
-			return
-		}
-
-		def prompt = 
-				"\n==========================================================" +
-				"\nKeystore : ${android.signingConfigs.release.storeFile}"     +
-				"\nKey alias: ${android.signingConfigs.release.keyAlias}"      +
-				"\n==========================================================" +
-				"\nPassword: "
-
-		def console = System.console()
-
-		if (console) {
-			def pw = new String(console.readPassword(prompt))
-
-			android.signingConfigs.release.storePassword = pw
-			android.signingConfigs.release.keyPassword = pw
-		}
-	}
-}
-
-tasks.whenTaskAdded { theTask ->
-	if (theTask.name.equals("packageRelease")) {
-		theTask.dependsOn "askForKeystorePassword"
 	}
 }
