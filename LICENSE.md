@@ -2,7 +2,7 @@ RxDroid
 =======
 
 <small>
-Copyright (C) 2011-2015 Joseph C. Lehner
+Copyright (C) 2011-2019 Joseph C. Lehner
 
 RxDroid is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -45,10 +45,7 @@ Third Party Works
   Android Open Source Project
 * [ORMLite](http://ormlite.com) by Gray Watson
 * [Joda-Time](http://www.joda.org/joda-time/)
-* [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids) by
-  Jake Wharton
-* [ShowcaseView](https://github.com/jclehner/ShowcaseView) by Alex Curran,
-  modified by Joseph C. Lehner
+* [TapTargetView](https://github.com/KeepSafe/TapTargetView) by Keepsafe Engineering
 * [zip4j](http://www.lingala.net/zip4j) by Srikanth Reddy Lingala
 
 #### Artwork
