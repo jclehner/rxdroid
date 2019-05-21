@@ -166,6 +166,8 @@ public class DrugListActivity2 extends AppCompatActivity implements
 				getIntent().putExtra(EXTRA_STARTED_FROM_NOTIFICATION, false);
 			}
 		}
+
+		Components.onResumeActivity(this, 0);
 	}
 
 	@Override
