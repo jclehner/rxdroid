@@ -113,6 +113,7 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 
 		super.setOnShowListener(mLocalOnShowListener);
 		Database.registerEventListener(this);
+		mDoseInput.setHostingDialog(this);
 
 		// Without this, the setMessage() calls in updateMessage() would be ignored; same
 		// goes for title and icon, but we don't set one for now.

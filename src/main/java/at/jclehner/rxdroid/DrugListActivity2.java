@@ -320,7 +320,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 			@Override
 			public void run()
 			{
-				for(int i = 0; i != 10; ++i)
+				for(int i = 0; i != (BuildConfig.DEBUG ? 1 : 10); ++i)
 				{
 					final String btnStr = btnStrOrig + " (" + (10 - i) + ")";
 
@@ -1336,7 +1336,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 				final int top = (metrics.heightPixels / 2) - px;
 
 				final TapTargetSequence seq = new TapTargetSequence(activity);
-				seq.targets(
+				Util.tapTargetsAdd(seq,
 						Util.tapTargetConfig(TapTarget.forBounds(
 								new Rect(left, top, left  + 2 * px, top + 2 * px),
 								getString(R.string._help_title_swipe_date),

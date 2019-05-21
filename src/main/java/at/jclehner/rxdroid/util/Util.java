@@ -54,6 +54,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 
 import org.joda.time.LocalDate;
 
@@ -74,10 +75,15 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
+import java.util.Set;
 
+import at.jclehner.androidutils.Extras;
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.Fraction;
@@ -806,6 +812,27 @@ public final class Util
 			return getActivity(view.findViewById(android.R.id.content));
 
 		return null;
+	}
+
+	public static void tapTargetsAdd(TapTargetSequence seq, TapTarget... targets)
+	{
+		final List<TapTarget> filtered = new ArrayList<>();
+		final Set<String> displayed = Settings.getStringSet("displayed_tap_targets");
+		for(TapTarget target : targets)
+		{
+			if(target == null)
+				continue;
+
+			final String id = Integer.toString(target.id());
+			if("-1".equals(id) || !displayed.contains(id))
+			{
+				filtered.add(target);
+				displayed.add(id);
+			}
+		}
+
+		Settings.putStringSet("displayed_tap_targets", displayed);
+		seq.targets(filtered);
 	}
 
 	public static TapTarget tapTargetFor(View view, int titleResId, int msgResId)
