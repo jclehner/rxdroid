@@ -1,5 +1,6 @@
 ### 0.9.33
 * Fix notification issues
+* Fix landscape mode
 * Update translations
 * Update icon
 
