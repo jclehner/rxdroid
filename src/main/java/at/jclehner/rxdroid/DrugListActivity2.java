@@ -1351,7 +1351,14 @@ public class DrugListActivity2 extends AppCompatActivity implements
 								R.string._help_msg_click_dose));
 
 				Settings.setDisplayedOnce("date_swipe");
-				seq.start();
+
+				new Handler().postDelayed(new Runnable() {
+					@Override
+					public void run()
+					{
+						seq.start();
+					}
+				}, 100);
 			}
 		}
 

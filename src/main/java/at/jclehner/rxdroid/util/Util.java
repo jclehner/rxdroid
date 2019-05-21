@@ -810,6 +810,9 @@ public final class Util
 
 	public static TapTarget tapTargetFor(View view, int titleResId, int msgResId)
 	{
+		if(view == null)
+			return null;
+
 		final Context ctx = view.getContext();
 		return tapTargetConfig(TapTarget.forView(
 				view,
