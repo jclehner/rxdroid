@@ -180,9 +180,7 @@
 			</intent-filter>
 
             <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.PACKAGE_ADDED" />
-                <data android:scheme="package" android:path="at.jclehner.rxdroid" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
 
 		</receiver>
