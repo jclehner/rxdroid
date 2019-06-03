@@ -17,7 +17,7 @@ limited permissions.
 
 Help with translating RxDroid to your language at https://crowdin.com/project/rxdroid!
 
-Tags: pill reminder, drug reminder, prescription reminder, free, open source, gpl
+**Please note that development on RxDroid is currently limited to fixing bugs and minor improvements.**
 
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=QTBC4AVEYASYU" rel="nofollow"> 
 	<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif">
