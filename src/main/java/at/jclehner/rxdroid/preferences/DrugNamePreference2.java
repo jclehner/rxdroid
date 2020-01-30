@@ -21,7 +21,7 @@
 
 package at.jclehner.rxdroid.preferences;
 
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,7 +34,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import at.jclehner.androidutils.AdvancedDialogPreference;
+
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;

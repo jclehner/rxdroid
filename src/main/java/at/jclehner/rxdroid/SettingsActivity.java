@@ -1,7 +1,7 @@
 package at.jclehner.rxdroid;
 
 import android.annotation.TargetApi;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,7 +19,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.app.Fragment;
 import android.preference.PreferenceFragment;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.style.TypefaceSpan;
 import android.util.Log;

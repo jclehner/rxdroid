@@ -21,7 +21,7 @@
 
 package at.jclehner.rxdroid.preferences;
 
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -31,7 +31,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import at.jclehner.androidutils.InstanceState;
 import at.jclehner.androidutils.InstanceState.SaveState;
-import at.jclehner.androidutils.AdvancedDialogPreference;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.FractionInputDialog;
 import at.jclehner.rxdroid.FractionInputDialog.OnFractionSetListener;

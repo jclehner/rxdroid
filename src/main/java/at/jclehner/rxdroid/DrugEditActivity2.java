@@ -22,10 +22,9 @@
 package at.jclehner.rxdroid;
 
 import android.os.Bundle;
-import android.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.KeyEvent;
-import android.view.Menu;
 
 import at.jclehner.rxdroid.util.Components;
 

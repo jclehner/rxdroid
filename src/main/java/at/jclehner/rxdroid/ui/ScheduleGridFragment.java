@@ -21,9 +21,8 @@
 
 package at.jclehner.rxdroid.ui;
 
-import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import androidx.fragment.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,10 +32,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ListAdapter;
 import android.widget.TextView;
-
-import java.util.Arrays;
 
 import at.jclehner.androidutils.ArrayOfParcelables;
 import at.jclehner.rxdroid.DoseView;
@@ -44,7 +40,6 @@ import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.FractionInputDialog;
 import at.jclehner.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.jclehner.rxdroid.R;
-import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Schedule;
 import at.jclehner.rxdroid.util.Constants;
 import at.jclehner.rxdroid.util.SimpleBitSet;

@@ -22,8 +22,8 @@
 package at.jclehner.rxdroid;
 
 import android.annotation.TargetApi;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AlertDialog.Builder;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -32,18 +32,16 @@ import android.os.Bundle;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
+import androidx.core.view.MenuItemCompat;
+import androidx.appcompat.app.ActionBar;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.ui.DoseLogFragment;
-import at.jclehner.rxdroid.ui.ExpandableListFragment;
 import at.jclehner.rxdroid.util.Components;
 import at.jclehner.rxdroid.util.Extras;
 

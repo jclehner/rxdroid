@@ -21,27 +21,18 @@
 
 package at.jclehner.rxdroid.preferences;
 
-import android.annotation.TargetApi;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.View;
-import android.widget.DatePicker;
-import android.widget.Toast;
 
 import org.joda.time.LocalDate;
-
-import java.util.IllegalFormatException;
 
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.Version;
 import at.jclehner.rxdroid.ui.DatePickerDialog;
 import at.jclehner.rxdroid.util.DateTime;
-import at.jclehner.rxdroid.util.Util;
 
 public class DatePreference extends BaseAdvancedDialogPreference<LocalDate>
 		implements DatePickerDialog.OnDateSetListener

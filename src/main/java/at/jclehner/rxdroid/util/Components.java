@@ -23,7 +23,7 @@ package at.jclehner.rxdroid.util;
 
 import java.util.Locale;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;

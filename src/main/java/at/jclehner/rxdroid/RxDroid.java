@@ -21,12 +21,7 @@
 
 package at.jclehner.rxdroid;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.media.AudioAttributes;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
@@ -37,8 +32,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.*;
-import android.support.v4.content.IntentCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.core.content.IntentCompat;
+
 import android.util.Log;
 import android.widget.Toast;
 
@@ -50,7 +45,6 @@ import java.io.File;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.WeakHashMap;
 
 import at.jclehner.rxdroid.db.Database;
@@ -146,18 +140,6 @@ public class RxDroid extends Application
 
 	public static void runInMainThread(Runnable r) {
 		sHandler.post(r);
-	}
-
-	public static LocalBroadcastManager getLocalBroadcastManager() {
-		return LocalBroadcastManager.getInstance(getContext());
-	}
-
-	public static void doStartActivity(Intent intent) {
-		getContext().startActivity(intent);
-	}
-
-	public static void doSendBroadcast(Intent intent) {
-		getContext().sendBroadcast(intent);
 	}
 
 	public static String getQuantityString(int id, int quantity, Object... formatArgs)

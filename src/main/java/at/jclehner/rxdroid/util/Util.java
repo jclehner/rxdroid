@@ -21,21 +21,16 @@
 
 package at.jclehner.rxdroid.util;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContextWrapper;
 import android.net.Uri;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AlertDialog;
-import android.app.DatePickerDialog;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -45,18 +40,13 @@ import android.text.Spannable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.DatePicker;
-import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
-
-import org.joda.time.LocalDate;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -77,20 +67,16 @@ import java.lang.reflect.Modifier;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 import java.util.Set;
 
-import at.jclehner.androidutils.Extras;
 import at.jclehner.androidutils.Reflect;
 import at.jclehner.rxdroid.DumbTime;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.R;
 import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.Settings;
-import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.Theme;
 import at.jclehner.rxdroid.Version;
 import at.jclehner.rxdroid.db.DatabaseHelper;
