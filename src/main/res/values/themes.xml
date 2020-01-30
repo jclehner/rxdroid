@@ -162,6 +162,7 @@
 
 	<style name="DrugNameStyle" parent="@android:style/TextAppearance.Large">
 		<item name="android:gravity">center_horizontal|left</item>
+		<item name="android:textColor">?attr/textColorClickable</item>
 	</style>
 
 	<style name="ShowcaseButton">
