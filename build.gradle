@@ -67,7 +67,7 @@ android {
 
         applicationId 'at.jclehner.rxdroid';
 
-		versionCode 9329
+		versionCode 9330
 		versionName '0.9.33'
 	}
 

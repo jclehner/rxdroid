@@ -1,4 +1,5 @@
 ### 0.9.33
+* Target Android 10
 * Fix notification issues
 * Fix landscape mode
 * Update translations
