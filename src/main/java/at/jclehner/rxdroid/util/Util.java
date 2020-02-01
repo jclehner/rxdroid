@@ -653,8 +653,10 @@ public final class Util
 			if(pretty != null)
 				return (wholeNum != 0 ? (wholeNum + pretty) : pretty) + "\u200E";
 		}
+		else if (!frac.isInteger())
+			return frac.toString() + "\u200E";
 
-		return frac.toString() + "\u200E";
+		return frac.toString();
 	}
 
 	public static String visibilityToString(int visibility)
