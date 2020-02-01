@@ -1,3 +1,6 @@
+### 0.9.33.1
+* Correctly display empty doses
+
 ### 0.9.33
 * Target Android 10
 * Fix notification issues
