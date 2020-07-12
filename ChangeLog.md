@@ -1,3 +1,7 @@
+### 0.9.33.2
+* Allow backup creation if external storage is read-only
+* Fix issue in TimePeriodPreference
+
 ### 0.9.33.1
 * Correctly display empty doses
 
