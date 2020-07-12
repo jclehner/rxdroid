@@ -196,14 +196,14 @@ public class DumbTime implements Serializable, Comparable<DumbTime>
 		if(begin != null && end != null)
 		{
 			if(allowWrap && end.isLessThan(begin))
-				return equals(begin) || isGreaterThan(begin) || isLessThan(end);
+				return compareTo(begin) >= 0 || compareTo(end) <= 0;
 			else
-				return (equals(begin) || isGreaterThan(begin)) && isLessThan(end);
+				return compareTo(begin) >= 0 && compareTo(end) <= 0;
 		}
 		else if(begin == null)
-			return isLessThan(end);
+			return compareTo(end) <= 0;
 		else if(end == null)
-			return equals(begin) || isGreaterThan(begin);
+			return compareTo(begin) >= 0;
 
 		throw new NullPointerException();
 	}
