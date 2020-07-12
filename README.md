@@ -1,6 +1,8 @@
 RxDroid - A medication reminder
 ===============================
 
+**!!! Please note that development on RxDroid is currently limited to fixing bugs and minor improvements !!!**
+
 RxDroid is a simple medication reminder app. Apart from reminding you to take 
 your meds, it will also keep track of your pill count, warning you to get a 
 refill in time.
@@ -17,8 +19,8 @@ limited permissions.
 
 Help with translating RxDroid to your language at https://crowdin.com/project/rxdroid!
 
-**Please note that development on RxDroid is currently limited to fixing bugs and minor improvements.**
+### Donate
 
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=QTBC4AVEYASYU" rel="nofollow"> 
-	<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif">
-</a>
+You can [buy me a coffee](https://www.buymeacoffee.com/jclehner) if you want, but please consider
+donating the money for charity instead - [Médecins Sans Frontiers](https://www.msf.org/donate) comes to mind,
+but any other organization, local or international, that you think deserves support will do. Thank you!
