@@ -24,4 +24,5 @@
 
 <paths>
     <external-path name="external" path="."/>
+    <files-path name="internal" path="." />
 </paths>

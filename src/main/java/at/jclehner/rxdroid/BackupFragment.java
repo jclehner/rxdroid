@@ -172,9 +172,6 @@ public class BackupFragment extends LoaderListFragment<File>
 		}
 	}
 
-	private boolean mShowDialogIfNotWriteable = true;
-	private File[] mDirectories;
-
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
@@ -187,37 +184,29 @@ public class BackupFragment extends LoaderListFragment<File>
 						@Override
 						public boolean onMenuItemClick(MenuItem menuItem)
 						{
-							final String storageState = Backup.getStorageState();
-							if(Backup.StorageStateListener.isWritable(storageState))
-							{
-								try
-								{
-									Backup.createBackup(null, null);
-									getLoaderManager().restartLoader(0, null, BackupFragment.this);
-								} catch(ZipException e)
-								{
-									showExceptionDialog(e);
-								}
-							}
+							final File outFile;
+							if(Backup.StorageStateListener.isWritable(Backup.getStorageState()))
+								outFile = null;
 							else
 							{
-								if(mShowDialogIfNotWriteable)
-								{
-									final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-									ab.setPositiveButton(android.R.string.ok, null);
-									ab.setMessage(R.string._msg_external_storage_not_writeable);
-									ab.setTitle(R.string._title_error);
-									ab.setIcon(android.R.drawable.ic_dialog_alert);
-
-									ab.show();
-									mShowDialogIfNotWriteable = false;
-								}
-								else
-								{
-									Toast.makeText(getActivity(), R.string._msg_external_storage_not_writeable,
-											Toast.LENGTH_LONG).show();
-								}
+								outFile = getActivity().getFileStreamPath("backup.rxdbak");
+								outFile.delete();
+								Toast.makeText(getActivity(), R.string._msg_external_storage_not_writeable,
+										Toast.LENGTH_LONG).show();
 							}
+
+							try
+							{
+								Backup.createBackup(outFile, null);
+							} catch(ZipException e)
+							{
+								showExceptionDialog(e);
+							}
+
+							if(outFile == null)
+								getLoaderManager().restartLoader(0, null, BackupFragment.this);
+							else
+								shareBackupFile(outFile);
 
 							return true;
 						}
@@ -239,7 +228,6 @@ public class BackupFragment extends LoaderListFragment<File>
 	public void onResume()
 	{
 		super.onResume();
-		mShowDialogIfNotWriteable = true;
 
 		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_backup_restore);
 	}
@@ -283,6 +271,19 @@ public class BackupFragment extends LoaderListFragment<File>
 
 		//ab.show(getFragmentManager(), "create_error");
 		ab.show();
+	}
+
+	private void shareBackupFile(File file)
+	{
+		final Intent target = new Intent(Intent.ACTION_SEND);
+		target.putExtra(Intent.EXTRA_STREAM, Util.getExternalFileUri(file));
+		target.setType("application/octet-stream");
+
+		final Intent intent = Intent.createChooser(target, getString(R.string._title_share));
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+		startActivity(intent);
 	}
 
 
@@ -338,15 +339,7 @@ public class BackupFragment extends LoaderListFragment<File>
 					}
 					else if(item.getItemId() == R.id.menuitem_share)
 					{
-						final Intent target = new Intent(Intent.ACTION_SEND);
-						target.putExtra(Intent.EXTRA_STREAM, Util.getExternalFileUri(file.item));
-						target.setType("application/octet-stream");
-
-						final Intent intent = Intent.createChooser(target, getString(R.string._title_share));
-						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-						startActivity(intent);
+						shareBackupFile(file.item);
 					}
 
 					return true;
