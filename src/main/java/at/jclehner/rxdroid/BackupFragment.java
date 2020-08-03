@@ -29,8 +29,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import androidx.core.view.MenuItemCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
@@ -55,6 +53,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;

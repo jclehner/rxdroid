@@ -23,6 +23,7 @@ package at.jclehner.rxdroid;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import androidx.fragment.app.Fragment;
 import android.database.DataSetObserver;
 import androidx.appcompat.app.AlertDialog;
 import android.app.Dialog;
@@ -35,9 +36,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import androidx.legacy.app.FragmentStatePagerAdapter;
+
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -132,7 +134,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 				initDrugListPagerFragment();
 			else
 			{
-				final Fragment f = getFragmentManager().findFragmentByTag("pager");
+				final Fragment f = getSupportFragmentManager().findFragmentByTag("pager");
 				if(f instanceof DrugListPagerFragment)
 					((DrugListPagerFragment) f).setDate(Settings.getDoseTimeInfo().displayDate(), true);
 			}
@@ -231,7 +233,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 		dialog.setNegativeButtonText(getString(R.string._btn_reset));
 		dialog.setPositiveButtonText(getString(R.string._btn_exit));
 
-		getFragmentManager().beginTransaction()
+		getSupportFragmentManager().beginTransaction()
 				.replace(android.R.id.content, dialog).commitAllowingStateLoss();
 
 		mIsShowingDbErrorDialog = true;
@@ -250,7 +252,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 		f.setArguments(args);
 		f.setRetainInstance(false);
 
-		getFragmentManager().beginTransaction().replace(android.R.id.content, f, "pager").commit();
+		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, f, "pager").commit();
 	}
 
 	private boolean showBackupAgentRemovalDialogIfNeccessary()
@@ -1091,7 +1093,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 					final int daysLeft = Entries.getSupplyDaysLeftForDrug(drug, mDate);
 					final String dateString = DateTime.toNativeDate(DateTime.add(mDate, Calendar.DAY_OF_MONTH, daysLeft));
 
-					Toast.makeText(getActivity(), getString(R.string._toast_low_supplies, dateString), Toast.LENGTH_LONG).show();
+					Toast.makeText(RxDroid.getContext(), getString(R.string._toast_low_supplies, dateString), Toast.LENGTH_LONG).show();
 				}
 			}
 		}
@@ -1310,7 +1312,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 						return;
 					}
 
-					final Fragment f = activity.getFragmentManager().findFragmentByTag("pager");
+					final Fragment f = ((FragmentActivity) activity).getSupportFragmentManager().findFragmentByTag("pager");
 					if(f instanceof DrugListPagerFragment)
 						((DrugListPagerFragment) f).setDate(date, false);
 					else

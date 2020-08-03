@@ -22,6 +22,9 @@
 package at.jclehner.rxdroid;
 
 import android.Manifest;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -33,8 +36,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import androidx.core.app.NavUtils;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
@@ -401,8 +402,9 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 
 		//setContentView(R.layout.simple_activity);
 
-		final Fragment currentFragment = getFragmentManager().findFragmentByTag("content");
-		final FragmentTransaction ft = getFragmentManager().beginTransaction();
+		final FragmentManager fm = getSupportFragmentManager();
+		final Fragment currentFragment = fm.findFragmentByTag("content");
+		final FragmentTransaction ft = fm.beginTransaction();
 
 		if(currentFragment != null)
 		{

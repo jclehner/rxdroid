@@ -23,10 +23,11 @@ package at.jclehner.rxdroid;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.app.DialogFragment;
 import android.view.ViewStub;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.fragment.app.DialogFragment;
 import at.jclehner.rxdroid.FractionInputDialog.OnFractionSetListener;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.Drug;

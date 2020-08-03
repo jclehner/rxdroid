@@ -23,11 +23,6 @@ package at.jclehner.androidutils;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.app.ListFragment;
-import android.app.LoaderManager;
-import android.content.AsyncTaskLoader;
-import android.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +32,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import at.jclehner.rxdroid.util.Exceptions;
+import androidx.fragment.app.ListFragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
 
 public abstract class LoaderListFragment<T> extends ListFragment implements LoaderManager.LoaderCallbacks<List<LoaderListFragment.LLFLoader.ItemHolder<T>>>
 {
@@ -178,11 +176,11 @@ public abstract class LoaderListFragment<T> extends ListFragment implements Load
 		setListAdapter(mAdapter);
 		setListShown(false);
 
-		getLoaderManager().initLoader(0, null, this);
+		LoaderManager.getInstance(this).initLoader(0, null, this);
 	}
 
 	public void restartLoader() {
-		getLoaderManager().restartLoader(0, null, this);
+		LoaderManager.getInstance(this).restartLoader(0, null, this);
 	}
 
 	@Override
