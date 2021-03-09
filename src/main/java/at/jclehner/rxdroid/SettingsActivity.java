@@ -179,7 +179,7 @@ public class SettingsActivity extends AppCompatActivity
 				}
 
 				sb.append("\n" +
-						"Copyright (C) 2011-2020 Joseph C. Lehner\n" +
+						"Copyright (C) 2011-2021 Joseph C. Lehner\n" +
 						"<joseph.c.lehner@gmail.com>");
 
 				final String translator = getString(R.string.translator);
@@ -205,9 +205,7 @@ public class SettingsActivity extends AppCompatActivity
 				if(!Util.wasInstalledViaGooglePlay())
 				{
 
-					intent.setData(Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=joseph%2ec%2elehner%40gmail%2ecom" +
-							"&lc=AT&item_name=RxDroid&amount=5%2e00&currency_code=EUR&button_subtype=services" +
-							"&bn=PP%2dBuyNowBF%3abtn_buynowCC_LG%2egif%3aNonHosted"));
+					intent.setData(Uri.parse("https://www.buymeacoffee.com/jclehner"));
 				}
 				else
 					intent.setData(Uri.parse("https://github.com/jclehner/rxdroid/blob/master/README.md"));
@@ -316,23 +314,6 @@ public class SettingsActivity extends AppCompatActivity
 			if(Settings.Keys.LICENSES.equals(key))
 			{
 				showLicensesDialog();
-				return true;
-			}
-			else if(Settings.Keys.VERSION.equals(key))
-			{
-				final Intent intent = new Intent(Intent.ACTION_SENDTO);
-				intent.setData(Uri.fromParts("mailto", "josephclehner+rxdroid-feedback@gmail.com", null));
-				intent.putExtra(Intent.EXTRA_SUBJECT, "RxDroid");
-
-				try
-				{
-					startActivity(intent);
-				}
-				catch(ActivityNotFoundException e)
-				{
-					// Happens if no mail client is installed
-				}
-
 				return true;
 			}
 
