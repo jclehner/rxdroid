@@ -231,18 +231,18 @@ public final class DateTime
 		return date != null ? LocalDate.fromDateFields(date) : null;
 	}
 
+
 	public static String toNativeDate(LocalDate date) {
 		return toNativeDate(date.toDate());
 	}
 
 	public static String toNativeDate(Date date) {
-		return DateFormat.getDateFormat(RxDroid.getContext()).format(date);
+		return DateFormat.getMediumDateFormat(RxDroid.getContext()).format(date);
 	}
 
 	public static String toNativeDateAndTime(Date date)
 	{
-		return DateFormat.getDateFormat(RxDroid.getContext()).format(date) + ", " +
-			DateFormat.getTimeFormat(RxDroid.getContext()).format(date);
+		return toNativeDate(date) + ", " + toNativeTime(date, false);
 	}
 
 	public static String toNativeTime(DumbTime time) {
