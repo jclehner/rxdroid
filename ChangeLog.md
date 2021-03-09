@@ -1,3 +1,6 @@
+### 0.9.34:
+* Use native date formats.
+
 ### 0.9.33.2
 * Allow backup creation if external storage is read-only
 * Fix issue in TimePeriodPreference
