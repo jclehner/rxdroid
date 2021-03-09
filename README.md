@@ -1,7 +1,7 @@
 RxDroid - A medication reminder
 ===============================
 
-**!!! Please note that development on RxDroid is currently limited to fixing bugs and minor improvements !!!**
+**!!! Please note that development on RxDroid is currently limited to fixing bugs !!!**
 
 RxDroid is a simple medication reminder app. Apart from reminding you to take 
 your meds, it will also keep track of your pill count, warning you to get a 
