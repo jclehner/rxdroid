@@ -1341,8 +1341,8 @@ public class DrugListActivity2 extends AppCompatActivity implements
 				Util.tapTargetsAdd(seq,
 						Util.tapTargetConfig(TapTarget.forBounds(
 								new Rect(left, top, left  + 2 * px, top + 2 * px),
-								getString(R.string._help_title_swipe_date),
-								getString(R.string._help_msg_swipe_date))),
+								activity.getString(R.string._help_title_swipe_date),
+								activity.getString(R.string._help_msg_swipe_date))),
 						Util.tapTargetFor(
 								activity.findViewById(R.id.drug_icon),
 								R.string._help_title_edit_drug,
