@@ -1,3 +1,6 @@
+### 0.9.34.2:
+* Fix crash on first boot
+
 ### 0.9.34:
 * Use native date formats.
 
