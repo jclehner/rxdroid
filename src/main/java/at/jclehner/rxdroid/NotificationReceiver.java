@@ -563,7 +563,7 @@ public class NotificationReceiver extends BroadcastReceiver
 					CHANNEL_DEFAULT);
 			builder.setContentIntent(createDrugListIntent(mDate));
 			builder.setTicker(getString(R.string._msg_new_notification));
-			builder.setCategory(NotificationCompat.CATEGORY_ALARM);
+			builder.setCategory(NotificationCompat.CATEGORY_REMINDER);
 			builder.setColor(!BuildConfig.DEBUG ? Theme.getColorAttribute(R.attr.colorPrimary) : Color.GREEN);
 			builder.setWhen(0);
 
