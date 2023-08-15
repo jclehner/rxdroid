@@ -21,9 +21,16 @@
 
 package at.jclehner.rxdroid;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+
+import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
 import androidx.appcompat.app.AlertDialog;
 import android.app.Dialog;
@@ -1249,7 +1256,24 @@ public class DrugListActivity2 extends AppCompatActivity implements
 			super.onLoadFinished(data);
 			setEmptyText(getEmptyText());
 
-			showHelpOverlaysIfApplicable(false);
+			if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.POST_NOTIFICATIONS)
+					== PackageManager.PERMISSION_GRANTED) {
+				showHelpOverlaysIfApplicable(false);
+			}
+			else
+			{
+				requestPermissions(new String[] { Manifest.permission.POST_NOTIFICATIONS}, 0);
+			}
+		}
+
+		@Override
+		public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+				@NonNull int[] grantResults)
+		{
+			if (requestCode == 0)
+			{
+				NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
+			}
 		}
 
 		private void showDoseDialog(DoseView doseView, boolean force)
