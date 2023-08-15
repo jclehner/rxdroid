@@ -1,3 +1,7 @@
+### 0.9.35:
+* Target Android 13
+* Make Notifications respect DND
+
 ### 0.9.34.2:
 * Fix crash on first boot
 
