@@ -194,7 +194,7 @@ public class DrugSupplyMonitor extends TextView implements
 		}
 
 		setBackgroundResource(mHasLowSupply ? R.drawable.highlight
-						: Theme.getResourceAttribute(R.attr.selectableItemBackground));
+						: Theme.getResourceAttribute(android.R.attr.selectableItemBackground));
 
 		setTypeface(null, typeface);
 		setTextScaleX(textScaleX);

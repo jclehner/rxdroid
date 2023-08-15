@@ -1186,7 +1186,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 
 				pm.show();
 
-				doseView.setBackgroundColor(Theme.getColorAttribute(R.attr.colorControlHighlight));
+				doseView.setBackgroundColor(Theme.getColorAttribute(android.R.attr.colorControlHighlight));
 
 				pm.setOnDismissListener(new PopupMenu.OnDismissListener()
 				{
@@ -1195,7 +1195,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 					{
 						//doseView.setConstantBackgroundResource(0);
 						//doseView.setForceSelected(false);
-						doseView.setBackgroundResource(Theme.getResourceAttribute(R.attr.selectableItemBackground));
+						doseView.setBackgroundResource(Theme.getResourceAttribute(android.R.attr.selectableItemBackground));
 					}
 				});
 			}

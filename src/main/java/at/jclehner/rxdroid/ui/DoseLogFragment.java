@@ -50,6 +50,7 @@ import at.jclehner.rxdroid.DoseView;
 import at.jclehner.rxdroid.DrugListActivity2;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.R;
+import at.jclehner.rxdroid.RxDroid;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.Settings.Keys;

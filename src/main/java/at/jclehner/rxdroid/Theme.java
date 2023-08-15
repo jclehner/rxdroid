@@ -24,10 +24,14 @@ package at.jclehner.rxdroid;
 import java.util.NoSuchElementException;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.Log;
 import android.util.SparseIntArray;
+import android.util.TypedValue;
+
+import androidx.core.content.ContextCompat;
 import at.jclehner.rxdroid.Settings.Keys;
 import at.jclehner.rxdroid.util.Timer;
 
@@ -101,15 +105,18 @@ public final class Theme
 			if(sAttrCache.indexOfKey(attr) < 0)
 			{
 				final Context c = RxDroid.getContext();
-				final int[] attrs = { attr };
-				final TypedArray a = c.obtainStyledAttributes(get(), attrs);
-				final int color = a.getColor(0, Color.TRANSPARENT);
+				final Resources.Theme t = RxDroid.getContext().getTheme();
+				final TypedValue v = new TypedValue();
+				final int color;
 
-				a.recycle();
+				if(t.resolveAttribute(attr, v, true))
+				{
+					color = ContextCompat.getColor(c, v.resourceId);
+					sAttrCache.put(attr, color);
+					return color;
+				}
 
-				sAttrCache.put(attr, color);
-
-				return color;
+				return Color.TRANSPARENT;
 			}
 
 			return sAttrCache.get(attr);

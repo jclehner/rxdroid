@@ -238,7 +238,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		nb.setContentTitle(getString(R.string._title_database));
 		nb.setContentText(Util.getDbErrorMessage(mContext, e));
 		nb.setContentIntent(createDrugListIntent(null));
-		nb.setColor(Theme.getColorAttribute(R.attr.colorPrimary));
+		nb.setColor(Theme.getColorAttribute(android.R.attr.colorPrimary));
 		nb.setOngoing(true);
 
 		getNotificationManager().notify(ID_ERROR, nb.build());
@@ -562,7 +562,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			builder.setContentIntent(createDrugListIntent(mDate));
 			builder.setTicker(getString(R.string._msg_new_notification));
 			builder.setCategory(NotificationCompat.CATEGORY_REMINDER);
-			builder.setColor(!BuildConfig.DEBUG ? Theme.getColorAttribute(R.attr.colorPrimary) : Color.GREEN);
+			builder.setColor(!BuildConfig.DEBUG ? Theme.getColorAttribute(android.R.attr.colorPrimary) : Color.GREEN);
 			builder.setWhen(0);
 
 			builder.setStyle(createSummaryStyle(builder));
