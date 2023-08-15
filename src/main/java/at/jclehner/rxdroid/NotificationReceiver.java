@@ -374,12 +374,10 @@ public class NotificationReceiver extends BroadcastReceiver
 	{
 		final int mode = AlarmManager.RTC_WAKEUP;
 
-		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
+		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
 			mAlarmMgr.set(mode, triggerAtMillis, operation);
-		else if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-			mAlarmMgr.setExact(mode, triggerAtMillis, operation);
 		else
-			mAlarmMgr.setExactAndAllowWhileIdle(mode, triggerAtMillis, operation);
+			mAlarmMgr.setAndAllowWhileIdle(mode, triggerAtMillis, operation);
 	}
 
 	private void cancelAllAlarms() {
