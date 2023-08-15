@@ -394,7 +394,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		if(extras != null)
 			intent.putExtras(extras);
 
-		return PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		return PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 	}
 
 	private PendingIntent createDrugListIntent(Date date)
@@ -404,7 +404,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		//intent.putExtra(DrugListActivity2.EXTRA_DATE, date);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 	}
 
 	public void updateNotification(Date date, int doseTime, boolean isActiveDoseTime, int mode)
@@ -603,7 +603,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				final Intent intent = new Intent(mContext, NotificationReceiver.class);
 				intent.setAction(ACTION_MARK_ALL_AS_TAKEN);
 
-				PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
 				if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
 				{
@@ -639,7 +639,7 @@ public class NotificationReceiver extends BroadcastReceiver
 				intent.putExtra(EXTRA_REFILL_SNOOZE_DRUGS, drugIds.toString());
 				intent.putExtra(EXTRA_DATE, mDate);
 
-				PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent operation = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
 				if(Version.SDK_IS_JELLYBEAN_OR_NEWER)
 				{
