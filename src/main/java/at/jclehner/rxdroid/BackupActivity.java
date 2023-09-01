@@ -22,9 +22,15 @@
 package at.jclehner.rxdroid;
 
 import android.Manifest;
+
+import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+import android.app.Activity;
+import android.content.UriPermission;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -33,11 +39,15 @@ import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import androidx.core.app.NavUtils;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.provider.DocumentsContract;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -68,16 +78,18 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 		ActivityCompat.OnRequestPermissionsResultCallback
 {
 	public static final String EXTRA_NO_BACKUP_CREATION = "rxdroid:no_backup_creation";
+	private static final int REQUEST_BACKUP_DIRECTORY = 0;
+	private static final String TAG = BackupActivity.class.getSimpleName();
 
 	public static class ImportDialog extends DialogLike
 	{
 		private boolean mCanRestore = false;
 		private Backup.BackupFile mFile;
 
-		public static ImportDialog newInstance(String file)
+		public static ImportDialog newInstance(Uri uri)
 		{
 			final ImportDialog instance = new ImportDialog();
-			instance.getArguments().putString("file", file);
+			instance.getArguments().putString("uri", uri.toString());
 			return instance;
 		}
 
@@ -86,7 +98,7 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 		{
 			super.onResume();
 
-			mFile = new Backup.BackupFile(getBackupFilePath());
+			mFile = new Backup.BackupFile(getBackupFileUri());
 			mCanRestore = mFile.isValid();
 
 			((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string._title_restore);
@@ -239,22 +251,14 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 			return false;
 		}
 
-		private String getBackupFilePath()
+		private Uri getBackupFileUri()
 		{
-			final String arg = getArguments().getString("file");
-			if(arg != null)
-				return arg;
+			final String uriStr = getArguments().getString("uri");
+			final Uri uri = (uriStr != null) ? Uri.parse(uriStr) : getActivity().getIntent().getData();
+			if(uri != null)
+				return uri;
 
-			final Uri data = getActivity().getIntent().getData();
-			if(data != null)
-			{
-				if(!ContentResolver.SCHEME_CONTENT.equals(data.getScheme()))
-					return data.getSchemeSpecificPart();
-
-				return createBackupFileFromContentStream(data);
-			}
-
-			throw new IllegalStateException("No 'file' argument given and no data in hosting Activity");
+			throw new IllegalStateException("No 'uri' argument given and no data in hosting Activity");
 		}
 
 		private String createBackupFileFromContentStream(Uri uri)
@@ -287,31 +291,19 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 		setContentView(R.layout.simple_activity);
 		setTitle(R.string._title_backup_restore);
 
-		mStorageListener = new Backup.StorageStateListener(this) {
-			@Override
-			public void onStateChanged(String storageState, Intent intent)
-			{
-				setContentFragment(false);
-			}
-		};
-
 		if(savedInstanceState == null)
 			setContentFragment(true);
-		else
-			mStorageListener.onStateChanged(Environment.getExternalStorageState(), null);
 	}
 
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		mStorageListener.register(this);
 	}
 
 	@Override
 	protected void onPause()
 	{
-		mStorageListener.unregister(this);
 		super.onPause();
 	}
 
@@ -341,15 +333,37 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 	{
 		if(grantResults.length >= 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
 		{
-			mStorageListener.update(this);
 			setContentFragment(false);
 		}
+
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 	}
 
 	private boolean shouldShowPermissionDialog()
 	{
 		return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 				!= PackageManager.PERMISSION_GRANTED;
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+	{
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
+			return;
+
+		if(requestCode == REQUEST_BACKUP_DIRECTORY && resultCode == Activity.RESULT_OK)
+		{
+			final Uri uri = (data != null) ? data.getData() : null;
+			if(uri != null)
+			{
+				Settings.putString(Settings.Keys.BACKUP_DIRECTORY, uri.toString());
+				final int flags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION;
+				getContentResolver().takePersistableUriPermission(uri, flags);
+				setContentFragment(false);
+			}
+		}
 	}
 
 	private void setContentFragment(boolean calledFromOnCreate)
@@ -361,42 +375,24 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 
 		}
 
+		final DocumentFile backupDir = Backup.getDirectory();
+		if (backupDir == null)
+		{
+			Log.d(TAG, "backupDir=" + backupDir);
+
+			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+			{
+				Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+				//intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Backup.getDirectory().toURI());
+				startActivityForResult(intent, REQUEST_BACKUP_DIRECTORY);
+				return;
+			}
+		}
+
 		final Fragment content;
 
 		if(!Intent.ACTION_VIEW.equals(getIntent().getAction()))
-		{
-			//getActionBar().setDisplayShowHomeEnabled(true);
-			//getActionBar().setDisplayHomeAsUpEnabled(true);
-
-			if(mStorageListener.isReadable())
-			{
-				content = new BackupFragment();
-
-				if(!Backup.DIRECTORY.exists())
-					Backup.DIRECTORY.mkdirs();
-				else if(!Backup.DIRECTORY.isDirectory())
-				{
-					// Hackish, but simple - a full blown AlertDialog would be
-					// overkill...
-
-					final File newFile = new File(Backup.DIRECTORY + "___");
-
-					Backup.DIRECTORY.renameTo(newFile);
-					Backup.DIRECTORY.mkdirs();
-
-					Toast.makeText(this, Backup.DIRECTORY + " -> " + newFile, Toast.LENGTH_LONG).show();
-				}
-			}
-			else
-			{
-				final DialogLike dialog = new DialogLike();
-				dialog.setTitle(getString(R.string._title_error));
-				dialog.setMessage(getString(R.string._msg_external_storage_not_readable));
-				dialog.setPositiveButtonText(getString(android.R.string.ok));
-
-				content = dialog;
-			}
-		}
+			content = new BackupFragment();
 		else
 			content = new ImportDialog();
 
@@ -420,6 +416,4 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 		ft.commit();
 		invalidateOptionsMenu();
 	}
-
-	private Backup.StorageStateListener mStorageListener;
 }

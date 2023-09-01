@@ -112,6 +112,10 @@ public final class Settings
 		public static final String LAST_NOT_STARTED_WARNING_TIMESTAMP = "last_not_started_timestamp";
 
 		public static final String DEBUG_FORCE_SPLASH_WARNING = "debug_force_splash_warning";
+
+		public static final String BACKUP_DIRECTORY = "backup_directory";
+
+
 	}
 
 	public static class Enums

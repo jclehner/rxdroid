@@ -113,7 +113,7 @@ public class SettingsActivity extends AppCompatActivity
 
 		private static final String[] REGISTER_CLICK_LISTENER = {
 			Settings.Keys.LICENSES,
-			Settings.Keys.VERSION
+			Settings.Keys.VERSION,
 		};
 
 		private static final String[] REGISTER_CHANGE_LISTENER = {
@@ -778,28 +778,6 @@ public class SettingsActivity extends AppCompatActivity
 					public boolean onPreferenceClick(Preference preference)
 					{
 						Settings.putDate(Settings.Keys.NEXT_REFILL_REMINDER_DATE, null);
-						return true;
-					}
-				});
-			}
-
-			p = findPreference("key_debug_create_backup");
-			if(p != null)
-			{
-				p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-				{
-					@Override
-					public boolean onPreferenceClick(Preference preference)
-					{
-						try
-						{
-							Backup.createBackup(null, "foobar");
-						}
-						catch(ZipException e)
-						{
-							Log.w(TAG, e);
-							Toast.makeText(getActivity(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-						}
 						return true;
 					}
 				});

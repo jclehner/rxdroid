@@ -57,9 +57,9 @@ public class DatabaseUpgrader implements Closeable
 	{
 		try
 		{
-			final File f = Backup.makeBackupFilename("pre_v" + oldVersion + "to" + newVersion);
-			Backup.createBackup(f, null);
-			Log.i(TAG, "Created backup: " + f);
+			final String s = Backup.makeBackupFilename("pre_v" + oldVersion + "to" + newVersion);
+			Backup.createBackup(s);
+			Log.i(TAG, "Created backup: " + s);
 		}
 		catch(ZipException e)
 		{

@@ -24,6 +24,8 @@ package at.jclehner.rxdroid.util;
 import android.app.Activity;
 import android.content.ContextWrapper;
 import android.net.Uri;
+
+import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
@@ -523,7 +525,7 @@ public final class Util
 		return pm.getInstallerPackageName(packageName);
 	}
 
-	public static void closeQuietly(Closeable closeable)
+	public static void closeQuietly(@Nullable Closeable closeable)
 	{
 		if(closeable == null)
 			return;
@@ -540,14 +542,19 @@ public final class Util
 
 	public static void copy(InputStream in, OutputStream out) throws IOException
 	{
-		byte[] buf = new byte[10*1024];
+		byte[] buf = new byte[8192];
 		int len;
 
 		while((len = in.read(buf)) > 0)
 			out.write(buf, 0, len);
+	}
 
-		closeQuietly(in);
-		closeQuietly(out);
+	public static void copyFile(InputStream in, File out) throws IOException
+	{
+		try(FileOutputStream fos = new FileOutputStream(out))
+		{
+			Util.copy(in, fos);
+		}
 	}
 
 	public static String capitalize(String str)

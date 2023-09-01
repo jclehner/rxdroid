@@ -27,31 +27,85 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+
+import android.renderscript.ScriptGroup;
 import android.util.Log;
 
-import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
+import org.w3c.dom.Document;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
+import androidx.documentfile.provider.DocumentFile;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
+import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
 public class Backup
 {
 	private static final String TAG = Backup.class.getSimpleName();
 
-	public static final File DIRECTORY =
+	private static final File DIRECTORY =
 			new File(Environment.getExternalStorageDirectory(), "RxDroid");
+
+	public static @Nullable DocumentFile getDirectory()
+	{
+		final String str = Settings.getString(Settings.Keys.BACKUP_DIRECTORY, null);
+		if(str == null)
+			return null;
+
+		try
+		{
+			final Context c = RxDroid.getContext();
+			final Uri uri = Uri.parse(str);
+
+			final DocumentFile df = DocumentFile.fromTreeUri(c, uri);
+			if(!df.isDirectory())
+			{
+				Log.w(TAG, "Not a directory: " + uri);
+				return null;
+			}
+			else if(!df.canWrite() || !df.canRead())
+			{
+				Log.w(TAG, "No R/W access: " + uri);
+				return null;
+			}
+
+			return df;
+		}
+		catch(Exception e)
+		{
+			Log.w(TAG, e);
+			return null;
+		}
+	}
+
+
 
 	public static abstract class StorageStateListener extends BroadcastReceiver
 	{
@@ -129,37 +183,56 @@ public class Backup
 
 	public static class BackupFile
 	{
-		private ZipFile mZip = null;
-		private String mPath;
-
+		private Uri mUri;
 		private String[] mInfo;
 		private Date mTimestamp;
-		private int mVersion;
+		private int mVersion = 0;
 		private int mDbVersion;
-		private boolean mIsEncrypted;
+		private final boolean mIsEncrypted = false;
 
-		public BackupFile(String path)
+		private String mLocation;
+
+		public BackupFile(Uri uri)
 		{
-			mPath = path;
+			mUri = uri;
+
+			final InputStream is = openInputStream();
+			if(is == null)
+				return;
+
+			final String comment;
+
+			// copy the InputStream to a temporary file, because ZipInputStream doesn't
+			// support reading the ZIP file comment
+			final File f = new File(RxDroid.getContext().getCacheDir(), "temp.rxdbak");
 
 			try
 			{
-				mZip = new ZipFile(path);
-				mIsEncrypted = mZip.isEncrypted();
-
-				if(mZip.getComment() == null)
-					return;
-
-				mInfo = mZip.getComment().split(":");
+				Util.copyFile(is, f);
+				try(final ZipFile zf = new ZipFile(f))
+				{
+					comment = zf.getComment();
+				}
 			}
-			catch(ZipException e)
+			catch(IOException e)
 			{
 				Log.w(TAG, e);
 				return;
 			}
+			finally
+			{
+				Util.closeQuietly(is);
+			}
+
+			if(comment == null)
+				return;
+
+			mInfo = comment.split(":");
 
 			if(mInfo.length < 2 || !mInfo[0].startsWith("rxdbak") || mInfo[0].equals("rxdbak"))
 				return;
+
+			Log.d(TAG, "mInfo=" + Arrays.toString(mInfo));
 
 			mVersion = Integer.parseInt(mInfo[0].substring("rxdbak".length()));
 
@@ -169,10 +242,13 @@ public class Backup
 				mDbVersion = Integer.parseInt(mInfo[2].substring("DBv".length()));
 			else
 				mDbVersion = -1;
+
+			final DocumentFile df = DocumentFile.fromSingleUri(RxDroid.getContext(), mUri);
+			mLocation = (df != null) ? df.getName() : "[unknown]";
 		}
 
 		public boolean isValid() {
-			return mZip != null && mVersion == 1;
+			return mVersion != 0;
 		}
 
 		public boolean isEncrypted() {
@@ -187,27 +263,12 @@ public class Backup
 			return mDbVersion;
 		}
 
-		public String getPath() {
-			return mPath;
-		}
-
 		public Date getTimestamp() {
 			return mTimestamp;
 		}
 
-		public String getLocation()
-		{
-			final String file = new File(mPath).getAbsolutePath();
-
-			final String extDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-			if(file.startsWith(extDir))
-				return file.substring(extDir.length() + 1);
-
-			final String filesDir = RxDroid.getContext().getFilesDir().getAbsolutePath();
-			if(file.startsWith(filesDir))
-				return file.replace(filesDir, "[files]");
-
-			return file;
+		public String getLocation() {
+			return mLocation;
 		}
 
 		public boolean restore(String password)
@@ -217,20 +278,45 @@ public class Backup
 
 			synchronized(Database.LOCK_DATA)
 			{
+				final ZipInputStream zis = new ZipInputStream(openInputStream());
+				if(zis == null)
+					throw new IllegalStateException("Failed to open input stream");
+
+				FileOutputStream fos = null;
+
 				try
 				{
-					if(password != null)
-						mZip.setPassword(password);
+					ZipEntry ze;
+					while((ze = zis.getNextEntry()) != null)
+					{
+						if (!Arrays.asList(FILES).contains(ze.getName()))
+						{
+							Log.d(TAG, "Skipping " + ze.getName());
+							continue;
+						}
 
-					mZip.extractAll(RxDroid.getPackageInfo().applicationInfo.dataDir);
+						final File f = new File(RxDroid.getPackageInfo().applicationInfo.dataDir, ze.getName());
+						final byte[] bytes = new byte[1024];
+						int n;
+
+						fos = new FileOutputStream(f);
+
+						while ((n = zis.read(bytes)) > 0) {
+							fos.write(bytes, 0, n);
+						}
+
+						fos.close();
+					}
 				}
-				catch(ZipException e)
+				catch(IOException e)
 				{
-					final String msg = e.getMessage();
-					if(password != null && msg.toLowerCase(Locale.US).contains("password"))
-						return false;
-
+					Log.w(TAG, e);
 					throw new WrappedCheckedException(e);
+				}
+				finally
+				{
+					Util.closeQuietly(fos);
+					Util.closeQuietly(zis);
 				}
 
 				Settings.init(true);
@@ -238,6 +324,18 @@ public class Backup
 
 			NotificationReceiver.rescheduleAlarmsAndUpdateNotification(false);
 			return true;
+		}
+
+		private @Nullable InputStream openInputStream()
+		{
+			try
+			{
+				return RxDroid.getContext().getContentResolver().openInputStream(mUri);
+			}
+			catch(FileNotFoundException e)
+			{
+				return null;
+			}
 		}
 	}
 
@@ -261,52 +359,61 @@ public class Backup
 		return state;
 	}
 
-	public static File makeBackupFilename(String template)
+	public static String makeBackupFilename(String template)
 	{
-		return new File(Environment.getExternalStorageDirectory(),
-				"RxDroid/" + template + ".rxdbak");
+		return template + ".rxdbak";
 	}
 
-	public static File createBackup(File outFile, String password) throws ZipException
+	@NonNull public static void createBackup(@Nullable String filename) throws ZipException
 	{
-		if(outFile == null)
+		if(filename == null)
 		{
 			final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-			outFile = makeBackupFilename(sdf.format(new Date()));
+			filename = makeBackupFilename(sdf.format(new Date()));
 		}
 
 		synchronized(Database.LOCK_DATA)
 		{
-			final ZipFile zip = new ZipFile(outFile);
-			final File dataDir = new File(RxDroid.getPackageInfo().applicationInfo.dataDir);
-
-			for(int i = 0; i != FILES.length; ++i)
+			try
 			{
-				final File file = new File(dataDir, FILES[i]);
-				if(!file.exists())
-					continue;
+				DocumentFile dir = Backup.getDirectory().createFile("application/octet-stream",
+						filename);
+				final OutputStream os = RxDroid.getContext().getContentResolver().openOutputStream(
+						dir.getUri());
+				final ZipOutputStream zos = new ZipOutputStream(os);
 
-				final ZipParameters zp = new ZipParameters();
-				zp.setRootFolderInZip(new File(FILES[i]).getParent());
-				zp.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
-				zp.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+				final File dataDir = new File(RxDroid.getPackageInfo().applicationInfo.dataDir);
 
-				if(password != null)
+				for(int i = 0; i != FILES.length; ++i)
 				{
-					zp.setPassword(password);
-					zp.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
-					zp.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
-					zp.setEncryptFiles(true);
-					//zp.setCompressionMethod(Zip4jConstants.COMP_AES_ENC);
+					final File file = new File(dataDir, FILES[i]);
+					if(!file.exists())
+						continue;
+
+					final ZipEntry ze = new ZipEntry(FILES[i]);
+					FileInputStream fis = null;
+
+					try
+					{
+						fis = new FileInputStream(file);
+						zos.putNextEntry(ze);
+						Util.copy(fis, zos);
+					}
+					finally
+					{
+						Util.closeQuietly(fis);
+					}
 				}
 
-				zip.addFile(file, zp);
+				zos.setComment(
+						"rxdbak1:" + System.currentTimeMillis() + ":DBv" + DatabaseHelper.DB_VERSION);
+				zos.close();
 			}
-
-			zip.setComment("rxdbak1:" + System.currentTimeMillis() + ":DBv" + DatabaseHelper.DB_VERSION);
+			catch(IOException e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
-
-		return outFile;
 	}
 
 	private static final String[] FILES = {

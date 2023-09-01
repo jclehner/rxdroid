@@ -53,24 +53,26 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import at.jclehner.androidutils.LoaderListFragment;
 import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 
-public class BackupFragment extends LoaderListFragment<File>
+public class BackupFragment extends LoaderListFragment<DocumentFile>
 {
-	static class BackupFileHolder extends LLFLoader.ItemHolder<File> implements Comparable<BackupFileHolder>
+	static class BackupFileHolder extends LLFLoader.ItemHolder<DocumentFile> implements Comparable<BackupFileHolder>
 	{
-		BackupFileHolder(File file)
+		BackupFileHolder(DocumentFile file)
 		{
 			super(file);
 
-			final Backup.BackupFile bf = new Backup.BackupFile(file.getAbsolutePath());
+			uri = file.getUri();
+			location = file.getName();
 
-			uri = Uri.fromFile(file);
-			location = bf.getLocation();
+			final Backup.BackupFile bf = new Backup.BackupFile(uri);
+
 			isValid = bf.isValid();
 
 			if(isValid)
@@ -94,7 +96,7 @@ public class BackupFragment extends LoaderListFragment<File>
 		final boolean isValid;
 	}
 
-	static class Loader extends LLFLoader<File> implements FilenameFilter
+	static class Loader extends LLFLoader<DocumentFile>
 	{
 		Loader(Context context)
 		{
@@ -102,43 +104,27 @@ public class BackupFragment extends LoaderListFragment<File>
 		}
 
 		@Override
-		public List<? extends ItemHolder<File>> doLoadInBackground()
+		public List<? extends ItemHolder<DocumentFile>> doLoadInBackground()
 		{
-			final List<File> dirs = new ArrayList<>();
-			dirs.add(mContext.getFilesDir());
-			dirs.add(new File(Environment.getExternalStorageDirectory(), "RxDroid"));
+			final List<BackupFileHolder> ret = new ArrayList<>();
+			final DocumentFile dir = Backup.getDirectory();
 
-			final List<BackupFileHolder> data = new ArrayList<BackupFileHolder>();
-
-			for(File dir : dirs)
+			if(dir != null)
 			{
-				if(!dir.exists() || !dir.isDirectory())
-					continue;
-
-				final File[] files = dir.listFiles(this);
-				if(files != null)
+				for(DocumentFile df : dir.listFiles())
 				{
-					for(File file : dir.listFiles(this))
-					{
-						if(file.isFile())
-							data.add(new BackupFileHolder(file));
-					}
+					if(df.isFile() && df.getName().endsWith(".rxdbak"))
+						ret.add(new BackupFileHolder(df));
 				}
+
+				Collections.sort(ret);
 			}
 
-			Collections.sort(data);
-
-			return data;
-		}
-
-		@Override
-		public boolean accept(File dir, String filename)
-		{
-			return filename.endsWith(".rxdbak");
+			return ret;
 		}
 	}
 
-	class Adapter extends LLFAdapter<File>
+	class Adapter extends LLFAdapter<DocumentFile>
 	{
 		Adapter()
 		{
@@ -184,29 +170,15 @@ public class BackupFragment extends LoaderListFragment<File>
 						@Override
 						public boolean onMenuItemClick(MenuItem menuItem)
 						{
-							final File outFile;
-							if(Backup.StorageStateListener.isWritable(Backup.getStorageState()))
-								outFile = null;
-							else
-							{
-								outFile = getActivity().getFileStreamPath("backup.rxdbak");
-								outFile.delete();
-								Toast.makeText(getActivity(), R.string._msg_external_storage_not_writeable,
-										Toast.LENGTH_LONG).show();
-							}
-
 							try
 							{
-								Backup.createBackup(outFile, null);
+								Backup.createBackup(null);
 							} catch(ZipException e)
 							{
 								showExceptionDialog(e);
 							}
 
-							if(outFile == null)
-								getLoaderManager().restartLoader(0, null, BackupFragment.this);
-							else
-								shareBackupFile(outFile);
+							getLoaderManager().restartLoader(0, null, BackupFragment.this);
 
 							return true;
 						}
@@ -240,13 +212,13 @@ public class BackupFragment extends LoaderListFragment<File>
 	}
 
 	@Override
-	protected LLFLoader<File> onCreateLoader()
+	protected LLFLoader<DocumentFile> onCreateLoader()
 	{
 		return new Loader(getActivity());
 	}
 
 	@Override
-	protected LLFAdapter<File> onCreateAdapter()
+	protected LLFAdapter<DocumentFile> onCreateAdapter()
 	{
 		return new Adapter();
 	}
@@ -273,11 +245,11 @@ public class BackupFragment extends LoaderListFragment<File>
 		ab.show();
 	}
 
-	private void shareBackupFile(File file)
+	private void shareBackupFile(DocumentFile df)
 	{
 		final Intent target = new Intent(Intent.ACTION_SEND);
-		target.putExtra(Intent.EXTRA_STREAM, Util.getExternalFileUri(file));
 		target.setType("application/octet-stream");
+		target.setData(df.getUri());
 
 		final Intent intent = Intent.createChooser(target, getString(R.string._title_share));
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -308,7 +280,7 @@ public class BackupFragment extends LoaderListFragment<File>
 						{
 							final FragmentManager fm = getFragmentManager();
 							final FragmentTransaction ft = fm.beginTransaction();
-							ft.replace(android.R.id.content, BackupActivity.ImportDialog.newInstance(file.item.toString()));
+							ft.replace(android.R.id.content, BackupActivity.ImportDialog.newInstance(file.item.getUri()));
 							ft.addToBackStack(null);
 
 							ft.commit();
@@ -339,6 +311,7 @@ public class BackupFragment extends LoaderListFragment<File>
 					}
 					else if(item.getItemId() == R.id.menuitem_share)
 					{
+						// FIXME
 						shareBackupFile(file.item);
 					}
 
