@@ -1,3 +1,7 @@
+### 0.9.36:
+* Fix backup mechanism
+* App now requires Android >= Jellybean
+
 ### 0.9.35:
 * Target Android 13
 * Make Notifications respect DND
