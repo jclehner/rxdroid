@@ -28,13 +28,9 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
 import com.j256.ormlite.table.TableUtils;
 
-import net.lingala.zip4j.exception.ZipException;
-
 import java.io.Closeable;
-import java.io.File;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.zip.ZipException;
 
 import at.jclehner.rxdroid.Backup;
 
@@ -55,16 +51,9 @@ public class DatabaseUpgrader implements Closeable
 
 	public void onUpgrade(int oldVersion, int newVersion) throws SQLException
 	{
-		try
-		{
-			final String s = Backup.makeBackupFilename("pre_v" + oldVersion + "to" + newVersion);
-			Backup.createBackup(s);
-			Log.i(TAG, "Created backup: " + s);
-		}
-		catch(ZipException e)
-		{
-			Log.w(TAG, e);
-		}
+		final String s = Backup.makeBackupFilename("pre_v" + oldVersion + "to" + newVersion);
+		Backup.createBackup(s);
+		Log.i(TAG, "Created backup: " + s);
 
 		for(int version = oldVersion + 1; version <= newVersion; ++version)
 		{

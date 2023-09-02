@@ -35,12 +35,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import android.renderscript.ScriptGroup;
 import android.util.Log;
-
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import org.w3c.dom.Document;
 
@@ -56,6 +51,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -364,7 +360,7 @@ public class Backup
 		return template + ".rxdbak";
 	}
 
-	@NonNull public static void createBackup(@Nullable String filename) throws ZipException
+	@NonNull public static void createBackup(@Nullable String filename)
 	{
 		if(filename == null)
 		{

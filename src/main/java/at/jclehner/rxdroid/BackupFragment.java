@@ -44,14 +44,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.lingala.zip4j.exception.ZipException;
-
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipException;
 
 import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.FragmentManager;
@@ -170,13 +167,7 @@ public class BackupFragment extends LoaderListFragment<DocumentFile>
 						@Override
 						public boolean onMenuItemClick(MenuItem menuItem)
 						{
-							try
-							{
-								Backup.createBackup(null);
-							} catch(ZipException e)
-							{
-								showExceptionDialog(e);
-							}
+							Backup.createBackup(null);
 
 							getLoaderManager().restartLoader(0, null, BackupFragment.this);
 
