@@ -26,8 +26,6 @@ import android.util.Log;
 import android.webkit.WebView;
 import android.widget.Toast;
 
-import net.lingala.zip4j.exception.ZipException;
-
 import org.joda.time.LocalDate;
 
 import java.io.File;
