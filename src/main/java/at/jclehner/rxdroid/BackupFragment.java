@@ -21,7 +21,6 @@
 
 package at.jclehner.rxdroid;
 
-import android.os.Environment;
 import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.zip.ZipException;
 
 import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.FragmentManager;
@@ -240,7 +238,7 @@ public class BackupFragment extends LoaderListFragment<DocumentFile>
 	{
 		final Intent target = new Intent(Intent.ACTION_SEND);
 		target.setType("application/octet-stream");
-		target.setData(df.getUri());
+		target.putExtra(Intent.EXTRA_STREAM, df.getUri());
 
 		final Intent intent = Intent.createChooser(target, getString(R.string._title_share));
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
