@@ -499,5 +499,6 @@
 	<string name="_msg_constraints_date_from">Select date from %1$s.</string>
 	<!-- %2$s is EXCLUSIVE, so in "date before 1970-01-03", the last valid date would be 1970-01-02 -->
 	<string name="_msg_constraints_date_before">Select date before %2$s.</string>
+    <string name="_title_change_dir">Change directory</string>
 
 </resources>

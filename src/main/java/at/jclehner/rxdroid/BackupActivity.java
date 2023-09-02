@@ -23,7 +23,9 @@ package at.jclehner.rxdroid;
 
 import android.Manifest;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.MenuItemCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -52,6 +54,8 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -261,26 +265,6 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 			throw new IllegalStateException("No 'uri' argument given and no data in hosting Activity");
 		}
 
-		private String createBackupFileFromContentStream(Uri uri)
-		{
-			try
-			{
-				final File tempFile = new File(getActivity().getCacheDir(), "temp.rxdbak");
-				final InputStream in = getActivity().getContentResolver().openInputStream(uri);
-				final OutputStream out = new FileOutputStream(tempFile);
-				Util.copy(in, out);
-
-				return tempFile.getAbsolutePath();
-			}
-			catch(FileNotFoundException e)
-			{
-				throw new WrappedCheckedException(e);
-			}
-			catch(IOException e)
-			{
-				throw new WrappedCheckedException(e);
-			}
-		}
 	}
 
 	@Override
@@ -293,6 +277,26 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 
 		if(savedInstanceState == null)
 			setContentFragment(true);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		final MenuItem item = menu.add(getString(R.string._title_change_dir))
+				.setIcon(R.drawable.ic_folder_white)
+				.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+				{
+					@Override
+					public boolean onMenuItemClick(MenuItem menuItem)
+					{
+						showDirectoryChooser();
+						return true;
+					}
+				});
+
+		MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
@@ -376,18 +380,8 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 		}
 
 		final DocumentFile backupDir = Backup.getDirectory();
-		if (backupDir == null)
-		{
-			Log.d(TAG, "backupDir=" + backupDir);
-
-			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-			{
-				Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-				//intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Backup.getDirectory().toURI());
-				startActivityForResult(intent, REQUEST_BACKUP_DIRECTORY);
-				return;
-			}
-		}
+		if(backupDir == null)
+			showDirectoryChooser();
 
 		final Fragment content;
 
@@ -415,5 +409,19 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 
 		ft.commit();
 		invalidateOptionsMenu();
+	}
+
+	private void showDirectoryChooser()
+	{
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+		{
+			Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+			final DocumentFile backupDir = Backup.getDirectory();
+			if (backupDir != null)
+				intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, backupDir.getUri());
+
+			startActivityForResult(intent, REQUEST_BACKUP_DIRECTORY);
+			return;
+		}
 	}
 }
