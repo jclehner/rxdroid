@@ -267,7 +267,7 @@ public class Backup
 			return mLocation;
 		}
 
-		public boolean restore(String password)
+		public boolean restore()
 		{
 			if(!isValid())
 				throw new IllegalStateException("Invalid backup file");

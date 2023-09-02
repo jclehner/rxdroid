@@ -475,4 +475,5 @@
     <string name="dialog_picker_title">Zahl wählen</string>
     <string name="_title_auto_dose_events">Automatische Einnahmen</string>
     <string name="_title_change_dir">Verzeichnis wählen</string>
+	<string name="_msg_select_backup_directory">Bitte Backup-Verzeichnis wählen.</string>
 </resources>

@@ -128,100 +128,9 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 		public void onButtonClick(DialogLike dialogLike, int which)
 		{
 			if(which == BUTTON_POSITIVE && mCanRestore)
-			{
-				if(mFile.isEncrypted())
-					showPasswordDialog();
-				else
-					restoreBackup(null);
-			}
+				restoreBackup();
 			else
 				finishOrPopBack();
-		}
-
-		private void showPasswordDialog()
-		{
-			final EditText edit = new EditText(getActivity());
-			edit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-			edit.setHint(R.string._title_password);
-
-			final AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-			ab.setView(edit);
-			// null listener since we're using a View.OnClickListener on the Button itself
-			ab.setPositiveButton(android.R.string.ok, null);
-			ab.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
-			{
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					finishOrPopBack();
-				}
-			});
-
-			final AlertDialog dialog = ab.create();
-			dialog.setOnShowListener(new DialogInterface.OnShowListener()
-			{
-				@Override
-				public void onShow(DialogInterface dialogInterface)
-				{
-					final Button b = dialog.getButton(Dialog.BUTTON_POSITIVE);
-					if(b != null)
-					{
-						b.setEnabled(false);
-						b.setOnClickListener(new View.OnClickListener()
-						{
-							@Override
-							public void onClick(View v)
-							{
-								if(!restoreBackup(edit.getText().toString()))
-									edit.setError(getString(R.string._title_error));
-								else
-									dialog.dismiss();
-							}
-						});
-					}
-				}
-			});
-
-			edit.addTextChangedListener(new TextWatcher()
-			{
-				@Override
-				public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-				@Override
-				public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-				@Override
-				public void afterTextChanged(Editable s)
-				{
-					final Button b = dialog.getButton(Dialog.BUTTON_POSITIVE);
-					if(b == null)
-						return;
-
-					if(s == null || s.length() == 0)
-						b.setEnabled(false);
-					else
-						b.setEnabled(true);
-
-					edit.setError(null);
-				}
-			});
-
-			edit.setOnFocusChangeListener(new View.OnFocusChangeListener()
-			{
-				@Override
-				public void onFocusChange(View v, boolean hasFocus)
-				{
-					if(hasFocus)
-					{
-						dialog.getWindow().setSoftInputMode(
-								WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
-								| WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
-						);
-					}
-				}
-			});
-
-			dialog.show();
 		}
 
 		private void finishOrPopBack()
@@ -232,11 +141,11 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 				getFragmentManager().popBackStack();
 		}
 
-		private boolean restoreBackup(String password)
+		private boolean restoreBackup()
 		{
 			Log.i("BackupActivity", "Restoring backup with DBv" + mFile.dbVersion());
 
-			if(mFile.restore(password))
+			if(mFile.restore())
 			{
 				if(mFile.dbVersion() == DatabaseHelper.DB_VERSION)
 				{
@@ -328,25 +237,12 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 	}
 
 	@Override
-	public void onButtonClick(DialogLike dialogLike, int which) {
-		finish();
-	}
-
-	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+	public void onButtonClick(DialogLike dialogLike, int which)
 	{
-		if(grantResults.length >= 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-		{
-			setContentFragment(false);
-		}
-
-		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-	}
-
-	private boolean shouldShowPermissionDialog()
-	{
-		return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-				!= PackageManager.PERMISSION_GRANTED;
+		if(dialogLike instanceof ImportDialog)
+			finish();
+		else
+			showDirectoryChooser();
 	}
 
 	@Override
@@ -372,21 +268,21 @@ public class BackupActivity extends AppCompatActivity implements DialogLike.OnBu
 
 	private void setContentFragment(boolean calledFromOnCreate)
 	{
-		if(shouldShowPermissionDialog())
-		{
-			ActivityCompat.requestPermissions(this,
-					new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
-
-		}
-
-		final DocumentFile backupDir = Backup.getDirectory();
-		if(backupDir == null)
-			showDirectoryChooser();
-
 		final Fragment content;
 
 		if(!Intent.ACTION_VIEW.equals(getIntent().getAction()))
-			content = new BackupFragment();
+		{
+			final DocumentFile backupDir = Backup.getDirectory();
+			if (backupDir == null)
+			{
+				final DialogLike dialog = new DialogLike();
+				dialog.setMessage(getString(R.string._msg_select_backup_directory));
+				dialog.setPositiveButtonText(getString(android.R.string.ok));
+				content = dialog;
+			}
+			else
+				content = new BackupFragment();
+		}
 		else
 			content = new ImportDialog();
 
