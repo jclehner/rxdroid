@@ -1,6 +1,6 @@
 ### 0.9.36:
 * Fix backup mechanism
-* App now requires Android >= Jellybean
+* App now requires Android >= Lollipop
 
 ### 0.9.35:
 * Target Android 13
