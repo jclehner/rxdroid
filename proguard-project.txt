@@ -2,7 +2,12 @@
 -keep class !android.support.v7.internal.view.menu.**,** {*;}
 -dontwarn android.support.**
 -dontwarn org.joda.convert.**
+-dontwarn javax.persistence.**
+-dontwarn org.apache.logging.log4j.**
+-dontwarn org.apache.log4j.**
+-dontwarn org.slf4j.**
 -dontobfuscate
 -dontpreverify
 -dontoptimize
 -dontshrink
+
