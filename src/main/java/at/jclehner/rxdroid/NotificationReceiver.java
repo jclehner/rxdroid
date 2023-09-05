@@ -433,7 +433,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		private final int missedDoseCount;
 		private final int dueDoseCount;
 
-		private boolean mUseGroups = true;
+		private boolean mUseGroups = false;
 		private String mGroup = mUseGroups ? "rxdroid" : null;
 
 		private Notification mNtfSummary;
