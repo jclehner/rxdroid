@@ -43,6 +43,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -112,6 +113,12 @@ public class BackupFragment extends LoaderListFragment<DocumentFile>
 						ret.add(new BackupFileHolder(df));
 				}
 
+				for (File f : mContext.getCacheDir().listFiles())
+				{
+					if(f.isFile() && f.getName().endsWith(".rxdbak"))
+						ret.add(new BackupFileHolder(DocumentFile.fromFile(f)));
+				}
+
 				Collections.sort(ret);
 			}
 
@@ -165,7 +172,7 @@ public class BackupFragment extends LoaderListFragment<DocumentFile>
 						@Override
 						public boolean onMenuItemClick(MenuItem menuItem)
 						{
-							Backup.createBackup(null);
+							Backup.createBackup(false,null);
 
 							getLoaderManager().restartLoader(0, null, BackupFragment.this);
 

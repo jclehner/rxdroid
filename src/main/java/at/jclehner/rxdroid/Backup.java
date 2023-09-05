@@ -217,6 +217,7 @@ public class Backup
 			}
 			finally
 			{
+				f.delete();
 				Util.closeQuietly(is);
 			}
 
@@ -360,7 +361,7 @@ public class Backup
 		return template + ".rxdbak";
 	}
 
-	@NonNull public static void createBackup(@Nullable String filename)
+	@NonNull public static void createBackup(boolean useCacheDirectory, @Nullable String filename)
 	{
 		if(filename == null)
 		{
@@ -372,10 +373,23 @@ public class Backup
 		{
 			try
 			{
-				DocumentFile dir = Backup.getDirectory().createFile("application/octet-stream",
-						filename);
-				final OutputStream os = RxDroid.getContext().getContentResolver().openOutputStream(
-						dir.getUri());
+				final Uri uri;
+
+				if(!useCacheDirectory)
+				{
+					DocumentFile dir = Backup.getDirectory();
+					if (dir != null) {
+						uri = dir.createFile("application/octet-stream", filename).getUri();
+					} else {
+						throw new IllegalStateException("No backup directory available");
+					}
+				}
+				else
+				{
+					uri = Uri.fromFile(new File(RxDroid.getContext().getCacheDir(), filename));
+				}
+
+				final OutputStream os = RxDroid.getContext().getContentResolver().openOutputStream(uri);
 				final ZipOutputStream zos = new ZipOutputStream(os);
 
 				final File dataDir = new File(RxDroid.getPackageInfo().applicationInfo.dataDir);

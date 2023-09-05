@@ -51,8 +51,8 @@ public class DatabaseUpgrader implements Closeable
 
 	public void onUpgrade(int oldVersion, int newVersion) throws SQLException
 	{
-		final String s = Backup.makeBackupFilename("pre_v" + oldVersion + "to" + newVersion);
-		Backup.createBackup(s);
+		final String s = Backup.makeBackupFilename("pre_v" + oldVersion + "_to_v" + newVersion);
+		Backup.createBackup(true, s);
 		Log.i(TAG, "Created backup: " + s);
 
 		for(int version = oldVersion + 1; version <= newVersion; ++version)
