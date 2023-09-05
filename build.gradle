@@ -24,7 +24,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:8.1.0'
+		classpath 'com.android.tools.build:gradle:8.1.1'
 	}
 }
 
@@ -39,7 +39,7 @@ dependencies {
 		implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 		implementation 'androidx.legacy:legacy-support-v13:1.0.0'
 		implementation 'androidx.appcompat:appcompat:1.6.1'
-		implementation 'joda-time:joda-time:2.10.5'
+		implementation 'joda-time:joda-time:2.12.5'
 		implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.3'
 }
 
