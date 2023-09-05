@@ -1,3 +1,7 @@
+### 0.9.36.1:
+* Fix crash during database upgrades
+* Upgrade third-party libraries
+
 ### 0.9.36:
 * Fix backup mechanism
 * App now requires Android >= Lollipop

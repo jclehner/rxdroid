@@ -46,7 +46,7 @@ public class DatabaseUpgrader implements Closeable
 	{
 		mDb = db;
 		mCs = cs;
-		mDc = cs.getReadWriteConnection();
+		mDc = cs.getReadWriteConnection(null);
 	}
 
 	public void onUpgrade(int oldVersion, int newVersion) throws SQLException
