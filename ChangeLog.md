@@ -1,6 +1,7 @@
-### 0.9.36.1:
+### 0.9.37
 * Fix crash during database upgrades
 * Upgrade third-party libraries
+* Display notifications on Wear OS
 
 ### 0.9.36:
 * Fix backup mechanism

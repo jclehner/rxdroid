@@ -408,7 +408,7 @@ public class NotificationReceiver extends BroadcastReceiver
 	public void updateNotification(Date date, int doseTime, boolean isActiveDoseTime, int mode)
 	{
 		new MyNotificationBuilder(date, doseTime,
-				isActiveDoseTime, mode).update();
+				isActiveDoseTime, mode, mUseWearableHack).update();
 	}
 
 	private static boolean isNowWithinQuietHours()
@@ -433,7 +433,7 @@ public class NotificationReceiver extends BroadcastReceiver
 		private final int missedDoseCount;
 		private final int dueDoseCount;
 
-		private boolean mUseGroups = true;
+		private boolean mUseGroups = false;
 		private String mGroup = mUseGroups ? "rxdroid" : null;
 
 		private Notification mNtfSummary;
@@ -445,7 +445,7 @@ public class NotificationReceiver extends BroadcastReceiver
 
 		private boolean mNoClear = true;
 
-		public MyNotificationBuilder(Date date, int doseTime, boolean isActiveDoseTime, int mode)
+		public MyNotificationBuilder(Date date, int doseTime, boolean isActiveDoseTime, int mode, boolean useGroups)
 		{
 			mDate = date;
 			mMode = mode;
@@ -453,6 +453,7 @@ public class NotificationReceiver extends BroadcastReceiver
 			getDrugsWithLowSupplies(date, doseTime, mLowSupplyDrugs);
 			missedDoseCount = getDrugsWithMissedDoses(date, doseTime, isActiveDoseTime);
 			dueDoseCount = isActiveDoseTime ? getDrugsWithDueDoses(date, doseTime) : 0;
+			mUseGroups = useGroups;
 		}
 
 		public void update()
