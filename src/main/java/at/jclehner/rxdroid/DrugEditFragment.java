@@ -56,6 +56,8 @@ import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.BuildConfig;
+
 import org.joda.time.LocalDate;
 
 import at.jclehner.androidutils.AdvancedDialogPreference;
@@ -922,7 +924,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 				// FIXME change to next occurence
 				summary = mContext.getString(
 						R.string._msg_freq_every_n_days,
-						repeatArg,
+						Long.toString(repeatArg),
 						DateTime.toNativeDate(repeatOrigin)
 				);
 			}

@@ -61,7 +61,6 @@
 		    android:configChanges="orientation|screenSize|keyboardHidden"
 		>	    
 			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
 				<action android:name="android.intent.action.EDIT" />
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
@@ -158,12 +157,6 @@
 		    android:exported="false"
             android:configChanges="orientation|screenSize|keyboardHidden"
 		/>
-
-        <activity android:name="org.acra.CrashReportDialog"
-                  android:theme="@style/Theme.RxDroid.CrashDialog"
-                  android:launchMode="singleInstance"
-                  android:excludeFromRecents="true"
-                  android:finishOnTaskLaunch="true" />
 
 		<receiver android:name=".SystemEventReceiver"
 			android:exported="false"    

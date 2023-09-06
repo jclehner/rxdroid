@@ -59,6 +59,7 @@ android {
 
 	lintOptions {
 		warning 'MissingTranslation'
+		warning 'MissingQuantity'
 	}
 
 	signingConfigs {

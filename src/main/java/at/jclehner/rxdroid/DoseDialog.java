@@ -173,8 +173,10 @@ public class DoseDialog extends AlertDialog implements OnChangedListener, Databa
 	}
 
 	@Override
-	protected void onStop() {
+	protected void onStop()
+	{
 		Database.unregisterEventListener(this);
+		super.onStop();
 	}
 
 	@Override
