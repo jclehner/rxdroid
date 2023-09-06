@@ -31,6 +31,8 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.AppCompatTextView;
 import at.jclehner.rxdroid.Fraction;
 import at.jclehner.rxdroid.Fraction.MutableFraction;
 import at.jclehner.rxdroid.R;
@@ -44,7 +46,7 @@ import at.jclehner.rxdroid.util.DateTime;
 import at.jclehner.rxdroid.util.Util;
 import at.jclehner.rxdroid.util.WrappedCheckedException;
 
-public class DrugSupplyMonitor extends TextView implements
+public class DrugSupplyMonitor extends AppCompatTextView implements
 		Database.OnChangeListener/*, OnLongClickListener*/
 {
 	//private int mDrugId = -1;

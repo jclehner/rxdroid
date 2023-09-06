@@ -26,7 +26,9 @@ import android.text.Html;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-public class HtmlTextView extends TextView
+import androidx.appcompat.widget.AppCompatTextView;
+
+public class HtmlTextView extends AppCompatTextView
 {
 	private CharSequence mHtmlSource;
 

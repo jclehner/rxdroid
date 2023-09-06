@@ -25,11 +25,13 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.AppCompatTextView;
 import at.jclehner.rxdroid.Settings;
 import at.jclehner.rxdroid.db.Drug;
 import at.jclehner.rxdroid.db.Entries;
 
-public class DrugNameView extends TextView
+public class DrugNameView extends AppCompatTextView
 {
 	private boolean mIsCurrentlyScrambled = false;
 	private long mUnscrambledDuration = 1000;
