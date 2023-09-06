@@ -38,6 +38,8 @@ import androidx.core.app.NotificationManagerCompat;
 import android.text.Html;
 import android.util.Log;
 
+import com.getkeepsafe.taptargetview.BuildConfig;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -241,7 +243,11 @@ public class NotificationReceiver extends BroadcastReceiver
 		nb.setColor(Theme.getColorAttribute(android.R.attr.colorPrimary));
 		nb.setOngoing(true);
 
-		getNotificationManager().notify(ID_ERROR, nb.build());
+		if(!NotificationReceiver.notify(getNotificationManager(), ID_ERROR, nb.build()))
+		{
+			// rethrow the original exception
+			throw e;
+		}
 	}
 
 	private void rescheduleAlarms()
@@ -474,12 +480,12 @@ public class NotificationReceiver extends BroadcastReceiver
 
 			int i = 0;
 
-			nm.notify(IDS[i], mNtfSummary);
+			NotificationReceiver.notify(nm, IDS[i], mNtfSummary);
 
 			if(mUseGroups)
 			{
 				for(Notification n : getPages())
-					nm.notify(IDS[++i], n);
+					NotificationReceiver.notify(nm, IDS[i], n);
 			}
 		}
 
@@ -859,6 +865,20 @@ public class NotificationReceiver extends BroadcastReceiver
 
 	private NotificationManagerCompat getNotificationManager() {
         return NotificationManagerCompat.from(mContext);
+	}
+
+	private static boolean notify(NotificationManagerCompat nm, int id, Notification n)
+	{
+		try
+		{
+			nm.notify(id, n);
+			return true;
+		}
+		catch(SecurityException e)
+		{
+			return false;
+		}
+
 	}
 
 	/* package */ static void cancelAllNotifications()
