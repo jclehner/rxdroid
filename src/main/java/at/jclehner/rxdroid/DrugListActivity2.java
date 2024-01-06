@@ -1186,7 +1186,7 @@ public class DrugListActivity2 extends AppCompatActivity implements
 
 				pm.show();
 
-				doseView.setBackgroundColor(Theme.getColorAttribute(android.R.attr.colorControlHighlight));
+				doseView.setBackgroundColor(Theme.getColorAttribute(getActivity(), android.R.attr.colorControlHighlight));
 
 				pm.setOnDismissListener(new PopupMenu.OnDismissListener()
 				{

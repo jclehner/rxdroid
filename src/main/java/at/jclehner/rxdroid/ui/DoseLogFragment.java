@@ -504,7 +504,7 @@ public class DoseLogFragment extends ExpandableListFragment
 					sb.append(getString(DOSE_NAME_IDS[info.doseTime]));
 					holder.text.setText(sb.toString());
 
-					final int color = Theme.getColorAttribute(timeColorAttr);
+					final int color = Theme.getColorAttribute(getActivity(), timeColorAttr);
 
 					holder.time.setText(info.getTimeString());
 					holder.time.setTextColor(color);

@@ -82,29 +82,13 @@ public final class Theme
 		}
 	}
 
-	public static int getColorAttribute(int attr)
+	public static int getColorAttribute(Context context, int attr)
 	{
-		synchronized(sAttrCache)
-		{
-			if(sAttrCache.indexOfKey(attr) < 0)
-			{
-				final Context c = RxDroid.getContext();
-				final Resources.Theme t = RxDroid.getContext().getTheme();
-				final TypedValue v = new TypedValue();
-				final int color;
-
-				if(t.resolveAttribute(attr, v, true))
-				{
-					color = ContextCompat.getColor(c, v.resourceId);
-					sAttrCache.put(attr, color);
-					return color;
-				}
-
-				return Color.TRANSPARENT;
-			}
-
-			return sAttrCache.get(attr);
-		}
+		final TypedValue tv = new TypedValue();
+		if(context.getTheme().resolveAttribute(attr, tv, true))
+			return tv.data;
+		else
+			return Color.TRANSPARENT;
 	}
 
 	public static void clearAttributeCache()
