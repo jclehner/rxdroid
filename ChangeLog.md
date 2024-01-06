@@ -1,3 +1,6 @@
+### 0.9.38
+* Make time of taken/missed doses visible again
+
 ### 0.9.37
 * Fix crash during database upgrades
 * Upgrade third-party libraries
