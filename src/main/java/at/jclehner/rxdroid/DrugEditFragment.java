@@ -1093,7 +1093,7 @@ public class DrugEditFragment extends PreferenceFragment implements OnPreference
 			preference.setCheckable(true);
 
 			final LocalDate minDate = LocalDate.fromDateFields(
-					Settings.getDoseTimeInfo().activeDate()).plusDays(1);
+					Settings.getDoseTimeInfo().activeDate());
 
 			((DatePreference) preference).setMinDate(minDate);
 		}
