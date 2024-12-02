@@ -84,4 +84,7 @@ android {
 	lint {
 		warning 'MissingTranslation', 'MissingQuantity'
 	}
+	buildFeatures {
+		buildConfig true
+	}
 }
