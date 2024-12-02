@@ -48,7 +48,7 @@ android {
 	compileSdk 34
 
 	defaultConfig {
-		minSdkVersion 19
+		minSdkVersion 21
 		targetSdkVersion 34
 
         applicationId 'at.jclehner.rxdroid';
