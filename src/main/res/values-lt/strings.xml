@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * RxDroid - A Medication Reminder
+ * Copyright (C) 2011-2013 Joseph Lehner <joseph.c.lehner@gmail.com>
+ *
+ *
+ * RxDroid is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version. Additional terms apply (see LICENSE).
+ *
+ * RxDroid is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with RxDroid.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
+-->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Your name here, for credit! -->
+    <string name="translator">Algimantas Margevičius</string>
+    <!-- 
+    Translatable strings start here. The naming scheme is as follows:
+    
+    _title_<foobar>		Titles for Dialogs, Preferences, Activities, etc. (as short as possible)
+    _summary_<foobar>	Preference summaries (w/o trailing dot*)
+    _toast_<foobar>		Message for Toast notifications (w/ trailing dot)
+    _btn_<foobar>		Button label. Should be as short as possible. (w/o trailing dot)
+    _msg_<foobar>		Everything that does not fit into the categories above (w/o trailing dot*) 
+    _help_<foobar>		Very long text for HelpActivity.
+    
+    If the first part is prefixed with a q (_qtitle_<foobar>, qmsg_<foobar>, etc.) the string is a
+    quantity-specific string. The first format argument (%1$d) will always be the quantity used for
+    selecting the string. 
+    
+    *) Use trailing dots if more than one sentence or if original text includes a trailing dot.
+    
+    -->
+    <string name="_title_morning">Rytas</string>
+    <string name="_title_noon">Pietūs</string>
+    <string name="_title_evening">Vakaras</string>
+    <string name="_title_night">Naktis</string>
+    <string name="_title_begin">Pradžia</string>
+    <string name="_title_end">Pabaiga</string>
+    <string name="_msg_new_notification">Nauji pranešimai</string>
+    <plurals name="_qmsg_missed">
+        <item quantity="one">%1$d praleista</item>
+        <item quantity="few">%1$d praleisti</item>
+        <item quantity="many">%1$d praleistų</item>
+        <item quantity="other">%1$d praleista</item>
+    </plurals>
+    <plurals name="_qmsg_due">
+        <item quantity="one">%1$d praleista</item>
+        <item quantity="few">%1$d </item>
+        <item quantity="many">%1$d </item>
+        <item quantity="other">%1$d  </item>
+    </plurals>
+    <string name="_qmsg_low_supply_single">%1$s</string>
+    <plurals name="_qmsg_low_supply_multiple">
+        <item quantity="one">%2$s ir %3$s  </item>
+        <item quantity="few">%2$s ir %1$d kitas </item>
+        <item quantity="many">%2$s ir %1$d kiti </item>
+        <item quantity="other">%2$s ir %1$d  kitų </item>
+    </plurals>
+    <string name="_msg_constraints_ab">Pasirinkite laiką tarp %1$s ir %2$s</string>
+    <string name="_msg_constraints_a">Pasirinkite laiką po %1$s</string>
+    <string name="_msg_constraints_b">Pasirinkite laiką prieš %2$s</string>
+    <string name="_btn_set">Nustatyti</string>
+    <string name="_title_drug_name">Vaisto pavadinimas</string>
+    <string name="_title_delete">Pašalinti</string>
+    <string name="_msg_freq_daily">Kasdien</string>
+    <string name="_toast_deleted">Pašalintas.</string>
+    <string name="_title_error">Klaida</string>
+    <string name="_msg_timepreference_constraint_failed">Laikas nėra nurodytose ribose</string>
+    <string name="_msg_err_empty_drug_name">Vaistas neturi pavadinimo ir bus pašalintas</string>
+    <string name="_msg_err_non_unique_drug_name">Šis pavadinimas jau naudojamas</string>
+    <string name="_title_warning">Įspėjimas</string>
+    <string name="_title_preferences">Nustatymai</string>
+    <string name="_title_prefscreen_times">Laikai</string>
+    <string name="_summary_prefscreen_times">Ryto, vakaro ir t. t. nustatymas.</string>
+    <string name="_title_prefscreen_notifications">Pranešimai</string>
+    <string name="_summary_prefscreen_notifications">Pranešimo būdai, atidėjimo laikas ir t. t.</string>
+    <string name="_title_pref_notification_methods">Pritaikymas</string>
+    <string name="_title_min_supply_days">Papildymo priminimas</string>
+    <string name="_summary_min_supply_days">Kiek dienų likus iki vaisto atsargų pabaigos bus rodomas pranešimas - dabar %1$s</string>
+    <string name="_title_pref_use_led">LED</string>
+    <string name="_title_pref_use_sound">Garsas</string>
+    <string name="_title_pref_use_vibrator">Vibracija</string>
+    <string name="_title_prefscreen_display">Išvaizda</string>
+    <string name="_summary_prefscreen_display"></string>
+    <string name="_title_pref_restore_defaults">Atkurti numatytuosius</string>
+    <string name="_title_prefscreen_display_info">Pastaba</string>
+    <string name="_summary_prefscreen_display_info">Šie nustatymai laikinai gali būti perrašyti naudojant MENIU -&gt; Rodyti viską</string>
+    <string name="_btn_discard">Atmesti</string>
+    <string name="_btn_save">Išsaugoti</string>
+    <string name="_toast_intake_noted">Išsaugota.</string>
+    <string name="_toast_saved">Išsaugota.</string>
+    <string name="_title_add">Pridėti</string>
+    <string name="_msg_intake_normal">Išgerti šią dozę &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="_msg_intake_unscheduled">Nurodykite &lt;b&gt;%1$s&lt;/b&gt; dozę</string>
+    <string name="_title_change_dose">Keisti dozę</string>
+    <string name="_title_edit_drug">Keisti vaistą</string>
+    <string name="_title_mark_not_taken">Pašalinti suvartotą dozę</string>
+    <string name="_title_mark_taken">Išgerti</string>
+    <string name="_msg_freq_every_n_days">Kasdien %1$s dienas, pradedant %2$s</string>
+    <string name="_msg_freq_21days_on_7days_off">21dieną pradedant %1$s, su 7 dienų pauze</string>
+    <string name="_summary_intake_never">Niekada</string>
+    <string name="_msg_drug_repeat_ge_2">Turi būti bent 2</string>
+    <string name="_title_version">Versija</string>
+    <string name="_summary_not_available">Nėra</string>
+    <string name="_title_tablet">Tabletė</string>
+    <string name="_title_capsule">Kapsulė</string>
+    <string name="_title_inhaler">Inhaliatorius</string>
+    <string name="_title_injection">Švirkštas</string>
+    <string name="_title_spray">Purškalas</string>
+    <string name="_title_drop">Stiklinė</string>
+    <string name="_title_gel">Tūbelė</string>
+    <string name="_title_ring">Žiedas</string>
+    <string name="_title_other">Kita</string>
+    <string name="_title_ampoule">Ampuolė</string>
+    <string name="_title_iv_bag">Intraveninis</string>
+    <string name="_title_pipette">Pipetė</string>
+    <string name="_title_daily">Kasdien</string>
+    <string name="_title_every_n_days">Kas N dienų</string>
+    <string name="_title_pick_days">Pasirinktos dienos</string>
+    <string name="_title_21_days_on_7_days_off">7 dienų pertrauka kas 21 dieną</string>
+    <string name="_msg_supply">%1$s - užteks iki %2$s</string>
+    <string name="_title_save_chanes">Išsaugoti pakeitimus</string>
+    <string name="_msg_save_drug_changes">Ar norite išsaugoti padarytus pakeitimus šiam vaistui?</string>
+    <string name="_msg_every_n_days_distance">Kiek dienų tarp kiekvieno kartojimo</string>
+    <string name="_title_intake_schedule">Tvarkaraštis</string>
+    <string name="_title_repeat">Pasikartojimas</string>
+    <string name="_title_misc">Kita</string>
+    <string name="_title_icon">Piktograma</string>
+    <string name="_title_current_supply">Dabartinis likutis</string>
+    <string name="_title_refill_size">Papildymo dydis</string>
+    <string name="_title_active">Aktyvus</string>
+    <string name="_title_ignore_dose">Praleisti dozę</string>
+    <string name="_msg_touch_to_edit">(paspauskite keitimui)</string>
+    <string name="_msg_no_doses_on_this_day">Šiandien nėra numatytų dozių</string>
+    <string name="_msg_db_error_general">Nežinoma duomenų bazės klaida.</string>
+    <string name="_msg_db_error_upgrade">Duomenų bazės atnaujinimo klaida.</string>
+    <string name="_msg_db_error_downgrade">Nesuderinama duomenų bazės versija.</string>
+    <string name="_msg_db_error_footer">Norėdami atstatyti duomenų bazę paspauskite \"[@string/_btn_reset]\".</string>
+    <string name="_btn_reset">Astatyti</string>
+    <string name="_msg_footer_insufficient_supplies"><![CDATA[        Nepakankamas likutis. Norėdami nepaisyti paspauskite \"[@android:string/ok]\", \"[@android:string/cancel]\" pakeisti dozę,
+        arba paspauskite šį tekstą norėdami pakeisti dozę <b>%1$s</b>.
+    ]]></string>
+    <string name="_title_weekdays">Darbo dienos</string>
+    <string name="_title_on_demand">Pagal poreikį</string>
+    <string name="_title_delete_item">Tikrai pašalinti \"%1$s\"?</string>
+    <string name="_msg_delete_drug">Atšaukti negalėsite!</string>
+    <string name="_toast_db_reset_success">Duomenų bazė sėkmingai atstatya.</string>
+    <string name="_toast_db_reset_failure">Duomenų bazės atstatymas nepavyko. Prašome įdiegti iš naujo.</string>
+    <string name="_btn_exit">Išeiti</string>
+    <string name="_toast_drug_notification_icon">Šis vaistas turi bent vieną neišgertą dozę.</string>
+    <string name="_title_notification_doses">Dozės</string>
+    <string name="_title_notification_low_supplies">Mažas likutis</string>
+    <string name="_btn_next">Kitas</string>
+    <string name="_btn_back">Atgal</string>
+    <string name="_title_scramble_names">Paslėpti pavadinimus</string>
+    <string name="_summary_scramble_names">Paslepia jūsų vaistų pavadinimus. Norėdami pamatyti pavadinimą, paspauskite ant jo.</string>
+    <string name="_title_select_date">Pasirinkite datą</string>
+    <string name="_title_repetition_origin">Pradžios data</string>
+    <string name="_title_history_age">Istorijos dydis</string>
+    <string name="_summary_history_age">Senesnės datos nei nurodytas laikotarpis bus pašalintos</string>
+    <string name="_title_history_1_month">Mėnuo</string>
+    <string name="_title_history_2_months">Du mėnesiai</string>
+    <string name="_title_history_6_months">Pusmetis</string>
+    <string name="_title_history_1_year">Metai</string>
+    <string name="_title_history_unlimited">Neribota</string>
+    <string name="_title_database">Duomenų bazė</string>
+    <string name="_toast_large_history_size">Dėmesio: šis nustatymas gali sukelti ilgą laukimo laiką!</string>
+    <string name="_title_supply_monitor">Žymėti kaip išgertą</string>
+    <string name="_summary_supply_monitor">Vaistai automatiškai pažymimi kaip išgerti. Pranešimai rodomi tik tada kai vaistai eina į pabaigą.</string>
+    <string name="_title_go_to_date">Pereiti prie datos</string>
+    <string name="_title_today">Šiandien</string>
+    <string name="_title_restore_default_settings">@string/_msg_restore_default_settings</string>
+    <string name="_msg_restore_default_settings">Bus atstatyti visi nustatymai į numatytąsias reikšmes</string>
+    <string name="_title_show_supply_monitors">Rodyti viską</string>
+    <string name="_summary_show_supply_monitors">Rodyti vaistus su išjungtais pranešimais</string>
+    <string name="_title_show_in_list">Vaistų sąrašas</string>
+    <string name="_title_help">Pagalba</string>
+    <string name="_title_n_of_n">%1$d iš %2$d</string>
+    <string name="_title_dark_theme">Naudoti tamsią temą</string>
+    <string name="_toast_theme_changed">Paleidžiama iš naujo…</string>
+    <string name="_toast_low_supplies">Užteks iki %1$s.</string>
+    <string name="_title_notification_sound">Garsas</string>
+    <string name="_title_doses_and_low_supplies">Visi</string>
+    <string name="_title_low_supplies_only">Tik papildymai</string>
+    <string name="_title_about">Apie</string>
+    <string name="_title_licenses">Licencijos</string>
+    <string name="_title_db_status_loading">Įkeliama…</string>
+    <string name="_title_db_status_upgrading">Atnaujinama…</string>
+    <string name="_title_db_status_discarding_intakes">Šalinami seni duomenys…</string>
+    <string name="_title_db_status_creating_intakes">Įterpiami trūkstami duomenys…</string>
+    <string name="_title_db_status_initializing">Įkeliama…</string>
+    <string name="_summary_enable_landscape_mode">Įjungia gulsčią režimą (eksperimentinis)</string>
+    <string name="_title_enable_landscape_mode">Gulsčias režimas </string>
+    <string name="_msg_repetition_origin">Pasirinkite pradžios datą</string>
+    <string name="_title_filter">Filtras</string>
+    <string name="_title_show_all">Rodyti viską</string>
+    <string name="_title_donate">Paaukoti!</string>
+    <string name="_title_factory_reset">Gamykliniai nustatymai</string>
+    <string name="_title_dont_repeat">Nekartoti</string>
+    <string name="_title_15_minutes">15 minučių</string>
+    <string name="_title_30_minutes">30 minučių</string>
+    <string name="_title_1_hour">1 valanda</string>
+    <string name="_title_2_hour">2 valandos</string>
+    <string name="_title_repeat_alarm">Kartoti</string>
+    <string name="_summary_repeat_alarm">Pakartoti pranešimą po numatyto laiko</string>
+    <string name="_help_dose_times">Jūs paleidote RxDroid pirmą kartą. nustatykite 
+		4 laiko intervalus, pagal kuriuos gersite vaistus.</string>
+    <string name="_title_info">Informacija</string>
+    <string name="_toast_past_max_history_age">Ši data nepatenka į pasirinktą laiko intervalo ribą.</string>
+    <string name="_title_new_drug">Naujas vaistas</string>
+    <string name="_title_db_stats">Statistika</string>
+    <string name="_msg_db_stats">Duomenų bazė įkelta %1$s. Galite sumažinti 
+		šį laiką sumažindami istorijos dydį.</string>
+    <string name="_title_compact_action_bar">Sumažinti veiksmų juostą</string>
+    <string name="_summary_compact_action_bar">Rodyti mažiau piktogramų veiksmų juostoje</string>
+    <string name="_title_website">Tinklalapis</string>
+    <string name="_title_per_drug_reminders">Priminimai</string>
+    <string name="_title_me">Aš</string>
+    <string name="_title_patient">Pacientas</string>
+    <string name="_title_quiet_hours">Tylos laikas</string>
+    <string name="_summary_quiet_hours">Šiuo metu pranešimai nenaudos garso ar vibracijos</string>
+    <string name="_title_silent">Tyla</string>
+    <string name="_title_off">Išjungtas</string>
+    <string name="_title_default">Numatytasis</string>
+    <string name="_title_white">Baltas</string>
+    <string name="_title_red">Raudonas</string>
+    <string name="_title_green">Žalias</string>
+    <string name="_title_blue">Mėlynas</string>
+    <string name="_title_yellow">Geltonas</string>
+    <string name="_title_orange">Oranžinis</string>
+    <string name="_title_magenta">Purpurinis</string>
+    <string name="_toast_custom_led_color">Įspėjimas: jūsų įrenginys gali nepalaikyti visų spalvų.</string>
+    <string name="_title_supply_edit">Likutis: %1$s</string>
+    <string name="_title_x_to_y" tools:ignore="MissingTranslation">%1$s – %2$s</string>
+    <string name="_title_disabled">Išjungta</string>
+    <string name="_msg_no_drugs_compact_ab">Norėdami pasirinkti vaistą iš meniu paspauskite \"[@string/_title_add]\".</string>
+    <string name="_msg_no_drugs_extended_ab">Norėdami pridėti vaistą veiksmų juostoje paspauskite \"+\".</string>
+    <string name="_help_msg_menu_hardware">Meniu prieinamas paspaudus meniu mygtuką jūsų įrenginyje.</string>
+    <string name="_help_msg_menu_ab_overflow">Meniu prieinamas paspaudus tritaškio piktogramą.</string>
+    <string name="_summary_smart_sort">Rikiuoti vaistus pagal svarbumą</string>
+    <string name="_title_smart_sort">Automatinis rikiavimas</string>
+    <string name="_title_language">Kalba</string>
+    <string name="_title_use_backup_framework">Atsarginė kopija debesyje</string>
+    <string name="_summary_use_backup_framework">Atsarginė kopija saugoma naudojant paslaugas tokias kaip \"Google išsaugoti ir atkurti\".</string>
+    <string name="_title_view">Peržiūrėti</string>
+    <string name="_title_missed">Pamiršta</string>
+    <string name="_title_skipped">Praleista</string>
+    <string name="_title_taken">Išgerta</string>
+    <string name="_title_morning_dose">Rytinė dozė</string>
+    <string name="_title_noon_dose">Pietū dozė</string>
+    <string name="_title_evening_dose">Vakaro dozė</string>
+    <string name="_title_night_dose">Nakties dozė</string>
+    <string name="_title_collapse">Suskleisti</string>
+    <string name="_title_expand">Išskleisti</string>
+    <string name="_title_show_log">Rodyti žurnalą</string>
+    <string name="_msg_tap_to_view_date">(paspauskite datos peržiūrai)</string>
+    <string name="_msg_beta_version">Jūs naudojate %1$s beta versiją. Gali būti klaidų, gali kažkas neveikti. Prašom pranešti apie visas klaidas, tai padės greičiau pataisyti jas.</string>
+    <string name="_msg_no_history_data">Pagal nurodytus kriterijus duomenų istorijoje nėra.</string>
+    <string name="_title_skip_dose_dialog">Praleisti dialogą</string>
+    <string name="_summary_skip_dose_dialog">Paslėpti rodomą langą paspaudus ant dozės. Norėdami atverti
+	    ilgai paspauskite dozę ir pasirinkite \"[@string/_title_mark_taken]\".</string>
+    <string name="_title_take_all_doses">Išgerti viską</string>
+    <string name="_toast_all_doses_taken">Visi vaistai pažymėti kaip išgerti.</string>
+    <string name="_toast_some_doses_skipped">Kaikurie vaistai buvo pažymėti kaip praleisti, nes jų nebeliko.</string>
+    <string name="_toast_no_doses_to_take">Šiuo metu nieko gerti nereikia.</string>
+    <string name="_help_title_to_fraction_mode">Gersite tik pusę tabletės?</string>
+    <string name="_help_msg_to_fraction_mode">Paspaudus šį mygtuką galite nustatyti tokias dozes kaip ½ ir 1¾!</string>
+    <string name="_help_title_input_fraction">Dalinis režimas.</string>
+    <string name="_help_msg_input_fraction">    Norėdami įrašyti ¾, įveskite \"3\" kairiame langelyje ir \"4\" dešiniame langelyje.
+	    \n\nNorėdami įvesti sveiką skaičių įveskite tą skaičių kairiame langelye ir \"1\" dešiniame langelyje.</string>
+    <string name="_help_title_to_mixed_mode">Daugiau nei vieną?</string>
+    <string name="_help_msg_to_mixed_mode">Jei geriate daugiau nei 1 tabletę paspauskite šį mygtuką.</string>
+    <string name="_help_title_input_mixed">Maišytas dalinis režimas.</string>
+    <string name="_help_msg_input_mixed">    Norėdami įrašyti 1¾, įveskite \"1\" kairiame langelyje ir \"3\" viduriniame langelyje,
+	    \"4\" dešiniame langelyje.</string>
+    <string name="_help_title_swipe_date">Perbraukite norėdami pakeisti datą.</string>
+    <string name="_help_msg_swipe_date">Dabar rodoma data rodoma pagrindinėj juostoj. Norėdami pereiti į kitą datą,
+	    perbraukite kairėn ar dešinėn.</string>
+    <string name="_msg_drag_drop_sorting">Galite pakeisti vaistų rodymo eiliškumą paspaudami
+	    vaisto piktogramą ir pervilkdami į pageidaujamą vietą.</string>
+    <string name="_help_title_drag_drop_sort">Pakeisti eiliškumą.</string>
+    <string name="_help_title_edit_drug">Keisti vaistą.</string>
+    <string name="_help_msg_edit_drug">Jei norite keisti šį vaistą paspauskite jo pavadinimą.</string>
+    <string name="_help_title_click_dose">Išgerti.</string>
+    <string name="_help_msg_click_dose">Norėdami išgerti vaistą paspauskite ant jo. Ilgiau paspaudus bus daugiau parinkčių.</string>
+    <!--  
+	<string name="_help_msg_fraction_mode">If you are not taking full doses, but 1½, ⅔, etc., click here. 
+	    This switches to fraction mode.</string>
+	    -->
+    <string name="_title_use_pretty_fractions">Suapvalintos dalys</string>
+    <string name="_summary_use_pretty_fractions">Rodyti dali kaip ½\" vietoj \"1/2\" (veikia tik kai kuriom trupmenom)</string>
+    <string name="_btn_report">Pranešti</string>
+    <string name="_btn_continue">Tęsti</string>
+    <string name="_title_use_safe_mode">Saugus režimas</string>
+    <string name="_summary_use_safe_mode">Išjunkite nesaugias galimybes tokias kaip  \"[@string/_title_take_all_doses]\" ar
+        \"[@string/_title_skip_dose_dialog]\"</string>
+    <string name="_title_remind_tomorrow">Priminti rytoj</string>
+    <string name="_toast_remind_tomorrow">Pranešimas paslepiamas iki rytojaus.</string>
+    <string name="_msg_restore_backup_warning">Šis veiksmas atkurs duomenis iš atsarginės kopijos sukurtos %1$s. Visi dabartiniai
+            duomenys bus pašalinti. Šio veiksmo atšaukti negalima!</string>
+    <string name="_msg_restore_backup_error">Atstatant duomenis iš %1$s įvyko klaida</string>
+    <string name="_msg_invalid_backup_file">Failas nėra tinkamas atsarginės kopijos failas.</string>
+    <string name="_title_share">Dalintis</string>
+    <string name="_title_restore">Atkurti</string>
+    <string name="_title_create_backup">Sukurti atsarginę kopiją</string>
+    <string name="_title_backup_restore">Sukurti atsarginę kopiją/atkurti</string>
+    <string name="_msg_no_backups_available">Atsarginių kopijų nėra. Norėdami sukurti paspauskit \"+\" veiksmų juostoje.</string>
+    <string name="_title_swipe_to_take_all">Išvaloma</string>
+    <string name="_summary_swipe_to_take_all">Išvalykite arba perbraukite dozės pranešimą norėdami pažymėti kaip išgertą.</string>
+    <string name="_title_password">Slaptažodis</string>
+    <string name="_msg_schedule_changed">Šią dieną buvo pakeistas šio vaisto tvarkaraštis.
+            Praleisti vartojimai iki šios dienos nebus rodomi!</string>
+    <string name="_msg_crash_dialog_text">        Dėja, RxDroid sustojo. Praneškite apie šią klaidą.
+    </string>
+    <string name="_msg_external_storage_not_writeable">Išorinė laikmena prijungta tik skaitymui. Atsarginės kopijos sukurti nepavyko.</string>
+    <string name="_msg_external_storage_not_readable">Išorinė laikmena neskaitoma. Sukurti ar atstatyti atsarginės kopijos nepavyko.</string>
+    <string name="_msg_comment">Komentaras:</string>
+    <string name="_title_history">Istorija</string>
+    <string name="_btn_skip">Praleisti</string>
+    <!--
+    Keep at the end of strings.xml!  
+     -->
+    <string name="dialog_set_number">@string/_btn_set</string>
+    <string name="dialog_cancel">@android:string/cancel</string>
+    <string name="dialog_picker_title">Pasirinkite numerį</string>
+    <string name="_title_auto_dose_events">Automatiškai išgerti dozę</string>
+    <string name="_msg_backup_agent_removal"> \"[@string/_title_use_backup_framework]\" buvo 
+		išjungta, nes pasirodė nepatikima. Naudokite rankinį būdą,
+		jį galite rasti \"[@string/_title_preferences]\" &#x2192; \"[@string/_title_database]\" &#x2192;
+		\"[@string/_title_backup_restore]\"!</string>
+    <string name="_msg_power_save_warning"> <b>Energijos taupymo</b> režimas arba <b>užduočių uždarytojas</b> gali priversti RxDroid veikti
+		netinkama (pranešimai nerodomi ir pan.). Pridėkite RxDroid į išimtis
+		arba išjunkite šias funkcijas!</string>
+    <string name="_msg_backups_detected">RxDroid šiame įrenginyje rado atsarginę kopiją. Atstatyti dabar?</string>
+    <!-- %1$s and %2$s are INCLUSIVE, so "date between 1970-01-01 and 1970-01-03" would include 1970-01-01 and 1970-01-03 -->
+    <string name="_msg_constraints_date_between">Pasirinkite datą tarp %1$s ir %2$s.</string>
+    <!-- %1$s is INCLUSIVE, so in "date from 1970-01-01", the first valid date would be 1970-01-02 -->
+    <string name="_msg_constraints_date_from">Pasirinkite datą nuo %1$s.</string>
+    <!-- %2$s is EXCLUSIVE, so in "date before 1970-01-03", the last valid date would be 1970-01-02 -->
+    <string name="_msg_constraints_date_before">Pasirinkite datą iki %2$s.</string>
+    <string name="_title_change_dir">Pakeisti aplanką</string>
+    <string name="_msg_select_backup_directory">Pasirinkite atsarginės kopijos aplanką.</string>
+</resources>
