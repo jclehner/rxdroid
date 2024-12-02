@@ -37,9 +37,9 @@ dependencies {
 		implementation 'com.j256.ormlite:ormlite-android:6.1'
 		implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 		implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-		implementation 'androidx.appcompat:appcompat:1.6.1'
-		implementation 'joda-time:joda-time:2.12.5'
-		implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.3'
+		implementation 'androidx.appcompat:appcompat:1.7.0'
+		implementation 'joda-time:joda-time:2.13.0'
+		implementation 'com.getkeepsafe.taptargetview:taptargetview:1.15.0'
 }
 
 
