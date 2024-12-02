@@ -45,11 +45,11 @@ dependencies {
 
 android {
 	namespace 'at.jclehner.rxdroid'
-	compileSdk 33
+	compileSdk 34
 
 	defaultConfig {
 		minSdkVersion 19
-		targetSdkVersion 33
+		targetSdkVersion 34
 
         applicationId 'at.jclehner.rxdroid';
 
