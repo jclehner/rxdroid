@@ -1,3 +1,7 @@
+### 0.9.39:
+* Target recent Android SDK
+* Allow setting current date as end of dose schedule
+
 ### 0.9.38
 * Make time of taken/missed doses visible again
 
