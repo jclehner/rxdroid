@@ -56,8 +56,6 @@ import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
-import com.getkeepsafe.taptargetview.BuildConfig;
-
 import org.joda.time.LocalDate;
 
 import at.jclehner.androidutils.AdvancedDialogPreference;

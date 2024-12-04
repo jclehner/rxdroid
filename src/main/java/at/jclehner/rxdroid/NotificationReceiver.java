@@ -38,8 +38,6 @@ import androidx.core.app.NotificationManagerCompat;
 import android.text.Html;
 import android.util.Log;
 
-import com.getkeepsafe.taptargetview.BuildConfig;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,6 +47,7 @@ import java.util.List;
 import java.util.Set;
 
 import at.jclehner.androidutils.EventDispatcher;
+import at.jclehner.rxdroid.BuildConfig;
 import at.jclehner.rxdroid.Settings.DoseTimeInfo;
 import at.jclehner.rxdroid.db.Database;
 import at.jclehner.rxdroid.db.DatabaseHelper;
